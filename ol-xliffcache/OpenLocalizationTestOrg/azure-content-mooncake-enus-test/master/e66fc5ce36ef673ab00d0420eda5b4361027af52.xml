@@ -1,0 +1,565 @@
+{
+  "nodes": [
+    {
+      "content": "在 Ubuntu 上使用资源管理器模板创建 MongoDB 群集",
+      "pos": [
+        23,
+        55
+      ]
+    },
+    {
+      "content": "通过 PowerShell 或 Azure CLI 使用资源管理器模板在 Ubuntu 上创建 MongoDB 群集",
+      "pos": [
+        70,
+        128
+      ]
+    },
+    {
+      "content": "在 Ubuntu 上使用资源管理器模板创建 MongoDB 群集",
+      "pos": [
+        320,
+        352
+      ]
+    },
+    {
+      "content": "MongoDB 是一种可提供高性能、高可用性和自动缩放的开源文档数据库。MongoDB 可独立安装或利用内置的复制功能在群集内安装。在某些情况下，你可使用复制来提高读取容量。客户端能够将读取和写入操作发送到不同的服务器。你还可以在不同数据中心中维护副本，以增加分布式应用程序的的数据位置和可用性。使用 MongoDB，复制还提供了冗余，并提高数据可用性。通过将数据的多个副本保存在不同数据库服务器上，复制还可保护数据库免遭丢失一个服务器的危害。复制还可以让你从硬件故障和服务中断中恢复。有了附加数据副本，你可以将其中一个副本专用于灾难恢复、报告或备份。",
+      "pos": [
+        354,
+        630
+      ]
+    },
+    {
+      "pos": [
+        632,
+        836
+      ],
+      "content": "除了提供 Azure 应用商店中已可供使用的各种功能之外，现在你还可以使用通过 <bpt id=\"p1\">[</bpt>Azure PowerShell<ept id=\"p1\">](/documentation/articles/powershell-install-configure)</ept> 或 <bpt id=\"p2\">[</bpt>Azure CLI<ept id=\"p2\">](/documentation/articles/xplat-cli)</ept> 部署的资源管理器模板，在 Ubuntu VM 上轻松部署新的 MongoDB 群集。"
+    },
+    {
+      "content": "根据此模板新部署的群集采用下图中所述的拓扑，不过，你可以通过自定义本文中所述的模板，轻松实现其他拓扑：",
+      "pos": [
+        838,
+        889
+      ]
+    },
+    {
+      "content": "cluster-architecture",
+      "pos": [
+        893,
+        913
+      ]
+    },
+    {
+      "pos": [
+        984,
+        1275
+      ],
+      "content": "通过一个参数你可以定义要在新的 MongoDB 群集中部署的节点数，而基于另一个参数，也可以将一个具有公共 IP 地址的 VM 实例 (Jumpbox) 部署在同一个虚拟网络内，从而使你能够从公共 Internet 连接到该群集并执行任何种类的与该群集相关的管理任务。使用作为参数提供的另一个选项可以向副本集添加一个仲裁节点，当副本集具有偶数个成员时通常会建议这样做。有关 MongoDB 复制拓扑和细节的详细信息，应参阅正式的 <bpt id=\"p1\">[</bpt>MongoDB 文档<ept id=\"p1\">](http://docs.mongodb.org/manual/core/replication-introduction/)</ept>。"
+    },
+    {
+      "content": "部署完成之后，你可以使用 SSH 端口 22 上配置的 DNS 地址来访问 Jumpbox。",
+      "pos": [
+        1277,
+        1323
+      ]
+    },
+    {
+      "content": "在深入了解与 Azure 资源管理器和你将用于此部署的模板相关的详细信息之前，请确保你已正确配置 Azure PowerShell 或 Azure CLI。",
+      "pos": [
+        1325,
+        1403
+      ]
+    },
+    {
+      "content": "使用资源管理器模板创建 MongoDB 群集",
+      "pos": [
+        1580,
+        1602
+      ]
+    },
+    {
+      "content": "按照以下步骤，使用 Github 模板存储库中的资源管理器模板创建 MongoDB 群集。每个步骤将同时提供 Azure PowerShell 和 Azure CLI 指令。",
+      "pos": [
+        1604,
+        1691
+      ]
+    },
+    {
+      "content": "步骤 1-a：使用 PowerShell 下载模板文件",
+      "pos": [
+        1697,
+        1724
+      ]
+    },
+    {
+      "content": "为 JSON 模板和其他关联的文件创建本地文件夹（例如，C:\\Azure\\\\Templates\\\\MongoDB）。",
+      "pos": [
+        1726,
+        1784
+      ]
+    },
+    {
+      "content": "替换为你的本地文件夹的文件夹名称，并运行以下命令：",
+      "pos": [
+        1786,
+        1811
+      ]
+    },
+    {
+      "content": "步骤 1-b：使用 Azure CLI 下载模板文件",
+      "pos": [
+        5710,
+        5736
+      ]
+    },
+    {
+      "content": "使用所选的 git 客户端克隆整个模板存储库，例如：",
+      "pos": [
+        5738,
+        5764
+      ]
+    },
+    {
+      "pos": [
+        5852,
+        5918
+      ],
+      "content": "完成后，在 C:\\Azure\\\\Templates 目录中查找 <bpt id=\"p1\">**</bpt>mongodb-high-availability<ept id=\"p1\">**</ept> 文件夹。"
+    },
+    {
+      "content": "步骤 2：（可选）了解模板参数",
+      "pos": [
+        5924,
+        5939
+      ]
+    },
+    {
+      "content": "部署非简单的解决方案（例如，MongoDB 群集）时，必须指定一组配置参数来处理一些所需的设置。通过在模板定义中声明这些参数，就能在部署期间通过外部文件或命令行指定值。",
+      "pos": [
+        5941,
+        6025
+      ]
+    },
+    {
+      "pos": [
+        6027,
+        6143
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>azuredeploy.json<ept id=\"p1\">**</ept> 文件顶部的“parameters”节中，你会发现模板需要用来配置 MongoDB 群集的参数集。以下示例来自此模板的 azuredeploy.json 文件的 parameters 节："
+    },
+    {
+      "content": "每个参数都具有数据类型和允许值之类的详细信息。这样，便可以验证在交互模式（例如 PowerShell 或 Azure CLI）下，以及在自我发现 UI（通过分析所需参数列表及其说明动态生成的 UI）中执行模板期间所传递的参数。",
+      "pos": [
+        10059,
+        10172
+      ]
+    },
+    {
+      "content": "步骤 3-a：使用 PowerShell 基于模板部署 MongoDB 群集",
+      "pos": [
+        10178,
+        10216
+      ]
+    },
+    {
+      "content": "通过创建包含所有参数的运行时值的 JSON 文件，为部署准备参数文件。然后，将此文件作为单个实体传递给部署命令。如果未包含参数文件，PowerShell 将使用模板中指定的任何默认值，然后提示你填写剩余的值。",
+      "pos": [
+        10218,
+        10322
+      ]
+    },
+    {
+      "pos": [
+        10324,
+        10371
+      ],
+      "content": "下面是 <bpt id=\"p1\">**</bpt>azuredeploy-parameters.json<ept id=\"p1\">**</ept> 文件中的一组示例参数："
+    },
+    {
+      "content": "填写 Azure 部署名称、资源组名称、Azure 位置，以及存储 JSON 部署文件的文件夹。然后运行以下命令：",
+      "pos": [
+        11320,
+        11377
+      ]
+    },
+    {
+      "pos": [
+        11917,
+        12044
+      ],
+      "content": "运行 <bpt id=\"p1\">**</bpt>New-AzureResourceGroupDeployment<ept id=\"p1\">**</ept> 命令时，会从 JSON 参数文件中提取参数值，然后相应地开始执行模板。在不同的环境（例如测试、生产等）中定义和使用多个参数文件有利于重复使用模板，并简化复杂的多环境解决方案。"
+    },
+    {
+      "content": "部署时，请记得需要创建新的 Azure 存储帐户，因此，提供用作存储帐户参数的名称必须唯一且符合 Azure 存储帐户的所有要求（仅限小写字母和数字）。",
+      "pos": [
+        12046,
+        12122
+      ]
+    },
+    {
+      "content": "部署期间以及部署之后，你可以检查设置期间发出的所有要求，包括发生的任何错误。",
+      "pos": [
+        12124,
+        12162
+      ]
+    },
+    {
+      "pos": [
+        12164,
+        12221
+      ],
+      "content": "为此，请转到 <bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>并执行以下操作："
+    },
+    {
+      "content": "单击左侧导航栏上的“浏览”，向下滚动，然后单击“资源组”。",
+      "pos": [
+        12225,
+        12254
+      ]
+    },
+    {
+      "content": "单击刚创建的资源组之后，系统会显示“资源组”边栏选项卡。",
+      "pos": [
+        12257,
+        12285
+      ]
+    },
+    {
+      "content": "在“资源组”边栏选项卡的“监视”部分中单击“事件”条形图可以查看部署的事件：",
+      "pos": [
+        12288,
+        12326
+      ]
+    },
+    {
+      "content": "单击各个事件可以进一步细化到系统代表模板执行的各项操作的详细信息中。",
+      "pos": [
+        12329,
+        12363
+      ]
+    },
+    {
+      "content": "测试之后，如果需要删除此资源组及其所有资源（存储帐户、虚拟机和虚拟网络），请使用这一命令：",
+      "pos": [
+        12365,
+        12410
+      ]
+    },
+    {
+      "content": "步骤 3-b：使用 Azure CLI 基于模板部署 MongoDB 群集",
+      "pos": [
+        12484,
+        12521
+      ]
+    },
+    {
+      "content": "若要通过 Azure CLI 部署 MongoDB 群集，请先通过指定名称和位置来创建资源组：",
+      "pos": [
+        12523,
+        12570
+      ]
+    },
+    {
+      "content": "将此资源组名称、JSON 模板文件的位置，以及参数文件的位置（有关详细信息，请参阅上面的 PowerShell 部分）传入以下命令：",
+      "pos": [
+        12615,
+        12681
+      ]
+    },
+    {
+      "content": "你可以使用以下命令来检查单个资源部署的状态：",
+      "pos": [
+        12778,
+        12800
+      ]
+    },
+    {
+      "content": "MongoDB 模板结构和文件组织概览",
+      "pos": [
+        12843,
+        12862
+      ]
+    },
+    {
+      "pos": [
+        12864,
+        13018
+      ],
+      "content": "为了让资源管理器模板的设计更加完善且可重复使用，你必须在部署 MongoDB 之类的复杂解决方案期间，考虑清楚如何安排一连串复杂但又彼此相关的任务。除了通过相关扩展执行脚本之外，还可以利用 ARM <bpt id=\"p1\">**</bpt>模板链接<ept id=\"p1\">**</ept>和<bpt id=\"p2\">**</bpt>资源循环<ept id=\"p2\">**</ept>，这样就能实现模块化方法，而所有基于模板的复杂部署基本上都能重复使用此方法。"
+    },
+    {
+      "content": "下图描述了从 GitHub 中为此部署下载的所有文件彼此间的关系：",
+      "pos": [
+        13020,
+        13053
+      ]
+    },
+    {
+      "content": "mongodb-files",
+      "pos": [
+        13057,
+        13070
+      ]
+    },
+    {
+      "pos": [
+        13134,
+        13184
+      ],
+      "content": "本部分将指导你逐步了解 MongoDB 群集的 <bpt id=\"p1\">**</bpt>azuredeploy.json<ept id=\"p1\">**</ept> 文件结构。"
+    },
+    {
+      "content": "“parameters”节",
+      "pos": [
+        13190,
+        13203
+      ]
+    },
+    {
+      "pos": [
+        13205,
+        13343
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>azuredeploy.json<ept id=\"p1\">**</ept> 的“parameters”节指定此模板中使用的可修改参数。本文前面所述的 <bpt id=\"p2\">**</bpt>azuredeploy-parameters.json<ept id=\"p2\">**</ept> 文件用于在模板执行期间将值传入 azuredeploy.json 的“parameters”节。"
+    },
+    {
+      "content": "“variables”节",
+      "pos": [
+        13349,
+        13361
+      ]
+    },
+    {
+      "content": "“variables”节指定可在这整个模板中使用的变量。这包含多个字段（JSON 数据类型或片段），在执行时，这些字段将设置为常量或计算值。下面是此 MongoDB 模板的“variables”节：",
+      "pos": [
+        13363,
+        13462
+      ]
+    },
+    {
+      "content": "深入分析此示例之后，你可以看到两种不同的方法。在这第一个片段中，“osFamilyUbuntu”变量将设为 JSON 元素，其中包含 6 个键/值对：",
+      "pos": [
+        22616,
+        22691
+      ]
+    },
+    {
+      "content": "在这第二个片段中，将“vmScripts”变量分配给 JSON 数组，其中的单个元素将在运行时使用模板语言函数 (concat)、另一个变量的值以及字符串常量来计算：",
+      "pos": [
+        22962,
+        23045
+      ]
+    },
+    {
+      "content": "此模板中的一个重要概念是针对 MongoDB 群集定义不同“T 恤大小”的方式。看一下这些“tshirtSizeXXXX”变量中的一个，可以注意到它描述了群集的部署方式的重要特征。让我们以“中等”大小为例：",
+      "pos": [
+        23277,
+        23380
+      ]
+    },
+    {
+      "pos": [
+        23724,
+        23912
+      ],
+      "content": "“中等”MongoDB 群集将使用 D2 作为托管数据的 3 个 MongoDB 节点，以及将出于复制目的用作仲裁器的第四个 A1 VM 的 VM 大小。调用以部署数据节点的相应子模板将是 <bpt id=\"p1\">**</bpt>member-resources-D2.json<ept id=\"p1\">**</ept>，并且数据文件（每个 250 GB）将存储在 2 个存储帐户中。在“resources”节中将使用此变量来安排节点部署和其他任务。"
+    },
+    {
+      "content": "“resources”节",
+      "pos": [
+        23918,
+        23930
+      ]
+    },
+    {
+      "pos": [
+        23932,
+        24124
+      ],
+      "content": "大多数操作是在<bpt id=\"p1\">**</bpt>“resources”<ept id=\"p1\">**</ept>节中发生的。仔细查看此节，你会立即找到两个不同的案例：第一个案例是定义为 <ph id=\"ph1\">`Microsoft.Resources/deployments`</ph> 类型的元素，它基本上表示调用主部署中的嵌套部署。通过“templateLink”元素（和相关的版本属性），可以指定链接的模板文件，并在调用此文件时传递一组参数作为输入，如同你在此片段中所看到的那样："
+    },
+    {
+      "pos": [
+        24771,
+        24858
+      ],
+      "content": "从第一个示例我们清楚地了解此方案中的 <bpt id=\"p1\">**</bpt>azuredeploy.json<ept id=\"p1\">**</ept> 如何作为一种协调机制进行组织，并调用其他一些模板文件，其中每个文件都负责所需部署活动的一部分。"
+    },
+    {
+      "content": "具体而言，以下链接模板将用于此部署：",
+      "pos": [
+        24860,
+        24878
+      ]
+    },
+    {
+      "pos": [
+        24884,
+        24958
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>shared-resource.json<ept id=\"p1\">**</ept>：包含要在整个部署中共享的所有资源的定义。例如，用来存储 VM 的操作系统磁盘和虚拟网络的存储帐户。"
+    },
+    {
+      "pos": [
+        24963,
+        25058
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>jumpbox-resources.json<ept id=\"p1\">**</ept>：如果启用，将负责部署与 Jumpbox VM 相关的所有资源，该 VM 具有公共 IP 地址可用于从公共网络访问 MongoDB 群集。"
+    },
+    {
+      "pos": [
+        25063,
+        25153
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>arbiter-resources.json<ept id=\"p1\">**</ept>：如果启用，此模板会在 MongoDB 群集中部署仲裁器成员。仲裁器不包含数据，但在副本集包含偶数个用于管理主选举的节点时使用。"
+    },
+    {
+      "pos": [
+        25158,
+        25252
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>member-resources-Dx.json<ept id=\"p1\">**</ept>：这些资源模板有效地部署 MongoDB 节点。将根据所选的 T 恤大小定义使用特定文件，其中每个文件将因每个节点的附加磁盘数而异。"
+    },
+    {
+      "pos": [
+        25257,
+        25366
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>mongodb-ubuntu-install.sh<ept id=\"p1\">**</ept>：CustomScriptForLinux 扩展对群集中每个节点调用的 bash 脚本文件。负责装载并格式化数据磁盘，以及在节点上安装 MongoDB 各部分。"
+    },
+    {
+      "content": "若要部署 MongoDB 群集，需要特定逻辑才能正确设置副本集。在部署过程中必须按照的特定顺序如下：",
+      "pos": [
+        25368,
+        25418
+      ]
+    },
+    {
+      "content": "部署数据成员（以并行方式）= &gt; 部署最后一个数据成员 = &gt;（可选）部署仲裁器",
+      "pos": [
+        25420,
+        25460
+      ]
+    },
+    {
+      "content": "在此顺序中，部署多个数据节点以并行方式进行，但最后一个节点除外。这是将形成群集和新副本集将部署到的位置，因此以前的所有节点需要在该时刻之前已启动并在运行。最后一步将部署可选的仲裁节点（仅适用于需要此节点的 T 恤大小）。",
+      "pos": [
+        25462,
+        25572
+      ]
+    },
+    {
+      "content": "在我们的主模板 (azuredeploy.json) 内再看一下，让我们看一下如何实现此逻辑，从所有数据成员开始：",
+      "pos": [
+        25574,
+        25631
+      ]
+    },
+    {
+      "pos": [
+        28003,
+        28072
+      ],
+      "content": "在此要强调一个重要的概念，那就是如何可以部署单个资源类型的多个副本，而且可以为每一个实例指定所需设置的唯一值。此概念称为<bpt id=\"p1\">**</bpt>资源循环<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        28074,
+        28250
+      ],
+      "content": "在上一片段中，参数（要在群集中部署的节点数）将用于设置变量 (“numberOfMembers”)，然后将该变量传递给 <bpt id=\"p1\">**</bpt>“copy”<ept id=\"p1\">**</ept>元素以触发多个子部署（环），每个子部署将导致群集中的每个成员的模板实例化。若要能够设置在实例之间需要唯一值的所有设置，可使用 <bpt id=\"p2\">**</bpt>copyindex()<ept id=\"p2\">**</ept> 函数获取数字值，以指示该特定资源循环创建中的当前索引。"
+    },
+    {
+      "pos": [
+        28252,
+        28348
+      ],
+      "content": "资源创建中的另一个重要概念是能够指定资源间的依赖关系和优先级，如你在 <bpt id=\"p1\">**</bpt>dependsOn<ept id=\"p1\">**</ept> JSON 数组中所注意到的。在此特定模板中，部署每个节点取决于<bpt id=\"p2\">**</bpt>共享资源<ept id=\"p2\">**</ept>的前次成功部署。"
+    },
+    {
+      "pos": [
+        28350,
+        28432
+      ],
+      "content": "在通过执行 <bpt id=\"p1\">**</bpt>mongodb-ubuntu-install.sh<ept id=\"p1\">**</ept> 脚本文件触发的节点准备活动中，将格式化附加的磁盘。在该文件中，实际上你可以找到此调用的实例："
+    },
+    {
+      "pos": [
+        28485,
+        28637
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>vm-disk-utils-0.1.sh<ept id=\"p1\">**</ept> 是 azure-quickstart-tempates github 存储库中 <bpt id=\"p2\">**</bpt>shared_scripts\\\\ubuntu<ept id=\"p2\">**</ept> 文件夹的一部分，其中包含用于磁盘装入、格式化和条带化的非常有用的函数，每次需要在模板创建过程中执行类似任务时都可以使用。"
+    },
+    {
+      "pos": [
+        28639,
+        28760
+      ],
+      "content": "另一个要探讨的有趣片段是与 CustomScriptForLinux VM 扩展相关的片段。这些扩展作为单独的资源类型安装，并依赖于每个群集节点部署模板，请在每个 <bpt id=\"p1\">**</bpt>member-resources-Dx.json<ept id=\"p1\">**</ept> 文件末尾查看此片段："
+    },
+    {
+      "content": "熟悉此部署包含的其他文件后，你将能够了解有关如何利用 Azure 资源管理器模板基于任何技术来组织和协调多节点解决方案的复杂部署策略所需的所有详细信息和最佳实践。在此建议一种构造模板文件的方法，请自行决定是否采用，如下图突出显示的部分所示：",
+      "pos": [
+        29507,
+        29627
+      ]
+    },
+    {
+      "content": "mongodb-template-structure",
+      "pos": [
+        29631,
+        29657
+      ]
+    },
+    {
+      "content": "本质上，这种方法会建议：",
+      "pos": [
+        29734,
+        29746
+      ]
+    },
+    {
+      "content": "将你的核心模板文件定义成所有特定部署活动的中心协调点，并利用模板链接来调用子模板执行",
+      "pos": [
+        29752,
+        29794
+      ]
+    },
+    {
+      "content": "创建特定的模板文件，用于部署所有其他特定部署任务会共享的所有资源（例如存储帐户、虚拟网络配置，等等）。如果不同的部署在公用基础结构方面具有类似的要求，你就可以对其频繁重复使用此方法。",
+      "pos": [
+        29799,
+        29890
+      ]
+    },
+    {
+      "content": "针对特定于给定资源的场地要求提供可选资源模板",
+      "pos": [
+        29895,
+        29917
+      ]
+    },
+    {
+      "content": "针对资源组的相同成员（群集中的节点，等等）创建利用资源循环的特定模板，以便部署多个具有特有属性的实例。",
+      "pos": [
+        29922,
+        29973
+      ]
+    },
+    {
+      "content": "对于所有部署后任务（例如产品安装、配置，等等），利用脚本部署扩展并创建特定于每种技术的脚本",
+      "pos": [
+        29978,
+        30023
+      ]
+    },
+    {
+      "pos": [
+        30025,
+        30116
+      ],
+      "content": "有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 资源管理器模板语言<ept id=\"p1\">](https://msdn.microsoft.com/zh-CN/library/azure/dn835138.aspx)</ept>。"
+    }
+  ],
+  "content": "<properties pageTitle=\"在 Ubuntu 上使用资源管理器模板创建 MongoDB 群集\" description=\"通过 PowerShell 或 Azure CLI 使用资源管理器模板在 Ubuntu 上创建 MongoDB 群集\" services=\"virtual-machines\" documentationCenter=\"\" authors=\"karthmut\" manager=\"timlt\" editor=\"tysonn\"/>\n\n<tags ms.service=\"virtual-machines\" ms.date=\"04/29/2015\" wacn.date=\"08/29/2015\"/>\n\n# 在 Ubuntu 上使用资源管理器模板创建 MongoDB 群集\n\nMongoDB 是一种可提供高性能、高可用性和自动缩放的开源文档数据库。MongoDB 可独立安装或利用内置的复制功能在群集内安装。在某些情况下，你可使用复制来提高读取容量。客户端能够将读取和写入操作发送到不同的服务器。你还可以在不同数据中心中维护副本，以增加分布式应用程序的的数据位置和可用性。使用 MongoDB，复制还提供了冗余，并提高数据可用性。通过将数据的多个副本保存在不同数据库服务器上，复制还可保护数据库免遭丢失一个服务器的危害。复制还可以让你从硬件故障和服务中断中恢复。有了附加数据副本，你可以将其中一个副本专用于灾难恢复、报告或备份。\n\n除了提供 Azure 应用商店中已可供使用的各种功能之外，现在你还可以使用通过 [Azure PowerShell](/documentation/articles/powershell-install-configure) 或 [Azure CLI](/documentation/articles/xplat-cli) 部署的资源管理器模板，在 Ubuntu VM 上轻松部署新的 MongoDB 群集。\n\n根据此模板新部署的群集采用下图中所述的拓扑，不过，你可以通过自定义本文中所述的模板，轻松实现其他拓扑：\n\n![cluster-architecture](./media/virtual-machines-mongodb-template/cluster-architecture.png)\n\n通过一个参数你可以定义要在新的 MongoDB 群集中部署的节点数，而基于另一个参数，也可以将一个具有公共 IP 地址的 VM 实例 (Jumpbox) 部署在同一个虚拟网络内，从而使你能够从公共 Internet 连接到该群集并执行任何种类的与该群集相关的管理任务。使用作为参数提供的另一个选项可以向副本集添加一个仲裁节点，当副本集具有偶数个成员时通常会建议这样做。有关 MongoDB 复制拓扑和细节的详细信息，应参阅正式的 [MongoDB 文档](http://docs.mongodb.org/manual/core/replication-introduction/)。\n\n部署完成之后，你可以使用 SSH 端口 22 上配置的 DNS 地址来访问 Jumpbox。\n\n在深入了解与 Azure 资源管理器和你将用于此部署的模板相关的详细信息之前，请确保你已正确配置 Azure PowerShell 或 Azure CLI。\n\n[AZURE.INCLUDE [arm-getting-setup-powershell](../includes/arm-getting-setup-powershell)]\n\n[AZURE.INCLUDE [xplat-getting-set-up-arm](../includes/xplat-getting-set-up-arm)]\n\n## 使用资源管理器模板创建 MongoDB 群集\n\n按照以下步骤，使用 Github 模板存储库中的资源管理器模板创建 MongoDB 群集。每个步骤将同时提供 Azure PowerShell 和 Azure CLI 指令。\n\n### 步骤 1-a：使用 PowerShell 下载模板文件\n\n为 JSON 模板和其他关联的文件创建本地文件夹（例如，C:\\Azure\\\\Templates\\\\MongoDB）。\n\n替换为你的本地文件夹的文件夹名称，并运行以下命令：\n\n    $folderName=\"C:\\Azure\\Templates\\MongoDB\"\n    $webclient = New-Object System.Net.WebClient\n    $url = \"https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/mongodb-high-availability/azuredeploy.json\"\n    $filePath = $folderName + \"\\azuredeploy.json\"\n    $webclient.DownloadFile($url,$filePath)\n    $url = \"https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/mongodb-high-availability/azuredeploy-parameters.json\"\n    $filePath = $folderName + \"\\azuredeploy-parameters.json\"\n    $webclient.DownloadFile($url,$filePath)\n    $url = \"https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/mongodb-high-availability/arbiter-resources.json\"\n    $filePath = $folderName + \"\\arbiter-resources.json\"\n    $webclient.DownloadFile($url,$filePath)\n    $url = \"https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/mongodb-high-availability/empty-resources.json\"\n    $filePath = $folderName + \"\\empty-resources.json\"\n    $webclient.DownloadFile($url,$filePath)\n    $url = \"https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/mongodb-high-availability/jumpbox-resources.json\"\n    $filePath = $folderName + \"\\jumpbox-resources.json\"\n    $webclient.DownloadFile($url,$filePath)\n    $url = \"https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/mongodb-high-availability/member-resources-D1.json\"\n    $filePath = $folderName + \"\\member-resources-D1.json\"\n    $webclient.DownloadFile($url,$filePath)\n    $url = \"https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/mongodb-high-availability/member-resources-D2.json\"\n    $filePath = $folderName + \"\\member-resources-D2.json\"\n    $webclient.DownloadFile($url,$filePath)\n    $url = \"https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/mongodb-high-availability/member-resources-D3.json\"\n    $filePath = $folderName + \"\\member-resources-D3.json\"\n    $webclient.DownloadFile($url,$filePath)\n    $url = \"https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/mongodb-high-availability/member-resources-D4.json\"\n    $filePath = $folderName + \"\\member-resources-D4.json\"\n    $webclient.DownloadFile($url,$filePath)\n    $url = \"https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/mongodb-high-availability/member-resources-D11.json\"\n    $filePath = $folderName + \"\\member-resources-D11.json\"\n    $webclient.DownloadFile($url,$filePath)\n    $url = \"https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/mongodb-high-availability/member-resources-D12.json\"\n    $filePath = $folderName + \"\\member-resources-D12.json\"\n    $webclient.DownloadFile($url,$filePath)\n    $url = \"https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/mongodb-high-availability/member-resources-D13.json\"\n    $filePath = $folderName + \"\\member-resources-D13.json\"\n    $webclient.DownloadFile($url,$filePath)\n    $url = \"https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/mongodb-high-availability/member-resources-D14.json\"\n    $filePath = $folderName + \"\\member-resources-D14.json\"\n    $webclient.DownloadFile($url,$filePath)\n    $url = \"https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/mongodb-high-availability/mongodb-ubuntu-install.sh\"\n    $filePath = $folderName + \"\\mongodb-ubuntu-install.sh\"\n    $webclient.DownloadFile($url,$filePath)\n    $url = \"https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/mongodb-high-availability/metadata.json\"\n    $filePath = $folderName + \"\\metadata.json\"\n    $webclient.DownloadFile($url,$filePath)\n    $url = \"https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/mongodb-high-availability/shared-resources.json\"\n    $filePath = $folderName + \"\\shared-resources.json\"\n    $webclient.DownloadFile($url,$filePath)  \n\n### 步骤 1-b：使用 Azure CLI 下载模板文件\n\n使用所选的 git 客户端克隆整个模板存储库，例如：\n\n    git clone https://github.com/Azure/azure-quickstart-templates C:\\Azure\\Templates\n\n完成后，在 C:\\Azure\\\\Templates 目录中查找 **mongodb-high-availability** 文件夹。\n\n### 步骤 2：（可选）了解模板参数\n\n部署非简单的解决方案（例如，MongoDB 群集）时，必须指定一组配置参数来处理一些所需的设置。通过在模板定义中声明这些参数，就能在部署期间通过外部文件或命令行指定值。\n\n在 **azuredeploy.json** 文件顶部的“parameters”节中，你会发现模板需要用来配置 MongoDB 群集的参数集。以下示例来自此模板的 azuredeploy.json 文件的 parameters 节：\n\n    \"parameters\": {\n      \"adminUsername\": {\n          \"type\": \"string\",\n          \"metadata\": {\n            \"Description\": \"Administrator user name used when provisioning virtual machines (which also becomes a system user administrator in MongoDB)\"\n          }\n        },\n        \"adminPassword\": {\n          \"type\": \"securestring\",\n          \"metadata\": {\n            \"Description\": \"Administrator password used when provisioning virtual machines (which is also a password for the system administrator in MongoDB)\"\n          }\n        },\n        \"storageAccountName\": {\n          \"type\": \"string\",\n          \"defaultValue\": \"\",\n          \"metadata\": {\n            \"Description\": \"Unique namespace for the Storage Account where the Virtual Machine's disks will be placed (this name will be used as a prefix to create one or more storage accounts as per t-shirt size)\"\n          }\n        },\n        \"region\": {\n          \"type\": \"string\",\n          \"metadata\": {\n            \"Description\": \"Location where resources will be provisioned\"\n          }\n        },\n        \"virtualNetworkName\": {\n          \"type\": \"string\",\n          \"defaultValue\": \"mongodbVnet\",\n          \"metadata\": {\n            \"Description\": \"The arbitrary name of the virtual network provisioned for the MongoDB deployment\"\n          }\n        },\n        \"subnetName\": {\n          \"type\": \"string\",\n          \"defaultValue\": \"mongodbSubnet\",\n          \"metadata\": {\n            \"Description\": \"Subnet name for the virtual network that resources will be provisioned in to\"\n          }\n        },\n        \"addressPrefix\": {\n          \"type\": \"string\",\n          \"defaultValue\": \"10.0.0.0/16\",\n          \"metadata\": {\n            \"Description\": \"The network address space for the virtual network\"\n          }\n        },\n        \"subnetPrefix\": {\n          \"type\": \"string\",\n          \"defaultValue\": \"10.0.0.0/24\",\n          \"metadata\": {\n            \"Description\": \"The network address space for the virtual subnet\"\n          }\n        },\n        \"nodeAddressPrefix\": {\n          \"type\": \"string\",\n          \"defaultValue\": \"10.0.0.1\",\n          \"metadata\": {\n            \"Description\": \"The IP address prefix that will be used for constructing a static private IP address for each node in the cluster\"\n          }\n        },\n        \"jumpbox\": {\n          \"type\": \"string\",\n          \"defaultValue\": \"Disabled\",\n          \"allowedValues\": [\n          \"Enabled\",\n          \"Disabled\"\n          ],\n          \"metadata\": {\n            \"Description\": \"The flag allowing to enable or disable provisioning of the jumpbox VM that can be used to access the MongoDB environment\"\n          }\n        },\n        \"tshirtSize\": {\n          \"type\": \"string\",\n          \"defaultValue\": \"XSmall\",\n          \"allowedValues\": [\n          \"XSmall\",\n          \"Small\",\n          \"Medium\",\n          \"Large\",\n          \"XLarge\",\n          \"XXLarge\"\n          ],\n          \"metadata\": {\n            \"Description\": \"T-shirt size of the MongoDB deployment\"\n          }\n        },\n        \"osFamily\": {\n          \"type\": \"string\",\n          \"defaultValue\": \"Ubuntu\",\n          \"allowedValues\": [\n          \"Ubuntu\"\n          ],\n          \"metadata\": {\n            \"Description\": \"The target OS for the virtual machines running MongoDB\"\n          }\n        },\n        \"mongodbVersion\": {\n          \"type\": \"string\",\n          \"defaultValue\": \"3.0.2\",\n          \"metadata\": {\n            \"Description\": \"The version of the MongoDB packages to be deployed\"\n          }\n        },\n        \"replicaSetName\": {\n          \"type\": \"string\",\n          \"defaultValue\": \"rs0\",\n          \"metadata\": {\n            \"Description\": \"The name of the MongoDB replica set\"\n          }\n        },\n        \"replicaSetKey\": {\n          \"type\": \"string\",\n          \"metadata\": {\n            \"Description\": \"The shared secret key for the MongoDB replica set\"\n          }\n        }\n      },\n\n每个参数都具有数据类型和允许值之类的详细信息。这样，便可以验证在交互模式（例如 PowerShell 或 Azure CLI）下，以及在自我发现 UI（通过分析所需参数列表及其说明动态生成的 UI）中执行模板期间所传递的参数。\n\n### 步骤 3-a：使用 PowerShell 基于模板部署 MongoDB 群集\n\n通过创建包含所有参数的运行时值的 JSON 文件，为部署准备参数文件。然后，将此文件作为单个实体传递给部署命令。如果未包含参数文件，PowerShell 将使用模板中指定的任何默认值，然后提示你填写剩余的值。\n\n下面是 **azuredeploy-parameters.json** 文件中的一组示例参数：\n\n    {\n      \"adminUsername\": {\n          \"value\": \"MongoAdmin\"\n      },\n      \"adminPassword\": {\n          \"value\": \"\"\n      },\n      \"storageAccountName\": {\n          \"value\": \"\"\n      },\n      \"region\": {\n          \"value\": \"China North\"\n      },\n      \"virtualNetworkName\": {\n          \"value\": \"mongodbVnet\"\n      },\n      \"subnetName\": {\n          \"value\": \"mongodbSubnet\"\n      },\n      \"addressPrefix\": {\n          \"value\": \"10.0.0.0/16\"\n      },\n      \"subnetPrefix\": {\n          \"value\": \"10.0.0.0/24\"\n      },\n      \"nodeAddressPrefix\": {\n          \"value\": \"10.0.0.1\"\n      },\n      \"jumpbox\": {\n          \"value\": \"Disabled\"\n      },\n      \"tshirtSize\": {\n          \"value\": \"XSmall\"\n      },\n      \"osFamily\": {\n          \"value\": \"Ubuntu\"\n      },\n      \"mongodbVersion\": {\n          \"value\": \"3.0.2\"\n      },\n      \"replicaSetName\": {\n          \"value\": \"rs0\"\n      },\n      \"replicaSetKey\":  {\n          \"value\": \"\"\n      }\n    }\n\n填写 Azure 部署名称、资源组名称、Azure 位置，以及存储 JSON 部署文件的文件夹。然后运行以下命令：\n\n    $deployName=\"<deployment name>\"\n    $RGName=\"<resource group name>\"\n    $locName=\"<Azure location, such as China North>\"\n    $folderName=\"<folder name, such as C:\\Azure\\Templates\\MongoDB>\"\n    $templateFile= $folderName + \"\\azuredeploy.json\"\n    $templateParameterFile= $folderName + \"\\azuredeploy-parameters.json\"\n\n    New-AzureResourceGroup –Name $RGName –Location $locName\n\n    New-AzureResourceGroupDeployment -Name $deployName -ResourceGroupName $RGName -TemplateParameterFile $templateParameterFile -TemplateFile $templateFile\n\n运行 **New-AzureResourceGroupDeployment** 命令时，会从 JSON 参数文件中提取参数值，然后相应地开始执行模板。在不同的环境（例如测试、生产等）中定义和使用多个参数文件有利于重复使用模板，并简化复杂的多环境解决方案。\n\n部署时，请记得需要创建新的 Azure 存储帐户，因此，提供用作存储帐户参数的名称必须唯一且符合 Azure 存储帐户的所有要求（仅限小写字母和数字）。\n\n部署期间以及部署之后，你可以检查设置期间发出的所有要求，包括发生的任何错误。\n\n为此，请转到 [Azure 门户](https://manage.windowsazure.cn)并执行以下操作：\n\n- 单击左侧导航栏上的“浏览”，向下滚动，然后单击“资源组”。\n- 单击刚创建的资源组之后，系统会显示“资源组”边栏选项卡。\n- 在“资源组”边栏选项卡的“监视”部分中单击“事件”条形图可以查看部署的事件：\n- 单击各个事件可以进一步细化到系统代表模板执行的各项操作的详细信息中。\n\n测试之后，如果需要删除此资源组及其所有资源（存储帐户、虚拟机和虚拟网络），请使用这一命令：\n\n    Remove-AzureResourceGroup –Name \"<resource group name>\" -Force\n\n### 步骤 3-b：使用 Azure CLI 基于模板部署 MongoDB 群集\n\n若要通过 Azure CLI 部署 MongoDB 群集，请先通过指定名称和位置来创建资源组：\n\n    azure group create mdbc \"China North\"\n\n将此资源组名称、JSON 模板文件的位置，以及参数文件的位置（有关详细信息，请参阅上面的 PowerShell 部分）传入以下命令：\n\n    azure group deployment create mdbc -f .\\azuredeploy.json -e .\\azuredeploy-parameters.json\n\n你可以使用以下命令来检查单个资源部署的状态：\n\n    azure group deployment list mdbc\n\n## MongoDB 模板结构和文件组织概览\n\n为了让资源管理器模板的设计更加完善且可重复使用，你必须在部署 MongoDB 之类的复杂解决方案期间，考虑清楚如何安排一连串复杂但又彼此相关的任务。除了通过相关扩展执行脚本之外，还可以利用 ARM **模板链接**和**资源循环**，这样就能实现模块化方法，而所有基于模板的复杂部署基本上都能重复使用此方法。\n\n下图描述了从 GitHub 中为此部署下载的所有文件彼此间的关系：\n\n![mongodb-files](./media/virtual-machines-mongodb-template/mongodb-files.png)\n\n本部分将指导你逐步了解 MongoDB 群集的 **azuredeploy.json** 文件结构。\n\n### “parameters”节\n\n**azuredeploy.json** 的“parameters”节指定此模板中使用的可修改参数。本文前面所述的 **azuredeploy-parameters.json** 文件用于在模板执行期间将值传入 azuredeploy.json 的“parameters”节。\n\n### “variables”节\n\n“variables”节指定可在这整个模板中使用的变量。这包含多个字段（JSON 数据类型或片段），在执行时，这些字段将设置为常量或计算值。下面是此 MongoDB 模板的“variables”节：\n\n    \"variables\": {\n          \"_comment0\": \"/* T-shirt sizes may vary for different reasons, and some customers may want to modify these - so feel free to go ahead and define your favorite t-shirts */\",\n          \"tshirtSizeXSmall\": {\n              \"vmSizeMember\": \"Standard_D1\",\n              \"vmSizeArbiter\": \"Standard_A1\",\n              \"numberOfMembers\": 1,\n              \"totalMemberCount\": 2,\n              \"arbiter\": \"Enabled\",\n              \"vmTemplate\": \"[concat(variables('templateBaseUrl'), 'member-resources-D1.json')]\",\n              \"storageAccountCount\": 1,\n              \"dataDiskSize\": 100\n          },\n          \"tshirtSizeSmall\": {\n              \"vmSizeMember\": \"Standard_D1\",\n              \"vmSizeArbiter\": \"Standard_A1\",\n              \"numberOfMembers\": 2,\n              \"totalMemberCount\": 3,\n              \"arbiter\": \"Disabled\",\n              \"vmTemplate\": \"[concat(variables('templateBaseUrl'), 'member-resources-D1.json')]\",\n              \"storageAccountCount\": 1,\n              \"dataDiskSize\": 100\n          },\n          \"tshirtSizeMedium\": {\n              \"vmSizeMember\": \"Standard_D2\",\n              \"vmSizeArbiter\": \"Standard_A1\",\n              \"numberOfMembers\": 3,\n              \"totalMemberCount\": 4,\n              \"arbiter\": \"Enabled\",\n              \"vmTemplate\": \"[concat(variables('templateBaseUrl'), 'member-resources-D2.json')]\",\n              \"storageAccountCount\": 2,\n              \"dataDiskSize\": 250\n          },\n          \"tshirtSizeLarge\": {\n              \"vmSizeMember\": \"Standard_D2\",\n              \"vmSizeArbiter\": \"Standard_A1\",\n              \"numberOfMembers\": 7,\n              \"totalMemberCount\": 8,\n              \"arbiter\": \"Enabled\",\n              \"vmTemplate\": \"[concat(variables('templateBaseUrl'), 'member-resources-D2.json')]\",\n              \"storageAccountCount\": 4,\n              \"dataDiskSize\": 250\n          },\n          \"tshirtSizeXLarge\": {\n              \"vmSizeMember\": \"Standard_D3\",\n              \"vmSizeArbiter\": \"Standard_A1\",\n              \"numberOfMembers\": 7,\n              \"totalMemberCount\": 8,\n              \"arbiter\": \"Enabled\",\n              \"vmTemplate\": \"[concat(variables('templateBaseUrl'), 'member-resources-D3.json')]\",\n              \"storageAccountCount\": 4,\n              \"dataDiskSize\": 500\n          },\n          \"tshirtSizeXXLarge\": {\n              \"vmSizeMember\": \"Standard_D3\",\n              \"vmSizeArbiter\": \"Standard_A1\",\n              \"numberOfMembers\": 15,\n              \"totalMemberCount\": 16,\n              \"arbiter\": \"Disabled\",\n              \"vmTemplate\": \"[concat(variables('templateBaseUrl'), 'member-resources-D3.json')]\",\n              \"storageAccountCount\": 8,\n              \"dataDiskSize\": 500\n          },\n          \"osFamilyUbuntu\": {\n              \"osName\": \"ubuntu\",\n              \"installerBaseUrl\": \"http://repo.mongodb.org/apt/ubuntu\",\n              \"installerPackages\": \"mongodb-org\",\n              \"imagePublisher\": \"Canonical\",\n              \"imageOffer\": \"UbuntuServer\",\n              \"imageSKU\": \"14.04.2-LTS\"\n          },\n          \"vmStorageAccountContainerName\": \"vhd-mongodb\",\n          \"vmStorageAccountDomain\": \".blob.core.chinacloudapi.cn\",\n          \"vnetID\": \"[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]\",\n          \"sharedScriptUrl\": \"[concat('https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/shared_scripts/', variables('osFamilySpec').osName, '/')]\",\n          \"scriptUrl\": \"https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/mongodb-high-availability/\",\n          \"templateBaseUrl\": \"[variables('scriptUrl')]\",\n          \"jumpboxTemplateEnabled\": \"jumpbox-resources.json\",\n          \"jumpboxTemplateDisabled\": \"empty-resources.json\",\n          \"arbiterTemplateEnabled\": \"arbiter-resources.json\",\n          \"arbiterTemplateDisabled\": \"empty-resources.json\",\n          \"sharedTemplateUrl\": \"[concat(variables('templateBaseUrl'), 'shared-resources.json')]\",\n          \"jumpboxTemplateUrl\": \"[concat(variables('templateBaseUrl'), variables(concat('jumpboxTemplate', parameters('jumpbox'))))]\",\n          \"arbiterTemplateUrl\": \"[concat(variables('templateBaseUrl'), variables(concat('arbiterTemplate', variables('clusterSpec').arbiter)))]\",\n          \"commonSettings\": {\n              \"availabilitySetName\": \"mongodbAvailSet\",\n              \"region\": \"[parameters('region')]\"\n          },\n          \"storageSettings\": {\n              \"vhdStorageAccountName\": \"[parameters('storageAccountName')]\",\n              \"vhdContainerName\": \"[variables('vmStorageAccountContainerName')]\",\n              \"destinationVhdsContainer\": \"[concat('https://', parameters('storageAccountName'), variables('vmStorageAccountDomain'), '/', variables('vmStorageAccountContainerName'), '/')]\",\n              \"storageAccountCount\": \"[variables('clusterSpec').storageAccountCount]\"\n          },\n          \"networkSettings\": {\n              \"virtualNetworkName\": \"[parameters('virtualNetworkName')]\",\n              \"addressPrefix\": \"[parameters('addressPrefix')]\",\n              \"subnetName\": \"[parameters('subnetName')]\",\n              \"subnetPrefix\": \"[parameters('subnetPrefix')]\",\n              \"subnetRef\": \"[concat(variables('vnetID'), '/subnets/', parameters('subnetName'))]\",\n              \"machineIpPrefix\": \"[parameters('nodeAddressPrefix')]\"\n          },\n          \"machineSettings\": {\n              \"adminUsername\": \"[parameters('adminUsername')]\",\n              \"adminPassword\": \"[parameters('adminPassword')]\",\n              \"machineNamePrefix\": \"mongodb-\",\n              \"osImageReference\": {\n                  \"publisher\": \"[variables('osFamilySpec').imagePublisher]\",\n                  \"offer\": \"[variables('osFamilySpec').imageOffer]\",\n                  \"sku\": \"[variables('osFamilySpec').imageSKU]\",\n                  \"version\": \"latest\"\n              }\n          },\n          \"clusterSpec\": \"[variables(concat('tshirtSize', parameters('tshirtSize')))]\",\n          \"osFamilySpec\": \"[variables(concat('osFamily', parameters('osFamily')))]\",\n          \"installCommand\": \"[concat('bash mongodb-', variables('osFamilySpec').osName, '-install.sh', ' -i ', variables('osFamilySpec').installerBaseUrl, ' -b ', variables('osFamilySpec').installerPackages, ' -r ', parameters('replicaSetName'), ' -k ', parameters('replicaSetKey'), ' -u ', parameters('adminUsername'), ' -p ', parameters('adminPassword'), ' -x ', variables('networkSettings').machineIpPrefix, ' -n ', variables('clusterSpec').totalMemberCount)]\",\n          \"vmScripts\": {\n              \"scriptsToDownload\": [\n                  \"[concat(variables('scriptUrl'), 'mongodb-', variables('osFamilySpec').osName, '-install.sh')]\",\n                  \"[concat(variables('sharedScriptUrl'), 'vm-disk-utils-0.1.sh')]\"\n              ],\n              \"regularNodeInstallCommand\": \"[variables('installCommand')]\",\n              \"lastNodeInstallCommand\": \"[concat(variables('installCommand'), ' -l')]\",\n              \"arbiterNodeInstallCommand\": \"[concat(variables('installCommand'), ' -a')]\"\n          },\n          \"_comment1\": \"/* The list of values below helps partition VM disks across multiple storage accounts to achieve a better throughput */\",\n          \"_comment2\": \"/* Feel free to modify the default allocations if you are comfortable and understand what you are doing */\",\n          \"storageAccountForXSmall_0\": \"0\",\n          \"storageAccountForXSmall_1\": \"0\",\n          \"storageAccountForSmall_0\": \"0\",\n          \"storageAccountForSmall_1\": \"0\",\n          \"storageAccountForSmall_2\": \"0\",\n          \"storageAccountForMedium_0\": \"0\",\n          \"storageAccountForMedium_1\": \"0\",\n          \"storageAccountForMedium_2\": \"0\",\n          \"storageAccountForMedium_3\": \"0\",\n          \"storageAccountForLarge_0\": \"0\",\n          \"storageAccountForLarge_1\": \"1\",\n          \"storageAccountForLarge_2\": \"2\",\n          \"storageAccountForLarge_3\": \"3\",\n          \"storageAccountForLarge_4\": \"0\",\n          \"storageAccountForLarge_5\": \"1\",\n          \"storageAccountForLarge_6\": \"2\",\n          \"storageAccountForLarge_7\": \"3\",\n          \"storageAccountForXLarge_0\": \"0\",\n          \"storageAccountForXLarge_1\": \"1\",\n          \"storageAccountForXLarge_2\": \"2\",\n          \"storageAccountForXLarge_3\": \"3\",\n          \"storageAccountForXLarge_4\": \"0\",\n          \"storageAccountForXLarge_5\": \"1\",\n          \"storageAccountForXLarge_6\": \"2\",\n          \"storageAccountForXLarge_7\": \"3\",\n          \"storageAccountForXXLarge_0\": \"0\",\n          \"storageAccountForXXLarge_1\": \"1\",\n          \"storageAccountForXXLarge_2\": \"2\",\n          \"storageAccountForXXLarge_3\": \"3\",\n          \"storageAccountForXXLarge_4\": \"4\",\n          \"storageAccountForXXLarge_5\": \"5\",\n          \"storageAccountForXXLarge_6\": \"6\",\n          \"storageAccountForXXLarge_7\": \"7\",\n          \"storageAccountForXXLarge_8\": \"0\",\n          \"storageAccountForXXLarge_9\": \"1\",\n          \"storageAccountForXXLarge_10\": \"2\",\n          \"storageAccountForXXLarge_11\": \"3\",\n          \"storageAccountForXXLarge_12\": \"4\",\n          \"storageAccountForXXLarge_13\": \"5\",\n          \"storageAccountForXXLarge_14\": \"6\",\n          \"storageAccountForXXLarge_15\": \"7\"\n      },\n\n深入分析此示例之后，你可以看到两种不同的方法。在这第一个片段中，“osFamilyUbuntu”变量将设为 JSON 元素，其中包含 6 个键/值对：\n\n    \"osFamilyUbuntu\": {\n      \"osName\": \"ubuntu\",\n      \"installerBaseUrl\": \"http://repo.mongodb.org/apt/ubuntu\",\n      \"installerPackages\": \"mongodb-org\",\n      \"imagePublisher\": \"Canonical\",\n      \"imageOffer\": \"UbuntuServer\",\n      \"imageSKU\": \"14.04.2-LTS\"\n    },\n\n在这第二个片段中，将“vmScripts”变量分配给 JSON 数组，其中的单个元素将在运行时使用模板语言函数 (concat)、另一个变量的值以及字符串常量来计算：\n\n    \"vmScripts\": {\n      \"scriptsToDownload\": [\n      \"[concat(variables('scriptUrl'), 'mongodb-', variables('osFamilySpec').osName, '-install.sh')]\",\n      \"[concat(variables('sharedScriptUrl'), 'vm-disk-utils-0.1.sh')]\"\n    ],\n\n此模板中的一个重要概念是针对 MongoDB 群集定义不同“T 恤大小”的方式。看一下这些“tshirtSizeXXXX”变量中的一个，可以注意到它描述了群集的部署方式的重要特征。让我们以“中等”大小为例：\n\n    \"tshirtSizeMedium\": {\n      \"vmSizeMember\": \"Standard_D2\",\n      \"vmSizeArbiter\": \"Standard_A1\",\n      \"numberOfMembers\": 3,\n      \"totalMemberCount\": 4,\n      \"arbiter\": \"Enabled\",\n      \"vmTemplate\": \"[concat(variables('templateBaseUrl'), 'member-resources-D2.json')]\",\n      \"storageAccountCount\": 2,\n      \"dataDiskSize\": 250\n    },\n\n“中等”MongoDB 群集将使用 D2 作为托管数据的 3 个 MongoDB 节点，以及将出于复制目的用作仲裁器的第四个 A1 VM 的 VM 大小。调用以部署数据节点的相应子模板将是 **member-resources-D2.json**，并且数据文件（每个 250 GB）将存储在 2 个存储帐户中。在“resources”节中将使用此变量来安排节点部署和其他任务。\n\n### “resources”节\n\n大多数操作是在**“resources”**节中发生的。仔细查看此节，你会立即找到两个不同的案例：第一个案例是定义为 `Microsoft.Resources/deployments` 类型的元素，它基本上表示调用主部署中的嵌套部署。通过“templateLink”元素（和相关的版本属性），可以指定链接的模板文件，并在调用此文件时传递一组参数作为输入，如同你在此片段中所看到的那样：\n\n    {\n      \"name\": \"shared-resources\",\n      \"type\": \"Microsoft.Resources/deployments\",\n      \"apiVersion\": \"2015-01-01\",\n      \"properties\": {\n        \"mode\": \"Incremental\",\n        \"templateLink\": {\n          \"uri\": \"[variables('sharedTemplateUrl')]\",\n          \"contentVersion\": \"1.0.0.0\"\n        },\n        \"parameters\": {\n          \"commonSettings\": {\n            \"value\": \"[variables('commonSettings')]\"\n          },\n          \"storageSettings\": {\n            \"value\": \"[variables('storageSettings')]\"\n          },\n          \"networkSettings\": {\n            \"value\": \"[variables('networkSettings')]\"\n          }\n        }\n      }\n    },\n\n从第一个示例我们清楚地了解此方案中的 **azuredeploy.json** 如何作为一种协调机制进行组织，并调用其他一些模板文件，其中每个文件都负责所需部署活动的一部分。\n\n具体而言，以下链接模板将用于此部署：\n\n-   **shared-resource.json**：包含要在整个部署中共享的所有资源的定义。例如，用来存储 VM 的操作系统磁盘和虚拟网络的存储帐户。\n-   **jumpbox-resources.json**：如果启用，将负责部署与 Jumpbox VM 相关的所有资源，该 VM 具有公共 IP 地址可用于从公共网络访问 MongoDB 群集。\n-   **arbiter-resources.json**：如果启用，此模板会在 MongoDB 群集中部署仲裁器成员。仲裁器不包含数据，但在副本集包含偶数个用于管理主选举的节点时使用。\n-   **member-resources-Dx.json**：这些资源模板有效地部署 MongoDB 节点。将根据所选的 T 恤大小定义使用特定文件，其中每个文件将因每个节点的附加磁盘数而异。\n-   **mongodb-ubuntu-install.sh**：CustomScriptForLinux 扩展对群集中每个节点调用的 bash 脚本文件。负责装载并格式化数据磁盘，以及在节点上安装 MongoDB 各部分。\n\n若要部署 MongoDB 群集，需要特定逻辑才能正确设置副本集。在部署过程中必须按照的特定顺序如下：\n\n部署数据成员（以并行方式）= > 部署最后一个数据成员 = >（可选）部署仲裁器\n\n在此顺序中，部署多个数据节点以并行方式进行，但最后一个节点除外。这是将形成群集和新副本集将部署到的位置，因此以前的所有节点需要在该时刻之前已启动并在运行。最后一步将部署可选的仲裁节点（仅适用于需要此节点的 T 恤大小）。\n\n在我们的主模板 (azuredeploy.json) 内再看一下，让我们看一下如何实现此逻辑，从所有数据成员开始：\n\n    {\n      \"type\": \"Microsoft.Resources/deployments\",\n      \"name\": \"[concat('member-resources', copyindex())]\",\n      \"apiVersion\": \"2015-01-01\",\n      \"dependsOn\": [\n        \"[concat('Microsoft.Resources/deployments/', 'shared-resources')]\"\n      ],\n      \"copy\": {\n        \"name\": \"memberNodesLoop\",\n        \"count\": \"[variables('clusterSpec').numberOfMembers]\"\n      },\n      \"properties\": {\n        \"mode\": \"Incremental\",\n        \"templateLink\": {\n          \"uri\": \"[variables('clusterSpec').vmTemplate]\",\n          \"contentVersion\": \"1.0.0.0\"\n        },\n        \"parameters\": {\n          \"commonSettings\": {\n            \"value\": \"[variables('commonSettings')]\"\n          },\n          \"storageSettings\": {\n            \"value\": {\n              \"vhdStorageAccountName\": \"[concat(variables('storageSettings').vhdStorageAccountName, variables(concat('storageAccountFor', parameters('tshirtSize'), '_', copyindex())))]\",\n                              \"vhdContainerName\": \"[variables('storageSettings').vhdContainerName]\",\n                              \"destinationVhdsContainer\": \"[concat('https://', variables('storageSettings').vhdStorageAccountName, variables(concat('storageAccountFor', parameters('tshirtSize'), '_', copyindex())), variables('vmStorageAccountDomain'), '/', variables('storageSettings').vhdContainerName, '/')]\"\n            }\n          },\n          \"networkSettings\": {\n            \"value\": \"[variables('networkSettings')]\"\n          },\n          \"machineSettings\": {\n            \"value\": {\n              \"adminUsername\": \"[variables('machineSettings').adminUsername]\",\n                              \"adminPassword\": \"[variables('machineSettings').adminPassword]\",\n                              \"machineNamePrefix\": \"[variables('machineSettings').machineNamePrefix]\",\n                              \"osImageReference\": \"[variables('machineSettings').osImageReference]\",\n                              \"vmSize\": \"[variables('clusterSpec').vmSizeMember]\",\n                              \"dataDiskSize\": \"[variables('clusterSpec').dataDiskSize]\",\n                              \"machineIndex\": \"[copyindex()]\",\n                              \"vmScripts\": \"[variables('vmScripts').scriptsToDownload]\",\n                              \"commandToExecute\": \"[variables('vmScripts').regularNodeInstallCommand]\"\n            }\n          }\n        }\n      }\n    },\n\n在此要强调一个重要的概念，那就是如何可以部署单个资源类型的多个副本，而且可以为每一个实例指定所需设置的唯一值。此概念称为**资源循环**。\n\n在上一片段中，参数（要在群集中部署的节点数）将用于设置变量 (“numberOfMembers”)，然后将该变量传递给 **“copy”**元素以触发多个子部署（环），每个子部署将导致群集中的每个成员的模板实例化。若要能够设置在实例之间需要唯一值的所有设置，可使用 **copyindex()** 函数获取数字值，以指示该特定资源循环创建中的当前索引。\n\n资源创建中的另一个重要概念是能够指定资源间的依赖关系和优先级，如你在 **dependsOn** JSON 数组中所注意到的。在此特定模板中，部署每个节点取决于**共享资源**的前次成功部署。\n\n在通过执行 **mongodb-ubuntu-install.sh** 脚本文件触发的节点准备活动中，将格式化附加的磁盘。在该文件中，实际上你可以找到此调用的实例：\n\n    bash ./vm-disk-utils-0.1.sh -b $DATA_DISKS -s\n\n**vm-disk-utils-0.1.sh** 是 azure-quickstart-tempates github 存储库中 **shared_scripts\\\\ubuntu** 文件夹的一部分，其中包含用于磁盘装入、格式化和条带化的非常有用的函数，每次需要在模板创建过程中执行类似任务时都可以使用。\n\n另一个要探讨的有趣片段是与 CustomScriptForLinux VM 扩展相关的片段。这些扩展作为单独的资源类型安装，并依赖于每个群集节点部署模板，请在每个 **member-resources-Dx.json** 文件末尾查看此片段：\n\n    {\n      \"type\": \"Microsoft.Compute/virtualMachines/extensions\",\n      \"name\": \"[concat('vmMember', parameters('machineSettings').machineIndex, '/installmongodb')]\",\n      \"apiVersion\": \"2015-05-01-preview\",\n      \"location\": \"[parameters('commonSettings').region]\",\n      \"dependsOn\": [\n        \"[concat('Microsoft.Compute/virtualMachines/', 'vmMember', parameters('machineSettings').machineIndex)]\"\n      ],\n      \"properties\": {\n        \"publisher\": \"Microsoft.OSTCExtensions\",\n        \"type\": \"CustomScriptForLinux\",\n        \"typeHandlerVersion\": \"1.2\",\n        \"settings\": {\n          \"fileUris\": \"[parameters('machineSettings').vmScripts]\", \"commandToExecute\":\"[parameters('machineSettings').commandToExecute]\"\n        }\n      }\n    }\n\n熟悉此部署包含的其他文件后，你将能够了解有关如何利用 Azure 资源管理器模板基于任何技术来组织和协调多节点解决方案的复杂部署策略所需的所有详细信息和最佳实践。在此建议一种构造模板文件的方法，请自行决定是否采用，如下图突出显示的部分所示：\n\n![mongodb-template-structure](./media/virtual-machines-mongodb-template/mongodb-template-structure.png)\n\n本质上，这种方法会建议：\n\n-   将你的核心模板文件定义成所有特定部署活动的中心协调点，并利用模板链接来调用子模板执行\n-   创建特定的模板文件，用于部署所有其他特定部署任务会共享的所有资源（例如存储帐户、虚拟网络配置，等等）。如果不同的部署在公用基础结构方面具有类似的要求，你就可以对其频繁重复使用此方法。\n-   针对特定于给定资源的场地要求提供可选资源模板\n-   针对资源组的相同成员（群集中的节点，等等）创建利用资源循环的特定模板，以便部署多个具有特有属性的实例。\n-   对于所有部署后任务（例如产品安装、配置，等等），利用脚本部署扩展并创建特定于每种技术的脚本\n\n有关详细信息，请参阅 [Azure 资源管理器模板语言](https://msdn.microsoft.com/zh-CN/library/azure/dn835138.aspx)。\n\n<!---HONumber=67-->"
+}

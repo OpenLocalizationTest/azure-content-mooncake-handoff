@@ -1,0 +1,635 @@
+{
+  "nodes": [
+    {
+      "content": "Configure SQL Data Sync to replicate to MySQL Database on Azure – Azure cloud",
+      "pos": [
+        51,
+        128
+      ]
+    },
+    {
+      "content": "This article helps you to understand how to use the SQL Data Sync function to replicate local MySQL instances to the cloud.",
+      "pos": [
+        368,
+        491
+      ]
+    },
+    {
+      "content": "Configure SQL Data Sync to replicate to MySQL Database on Azure",
+      "pos": [
+        679,
+        742
+      ]
+    },
+    {
+      "content": "MySQL Database on Azure supports slave server mode and standard MySQL data replication.",
+      "pos": [
+        743,
+        830
+      ]
+    },
+    {
+      "content": "You can use this feature to automatically sync database data from a MySQL server that is running locally or in other locations to a server that is running on MySQL Database on Azure.",
+      "pos": [
+        831,
+        1013
+      ]
+    },
+    {
+      "content": "Configuration steps",
+      "pos": [
+        1017,
+        1036
+      ]
+    },
+    {
+      "content": "Confirm that the system variable lower\\_case\\_table\\_names on the master MySQL server is set to 1.",
+      "pos": [
+        1041,
+        1139
+      ]
+    },
+    {
+      "content": "If not, then you must set it to 1.",
+      "pos": [
+        1140,
+        1174
+      ]
+    },
+    {
+      "content": "MySQL database replication requires the value of this parameter to be consistent between the master and slave servers, and this parameter is set to 1 on MySQL on Azure.",
+      "pos": [
+        1175,
+        1343
+      ]
+    },
+    {
+      "content": "mysql&gt; SET GLOBAL lower\\_case\\_table\\_names = 1;",
+      "pos": [
+        1344,
+        1392
+      ]
+    },
+    {
+      "content": "Set the master server to read-only mode: mysql&gt; FLUSH TABLES WITH READ LOCK; mysql&gt; SET GLOBAL read\\_only = ON;",
+      "pos": [
+        1397,
+        1508
+      ]
+    },
+    {
+      "content": "Run the “show master status” SQL command on the master server to ascertain the current binary log file name and offset.",
+      "pos": [
+        1513,
+        1632
+      ]
+    },
+    {
+      "content": "The results returned should be similar to this:",
+      "pos": [
+        1633,
+        1680
+      ]
+    },
+    {
+      "content": "Return to results",
+      "pos": [
+        1683,
+        1700
+      ]
+    },
+    {
+      "content": "Export the databases for all users on the master server, for example, by using the mysqldump tool.",
+      "pos": [
+        1759,
+        1857
+      ]
+    },
+    {
+      "content": "mysqldump --databases",
+      "pos": [
+        1858,
+        1879
+      ]
+    },
+    {
+      "content": "--single-transaction --order-by-primary -r",
+      "pos": [
+        1896,
+        1938
+      ]
+    },
+    {
+      "content": "--routines -h",
+      "pos": [
+        1958,
+        1971
+      ]
+    },
+    {
+      "content": "-P",
+      "pos": [
+        1988,
+        1990
+      ]
+    },
+    {
+      "content": "–u",
+      "pos": [
+        2004,
+        2006
+      ]
+    },
+    {
+      "content": "-p",
+      "pos": [
+        2017,
+        2019
+      ]
+    },
+    {
+      "content": "Note that databases that are built into MySQL servers, including the MySQL library and test library, do not need to be exported.",
+      "pos": [
+        2030,
+        2158
+      ]
+    },
+    {
+      "content": "Once the database has been exported, change the master MySQL server setting back to read/write mode: mysql&gt; SET GLOBAL read\\_only = OFF; mysql&gt; UNLOCK TABLES;",
+      "pos": [
+        2163,
+        2321
+      ]
+    },
+    {
+      "content": "Create an account on the master MySQL server for data replication use, and set up the permissions.",
+      "pos": [
+        2328,
+        2426
+      ]
+    },
+    {
+      "content": "CREATE USER '",
+      "pos": [
+        2427,
+        2440
+      ]
+    },
+    {
+      "content": "'@'%' IDENTIFIED BY '",
+      "pos": [
+        2451,
+        2472
+      ]
+    },
+    {
+      "content": "'; GRANT REPLICATION SLAVE ON <bpt id=\"p1\">*</bpt>.<ept id=\"p1\">*</ept>",
+      "pos": [
+        2487,
+        2520
+      ]
+    },
+    {
+      "content": "TO '",
+      "pos": [
+        2521,
+        2525
+      ]
+    },
+    {
+      "content": "'@'%';",
+      "pos": [
+        2536,
+        2542
+      ]
+    },
+    {
+      "content": "Sign in to the Azure portal and create a new MySQL server on MySQL Database on Azure.",
+      "pos": [
+        2547,
+        2632
+      ]
+    },
+    {
+      "content": "Create individual databases for all users on the master server on the newly created MySQL server.",
+      "pos": [
+        2637,
+        2734
+      ]
+    },
+    {
+      "content": "Create the required user accounts on the newly created MySQL server.",
+      "pos": [
+        2739,
+        2807
+      ]
+    },
+    {
+      "content": "This is necessary because user account information cannot be replicated.",
+      "pos": [
+        2808,
+        2880
+      ]
+    },
+    {
+      "content": "Import the user database data exported from the master server onto the newly created MySQL server.",
+      "pos": [
+        2885,
+        2983
+      ]
+    },
+    {
+      "content": "If the database file is very large, we recommend that you upload the file to a virtual machine on Azure, and then import it into the MySQL server from the virtual machine.",
+      "pos": [
+        2984,
+        3155
+      ]
+    },
+    {
+      "content": "The virtual machine should be in the same data center as the newly created MySQL server.",
+      "pos": [
+        3156,
+        3244
+      ]
+    },
+    {
+      "content": "The specific steps are listed below.",
+      "pos": [
+        3245,
+        3281
+      ]
+    },
+    {
+      "content": "a) Upload the mysql.exe tool to the virtual machine.",
+      "pos": [
+        3287,
+        3339
+      ]
+    },
+    {
+      "content": "b) Upload the file that was exported from the database onto the virtual machine.",
+      "pos": [
+        3345,
+        3425
+      ]
+    },
+    {
+      "content": "If the backup file is very large, you can compress it before uploading.",
+      "pos": [
+        3426,
+        3497
+      ]
+    },
+    {
+      "content": "c) Sign in to the virtual machine, and connect to the newly created MySQL server by using mysql.exe: mysql -h",
+      "pos": [
+        3503,
+        3612
+      ]
+    },
+    {
+      "content": "-P",
+      "pos": [
+        3629,
+        3631
+      ]
+    },
+    {
+      "content": "–u",
+      "pos": [
+        3645,
+        3647
+      ]
+    },
+    {
+      "content": "-p",
+      "pos": [
+        3658,
+        3660
+      ]
+    },
+    {
+      "content": "d) Run the source",
+      "pos": [
+        3676,
+        3693
+      ]
+    },
+    {
+      "content": "SQL command to import data within the backup file.",
+      "pos": [
+        3713,
+        3763
+      ]
+    },
+    {
+      "content": "e) Repeat steps c and d until all the data in the user databases has been imported into the MySQL server.",
+      "pos": [
+        3769,
+        3874
+      ]
+    },
+    {
+      "content": "Make the newly created MySQL server the slave server",
+      "pos": [
+        3880,
+        3932
+      ]
+    },
+    {
+      "content": "a) Select the newly created MySQL server, and click the “Replicate” page.",
+      "pos": [
+        3938,
+        4011
+      ]
+    },
+    {
+      "content": "b) Change the role to “Slave server,” and then enter the master server parameters.",
+      "pos": [
+        4017,
+        4099
+      ]
+    },
+    {
+      "content": "i.",
+      "pos": [
+        4105,
+        4107
+      ]
+    },
+    {
+      "content": "For the master server binary log file name and offset, enter the results obtained in step b.",
+      "pos": [
+        4108,
+        4200
+      ]
+    },
+    {
+      "content": "ii.",
+      "pos": [
+        4206,
+        4209
+      ]
+    },
+    {
+      "content": "If you are using SSL links, select the enable option in the locations by using the SSL links.",
+      "pos": [
+        4210,
+        4303
+      ]
+    },
+    {
+      "content": "Next, open the master server certification authority (CA) certificate and copy the entire contents into the input box of the master server CA certificate.",
+      "pos": [
+        4304,
+        4458
+      ]
+    },
+    {
+      "content": "c) Click Save after all the details are correctly configured.",
+      "pos": [
+        4459,
+        4520
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>**We strongly recommend using SSL to help ensure that your data is secure.",
+      "pos": [
+        4523,
+        4609
+      ]
+    },
+    {
+      "content": "**",
+      "pos": [
+        4610,
+        4612
+      ]
+    },
+    {
+      "content": "Configuration process",
+      "pos": [
+        4616,
+        4637
+      ]
+    },
+    {
+      "content": "Once the configuration is successful, the Replication Status at the bottom should say “replicating.”",
+      "pos": [
+        4709,
+        4809
+      ]
+    },
+    {
+      "content": "Configuration process",
+      "pos": [
+        4812,
+        4833
+      ]
+    },
+    {
+      "pos": [
+        4900,
+        5497
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph><bpt id=\"p1\">**</bpt>Once the replication role of the MySQL server is set to slave server, the server will be in read-only mode. - Once the replication role of the MySQL server is set to slave server, none of the master server parameters on the replication page will be editable, except for the role. If there is an input error, you must set the replication role to Disabled and then reconfigure the slave server parameters. - We recommend setting the binlog\\_format for the master server to Mixed or Row, to avoid causing data replication errors due to the use of unsafe statements such as sysdate ().<ept id=\"p1\">**</ept>"
+    },
+    {
+      "content": "Data replication restrictions",
+      "pos": [
+        5502,
+        5531
+      ]
+    },
+    {
+      "content": "Changes on the master server to accounts and permissions are not replicated.",
+      "pos": [
+        5535,
+        5611
+      ]
+    },
+    {
+      "content": "If you created an account on the master server and this account needs to access the slave server, then you will need to create the same account yourself on MySQL Database on Azure.",
+      "pos": [
+        5612,
+        5792
+      ]
+    },
+    {
+      "content": "The master and slave server versions must be the same.",
+      "pos": [
+        5797,
+        5851
+      ]
+    },
+    {
+      "content": "For example, both must be MySQL 5.5, or both must be MySQL 5.6.",
+      "pos": [
+        5852,
+        5915
+      ]
+    },
+    {
+      "content": "Solving data replication errors",
+      "pos": [
+        5919,
+        5950
+      ]
+    },
+    {
+      "content": "If replication stops because it encounters a problem of any kind, the replication status will change to “Replication Error.”",
+      "pos": [
+        5951,
+        6075
+      ]
+    },
+    {
+      "content": "You can find details of the error by looking at the Replication Error field.",
+      "pos": [
+        6076,
+        6152
+      ]
+    },
+    {
+      "content": "Common causes of replication errors include:",
+      "pos": [
+        6153,
+        6197
+      ]
+    },
+    {
+      "content": "The value of the max\\_allowed\\_packet parameter on the slave server is less than the value of the same parameter on the master server.",
+      "pos": [
+        6202,
+        6336
+      ]
+    },
+    {
+      "content": "This parameter determines the maximum permitted Data Manipulation Language (DML) size for MySQL servers.",
+      "pos": [
+        6337,
+        6441
+      ]
+    },
+    {
+      "content": "If the value of the parameter is smaller on the slave server than on the master server, some DMLs may run successfully on the master side but fail to run on the slave server, causing an error.",
+      "pos": [
+        6442,
+        6634
+      ]
+    },
+    {
+      "content": "Ensure that the max\\_allowed\\_packet values are consistent between the master and slave servers.",
+      "pos": [
+        6635,
+        6731
+      ]
+    },
+    {
+      "content": "When the replication role is changed to slave server, there is a parameter input error on the master server.",
+      "pos": [
+        6735,
+        6843
+      ]
+    },
+    {
+      "content": "This makes it impossible for the slave server to connect to the master server.",
+      "pos": [
+        6844,
+        6922
+      ]
+    },
+    {
+      "content": "Data is consistent between the master and slave servers.",
+      "pos": [
+        6926,
+        6982
+      ]
+    },
+    {
+      "content": "For example, replication attempts to insert a record into the slave server that already exists.",
+      "pos": [
+        6983,
+        7078
+      ]
+    },
+    {
+      "content": "There are several possible causes of this error:",
+      "pos": [
+        7079,
+        7127
+      ]
+    },
+    {
+      "content": "Some DMLs on the master server were not recorded in the binary log file.",
+      "pos": [
+        7135,
+        7207
+      ]
+    },
+    {
+      "content": "For example, SET sql\\_log\\_bin=0 was executed before the DML was executed on the master server.",
+      "pos": [
+        7208,
+        7303
+      ]
+    },
+    {
+      "content": "Before the replication role was changed to the slave server, faulty write operations were performed on it.",
+      "pos": [
+        7311,
+        7417
+      ]
+    },
+    {
+      "content": "There are input errors for the binary log file name or offset the replication role was changed to the slave server.",
+      "pos": [
+        7425,
+        7540
+      ]
+    },
+    {
+      "content": "If data replication errors do occur, solve them by using the following process:",
+      "pos": [
+        7542,
+        7621
+      ]
+    },
+    {
+      "content": "Use the Azure portal to change the replication role of the MySQL to Disabled.",
+      "pos": [
+        7627,
+        7704
+      ]
+    },
+    {
+      "content": "This will put the MySQL in read-only mode.",
+      "pos": [
+        7705,
+        7747
+      ]
+    },
+    {
+      "content": "Determine the cause of the error by looking at the replication error field, and resolve the issue.",
+      "pos": [
+        7753,
+        7851
+      ]
+    },
+    {
+      "content": "For example, you can set a max\\_allowed\\_packet value consistent with that on the master server and change the record on the slave server that is causing the replication failure.",
+      "pos": [
+        7852,
+        8030
+      ]
+    },
+    {
+      "content": "Use the Azure portal to change the replication role of the MySQL back to the slave server.",
+      "pos": [
+        8036,
+        8126
+      ]
+    }
+  ],
+  "content": "<properties linkid=\"\" urlDisplayName=\"\" pageTitle=\"Configure SQL Data Sync to replicate to MySQL Database on Azure – Azure cloud\" metakeywords=\"Azure Cloud, technical documentation, documents and resources, MySQL, database, service restrictions and limitations, data replication, Azure MySQL, MySQL PaaS, Azure MySQL PaaS, Azure MySQL Service, Azure RDS\" description=\"This article helps you to understand how to use the SQL Data Sync function to replicate local MySQL instances to the cloud.\" metaCanonical=\"\" services=\"MySQL\" documentationCenter=\"Services\" title=\"\" authors=\"\" solutions=\"\" manager=\"\" editor=\"\" />\n\n<tags ms.service=\"mysql\" ms.date=\"\" wacn.date=\"09/16/2015\"/>\n\n#Configure SQL Data Sync to replicate to MySQL Database on Azure\nMySQL Database on Azure supports slave server mode and standard MySQL data replication. You can use this feature to automatically sync database data from a MySQL server that is running locally or in other locations to a server that is running on MySQL Database on Azure.\n\n##Configuration steps\n1.  Confirm that the system variable lower\\_case\\_table\\_names on the master MySQL server is set to 1. If not, then you must set it to 1. MySQL database replication requires the value of this parameter to be consistent between the master and slave servers, and this parameter is set to 1 on MySQL on Azure. mysql> SET GLOBAL lower\\_case\\_table\\_names = 1;\n2.  Set the master server to read-only mode: mysql> FLUSH TABLES WITH READ LOCK; mysql> SET GLOBAL read\\_only = ON;\n3.  Run the “show master status” SQL command on the master server to ascertain the current binary log file name and offset. The results returned should be similar to this: ![Return to results](./media/mysql-database-data-replication/packet.png)\n\n4.  Export the databases for all users on the master server, for example, by using the mysqldump tool. mysqldump --databases <database name> --single-transaction --order-by-primary -r <backup file name> --routines -h<server address> -P<port number> –u<username> -p<password> Note that databases that are built into MySQL servers, including the MySQL library and test library, do not need to be exported.\n5.  Once the database has been exported, change the master MySQL server setting back to read/write mode: mysql> SET GLOBAL read\\_only = OFF; mysql> UNLOCK TABLES;  \n6.  Create an account on the master MySQL server for data replication use, and set up the permissions. CREATE USER '<your user>'@'%' IDENTIFIED BY '<your password>'; GRANT REPLICATION SLAVE ON *.* TO '<your user>'@'%';\n7.  Sign in to the Azure portal and create a new MySQL server on MySQL Database on Azure.\n8.  Create individual databases for all users on the master server on the newly created MySQL server.\n9.  Create the required user accounts on the newly created MySQL server. This is necessary because user account information cannot be replicated.\n10. Import the user database data exported from the master server onto the newly created MySQL server. If the database file is very large, we recommend that you upload the file to a virtual machine on Azure, and then import it into the MySQL server from the virtual machine. The virtual machine should be in the same data center as the newly created MySQL server. The specific steps are listed below.\n\n    a) Upload the mysql.exe tool to the virtual machine.\n\n    b) Upload the file that was exported from the database onto the virtual machine. If the backup file is very large, you can compress it before uploading.\n\n    c) Sign in to the virtual machine, and connect to the newly created MySQL server by using mysql.exe: mysql -h<server address> -P<port number> –u<username> -p<password>\n\n    d) Run the source <backup file name> SQL command to import data within the backup file.\n\n    e) Repeat steps c and d until all the data in the user databases has been imported into the MySQL server.\n\n11. Make the newly created MySQL server the slave server\n\n    a) Select the newly created MySQL server, and click the “Replicate” page.\n\n    b) Change the role to “Slave server,” and then enter the master server parameters.\n\n    i. For the master server binary log file name and offset, enter the results obtained in step b.\n\n    ii. If you are using SSL links, select the enable option in the locations by using the SSL links. Next, open the master server certification authority (CA) certificate and copy the entire contents into the input box of the master server CA certificate. c) Click Save after all the details are correctly configured.\n\n>[AZURE.NOTE]**We strongly recommend using SSL to help ensure that your data is secure. **\n\n![Configuration process](./media/mysql-database-data-replication/replicationsetting.png)\n\n\n12. Once the configuration is successful, the Replication Status at the bottom should say “replicating.” ![Configuration process](./media/mysql-database-data-replication/replicationstatus.png)\n\n>[AZURE.NOTE]**Once the replication role of the MySQL server is set to slave server, the server will be in read-only mode. - Once the replication role of the MySQL server is set to slave server, none of the master server parameters on the replication page will be editable, except for the role. If there is an input error, you must set the replication role to Disabled and then reconfigure the slave server parameters. - We recommend setting the binlog\\_format for the master server to Mixed or Row, to avoid causing data replication errors due to the use of unsafe statements such as sysdate ().**\n\n\n##Data replication restrictions\n1. Changes on the master server to accounts and permissions are not replicated. If you created an account on the master server and this account needs to access the slave server, then you will need to create the same account yourself on MySQL Database on Azure.\n\n2. The master and slave server versions must be the same. For example, both must be MySQL 5.5, or both must be MySQL 5.6.\n\n##Solving data replication errors\nIf replication stops because it encounters a problem of any kind, the replication status will change to “Replication Error.” You can find details of the error by looking at the Replication Error field. Common causes of replication errors include:  \n- The value of the max\\_allowed\\_packet parameter on the slave server is less than the value of the same parameter on the master server. This parameter determines the maximum permitted Data Manipulation Language (DML) size for MySQL servers. If the value of the parameter is smaller on the slave server than on the master server, some DMLs may run successfully on the master side but fail to run on the slave server, causing an error. Ensure that the max\\_allowed\\_packet values are consistent between the master and slave servers.\n\n- When the replication role is changed to slave server, there is a parameter input error on the master server. This makes it impossible for the slave server to connect to the master server.\n\n- Data is consistent between the master and slave servers. For example, replication attempts to insert a record into the slave server that already exists. There are several possible causes of this error:\n\n    - Some DMLs on the master server were not recorded in the binary log file. For example, SET sql\\_log\\_bin=0 was executed before the DML was executed on the master server.\n\n    - Before the replication role was changed to the slave server, faulty write operations were performed on it.\n\n    - There are input errors for the binary log file name or offset the replication role was changed to the slave server.\n\nIf data replication errors do occur, solve them by using the following process:\n\n1.  Use the Azure portal to change the replication role of the MySQL to Disabled. This will put the MySQL in read-only mode.\n\n2.  Determine the cause of the error by looking at the replication error field, and resolve the issue. For example, you can set a max\\_allowed\\_packet value consistent with that on the master server and change the record on the slave server that is causing the replication failure.\n\n3.  Use the Azure portal to change the replication role of the MySQL back to the slave server.\n\n\n    - The master server binary log file name and offset are the master server binary file name and offset that were previously replicated and executed. If there were previously no input errors with the binary log file name or offset, we do not recommend making any changes.\n\n    - For security reasons, the master server password and master server CA certificate that were previously entered will not be displayed at this time. If you do not make any changes, MySQL will continue to use the previous password and CA certificate.\n\n    - The other master server parameter fields will show the corresponding parameter values that were previously entered. If there are no errors, you do not need to make any changes.\n\n<!--HONumber=81-->"
+}

@@ -1,0 +1,467 @@
+{
+  "nodes": [
+    {
+      "content": "创建和上载 Oracle Linux VHD | Azure",
+      "pos": [
+        27,
+        57
+      ]
+    },
+    {
+      "content": "了解如何创建和上载包含 Oracle Linux 操作系统的 Azure 虚拟硬盘 (VHD)。",
+      "pos": [
+        76,
+        124
+      ]
+    },
+    {
+      "content": "为 Azure 准备 Oracle Linux 虚拟机",
+      "pos": [
+        407,
+        434
+      ]
+    },
+    {
+      "content": "为 Azure 准备 Oracle Linux 6.4+ 虚拟机",
+      "pos": [
+        440,
+        472
+      ]
+    },
+    {
+      "content": "为 Azure 准备 Oracle Linux 7.0+ 虚拟机",
+      "pos": [
+        487,
+        519
+      ]
+    },
+    {
+      "pos": [
+        532,
+        615
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-both-include.md)</ept>]"
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        619,
+        623
+      ]
+    },
+    {
+      "pos": [
+        627,
+        783
+      ],
+      "content": "本文假定你已在虚拟硬盘中安装了 Oracle Linux 操作系统。存在多个用于创建 .vhd 文件的工具，例如 Hyper-V 等虚拟化解决方案。有关说明，请参阅<bpt id=\"p1\">[</bpt>安装 Hyper-V 角色和配置虚拟机<ept id=\"p1\">](http://technet.microsoft.com/library/hh846766.aspx)</ept>。"
+    },
+    {
+      "content": "Oracle Linux 安装说明",
+      "pos": [
+        788,
+        805
+      ]
+    },
+    {
+      "content": "Hyper-V 和 Azure 同时支持 Oracle 的 Red Hat 兼容内核及其 UEK3（坚不可摧企业内核）。为了获得最佳结果，请务必在准备 Oracle Linux VHD 时更新到最新内核。",
+      "pos": [
+        811,
+        913
+      ]
+    },
+    {
+      "content": "Hyper-V 和 Azure 不支持 Oracle 的 UEK2，因为它不包括所需的驱动程序。",
+      "pos": [
+        917,
+        965
+      ]
+    },
+    {
+      "pos": [
+        969,
+        1054
+      ],
+      "content": "Azure 不支持 VHDX 格式，仅支持<bpt id=\"p1\">**</bpt>固定大小的 VHD<ept id=\"p1\">**</ept>。可使用 Hyper-V 管理器或 convert-vhd cmdlet 将磁盘转换为 VHD 格式。"
+    },
+    {
+      "pos": [
+        1058,
+        1250
+      ],
+      "content": "在安装 Linux 系统时，建议使用标准分区而不是 LVM（通常是许多安装的默认值）。这将避免 LVM 与克隆 VM 发生名称冲突，特别是在 OS 磁盘需要连接到另一台 VM 以进行故障排除的情况下。如果首选，LVM 或 <bpt id=\"p1\">[</bpt>RAID<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-configure-raid)</ept> 可以在数据磁盘上使用。"
+    },
+    {
+      "content": "由于低于 2.6.37 的 Linux 内核版本中的 bug，更大的 VM 不支持 NUMA。此问题主要影响使用上游 Red Hat 2.6.32 内核的分发。手动安装的 Azure Linux 代理 (waagent) 将自动在 Linux 内核的 GRUB 配置中禁用 NUMA。可以在下面的步骤中找到有关此内容的详细信息。",
+      "pos": [
+        1254,
+        1418
+      ]
+    },
+    {
+      "content": "不要在操作系统磁盘上配置交换分区。可以配置 Linux 代理，以在临时资源磁盘上创建交换文件。可以在下面的步骤中找到有关此内容的详细信息。",
+      "pos": [
+        1422,
+        1491
+      ]
+    },
+    {
+      "content": "所有 VHD 的大小必须是 1 MB 的倍数。",
+      "pos": [
+        1495,
+        1518
+      ]
+    },
+    {
+      "pos": [
+        1524,
+        1563
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"oracle6\"&gt;</ph> <ph id=\"ph2\">&lt;/a&gt;</ph> Oracle Linux 6.4+"
+    },
+    {
+      "content": "您必须在操作系统中完成特定的配置步骤才能使虚拟机在 Azure 中运行。",
+      "pos": [
+        1568,
+        1604
+      ]
+    },
+    {
+      "content": "在 Hyper-V 管理器的中间窗格中，选择虚拟机。",
+      "pos": [
+        1609,
+        1635
+      ]
+    },
+    {
+      "pos": [
+        1640,
+        1659
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“连接”<ept id=\"p1\">**</ept>以打开虚拟机窗口。"
+    },
+    {
+      "content": "通过运行以下命令卸载 NetworkManager：",
+      "pos": [
+        1664,
+        1690
+      ]
+    },
+    {
+      "pos": [
+        1743,
+        1784
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>如果尚未安装此包，则该命令将失败，并显示一条错误消息。这是正常情况。"
+    },
+    {
+      "pos": [
+        1790,
+        1843
+      ],
+      "content": "在包含以下文本的 <ph id=\"ph1\">`/etc/sysconfig/`</ph> 目录中创建一个名为 <bpt id=\"p1\">**</bpt>network<ept id=\"p1\">**</ept> 的文件："
+    },
+    {
+      "pos": [
+        1912,
+        1984
+      ],
+      "content": "在包含以下文本的 <ph id=\"ph1\">`/etc/sysconfig/network-scripts/`</ph> 目录中创建一个名为 <bpt id=\"p1\">**</bpt>ifcfg-eth0<ept id=\"p1\">**</ept> 的文件："
+    },
+    {
+      "content": "移动（或删除）udev 规则，以避免产生以太网接口的静态规则。在 Azure 或 Hyper-V 中克隆虚拟机时，这些规则会引发问题：",
+      "pos": [
+        2134,
+        2201
+      ]
+    },
+    {
+      "content": "通过运行以下命令，确保网络服务将在引导时启动：",
+      "pos": [
+        2443,
+        2466
+      ]
+    },
+    {
+      "content": "通过运行以下命令安装 python-pyasn1：",
+      "pos": [
+        2503,
+        2528
+      ]
+    },
+    {
+      "content": "在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开“/boot/grub/menu.lst”，并确保默认内核包含以下参数：",
+      "pos": [
+        2576,
+        2663
+      ]
+    },
+    {
+      "content": "这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。由于 Oracle 的 Red Hat 兼容内核中的 bug，这将禁用 NUMA。",
+      "pos": [
+        2733,
+        2820
+      ]
+    },
+    {
+      "pos": [
+        2826,
+        2842
+      ],
+      "content": "除此之外，建议<bpt id=\"p1\">*</bpt>删除<ept id=\"p1\">*</ept>以下参数："
+    },
+    {
+      "content": "图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。",
+      "pos": [
+        2885,
+        2927
+      ]
+    },
+    {
+      "pos": [
+        2933,
+        3008
+      ],
+      "content": "根据需要可以配置 <ph id=\"ph1\">`crashkernel`</ph> 选项，但请注意此参数会使虚拟机中的可用内存量减少 128MB 或更多，这在较小的虚拟机上可能会出现问题。"
+    },
+    {
+      "content": "请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。",
+      "pos": [
+        3015,
+        3052
+      ]
+    },
+    {
+      "content": "通过运行以下命令来安装 Azure Linux 代理：",
+      "pos": [
+        3058,
+        3085
+      ]
+    },
+    {
+      "content": "请注意，如果没有如步骤 2 中所述删除 NetworkManager 包和 NetworkManager-gnome 包，则安装 WALinuxAgent 包将删除它们。",
+      "pos": [
+        3132,
+        3217
+      ]
+    },
+    {
+      "content": "不要在 OS 磁盘上创建交换空间。",
+      "pos": [
+        3223,
+        3240
+      ]
+    },
+    {
+      "pos": [
+        3246,
+        3391
+      ],
+      "content": "Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是<bpt id=\"p1\">*</bpt>临时<ept id=\"p1\">*</ept>磁盘，并可能在取消设置虚拟机时被清空。在安装 Azure Linux 代理（请参见前一步骤）后，相应地在 /etc/waagent.conf 中修改以下参数："
+    },
+    {
+      "content": "运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：",
+      "pos": [
+        3634,
+        3674
+      ]
+    },
+    {
+      "pos": [
+        3769,
+        3825
+      ],
+      "content": "在 Hyper-V 管理器中单击<bpt id=\"p1\">**</bpt>“操作”-&gt;“关闭”<ept id=\"p1\">**</ept>。Linux VHD 现已准备好上载到 Azure。"
+    },
+    {
+      "pos": [
+        3844,
+        3883
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"oracle7\"&gt;</ph> <ph id=\"ph2\">&lt;/a&gt;</ph> Oracle Linux 7.0+"
+    },
+    {
+      "content": "Oracle Linux 7 中的更改",
+      "pos": [
+        3890,
+        3909
+      ]
+    },
+    {
+      "content": "为 Azure 准备 Oracle Linux 7 虚拟机非常类似于 Oracle Linux 6，但有几个值得注意的重要区别：",
+      "pos": [
+        3913,
+        3977
+      ]
+    },
+    {
+      "content": "在 Azure 中同时支持 Red Hat 兼容内核和 Oracle 的 UEK3。建议使用 UEK3 内核。",
+      "pos": [
+        3982,
+        4037
+      ]
+    },
+    {
+      "content": "NetworkManager 包不再与 Azure Linux 代理冲突。默认情况下将安装此包，建议你不要删除它。",
+      "pos": [
+        4041,
+        4098
+      ]
+    },
+    {
+      "content": "GRUB2 现在用作默认引导加载程序，因此用于编辑内核参数的过程已更改（请参见下文）。",
+      "pos": [
+        4102,
+        4145
+      ]
+    },
+    {
+      "content": "XFS 现在是默认文件系统。如果需要，仍可以使用 ext4 文件系统。",
+      "pos": [
+        4149,
+        4184
+      ]
+    },
+    {
+      "content": "配置步骤",
+      "pos": [
+        4189,
+        4193
+      ]
+    },
+    {
+      "content": "在 Hyper-V 管理器中，选择虚拟机。",
+      "pos": [
+        4200,
+        4221
+      ]
+    },
+    {
+      "pos": [
+        4226,
+        4250
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“连接”<ept id=\"p1\">**</ept>以打开该虚拟机的控制台窗口。"
+    },
+    {
+      "pos": [
+        4256,
+        4309
+      ],
+      "content": "在包含以下文本的 <ph id=\"ph1\">`/etc/sysconfig/`</ph> 目录中创建一个名为 <bpt id=\"p1\">**</bpt>network<ept id=\"p1\">**</ept> 的文件："
+    },
+    {
+      "pos": [
+        4378,
+        4450
+      ],
+      "content": "在包含以下文本的 <ph id=\"ph1\">`/etc/sysconfig/network-scripts/`</ph> 目录中创建一个名为 <bpt id=\"p1\">**</bpt>ifcfg-eth0<ept id=\"p1\">**</ept> 的文件："
+    },
+    {
+      "content": "移动（或删除）udev 规则，以避免产生以太网接口的静态规则。在 Azure 或 Hyper-V 中克隆虚拟机时，这些规则会引发问题：",
+      "pos": [
+        4600,
+        4667
+      ]
+    },
+    {
+      "content": "通过运行以下命令，确保网络服务将在引导时启动：",
+      "pos": [
+        4909,
+        4932
+      ]
+    },
+    {
+      "content": "通过运行以下命令安装 python-pyasn1 包：",
+      "pos": [
+        4974,
+        5001
+      ]
+    },
+    {
+      "content": "运行以下命令以清除当前 yum 元数据并安装所有更新：",
+      "pos": [
+        5049,
+        5076
+      ]
+    },
+    {
+      "pos": [
+        5141,
+        5242
+      ],
+      "content": "在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开“/etc/default/grub”并编辑 <ph id=\"ph1\">`GRUB_CMDLINE_LINUX`</ph> 参数，例如："
+    },
+    {
+      "pos": [
+        5324,
+        5386
+      ],
+      "content": "这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。除此之外，建议<bpt id=\"p1\">*</bpt>删除<ept id=\"p1\">*</ept>以下参数："
+    },
+    {
+      "content": "图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。",
+      "pos": [
+        5429,
+        5471
+      ]
+    },
+    {
+      "pos": [
+        5477,
+        5552
+      ],
+      "content": "根据需要可以配置 <ph id=\"ph1\">`crashkernel`</ph> 选项，但请注意此参数会使虚拟机中的可用内存量减少 128MB 或更多，这在较小的虚拟机上可能会出现问题。"
+    },
+    {
+      "content": "完成后，请按照上面所示编辑“/etc/default/grub”，运行以下命令以重新生成 grub 配置：",
+      "pos": [
+        5559,
+        5612
+      ]
+    },
+    {
+      "content": "请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。",
+      "pos": [
+        5673,
+        5710
+      ]
+    },
+    {
+      "content": "通过运行以下命令来安装 Azure Linux 代理：",
+      "pos": [
+        5716,
+        5743
+      ]
+    },
+    {
+      "content": "不要在操作系统磁盘上创建交换空间",
+      "pos": [
+        5790,
+        5806
+      ]
+    },
+    {
+      "pos": [
+        5812,
+        5957
+      ],
+      "content": "Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是<bpt id=\"p1\">*</bpt>临时<ept id=\"p1\">*</ept>磁盘，并可能在取消设置虚拟机时被清空。在安装 Azure Linux 代理（请参见前一步骤）后，相应地在 /etc/waagent.conf 中修改以下参数："
+    },
+    {
+      "content": "运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：",
+      "pos": [
+        6200,
+        6240
+      ]
+    },
+    {
+      "pos": [
+        6335,
+        6391
+      ],
+      "content": "在 Hyper-V 管理器中单击<bpt id=\"p1\">**</bpt>“操作”-&gt;“关闭”<ept id=\"p1\">**</ept>。Linux VHD 现已准备好上载到 Azure。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"创建和上载 Oracle Linux VHD | Azure\"\n    description=\"了解如何创建和上载包含 Oracle Linux 操作系统的 Azure 虚拟硬盘 (VHD)。\"\n    services=\"virtual-machines\"\n    documentationCenter=\"\"\n    authors=\"szarkos\"\n    manager=\"timlt\"\n    editor=\"tysonn\"\n    tags=\"azure-service-management,azure-resource-manager\" />\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"10/05/2015\"\n    wacn.date=\"12/17/2015\"/>\n\n# 为 Azure 准备 Oracle Linux 虚拟机\n\n\n- [为 Azure 准备 Oracle Linux 6.4+ 虚拟机](#oracle6)\n- [为 Azure 准备 Oracle Linux 7.0+ 虚拟机](#oracle7)\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-both-include.md)]\n\n##先决条件##\n\n本文假定你已在虚拟硬盘中安装了 Oracle Linux 操作系统。存在多个用于创建 .vhd 文件的工具，例如 Hyper-V 等虚拟化解决方案。有关说明，请参阅[安装 Hyper-V 角色和配置虚拟机](http://technet.microsoft.com/library/hh846766.aspx)。\n\n\n**Oracle Linux 安装说明**\n\n- Hyper-V 和 Azure 同时支持 Oracle 的 Red Hat 兼容内核及其 UEK3（坚不可摧企业内核）。为了获得最佳结果，请务必在准备 Oracle Linux VHD 时更新到最新内核。\n\n- Hyper-V 和 Azure 不支持 Oracle 的 UEK2，因为它不包括所需的驱动程序。\n\n- Azure 不支持 VHDX 格式，仅支持**固定大小的 VHD**。可使用 Hyper-V 管理器或 convert-vhd cmdlet 将磁盘转换为 VHD 格式。\n\n- 在安装 Linux 系统时，建议使用标准分区而不是 LVM（通常是许多安装的默认值）。这将避免 LVM 与克隆 VM 发生名称冲突，特别是在 OS 磁盘需要连接到另一台 VM 以进行故障排除的情况下。如果首选，LVM 或 [RAID](/documentation/articles/virtual-machines-linux-configure-raid) 可以在数据磁盘上使用。\n\n- 由于低于 2.6.37 的 Linux 内核版本中的 bug，更大的 VM 不支持 NUMA。此问题主要影响使用上游 Red Hat 2.6.32 内核的分发。手动安装的 Azure Linux 代理 (waagent) 将自动在 Linux 内核的 GRUB 配置中禁用 NUMA。可以在下面的步骤中找到有关此内容的详细信息。\n\n- 不要在操作系统磁盘上配置交换分区。可以配置 Linux 代理，以在临时资源磁盘上创建交换文件。可以在下面的步骤中找到有关此内容的详细信息。\n\n- 所有 VHD 的大小必须是 1 MB 的倍数。\n\n\n## <a id=\"oracle6\"> </a> Oracle Linux 6.4+ ##\n\n您必须在操作系统中完成特定的配置步骤才能使虚拟机在 Azure 中运行。\n\n1. 在 Hyper-V 管理器的中间窗格中，选择虚拟机。\n\n2. 单击**“连接”**以打开虚拟机窗口。\n\n3. 通过运行以下命令卸载 NetworkManager：\n\n        # sudo rpm -e --nodeps NetworkManager\n\n    **注意：**如果尚未安装此包，则该命令将失败，并显示一条错误消息。这是正常情况。\n\n4.  在包含以下文本的 `/etc/sysconfig/` 目录中创建一个名为 **network** 的文件：\n\n        NETWORKING=yes\n        HOSTNAME=localhost.localdomain\n\n5.  在包含以下文本的 `/etc/sysconfig/network-scripts/` 目录中创建一个名为 **ifcfg-eth0** 的文件：\n\n        DEVICE=eth0\n        ONBOOT=yes\n        BOOTPROTO=dhcp\n        TYPE=Ethernet\n        USERCTL=no\n        PEERDNS=yes\n        IPV6INIT=no\n\n6.  移动（或删除）udev 规则，以避免产生以太网接口的静态规则。在 Azure 或 Hyper-V 中克隆虚拟机时，这些规则会引发问题：\n\n        # sudo mkdir -m 0700 /var/lib/waagent\n        # sudo mv /lib/udev/rules.d/75-persistent-net-generator.rules /var/lib/waagent/ 2>/dev/null\n        # sudo mv /etc/udev/rules.d/70-persistent-net.rules /var/lib/waagent/ 2>/dev/null\n\n7. 通过运行以下命令，确保网络服务将在引导时启动：\n\n        # chkconfig network on\n\n8. 通过运行以下命令安装 python-pyasn1：\n\n        # sudo yum install python-pyasn1\n\n9.  在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开“/boot/grub/menu.lst”，并确保默认内核包含以下参数：\n\n        console=ttyS0 earlyprintk=ttyS0 rootdelay=300 numa=off\n\n    这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。由于 Oracle 的 Red Hat 兼容内核中的 bug，这将禁用 NUMA。\n\n    除此之外，建议*删除*以下参数：\n\n        rhgb quiet crashkernel=auto\n\n    图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。\n\n    根据需要可以配置 `crashkernel` 选项，但请注意此参数会使虚拟机中的可用内存量减少 128MB 或更多，这在较小的虚拟机上可能会出现问题。\n\n\n10. 请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。\n\n11. 通过运行以下命令来安装 Azure Linux 代理：\n\n        # sudo yum install WALinuxAgent\n\n    请注意，如果没有如步骤 2 中所述删除 NetworkManager 包和 NetworkManager-gnome 包，则安装 WALinuxAgent 包将删除它们。\n\n12. 不要在 OS 磁盘上创建交换空间。\n\n    Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是*临时*磁盘，并可能在取消设置虚拟机时被清空。在安装 Azure Linux 代理（请参见前一步骤）后，相应地在 /etc/waagent.conf 中修改以下参数：\n\n        ResourceDisk.Format=y\n        ResourceDisk.Filesystem=ext4\n        ResourceDisk.MountPoint=/mnt/resource\n        ResourceDisk.EnableSwap=y\n        ResourceDisk.SwapSizeMB=2048    ## NOTE: set this to whatever you need it to be.\n\n13. 运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：\n\n        # sudo waagent -force -deprovision\n        # export HISTSIZE=0\n        # logout\n\n14. 在 Hyper-V 管理器中单击**“操作”->“关闭”**。Linux VHD 现已准备好上载到 Azure。\n\n\n----------\n\n\n## <a id=\"oracle7\"> </a> Oracle Linux 7.0+ ##\n\n**Oracle Linux 7 中的更改**\n\n为 Azure 准备 Oracle Linux 7 虚拟机非常类似于 Oracle Linux 6，但有几个值得注意的重要区别：\n\n - 在 Azure 中同时支持 Red Hat 兼容内核和 Oracle 的 UEK3。建议使用 UEK3 内核。\n - NetworkManager 包不再与 Azure Linux 代理冲突。默认情况下将安装此包，建议你不要删除它。\n - GRUB2 现在用作默认引导加载程序，因此用于编辑内核参数的过程已更改（请参见下文）。\n - XFS 现在是默认文件系统。如果需要，仍可以使用 ext4 文件系统。\n\n\n**配置步骤**\n\n1. 在 Hyper-V 管理器中，选择虚拟机。\n\n2. 单击**“连接”**以打开该虚拟机的控制台窗口。\n\n3.  在包含以下文本的 `/etc/sysconfig/` 目录中创建一个名为 **network** 的文件：\n\n        NETWORKING=yes\n        HOSTNAME=localhost.localdomain\n\n4.  在包含以下文本的 `/etc/sysconfig/network-scripts/` 目录中创建一个名为 **ifcfg-eth0** 的文件：\n\n        DEVICE=eth0\n        ONBOOT=yes\n        BOOTPROTO=dhcp\n        TYPE=Ethernet\n        USERCTL=no\n        PEERDNS=yes\n        IPV6INIT=no\n\n5.  移动（或删除）udev 规则，以避免产生以太网接口的静态规则。在 Azure 或 Hyper-V 中克隆虚拟机时，这些规则会引发问题：\n\n        # sudo mkdir -m 0700 /var/lib/waagent\n        # sudo mv /lib/udev/rules.d/75-persistent-net-generator.rules /var/lib/waagent/ 2>/dev/null\n        # sudo mv /etc/udev/rules.d/70-persistent-net.rules /var/lib/waagent/ 2>/dev/null\n\n6. 通过运行以下命令，确保网络服务将在引导时启动：\n\n        # sudo chkconfig network on\n\n7. 通过运行以下命令安装 python-pyasn1 包：\n\n        # sudo yum install python-pyasn1\n\n8.  运行以下命令以清除当前 yum 元数据并安装所有更新：\n\n        # sudo yum clean all\n        # sudo yum -y update\n\n9.  在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开“/etc/default/grub”并编辑 `GRUB_CMDLINE_LINUX` 参数，例如：\n\n        GRUB_CMDLINE_LINUX=\"rootdelay=300 console=ttyS0 earlyprintk=ttyS0\"\n\n    这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。除此之外，建议*删除*以下参数：\n\n        rhgb quiet crashkernel=auto\n\n    图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。\n\n    根据需要可以配置 `crashkernel` 选项，但请注意此参数会使虚拟机中的可用内存量减少 128MB 或更多，这在较小的虚拟机上可能会出现问题。\n\n\n10. 完成后，请按照上面所示编辑“/etc/default/grub”，运行以下命令以重新生成 grub 配置：\n\n        # sudo grub2-mkconfig -o /boot/grub2/grub.cfg\n\n11. 请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。\n\n12. 通过运行以下命令来安装 Azure Linux 代理：\n\n        # sudo yum install WALinuxAgent\n\n13. 不要在操作系统磁盘上创建交换空间\n\n    Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是*临时*磁盘，并可能在取消设置虚拟机时被清空。在安装 Azure Linux 代理（请参见前一步骤）后，相应地在 /etc/waagent.conf 中修改以下参数：\n\n        ResourceDisk.Format=y\n        ResourceDisk.Filesystem=ext4\n        ResourceDisk.MountPoint=/mnt/resource\n        ResourceDisk.EnableSwap=y\n        ResourceDisk.SwapSizeMB=2048    ## NOTE: set this to whatever you need it to be.\n\n14. 运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：\n\n        # sudo waagent -force -deprovision\n        # export HISTSIZE=0\n        # logout\n\n15. 在 Hyper-V 管理器中单击**“操作”->“关闭”**。Linux VHD 现已准备好上载到 Azure。\n\n<!---HONumber=Mooncake_1207_2015-->"
+}

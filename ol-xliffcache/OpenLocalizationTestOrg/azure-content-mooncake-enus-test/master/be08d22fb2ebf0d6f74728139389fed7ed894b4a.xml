@@ -1,0 +1,1040 @@
+{
+  "nodes": [
+    {
+      "content": "使用 Azure 表服务的 Node.js Web 应用",
+      "pos": [
+        27,
+        55
+      ]
+    },
+    {
+      "content": "本教程演示如何使用 Azure 表服务在 Azure Web 应用所托管的 Node.js 应用程序中存储数据。",
+      "pos": [
+        74,
+        130
+      ]
+    },
+    {
+      "content": "使用 Azure 表服务的 Node.js Web 应用",
+      "pos": [
+        384,
+        412
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        417,
+        419
+      ]
+    },
+    {
+      "pos": [
+        420,
+        513
+      ],
+      "content": "本教程演示如何使用 Azure 数据管理提供的表服务来存储和访问在 Azure Web 应用上托管的 <bpt id=\"p1\">[</bpt><ept id=\"p1\">node]</ept> 应用程序的数据。本教程假定你之前有使用 node 和<bpt id=\"p2\">[</bpt><ept id=\"p2\">Git]</ept>的经验。"
+    },
+    {
+      "content": "你将学习以下内容：",
+      "pos": [
+        515,
+        524
+      ]
+    },
+    {
+      "content": "如何使用 npm（Node 包管理器）安装 Node 模块",
+      "pos": [
+        528,
+        557
+      ]
+    },
+    {
+      "content": "如何使用 Azure 表服务",
+      "pos": [
+        561,
+        575
+      ]
+    },
+    {
+      "content": "如何使用 Azure CLI 创建 Web 应用。",
+      "pos": [
+        579,
+        604
+      ]
+    },
+    {
+      "content": "按照本教程中的说明操作，构建基于 Web 的简单“待办事项”应用程序，该应用程序可用于创建、检索和完成任务。这些任务存储在表服务中。",
+      "pos": [
+        606,
+        672
+      ]
+    },
+    {
+      "content": "下面是已完成的应用程序：",
+      "pos": [
+        674,
+        686
+      ]
+    },
+    {
+      "content": "显示空白 tasklist 的网页",
+      "pos": [
+        690,
+        707
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        734,
+        738
+      ]
+    },
+    {
+      "content": "在按照本文中的说明操作之前，请确保已安装下列项：",
+      "pos": [
+        740,
+        764
+      ]
+    },
+    {
+      "pos": [
+        768,
+        788
+      ],
+      "content": "<bpt id=\"p1\">[</bpt><ept id=\"p1\">node]</ept> 0.10.24 或更高版本"
+    },
+    {
+      "content": "Git",
+      "pos": [
+        793,
+        796
+      ]
+    },
+    {
+      "content": "创建存储帐户",
+      "pos": [
+        904,
+        910
+      ]
+    },
+    {
+      "content": "创建 Azure 存储帐户。应用会使用此帐户存储待办事项。",
+      "pos": [
+        912,
+        941
+      ]
+    },
+    {
+      "pos": [
+        946,
+        1001
+      ],
+      "content": "打开你的 Web 浏览器并转到 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 门户]</ept>。如果出现提示，请使用你的 Azure 订阅信息进行登录。"
+    },
+    {
+      "content": "在门户底部，单击“+新建”，然后选择“存储帐户”。",
+      "pos": [
+        1006,
+        1031
+      ]
+    },
+    {
+      "content": "\\+新建",
+      "pos": [
+        1039,
+        1043
+      ]
+    },
+    {
+      "content": "存储帐户",
+      "pos": [
+        1064,
+        1068
+      ]
+    },
+    {
+      "content": "选择“快速创建”，然后为此存储帐户输入 URL 和区域/地缘组。由于这是一个教程，不需要全球复制，因此请取消选中“启用异地复制”。最后，单击“创建存储帐户”。",
+      "pos": [
+        1098,
+        1177
+      ]
+    },
+    {
+      "content": "快速创建",
+      "pos": [
+        1185,
+        1189
+      ]
+    },
+    {
+      "content": "请记下你输入的 URL，因为后续步骤将引用此 URL 作为帐户名称。",
+      "pos": [
+        1225,
+        1259
+      ]
+    },
+    {
+      "content": "在创建存储帐户后，单击页面底部的“管理密钥”。这将显示此存储帐户的主访问密钥和辅助访问密钥。复制并保存主访问密钥，然后单击复选标记。",
+      "pos": [
+        1264,
+        1330
+      ]
+    },
+    {
+      "content": "访问密钥",
+      "pos": [
+        1338,
+        1342
+      ]
+    },
+    {
+      "content": "安装模块并生成基架",
+      "pos": [
+        1376,
+        1385
+      ]
+    },
+    {
+      "pos": [
+        1387,
+        1511
+      ],
+      "content": "在本节中，你将创建新的 Node 应用程序并使用 npm 添加模块包。对于此应用程序，你将使用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Express]</ept> 和 <bpt id=\"p2\">[</bpt><ept id=\"p2\">Azure]</ept> 模块。Express 模块为 Node 提供了一个模型视图控制器框架，而 Azure 模块提供了与表服务的连接。"
+    },
+    {
+      "content": "安装 Express 并生成基架",
+      "pos": [
+        1517,
+        1533
+      ]
+    },
+    {
+      "pos": [
+        1538,
+        1574
+      ],
+      "content": "在命令行中，创建名为 <bpt id=\"p1\">**</bpt>tasklist<ept id=\"p1\">**</ept> 的新目录并切换到该目录。"
+    },
+    {
+      "content": "请输入以下命令来安装 Express 模块。",
+      "pos": [
+        1581,
+        1603
+      ]
+    },
+    {
+      "content": "根据操作系统，可能需要将“sudo”放在命令之前：",
+      "pos": [
+        1657,
+        1682
+      ]
+    },
+    {
+      "content": "输出显示类似于以下示例：",
+      "pos": [
+        1741,
+        1753
+      ]
+    },
+    {
+      "pos": [
+        1910,
+        1979
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>“-g”参数会全局安装模块。这样我们使用 <bpt id=\"p1\">**</bpt>express<ept id=\"p1\">**</ept> 生成 Web 应用基架，而无需键入其他路径信息。"
+    },
+    {
+      "pos": [
+        1984,
+        2015
+      ],
+      "content": "若要创建应用程序的基架，请输入 <bpt id=\"p1\">**</bpt>express<ept id=\"p1\">**</ept> 命令："
+    },
+    {
+      "content": "此命令的输出显示类似于以下示例：",
+      "pos": [
+        2038,
+        2054
+      ]
+    },
+    {
+      "pos": [
+        2808,
+        2838
+      ],
+      "content": "此时 <bpt id=\"p1\">**</bpt>tasklist<ept id=\"p1\">**</ept> 目录中会有几个新目录和文件。"
+    },
+    {
+      "content": "安装其他模块",
+      "pos": [
+        2844,
+        2850
+      ]
+    },
+    {
+      "pos": [
+        2852,
+        2957
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>express<ept id=\"p1\">**</ept> 创建的其中一个文件是 <bpt id=\"p2\">**</bpt>package.json<ept id=\"p2\">**</ept>。此文件包含模块依赖项的列表。之后，当你将应用程序部署到 Azure Web 应用时，此文件会确定需要在 Azure 上安装的模块。"
+    },
+    {
+      "pos": [
+        2959,
+        3015
+      ],
+      "content": "在命令行中，输入以下命令，以安装 <bpt id=\"p1\">**</bpt>package.json<ept id=\"p1\">**</ept> 文件中描述的模块。可能需要使用“sudo”。"
+    },
+    {
+      "content": "此命令的输出显示类似于以下示例：",
+      "pos": [
+        3038,
+        3054
+      ]
+    },
+    {
+      "pos": [
+        3208,
+        3264
+      ],
+      "content": "接下来，输入以下命令，以安装 <bpt id=\"p1\">[</bpt><ept id=\"p1\">azure]</ept>、<bpt id=\"p2\">[</bpt><ept id=\"p2\">node-uuid]</ept>、<bpt id=\"p3\">[</bpt><ept id=\"p3\">nconf]</ept> 和 <bpt id=\"p4\">[</bpt><ept id=\"p4\">async]</ept> 模块："
+    },
+    {
+      "pos": [
+        3326,
+        3372
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>--保存<ept id=\"p1\">**</ept>标志将这些模块的条目添加到 <bpt id=\"p2\">**</bpt>package.json<ept id=\"p2\">**</ept> 文件中。"
+    },
+    {
+      "content": "此命令的输出显示类似于以下示例：",
+      "pos": [
+        3374,
+        3390
+      ]
+    },
+    {
+      "content": "创建应用程序",
+      "pos": [
+        3618,
+        3624
+      ]
+    },
+    {
+      "content": "现在我们准备好生成应用程序。",
+      "pos": [
+        3626,
+        3640
+      ]
+    },
+    {
+      "content": "创建模型",
+      "pos": [
+        3646,
+        3650
+      ]
+    },
+    {
+      "pos": [
+        3652,
+        3711
+      ],
+      "content": "<bpt id=\"p1\">*</bpt>模型<ept id=\"p1\">*</ept>是表示应用程序中的数据的对象。对于应用程序，唯一的模型是任务对象，表示待办事项列表中的项。任务将具有以下字段："
+    },
+    {
+      "content": "PartitionKey",
+      "pos": [
+        3715,
+        3727
+      ]
+    },
+    {
+      "content": "RowKey",
+      "pos": [
+        3730,
+        3736
+      ]
+    },
+    {
+      "content": "名称（字符串）",
+      "pos": [
+        3739,
+        3746
+      ]
+    },
+    {
+      "content": "类别（字符串）",
+      "pos": [
+        3749,
+        3756
+      ]
+    },
+    {
+      "content": "已完成（布尔值）",
+      "pos": [
+        3759,
+        3767
+      ]
+    },
+    {
+      "pos": [
+        3769,
+        3892
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>PartitionKey<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>RowKey<ept id=\"p2\">**</ept> 被表服务用作表键。有关详细信息，请参阅<bpt id=\"p3\">[</bpt>了解表服务数据模型<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/azure/dd179338.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        3898,
+        3938
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>tasklist<ept id=\"p1\">**</ept> 目录中，创建名为 <bpt id=\"p2\">**</bpt>models<ept id=\"p2\">**</ept> 的新目录。"
+    },
+    {
+      "pos": [
+        3943,
+        4005
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>models<ept id=\"p1\">**</ept> 目录中，创建一个名为 <bpt id=\"p2\">**</bpt>task.js<ept id=\"p2\">**</ept> 的新文件。此文件将包含你的应用程序创建的任务的模型。"
+    },
+    {
+      "pos": [
+        4010,
+        4044
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>task.js<ept id=\"p1\">**</ept> 文件的开头，添加以下代码来引用所需的库："
+    },
+    {
+      "content": "添加以下代码，以定义和导出 Task 对象。此对象负责与表连接。",
+      "pos": [
+        4199,
+        4231
+      ]
+    },
+    {
+      "content": "添加以下代码来定义 Task 对象上的其他方法，利用这些方法可以实现与表中存储的数据进行交互：",
+      "pos": [
+        4645,
+        4692
+      ]
+    },
+    {
+      "content": "保存并关闭 **task.js **文件。",
+      "pos": [
+        6471,
+        6492
+      ]
+    },
+    {
+      "content": "添加控制器",
+      "pos": [
+        6498,
+        6503
+      ]
+    },
+    {
+      "pos": [
+        6505,
+        6532
+      ],
+      "content": "<bpt id=\"p1\">*</bpt>控制器<ept id=\"p1\">*</ept>处理 HTTP 请求并渲染 HTML 响应。"
+    },
+    {
+      "pos": [
+        6537,
+        6602
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>tasklist/routes<ept id=\"p1\">**</ept> 目录中，创建名为 <bpt id=\"p2\">**</bpt>tasklist.js<ept id=\"p2\">**</ept> 的新文件，并在文本编辑器中将其打开。"
+    },
+    {
+      "pos": [
+        6607,
+        6728
+      ],
+      "content": "将以下代码添加到 <bpt id=\"p1\">**</bpt>tasklist.js<ept id=\"p1\">**</ept>。这将加载 <bpt id=\"p2\">**</bpt>tasklist.js<ept id=\"p2\">**</ept> 使用的 azure 和 async 模块。这还将定义 <bpt id=\"p3\">**</bpt>TaskList<ept id=\"p3\">**</ept> 函数，将向该函数传递我们之前定义的 <bpt id=\"p4\">**</bpt>Task<ept id=\"p4\">**</ept> 对象的一个实例："
+    },
+    {
+      "pos": [
+        6854,
+        6873
+      ],
+      "content": "定义 <bpt id=\"p1\">**</bpt>TaskList<ept id=\"p1\">**</ept> 对象。"
+    },
+    {
+      "pos": [
+        6952,
+        6974
+      ],
+      "content": "将以下方法添加到 <bpt id=\"p1\">**</bpt>TaskList<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "修改 app.js",
+      "pos": [
+        8315,
+        8324
+      ]
+    },
+    {
+      "pos": [
+        8329,
+        8394
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>tasklist<ept id=\"p1\">**</ept> 目录中，打开 <bpt id=\"p2\">**</bpt>app.js<ept id=\"p2\">**</ept> 文件。此文件之前是通过运行 <bpt id=\"p3\">**</bpt>express<ept id=\"p3\">**</ept> 命令创建的。"
+    },
+    {
+      "content": "在文件开头，添加以下代码来加载 azure 模块，设置表名称、partitionKey，并设置此示例使用的存储凭据：",
+      "pos": [
+        8399,
+        8457
+      ]
+    },
+    {
+      "pos": [
+        8837,
+        8896
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>nconf 将从环境变量或我们稍后将创建的 <bpt id=\"p1\">**</bpt>config.json<ept id=\"p1\">**</ept> 文件中加载配置值。"
+    },
+    {
+      "content": "在 app.js 文件中，向下滚动到以下行：",
+      "pos": [
+        8901,
+        8923
+      ]
+    },
+    {
+      "pos": [
+        8994,
+        9111
+      ],
+      "content": "将上面的行替换为下面显示的代码。这将通过与你的存储帐户的连接初始化 <ph id=\"ph1\">&lt;strong&gt;</ph>Task<ph id=\"ph2\">&lt;/strong&gt;</ph> 的实例。这是 <ph id=\"ph3\">&lt;strong&gt;</ph>TaskList<ph id=\"ph4\">&lt;/strong&gt;</ph> 的密码，TaskList 将使用该密码与表服务进行通信："
+    },
+    {
+      "pos": [
+        9561,
+        9578
+      ],
+      "content": "保存 <bpt id=\"p1\">**</bpt>app.js<ept id=\"p1\">**</ept> 文件。"
+    },
+    {
+      "content": "修改索引视图",
+      "pos": [
+        9584,
+        9590
+      ]
+    },
+    {
+      "pos": [
+        9595,
+        9638
+      ],
+      "content": "在文本编辑器中打开 <bpt id=\"p1\">**</bpt>tasklist/views/index.jade<ept id=\"p1\">**</ept> 文件。"
+    },
+    {
+      "content": "将文件的全部内容替换为以下代码。这会定义显示现有任务的视图，并包括用于添加新任务和将现有任务标记为已完成的表单。",
+      "pos": [
+        9643,
+        9699
+      ]
+    },
+    {
+      "pos": [
+        11020,
+        11044
+      ],
+      "content": "保存并关闭 <bpt id=\"p1\">**</bpt>index.jade<ept id=\"p1\">**</ept> 文件。"
+    },
+    {
+      "content": "修改全局布局",
+      "pos": [
+        11050,
+        11056
+      ]
+    },
+    {
+      "pos": [
+        11058,
+        11210
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>views<ept id=\"p1\">**</ept> 目录中的 <bpt id=\"p2\">**</bpt>Layout.jade<ept id=\"p2\">**</ept> 文件是其他 <bpt id=\"p3\">**</bpt>.jade<ept id=\"p3\">**</ept> 文件的全局模板。在此步骤中，你将对其进行修改，以使用 <bpt id=\"p4\">[</bpt>Twitter Bootstrap<ept id=\"p4\">](https://github.com/twbs/bootstrap)</ept>（一个可以轻松设计美观 Web 应用的工具包）。"
+    },
+    {
+      "pos": [
+        11212,
+        11353
+      ],
+      "content": "下载并提取 <bpt id=\"p1\">[</bpt>Twitter Bootstrap<ept id=\"p1\">](http://getbootstrap.com/)</ept> 的文件。将 <bpt id=\"p2\">**</bpt>bootstrap.min.css<ept id=\"p2\">**</ept> 文件从 Bootstrap <bpt id=\"p3\">**</bpt>css<ept id=\"p3\">**</ept> 文件夹复制到应用程序的 <bpt id=\"p4\">**</bpt>public/stylesheets<ept id=\"p4\">**</ept> 目录中。"
+    },
+    {
+      "pos": [
+        11355,
+        11405
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>views<ept id=\"p1\">**</ept> 文件夹中，打开 <bpt id=\"p2\">**</bpt>layout.jade<ept id=\"p2\">**</ept> 并将整体内容替换为以下代码："
+    },
+    {
+      "content": "创建 config 文件",
+      "pos": [
+        11745,
+        11757
+      ]
+    },
+    {
+      "pos": [
+        11759,
+        11836
+      ],
+      "content": "若要在本地运行应用，我们则会将 Azure 存储的凭据置于 config 文件中。使用以下 JSON 创建名为 *<bpt id=\"p1\">*</bpt>config.json<ept id=\"p1\">*</ept> * 的文件："
+    },
+    {
+      "pos": [
+        12014,
+        12073
+      ],
+      "content": "将<bpt id=\"p1\">**</bpt>存储帐户名称<ept id=\"p1\">**</ept>替换为你之前创建的存储帐户的名称，并将<bpt id=\"p2\">**</bpt>存储访问密钥<ept id=\"p2\">**</ept>替换为你的存储帐户的主访问密钥。例如："
+    },
+    {
+      "pos": [
+        12233,
+        12270
+      ],
+      "content": "将此文件保存为比 <bpt id=\"p1\">**</bpt>tasklist<ept id=\"p1\">**</ept> 目录<bpt id=\"p2\">*</bpt>高一个目录级<ept id=\"p2\">*</ept>，像这样："
+    },
+    {
+      "content": "这样做的目的是避免将 config 文件签入源代码管理中，其中该文件可能会成为公共文件。当我们将应用部署到 Azure 时，我们会使用环境变量而不是 config 文件。",
+      "pos": [
+        12327,
+        12412
+      ]
+    },
+    {
+      "content": "在本地运行应用程序",
+      "pos": [
+        12418,
+        12427
+      ]
+    },
+    {
+      "content": "若要在你的本地计算机中测试应用程序，请执行以下步骤：",
+      "pos": [
+        12429,
+        12455
+      ]
+    },
+    {
+      "pos": [
+        12460,
+        12489
+      ],
+      "content": "在命令行中，将目录更改为 <bpt id=\"p1\">**</bpt>tasklist<ept id=\"p1\">**</ept> 目录。"
+    },
+    {
+      "content": "使用以下命令在本地启动应用程序：",
+      "pos": [
+        12494,
+        12510
+      ]
+    },
+    {
+      "content": "打开 Web 浏览器并导航到 http://127.0.0.1:3000。",
+      "pos": [
+        12534,
+        12571
+      ]
+    },
+    {
+      "content": "此时会显示类似于以下示例的网页。",
+      "pos": [
+        12577,
+        12593
+      ]
+    },
+    {
+      "content": "显示空白 tasklist 的网页",
+      "pos": [
+        12597,
+        12614
+      ]
+    },
+    {
+      "content": "若要创建新的待办事项，请输入名称和类别，然后单击“添加项”。",
+      "pos": [
+        12641,
+        12671
+      ]
+    },
+    {
+      "content": "若要将任务标记为完成，请选中“完成”，然后单击“更新任务”。",
+      "pos": [
+        12677,
+        12707
+      ]
+    },
+    {
+      "content": "任务列表中新项的图像",
+      "pos": [
+        12711,
+        12721
+      ]
+    },
+    {
+      "content": "即使应用程序在本地运行，它也会将数据存储在 Azure 表服务中。",
+      "pos": [
+        12747,
+        12780
+      ]
+    },
+    {
+      "content": "将你的应用程序部署到 Azure",
+      "pos": [
+        12785,
+        12801
+      ]
+    },
+    {
+      "content": "本部分中的步骤使用 Azure 命令行工具在 Azure 中创建新的 Web 应用，然后使用 Git 部署应用程序。若要执行这些步骤，你必须具有 Azure 订阅。",
+      "pos": [
+        12803,
+        12885
+      ]
+    },
+    {
+      "pos": [
+        12889,
+        12992
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>还可以使用 <bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">](https://manage.windowsazure.cn/)</ept>执行这些步骤。请参阅[在 Azure 中生成和部署 Node.js Web 应用]。"
+    },
+    {
+      "content": "如果这是你创建的第一个 Web 应用，则你必须使用 Azure 门户部署此应用程序。",
+      "pos": [
+        12997,
+        13039
+      ]
+    },
+    {
+      "pos": [
+        13041,
+        13074
+      ],
+      "content": "若要开始，请在命令行中输入以下命令以安装 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure CLI]</ept>："
+    },
+    {
+      "content": "导入发布设置",
+      "pos": [
+        13110,
+        13116
+      ]
+    },
+    {
+      "content": "在此步骤中，将下载包含有关你的订阅的信息的文件。",
+      "pos": [
+        13118,
+        13142
+      ]
+    },
+    {
+      "content": "输入以下命令：",
+      "pos": [
+        13147,
+        13154
+      ]
+    },
+    {
+      "content": "此命令启动浏览器并导航到下载页面。如果出现提示，请使用与你的 Azure 订阅关联的帐户登录。",
+      "pos": [
+        13192,
+        13239
+      ]
+    },
+    {
+      "pos": [
+        13245,
+        13360
+      ],
+      "content": "<!-- ![The download page][download-publishing-settings] -->\n 文件下载会自动开始；如果没有自动开始，你可以单击该页面开头的链接手动下载文件。保存文件并记下文件路径。",
+      "leadings": [
+        "",
+        "   "
+      ],
+      "nodes": [
+        {
+          "content": "文件下载会自动开始；如果没有自动开始，你可以单击该页面开头的链接手动下载文件。保存文件并记下文件路径。",
+          "pos": [
+            61,
+            112
+          ]
+        }
+      ]
+    },
+    {
+      "content": "输入以下命令以导入设置：",
+      "pos": [
+        13365,
+        13377
+      ]
+    },
+    {
+      "content": "指定你在上一步中下载的发布设置文件的路径和文件名。",
+      "pos": [
+        13428,
+        13453
+      ]
+    },
+    {
+      "content": "导入设置后，请删除发布设置文件。因为不再需要该文件并且它包含有关你的 Azure 订阅的敏感信息。",
+      "pos": [
+        13458,
+        13507
+      ]
+    },
+    {
+      "content": "创建 Web 应用",
+      "pos": [
+        13513,
+        13522
+      ]
+    },
+    {
+      "pos": [
+        13527,
+        13556
+      ],
+      "content": "在命令行中，将目录更改为 <bpt id=\"p1\">**</bpt>tasklist<ept id=\"p1\">**</ept> 目录。"
+    },
+    {
+      "content": "使用以下命令创建新的 Web 应用。",
+      "pos": [
+        13561,
+        13579
+      ]
+    },
+    {
+      "content": "系统将提示 Web 应用名称和位置。提供唯一的名称并选择与你的 Azure 存储帐户的相同的地理位置。",
+      "pos": [
+        13618,
+        13669
+      ]
+    },
+    {
+      "pos": [
+        13675,
+        13890
+      ],
+      "content": "<ph id=\"ph1\">`--git`</ph> 参数在 Azure 中为此 Web 应用创建 Git 存储库。如果不存在，则还会初始化当前目录中的 Git 存储库，并添加名为“azure”的 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Git remote]</ept>，用于将应用程序发布到 Azure。最后，它会创建 <bpt id=\"p2\">**</bpt>web.config<ept id=\"p2\">**</ept> 文件，其中包含 Azure 用于托管 node 应用程序的设置。如果省略 <ph id=\"ph2\">`--git`</ph> 参数，但目录包含 Git 存储库，命令仍会创建“azure”remote。"
+    },
+    {
+      "pos": [
+        13896,
+        13964
+      ],
+      "content": "此命令完成后，你将看到与下面类似的输出。请注意，以 <bpt id=\"p1\">**</bpt>Website created at<ept id=\"p1\">**</ept> 开头的行包含 Web 应用的 URL。"
+    },
+    {
+      "pos": [
+        14565,
+        14666
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果这是你的订阅的第一个 Web 应用，系统会指示你使用 Azure 门户创建 Web 应用。有关详细信息，请参阅[在 Azure 中生成和部署 Node.js Web 应用]。"
+    },
+    {
+      "content": "切换到环境变量",
+      "pos": [
+        14672,
+        14679
+      ]
+    },
+    {
+      "pos": [
+        14681,
+        14768
+      ],
+      "content": "前面我们实现了用于查找环境变量或从 <bpt id=\"p1\">**</bpt>config.json<ept id=\"p1\">**</ept> 文件中加载值的代码。在接下来的步骤中，你将在 Web 应用配置中创建应用程序通过环境变量实际访问的键值对。"
+    },
+    {
+      "content": "从管理门户中，单击“ Web 应用”，然后选择你的 Web 应用。",
+      "pos": [
+        14773,
+        14806
+      ]
+    },
+    {
+      "content": "打开 Web 应用仪表板",
+      "pos": [
+        14814,
+        14826
+      ]
+    },
+    {
+      "content": "单击“配置”，然后找到页面的“应用设置”部分。",
+      "pos": [
+        14849,
+        14872
+      ]
+    },
+    {
+      "content": "配置链接",
+      "pos": [
+        14880,
+        14884
+      ]
+    },
+    {
+      "pos": [
+        14905,
+        15003
+      ],
+      "content": "在“应用设置”部分的 <bpt id=\"p1\">**</bpt>KEY<ept id=\"p1\">**</ept> 字段中输入 <bpt id=\"p2\">**</bpt>STORAGE\\_NAME<ept id=\"p2\">**</ept>，并在 <bpt id=\"p3\">**</bpt>VALUE<ept id=\"p3\">**</ept>字段中输入你的存储帐户的名称。单击复选标记以移到下一个字段。为以下密钥和值重复此过程："
+    },
+    {
+      "pos": [
+        15011,
+        15041
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>STORAGE\\_KEY<ept id=\"p1\">**</ept> - 你的存储帐户的访问密钥"
+    },
+    {
+      "pos": [
+        15053,
+        15082
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>PARTITION\\_KEY<ept id=\"p1\">**</ept> -“mytasks”"
+    },
+    {
+      "pos": [
+        15090,
+        15114
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>TABLE\\_NAME<ept id=\"p1\">**</ept> -“tasks”"
+    },
+    {
+      "content": "应用程序设置",
+      "pos": [
+        15122,
+        15128
+      ]
+    },
+    {
+      "content": "最后，单击页面底部的“保存”图标，将此更改提交到运行时环境。",
+      "pos": [
+        15148,
+        15178
+      ]
+    },
+    {
+      "content": "保存应用程序设置",
+      "pos": [
+        15186,
+        15194
+      ]
+    },
+    {
+      "pos": [
+        15219,
+        15279
+      ],
+      "content": "从命令行中，将目录更改为 <bpt id=\"p1\">**</bpt>tasklist<ept id=\"p1\">**</ept> 目录，然后输入以下命令以删除 <bpt id=\"p2\">**</bpt>config.json<ept id=\"p2\">**</ept> 文件："
+    },
+    {
+      "content": "执行以下命令将更改部署到 Azure：",
+      "pos": [
+        15357,
+        15376
+      ]
+    },
+    {
+      "pos": [
+        15409,
+        15543
+      ],
+      "content": "在将更改部署到 Azure 后，你的 Web 应用应当继续工作，因为它现在从“应用设置”条目读取连接字符串。若要验证此情况，请在“应用设置”中将 <bpt id=\"p1\">**</bpt>STORAGE\\_KEY<ept id=\"p1\">**</ept> 条目的值更改为一个无效值。保存该值后， Web 应用应该会因存储访问密钥设置无效而失败。"
+    },
+    {
+      "content": "发布应用程序",
+      "pos": [
+        15549,
+        15555
+      ]
+    },
+    {
+      "content": "若要发布应用，将代码文件提交到 Git 中，随后推送到 azure/master。",
+      "pos": [
+        15557,
+        15598
+      ]
+    },
+    {
+      "content": "设置部署凭据。",
+      "pos": [
+        15603,
+        15610
+      ]
+    },
+    {
+      "content": "添加并提交应用程序文件。",
+      "pos": [
+        15673,
+        15685
+      ]
+    },
+    {
+      "content": "将提交的文件推送到 Web 应用：",
+      "pos": [
+        15746,
+        15763
+      ]
+    },
+    {
+      "pos": [
+        15800,
+        15843
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>master<ept id=\"p1\">**</ept> 作为目标分支。在部署结束时，你将看到类似于以下示例的语句："
+    },
+    {
+      "pos": [
+        15974,
+        16034
+      ],
+      "content": "推送操作完成后，浏览到 <ph id=\"ph1\">`azure create site`</ph> 命令之前返回的 Web 应用URL，以查看你的应用程序。"
+    },
+    {
+      "content": "其他资源",
+      "pos": [
+        16039,
+        16043
+      ]
+    },
+    {
+      "content": "Azure 命令行界面",
+      "pos": [
+        16045,
+        16056
+      ]
+    },
+    {
+      "content": "[创建 Node.js 应用程序并将其部署到 Azure Web 应用]: /documentation/articles/web-sites-nodejs-develop-deploy-mac/",
+      "pos": [
+        16069,
+        16167
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">[</bpt><ept id=\"p1\">使用 Git 发布到 Azure Web 应用]</ept>: /documentation/articles/web-sites-publish-source-control/",
+      "pos": [
+        16168,
+        16252
+      ]
+    },
+    {
+      "content": "[Azure 开发人员中心]: /develop/nodejs/",
+      "pos": [
+        16253,
+        16285
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"使用 Azure 表服务的 Node.js Web 应用\"\n    description=\"本教程演示如何使用 Azure 表服务在 Azure Web 应用所托管的 Node.js 应用程序中存储数据。\"\n    tags=\"azure-portal\"\n    services=\"app-service\\web, storage\"\n    documentationCenter=\"nodejs\"\n    authors=\"MikeWasson\"\n    manager=\"wpickett\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"storage\"\n    ms.date=\"01/09/2016\"\n    wacn.date=\"03/03/2016\"/>\n\n\n\n# 使用 Azure 表服务的 Node.js Web 应用\n\n## 概述\n本教程演示如何使用 Azure 数据管理提供的表服务来存储和访问在 Azure Web 应用上托管的 [node] 应用程序的数据。本教程假定你之前有使用 node 和[Git]的经验。\n\n你将学习以下内容：\n\n* 如何使用 npm（Node 包管理器）安装 Node 模块\n\n* 如何使用 Azure 表服务\n\n* 如何使用 Azure CLI 创建 Web 应用。\n\n按照本教程中的说明操作，构建基于 Web 的简单“待办事项”应用程序，该应用程序可用于创建、检索和完成任务。这些任务存储在表服务中。\n\n下面是已完成的应用程序：\n\n![显示空白 tasklist 的网页][node-table-finished]\n\n## 先决条件\n\n在按照本文中的说明操作之前，请确保已安装下列项：\n\n* [node] 0.10.24 或更高版本\n\n* [Git]\n\n\n[AZURE.INCLUDE [create-account-and-websites-note](../includes/create-account-and-websites-note.md)]\n\n## 创建存储帐户\n\n创建 Azure 存储帐户。应用会使用此帐户存储待办事项。\n\n1. 打开你的 Web 浏览器并转到 [Azure 门户]。如果出现提示，请使用你的 Azure 订阅信息进行登录。\n\n2. 在门户底部，单击“+新建”，然后选择“存储帐户”。\n\n    ![\\+新建][portal-new]\n\n    ![存储帐户][portal-storage-account]\n\n3. 选择“快速创建”，然后为此存储帐户输入 URL 和区域/地缘组。由于这是一个教程，不需要全球复制，因此请取消选中“启用异地复制”。最后，单击“创建存储帐户”。\n\n    ![快速创建][portal-quick-create-storage]\n\n    请记下你输入的 URL，因为后续步骤将引用此 URL 作为帐户名称。\n\n4. 在创建存储帐户后，单击页面底部的“管理密钥”。这将显示此存储帐户的主访问密钥和辅助访问密钥。复制并保存主访问密钥，然后单击复选标记。\n\n    ![访问密钥][portal-storage-access-keys]\n\n## 安装模块并生成基架\n\n在本节中，你将创建新的 Node 应用程序并使用 npm 添加模块包。对于此应用程序，你将使用 [Express] 和 [Azure] 模块。Express 模块为 Node 提供了一个模型视图控制器框架，而 Azure 模块提供了与表服务的连接。\n\n### 安装 Express 并生成基架\n\n1. 在命令行中，创建名为 **tasklist** 的新目录并切换到该目录。  \n\n2. 请输入以下命令来安装 Express 模块。\n\n        npm install express-generator@4.2.0 -g\n\n    根据操作系统，可能需要将“sudo”放在命令之前：\n\n        sudo npm install express-generator@4.2.0 -g\n\n    输出显示类似于以下示例：\n\n        express-generator@4.2.0 /usr/local/lib/node_modules/express-generator\n        ├── mkdirp@0.3.5\n        └── commander@1.3.2 (keypress@0.1.0)\n\n    > [AZURE.NOTE]“-g”参数会全局安装模块。这样我们使用 **express** 生成 Web 应用基架，而无需键入其他路径信息。\n\n4. 若要创建应用程序的基架，请输入 **express** 命令：\n\n        express\n\n    此命令的输出显示类似于以下示例：\n\n           create : .\n           create : ./package.json\n           create : ./app.js\n           create : ./public\n           create : ./public/images\n           create : ./routes\n           create : ./routes/index.js\n           create : ./routes/users.js\n           create : ./public/stylesheets\n           create : ./public/stylesheets/style.css\n           create : ./views\n           create : ./views/index.jade\n           create : ./views/layout.jade\n           create : ./views/error.jade\n           create : ./public/javascripts\n           create : ./bin\n           create : ./bin/www\n        \n           install dependencies:\n             $ cd . && npm install\n        \n           run the app:\n             $ DEBUG=my-application ./bin/www\n\n    此时 **tasklist** 目录中会有几个新目录和文件。\n\n### 安装其他模块\n\n**express** 创建的其中一个文件是 **package.json**。此文件包含模块依赖项的列表。之后，当你将应用程序部署到 Azure Web 应用时，此文件会确定需要在 Azure 上安装的模块。\n\n在命令行中，输入以下命令，以安装 **package.json** 文件中描述的模块。可能需要使用“sudo”。\n\n        npm install\n\n此命令的输出显示类似于以下示例：\n\n    debug@0.7.4 node_modules\\debug\n\n    cookie-parser@1.0.1 node_modules\\cookie-parser\n    ├── cookie-signature@1.0.3\n    └── cookie@0.1.0\n\n    [...]\n\n\n接下来，输入以下命令，以安装 [azure]、[node-uuid]、[nconf] 和 [async] 模块：\n\n    npm install azure-storage node-uuid async nconf --save\n\n使用 **--保存**标志将这些模块的条目添加到 **package.json** 文件中。\n\n此命令的输出显示类似于以下示例：\n\n    async@0.9.0 node_modules\\async\n\n    node-uuid@1.4.1 node_modules\\node-uuid\n\n    nconf@0.6.9 node_modules\\nconf\n    ├── ini@1.2.1\n    ├── async@0.2.9\n    └── optimist@0.6.0 (wordwrap@0.0.2, minimist@0.0.10)\n\n    [...]\n\n\n## 创建应用程序\n\n现在我们准备好生成应用程序。\n\n### 创建模型\n\n*模型*是表示应用程序中的数据的对象。对于应用程序，唯一的模型是任务对象，表示待办事项列表中的项。任务将具有以下字段：\n\n- PartitionKey\n- RowKey\n- 名称（字符串）\n- 类别（字符串）\n- 已完成（布尔值）\n\n**PartitionKey** 和 **RowKey** 被表服务用作表键。有关详细信息，请参阅[了解表服务数据模型](https://msdn.microsoft.com/zh-cn/library/azure/dd179338.aspx)。\n\n\n1. 在 **tasklist** 目录中，创建名为 **models** 的新目录。\n\n2. 在 **models** 目录中，创建一个名为 **task.js** 的新文件。此文件将包含你的应用程序创建的任务的模型。\n\n3. 在 **task.js** 文件的开头，添加以下代码来引用所需的库：\n\n        var azure = require('azure-storage');\n        var uuid = require('node-uuid');\n        var entityGen = azure.TableUtilities.entityGenerator;\n\n4. 添加以下代码，以定义和导出 Task 对象。此对象负责与表连接。\n\n        module.exports = Task;\n\n        function Task(storageClient, tableName, partitionKey) {\n          this.storageClient = storageClient;\n          this.tableName = tableName;\n          this.partitionKey = partitionKey;\n          this.storageClient.createTableIfNotExists(tableName, function tableCreated(error) {\n            if(error) {\n              throw error;\n            }\n          });\n        };\n\n5. 添加以下代码来定义 Task 对象上的其他方法，利用这些方法可以实现与表中存储的数据进行交互：\n\n        Task.prototype = {\n          find: function(query, callback) {\n            self = this;\n            self.storageClient.queryEntities(this.tableName, query, null, function entitiesQueried(error, result) {\n              if(error) {\n                callback(error);\n              } else {\n                callback(null, result.entries);\n              }\n            });\n          },\n\n          addItem: function(item, callback) {\n            self = this;\n            // use entityGenerator to set types\n            // NOTE: RowKey must be a string type, even though\n            // it contains a GUID in this example.\n            var itemDescriptor = {\n              PartitionKey: entityGen.String(self.partitionKey),\n              RowKey: entityGen.String(uuid()),\n              name: entityGen.String(item.name),\n              category: entityGen.String(item.category),\n              completed: entityGen.Boolean(false)\n            };\n            self.storageClient.insertEntity(self.tableName, itemDescriptor, function entityInserted(error) {\n              if(error){  \n                callback(error);\n              }\n              callback(null);\n            });\n          },\n\n          updateItem: function(rKey, callback) {\n            self = this;\n            self.storageClient.retrieveEntity(self.tableName, self.partitionKey, rKey, function entityQueried(error, entity) {\n              if(error) {\n                callback(error);\n              }\n              entity.completed._ = true;\n              self.storageClient.updateEntity(self.tableName, entity, function entityUpdated(error) {\n                if(error) {\n                  callback(error);\n                }\n                callback(null);\n              });\n            });\n          }\n        }\n\n6. 保存并关闭 **task.js **文件。\n\n### 添加控制器\n\n*控制器*处理 HTTP 请求并渲染 HTML 响应。\n\n1. 在 **tasklist/routes** 目录中，创建名为 **tasklist.js** 的新文件，并在文本编辑器中将其打开。\n\n2. 将以下代码添加到 **tasklist.js**。这将加载 **tasklist.js** 使用的 azure 和 async 模块。这还将定义 **TaskList** 函数，将向该函数传递我们之前定义的 **Task** 对象的一个实例：\n\n        var azure = require('azure-storage');\n        var async = require('async');\n\n        module.exports = TaskList;\n\n3. 定义 **TaskList** 对象。\n\n        function TaskList(task) {\n          this.task = task;\n        }\n\n\n4. 将以下方法添加到 **TaskList**。\n\n        TaskList.prototype = {\n          showTasks: function(req, res) {\n            self = this;\n            var query = new azure.TableQuery()\n              .where('completed eq ?', false);\n            self.task.find(query, function itemsFound(error, items) {\n              res.render('index',{title: 'My ToDo List ', tasks: items});\n            });\n          },\n\n          addTask: function(req,res) {\n            var self = this;\n            var item = req.body.item;\n            self.task.addItem(item, function itemAdded(error) {\n              if(error) {\n                throw error;\n              }\n              res.redirect('/');\n            });\n          },\n\n          completeTask: function(req,res) {\n            var self = this;\n            var completedTasks = Object.keys(req.body);\n            async.forEach(completedTasks, function taskIterator(completedTask, callback) {\n              self.task.updateItem(completedTask, function itemsUpdated(error) {\n                if(error){\n                  callback(error);\n                } else {\n                  callback(null);\n                }\n              });\n            }, function goHome(error){\n              if(error) {\n                throw error;\n              } else {\n               res.redirect('/');\n              }\n            });\n          }\n        }\n\n\n### 修改 app.js\n\n1. 在 **tasklist** 目录中，打开 **app.js** 文件。此文件之前是通过运行 **express** 命令创建的。\n\n2. 在文件开头，添加以下代码来加载 azure 模块，设置表名称、partitionKey，并设置此示例使用的存储凭据：\n\n        var azure = require('azure-storage');\n        var nconf = require('nconf');\n        nconf.env()\n             .file({ file: 'config.json', search: true });\n        var tableName = nconf.get(\"TABLE_NAME\");\n        var partitionKey = nconf.get(\"PARTITION_KEY\");\n        var accountName = nconf.get(\"STORAGE_NAME\");\n        var accountKey = nconf.get(\"STORAGE_KEY\");\n\n    > [AZURE.NOTE]nconf 将从环境变量或我们稍后将创建的 **config.json** 文件中加载配置值。\n\n3. 在 app.js 文件中，向下滚动到以下行：\n\n        app.use('/', routes);\n        app.use('/users', users);\n\n    将上面的行替换为下面显示的代码。这将通过与你的存储帐户的连接初始化 <strong>Task</strong> 的实例。这是 <strong>TaskList</strong> 的密码，TaskList 将使用该密码与表服务进行通信：\n\n        var TaskList = require('./routes/tasklist');\n        var Task = require('./models/task');\n        var task = new Task(azure.createTableService(accountName, accountKey), tableName, partitionKey);\n        var taskList = new TaskList(task);\n\n        app.get('/', taskList.showTasks.bind(taskList));\n        app.post('/addtask', taskList.addTask.bind(taskList));\n        app.post('/completetask', taskList.completeTask.bind(taskList));\n    \n4. 保存 **app.js** 文件。\n\n### 修改索引视图\n\n1. 在文本编辑器中打开 **tasklist/views/index.jade** 文件。\n\n2. 将文件的全部内容替换为以下代码。这会定义显示现有任务的视图，并包括用于添加新任务和将现有任务标记为已完成的表单。\n\n        extends layout\n\n        block content\n          h1= title\n          br\n        \n          form(action=\"/completetask\", method=\"post\")\n            table.table.table-striped.table-bordered\n              tr\n                td Name\n                td Category\n                td Date\n                td Complete\n              if (typeof tasks === \"undefined\")\n                tr\n                  td \n              else\n                each task in tasks\n                  tr\n                    td #{task.name._}\n                    td #{task.category._}\n                    - var day   = task.Timestamp._.getDate();\n                    - var month = task.Timestamp._.getMonth() + 1;\n                    - var year  = task.Timestamp._.getFullYear();\n                    td #{month + \"/\" + day + \"/\" + year}\n                    td\n                      input(type=\"checkbox\", name=\"#{task.RowKey._}\", value=\"#{!task.completed._}\", checked=task.completed._)\n            button.btn(type=\"submit\") Update tasks\n          hr\n          form.well(action=\"/addtask\", method=\"post\")\n            label Item Name: \n            input(name=\"item[name]\", type=\"textbox\")\n            label Item Category: \n            input(name=\"item[category]\", type=\"textbox\")\n            br\n            button.btn(type=\"submit\") Add item\n\n3. 保存并关闭 **index.jade** 文件。\n\n### 修改全局布局\n\n**views** 目录中的 **Layout.jade** 文件是其他 **.jade** 文件的全局模板。在此步骤中，你将对其进行修改，以使用 [Twitter Bootstrap](https://github.com/twbs/bootstrap)（一个可以轻松设计美观 Web 应用的工具包）。\n\n下载并提取 [Twitter Bootstrap](http://getbootstrap.com/) 的文件。将 **bootstrap.min.css** 文件从 Bootstrap **css** 文件夹复制到应用程序的 **public/stylesheets** 目录中。\n\n在 **views** 文件夹中，打开 **layout.jade** 并将整体内容替换为以下代码：\n\n    doctype html\n    html\n      head\n        title= title\n        link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')\n        link(rel='stylesheet', href='/stylesheets/style.css')\n      body.app\n        nav.navbar.navbar-default\n          div.navbar-header\n          a.navbar-brand(href='/') My Tasks\n        block content\n\n### 创建 config 文件\n\n若要在本地运行应用，我们则会将 Azure 存储的凭据置于 config 文件中。使用以下 JSON 创建名为 **config.json* * 的文件：\n\n    {\n        \"STORAGE_NAME\": \"<storage account name>\",\n        \"STORAGE_KEY\": \"<storage access key>\",\n        \"PARTITION_KEY\": \"mytasks\",\n        \"TABLE_NAME\": \"tasks\"\n    }\n\n将**存储帐户名称**替换为你之前创建的存储帐户的名称，并将**存储访问密钥**替换为你的存储帐户的主访问密钥。例如：\n\n    {\n        \"STORAGE_NAME\": \"nodejsappstorage\",\n        \"STORAGE_KEY\": \"KG0oDd...\"\n        \"PARTITION_KEY\": \"mytasks\",\n        \"TABLE_NAME\": \"tasks\"\n    }\n\n将此文件保存为比 **tasklist** 目录*高一个目录级*，像这样：\n\n    parent/\n      |-- config.json\n      |-- tasklist/\n\n这样做的目的是避免将 config 文件签入源代码管理中，其中该文件可能会成为公共文件。当我们将应用部署到 Azure 时，我们会使用环境变量而不是 config 文件。\n\n\n## 在本地运行应用程序\n\n若要在你的本地计算机中测试应用程序，请执行以下步骤：\n\n1. 在命令行中，将目录更改为 **tasklist** 目录。\n\n2. 使用以下命令在本地启动应用程序：\n\n        npm start\n\n3. 打开 Web 浏览器并导航到 http://127.0.0.1:3000。\n\n    此时会显示类似于以下示例的网页。\n\n![显示空白 tasklist 的网页][node-table-finished]\n\n4. 若要创建新的待办事项，请输入名称和类别，然后单击“添加项”。 \n\n6. 若要将任务标记为完成，请选中“完成”，然后单击“更新任务”。\n\n![任务列表中新项的图像][node-table-list-items]\n\n即使应用程序在本地运行，它也会将数据存储在 Azure 表服务中。\n\n## 将你的应用程序部署到 Azure\n\n本部分中的步骤使用 Azure 命令行工具在 Azure 中创建新的 Web 应用，然后使用 Git 部署应用程序。若要执行这些步骤，你必须具有 Azure 订阅。\n\n> [AZURE.NOTE]还可以使用 [Azure 门户](https://manage.windowsazure.cn/)执行这些步骤。请参阅[在 Azure 中生成和部署 Node.js Web 应用]。\n>\n> 如果这是你创建的第一个 Web 应用，则你必须使用 Azure 门户部署此应用程序。\n\n若要开始，请在命令行中输入以下命令以安装 [Azure CLI]：\n\n    npm install azure-cli -g\n\n### 导入发布设置\n\n在此步骤中，将下载包含有关你的订阅的信息的文件。\n\n1. 输入以下命令：\n\n        azure account download\n\n    此命令启动浏览器并导航到下载页面。如果出现提示，请使用与你的 Azure 订阅关联的帐户登录。\n\n    <!-- ![The download page][download-publishing-settings] -->\n    文件下载会自动开始；如果没有自动开始，你可以单击该页面开头的链接手动下载文件。保存文件并记下文件路径。\n\n2. 输入以下命令以导入设置：\n\n        azure account import <path-to-file>\n\n    指定你在上一步中下载的发布设置文件的路径和文件名。\n\n3. 导入设置后，请删除发布设置文件。因为不再需要该文件并且它包含有关你的 Azure 订阅的敏感信息。\n\n### 创建 Web 应用\n\n1. 在命令行中，将目录更改为 **tasklist** 目录。\n\n2. 使用以下命令创建新的 Web 应用。\n\n        azure site create --git\n\n    系统将提示 Web 应用名称和位置。提供唯一的名称并选择与你的 Azure 存储帐户的相同的地理位置。\n\n    `--git` 参数在 Azure 中为此 Web 应用创建 Git 存储库。如果不存在，则还会初始化当前目录中的 Git 存储库，并添加名为“azure”的 [Git remote]，用于将应用程序发布到 Azure。最后，它会创建 **web.config** 文件，其中包含 Azure 用于托管 node 应用程序的设置。如果省略 `--git` 参数，但目录包含 Git 存储库，命令仍会创建“azure”remote。\n\n    此命令完成后，你将看到与下面类似的输出。请注意，以 **Website created at** 开头的行包含 Web 应用的 URL。\n\n        info:   Executing command site create\n        help:   Need a site name\n        Name: TableTasklist\n        info:   Using location southcentraluswebspace\n        info:   Executing `git init`\n        info:   Creating default .gitignore file\n        info:   Creating a new web site\n        info:   Created web site at  tabletasklist.chinacloudsites.cn\n        info:   Initializing repository\n        info:   Repository initialized\n        info:   Executing `git remote add azure https://username@tabletasklist.chinacloudsites.cn/TableTasklist.git`\n        info:   site create command OK\n\n    > [AZURE.NOTE]如果这是你的订阅的第一个 Web 应用，系统会指示你使用 Azure 门户创建 Web 应用。有关详细信息，请参阅[在 Azure 中生成和部署 Node.js Web 应用]。\n\n### 切换到环境变量\n\n前面我们实现了用于查找环境变量或从 **config.json** 文件中加载值的代码。在接下来的步骤中，你将在 Web 应用配置中创建应用程序通过环境变量实际访问的键值对。\n\n1. 从管理门户中，单击“ Web 应用”，然后选择你的 Web 应用。\n\n    ![打开 Web 应用仪表板][go-to-dashboard]\n\n2. 单击“配置”，然后找到页面的“应用设置”部分。\n\n    ![配置链接][web-configure]\n\n3. 在“应用设置”部分的 **KEY** 字段中输入 **STORAGE\\_NAME**，并在 **VALUE**字段中输入你的存储帐户的名称。单击复选标记以移到下一个字段。为以下密钥和值重复此过程：\n\n    * **STORAGE\\_KEY** - 你的存储帐户的访问密钥\n    \n    * **PARTITION\\_KEY** -“mytasks”\n\n    * **TABLE\\_NAME** -“tasks”\n\n    ![应用程序设置][app-settings]\n\n4. 最后，单击页面底部的“保存”图标，将此更改提交到运行时环境。\n\n    ![保存应用程序设置][app-settings-save]\n\n5. 从命令行中，将目录更改为 **tasklist** 目录，然后输入以下命令以删除 **config.json** 文件：\n\n        git rm config.json\n        git commit -m \"Removing config file\"\n\n6. 执行以下命令将更改部署到 Azure：\n\n        git push azure master\n\n在将更改部署到 Azure 后，你的 Web 应用应当继续工作，因为它现在从“应用设置”条目读取连接字符串。若要验证此情况，请在“应用设置”中将 **STORAGE\\_KEY** 条目的值更改为一个无效值。保存该值后， Web 应用应该会因存储访问密钥设置无效而失败。\n\n### 发布应用程序\n\n若要发布应用，将代码文件提交到 Git 中，随后推送到 azure/master。\n\n1. 设置部署凭据。\n\n        azure site deployment user set <name> <password>\n\n2. 添加并提交应用程序文件。\n\n        git add .\n        git commit -m \"adding files\"\n\n3. 将提交的文件推送到 Web 应用：\n\n        git push azure master\n\n    使用 **master** 作为目标分支。在部署结束时，你将看到类似于以下示例的语句：\n\n        To https://username@tabletasklist.chinacloudsites.cn/TableTasklist.git\n         * [new branch]      master -> master\n\n4. 推送操作完成后，浏览到 `azure create site` 命令之前返回的 Web 应用URL，以查看你的应用程序。\n\n## 其他资源\n[Azure 命令行界面][Azure CLI]\n[创建 Node.js 应用程序并将其部署到 Azure Web 应用]: /documentation/articles/web-sites-nodejs-develop-deploy-mac/\n[使用 Git 发布到 Azure Web 应用]: /documentation/articles/web-sites-publish-source-control/\n[Azure 开发人员中心]: /develop/nodejs/\n\n\n\n[node]: http://nodejs.org\n[Git]: http://git-scm.com\n[Express]: http://expressjs.com\n[for free]: http://www.windowsazure.cn\n[Git remote]: http://git-scm.com/docs/git-remote\n\n[使用 MongoDB 的 Node.js Web 应用]: /documentation/articles/web-sites-nodejs-store-data-mongodb/\n[Azure CLI]: /documentation/articles/xplat-cli-install\n\n[使用 Git 发布到 Azure Web 应用]: /documentation/articles/web-sites-publish-source-control/\n[azure]: https://github.com/Azure/azure-sdk-for-node\n[node-uuid]: https://www.npmjs.com/package/node-uuid\n[nconf]: https://www.npmjs.com/package/nconf\n[async]: https://www.npmjs.com/package/async\n\n[Azure 门户]: http://manage.windowsazure.cn\n\n\n[node-table-finished]: ./media/storage-nodejs-use-table-storage-web-site/table_todo_empty.png\n[node-table-list-items]: ./media/storage-nodejs-use-table-storage-web-site/table_todo_list.png\n[download-publishing-settings]: ./media/storage-nodejs-use-table-storage-web-site/azure-account-download-cli.png\n[portal-new]: ./media/storage-nodejs-use-table-storage-web-site/plus-new.png\n[portal-storage-account]: ./media/storage-nodejs-use-table-storage-web-site/new-storage.png\n[portal-quick-create-storage]: ./media/storage-nodejs-use-table-storage-web-site/quick-storage.png\n[portal-storage-access-keys]: ./media/storage-nodejs-use-table-storage-web-site/manage-access-keys.png\n\n[go-to-dashboard]: ./media/storage-nodejs-use-table-storage-web-site/go_to_dashboard.png\n[web-configure]: ./media/storage-nodejs-use-table-storage-web-site/sql-task-configure.png\n[app-settings-save]: ./media/storage-nodejs-use-table-storage-web-site/savebutton.png\n[app-settings]: ./media/storage-nodejs-use-table-storage-web-site/storage-tasks-appsettings.png\n\n[Create and deploy a Node.js application to an Azure  Website]: /documentation/articles/web-sites-nodejs-develop-deploy-mac/\n\n<!---HONumber=74-->"
+}

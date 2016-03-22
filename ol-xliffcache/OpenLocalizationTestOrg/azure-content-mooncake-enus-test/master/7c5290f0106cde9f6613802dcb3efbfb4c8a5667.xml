@@ -1,0 +1,929 @@
+{
+  "nodes": [
+    {
+      "content": "在 Azure Web 应用中使用 Azure CDN",
+      "pos": [
+        28,
+        55
+      ]
+    },
+    {
+      "content": "本教程演示如何将 Web 应用部署到 Azure，以便从集成的 Azure CDN 终结点提供内容",
+      "pos": [
+        75,
+        124
+      ]
+    },
+    {
+      "content": "在 Azure Web 应用中使用 Azure CDN",
+      "pos": [
+        354,
+        381
+      ]
+    },
+    {
+      "pos": [
+        383,
+        625
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Azure Web 应用<ept id=\"p1\">](/documentation/services/web-sites/)</ept>可与 <bpt id=\"p2\">[</bpt>Azure CDN<ept id=\"p2\">](/home/features/cdn/)</ept> 集成，增强 <bpt id=\"p3\">[</bpt>Azure Web 应用<ept id=\"p3\">](/documentation/services/web-sites/)</ept>固有的全局缩放功能，在全球通过靠近客户的服务器节点提供 Web 应用内容。在特定情况下（例如提供静态映像），此集成可以大幅提高 Azure Web 应用的性能，在全球显著改善 Web 应用的用户体验。"
+    },
+    {
+      "content": "将 Web 应用与 Azure CDN 集成具有以下优点：",
+      "pos": [
+        627,
+        656
+      ]
+    },
+    {
+      "pos": [
+        660,
+        753
+      ],
+      "content": "在 Web 应用的<bpt id=\"p1\">[</bpt>持续部署<ept id=\"p1\">](/documentation/articles/web-sites-publish-source-control)</ept>过程中集成内容部署（映像、脚本和样式表）"
+    },
+    {
+      "content": "轻松升级 Azure Web 应用中的 NuGet 包，例如 jQuery 或 Bootstrap 版本",
+      "pos": [
+        756,
+        808
+      ]
+    },
+    {
+      "content": "在同一 Visual Studio 界面中管理 Web 应用和 CDN 提供的内容",
+      "pos": [
+        812,
+        853
+      ]
+    },
+    {
+      "content": "将 ASP.NET 绑定和缩减与 Azure CDN 集成",
+      "pos": [
+        856,
+        885
+      ]
+    },
+    {
+      "content": "要生成的项目",
+      "pos": [
+        993,
+        999
+      ]
+    },
+    {
+      "content": "你需要在 Visual Studio 中使用默认的 ASP.NET MVC 模板将一个 Web 应用部署到 Azure，需要添加代码来处理集成 Azure CDN 所提供的内容（例如映像、控制器操作结果、默认的 JavaScript 和 CSS 文件），还需要编写代码来配置回退机制以处理 CDN 脱机时提供的捆绑包。",
+      "pos": [
+        1004,
+        1163
+      ]
+    },
+    {
+      "content": "所需的项目",
+      "pos": [
+        1168,
+        1173
+      ]
+    },
+    {
+      "content": "本教程设置了以下前提条件：",
+      "pos": [
+        1178,
+        1191
+      ]
+    },
+    {
+      "content": "有效的 Azure 帐户",
+      "pos": [
+        1198,
+        1210
+      ]
+    },
+    {
+      "pos": [
+        1238,
+        1413
+      ],
+      "content": "Visual Studio 2015 with the <bpt id=\"p1\">[</bpt>Azure SDK for .NET<ept id=\"p1\">](https://www.microsoft.com/web/handlers/webpi.ashx/getinstaller/VWDOrVs2013AzurePack.appids)</ept>。如果你使用 Visual Studio 2013，步骤可能有所不同。"
+    },
+    {
+      "pos": [
+        1417,
+        1449
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>完成本教程需要有一个 Azure 帐户："
+    },
+    {
+      "pos": [
+        1454,
+        1569
+      ],
+      "content": "你可以<bpt id=\"p1\">[</bpt>免费建立一个 Azure 帐户<ept id=\"p1\">](/pricing/1rmb-trial/)</ept> - 获取可用来试用付费版 Azure 服务的信用额度，甚至在用完信用额度后，你仍可以保留帐户和使用免费的 Azure 服务（如 Web 应用）。"
+    },
+    {
+      "pos": [
+        1574,
+        1677
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"deploy-a-web-app-to-azure-with-an-integrated-cdn-endpoint\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 将 Web 应用部署到具有集成 CDN 终结点的 Azure"
+    },
+    {
+      "content": "在本部分，你需要将 Visual Studio 2013 中的默认 ASP.NET MVC 应用程序模板部署到 Azure Web 应用，然后将其与新的 CDN 终结点相集成。请根据以下说明进行操作：",
+      "pos": [
+        1682,
+        1782
+      ]
+    },
+    {
+      "content": "在 Visual Studio 2015 中转到“文件”&gt;“新建”&gt;“项目”&gt;“Web”&gt;“ASP.NET Web 应用”，以便从菜单栏创建新的 ASP.NET Web 应用。为该应用程序提供一个名称，然后单击“确定”。",
+      "pos": [
+        1787,
+        1897
+      ]
+    },
+    {
+      "content": "选择“MVC”，然后单击“确定”。确保取消选中”在云中托管“",
+      "pos": [
+        1960,
+        1990
+      ]
+    },
+    {
+      "pos": [
+        2058,
+        2166
+      ],
+      "content": "Azure 中国区目前不支持在 Visual Studio 中创建或管理 Web 应用。因此，你需要转到<bpt id=\"p1\">[</bpt>管理门户<ept id=\"p1\">](https://manage.windowsazure.cn/)</ept>创建新的 Azure Web 应用"
+    },
+    {
+      "content": "在管理门户中创建 Web 应用后，单击 Web 应用的“仪表板”。在“速览”下，单击“下载发布配置文件”。",
+      "pos": [
+        2175,
+        2228
+      ]
+    },
+    {
+      "content": "在 Visual Studio 中，右键单击你的项目并选择“发布”",
+      "pos": [
+        2233,
+        2266
+      ]
+    },
+    {
+      "content": "选择\"发布\"",
+      "pos": [
+        2274,
+        2280
+      ]
+    },
+    {
+      "content": "几秒钟后，将显示“发布 Web”向导。",
+      "pos": [
+        2343,
+        2362
+      ]
+    },
+    {
+      "content": "在“发布配置文件”中单击“导入”，然后选择前面下载的发布配置文件。",
+      "pos": [
+        2367,
+        2400
+      ]
+    },
+    {
+      "content": "Visual Studio 将项目部署到 Azure 所需的设置随即已导入。可以使用该向导查看和更改这些设置。",
+      "pos": [
+        2406,
+        2461
+      ]
+    },
+    {
+      "content": "在“发布 Web”向导的“连接”选项卡中，单击“下一步”。",
+      "pos": [
+        2466,
+        2495
+      ]
+    },
+    {
+      "content": "验证成功的连接",
+      "pos": [
+        2503,
+        2510
+      ]
+    },
+    {
+      "content": "在“设置”选项卡中，单击“下一步”。",
+      "pos": [
+        2582,
+        2600
+      ]
+    },
+    {
+      "content": "你可以接受“配置”和“文件发布选项”的默认值。",
+      "pos": [
+        2606,
+        2629
+      ]
+    },
+    {
+      "pos": [
+        2635,
+        2720
+      ],
+      "content": "你可以通过“配置”下拉列表部署用于远程调试的调试版本。<bpt id=\"p1\">[</bpt>后续步骤<ept id=\"p1\">](#next-steps)</ept>部分链接到了说明如何在调试模式下远程运行 Visual Studio 的教程。"
+    },
+    {
+      "content": "“设置”选项卡",
+      "pos": [
+        2728,
+        2735
+      ]
+    },
+    {
+      "content": "在“预览”选项卡中，单击“发布”。",
+      "pos": [
+        2800,
+        2817
+      ]
+    },
+    {
+      "content": "如果你想要查看哪些文件将复制到 Azure，可以单击“开始预览”，然后单击“发布”。",
+      "pos": [
+        2823,
+        2865
+      ]
+    },
+    {
+      "content": "单击“发布”后，Visual Studio 开始执行将文件复制到 Azure 服务器的过程。",
+      "pos": [
+        2940,
+        2986
+      ]
+    },
+    {
+      "content": "发布完成后，你会在浏览器中看到发布的 Web 应用。",
+      "pos": [
+        2992,
+        3018
+      ]
+    },
+    {
+      "pos": [
+        3023,
+        3086
+      ],
+      "content": "若要创建 CDN 终结点，请登录到 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>。"
+    },
+    {
+      "pos": [
+        3090,
+        3176
+      ],
+      "content": "单击“新建 &gt; 应用服务 &gt; CDN &gt; 快速创建”。选择 <bpt id=\"p1\">*</bpt><bpt id=\"p2\">*</bpt>http://<ept id=\"p2\">*</ept>&amp;lt;sitename&gt;<ept id=\"p1\">*</ept>.chinacloudsites.cn/**，然后单击“创建”。"
+    },
+    {
+      "pos": [
+        3241,
+        3334
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 创建 CDN 终结点以后，管理门户就会向你显示其 URL 以及所集成的源域。不过，需要一定的时间才能将新 CDN 终结点的配置完全传播到所有 CDN 节点位置。"
+    },
+    {
+      "content": "回到管理门户，在“CDN”选项卡中，单击刚创建的 CDN 终结点的名称。",
+      "pos": [
+        3339,
+        3375
+      ]
+    },
+    {
+      "content": "单击“启用查询字符串”在 CDN 缓存中启用查询字符串。启用此功能后，通过不同的查询字符串进行访问的同一链接就可以缓存为不同的项。",
+      "pos": [
+        3437,
+        3502
+      ]
+    },
+    {
+      "pos": [
+        3575,
+        3713
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 虽然启用查询字符串对于教程的此部分来说不是必需的，但为方便起见，最好是尽早启用此功能，因为在这里所做的任何更改都需要一定的时间才能传播到所有 CDN 节点，而你并不想让任何非查询字符串支持的内容充斥 CDN 缓存（稍后将讨论如何更新 CDN 内容）。"
+    },
+    {
+      "pos": [
+        3718,
+        3831
+      ],
+      "content": "现在，请单击 CDN 终结点地址。如果终结点已准备就绪，你应该会看到显示的 Web 应用。如果收到 <bpt id=\"p1\">**</bpt>HTTP 404<ept id=\"p1\">**</ept> 错误，则说明 CDN 终结点尚未准备好。CDN 配置传播到所有边缘节点可能需要长达 1 小时的等待。"
+    },
+    {
+      "pos": [
+        3898,
+        4041
+      ],
+      "content": "接下来，可尝试访问 ASP.NET 项目中的 <bpt id=\"p1\">**</bpt>~/Content/bootstrap.css<ept id=\"p1\">**</ept> 文件。在浏览器窗口中，导航到 <bpt id=\"p2\">*</bpt><bpt id=\"p3\">*</bpt>http://<ept id=\"p3\">*</ept>&amp;lt;cdnName&gt;<ept id=\"p2\">*</ept>.vo.msecnd.net/Content/bootstrap.css**。在我的设置中，此 URL 为："
+    },
+    {
+      "content": "这对应于 CDN 终结点的以下源 URL：",
+      "pos": [
+        4108,
+        4129
+      ]
+    },
+    {
+      "pos": [
+        4202,
+        4317
+      ],
+      "content": "导航到 <bpt id=\"p1\">*</bpt><bpt id=\"p2\">*</bpt>http://<ept id=\"p2\">*</ept>&amp;lt;cdnName&gt;<ept id=\"p1\">*</ept>.vo.msecnd.net/Content/bootstrap.css** 时，系统会提示你下载 bootstrap.css，该文件来自你在 Azure 中的 Web 应用。"
+    },
+    {
+      "pos": [
+        4378,
+        4471
+      ],
+      "content": "你可以直接通过 CDN 终结点，采用类似方式访问 <bpt id=\"p1\">*</bpt><bpt id=\"p2\">*</bpt>http://<ept id=\"p2\">*</ept>&amp;lt;serviceName&gt;<ept id=\"p1\">*</ept>.chinacloudapp.cn/** 中提供的任何可公开访问的 URL。例如："
+    },
+    {
+      "content": "/Script 路径中的 .js 文件",
+      "pos": [
+        4477,
+        4496
+      ]
+    },
+    {
+      "content": "/Content 路径中的任何内容文件",
+      "pos": [
+        4501,
+        4520
+      ]
+    },
+    {
+      "content": "任何控制器/操作",
+      "pos": [
+        4525,
+        4533
+      ]
+    },
+    {
+      "content": "任何带查询字符串的 URL（如果在你的 CDN 终结点启用了查询字符串功能）",
+      "pos": [
+        4539,
+        4577
+      ]
+    },
+    {
+      "content": "整个 Azure Web 应用（如果所有内容都是公共的）",
+      "pos": [
+        4582,
+        4610
+      ]
+    },
+    {
+      "content": "请注意，通过 Azure CDN 提供整个 Azure Web 应用可能并不适合所有情况（或者说，可能并不是通用的作法）。部分注意事项如下：",
+      "pos": [
+        4612,
+        4682
+      ]
+    },
+    {
+      "content": "此方法要求你的整个站点都是公共的，因为 Azure CDN 不能提供任何私有内容。",
+      "pos": [
+        4688,
+        4729
+      ]
+    },
+    {
+      "pos": [
+        4734,
+        4854
+      ],
+      "content": "如果 CDN 终结点因某种原因而脱机（不管是因为计划的维护，还是因为用户错误），你的整个 Web 应用都会脱机，除非可以将客户重定向到源 URL <bpt id=\"p1\">*</bpt><bpt id=\"p2\">*</bpt>http://<ept id=\"p2\">*</ept>&amp;lt;sitename&gt;<ept id=\"p1\">*</ept>.chinacloudsites.cn/**。"
+    },
+    {
+      "pos": [
+        4860,
+        5195
+      ],
+      "content": "即使使用自定义的缓存-控制设置（参阅<bpt id=\"p1\">[</bpt>在 Azure Web 应用中配置静态文件的缓存选项<ept id=\"p1\">](#configure-caching-options-for-static-files-in-your-azure-web-app)</ept>），CDN 终结点也不会改善活动度极强的动态内容的性能。请注意，如果你尝试从如上所示的 CDN 终结点加载主页，则第一次操作时至少需要 5 秒钟才能加载默认主页，而该主页是相当简单的主页。想象一下，如果此页包含每分钟必须更新的动态内容，则客户端体验会是一种什么样的情景？从 CDN 终结点提供动态内容要求缓存过期时间短，这会造成在 CDN 终结点处频繁出现缓存未命中的情况。这会损害 Azure Web 应用的性能，与 CDN 的初衷背道而驰。"
+    },
+    {
+      "pos": [
+        5197,
+        5400
+      ],
+      "content": "替代方法是在 Azure Web 应用中按每次的具体情况来判断哪些内容可以由 Azure CDN 提供。就这点来说，我们已向你介绍了如何通过 CDN 终结点访问各个内容文件。我会在<bpt id=\"p1\">[</bpt>通过 Azure CDN 的控制器操作提供内容<ept id=\"p1\">](#serve-content-from-controller-actions-through-azure-cdn)</ept>中向你演示如何处理通过 CDN 终结点进行的特定控制器操作。"
+    },
+    {
+      "pos": [
+        5404,
+        5510
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"configure-caching-options-for-static-files-in-your-azure-web-app\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 在 Azure Web 应用中配置静态文件的缓存选项"
+    },
+    {
+      "pos": [
+        5515,
+        5701
+      ],
+      "content": "通知在 Azure Web 应用中进行 Azure CDN 集成，你可以指定你所希望的在 CDN 终结点中缓存静态内容的方式。为此，请通过某个 ASP.NET 项目（例如 <bpt id=\"p1\">**</bpt>cdnwebapp<ept id=\"p1\">**</ept>）打开 <bpt id=\"p2\">*</bpt>Web.config<ept id=\"p2\">*</ept>，然后将 <ph id=\"ph1\">`&lt;staticContent&gt;`</ph> 元素添加到 <ph id=\"ph2\">`&lt;system.webServer&gt;`</ph>。以下 XML 将缓存配置为 3 天后过期。"
+    },
+    {
+      "pos": [
+        5890,
+        6053
+      ],
+      "content": "执行完此操作后，Azure Web 应用中的所有静态文件将会遵守 CDN 缓存中的同一规则。若要对缓存设置进行更细致的控制，可将 <bpt id=\"p1\">*</bpt>Web.config<ept id=\"p1\">*</ept> 文件添加到一个文件夹中，然后在该处添加你的设置。例如，可将 <bpt id=\"p2\">*</bpt>Web.config<ept id=\"p2\">*</ept> 文件添加到 <bpt id=\"p3\">*</bpt>\\\\Content<ept id=\"p3\">*</ept> 文件夹中，然后使用以下 XML 替换其中的内容："
+    },
+    {
+      "pos": [
+        6310,
+        6348
+      ],
+      "content": "此设置可以让 <bpt id=\"p1\">*</bpt>\\\\Content<ept id=\"p1\">*</ept> 文件夹中的所有静态文件缓存 15 天。"
+    },
+    {
+      "pos": [
+        6350,
+        6488
+      ],
+      "content": "有关如何配置 <ph id=\"ph1\">`&lt;clientCache&gt;`</ph> 元素的详细信息，请参阅<bpt id=\"p1\">[</bpt>客户端缓存 &amp;lt;clientCache&gt;<ept id=\"p1\">](http://www.iis.net/configreference/system.webserver/staticcontent/clientcache)</ept>。"
+    },
+    {
+      "content": "在下一部分，我还将向你演示如何针对 CDN 缓存中的控制器操作结果配置缓存设置。",
+      "pos": [
+        6490,
+        6530
+      ]
+    },
+    {
+      "pos": [
+        6534,
+        6628
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"serve-content-from-controller-actions-through-azure-cdn\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 通过 Azure CDN 的控制器操作提供内容"
+    },
+    {
+      "pos": [
+        6633,
+        7168
+      ],
+      "content": "将 Web 应用与 Azure CDN 集成以后，可以相对轻松地通过 Azure CDN 的控制器操作提供内容。同样，如果你决定通过 CDN 提供整个 Azure Web 应用，则根本不需要执行此操作，因为此时所有控制器操作都已经可以通过 CDN 进行访问。不过，出于我在<bpt id=\"p1\">[</bpt>通过集成 CDN 终结点部署 Azure Web 应用<ept id=\"p1\">](#deploy-a-web-app-to-azure-with-an-integrated-cdn-endpoint)</ept>中指出的原因，你不应该决定执行这样的操作，而应选择需要通过 Azure CDN 来处理的控制器操作。<bpt id=\"p2\">[</bpt>Maarten Balliauw<ept id=\"p2\">](https://twitter.com/maartenballiauw)</ept> 在<bpt id=\"p3\">[</bpt>通过 Azure CDN 减少 Web 延迟<ept id=\"p3\">](http://channel9.msdn.com/events/TechDays/Techdays-2014-the-Netherlands/Reducing-latency-on-the-web-with-the-Windows-Azure-CDN)</ept>中向你演示了如何使用有趣的 MemeGenerator 控制器执行该操作。在这里，我将简单地再现该过程。"
+    },
+    {
+      "pos": [
+        7170,
+        7296
+      ],
+      "content": "假设在你的 Web 应用中，你希望根据年轻的 Chuck Norris 的照片（由 <bpt id=\"p1\">[</bpt>Alan Light<ept id=\"p1\">](http://www.flickr.com/photos/alan-light/218493788/)</ept> 拍摄）来制作一个搞笑的迷因，如下所示："
+    },
+    {
+      "pos": [
+        7358,
+        7477
+      ],
+      "content": "你提供了一个简单的 <ph id=\"ph1\">`Index`</ph> 操作，让客户能够指定照片中的夸张元素，然后待这些元素发布到操作后制作出迷因。由于这是 Chuck Norris，可以想见该页面会在全球热传。这是通过 Azure CDN 提供半动态内容的一个很好的示例。"
+    },
+    {
+      "content": "按照上述步骤设置此控制器操作：",
+      "pos": [
+        7479,
+        7494
+      ]
+    },
+    {
+      "pos": [
+        7499,
+        7648
+      ],
+      "content": "在 <bpt id=\"p1\">*</bpt>\\\\Controllers<ept id=\"p1\">*</ept> 文件夹中，创建一个新的名为 <bpt id=\"p2\">*</bpt>MemeGeneratorController.cs<ept id=\"p2\">*</ept> 的 .cs 文件，然后使用以下代码替换其中的内容。将 <ph id=\"ph1\">`~/Content/chuck.bmp`</ph> 替换为你的文件路径，将 <ph id=\"ph2\">`yourCDNName`</ph> 替换为你的 CDN 名称。"
+    },
+    {
+      "pos": [
+        11626,
+        11658
+      ],
+      "content": "右键单击默认的 <ph id=\"ph1\">`Index()`</ph> 操作，然后选择“添加视图”。"
+    },
+    {
+      "content": "接受下面的设置，然后单击“添加”。",
+      "pos": [
+        11722,
+        11739
+      ]
+    },
+    {
+      "pos": [
+        11808,
+        11883
+      ],
+      "content": "打开这个新的 <bpt id=\"p1\">*</bpt>Views\\\\MemeGenerator\\\\Index.cshtml<ept id=\"p1\">*</ept>，将其中的内容替换为下面这个简单的 HTML，以便提交夸张元素："
+    },
+    {
+      "pos": [
+        12257,
+        12354
+      ],
+      "content": "重新发布到 Azure Web 应用，然后在浏览器中导航到 <bpt id=\"p1\">*</bpt><bpt id=\"p2\">*</bpt>http://<ept id=\"p2\">*</ept>&amp;lt;serviceName&gt;<ept id=\"p1\">*</ept>.chinacloudapp.cn/MemeGenerator/Index**。"
+    },
+    {
+      "pos": [
+        12356,
+        12458
+      ],
+      "content": "当你将窗体值提交到 <ph id=\"ph1\">`/MemeGenerator/Index`</ph> 时，<ph id=\"ph2\">`Index_Post`</ph> 操作方法会返回一个指向 <ph id=\"ph3\">`Show`</ph> 操作方法的链接，其中包含相应的输入标识符。单击该链接即可访问以下代码："
+    },
+    {
+      "content": "如果连接了本地调试器，你就可以通过本地重定向获得常规的调试体验。如果是在 Azure Web 应用中运行，则会重定向到：",
+      "pos": [
+        13166,
+        13226
+      ]
+    },
+    {
+      "content": "这对应于 CDN 终结点的以下源 URL：",
+      "pos": [
+        13326,
+        13347
+      ]
+    },
+    {
+      "content": "由于已应用过 URL 重写规则，缓存到 CDN 终结点的实际文件为：",
+      "pos": [
+        13457,
+        13491
+      ]
+    },
+    {
+      "pos": [
+        13597,
+        13699
+      ],
+      "content": "然后，你可以使用 <ph id=\"ph1\">`Generate`</ph> 方法的 <ph id=\"ph2\">`OutputCacheAttribute`</ph> 属性来指定 Azure CDN 认可的操作结果缓存方式。以下代码指定缓存在 1 小时（3,600 秒）后过期。"
+    },
+    {
+      "content": "同样，你可以使用所需的缓存选项，在 Azure Web 应用中通过 Azure CDN 的任何控制器操作提供内容。",
+      "pos": [
+        13799,
+        13856
+      ]
+    },
+    {
+      "content": "在下一部分，我将向你演示如何通过 Azure CDN 提供绑定型和缩减型脚本和 CSS。",
+      "pos": [
+        13858,
+        13902
+      ]
+    },
+    {
+      "content": "将 ASP.NET 绑定和缩减与 Azure CDN 集成",
+      "pos": [
+        13907,
+        13936
+      ]
+    },
+    {
+      "pos": [
+        13941,
+        14224
+      ],
+      "content": "脚本和 CSS 样式表很少变化，尤其适合 Azure CDN 缓存。若要将绑定和缩减集成到 Azure CDN，最便捷的方式是通过 Azure CDN 提供整个 Web 应用。不过，出于<bpt id=\"p1\">[</bpt>将 Azure CDN 终结点与 Azure Web 应用集成，通过 Azure CDN 在网页中提供静态内容<ept id=\"p1\">](#deploy-a-web-app-to-azure-with-an-integrated-cdn-endpoint)</ept>中描述的原因，你可能不倾向于选择此方法，因此我会向你演示如何在实现既定目标的同时，保留所需的有关 ASP.NET 绑定和缩减的开发人员体验，例如："
+    },
+    {
+      "content": "理想的调试模式体验",
+      "pos": [
+        14230,
+        14239
+      ]
+    },
+    {
+      "content": "简化的部署",
+      "pos": [
+        14244,
+        14249
+      ]
+    },
+    {
+      "content": "即时更新客户端，进行脚本/CSS 版本升级",
+      "pos": [
+        14254,
+        14275
+      ]
+    },
+    {
+      "content": "在 CDN 终结点故障时适用的回退机制",
+      "pos": [
+        14280,
+        14299
+      ]
+    },
+    {
+      "content": "最大程度减少代码修改",
+      "pos": [
+        14304,
+        14314
+      ]
+    },
+    {
+      "pos": [
+        14316,
+        14513
+      ],
+      "content": "在<bpt id=\"p1\">[</bpt>将 Azure CDN 终结点与 Azure Web 应用集成，通过 Azure CDN 在网页中提供静态内容<ept id=\"p1\">](#deploy-a-web-app-to-azure-with-an-integrated-cdn-endpoint)</ept>部分创建的 ASP.NET 项目中，打开 <bpt id=\"p2\">*</bpt>App\\_Start\\\\BundleConfig.cs<ept id=\"p2\">*</ept>，然后查看 <ph id=\"ph1\">`bundles.Add()`</ph> 方法调用情况。"
+    },
+    {
+      "pos": [
+        14726,
+        14855
+      ],
+      "content": "第一个 <ph id=\"ph1\">`bundles.Add()`</ph> 语句将脚本捆绑包添加到了虚拟目录 <ph id=\"ph2\">`~/bundles/jquery`</ph>。然后，打开 <bpt id=\"p1\">*</bpt>Views\\\\Shared\\_Layout.cshtml<ept id=\"p1\">*</ept> 以查看脚本捆绑包标记的呈现方式。你应该能够找到以下 Razor 代码行："
+    },
+    {
+      "pos": [
+        14898,
+        14958
+      ],
+      "content": "当该 Razor 代码在 Azure Web 应用中运行时，它会呈现脚本捆绑包的 <ph id=\"ph1\">`&lt;script&gt;`</ph> 标记，如下所示："
+    },
+    {
+      "pos": [
+        15052,
+        15129
+      ],
+      "content": "但是，通过键入 <ph id=\"ph1\">`F5`</ph> 而让其在 Visual Studio 中运行时，它会逐一呈现捆绑包中的每个脚本文件（在上面的示例中，捆绑包中只有一个脚本文件）："
+    },
+    {
+      "content": "这样可以让你在开发环境中调试 JavaScript 代码时，减少生产环境中出现的并发客户端连接（绑定），改进文件下载性能（缩减）。这是一项很适合保留在 Azure CDN 集成中的功能。此外，由于呈现的捆绑包已包含自动生成的版本字符串，因此你希望能够复制该功能，这样当你通过 NuGet 更新 jQuery 版本时，就能够尽快在客户端进行相应的更新。",
+      "pos": [
+        15186,
+        15361
+      ]
+    },
+    {
+      "content": "按照以下步骤操作，将 ASP.NET 绑定和缩减功能集成到 CDN 终结点。",
+      "pos": [
+        15363,
+        15401
+      ]
+    },
+    {
+      "pos": [
+        15406,
+        15576
+      ],
+      "content": "回到 <bpt id=\"p1\">*</bpt>App\\_Start\\\\BundleConfig.cs<ept id=\"p1\">*</ept>，修改 <ph id=\"ph1\">`bundles.Add()`</ph> 方法以使用其他<bpt id=\"p2\">[</bpt>捆绑包构造函数<ept id=\"p2\">](http://msdn.microsoft.com/zh-cn/library/jj646464.aspx)</ept>来指定 CDN 地址。为此，请使用以下代码替换 <ph id=\"ph2\">`RegisterBundles`</ph> 方法定义："
+    },
+    {
+      "pos": [
+        17017,
+        17058
+      ],
+      "content": "请确保将 <ph id=\"ph1\">`&lt;yourCDNName&gt;`</ph> 替换为你的 Azure CDN 的名称。"
+    },
+    {
+      "pos": [
+        17064,
+        17142
+      ],
+      "content": "你将使用纯单词来设置 <ph id=\"ph1\">`bundles.UseCdn = true`</ph> 并已经将仔细编写的 CDN URL 添加到了每个捆绑包。例如，代码中的第一个构造函数："
+    },
+    {
+      "content": "相当于：",
+      "pos": [
+        17235,
+        17239
+      ]
+    },
+    {
+      "content": "进行本地调试时，此构造函数会指示 ASP.NET 绑定和缩减功能呈现各个脚本文件，但会使用指定的 CDN 地址来访问相关脚本。不过，请注意这个仔细编写的 CDN URL 存在两个重要的特征：",
+      "pos": [
+        17379,
+        17474
+      ]
+    },
+    {
+      "pos": [
+        17486,
+        17594
+      ],
+      "content": "此 CDN URL 的源是 <ph id=\"ph1\">`http://&lt;yourSiteName&gt;.chinacloudsites.cn/bundles/jquery?v=&lt;W.X.Y.Z&gt;`</ph>，这实际上是 Web 应用中脚本捆绑包的虚拟目录。"
+    },
+    {
+      "content": "由于你使用的是 CDN 构造函数，因此捆绑包的 CDN 脚本标记不再包含在呈现的 URL 中自动生成的版本字符串。每次对脚本捆绑包进行修改而造成 Azure CDN 中出现缓存未命中的情况时，你都必须手动生成唯一的脚本字符串。同时，这个唯一的版本字符串在部署过程中必须保持不变，以便在捆绑包部署完以后，最大程度地提高 Azure CDN 中的缓存命中率。",
+      "pos": [
+        17601,
+        17778
+      ]
+    },
+    {
+      "pos": [
+        17785,
+        17979
+      ],
+      "content": "查询字符串 v=&lt;W.X.Y.Z&gt; 的功能是从 ASP.NET 项目中的 <bpt id=\"p1\">*</bpt>Properties\\\\AssemblyInfo.cs<ept id=\"p1\">*</ept> 进行拉取。你可以建立一个部署工作流，这样当你每次将相关内容发布到 Azure 时，程序集版本就会递增一次。你也可以使用通配符“*”直接修改项目中的 <bpt id=\"p2\">*</bpt>Properties\\\\AssemblyInfo.cs<ept id=\"p2\">*</ept>，以便每次进行构建时让版本字符串自动递增。例如："
+    },
+    {
+      "content": "在这里，你可以使用任何其他的策略来简化部署过程中唯一字符串的生成。",
+      "pos": [
+        18041,
+        18074
+      ]
+    },
+    {
+      "content": "重新发布 ASP.NET 应用程序并访问主页。",
+      "pos": [
+        18079,
+        18102
+      ]
+    },
+    {
+      "content": "查看页面的 HTML 代码。每次重新发布对 Azure Web 应用的更改时，你都应该能够看到所呈现的 CDN URL，其中包含唯一版本字符串。例如：",
+      "pos": [
+        18108,
+        18183
+      ]
+    },
+    {
+      "pos": [
+        18605,
+        18649
+      ],
+      "content": "在 Visual Studio 中，键入 <ph id=\"ph1\">`F5`</ph> 即可调试 ASP.NET 应用程序。"
+    },
+    {
+      "content": "查看页面的 HTML 代码。你仍然会看到每个脚本文件独立呈现，因此，你在 Visual Studio 中的调试体验是一致的。",
+      "pos": [
+        18654,
+        18716
+      ]
+    },
+    {
+      "content": "CDN URL 的回退机制",
+      "pos": [
+        19111,
+        19124
+      ]
+    },
+    {
+      "content": "你希望你的网页在 Azure CDN 终结点因某种原因而出现故障时，能够表现出相当的智能，即能够访问作为回退选项的源 Web 服务器，以便加载 JavaScript 或 Bootstrap。因 CDN 不可用而丢失 Web 应用上的图像是很严重的问题，但更为严重的是失去脚本和样式表提供的重要页面功能。",
+      "pos": [
+        19129,
+        19280
+      ]
+    },
+    {
+      "pos": [
+        19282,
+        19541
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>捆绑包<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/system.web.optimization.bundle.aspx)</ept>类包含一个名为 <bpt id=\"p2\">[</bpt>CdnFallbackExpression<ept id=\"p2\">](http://msdn.microsoft.com/zh-cn/library/system.web.optimization.bundle.cdnfallbackexpression.aspx)</ept> 的属性，该属性可以让你配置回退机制以应对 CDN 故障情况。若要使用此属性，请执行以下步骤："
+    },
+    {
+      "pos": [
+        19546,
+        19737
+      ],
+      "content": "在 ASP.NET 项目中打开 <bpt id=\"p1\">*</bpt>App\\_Start\\\\BundleConfig.cs<ept id=\"p1\">*</ept>（你已在其中将 CDN URL 添加到了每个<bpt id=\"p2\">[</bpt>捆绑包构造函数<ept id=\"p2\">](http://msdn.microsoft.com/zh-cn/library/jj646464.aspx)</ept>），然后将 <ph id=\"ph1\">`CdnFallbackExpression`</ph> 代码添加到所示的四个位置，以便将回退机制添加到默认捆绑包中。"
+    },
+    {
+      "pos": [
+        21438,
+        21620
+      ],
+      "content": "当 <ph id=\"ph1\">`CdnFallbackExpression`</ph> 不为 null 时，会将脚本注入 HTML 中以测试捆绑包是否已成功加载，而如果没有成功加载，则会直接从源 Web 服务器访问捆绑包。需要将此属性设置成一个 JavaScript 表达式，以便测试相应的 CDN 捆绑包是否已正确加载。根据内容的不同，测试每个捆绑包所需的表达式也会有所不同。对于上面的默认捆绑包："
+    },
+    {
+      "pos": [
+        21632,
+        21673
+      ],
+      "content": "<ph id=\"ph1\">`window.jquery`</ph> 在 jquery-{version}.js 中定义"
+    },
+    {
+      "pos": [
+        21680,
+        21718
+      ],
+      "content": "<ph id=\"ph1\">`$.validator`</ph> 在 jquery.validate.js 中定义"
+    },
+    {
+      "pos": [
+        21725,
+        21773
+      ],
+      "content": "<ph id=\"ph1\">`window.Modernizr`</ph> 在 modernizer-{version}.js 中定义"
+    },
+    {
+      "pos": [
+        21780,
+        21811
+      ],
+      "content": "<ph id=\"ph1\">`$.fn.modal`</ph> 在 bootstrap.js 中定义"
+    },
+    {
+      "pos": [
+        21821,
+        22019
+      ],
+      "content": "你可能已注意到，我并没有为 <ph id=\"ph1\">`~/Cointent/css`</ph> 捆绑包设置 CdnFallbackExpression。这是因为，目前 <bpt id=\"p1\">[</bpt>System.Web.Optimization 中的 Bug<ept id=\"p1\">](https://aspnetoptimization.codeplex.com/workitem/104)</ept> 会针对回退 CSS 注入 <ph id=\"ph2\">`&lt;script&gt;`</ph> 标记而非预期的 <ph id=\"ph3\">`&lt;link&gt;`</ph> 标记。"
+    },
+    {
+      "pos": [
+        22029,
+        22173
+      ],
+      "content": "不过，你可以使用一个不错的<bpt id=\"p1\">[</bpt>样式捆绑包回退<ept id=\"p1\">](https://github.com/EmberConsultingGroup/StyleBundleFallback)</ept>，是由 <bpt id=\"p2\">[</bpt>Ember 咨询组<ept id=\"p2\">](https://github.com/EmberConsultingGroup)</ept> 提供的。"
+    },
+    {
+      "pos": [
+        22178,
+        22411
+      ],
+      "content": "若要将此解决方法用于 CSS，可在 ASP.NET 项目的 <bpt id=\"p1\">*</bpt>App\\_Start<ept id=\"p1\">*</ept> 文件夹中创建一个新的名为 <bpt id=\"p2\">*</bpt>StyleBundleExtensions.cs<ept id=\"p2\">*</ept> 的 .cs 文件，然后将其内容替换为 <bpt id=\"p3\">[</bpt>GitHub 提供的代码<ept id=\"p3\">](https://github.com/EmberConsultingGroup/StyleBundleFallback/blob/master/Website/App_Start/StyleBundleExtensions.cs)</ept>。"
+    },
+    {
+      "pos": [
+        22416,
+        22507
+      ],
+      "content": "在 <bpt id=\"p1\">*</bpt>App\\_Start\\\\StyleFundleExtensions.cs<ept id=\"p1\">*</ept> 中，将命名空间重命名为你的 ASP.NET 应用程序的命名空间（例如 <bpt id=\"p2\">**</bpt>cdnwebapp<ept id=\"p2\">**</ept>）。"
+    },
+    {
+      "pos": [
+        22512,
+        22573
+      ],
+      "content": "回到 <ph id=\"ph1\">`App_Start\\BundleConfig.cs`</ph>，将最后一个 <ph id=\"ph2\">`bundles.Add`</ph> 语句替换为以下代码："
+    },
+    {
+      "content": "这个新的扩展方法使用相同的机制将脚本注入 HTML 中，以便查看 DOM 中是否存在匹配的类名、规则名和规则值（在 CSS 捆绑包中定义），如果没有找到匹配项，则会回退到源 Web 服务器。",
+      "pos": [
+        22837,
+        22932
+      ]
+    },
+    {
+      "content": "重新发布到 Azure Web 应用并访问主页。",
+      "pos": [
+        22937,
+        22961
+      ]
+    },
+    {
+      "content": "查看页面的 HTML 代码。你会发现如下所示的已注入脚本：",
+      "pos": [
+        22965,
+        22994
+      ]
+    },
+    {
+      "pos": [
+        24806,
+        24862
+      ],
+      "content": "请注意，CSS 捆绑包的注入脚本仍包含以下行中 <ph id=\"ph1\">`CdnFallbackExpression`</ph> 属性的残存错误："
+    },
+    {
+      "content": "不过，由于 || 表达式的第一部分始终会返回 true（在紧邻其上的行中），因此始终不会运行 document.write() 函数。",
+      "pos": [
+        24949,
+        25016
+      ]
+    },
+    {
+      "content": "若要测试该回退脚本是否可正常运行，请回到 CDN 终结点的仪表板，然后单击“禁用终结点”。",
+      "pos": [
+        25021,
+        25066
+      ]
+    },
+    {
+      "content": "刷新 Azure Web 应用的浏览器窗口。你现在应该会看到所有脚本和样式表都已正常加载。",
+      "pos": [
+        25132,
+        25177
+      ]
+    },
+    {
+      "content": "更多信息",
+      "pos": [
+        25182,
+        25186
+      ]
+    },
+    {
+      "content": "Azure 内容交付网络 (CDN) 概述",
+      "pos": [
+        25191,
+        25212
+      ]
+    },
+    {
+      "content": "ASP.NET 绑定和缩减",
+      "pos": [
+        25255,
+        25268
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"在 Azure Web 应用中使用 Azure CDN\" \n    description=\"本教程演示如何将 Web 应用部署到 Azure，以便从集成的 Azure CDN 终结点提供内容\" \n    services=\"app-service\\web\" \n    documentationCenter=\".net\" \n    authors=\"cephalin\" \n    manager=\"wpickett\" \n    editor=\"jimbe\"/>\n\n<tags\n    ms.service=\"app-service\"\n    ms.date=\"12/08/2015\"\n    wacn.date=\"02/17/2016\"/>\n\n\n# 在 Azure Web 应用中使用 Azure CDN\n\n[Azure Web 应用](/documentation/services/web-sites/)可与 [Azure CDN](/home/features/cdn/) 集成，增强 [Azure Web 应用](/documentation/services/web-sites/)固有的全局缩放功能，在全球通过靠近客户的服务器节点提供 Web 应用内容。在特定情况下（例如提供静态映像），此集成可以大幅提高 Azure Web 应用的性能，在全球显著改善 Web 应用的用户体验。\n\n将 Web 应用与 Azure CDN 集成具有以下优点：\n\n- 在 Web 应用的[持续部署](/documentation/articles/web-sites-publish-source-control)过程中集成内容部署（映像、脚本和样式表）\n- 轻松升级 Azure Web 应用中的 NuGet 包，例如 jQuery 或 Bootstrap 版本 \n- 在同一 Visual Studio 界面中管理 Web 应用和 CDN 提供的内容\n- 将 ASP.NET 绑定和缩减与 Azure CDN 集成\n\n[AZURE.INCLUDE [app-service-web-to-api-and-mobile](../includes/app-service-web-to-api-and-mobile.md)]\n\n## 要生成的项目 ##\n\n你需要在 Visual Studio 中使用默认的 ASP.NET MVC 模板将一个 Web 应用部署到 Azure，需要添加代码来处理集成 Azure CDN 所提供的内容（例如映像、控制器操作结果、默认的 JavaScript 和 CSS 文件），还需要编写代码来配置回退机制以处理 CDN 脱机时提供的捆绑包。\n\n## 所需的项目 ##\n\n本教程设置了以下前提条件：\n\n-   [有效的 Azure 帐户](/pricing/1rmb-trial/)\n-   Visual Studio 2015 with the [Azure SDK for .NET](https://www.microsoft.com/web/handlers/webpi.ashx/getinstaller/VWDOrVs2013AzurePack.appids)。如果你使用 Visual Studio 2013，步骤可能有所不同。\n\n> [AZURE.NOTE]完成本教程需要有一个 Azure 帐户：\n> + 你可以[免费建立一个 Azure 帐户](/pricing/1rmb-trial/) - 获取可用来试用付费版 Azure 服务的信用额度，甚至在用完信用额度后，你仍可以保留帐户和使用免费的 Azure 服务（如 Web 应用）。\n\n\n##<a name=\"deploy-a-web-app-to-azure-with-an-integrated-cdn-endpoint\"></a> 将 Web 应用部署到具有集成 CDN 终结点的 Azure ##\n\n在本部分，你需要将 Visual Studio 2013 中的默认 ASP.NET MVC 应用程序模板部署到 Azure Web 应用，然后将其与新的 CDN 终结点相集成。请根据以下说明进行操作：\n\n1. 在 Visual Studio 2015 中转到“文件”>“新建”>“项目”>“Web”>“ASP.NET Web 应用”，以便从菜单栏创建新的 ASP.NET Web 应用。为该应用程序提供一个名称，然后单击“确定”。\n\n    ![](./media/cdn-websites-with-cdn/1-new-project.png)\n\n3. 选择“MVC”，然后单击“确定”。确保取消选中”在云中托管“\n\n    ![](./media/cdn-websites-with-cdn/2-webapp-template.png)\n\n    Azure 中国区目前不支持在 Visual Studio 中创建或管理 Web 应用。因此，你需要转到[管理门户](https://manage.windowsazure.cn/)创建新的 Azure Web 应用\n    \n3. 在管理门户中创建 Web 应用后，单击 Web 应用的“仪表板”。在“速览”下，单击“下载发布配置文件”。\n\n3. 在 Visual Studio 中，右键单击你的项目并选择“发布”\n\n    ![选择\"发布\"](./media/web-sites-dotnet-get-started/choosepublish.png)\n\n    几秒钟后，将显示“发布 Web”向导。\n\n4. 在“发布配置文件”中单击“导入”，然后选择前面下载的发布配置文件。\n\n    Visual Studio 将项目部署到 Azure 所需的设置随即已导入。可以使用该向导查看和更改这些设置。\n\n8. 在“发布 Web”向导的“连接”选项卡中，单击“下一步”。\n\n    ![验证成功的连接](./media/web-sites-dotnet-get-started/GS13ValidateConnection.png)\n\n10. 在“设置”选项卡中，单击“下一步”。\n\n    你可以接受“配置”和“文件发布选项”的默认值。\n\n    你可以通过“配置”下拉列表部署用于远程调试的调试版本。[后续步骤](#next-steps)部分链接到了说明如何在调试模式下远程运行 Visual Studio 的教程。\n\n    ![“设置”选项卡](./media/web-sites-dotnet-get-started/GS13SettingsTab.png)\n\n11. 在“预览”选项卡中，单击“发布”。\n\n    如果你想要查看哪些文件将复制到 Azure，可以单击“开始预览”，然后单击“发布”。\n\n    ![](./media/web-sites-dotnet-get-started/GS13previewoutput.png)\n\n    单击“发布”后，Visual Studio 开始执行将文件复制到 Azure 服务器的过程。\n\n    发布完成后，你会在浏览器中看到发布的 Web 应用。\n\n1. 若要创建 CDN 终结点，请登录到 [Azure 管理门户](https://manage.windowsazure.cn)。\n2. 单击“新建 > 应用服务 > CDN > 快速创建”。选择 **http://*&lt;sitename>*.chinacloudsites.cn/**，然后单击“创建”。\n\n    ![](./media/cdn-websites-with-cdn/7-create-cdn.png)\n\n    > [AZURE.NOTE] 创建 CDN 终结点以后，管理门户就会向你显示其 URL 以及所集成的源域。不过，需要一定的时间才能将新 CDN 终结点的配置完全传播到所有 CDN 节点位置。\n\n3. 回到管理门户，在“CDN”选项卡中，单击刚创建的 CDN 终结点的名称。\n\n    ![](./media/cdn-websites-with-cdn/8-select-cdn.png)\n\n3. 单击“启用查询字符串”在 CDN 缓存中启用查询字符串。启用此功能后，通过不同的查询字符串进行访问的同一链接就可以缓存为不同的项。\n\n    ![](./media/cdn-websites-with-cdn/9-enable-query-string.png)\n\n    >[AZURE.NOTE] 虽然启用查询字符串对于教程的此部分来说不是必需的，但为方便起见，最好是尽早启用此功能，因为在这里所做的任何更改都需要一定的时间才能传播到所有 CDN 节点，而你并不想让任何非查询字符串支持的内容充斥 CDN 缓存（稍后将讨论如何更新 CDN 内容）。\n\n2. 现在，请单击 CDN 终结点地址。如果终结点已准备就绪，你应该会看到显示的 Web 应用。如果收到 **HTTP 404** 错误，则说明 CDN 终结点尚未准备好。CDN 配置传播到所有边缘节点可能需要长达 1 小时的等待。\n\n    ![](./media/cdn-websites-with-cdn/11-access-success.png)\n\n1. 接下来，可尝试访问 ASP.NET 项目中的 **~/Content/bootstrap.css** 文件。在浏览器窗口中，导航到 **http://*&lt;cdnName>*.vo.msecnd.net/Content/bootstrap.css**。在我的设置中，此 URL 为：\n\n        http://az673227.vo.msecnd.net/Content/bootstrap.css\n\n    这对应于 CDN 终结点的以下源 URL：\n\n        http://cdnwebapp.chinacloudsites.cn/Content/bootstrap.css\n\n    导航到 **http://*&lt;cdnName>*.vo.msecnd.net/Content/bootstrap.css** 时，系统会提示你下载 bootstrap.css，该文件来自你在 Azure 中的 Web 应用。\n\n    ![](./media/cdn-websites-with-cdn/12-file-access.png)\n\n你可以直接通过 CDN 终结点，采用类似方式访问 **http://*&lt;serviceName>*.chinacloudapp.cn/** 中提供的任何可公开访问的 URL。例如：\n\n-   /Script 路径中的 .js 文件\n-   /Content 路径中的任何内容文件\n-   任何控制器/操作 \n-   任何带查询字符串的 URL（如果在你的 CDN 终结点启用了查询字符串功能）\n-   整个 Azure Web 应用（如果所有内容都是公共的）\n\n请注意，通过 Azure CDN 提供整个 Azure Web 应用可能并不适合所有情况（或者说，可能并不是通用的作法）。部分注意事项如下：\n\n-   此方法要求你的整个站点都是公共的，因为 Azure CDN 不能提供任何私有内容。\n-   如果 CDN 终结点因某种原因而脱机（不管是因为计划的维护，还是因为用户错误），你的整个 Web 应用都会脱机，除非可以将客户重定向到源 URL **http://*&lt;sitename>*.chinacloudsites.cn/**。 \n-   即使使用自定义的缓存-控制设置（参阅[在 Azure Web 应用中配置静态文件的缓存选项](#configure-caching-options-for-static-files-in-your-azure-web-app)），CDN 终结点也不会改善活动度极强的动态内容的性能。请注意，如果你尝试从如上所示的 CDN 终结点加载主页，则第一次操作时至少需要 5 秒钟才能加载默认主页，而该主页是相当简单的主页。想象一下，如果此页包含每分钟必须更新的动态内容，则客户端体验会是一种什么样的情景？从 CDN 终结点提供动态内容要求缓存过期时间短，这会造成在 CDN 终结点处频繁出现缓存未命中的情况。这会损害 Azure Web 应用的性能，与 CDN 的初衷背道而驰。\n\n替代方法是在 Azure Web 应用中按每次的具体情况来判断哪些内容可以由 Azure CDN 提供。就这点来说，我们已向你介绍了如何通过 CDN 终结点访问各个内容文件。我会在[通过 Azure CDN 的控制器操作提供内容](#serve-content-from-controller-actions-through-azure-cdn)中向你演示如何处理通过 CDN 终结点进行的特定控制器操作。\n\n##<a name=\"configure-caching-options-for-static-files-in-your-azure-web-app\"></a> 在 Azure Web 应用中配置静态文件的缓存选项 ##\n\n通知在 Azure Web 应用中进行 Azure CDN 集成，你可以指定你所希望的在 CDN 终结点中缓存静态内容的方式。为此，请通过某个 ASP.NET 项目（例如 **cdnwebapp**）打开 *Web.config*，然后将 `<staticContent>` 元素添加到 `<system.webServer>`。以下 XML 将缓存配置为 3 天后过期。\n\n    <system.webServer>\n      <staticContent>\n        <clientCache cacheControlMode=\"UseMaxAge\" cacheControlMaxAge=\"3.00:00:00\"/>\n      </staticContent>\n      ...\n    </system.webServer>\n\n执行完此操作后，Azure Web 应用中的所有静态文件将会遵守 CDN 缓存中的同一规则。若要对缓存设置进行更细致的控制，可将 *Web.config* 文件添加到一个文件夹中，然后在该处添加你的设置。例如，可将 *Web.config* 文件添加到 *\\\\Content* 文件夹中，然后使用以下 XML 替换其中的内容：\n\n    <?xml version=\"1.0\"?>\n    <configuration>\n      <system.webServer>\n        <staticContent>\n          <clientCache cacheControlMode=\"UseMaxAge\" cacheControlMaxAge=\"15.00:00:00\"/>\n        </staticContent>\n      </system.webServer>\n    </configuration>\n\n此设置可以让 *\\\\Content* 文件夹中的所有静态文件缓存 15 天。\n\n有关如何配置 `<clientCache>` 元素的详细信息，请参阅[客户端缓存 &lt;clientCache>](http://www.iis.net/configreference/system.webserver/staticcontent/clientcache)。\n\n在下一部分，我还将向你演示如何针对 CDN 缓存中的控制器操作结果配置缓存设置。\n\n##<a name=\"serve-content-from-controller-actions-through-azure-cdn\"></a> 通过 Azure CDN 的控制器操作提供内容 ##\n\n将 Web 应用与 Azure CDN 集成以后，可以相对轻松地通过 Azure CDN 的控制器操作提供内容。同样，如果你决定通过 CDN 提供整个 Azure Web 应用，则根本不需要执行此操作，因为此时所有控制器操作都已经可以通过 CDN 进行访问。不过，出于我在[通过集成 CDN 终结点部署 Azure Web 应用](#deploy-a-web-app-to-azure-with-an-integrated-cdn-endpoint)中指出的原因，你不应该决定执行这样的操作，而应选择需要通过 Azure CDN 来处理的控制器操作。[Maarten Balliauw](https://twitter.com/maartenballiauw) 在[通过 Azure CDN 减少 Web 延迟](http://channel9.msdn.com/events/TechDays/Techdays-2014-the-Netherlands/Reducing-latency-on-the-web-with-the-Windows-Azure-CDN)中向你演示了如何使用有趣的 MemeGenerator 控制器执行该操作。在这里，我将简单地再现该过程。\n\n假设在你的 Web 应用中，你希望根据年轻的 Chuck Norris 的照片（由 [Alan Light](http://www.flickr.com/photos/alan-light/218493788/) 拍摄）来制作一个搞笑的迷因，如下所示：\n\n![](./media/cdn-websites-with-cdn/cdn-5-memegenerator.PNG)\n\n你提供了一个简单的 `Index` 操作，让客户能够指定照片中的夸张元素，然后待这些元素发布到操作后制作出迷因。由于这是 Chuck Norris，可以想见该页面会在全球热传。这是通过 Azure CDN 提供半动态内容的一个很好的示例。\n\n按照上述步骤设置此控制器操作：\n\n1. 在 *\\\\Controllers* 文件夹中，创建一个新的名为 *MemeGeneratorController.cs* 的 .cs 文件，然后使用以下代码替换其中的内容。将 `~/Content/chuck.bmp` 替换为你的文件路径，将 `yourCDNName` 替换为你的 CDN 名称。\n\n\n        using System;\n        using System.Collections.Generic;\n        using System.Diagnostics;\n        using System.Drawing;\n        using System.IO;\n        using System.Net;\n        using System.Web.Hosting;\n        using System.Web.Mvc;\n        using System.Web.UI;\n\n        namespace cdnwebapp.Controllers\n        {\n          public class MemeGeneratorController : Controller\n          {\n            static readonly Dictionary<string, Tuple<string ,string>> Memes = new Dictionary<string, Tuple<string, string>>();\n\n            public ActionResult Index()\n            {\n              return View();\n            }\n\n            [HttpPost, ActionName(\"Index\")]\n            public ActionResult Index_Post(string top, string bottom)\n            {\n              var identifier = Guid.NewGuid().ToString();\n              if (!Memes.ContainsKey(identifier))\n              {\n                Memes.Add(identifier, new Tuple<string, string>(top, bottom));\n              }\n\n              return Content(\"<a href=\"\" + Url.Action(\"Show\", new {id = identifier}) + \"\">here's your meme</a>\");\n            }\n\n            [OutputCache(VaryByParam = \"*\", Duration = 1, Location = OutputCacheLocation.Downstream)]\n            public ActionResult Show(string id)\n            {\n              Tuple<string, string> data = null;\n              if (!Memes.TryGetValue(id, out data))\n              {\n                return new HttpStatusCodeResult(HttpStatusCode.NotFound);\n              }\n\n              if (Debugger.IsAttached) // Preserve the debug experience\n              {\n                return Redirect(string.Format(\"/MemeGenerator/Generate?top={0}&bottom={1}\", data.Item1, data.Item2));\n              }\n              else // Get content from Azure CDN\n              {\n                return Redirect(string.Format(\"http://<yourCDNName>.vo.msecnd.net/MemeGenerator/Generate?top={0}&bottom={1}\", data.Item1, data.Item2));\n              }\n            }\n\n            [OutputCache(VaryByParam = \"*\", Duration = 3600, Location = OutputCacheLocation.Downstream)]\n            public ActionResult Generate(string top, string bottom)\n            {\n              string imageFilePath = HostingEnvironment.MapPath(\"~/Content/chuck.bmp\");\n              Bitmap bitmap = (Bitmap)Image.FromFile(imageFilePath);\n\n              using (Graphics graphics = Graphics.FromImage(bitmap))\n              {\n                SizeF size = new SizeF();\n                using (Font arialFont = FindBestFitFont(bitmap, graphics, top.ToUpperInvariant(), new Font(\"Arial Narrow\", 100), out size))\n                {\n                    graphics.DrawString(top.ToUpperInvariant(), arialFont, Brushes.White, new PointF(((bitmap.Width - size.Width) / 2), 10f));\n                }\n                using (Font arialFont = FindBestFitFont(bitmap, graphics, bottom.ToUpperInvariant(), new Font(\"Arial Narrow\", 100), out size))\n                {\n                    graphics.DrawString(bottom.ToUpperInvariant(), arialFont, Brushes.White, new PointF(((bitmap.Width - size.Width) / 2), bitmap.Height - 10f - arialFont.Height));\n                }\n              }\n              MemoryStream ms = new MemoryStream();\n              bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);\n              return File(ms.ToArray(), \"image/png\");\n            }\n\n            private Font FindBestFitFont(Image i, Graphics g, String text, Font font, out SizeF size)\n            {\n              // Compute actual size, shrink if needed\n              while (true)\n              {\n                size = g.MeasureString(text, font);\n\n                // It fits, back out\n                if (size.Height < i.Height &&\n                     size.Width < i.Width) { return font; }\n\n                // Try a smaller font (90% of old size)\n                Font oldFont = font;\n                font = new Font(font.Name, (float)(font.Size * .9), font.Style);\n                oldFont.Dispose();\n              }\n            }\n          }\n        }\n\n2. 右键单击默认的 `Index()` 操作，然后选择“添加视图”。\n\n    ![](./media/cdn-websites-with-cdn/cdn-6-addview.PNG)\n\n3.  接受下面的设置，然后单击“添加”。\n\n    ![](./media/cdn-websites-with-cdn/cdn-7-configureview.PNG)\n\n4. 打开这个新的 *Views\\\\MemeGenerator\\\\Index.cshtml*，将其中的内容替换为下面这个简单的 HTML，以便提交夸张元素：\n\n        <h2>Meme Generator</h2>\n        \n        <form action=\"\" method=\"post\">\n            <input type=\"text\" name=\"top\" placeholder=\"Enter top text here\" />\n            <br />\n            <input type=\"text\" name=\"bottom\" placeholder=\"Enter bottom text here\" />\n            <br />\n            <input class=\"btn\" type=\"submit\" value=\"Generate meme\" />\n        </form>\n\n5. 重新发布到 Azure Web 应用，然后在浏览器中导航到 **http://*&lt;serviceName>*.chinacloudapp.cn/MemeGenerator/Index**。\n\n当你将窗体值提交到 `/MemeGenerator/Index` 时，`Index_Post` 操作方法会返回一个指向 `Show` 操作方法的链接，其中包含相应的输入标识符。单击该链接即可访问以下代码：\n\n    [OutputCache(VaryByParam = \"*\", Duration = 1, Location = OutputCacheLocation.Downstream)]\n    public ActionResult Show(string id)\n    {\n      Tuple<string, string> data = null;\n      if (!Memes.TryGetValue(id, out data))\n      {\n        return new HttpStatusCodeResult(HttpStatusCode.NotFound);\n      }\n\n      if (Debugger.IsAttached) // Preserve the debug experience\n      {\n        return Redirect(string.Format(\"/MemeGenerator/Generate?top={0}&bottom={1}\", data.Item1, data.Item2));\n      }\n      else // Get content from Azure CDN\n      {\n        return Redirect(string.Format(\"http://<yourCDNName>.vo.msecnd.net/MemeGenerator/Generate?top={0}&bottom={1}\", data.Item1, data.Item2));\n      }\n    }\n\n如果连接了本地调试器，你就可以通过本地重定向获得常规的调试体验。如果是在 Azure Web 应用中运行，则会重定向到：\n\n    http://<yourCDNName>.vo.msecnd.net/MemeGenerator/Generate?top=<formInput>&bottom=<formInput>\n\n这对应于 CDN 终结点的以下源 URL：\n\n    http://<yourSiteName>.chinacloudsites.cn/cdn/MemeGenerator/Generate?top=<formInput>&bottom=<formInput>\n\n由于已应用过 URL 重写规则，缓存到 CDN 终结点的实际文件为：\n\n    http://<yourSiteName>.chinacloudsites.cn/MemeGenerator/Generate?top=<formInput>&bottom=<formInput>\n\n然后，你可以使用 `Generate` 方法的 `OutputCacheAttribute` 属性来指定 Azure CDN 认可的操作结果缓存方式。以下代码指定缓存在 1 小时（3,600 秒）后过期。\n\n    [OutputCache(VaryByParam = \"*\", Duration = 3600, Location = OutputCacheLocation.Downstream)]\n\n同样，你可以使用所需的缓存选项，在 Azure Web 应用中通过 Azure CDN 的任何控制器操作提供内容。\n\n在下一部分，我将向你演示如何通过 Azure CDN 提供绑定型和缩减型脚本和 CSS。\n\n## 将 ASP.NET 绑定和缩减与 Azure CDN 集成 ##\n\n脚本和 CSS 样式表很少变化，尤其适合 Azure CDN 缓存。若要将绑定和缩减集成到 Azure CDN，最便捷的方式是通过 Azure CDN 提供整个 Web 应用。不过，出于[将 Azure CDN 终结点与 Azure Web 应用集成，通过 Azure CDN 在网页中提供静态内容](#deploy-a-web-app-to-azure-with-an-integrated-cdn-endpoint)中描述的原因，你可能不倾向于选择此方法，因此我会向你演示如何在实现既定目标的同时，保留所需的有关 ASP.NET 绑定和缩减的开发人员体验，例如：\n\n-   理想的调试模式体验\n-   简化的部署\n-   即时更新客户端，进行脚本/CSS 版本升级\n-   在 CDN 终结点故障时适用的回退机制\n-   最大程度减少代码修改\n\n在[将 Azure CDN 终结点与 Azure Web 应用集成，通过 Azure CDN 在网页中提供静态内容](#deploy-a-web-app-to-azure-with-an-integrated-cdn-endpoint)部分创建的 ASP.NET 项目中，打开 *App\\_Start\\\\BundleConfig.cs*，然后查看 `bundles.Add()` 方法调用情况。\n\n    public static void RegisterBundles(BundleCollection bundles)\n    {\n        bundles.Add(new ScriptBundle(\"~/bundles/jquery\").Include(\n                    \"~/Scripts/jquery-{version}.js\"));\n        ...\n    }\n\n第一个 `bundles.Add()` 语句将脚本捆绑包添加到了虚拟目录 `~/bundles/jquery`。然后，打开 *Views\\\\Shared\\_Layout.cshtml* 以查看脚本捆绑包标记的呈现方式。你应该能够找到以下 Razor 代码行：\n\n    @Scripts.Render(\"~/bundles/jquery\")\n\n当该 Razor 代码在 Azure Web 应用中运行时，它会呈现脚本捆绑包的 `<script>` 标记，如下所示：\n\n    <script src=\"/bundles/jquery?v=FVs3ACwOLIVInrAl5sdzR2jrCDmVOWFbZMY6g6Q0ulE1\"></script>\n\n但是，通过键入 `F5` 而让其在 Visual Studio 中运行时，它会逐一呈现捆绑包中的每个脚本文件（在上面的示例中，捆绑包中只有一个脚本文件）：\n\n    <script src=\"/Scripts/jquery-1.10.2.js\"></script>\n\n这样可以让你在开发环境中调试 JavaScript 代码时，减少生产环境中出现的并发客户端连接（绑定），改进文件下载性能（缩减）。这是一项很适合保留在 Azure CDN 集成中的功能。此外，由于呈现的捆绑包已包含自动生成的版本字符串，因此你希望能够复制该功能，这样当你通过 NuGet 更新 jQuery 版本时，就能够尽快在客户端进行相应的更新。\n\n按照以下步骤操作，将 ASP.NET 绑定和缩减功能集成到 CDN 终结点。\n\n1. 回到 *App\\_Start\\\\BundleConfig.cs*，修改 `bundles.Add()` 方法以使用其他[捆绑包构造函数](http://msdn.microsoft.com/zh-cn/library/jj646464.aspx)来指定 CDN 地址。为此，请使用以下代码替换 `RegisterBundles` 方法定义：  \n    \n        public static void RegisterBundles(BundleCollection bundles)\n        {\n          bundles.UseCdn = true;\n          var version = System.Reflection.Assembly.GetAssembly(typeof(Controllers.HomeController))\n            .GetName().Version.ToString();\n          var cdnUrl = \"http://<yourCDNName>.vo.msecnd.net/{0}?v=\" + version;\n\n          bundles.Add(new ScriptBundle(\"~/bundles/jquery\", string.Format(cdnUrl, \"bundles/jquery\")).Include(\n                \"~/Scripts/jquery-{version}.js\"));\n\n          bundles.Add(new ScriptBundle(\"~/bundles/jqueryval\", string.Format(cdnUrl, \"bundles/jqueryval\")).Include(\n                \"~/Scripts/jquery.validate*\"));\n\n          // Use the development version of Modernizr to develop with and learn from. Then, when you're\n          // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.\n          bundles.Add(new ScriptBundle(\"~/bundles/modernizr\", string.Format(cdnUrl, \"bundles/modernizr\")).Include(\n                \"~/Scripts/modernizr-*\"));\n\n          bundles.Add(new ScriptBundle(\"~/bundles/bootstrap\", string.Format(cdnUrl, \"bundles/bootstrap\")).Include(\n                \"~/Scripts/bootstrap.js\",\n                \"~/Scripts/respond.js\"));\n\n          bundles.Add(new StyleBundle(\"~/Content/css\", string.Format(cdnUrl, \"Content/css\")).Include(\n                \"~/Content/bootstrap.css\",\n                \"~/Content/site.css\"));\n        }\n\n\n    请确保将 `<yourCDNName>` 替换为你的 Azure CDN 的名称。\n\n    你将使用纯单词来设置 `bundles.UseCdn = true` 并已经将仔细编写的 CDN URL 添加到了每个捆绑包。例如，代码中的第一个构造函数：\n\n        new ScriptBundle(\"~/bundles/jquery\", string.Format(cdnUrl, \"bundles/jquery\"))\n\n    相当于：\n\n        new ScriptBundle(\"~/bundles/jquery\", string.Format(cdnUrl, \"http://<yourCDNName>.vo.msecnd.net/bundles/jquery?v=<W.X.Y.Z>\"))\n\n    进行本地调试时，此构造函数会指示 ASP.NET 绑定和缩减功能呈现各个脚本文件，但会使用指定的 CDN 地址来访问相关脚本。不过，请注意这个仔细编写的 CDN URL 存在两个重要的特征：\n    \n    - 此 CDN URL 的源是 `http://<yourSiteName>.chinacloudsites.cn/bundles/jquery?v=<W.X.Y.Z>`，这实际上是 Web 应用中脚本捆绑包的虚拟目录。\n    - 由于你使用的是 CDN 构造函数，因此捆绑包的 CDN 脚本标记不再包含在呈现的 URL 中自动生成的版本字符串。每次对脚本捆绑包进行修改而造成 Azure CDN 中出现缓存未命中的情况时，你都必须手动生成唯一的脚本字符串。同时，这个唯一的版本字符串在部署过程中必须保持不变，以便在捆绑包部署完以后，最大程度地提高 Azure CDN 中的缓存命中率。\n    - 查询字符串 v=<W.X.Y.Z> 的功能是从 ASP.NET 项目中的 *Properties\\\\AssemblyInfo.cs* 进行拉取。你可以建立一个部署工作流，这样当你每次将相关内容发布到 Azure 时，程序集版本就会递增一次。你也可以使用通配符“*”直接修改项目中的 *Properties\\\\AssemblyInfo.cs*，以便每次进行构建时让版本字符串自动递增。例如：\n\n            [assembly: AssemblyVersion(\"1.0.0.*\")]\n    \n    在这里，你可以使用任何其他的策略来简化部署过程中唯一字符串的生成。\n\n3. 重新发布 ASP.NET 应用程序并访问主页。\n \n4. 查看页面的 HTML 代码。每次重新发布对 Azure Web 应用的更改时，你都应该能够看到所呈现的 CDN URL，其中包含唯一版本字符串。例如：\n    \n        ...\n        <link href=\"http://az673227.vo.msecnd.net/Content/css?v=1.0.0.25449\" rel=\"stylesheet\"/>\n        <script src=\"http://az673227.vo.msecnd.net/bundles/modernizer?v=1.0.0.25449\"></script>\n        ...\n        <script src=\"http://az673227.vo.msecnd.net/bundles/jquery?v=1.0.0.25449\"></script>\n        <script src=\"http://az673227.vo.msecnd.net/bundles/bootstrap?v=1.0.0.25449\"></script>\n        ...\n\n5. 在 Visual Studio 中，键入 `F5` 即可调试 ASP.NET 应用程序。\n\n6. 查看页面的 HTML 代码。你仍然会看到每个脚本文件独立呈现，因此，你在 Visual Studio 中的调试体验是一致的。\n    \n        ...\n        <link href=\"/Content/bootstrap.css\" rel=\"stylesheet\"/>\n        <link href=\"/Content/site.css\" rel=\"stylesheet\"/>\n        <script src=\"/Scripts/modernizr-2.6.2.js\"></script>\n        ...\n        <script src=\"/Scripts/jquery-1.10.2.js\"></script>\n        <script src=\"/Scripts/bootstrap.js\"></script>\n        <script src=\"/Scripts/respond.js\"></script>\n        ...    \n\n## CDN URL 的回退机制 ##\n\n你希望你的网页在 Azure CDN 终结点因某种原因而出现故障时，能够表现出相当的智能，即能够访问作为回退选项的源 Web 服务器，以便加载 JavaScript 或 Bootstrap。因 CDN 不可用而丢失 Web 应用上的图像是很严重的问题，但更为严重的是失去脚本和样式表提供的重要页面功能。\n\n[捆绑包](http://msdn.microsoft.com/zh-cn/library/system.web.optimization.bundle.aspx)类包含一个名为 [CdnFallbackExpression](http://msdn.microsoft.com/zh-cn/library/system.web.optimization.bundle.cdnfallbackexpression.aspx) 的属性，该属性可以让你配置回退机制以应对 CDN 故障情况。若要使用此属性，请执行以下步骤：\n\n1. 在 ASP.NET 项目中打开 *App\\_Start\\\\BundleConfig.cs*（你已在其中将 CDN URL 添加到了每个[捆绑包构造函数](http://msdn.microsoft.com/zh-cn/library/jj646464.aspx)），然后将 `CdnFallbackExpression` 代码添加到所示的四个位置，以便将回退机制添加到默认捆绑包中。  \n    \n        public static void RegisterBundles(BundleCollection bundles)\n        {\n          var version = System.Reflection.Assembly.GetAssembly(typeof(BundleConfig))\n            .GetName().Version.ToString();\n          var cdnUrl = \"http://cdnurl.vo.msecnd.net/.../{0}?\" + version;\n          bundles.UseCdn = true;\n\n          bundles.Add(new ScriptBundle(\"~/bundles/jquery\", string.Format(cdnUrl, \"bundles/jquery\")) \n                { CdnFallbackExpression = \"window.jquery\" }\n                .Include(\"~/Scripts/jquery-{version}.js\"));\n\n          bundles.Add(new ScriptBundle(\"~/bundles/jqueryval\", string.Format(cdnUrl, \"bundles/jqueryval\")) \n                { CdnFallbackExpression = \"$.validator\" }\n                .Include(\"~/Scripts/jquery.validate*\"));\n\n          // Use the development version of Modernizr to develop with and learn from. Then, when you're\n          // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.\n          bundles.Add(new ScriptBundle(\"~/bundles/modernizr\", string.Format(cdnUrl, \"bundles/modernizer\")) \n                { CdnFallbackExpression = \"window.Modernizr\" }\n                .Include(\"~/Scripts/modernizr-*\"));\n\n          bundles.Add(new ScriptBundle(\"~/bundles/bootstrap\", string.Format(cdnUrl, \"bundles/bootstrap\"))     \n                { CdnFallbackExpression = \"$.fn.modal\" }\n                .Include(\n                        \"~/Scripts/bootstrap.js\",\n                        \"~/Scripts/respond.js\"));\n\n          bundles.Add(new StyleBundle(\"~/Content/css\", string.Format(cdnUrl, \"Content/css\")).Include(\n                \"~/Content/bootstrap.css\",\n                \"~/Content/site.css\"));\n        }\n\n    当 `CdnFallbackExpression` 不为 null 时，会将脚本注入 HTML 中以测试捆绑包是否已成功加载，而如果没有成功加载，则会直接从源 Web 服务器访问捆绑包。需要将此属性设置成一个 JavaScript 表达式，以便测试相应的 CDN 捆绑包是否已正确加载。根据内容的不同，测试每个捆绑包所需的表达式也会有所不同。对于上面的默认捆绑包：\n    \n    - `window.jquery` 在 jquery-{version}.js 中定义\n    - `$.validator` 在 jquery.validate.js 中定义\n    - `window.Modernizr` 在 modernizer-{version}.js 中定义\n    - `$.fn.modal` 在 bootstrap.js 中定义\n    \n    你可能已注意到，我并没有为 `~/Cointent/css` 捆绑包设置 CdnFallbackExpression。这是因为，目前 [System.Web.Optimization 中的 Bug](https://aspnetoptimization.codeplex.com/workitem/104) 会针对回退 CSS 注入 `<script>` 标记而非预期的 `<link>` 标记。\n    \n    不过，你可以使用一个不错的[样式捆绑包回退](https://github.com/EmberConsultingGroup/StyleBundleFallback)，是由 [Ember 咨询组](https://github.com/EmberConsultingGroup) 提供的。\n\n2. 若要将此解决方法用于 CSS，可在 ASP.NET 项目的 *App\\_Start* 文件夹中创建一个新的名为 *StyleBundleExtensions.cs* 的 .cs 文件，然后将其内容替换为 [GitHub 提供的代码](https://github.com/EmberConsultingGroup/StyleBundleFallback/blob/master/Website/App_Start/StyleBundleExtensions.cs)。\n\n4. 在 *App\\_Start\\\\StyleFundleExtensions.cs* 中，将命名空间重命名为你的 ASP.NET 应用程序的命名空间（例如 **cdnwebapp**）。\n\n3. 回到 `App_Start\\BundleConfig.cs`，将最后一个 `bundles.Add` 语句替换为以下代码：\n\n        bundles.Add(new StyleBundle(\"~/Content/css\", string.Format(cdnUrl, \"Content/css\"))\n          .IncludeFallback(\"~/Content/css\", \"sr-only\", \"width\", \"1px\")\n          .Include(\n            \"~/Content/bootstrap.css\",\n            \"~/Content/site.css\"));\n\n    这个新的扩展方法使用相同的机制将脚本注入 HTML 中，以便查看 DOM 中是否存在匹配的类名、规则名和规则值（在 CSS 捆绑包中定义），如果没有找到匹配项，则会回退到源 Web 服务器。\n\n4. 重新发布到 Azure Web 应用并访问主页。\n5. 查看页面的 HTML 代码。你会发现如下所示的已注入脚本：    \n    \n        ...\n        <link href=\"http://az673227.vo.msecnd.net/Content/css?v=1.0.0.25474\" rel=\"stylesheet\"/>\n            <script>(function() {\n                    var loadFallback,\n                        len = document.styleSheets.length;\n                    for (var i = 0; i < len; i++) {\n                        var sheet = document.styleSheets[i];\n                        if (sheet.href.indexOf('http://az673227.vo.msecnd.net/Content/css?v=1.0.0.25474') !== -1) {\n                            var meta = document.createElement('meta');\n                            meta.className = 'sr-only';\n                            document.head.appendChild(meta);\n                            var value = window.getComputedStyle(meta).getPropertyValue('width');\n                            document.head.removeChild(meta);\n                            if (value !== '1px') {\n                                document.write('<link href=\"/Content/css\" rel=\"stylesheet\" type=\"text/css\" />');\n                            }\n                        }\n                    }\n                    return true;\n                }())||document.write('<script src=\"/Content/css\"><\\/script>');</script>\n\n        <script src=\"http://az673227.vo.msecnd.net/bundles/modernizer?v=1.0.0.25474\"></script>\n        <script>(window.Modernizr)||document.write('<script src=\"/bundles/modernizr\"><\\/script>');</script>\n        ... \n        <script src=\"http://az673227.vo.msecnd.net/bundles/jquery?v=1.0.0.25474\"></script>\n        <script>(window.jquery)||document.write('<script src=\"/bundles/jquery\"><\\/script>');</script>\n\n        <script src=\"http://az673227.vo.msecnd.net/bundles/bootstrap?v=1.0.0.25474\"></script>\n        <script>($.fn.modal)||document.write('<script src=\"/bundles/bootstrap\"><\\/script>');</script>\n        ...\n\n\n    请注意，CSS 捆绑包的注入脚本仍包含以下行中 `CdnFallbackExpression` 属性的残存错误：\n\n        }())||document.write('<script src=\"/Content/css\"><\\/script>');</script>\n\n    不过，由于 || 表达式的第一部分始终会返回 true（在紧邻其上的行中），因此始终不会运行 document.write() 函数。\n\n6. 若要测试该回退脚本是否可正常运行，请回到 CDN 终结点的仪表板，然后单击“禁用终结点”。\n\n    ![](./media/cdn-websites-with-cdn/13-test-fallback.png)\n\n7. 刷新 Azure Web 应用的浏览器窗口。你现在应该会看到所有脚本和样式表都已正常加载。\n\n## 更多信息 \n- [Azure 内容交付网络 (CDN) 概述](/documentation/articles/cdn-overview)\n- [ASP.NET 绑定和缩减](http://www.asp.net/mvc/tutorials/mvc-4/bundling-and-minification)\n \n\n<!---HONumber=Mooncake_0118_2016-->"
+}

@@ -1,0 +1,236 @@
+{
+  "nodes": [
+    {
+      "content": "以编程方式监视流分析的作业 | Azure",
+      "pos": [
+        28,
+        49
+      ]
+    },
+    {
+      "content": "了解如何以编程方式监视通过 REST API、Azure SDK 或 Powershell 创建的流分析作业。",
+      "pos": [
+        69,
+        124
+      ]
+    },
+    {
+      "content": "以编程方式创建流分析作业监视器",
+      "pos": [
+        402,
+        417
+      ]
+    },
+    {
+      "content": "本文说明如何为流分析作业启用监视功能。通过 REST API、Azure SDK 或 Powershell 创建的流分析作业并不默认启用监视功能。你可以在 Azure 门户中手动启用此功能，只需导航到作业的“监视”页并单击“启用”按钮即可；你也可以按本文所述步骤自动化此过程。流分析作业的监视数据将显示在 Azure 门户的“监视”选项卡中。",
+      "pos": [
+        419,
+        590
+      ]
+    },
+    {
+      "content": "作业监视器作业选项卡",
+      "pos": [
+        594,
+        604
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        687,
+        691
+      ]
+    },
+    {
+      "content": "在开始阅读本文前，你必须具有：",
+      "pos": [
+        692,
+        707
+      ]
+    },
+    {
+      "content": "Visual Studio 2012 或 2013。",
+      "pos": [
+        711,
+        737
+      ]
+    },
+    {
+      "pos": [
+        740,
+        776
+      ],
+      "content": "下载和安装 <bpt id=\"p1\">[</bpt>Azure .NET SDK<ept id=\"p1\">](/downloads/)</ept>。"
+    },
+    {
+      "content": "需要启用监视功能的现有流分析作业。",
+      "pos": [
+        779,
+        796
+      ]
+    },
+    {
+      "content": "设置项目",
+      "pos": [
+        801,
+        805
+      ]
+    },
+    {
+      "content": "创建 Visual Studio C# .Net 控制台应用程序。",
+      "pos": [
+        811,
+        844
+      ]
+    },
+    {
+      "content": "在程序包管理器控制台中运行以下命令以安装 NuGet 包。第一个是 Azure 流分析管理 .NET SDK。第二个是 Azure Insights SDK，用于启用监视功能。最后一个是用于进行身份验证的 Azure Active Directory 客户端。",
+      "pos": [
+        849,
+        979
+      ]
+    },
+    {
+      "content": "将下面的 appSettings 部分添加到 App.config 文件。",
+      "pos": [
+        1183,
+        1220
+      ]
+    },
+    {
+      "pos": [
+        2054,
+        2159
+      ],
+      "content": "将 <bpt id=\"p1\">*</bpt>SubscriptionId<ept id=\"p1\">*</ept> 和 <bpt id=\"p2\">*</bpt>ActiveDirectoryTenantId<ept id=\"p2\">*</ept> 的值替换为你的 Azure 订阅和租户 ID。你可以通过运行以下 PowerShell cmdlet 来获取这些值："
+    },
+    {
+      "content": "将以下 using 语句添加到项目中的源文件 (Program.cs)。",
+      "pos": [
+        2202,
+        2238
+      ]
+    },
+    {
+      "content": "添加一个身份验证帮助器方法。",
+      "pos": [
+        2677,
+        2691
+      ]
+    },
+    {
+      "content": "创建管理客户端",
+      "pos": [
+        4161,
+        4168
+      ]
+    },
+    {
+      "content": "以下代码将设置必需变量和管理客户端。",
+      "pos": [
+        4169,
+        4187
+      ]
+    },
+    {
+      "content": "为现有流分析作业启用监视功能",
+      "pos": [
+        4981,
+        4995
+      ]
+    },
+    {
+      "pos": [
+        4997,
+        5144
+      ],
+      "content": "以下代码将为<bpt id=\"p1\">**</bpt>现有<ept id=\"p1\">**</ept>流分析作业启用监视功能。代码的第一部分针对流分析服务执行 GET 请求，目的是检索特定流分析作业的信息。它使用“Id”属性（从 GET 请求检索而得）作为代码第二部分中 Put 方法的参数，目的是将 PUT 请求发送到 Insights 服务以启用流分析作业的监视功能。"
+    },
+    {
+      "pos": [
+        5148,
+        5267
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.WARNING]</ph>如果你此前为其他流分析作业启用了监视功能，不管是通过 Azure 门户进行的还是通过以下代码以编程方式完成的，<bpt id=\"p1\">**</bpt>我们都建议你在提供存储帐户名称时提供你此前在启用监视功能时所使用的那个相同的存储帐户名称。<ept id=\"p1\">**</ept>"
+    },
+    {
+      "content": "存储帐户与你创建流分析作业时所在的区域相关联，并不特定于作业本身。",
+      "pos": [
+        5273,
+        5306
+      ]
+    },
+    {
+      "content": "该区域的所有流分析作业（以及所有其他的 Azure 资源）在存储监视数据时将共享这个存储帐户。如果你提供其他的存储帐户，则可能会产生意想不到的副作用，影响你监视其他流分析作业和/或其他 Azure 资源。",
+      "pos": [
+        5312,
+        5414
+      ]
+    },
+    {
+      "pos": [
+        5420,
+        5501
+      ],
+      "content": "用于替换下面的 <ph id=\"ph1\">```“&lt;YOUR STORAGE ACCOUNT NAME&gt;”```</ph> 的存储帐户名称所代表的存储帐户应该与要启用监视功能的流分析作业属同一订阅。"
+    },
+    {
+      "content": "获取支持",
+      "pos": [
+        6235,
+        6239
+      ]
+    },
+    {
+      "pos": [
+        6240,
+        6350
+      ],
+      "content": "如需进一步的帮助，请尝试我们的 <bpt id=\"p1\">[</bpt>Azure 流分析论坛<ept id=\"p1\">](https://social.msdn.microsoft.com/Forums/zh-CN/home?forum=AzureStreamAnalytics)</ept>。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        6356,
+        6360
+      ]
+    },
+    {
+      "content": "Azure 流分析简介",
+      "pos": [
+        6365,
+        6376
+      ]
+    },
+    {
+      "content": "Azure 流分析入门",
+      "pos": [
+        6436,
+        6447
+      ]
+    },
+    {
+      "content": "缩放 Azure 流分析作业",
+      "pos": [
+        6506,
+        6520
+      ]
+    },
+    {
+      "content": "Azure 流分析查询语言参考",
+      "pos": [
+        6578,
+        6593
+      ]
+    },
+    {
+      "content": "Azure 流分析管理 REST API 参考",
+      "pos": [
+        6660,
+        6683
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"以编程方式监视流分析的作业 | Azure\" \n    description=\"了解如何以编程方式监视通过 REST API、Azure SDK 或 Powershell 创建的流分析作业。\"\n    keywords=\".net 监视器, 作业监视器, 监视应用\"\n    services=\"stream-analytics\" \n    documentationCenter=\"\" \n    authors=\"jeffstokes72\" \n    manager=\"paulettm\" \n    editor=\"cgronlun\"/>\n\n<tags \n    ms.service=\"stream-analytics\" \n    ms.date=\"12/04/2015\" \n    wacn.date=\"01/14/2016\"/>\n\n\n# 以编程方式创建流分析作业监视器\n 本文说明如何为流分析作业启用监视功能。通过 REST API、Azure SDK 或 Powershell 创建的流分析作业并不默认启用监视功能。你可以在 Azure 门户中手动启用此功能，只需导航到作业的“监视”页并单击“启用”按钮即可；你也可以按本文所述步骤自动化此过程。流分析作业的监视数据将显示在 Azure 门户的“监视”选项卡中。\n\n![作业监视器作业选项卡](./media/stream-analytics-monitor-jobs/stream-analytics-monitor-jobs-tab.png)\n\n## 先决条件\n在开始阅读本文前，你必须具有：\n\n- Visual Studio 2012 或 2013。\n- 下载和安装 [Azure .NET SDK](/downloads/)。\n- 需要启用监视功能的现有流分析作业。\n\n## 设置项目\n\n1.  创建 Visual Studio C# .Net 控制台应用程序。\n2.  在程序包管理器控制台中运行以下命令以安装 NuGet 包。第一个是 Azure 流分析管理 .NET SDK。第二个是 Azure Insights SDK，用于启用监视功能。最后一个是用于进行身份验证的 Azure Active Directory 客户端。\n\n    ```\n    Install-Package Microsoft.Azure.Management.StreamAnalytics\n    Install-Package Microsoft.Azure.Insights -Pre\n    Install-Package Microsoft.IdentityModel.Clients.ActiveDirectory\n    ```\n\n3.  将下面的 appSettings 部分添加到 App.config 文件。\n\n    ```\n    <appSettings>\n        <!--CSM Prod related values-->\n        <add key=\"ResourceGroupName\" value=\"RESOURCE GROUP NAME\" />\n        <add key=\"JobName\" value=\"YOUR JOB NAME\" />\n        <add key=\"StorageAccountName\" value=\"YOUR STORAGE ACCOUNT\"/>\n        <add key=\"ActiveDirectoryEndpoint\" value=\"https://login.chinacloudapi.cn/\" />\n        <add key=\"ResourceManagerEndpoint\" value=\"https://management.azure.com/\" />\n        <add key=\"WindowsManagementUri\" value=\"https://management.core.chinacloudapi.cn/\" />\n        <add key=\"AsaClientId\" value=\"1950a258-227b-4e31-a9cf-717495945fc2\" />\n        <add key=\"RedirectUri\" value=\"urn:ietf:wg:oauth:2.0:oob\" />\n        <add key=\"SubscriptionId\" value=\"YOUR AZURE SUBSCRIPTION ID\" />\n        <add key=\"ActiveDirectoryTenantId\" value=\"YOUR TENANT ID\" />\n    </appSettings>\n    ```\n将 *SubscriptionId* 和 *ActiveDirectoryTenantId* 的值替换为你的 Azure 订阅和租户 ID。你可以通过运行以下 PowerShell cmdlet 来获取这些值：\n\n    ```\n    Get-AzureAccount\n    ```\n4.  将以下 using 语句添加到项目中的源文件 (Program.cs)。 \n\n    ```\n        using System;\n        using System.Configuration;\n        using System.Threading;\n        using Microsoft.Azure;\n        using Microsoft.Azure.Management.Insights;\n        using Microsoft.Azure.Management.Insights.Models;\n        using Microsoft.Azure.Management.StreamAnalytics;\n        using Microsoft.Azure.Management.StreamAnalytics.Models;\n        using Microsoft.IdentityModel.Clients.ActiveDirectory;\n    ```\n5.  添加一个身份验证帮助器方法。\n\n        public static string GetAuthorizationHeader()\n            {\n                AuthenticationResult result = null;\n                var thread = new Thread(() =>\n                {\n                    try\n                    {\n                        var context = new AuthenticationContext(\n                            ConfigurationManager.AppSettings[\"ActiveDirectoryEndpoint\"] +\n                            ConfigurationManager.AppSettings[\"ActiveDirectoryTenantId\"]);\n\n                        result = context.AcquireToken(\n                            resource: ConfigurationManager.AppSettings[\"WindowsManagementUri\"],\n                            clientId: ConfigurationManager.AppSettings[\"AsaClientId\"],\n                            redirectUri: new Uri(ConfigurationManager.AppSettings[\"RedirectUri\"]),\n                            promptBehavior: PromptBehavior.Always);\n                    }\n                    catch (Exception threadEx)\n                    {\n                        Console.WriteLine(threadEx.Message);\n                    }\n                });\n\n                thread.SetApartmentState(ApartmentState.STA);\n                thread.Name = \"AcquireTokenThread\";\n                thread.Start();\n                thread.Join();\n\n                if (result != null)\n                {\n                    return result.AccessToken;\n                }\n\n                throw new InvalidOperationException(\"Failed to acquire token\");\n        }\n\n## 创建管理客户端\n以下代码将设置必需变量和管理客户端。\n\n    string resourceGroupName = \"<YOUR AZURE RESOURCE GROUP NAME>\";\n    string streamAnalyticsJobName = \"<YOUR STREAM ANALYTICS JOB NAME>\";\n\n    // Get authentication token\n    TokenCloudCredentials aadTokenCredentials =\n        new TokenCloudCredentials(\n            ConfigurationManager.AppSettings[\"SubscriptionId\"],\n            GetAuthorizationHeader());\n\n    Uri resourceManagerUri = new\n    Uri(ConfigurationManager.AppSettings[\"ResourceManagerEndpoint\"]);\n\n    // Create Stream Analytics and Insights management client\n    StreamAnalyticsManagementClient streamAnalyticsClient = new\n    StreamAnalyticsManagementClient(aadTokenCredentials, resourceManagerUri);\n    InsightsManagementClient insightsClient = new\n    InsightsManagementClient(aadTokenCredentials, resourceManagerUri);\n\n## 为现有流分析作业启用监视功能\n\n以下代码将为**现有**流分析作业启用监视功能。代码的第一部分针对流分析服务执行 GET 请求，目的是检索特定流分析作业的信息。它使用“Id”属性（从 GET 请求检索而得）作为代码第二部分中 Put 方法的参数，目的是将 PUT 请求发送到 Insights 服务以启用流分析作业的监视功能。\n\n> [AZURE.WARNING]如果你此前为其他流分析作业启用了监视功能，不管是通过 Azure 门户进行的还是通过以下代码以编程方式完成的，**我们都建议你在提供存储帐户名称时提供你此前在启用监视功能时所使用的那个相同的存储帐户名称。**\n> \n> 存储帐户与你创建流分析作业时所在的区域相关联，并不特定于作业本身。\n> \n> 该区域的所有流分析作业（以及所有其他的 Azure 资源）在存储监视数据时将共享这个存储帐户。如果你提供其他的存储帐户，则可能会产生意想不到的副作用，影响你监视其他流分析作业和/或其他 Azure 资源。\n> \n> 用于替换下面的 ```“<YOUR STORAGE ACCOUNT NAME>”``` 的存储帐户名称所代表的存储帐户应该与要启用监视功能的流分析作业属同一订阅。\n\n    // Get an existing Stream Analytics job\n    JobGetParameters jobGetParameters = new JobGetParameters()\n    {\n        PropertiesToExpand = \"inputs,transformation,outputs\"\n    };\n    JobGetResponse jobGetResponse = streamAnalyticsClient.StreamingJobs.Get(resourceGroupName, streamAnalyticsJobName, jobGetParameters);\n\n    // Enable monitoring\n    ServiceDiagnosticSettingsPutParameters insightPutParameters = new ServiceDiagnosticSettingsPutParameters()\n    {\n            Properties = new ServiceDiagnosticSettings()\n            {\n                StorageAccountName = \"<YOUR STORAGE ACCOUNT NAME>\"\n            }\n    };\n    insightsClient.ServiceDiagnosticSettingsOperations.Put(jobGetResponse.Job.Id, insightPutParameters);\n\n\n\n## 获取支持\n如需进一步的帮助，请尝试我们的 [Azure 流分析论坛](https://social.msdn.microsoft.com/Forums/zh-CN/home?forum=AzureStreamAnalytics)。\n\n\n## 后续步骤\n\n- [Azure 流分析简介](/documentation/articles/stream-analytics-introduction)\n- [Azure 流分析入门](/documentation/articles/stream-analytics-get-started)\n- [缩放 Azure 流分析作业](/documentation/articles/stream-analytics-scale-jobs)\n- [Azure 流分析查询语言参考](https://msdn.microsoft.com/zh-cn/library/azure/dn834998.aspx)\n- [Azure 流分析管理 REST API 参考](https://msdn.microsoft.com/zh-cn/library/azure/dn835031.aspx)\n \n\n<!---HONumber=Mooncake_0104_2016-->"
+}

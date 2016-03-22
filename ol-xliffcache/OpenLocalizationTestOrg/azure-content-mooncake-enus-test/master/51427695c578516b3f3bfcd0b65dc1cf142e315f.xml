@@ -1,0 +1,397 @@
+{
+  "nodes": [
+    {
+      "content": "如何为高级 Azure Redis 缓存配置 Redis 群集功能",
+      "pos": [
+        28,
+        61
+      ]
+    },
+    {
+      "content": "了解如何为高级级别的 Azure Redis 缓存实例创建和管理 Redis 缓存功能",
+      "pos": [
+        81,
+        124
+      ]
+    },
+    {
+      "content": "如何为高级 Azure Redis 缓存配置 Redis 群集功能",
+      "pos": [
+        332,
+        365
+      ]
+    },
+    {
+      "content": "Azure Redis 缓存具有不同的缓存产品（包括新推出的高级层），使缓存大小和功能的选择更加灵活。本文介绍如何配置高级 Azure Redis 缓存实例中的群集功能。",
+      "pos": [
+        366,
+        451
+      ]
+    },
+    {
+      "content": "什么是 Redis 群集？",
+      "pos": [
+        457,
+        470
+      ]
+    },
+    {
+      "pos": [
+        471,
+        571
+      ],
+      "content": "Azure Redis 缓存提供的 Redis 群集与<bpt id=\"p1\">[</bpt>在 Redis 中实施<ept id=\"p1\">](http://redis.io/topics/cluster-tutorial)</ept>的一样。Redis 群集具有以下优势。"
+    },
+    {
+      "content": "能够在多个节点中自动拆分数据集。",
+      "pos": [
+        577,
+        593
+      ]
+    },
+    {
+      "content": "能够在部分节点遇到故障或无法与群集其余部分通信的情况下继续运行。",
+      "pos": [
+        599,
+        631
+      ]
+    },
+    {
+      "content": "更大的吞吐量：增加分片数时，吞吐量呈线性增加。",
+      "pos": [
+        637,
+        660
+      ]
+    },
+    {
+      "content": "更大的内存大小：增加分片数时，内存大小呈线性增加。",
+      "pos": [
+        666,
+        691
+      ]
+    },
+    {
+      "pos": [
+        695,
+        826
+      ],
+      "content": "有关高级缓存大小、吞吐量和带宽的更多详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure Redis 缓存常见问题<ept id=\"p1\">](/documentation/articles/cache-faq#what-redis-cache-offering-and-size-should-i-use)</ept>。"
+    },
+    {
+      "content": "在 Azure 中，Redis 群集以主/副模型提供。在该模型中，每个分片都有一个带副本的主/副对，副本由 Azure Redis 缓存服务管理。",
+      "pos": [
+        828,
+        901
+      ]
+    },
+    {
+      "content": "群集功能",
+      "pos": [
+        906,
+        910
+      ]
+    },
+    {
+      "content": "在 Azure 中国区，只能通过 Azure PowerShell 或 Azure CLI 管理 Redis 缓存",
+      "pos": [
+        912,
+        969
+      ]
+    },
+    {
+      "content": "使用以下 PowerShell 脚本创建缓存：",
+      "pos": [
+        1100,
+        1123
+      ]
+    },
+    {
+      "content": "群集中最多可以包含 10 个分片，上述脚本将创建“分片计数”为 2（可以是介于 1 和 10 之间的数字）的缓存。",
+      "pos": [
+        1529,
+        1586
+      ]
+    },
+    {
+      "content": "每个分片都是一个由 Azure 管理的主/副缓存对，而缓存的总大小则通过将定价层中选择的缓存大小乘以分片数来计算。",
+      "pos": [
+        1588,
+        1645
+      ]
+    },
+    {
+      "content": "创建缓存后，即可连接到缓存并使用缓存，就像该缓存没有进行群集一样，而 Redis 则会将数据分布到整个缓存分片中。",
+      "pos": [
+        1647,
+        1704
+      ]
+    },
+    {
+      "pos": [
+        1706,
+        1923
+      ],
+      "content": "有关在 StackExchange.Redis 客户端中使用群集的示例代码，请参阅 <bpt id=\"p1\">[</bpt>Hello World<ept id=\"p1\">](https://github.com/rustd/RedisSamples/tree/master/HelloWorld)</ept> 示例的 <bpt id=\"p2\">[</bpt>clustering.cs<ept id=\"p2\">](https://github.com/rustd/RedisSamples/blob/master/HelloWorld/Clustering.cs)</ept> 部分。"
+    },
+    {
+      "pos": [
+        1926,
+        2384
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>使用 StackExchange.Redis 连接已启用群集的 Azure Redis 缓存时，你可能会遇到问题并收到 <ph id=\"ph2\">`MOVE`</ph> 异常。这是因为 StackExchange.Redis 缓存客户端收集缓存群集中节点信息的间隔时间较短。如果你是第一次连接缓存，并在客户端完成收集此信息前立即调用缓存，便会发生这些异常。在应用程序中解决此问题的最简单方法是连接缓存，然后等待一秒后再对缓存进行任何调用。为此，请按以下示例代码中所示添加 <ph id=\"ph3\">`Thread.Sleep(1000)`</ph>。请注意，只会在首次连接到缓存期间发生 <ph id=\"ph4\">`Thread.Sleep(1000)`</ph>。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>StackExchange.Redis.RedisServerException - MOVED #248<ept id=\"p1\">](https://github.com/StackExchange/StackExchange.Redis/issues/248)</ept>。我们正在开发此问题的修复程序，如有任何更新，将发布在本页面。"
+    },
+    {
+      "content": "更改正在运行的高级缓存上的群集大小",
+      "pos": [
+        3011,
+        3028
+      ]
+    },
+    {
+      "content": "可以使用以下命令更改正在运行的、已启用群集的高级缓存上的群集大小。",
+      "pos": [
+        3030,
+        3063
+      ]
+    },
+    {
+      "pos": [
+        3158,
+        3249
+      ],
+      "content": "完成缩放需要花费几分钟的时间。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何缩放 Azure Redis 缓存<ept id=\"p1\">](/documentation/articles/cache-how-to-scale)</ept>。"
+    },
+    {
+      "content": "群集功能常见问题",
+      "pos": [
+        3254,
+        3262
+      ]
+    },
+    {
+      "content": "以下列表包含有关 Azure Redis 缓存群集功能常见问题的解答。",
+      "pos": [
+        3264,
+        3299
+      ]
+    },
+    {
+      "content": "使用群集功能时，是否需要对客户端应用程序进行更改？",
+      "pos": [
+        3304,
+        3329
+      ]
+    },
+    {
+      "pos": [
+        3335,
+        3626
+      ],
+      "content": "启用群集功能时，仅数据库 0 可用。如果你的客户端应用程序使用多个数据库并尝试读取或写入数据库 0 之外的其他数据库，则会引发以下异常。<ph id=\"ph1\">`Unhandled Exception: StackExchange.Redis.RedisConnectionException: ProtocolFailure on GET ---&gt;`</ph> <ph id=\"ph2\">`StackExchange.Redis.RedisCommandException: Multiple databases are not supported on this server; cannot switch to database: 6`</ph>"
+    },
+    {
+      "pos": [
+        3631,
+        3805
+      ],
+      "content": "如果你使用的是 <bpt id=\"p1\">[</bpt>StackExchange.Redis<ept id=\"p1\">](https://www.nuget.org/packages/StackExchange.Redis/)</ept>，则必须使用 1.0.481 或更高版本。连接到该缓存时，你使用的终结点、端口和密钥与你连接到未启用群集功能的缓存时使用的相同。唯一的区别是，所有读取和写入都必须在数据库 0 中进行。"
+    },
+    {
+      "pos": [
+        3814,
+        3897
+      ],
+      "content": "其他客户端可能有不同的要求。请参阅<bpt id=\"p1\">[</bpt>是否所有 Redis 客户端都支持群集功能？<ept id=\"p1\">](#do-all-redis-clients-support-clustering)</ept>"
+    },
+    {
+      "pos": [
+        3902,
+        4011
+      ],
+      "content": "如果应用程序使用的多个密钥操作都在单个命令中成批执行，则所有密钥都必须位于同一分片。若要完成此操作，请参阅<bpt id=\"p1\">[</bpt>密钥在群集中是如何分布的？<ept id=\"p1\">](#how-are-keys-distributed-in-a-cluster)</ept>。"
+    },
+    {
+      "pos": [
+        4016,
+        4198
+      ],
+      "content": "如果你使用的是 Redis ASP.NET 会话状态提供程序，则必须使用 2.0.1 或更高版本。请参阅<bpt id=\"p1\">[</bpt>能否在 Redis ASP.NET 会话状态和输出缓存提供程序中使用群集功能？<ept id=\"p1\">](#can-i-use-clustering-with-the-redis-aspnet-session-state-and-output-caching-providers)</ept>。"
+    },
+    {
+      "pos": [
+        4202,
+        4268
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"how-are-keys-distributed-in-a-cluster\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 密钥在群集中是如何分布的？"
+    },
+    {
+      "pos": [
+        4270,
+        4446
+      ],
+      "content": "请参阅 Redis <bpt id=\"p1\">[</bpt>密钥分布模型<ept id=\"p1\">](http://redis.io/topics/cluster-spec#keys-distribution-model)</ept>文档：密钥空间拆分成 16384 个槽。每个密钥都经过哈希处理并分配到其中一个槽，这些槽分布在群集的节点中。对密钥的哪部分进行哈希处理是可以配置的，这样可确保多个使用哈希标记的密钥位于同一分片。"
+    },
+    {
+      "pos": [
+        4452,
+        4670
+      ],
+      "content": "使用哈希标记的密钥 - 如果将密钥的任意部分括在 <ph id=\"ph1\">`{`</ph> 和 <ph id=\"ph2\">`}`</ph> 中，则只会对密钥的该部分进行哈希处理，以便确定密钥的哈希槽。例如，以下 3 个密钥将位于同一分片中：<ph id=\"ph3\">`{key}1`</ph>、<ph id=\"ph4\">`{key}2`</ph> 和 <ph id=\"ph5\">`{key}3`</ph>，因为只对名称的 <ph id=\"ph6\">`key`</ph> 部分进行了哈希处理。如需密钥哈希标记规范的完整列表，请参阅<bpt id=\"p1\">[</bpt>密钥哈希标记<ept id=\"p1\">](http://redis.io/topics/cluster-spec#keys-hash-tags)</ept>。"
+    },
+    {
+      "content": "没有哈希标记的密钥 - 使用整个密钥名称进行哈希处理。从统计学意义上来说，这样会导致密钥平均分布到缓存的各个分片中。",
+      "pos": [
+        4675,
+        4733
+      ]
+    },
+    {
+      "content": "为了优化性能和吞吐量，我们建议你让密钥平均分布。如果你使用带哈希标记的密钥，则应用程序会负责确保密钥平均分布。",
+      "pos": [
+        4735,
+        4790
+      ]
+    },
+    {
+      "pos": [
+        4792,
+        5017
+      ],
+      "content": "有关详细信息，请参阅<bpt id=\"p1\">[</bpt>密钥分布模型<ept id=\"p1\">](http://redis.io/topics/cluster-spec#keys-distribution-model)</ept>、<bpt id=\"p2\">[</bpt>Redis 群集数据分片<ept id=\"p2\">](http://redis.io/topics/cluster-tutorial#redis-cluster-data-sharding)</ept>和<bpt id=\"p3\">[</bpt>密钥哈希标记<ept id=\"p3\">](http://redis.io/topics/cluster-spec#keys-hash-tags)</ept>。"
+    },
+    {
+      "pos": [
+        5019,
+        5247
+      ],
+      "content": "有关在 StackExchange.Redis 客户端中使用群集和查找同一分片中的密钥的示例代码，请参阅 <bpt id=\"p1\">[</bpt>Hello World<ept id=\"p1\">](https://github.com/rustd/RedisSamples/tree/master/HelloWorld)</ept> 示例的 <bpt id=\"p2\">[</bpt>clustering.cs<ept id=\"p2\">](https://github.com/rustd/RedisSamples/blob/master/HelloWorld/Clustering.cs)</ept> 部分。"
+    },
+    {
+      "content": "我可以创建的最大缓存大小是多大？",
+      "pos": [
+        5252,
+        5268
+      ]
+    },
+    {
+      "pos": [
+        5270,
+        5474
+      ],
+      "content": "高级缓存的最大大小为 53 GB。你可以创建多达 10 个分片，因此最大大小为 530 GB。如果你需要的大小更大，则可<bpt id=\"p1\">[</bpt>请求更多<ept id=\"p1\">](mailto:wapteams@microsoft.com?subject=Redis%20Cache%20quota%20increase)</ept>。有关详细信息，请参阅 <bpt id=\"p2\">[</bpt>Azure Redis 缓存定价<ept id=\"p2\">](/home/features/redis-cache/#price)</ept>。"
+    },
+    {
+      "pos": [
+        5478,
+        5555
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"do-all-redis-clients-support-clustering\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 是否所有 Redis 客户端都支持群集功能？"
+    },
+    {
+      "pos": [
+        5557,
+        5760
+      ],
+      "content": "目前，并非所有客户端都支持 Redis 群集功能。StackExchange.Redis 是不支持该功能的客户端。有关其他客户端的详细信息，请参阅 <bpt id=\"p1\">[</bpt>Redis 群集教程<ept id=\"p1\">](http://redis.io/topics/cluster-tutorial)</ept>的<bpt id=\"p2\">[</bpt>操作群集<ept id=\"p2\">](http://redis.io/topics/cluster-tutorial#playing-with-the-cluster)</ept>部分。"
+    },
+    {
+      "pos": [
+        5763,
+        5920
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果你使用 StackExchange.Redis 作为客户端，请确保使用最新版本的 <bpt id=\"p1\">[</bpt>StackExchange.Redis<ept id=\"p1\">](https://www.nuget.org/packages/StackExchange.Redis/)</ept>，即 1.0.481 或更高，以便群集功能能够正常使用。"
+    },
+    {
+      "content": "启用群集功能后，如何连接到我的缓存？",
+      "pos": [
+        5925,
+        5943
+      ]
+    },
+    {
+      "content": "连接到你的缓存时，可以使用的终结点、端口和密钥与你连接到未启用群集功能的缓存时使用的相同。Redis 在后端管理群集功能，因此不需要你通过客户端来管理它。",
+      "pos": [
+        5945,
+        6022
+      ]
+    },
+    {
+      "content": "我可以直接连接到缓存的各个分片吗？",
+      "pos": [
+        6027,
+        6044
+      ]
+    },
+    {
+      "pos": [
+        6046,
+        6382
+      ],
+      "content": "尚未正式提供此方面的支持。话虽如此，但每个分片都是由主/副缓存对组成的，该缓存对统称缓存实例。你可以在 GitHub 上通过 Redis 存储库的<bpt id=\"p1\">[</bpt>不稳定<ept id=\"p1\">](http://redis.io/download)</ept>分支使用 redis-cli 实用程序连接到这些缓存实例。使用 <ph id=\"ph1\">`-c`</ph> 开关启动后，此版本可实现基本的支持。有关详细信息，请参阅 <bpt id=\"p2\">[</bpt>http://redis.io<ept id=\"p2\">](http://redis.io)</ept> 上的 <bpt id=\"p3\">[</bpt>Redis 群集教程<ept id=\"p3\">](http://redis.io/topics/cluster-tutorial)</ept>中的<bpt id=\"p4\">[</bpt>操作群集<ept id=\"p4\">](http://redis.io/topics/cluster-tutorial#playing-with-the-cluster)</ept>。"
+    },
+    {
+      "content": "对于非 ssl，请使用以下命令。",
+      "pos": [
+        6384,
+        6400
+      ]
+    },
+    {
+      "pos": [
+        6695,
+        6725
+      ],
+      "content": "对于 ssl，请将 <ph id=\"ph1\">`1300N`</ph> 替换为 <ph id=\"ph2\">`1500N`</ph>。"
+    },
+    {
+      "content": "我可以为以前创建的缓存配置群集功能吗？",
+      "pos": [
+        6730,
+        6749
+      ]
+    },
+    {
+      "content": "目前，你只能在创建缓存时启用群集。创建缓存后，你可以更改群集大小，但不能将群集添加到高级缓存，或者从高级缓存中删除群集。已启用群集且只包含一个分片的高级缓存不同于具有相同大小且没有群集的高级缓存。",
+      "pos": [
+        6751,
+        6849
+      ]
+    },
+    {
+      "content": "我可以为基本缓存或标准缓存配置群集功能吗？",
+      "pos": [
+        6854,
+        6875
+      ]
+    },
+    {
+      "content": "群集功能仅适用于高级缓存。",
+      "pos": [
+        6877,
+        6890
+      ]
+    },
+    {
+      "pos": [
+        6894,
+        7034
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"can-i-use-clustering-with-the-redis-aspnet-session-state-and-output-caching-providers\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 能否在 Redis ASP.NET 会话状态和输出缓存提供程序中使用群集功能？"
+    },
+    {
+      "pos": [
+        7040,
+        7068
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Redis 输出缓存提供程序<ept id=\"p1\">**</ept> - 无需进行更改。"
+    },
+    {
+      "pos": [
+        7073,
+        7352
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Redis 会话状态提供程序<ept id=\"p1\">**</ept> - 若要使用群集功能，必须使用 <bpt id=\"p2\">[</bpt>RedisSessionStateProvider<ept id=\"p2\">](https://www.nuget.org/packages/Microsoft.Web.RedisSessionStateProvider)</ept> 2.0.1 或更高版本，否则会引发异常。这是一项重大更改；有关详细信息，请参阅 <bpt id=\"p3\">[</bpt>2\\.0.0 版重大更改详细信息<ept id=\"p3\">](https://github.com/Azure/aspnet-redis-providers/wiki/v2.0.0-Breaking-Change-Details)</ept>。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"如何为高级 Azure Redis 缓存配置 Redis 群集功能\" \n    description=\"了解如何为高级级别的 Azure Redis 缓存实例创建和管理 Redis 缓存功能\" \n    services=\"redis-cache\" \n    documentationCenter=\"\" \n    authors=\"steved0x\" \n    manager=\"dwrede\" \n    editor=\"\"/>\n\n<tags\n    ms.service=\"cache\"\n    ms.date=\"12/16/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n# 如何为高级 Azure Redis 缓存配置 Redis 群集功能\nAzure Redis 缓存具有不同的缓存产品（包括新推出的高级层），使缓存大小和功能的选择更加灵活。本文介绍如何配置高级 Azure Redis 缓存实例中的群集功能。\n\n\n## 什么是 Redis 群集？\nAzure Redis 缓存提供的 Redis 群集与[在 Redis 中实施](http://redis.io/topics/cluster-tutorial)的一样。Redis 群集具有以下优势。\n\n-   能够在多个节点中自动拆分数据集。 \n-   能够在部分节点遇到故障或无法与群集其余部分通信的情况下继续运行。 \n-   更大的吞吐量：增加分片数时，吞吐量呈线性增加。 \n-   更大的内存大小：增加分片数时，内存大小呈线性增加。  \n\n有关高级缓存大小、吞吐量和带宽的更多详细信息，请参阅 [Azure Redis 缓存常见问题](/documentation/articles/cache-faq#what-redis-cache-offering-and-size-should-i-use)。\n\n在 Azure 中，Redis 群集以主/副模型提供。在该模型中，每个分片都有一个带副本的主/副对，副本由 Azure Redis 缓存服务管理。\n\n## 群集功能\n\n在 Azure 中国区，只能通过 Azure PowerShell 或 Azure CLI 管理 Redis 缓存\n\n\n[AZURE.INCLUDE [azurerm-azurechinacloud-environment-parameter](../includes/azurerm-azurechinacloud-environment-parameter.md)]\n\n\n使用以下 PowerShell 脚本创建缓存：\n\n    $VerbosePreference = \"Continue\"\n\n    # Create a new cache with date string to make name unique. \n    $cacheName = \"MovieCache\" + $(Get-Date -Format ('ddhhmm')) \n    $location = \"China North\"\n    $resourceGroupName = \"Default-Web-ChinaNorth\"\n    \n    $movieCache = New-AzureRmRedisCache -Location $location -Name $cacheName  -ResourceGroupName $resourceGroupName -Size 6GB -Sku Premium -ShardCount 2\n\n群集中最多可以包含 10 个分片，上述脚本将创建“分片计数”为 2（可以是介于 1 和 10 之间的数字）的缓存。\n\n每个分片都是一个由 Azure 管理的主/副缓存对，而缓存的总大小则通过将定价层中选择的缓存大小乘以分片数来计算。\n\n创建缓存后，即可连接到缓存并使用缓存，就像该缓存没有进行群集一样，而 Redis 则会将数据分布到整个缓存分片中。\n\n有关在 StackExchange.Redis 客户端中使用群集的示例代码，请参阅 [Hello World](https://github.com/rustd/RedisSamples/tree/master/HelloWorld) 示例的 [clustering.cs](https://github.com/rustd/RedisSamples/blob/master/HelloWorld/Clustering.cs) 部分。\n\n>[AZURE.IMPORTANT]使用 StackExchange.Redis 连接已启用群集的 Azure Redis 缓存时，你可能会遇到问题并收到 `MOVE` 异常。这是因为 StackExchange.Redis 缓存客户端收集缓存群集中节点信息的间隔时间较短。如果你是第一次连接缓存，并在客户端完成收集此信息前立即调用缓存，便会发生这些异常。在应用程序中解决此问题的最简单方法是连接缓存，然后等待一秒后再对缓存进行任何调用。为此，请按以下示例代码中所示添加 `Thread.Sleep(1000)`。请注意，只会在首次连接到缓存期间发生 `Thread.Sleep(1000)`。有关详细信息，请参阅 [StackExchange.Redis.RedisServerException - MOVED #248](https://github.com/StackExchange/StackExchange.Redis/issues/248)。我们正在开发此问题的修复程序，如有任何更新，将发布在本页面。\n\n    private static Lazy<ConnectionMultiplexer> lazyConnection = new Lazy<ConnectionMultiplexer>(() =>\n    {\n        // Connect to the Redis cache for the first time\n        var connection =  ConnectionMultiplexer.Connect(\"contoso5.redis.cache.chinacloudapi.cn,abortConnect=false,ssl=true,password=...\");\n\n        // Wait for 1 second\n        Thread.Sleep(1000);\n\n        // Return the connected ConnectionMultiplexer\n        return connection;\n    });\n    \n    public static ConnectionMultiplexer Connection\n    {\n        get\n        {\n            return lazyConnection.Value;\n        }\n    }\n\n<a name=\"cluster-size\"></a>\n## 更改正在运行的高级缓存上的群集大小\n\n可以使用以下命令更改正在运行的、已启用群集的高级缓存上的群集大小。\n\n    New-AzureRmRedisCache -Name $cacheName -ResourceGroupName $resourceGroupName -Size 13GB\n\n完成缩放需要花费几分钟的时间。有关详细信息，请参阅[如何缩放 Azure Redis 缓存](/documentation/articles/cache-how-to-scale)。\n\n## 群集功能常见问题\n\n以下列表包含有关 Azure Redis 缓存群集功能常见问题的解答。\n\n## 使用群集功能时，是否需要对客户端应用程序进行更改？\n\n-   启用群集功能时，仅数据库 0 可用。如果你的客户端应用程序使用多个数据库并尝试读取或写入数据库 0 之外的其他数据库，则会引发以下异常。`Unhandled Exception: StackExchange.Redis.RedisConnectionException: ProtocolFailure on GET --->` `StackExchange.Redis.RedisCommandException: Multiple databases are not supported on this server; cannot switch to database: 6`\n-   如果你使用的是 [StackExchange.Redis](https://www.nuget.org/packages/StackExchange.Redis/)，则必须使用 1.0.481 或更高版本。连接到该缓存时，你使用的终结点、端口和密钥与你连接到未启用群集功能的缓存时使用的相同。唯一的区别是，所有读取和写入都必须在数据库 0 中进行。\n    -   其他客户端可能有不同的要求。请参阅[是否所有 Redis 客户端都支持群集功能？](#do-all-redis-clients-support-clustering)\n-   如果应用程序使用的多个密钥操作都在单个命令中成批执行，则所有密钥都必须位于同一分片。若要完成此操作，请参阅[密钥在群集中是如何分布的？](#how-are-keys-distributed-in-a-cluster)。\n-   如果你使用的是 Redis ASP.NET 会话状态提供程序，则必须使用 2.0.1 或更高版本。请参阅[能否在 Redis ASP.NET 会话状态和输出缓存提供程序中使用群集功能？](#can-i-use-clustering-with-the-redis-aspnet-session-state-and-output-caching-providers)。\n\n##<a name=\"how-are-keys-distributed-in-a-cluster\"></a> 密钥在群集中是如何分布的？\n\n请参阅 Redis [密钥分布模型](http://redis.io/topics/cluster-spec#keys-distribution-model)文档：密钥空间拆分成 16384 个槽。每个密钥都经过哈希处理并分配到其中一个槽，这些槽分布在群集的节点中。对密钥的哪部分进行哈希处理是可以配置的，这样可确保多个使用哈希标记的密钥位于同一分片。\n\n-   使用哈希标记的密钥 - 如果将密钥的任意部分括在 `{` 和 `}` 中，则只会对密钥的该部分进行哈希处理，以便确定密钥的哈希槽。例如，以下 3 个密钥将位于同一分片中：`{key}1`、`{key}2` 和 `{key}3`，因为只对名称的 `key` 部分进行了哈希处理。如需密钥哈希标记规范的完整列表，请参阅[密钥哈希标记](http://redis.io/topics/cluster-spec#keys-hash-tags)。\n-   没有哈希标记的密钥 - 使用整个密钥名称进行哈希处理。从统计学意义上来说，这样会导致密钥平均分布到缓存的各个分片中。\n\n为了优化性能和吞吐量，我们建议你让密钥平均分布。如果你使用带哈希标记的密钥，则应用程序会负责确保密钥平均分布。\n\n有关详细信息，请参阅[密钥分布模型](http://redis.io/topics/cluster-spec#keys-distribution-model)、[Redis 群集数据分片](http://redis.io/topics/cluster-tutorial#redis-cluster-data-sharding)和[密钥哈希标记](http://redis.io/topics/cluster-spec#keys-hash-tags)。\n\n有关在 StackExchange.Redis 客户端中使用群集和查找同一分片中的密钥的示例代码，请参阅 [Hello World](https://github.com/rustd/RedisSamples/tree/master/HelloWorld) 示例的 [clustering.cs](https://github.com/rustd/RedisSamples/blob/master/HelloWorld/Clustering.cs) 部分。\n\n## 我可以创建的最大缓存大小是多大？\n\n高级缓存的最大大小为 53 GB。你可以创建多达 10 个分片，因此最大大小为 530 GB。如果你需要的大小更大，则可[请求更多](mailto:wapteams@microsoft.com?subject=Redis%20Cache%20quota%20increase)。有关详细信息，请参阅 [Azure Redis 缓存定价](/home/features/redis-cache/#price)。\n\n##<a name=\"do-all-redis-clients-support-clustering\"></a> 是否所有 Redis 客户端都支持群集功能？\n\n目前，并非所有客户端都支持 Redis 群集功能。StackExchange.Redis 是不支持该功能的客户端。有关其他客户端的详细信息，请参阅 [Redis 群集教程](http://redis.io/topics/cluster-tutorial)的[操作群集](http://redis.io/topics/cluster-tutorial#playing-with-the-cluster)部分。\n\n>[AZURE.NOTE]如果你使用 StackExchange.Redis 作为客户端，请确保使用最新版本的 [StackExchange.Redis](https://www.nuget.org/packages/StackExchange.Redis/)，即 1.0.481 或更高，以便群集功能能够正常使用。\n\n## 启用群集功能后，如何连接到我的缓存？\n\n连接到你的缓存时，可以使用的终结点、端口和密钥与你连接到未启用群集功能的缓存时使用的相同。Redis 在后端管理群集功能，因此不需要你通过客户端来管理它。\n\n## 我可以直接连接到缓存的各个分片吗？\n\n尚未正式提供此方面的支持。话虽如此，但每个分片都是由主/副缓存对组成的，该缓存对统称缓存实例。你可以在 GitHub 上通过 Redis 存储库的[不稳定](http://redis.io/download)分支使用 redis-cli 实用程序连接到这些缓存实例。使用 `-c` 开关启动后，此版本可实现基本的支持。有关详细信息，请参阅 [http://redis.io](http://redis.io) 上的 [Redis 群集教程](http://redis.io/topics/cluster-tutorial)中的[操作群集](http://redis.io/topics/cluster-tutorial#playing-with-the-cluster)。\n\n对于非 ssl，请使用以下命令。\n\n    Redis-cli.exe -h <<cachename>> -p 13000 (to connect to instance 0)\n    Redis-cli.exe -h <<cachename>> -p 13001 (to connect to instance 1)\n    Redis-cli.exe -h <<cachename>> -p 13002 (to connect to instance 2)\n    ...\n    Redis-cli.exe -h <<cachename>> -p 1300N (to connect to instance N)\n\n对于 ssl，请将 `1300N` 替换为 `1500N`。\n\n## 我可以为以前创建的缓存配置群集功能吗？\n\n目前，你只能在创建缓存时启用群集。创建缓存后，你可以更改群集大小，但不能将群集添加到高级缓存，或者从高级缓存中删除群集。已启用群集且只包含一个分片的高级缓存不同于具有相同大小且没有群集的高级缓存。\n\n## 我可以为基本缓存或标准缓存配置群集功能吗？\n\n群集功能仅适用于高级缓存。\n\n##<a name=\"can-i-use-clustering-with-the-redis-aspnet-session-state-and-output-caching-providers\"></a> 能否在 Redis ASP.NET 会话状态和输出缓存提供程序中使用群集功能？\n\n-   **Redis 输出缓存提供程序** - 无需进行更改。\n-   **Redis 会话状态提供程序** - 若要使用群集功能，必须使用 [RedisSessionStateProvider](https://www.nuget.org/packages/Microsoft.Web.RedisSessionStateProvider) 2.0.1 或更高版本，否则会引发异常。这是一项重大更改；有关详细信息，请参阅 [2\\.0.0 版重大更改详细信息](https://github.com/Azure/aspnet-redis-providers/wiki/v2.0.0-Breaking-Change-Details)。\n\n  \n<!-- IMAGES -->\n\n[redis-cache-new-cache-menu]: ./media/cache-how-to-premium-clustering/redis-cache-new-cache-menu.png\n\n[redis-cache-premium-pricing-tier]: ./media/cache-how-to-premium-clustering/redis-cache-premium-pricing-tier.png\n\n[NewCacheMenu]: ./media/cache-how-to-premium-clustering/redis-cache-new-cache-menu.png\n\n[CacheCreate]: ./media/cache-how-to-premium-clustering/redis-cache-cache-create.png\n\n[redis-cache-premium-pricing-group]: ./media/cache-how-to-premium-clustering/redis-cache-premium-pricing-group.png\n\n[redis-cache-premium-features]: ./media/cache-how-to-premium-clustering/redis-cache-premium-features.png\n\n[redis-cache-clustering]: ./media/cache-how-to-premium-clustering/redis-cache-clustering.png\n\n[redis-cache-clustering-selected]: ./media/cache-how-to-premium-clustering/redis-cache-clustering-selected.png\n\n[redis-cache-redis-cluster-size]: ./media/cache-how-to-premium-clustering/redis-cache-redis-cluster-size.png\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

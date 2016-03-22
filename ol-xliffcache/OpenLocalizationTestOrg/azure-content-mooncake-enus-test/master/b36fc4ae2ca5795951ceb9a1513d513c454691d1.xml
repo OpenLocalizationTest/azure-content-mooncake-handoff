@@ -1,0 +1,271 @@
+{
+  "nodes": [
+    {
+      "content": "云服务和管理证书 | Azure",
+      "pos": [
+        28,
+        44
+      ]
+    },
+    {
+      "content": "了解如何在 Azure 中创建和使用证书",
+      "pos": [
+        64,
+        84
+      ]
+    },
+    {
+      "content": "Azure 云服务证书概述",
+      "pos": [
+        307,
+        320
+      ]
+    },
+    {
+      "pos": [
+        321,
+        531
+      ],
+      "content": "证书在 Azure 中用于云服务（<bpt id=\"p1\">[</bpt>服务证书<ept id=\"p1\">](#what-are-service-certificates)</ept>）以及用于通过管理 API 进行身份验证（<bpt id=\"p2\">[</bpt>管理证书<ept id=\"p2\">](#what-are-management-certificates)</ept>，适用于使用 Azure 经典门户而不是 ARM 的场合）。本主题同时提供了有关这两种证书类型的一般概述、如何<bpt id=\"p3\">[</bpt>创建<ept id=\"p3\">](#create)</ept>以及将其<bpt id=\"p4\">[</bpt>部署<ept id=\"p4\">](#deploy)</ept>到 Azure。"
+    },
+    {
+      "content": "在 Azure 中使用的证书是 x.509 v3 证书，且可由另一个受信任的证书进行签名或可进行自签名。自签名的证书由其自己的创建者进行签名，因此，默认情况下不受信任。大多数浏览器可以忽略这一点。自签名的证书仅应由自己在开发和测试云服务时使用。",
+      "pos": [
+        533,
+        655
+      ]
+    },
+    {
+      "pos": [
+        657,
+        805
+      ],
+      "content": "Azure 使用的证书可以包含一个私钥或公钥。证书具有指纹，它提供了一种可对证书进行明确识别的方法。该指纹用于在 Azure <bpt id=\"p1\">[</bpt>配置文件<ept id=\"p1\">](/documentation/articles/cloud-services-configure-ssl-certificate)</ept>中识别云服务应使用的证书。"
+    },
+    {
+      "content": "什么是服务证书？",
+      "pos": [
+        810,
+        818
+      ]
+    },
+    {
+      "content": "服务证书被附加到云服务，可实现与服务之间的安全通信。例如，如果你部署了 Web 角色，将需要提供可对公开的 HTTPS 终结点进行身份验证的证书。在你的服务定义中定义的服务证书会自动部署到运行你的角色实例的虚拟机。",
+      "pos": [
+        819,
+        926
+      ]
+    },
+    {
+      "content": "你可以使用 Azure 经典门户或服务管理 API 将服务证书上载到 Azure 经典门户。服务证书与特定的云服务相关联，并分配到服务定义文件中的部署。",
+      "pos": [
+        928,
+        1004
+      ]
+    },
+    {
+      "content": "可将服务证书和你的服务分开管理，并可由不同的个人进行管理。例如，一名开发人员可以上载服务包，该服务包引用 IT 管理员以前上载到 Azure 的证书。IT 管理员可以管理并续订更改服务配置的证书而无需上载新的服务包。这样之所以可行，是因为证书的逻辑名称及其存储名称和位置是在服务定义文件中指定的，而证书指纹是在服务配置文件中指定的。若要更新证书，只需上载新证书并更改服务配置文件中的指纹值。",
+      "pos": [
+        1006,
+        1201
+      ]
+    },
+    {
+      "content": "什么是管理证书？",
+      "pos": [
+        1206,
+        1214
+      ]
+    },
+    {
+      "content": "管理证书允许你使用 Azure 经典门户提供的服务管理 API 进行身份验证。许多程序和工具（如 Visual Studio 或 Azure SDK）将使用这些证书来自动配置和部署各种 Azure 服务。这些并不真正与云服务相关。",
+      "pos": [
+        1215,
+        1330
+      ]
+    },
+    {
+      "pos": [
+        1333,
+        1389
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.WARNING]</ph> 请小心！ 这些类型的证书允许任何使用它们进行身份验证的人管理与它们相关联的订阅。"
+    },
+    {
+      "content": "限制",
+      "pos": [
+        1395,
+        1397
+      ]
+    },
+    {
+      "content": "每个订阅限最多可具有 100 个管理证书。特定服务管理员的用户 ID 下的所有订阅同样最多只能具有 100 个管理证书。如果帐户管理员的用户 ID 已用于添加 100 个管理证书且需要更多证书，可以添加共同管理员以添加额外的证书。",
+      "pos": [
+        1398,
+        1513
+      ]
+    },
+    {
+      "content": "在添加 100 个以上证书之前，请检查你是否可重用现有证书。使用共同管理员将可能会给你的证书管理流程增加不必要的复杂性。",
+      "pos": [
+        1515,
+        1575
+      ]
+    },
+    {
+      "content": "创建新的自签名证书",
+      "pos": [
+        1603,
+        1612
+      ]
+    },
+    {
+      "content": "可以使用任何可用工具创建自签名的证书，只要它们符合这些设置：",
+      "pos": [
+        1613,
+        1643
+      ]
+    },
+    {
+      "content": "X.509 证书。",
+      "pos": [
+        1647,
+        1656
+      ]
+    },
+    {
+      "content": "包含私钥。",
+      "pos": [
+        1659,
+        1664
+      ]
+    },
+    {
+      "content": "为密钥交换（.pfx 文件）而创建。",
+      "pos": [
+        1667,
+        1685
+      ]
+    },
+    {
+      "content": "使用者名称必须与用于访问云服务的域匹配。",
+      "pos": [
+        1688,
+        1708
+      ]
+    },
+    {
+      "pos": [
+        1715,
+        1846
+      ],
+      "content": "你无法获取 chinacloudapp.cn 域（或与 Azure 相关的任何域）的 SSL 证书；该证书的使用者名称必须与用于访问应用程序的自定义域名匹配。例如，<bpt id=\"p1\">**</bpt>contoso.net<ept id=\"p1\">**</ept>，而不是 <bpt id=\"p2\">**</bpt>contoso.chinacloudapp.cn<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "至少为 2048 位加密。",
+      "pos": [
+        1849,
+        1862
+      ]
+    },
+    {
+      "pos": [
+        1865,
+        1895
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>仅服务证书<ept id=\"p1\">**</ept>：客户端证书必须驻留在<bpt id=\"p2\">*</bpt>个人<ept id=\"p2\">*</ept>证书存储区。"
+    },
+    {
+      "pos": [
+        1897,
+        1951
+      ],
+      "content": "有两种简单的方法可在 Windows 上创建证书，即使用 <ph id=\"ph1\">`makecert.exe`</ph> 实用程序或 IIS。"
+    },
+    {
+      "content": "Makecert.exe",
+      "pos": [
+        1957,
+        1969
+      ]
+    },
+    {
+      "pos": [
+        1971,
+        2105
+      ],
+      "content": "此实用程序随 Visual Studio 2013/2015 一并安装。它是一个控制台实用程序，可允许你创建和安装证书。如果你启动在安装 Visual Studio 时创建的 <bpt id=\"p1\">**</bpt>VS2015 开发人员命令提示符<ept id=\"p1\">**</ept>快捷方式，将出现命令提示符，提示在路径中加入此工具。"
+    },
+    {
+      "content": "Internet 信息服务 (IIS)",
+      "pos": [
+        2246,
+        2265
+      ]
+    },
+    {
+      "pos": [
+        2267,
+        2422
+      ],
+      "content": "在 internet 上有许多页面，包含了有关如何使用 IIS 实现此操作的信息。<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](https://www.sslshopper.com/article-how-to-create-a-self-signed-certificate-in-iis-7.html)</ept>就是一个很棒的页面，我认为其说明很不错。"
+    },
+    {
+      "content": "Java",
+      "pos": [
+        2428,
+        2432
+      ]
+    },
+    {
+      "pos": [
+        2433,
+        2539
+      ],
+      "content": "你可以使用 Java <bpt id=\"p1\">[</bpt>创建证书<ept id=\"p1\">](/documentation/articles/java-create-azure-website-using-java-sdk/#create-a-certificate)</ept>。"
+    },
+    {
+      "content": "Linux",
+      "pos": [
+        2545,
+        2550
+      ]
+    },
+    {
+      "pos": [
+        2551,
+        2631
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>本文<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-use-ssh-key)</ept>介绍如何通过 SSH 创建证书。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        2636,
+        2640
+      ]
+    },
+    {
+      "pos": [
+        2642,
+        2879
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>上载服务证书到 Azure 经典门户<ept id=\"p1\">](/documentation/articles/cloud-services-configure-ssl-certificate)</ept>（或 <bpt id=\"p2\">[</bpt>Azure 门户<ept id=\"p2\">](/documentation/articles/cloud-services-configure-ssl-certificate-portal)</ept>）并为云服务<bpt id=\"p3\">[</bpt>对其进行配置<ept id=\"p3\">](/documentation/articles/cloud-services-xml-certs)</ept>。"
+    },
+    {
+      "pos": [
+        2881,
+        2960
+      ],
+      "content": "将<bpt id=\"p1\">[</bpt>管理 API 证书<ept id=\"p1\">](/documentation/articles/azure-api-management-certs)</ept>上载到 Azure 经典门户。"
+    },
+    {
+      "pos": [
+        2963,
+        3008
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> Azure 门户不使用管理证书来访问 API，而是使用用户帐户。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"云服务和管理证书 | Azure\" \n    description=\"了解如何在 Azure 中创建和使用证书\" \n    services=\"cloud-services\" \n    documentationCenter=\".net\" \n    authors=\"Thraka\" \n    manager=\"timlt\" \n    editor=\"\"/>\n\n<tags \n    ms.service=\"cloud-services\" \n    ms.date=\"01/15/2016\"\n    wacn.date=\"02/26/2016\"/>\n\n# Azure 云服务证书概述\n证书在 Azure 中用于云服务（[服务证书](#what-are-service-certificates)）以及用于通过管理 API 进行身份验证（[管理证书](#what-are-management-certificates)，适用于使用 Azure 经典门户而不是 ARM 的场合）。本主题同时提供了有关这两种证书类型的一般概述、如何[创建](#create)以及将其[部署](#deploy)到 Azure。\n\n在 Azure 中使用的证书是 x.509 v3 证书，且可由另一个受信任的证书进行签名或可进行自签名。自签名的证书由其自己的创建者进行签名，因此，默认情况下不受信任。大多数浏览器可以忽略这一点。自签名的证书仅应由自己在开发和测试云服务时使用。\n\nAzure 使用的证书可以包含一个私钥或公钥。证书具有指纹，它提供了一种可对证书进行明确识别的方法。该指纹用于在 Azure [配置文件](/documentation/articles/cloud-services-configure-ssl-certificate)中识别云服务应使用的证书。\n\n## 什么是服务证书？\n服务证书被附加到云服务，可实现与服务之间的安全通信。例如，如果你部署了 Web 角色，将需要提供可对公开的 HTTPS 终结点进行身份验证的证书。在你的服务定义中定义的服务证书会自动部署到运行你的角色实例的虚拟机。\n\n你可以使用 Azure 经典门户或服务管理 API 将服务证书上载到 Azure 经典门户。服务证书与特定的云服务相关联，并分配到服务定义文件中的部署。\n\n可将服务证书和你的服务分开管理，并可由不同的个人进行管理。例如，一名开发人员可以上载服务包，该服务包引用 IT 管理员以前上载到 Azure 的证书。IT 管理员可以管理并续订更改服务配置的证书而无需上载新的服务包。这样之所以可行，是因为证书的逻辑名称及其存储名称和位置是在服务定义文件中指定的，而证书指纹是在服务配置文件中指定的。若要更新证书，只需上载新证书并更改服务配置文件中的指纹值。\n\n## 什么是管理证书？\n管理证书允许你使用 Azure 经典门户提供的服务管理 API 进行身份验证。许多程序和工具（如 Visual Studio 或 Azure SDK）将使用这些证书来自动配置和部署各种 Azure 服务。这些并不真正与云服务相关。\n\n>[AZURE.WARNING] 请小心！ 这些类型的证书允许任何使用它们进行身份验证的人管理与它们相关联的订阅。\n\n### 限制\n每个订阅限最多可具有 100 个管理证书。特定服务管理员的用户 ID 下的所有订阅同样最多只能具有 100 个管理证书。如果帐户管理员的用户 ID 已用于添加 100 个管理证书且需要更多证书，可以添加共同管理员以添加额外的证书。\n\n在添加 100 个以上证书之前，请检查你是否可重用现有证书。使用共同管理员将可能会给你的证书管理流程增加不必要的复杂性。\n\n\n<a name=\"create\"></a>\n## 创建新的自签名证书\n可以使用任何可用工具创建自签名的证书，只要它们符合这些设置：\n\n* X.509 证书。\n* 包含私钥。\n* 为密钥交换（.pfx 文件）而创建。\n* 使用者名称必须与用于访问云服务的域匹配。\n    > 你无法获取 chinacloudapp.cn 域（或与 Azure 相关的任何域）的 SSL 证书；该证书的使用者名称必须与用于访问应用程序的自定义域名匹配。例如，**contoso.net**，而不是 **contoso.chinacloudapp.cn**。\n* 至少为 2048 位加密。\n* **仅服务证书**：客户端证书必须驻留在*个人*证书存储区。\n\n有两种简单的方法可在 Windows 上创建证书，即使用 `makecert.exe` 实用程序或 IIS。\n\n### Makecert.exe\n\n此实用程序随 Visual Studio 2013/2015 一并安装。它是一个控制台实用程序，可允许你创建和安装证书。如果你启动在安装 Visual Studio 时创建的 **VS2015 开发人员命令提示符**快捷方式，将出现命令提示符，提示在路径中加入此工具。\n\n    makecert -sky exchange -r -n \"CN=[CertificateName]\" -pe -a sha1 -len 2048 -ss My -sv [CertificateName].pvk [CertificateName].cer\n\n\n### Internet 信息服务 (IIS)\n\n在 internet 上有许多页面，包含了有关如何使用 IIS 实现此操作的信息。[此处](https://www.sslshopper.com/article-how-to-create-a-self-signed-certificate-in-iis-7.html)就是一个很棒的页面，我认为其说明很不错。\n\n### Java\n你可以使用 Java [创建证书](/documentation/articles/java-create-azure-website-using-java-sdk/#create-a-certificate)。\n\n### Linux\n[本文](/documentation/articles/virtual-machines-linux-use-ssh-key)介绍如何通过 SSH 创建证书。\n\n## 后续步骤\n\n[上载服务证书到 Azure 经典门户](/documentation/articles/cloud-services-configure-ssl-certificate)（或 [Azure 门户](/documentation/articles/cloud-services-configure-ssl-certificate-portal)）并为云服务[对其进行配置](/documentation/articles/cloud-services-xml-certs)。\n\n将[管理 API 证书](/documentation/articles/azure-api-management-certs)上载到 Azure 经典门户。\n\n>[AZURE.NOTE] Azure 门户不使用管理证书来访问 API，而是使用用户帐户。\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

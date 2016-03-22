@@ -1,0 +1,306 @@
+{
+  "nodes": [
+    {
+      "content": "如何通过 WebJobs SDK 使用 Azure 表存储",
+      "pos": [
+        28,
+        57
+      ]
+    },
+    {
+      "content": "如何通过 WebJobs SDK 使用 Azure 表存储创建表，将实体添加到表，并读取现有表。",
+      "pos": [
+        77,
+        125
+      ]
+    },
+    {
+      "content": "如何通过 WebJobs SDK 使用 Azure 表存储",
+      "pos": [
+        367,
+        396
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        401,
+        403
+      ]
+    },
+    {
+      "pos": [
+        405,
+        519
+      ],
+      "content": "本指南提供了 C# 代码示例，用于演示如何使用 <bpt id=\"p1\">[</bpt>WebJobs SDK<ept id=\"p1\">](/documentation/articles/websites-dotnet-webjobs-sdk)</ept> 版本 1.x 读取和写入 Azure 存储表。"
+    },
+    {
+      "pos": [
+        521,
+        797
+      ],
+      "content": "本指南假设你了解<bpt id=\"p1\">[</bpt>如何使用指向存储帐户的连接字符串在 Visual Studio 中创建 WebJob 项目<ept id=\"p1\">](/documentation/articles/websites-dotnet-webjobs-sdk-get-started)</ept>或创建<bpt id=\"p2\">[</bpt>多个存储帐户<ept id=\"p2\">](https://github.com/Azure/azure-webjobs-sdk/blob/master/test/Microsoft.Azure.WebJobs.Host.EndToEndTests/MultipleStorageAccountsEndToEndTests.cs)</ept>。"
+    },
+    {
+      "pos": [
+        807,
+        939
+      ],
+      "content": "一些代码段显示了<bpt id=\"p1\">[</bpt>手动调用<ept id=\"p1\">](/documentation/articles/websites-dotnet-webjobs-sdk-storage-queues-how-to#manual)</ept>（即：不是使用触发器属性之一调用）的函数中使用的 <ph id=\"ph1\">`Table`</ph> 属性。"
+    },
+    {
+      "pos": [
+        944,
+        973
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"ingress\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何向表中添加实体"
+    },
+    {
+      "pos": [
+        975,
+        1087
+      ],
+      "content": "若要将实体添加到表中，请使用包含 <ph id=\"ph1\">`ICollector&lt;T&gt;`</ph> 或 <ph id=\"ph2\">`IAsyncCollector&lt;T&gt;`</ph> 参数的 <ph id=\"ph3\">`Table`</ph> 属性，其中 <ph id=\"ph4\">`T`</ph> 指定您想要添加的实体的架构。属性构造函数使用指定表名称的字符串参数。"
+    },
+    {
+      "pos": [
+        1089,
+        1128
+      ],
+      "content": "下面的代码示例将 <ph id=\"ph1\">`Person`</ph> 实体添加到名为 <bpt id=\"p1\">*</bpt>Ingress<ept id=\"p1\">*</ept> 的表。"
+    },
+    {
+      "pos": [
+        1586,
+        1699
+      ],
+      "content": "通常您用于 <ph id=\"ph1\">`ICollector`</ph> 的类型派生自 <ph id=\"ph2\">`TableEntity`</ph> 或实现 <ph id=\"ph3\">`ITableEntity`</ph>，但它并不一定要执行这些操作。以下 <ph id=\"ph4\">`Person`</ph> 类之一适用于前面 <ph id=\"ph5\">`Ingress`</ph> 方法中所示的代码。"
+    },
+    {
+      "pos": [
+        2003,
+        2062
+      ],
+      "content": "如果您想要直接使用 Azure 存储 API，可以将 <ph id=\"ph1\">`CloudStorageAccount`</ph> 参数添加到方法签名。"
+    },
+    {
+      "pos": [
+        2067,
+        2091
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"monitor\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>实时监视"
+    },
+    {
+      "content": "因为数据入口函数通常处理大量数据，WebJobs SDK 仪表板提供了实时监视的数据。“调用日志”部分告诉你函数是否仍在运行。",
+      "pos": [
+        2093,
+        2156
+      ]
+    },
+    {
+      "content": "Ingress 函数正在运行",
+      "pos": [
+        2160,
+        2174
+      ]
+    },
+    {
+      "content": "“调用详细信息”页在运行时报告函数的进度（写入的实体数），并且为你提供中止的机会。",
+      "pos": [
+        2255,
+        2296
+      ]
+    },
+    {
+      "content": "Ingress 函数正在运行",
+      "pos": [
+        2300,
+        2314
+      ]
+    },
+    {
+      "pos": [
+        2396,
+        2423
+      ],
+      "content": "该函数完成时，<bpt id=\"p1\">**</bpt>调用详细信息<ept id=\"p1\">**</ept>页会报告写入的行数。"
+    },
+    {
+      "content": "Ingress 函数已完成",
+      "pos": [
+        2427,
+        2440
+      ]
+    },
+    {
+      "pos": [
+        2524,
+        2556
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"multiple\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何从表中读取多个实体"
+    },
+    {
+      "pos": [
+        2558,
+        2649
+      ],
+      "content": "若要读取表，请将 <ph id=\"ph1\">`Table`</ph> 属性和 <ph id=\"ph2\">`IQueryable&lt;T&gt;`</ph> 参数一起使用，其中类型 <ph id=\"ph3\">`T`</ph> 派生自 <ph id=\"ph4\">`TableEntity`</ph> 或 实现 <ph id=\"ph5\">`ITableEntity`</ph>。"
+    },
+    {
+      "pos": [
+        2651,
+        2680
+      ],
+      "content": "下面的代码示例读取并记录 <ph id=\"ph1\">`Ingress`</ph> 表中所有行："
+    },
+    {
+      "pos": [
+        3103,
+        3134
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"readone\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何从表中读取单个实体"
+    },
+    {
+      "pos": [
+        3136,
+        3188
+      ],
+      "content": "通过包含两个其他参数的 <ph id=\"ph1\">`Table`</ph> 属性构造函数，您可以在想要绑定到单个表实体时，指定分区键和行键。"
+    },
+    {
+      "pos": [
+        3190,
+        3232
+      ],
+      "content": "下面的代码示例基于队列消息中接收的分区键和行键值读取 <ph id=\"ph1\">`Person`</ph> 实体的表行："
+    },
+    {
+      "pos": [
+        3906,
+        3942
+      ],
+      "content": "本示例中的 <ph id=\"ph1\">`Person`</ph> 类不必实现 <ph id=\"ph2\">`ITableEntity`</ph>。"
+    },
+    {
+      "pos": [
+        3947,
+        3991
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"storageapi\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何直接使用.NET 存储 API 处理表"
+    },
+    {
+      "pos": [
+        3993,
+        4043
+      ],
+      "content": "您还可以将 <ph id=\"ph1\">`Table`</ph> 属性和 <ph id=\"ph2\">`CloudTable`</ph> 对象一起使用，以便能够更灵活地处理表。"
+    },
+    {
+      "pos": [
+        4045,
+        4092
+      ],
+      "content": "下面的代码示例使用 <ph id=\"ph1\">`CloudTable`</ph> 对象将单个实体添加到 <bpt id=\"p1\">*</bpt>Ingress<ept id=\"p1\">*</ept> 表中。"
+    },
+    {
+      "pos": [
+        4560,
+        4667
+      ],
+      "content": "有关如何使用 <ph id=\"ph1\">`CloudTable`</ph> 对象的详细信息，请参阅<bpt id=\"p1\">[</bpt>如何通过 .NET 使用表存储<ept id=\"p1\">](/documentation/articles/storage-dotnet-how-to-use-tables)</ept>。"
+    },
+    {
+      "pos": [
+        4672,
+        4707
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"queues\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>队列操作说明文章中介绍了相关主题"
+    },
+    {
+      "pos": [
+        4709,
+        4866
+      ],
+      "content": "有关如何处理队列消息触发的表处理，或者不特定于表处理的 WebJobs SDK 方案的信息，请参阅<bpt id=\"p1\">[</bpt>如何通过 WebJobs SDK 使用 Azure 队列存储<ept id=\"p1\">](/documentation/articles/websites-dotnet-webjobs-sdk-storage-queues-how-to)</ept>。"
+    },
+    {
+      "content": "该文章涵盖的主题包括：",
+      "pos": [
+        4868,
+        4879
+      ]
+    },
+    {
+      "content": "异步函数",
+      "pos": [
+        4883,
+        4887
+      ]
+    },
+    {
+      "content": "多个实例",
+      "pos": [
+        4890,
+        4894
+      ]
+    },
+    {
+      "content": "正常关闭",
+      "pos": [
+        4897,
+        4901
+      ]
+    },
+    {
+      "content": "在函数正文中使用 WebJobs SDK 属性",
+      "pos": [
+        4904,
+        4927
+      ]
+    },
+    {
+      "content": "在代码中设置 SDK 连接字符串。",
+      "pos": [
+        4930,
+        4947
+      ]
+    },
+    {
+      "content": "在代码中设置 WebJobs SDK 构造函数参数的值",
+      "pos": [
+        4950,
+        4977
+      ]
+    },
+    {
+      "content": "手动触发函数",
+      "pos": [
+        4980,
+        4986
+      ]
+    },
+    {
+      "content": "写入日志",
+      "pos": [
+        4989,
+        4993
+      ]
+    },
+    {
+      "pos": [
+        4998,
+        5024
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"nextsteps\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>后续步骤"
+    },
+    {
+      "pos": [
+        5026,
+        5178
+      ],
+      "content": "本指南提供的代码示例演示了如何处理常见方案以操作 Azure 表。有关如何使用 Azure WebJobs 和 WebJobs SDK 的详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure WebJobs 推荐资源<ept id=\"p1\">](/documentation/articles/websites-webjobs-resources/)</ept>。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"如何通过 WebJobs SDK 使用 Azure 表存储\" \n    description=\"如何通过 WebJobs SDK 使用 Azure 表存储创建表，将实体添加到表，并读取现有表。\" \n    services=\"app-service\\web, storage\" \n    documentationCenter=\".net\" \n    authors=\"tdykstra\" \n    manager=\"wpickett\" \n    editor=\"jimbe\"/>\n\n<tags\n    ms.service=\"app-service-web\"\n    ms.date=\"12/14/2015\"\n    wacn.date=\"02/26/2016\"/>\n\n# 如何通过 WebJobs SDK 使用 Azure 表存储\n\n## 概述\n\n本指南提供了 C# 代码示例，用于演示如何使用 [WebJobs SDK](/documentation/articles/websites-dotnet-webjobs-sdk) 版本 1.x 读取和写入 Azure 存储表。\n\n本指南假设你了解[如何使用指向存储帐户的连接字符串在 Visual Studio 中创建 WebJob 项目](/documentation/articles/websites-dotnet-webjobs-sdk-get-started)或创建[多个存储帐户](https://github.com/Azure/azure-webjobs-sdk/blob/master/test/Microsoft.Azure.WebJobs.Host.EndToEndTests/MultipleStorageAccountsEndToEndTests.cs)。\n        \n一些代码段显示了[手动调用](/documentation/articles/websites-dotnet-webjobs-sdk-storage-queues-how-to#manual)（即：不是使用触发器属性之一调用）的函数中使用的 `Table` 属性。\n\n## <a id=\"ingress\"></a>如何向表中添加实体\n\n若要将实体添加到表中，请使用包含 `ICollector<T>` 或 `IAsyncCollector<T>` 参数的 `Table` 属性，其中 `T` 指定您想要添加的实体的架构。属性构造函数使用指定表名称的字符串参数。\n\n下面的代码示例将 `Person` 实体添加到名为 *Ingress* 的表。\n\n        [NoAutomaticTrigger]\n        public static void IngressDemo(\n            [Table(\"Ingress\")] ICollector<Person> tableBinding)\n        {\n            for (int i = 0; i < 100000; i++)\n            {\n                tableBinding.Add(\n                    new Person() { \n                        PartitionKey = \"Test\", \n                        RowKey = i.ToString(), \n                        Name = \"Name\" }\n                    );\n            }\n        }\n\n通常您用于 `ICollector` 的类型派生自 `TableEntity` 或实现 `ITableEntity`，但它并不一定要执行这些操作。以下 `Person` 类之一适用于前面 `Ingress` 方法中所示的代码。\n\n        public class Person : TableEntity\n        {\n            public string Name { get; set; }\n        }\n\n        public class Person\n        {\n            public string PartitionKey { get; set; }\n            public string RowKey { get; set; }\n            public string Name { get; set; }\n        }\n\n如果您想要直接使用 Azure 存储 API，可以将 `CloudStorageAccount` 参数添加到方法签名。\n\n## <a id=\"monitor\"></a>实时监视\n\n因为数据入口函数通常处理大量数据，WebJobs SDK 仪表板提供了实时监视的数据。“调用日志”部分告诉你函数是否仍在运行。\n\n![Ingress 函数正在运行](./media/websites-dotnet-webjobs-sdk-storage-tables-how-to/ingressrunning.png)\n\n“调用详细信息”页在运行时报告函数的进度（写入的实体数），并且为你提供中止的机会。\n\n![Ingress 函数正在运行](./media/websites-dotnet-webjobs-sdk-storage-tables-how-to/ingressprogress.png)\n\n该函数完成时，**调用详细信息**页会报告写入的行数。\n\n![Ingress 函数已完成](./media/websites-dotnet-webjobs-sdk-storage-tables-how-to/ingresssuccess.png)\n\n## <a id=\"multiple\"></a>如何从表中读取多个实体\n\n若要读取表，请将 `Table` 属性和 `IQueryable<T>` 参数一起使用，其中类型 `T` 派生自 `TableEntity` 或 实现 `ITableEntity`。\n\n下面的代码示例读取并记录 `Ingress` 表中所有行：\n \n        public static void ReadTable(\n            [Table(\"Ingress\")] IQueryable<Person> tableBinding,\n            TextWriter logger)\n        {\n            var query = from p in tableBinding select p;\n            foreach (Person person in query)\n            {\n                logger.WriteLine(\"PK:{0}, RK:{1}, Name:{2}\", \n                    person.PartitionKey, person.RowKey, person.Name);\n            }\n        }\n\n### <a id=\"readone\"></a>如何从表中读取单个实体\n\n通过包含两个其他参数的 `Table` 属性构造函数，您可以在想要绑定到单个表实体时，指定分区键和行键。\n\n下面的代码示例基于队列消息中接收的分区键和行键值读取 `Person` 实体的表行：\n\n        public static void ReadTableEntity(\n            [QueueTrigger(\"inputqueue\")] Person personInQueue,\n            [Table(\"persontable\",\"{PartitionKey}\", \"{RowKey}\")] Person personInTable,\n            TextWriter logger)\n        {\n            if (personInTable == null)\n            {\n                logger.WriteLine(\"Person not found: PK:{0}, RK:{1}\",\n                        personInQueue.PartitionKey, personInQueue.RowKey);\n            }\n            else\n            {\n                logger.WriteLine(\"Person found: PK:{0}, RK:{1}, Name:{2}\",\n                        personInTable.PartitionKey, personInTable.RowKey, personInTable.Name);\n            }\n        }\n\n\n本示例中的 `Person` 类不必实现 `ITableEntity`。\n\n## <a id=\"storageapi\"></a>如何直接使用.NET 存储 API 处理表\n\n您还可以将 `Table` 属性和 `CloudTable` 对象一起使用，以便能够更灵活地处理表。\n\n下面的代码示例使用 `CloudTable` 对象将单个实体添加到 *Ingress* 表中。\n \n        public static void UseStorageAPI(\n            [Table(\"Ingress\")] CloudTable tableBinding,\n            TextWriter logger)\n        {\n            var person = new Person()\n                {\n                    PartitionKey = \"Test\",\n                    RowKey = \"100\",\n                    Name = \"Name\"\n                };\n            TableOperation insertOperation = TableOperation.Insert(person);\n            tableBinding.Execute(insertOperation);\n        }\n\n有关如何使用 `CloudTable` 对象的详细信息，请参阅[如何通过 .NET 使用表存储](/documentation/articles/storage-dotnet-how-to-use-tables)。\n\n## <a id=\"queues\"></a>队列操作说明文章中介绍了相关主题\n\n有关如何处理队列消息触发的表处理，或者不特定于表处理的 WebJobs SDK 方案的信息，请参阅[如何通过 WebJobs SDK 使用 Azure 队列存储](/documentation/articles/websites-dotnet-webjobs-sdk-storage-queues-how-to)。\n\n该文章涵盖的主题包括：\n\n* 异步函数\n* 多个实例\n* 正常关闭\n* 在函数正文中使用 WebJobs SDK 属性\n* 在代码中设置 SDK 连接字符串。\n* 在代码中设置 WebJobs SDK 构造函数参数的值\n* 手动触发函数\n* 写入日志\n\n## <a id=\"nextsteps\"></a>后续步骤\n\n本指南提供的代码示例演示了如何处理常见方案以操作 Azure 表。有关如何使用 Azure WebJobs 和 WebJobs SDK 的详细信息，请参阅 [Azure WebJobs 推荐资源](/documentation/articles/websites-webjobs-resources/)。\n \n\n<!---HONumber=Mooncake_0215_2016-->"
+}

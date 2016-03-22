@@ -1,0 +1,502 @@
+{
+  "nodes": [
+    {
+      "content": "使用 castLabs 将 Widevine 许可证传送到 Azure 媒体服务",
+      "pos": [
+        28,
+        68
+      ]
+    },
+    {
+      "content": "本文介绍如何使用 Azure 媒体服务(AMS) 传送 AMS 使用 PlayReady 和 Widevine DRM 动态加密的流。PlayReady 许可证来自媒体服务 PlayReady 许可证服务器，而 Widevine 许可证则由 castLabs 许可证服务器传送。",
+      "pos": [
+        88,
+        227
+      ]
+    },
+    {
+      "content": "使用 castLabs 将 Widevine 许可证传送到 Azure 媒体服务",
+      "pos": [
+        465,
+        505
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        509,
+        525
+      ]
+    },
+    {
+      "content": "castLabs",
+      "pos": [
+        529,
+        537
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        603,
+        605
+      ]
+    },
+    {
+      "pos": [
+        607,
+        750
+      ],
+      "content": "本文介绍如何使用 Azure 媒体服务(AMS) 传送 AMS 使用 PlayReady 和 Widevine DRM 动态加密的流。PlayReady 许可证来自媒体服务 PlayReady 许可证服务器，而 Widevine 许可证则由 <bpt id=\"p1\">**</bpt>castLabs<ept id=\"p1\">**</ept> 许可证服务器传送。"
+    },
+    {
+      "pos": [
+        752,
+        943
+      ],
+      "content": "若要播放受 CENC（PlayReady 和/或 Widevine）保护的流式处理内容，可使用 <bpt id=\"p1\">[</bpt>Azure Media Player<ept id=\"p1\">](http://amsplayer.azurewebsites.net/azuremediaplayer.html)</ept>。有关详细信息，请参阅 <bpt id=\"p2\">[</bpt>AMP 文档<ept id=\"p2\">](http://amp.azure.net/libs/amp/latest/docs/)</ept>。"
+    },
+    {
+      "content": "下图演示了高级 Azure 媒体服务和 castLabs 集成体系结构。",
+      "pos": [
+        945,
+        981
+      ]
+    },
+    {
+      "content": "集成",
+      "pos": [
+        985,
+        987
+      ]
+    },
+    {
+      "content": "典型的系统设置",
+      "pos": [
+        1077,
+        1084
+      ]
+    },
+    {
+      "content": "媒体内容存储在 AMS 中。",
+      "pos": [
+        1088,
+        1102
+      ]
+    },
+    {
+      "content": "内容密钥的密钥 ID 存储在 castLabs 和 AMS 中。",
+      "pos": [
+        1105,
+        1137
+      ]
+    },
+    {
+      "content": "castLabs 和 AMS 均内置了令牌身份验证。以下部分讨论身份验证令牌。",
+      "pos": [
+        1140,
+        1179
+      ]
+    },
+    {
+      "pos": [
+        1183,
+        1288
+      ],
+      "content": "当客户端请求流式传输视频时，内容将使用 <bpt id=\"p1\">**</bpt>通用加密<ept id=\"p1\">**</ept> (CENC) 进行动态加密，并由 AMS 动态打包成平滑流和 DASH。我们还针对 HLS 流式处理协议提供 PlayReady M2TS 基本流加密。"
+    },
+    {
+      "content": "PlayReady 许可证从 AMS 许可证服务器检索，而 Widevine 许可证则从 castLabs 许可证服务器检索。",
+      "pos": [
+        1291,
+        1354
+      ]
+    },
+    {
+      "content": "Media Player 将自动根据客户端平台功能决定要提取哪个许可证。",
+      "pos": [
+        1358,
+        1394
+      ]
+    },
+    {
+      "content": "用于获取许可证的身份验证令牌生成",
+      "pos": [
+        1399,
+        1415
+      ]
+    },
+    {
+      "content": "castLabs 和 AMS 均支持用于授予许可证的 JWT（JSON Web 令牌）令牌格式。",
+      "pos": [
+        1417,
+        1465
+      ]
+    },
+    {
+      "content": "AMS 中的 JWT 令牌",
+      "pos": [
+        1470,
+        1483
+      ]
+    },
+    {
+      "content": "下表描述了 AMS 中的 JWT 令牌。",
+      "pos": [
+        1486,
+        1506
+      ]
+    },
+    {
+      "content": "颁发者",
+      "pos": [
+        1508,
+        1511
+      ]
+    },
+    {
+      "content": "所选安全令牌服务 (STS) 中的颁发者字符串",
+      "pos": [
+        1512,
+        1535
+      ]
+    },
+    {
+      "content": "目标受众",
+      "pos": [
+        1544,
+        1548
+      ]
+    },
+    {
+      "content": "所用 STS 中的受众字符串",
+      "pos": [
+        1549,
+        1563
+      ]
+    },
+    {
+      "content": "声明",
+      "pos": [
+        1564,
+        1566
+      ]
+    },
+    {
+      "content": "一组声明",
+      "pos": [
+        1567,
+        1571
+      ]
+    },
+    {
+      "content": "NotBefore",
+      "pos": [
+        1572,
+        1581
+      ]
+    },
+    {
+      "content": "令牌的有效起始日期",
+      "pos": [
+        1582,
+        1591
+      ]
+    },
+    {
+      "content": "Expires",
+      "pos": [
+        1592,
+        1599
+      ]
+    },
+    {
+      "content": "令牌的有效结束日期",
+      "pos": [
+        1600,
+        1609
+      ]
+    },
+    {
+      "content": "SigningCredentials",
+      "pos": [
+        1610,
+        1628
+      ]
+    },
+    {
+      "content": "在 PlayReady 许可证服务器、castLabs 许可证服务器和 STS 之间共享的密钥，它可以是对称或非对称密钥。",
+      "pos": [
+        1629,
+        1690
+      ]
+    },
+    {
+      "content": "castLabs 中的 JWT 令牌",
+      "pos": [
+        1695,
+        1713
+      ]
+    },
+    {
+      "content": "下表描述了 castLabs 中的 JWT 令牌。",
+      "pos": [
+        1715,
+        1740
+      ]
+    },
+    {
+      "content": "Name",
+      "pos": [
+        1742,
+        1746
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        1747,
+        1749
+      ]
+    },
+    {
+      "content": "optData",
+      "pos": [
+        1758,
+        1765
+      ]
+    },
+    {
+      "content": "一个包含你的相关信息的 JSON 字符串。",
+      "pos": [
+        1766,
+        1787
+      ]
+    },
+    {
+      "content": "crt",
+      "pos": [
+        1789,
+        1792
+      ]
+    },
+    {
+      "content": "一个包含有关资源、其许可证信息和播放权限的信息的 JSON 字符串。",
+      "pos": [
+        1793,
+        1827
+      ]
+    },
+    {
+      "content": "iat",
+      "pos": [
+        1828,
+        1831
+      ]
+    },
+    {
+      "content": "用 epoch 表示的当前日期时间。",
+      "pos": [
+        1832,
+        1850
+      ]
+    },
+    {
+      "content": "jti",
+      "pos": [
+        1851,
+        1854
+      ]
+    },
+    {
+      "content": "有关此令牌的唯一标识符（每个令牌只能在 castLabs 系统中使用一次）。",
+      "pos": [
+        1855,
+        1893
+      ]
+    },
+    {
+      "content": "示例解决方案设置",
+      "pos": [
+        1897,
+        1905
+      ]
+    },
+    {
+      "pos": [
+        1908,
+        1990
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>示例解决方案<ept id=\"p1\">](https://github.com/AzureMediaServicesSamples/CastlabsIntegration)</ept>由两个项目组成："
+    },
+    {
+      "content": "可用于对 PlayReady 和 Widevine 的已引入资源设置 DRM 限制的控制台应用程序。",
+      "pos": [
+        1996,
+        2046
+      ]
+    },
+    {
+      "content": "分发令牌的 Web 应用程序，可将其视为 STS 的非常简化版本。",
+      "pos": [
+        2051,
+        2084
+      ]
+    },
+    {
+      "content": "若要使用控制台应用程序，请执行以下操作：",
+      "pos": [
+        2087,
+        2107
+      ]
+    },
+    {
+      "content": "更改 app.config 以设置 AMS 凭据、castLabs 凭据、STS 配置和共享密钥。",
+      "pos": [
+        2113,
+        2162
+      ]
+    },
+    {
+      "content": "将资源上载到 AMS。",
+      "pos": [
+        2167,
+        2178
+      ]
+    },
+    {
+      "content": "从上载的资源中获取 UUID 并更改 Program.cs 文件中的第 32 行：",
+      "pos": [
+        2183,
+        2224
+      ]
+    },
+    {
+      "content": "使用 AssetId 来命名 castLabs 系统中的资源（Program.cs 文件中的第 44 行）。",
+      "pos": [
+        2361,
+        2415
+      ]
+    },
+    {
+      "pos": [
+        2421,
+        2464
+      ],
+      "content": "必须为 <bpt id=\"p1\">**</bpt>castLabs<ept id=\"p1\">**</ept> 设置 AssetId；它必须是唯一的字母数字字符串。"
+    },
+    {
+      "content": "运行该程序。",
+      "pos": [
+        2470,
+        2476
+      ]
+    },
+    {
+      "content": "若要使用 Web 应用(STS)，请执行以下操作：",
+      "pos": [
+        2479,
+        2504
+      ]
+    },
+    {
+      "content": "更改 web.config 以设置 castlabs 商家 ID、STS 配置和共享密钥。",
+      "pos": [
+        2510,
+        2555
+      ]
+    },
+    {
+      "content": "部署到 Azure 网站。",
+      "pos": [
+        2560,
+        2573
+      ]
+    },
+    {
+      "content": "导航到该网站。",
+      "pos": [
+        2578,
+        2585
+      ]
+    },
+    {
+      "content": "播放视频",
+      "pos": [
+        2589,
+        2593
+      ]
+    },
+    {
+      "pos": [
+        2595,
+        2749
+      ],
+      "content": "若要播放通过通用加密（PlayReady 和/或 Widevine）加密的视频，可以使用 <bpt id=\"p1\">[</bpt>Azure Media Player<ept id=\"p1\">](http://amsplayer.azurewebsites.net/azuremediaplayer.html)</ept>。运行控制台应用程序时，将回显内容密钥 ID 和清单 URL。"
+    },
+    {
+      "content": "打开新选项卡并启动 STS：http://[yourStsName].chinacloudsites.cn/api/token/assetid/[yourCastLabsAssetId]/contentkeyid/[thecontentkeyid]。",
+      "pos": [
+        2755,
+        2880
+      ]
+    },
+    {
+      "pos": [
+        2885,
+        2967
+      ],
+      "content": "转到 <bpt id=\"p1\">[</bpt>Azure Media Player<ept id=\"p1\">](http://amsplayer.azurewebsites.net/azuremediaplayer.html)</ept>。"
+    },
+    {
+      "content": "粘贴到流 URL 中。",
+      "pos": [
+        2972,
+        2983
+      ]
+    },
+    {
+      "pos": [
+        2988,
+        3006
+      ],
+      "content": "单击 <bpt id=\"p1\">**</bpt>“高级选项”<ept id=\"p1\">**</ept> 复选框。"
+    },
+    {
+      "content": "在“保护”下拉列表中选择 PlayReady 和/或 Widevine。",
+      "pos": [
+        3011,
+        3047
+      ]
+    },
+    {
+      "content": "将从 STS 获取的令牌粘贴到“令牌”文本框中。",
+      "pos": [
+        3052,
+        3076
+      ]
+    },
+    {
+      "content": "castLab 许可证服务器不需要在令牌前面添加“Bearer=”前缀。因此，请在提交令牌之前删除该前缀。",
+      "pos": [
+        3087,
+        3140
+      ]
+    },
+    {
+      "content": "更新播放器。",
+      "pos": [
+        3145,
+        3151
+      ]
+    },
+    {
+      "content": "视频应正在播放。",
+      "pos": [
+        3156,
+        3164
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"使用 castLabs 将 Widevine 许可证传送到 Azure 媒体服务\" \n    description=\"本文介绍如何使用 Azure 媒体服务(AMS) 传送 AMS 使用 PlayReady 和 Widevine DRM 动态加密的流。PlayReady 许可证来自媒体服务 PlayReady 许可证服务器，而 Widevine 许可证则由 castLabs 许可证服务器传送。\" \n    services=\"media-services\" \n    documentationCenter=\"\" \n    authors=\"Mingfeiy,willzhan,Juliako\" \n    manager=\"dwrede\" \n    editor=\"\"/>\n\n<tags\n    ms.service=\"media-services\"\n    ms.date=\"02/03/2016\" \n    wacn.date=\"03/17/2016\"/>\n\n\n#使用 castLabs 将 Widevine 许可证传送到 Azure 媒体服务\n\n> [AZURE.SELECTOR]\n- [castLabs](/documentation/articles/media-services-castlabs-integration)\n\n##概述\n\n本文介绍如何使用 Azure 媒体服务(AMS) 传送 AMS 使用 PlayReady 和 Widevine DRM 动态加密的流。PlayReady 许可证来自媒体服务 PlayReady 许可证服务器，而 Widevine 许可证则由 **castLabs** 许可证服务器传送。\n\n若要播放受 CENC（PlayReady 和/或 Widevine）保护的流式处理内容，可使用 [Azure Media Player](http://amsplayer.azurewebsites.net/azuremediaplayer.html)。有关详细信息，请参阅 [AMP 文档](http://amp.azure.net/libs/amp/latest/docs/)。\n\n下图演示了高级 Azure 媒体服务和 castLabs 集成体系结构。\n\n![集成](./media/media-services-castlabs-integration/media-services-castlabs-integration.png)\n\n##典型的系统设置\n\n- 媒体内容存储在 AMS 中。\n- 内容密钥的密钥 ID 存储在 castLabs 和 AMS 中。\n- castLabs 和 AMS 均内置了令牌身份验证。以下部分讨论身份验证令牌。 \n- 当客户端请求流式传输视频时，内容将使用 **通用加密** (CENC) 进行动态加密，并由 AMS 动态打包成平滑流和 DASH。我们还针对 HLS 流式处理协议提供 PlayReady M2TS 基本流加密。\n- PlayReady 许可证从 AMS 许可证服务器检索，而 Widevine 许可证则从 castLabs 许可证服务器检索。 \n- Media Player 将自动根据客户端平台功能决定要提取哪个许可证。 \n\n##用于获取许可证的身份验证令牌生成\n\ncastLabs 和 AMS 均支持用于授予许可证的 JWT（JSON Web 令牌）令牌格式。\n\n###AMS 中的 JWT 令牌 \n\n下表描述了 AMS 中的 JWT 令牌。\n\n颁发者|所选安全令牌服务 (STS) 中的颁发者字符串\n---|---\n目标受众|所用 STS 中的受众字符串\n声明|一组声明\nNotBefore|令牌的有效起始日期\nExpires|令牌的有效结束日期\nSigningCredentials|在 PlayReady 许可证服务器、castLabs 许可证服务器和 STS 之间共享的密钥，它可以是对称或非对称密钥。\n\n###castLabs 中的 JWT 令牌\n\n下表描述了 castLabs 中的 JWT 令牌。\n\nName|说明\n---|---\noptData|一个包含你的相关信息的 JSON 字符串。 \ncrt|一个包含有关资源、其许可证信息和播放权限的信息的 JSON 字符串。\niat|用 epoch 表示的当前日期时间。\njti|有关此令牌的唯一标识符（每个令牌只能在 castLabs 系统中使用一次）。\n\n##示例解决方案设置 \n\n[示例解决方案](https://github.com/AzureMediaServicesSamples/CastlabsIntegration)由两个项目组成：\n\n-   可用于对 PlayReady 和 Widevine 的已引入资源设置 DRM 限制的控制台应用程序。\n-   分发令牌的 Web 应用程序，可将其视为 STS 的非常简化版本。\n\n\n若要使用控制台应用程序，请执行以下操作：\n\n1.  更改 app.config 以设置 AMS 凭据、castLabs 凭据、STS 配置和共享密钥。\n2.  将资源上载到 AMS。\n3.  从上载的资源中获取 UUID 并更改 Program.cs 文件中的第 32 行：\n\n         var objIAsset = _context.Assets.Where(x => x.Id == \"nb:cid:UUID:dac53a5d-1500-80bd-b864-f1e4b62594cf\").FirstOrDefault();\n\n4.  使用 AssetId 来命名 castLabs 系统中的资源（Program.cs 文件中的第 44 行）。\n\n    必须为 **castLabs** 设置 AssetId；它必须是唯一的字母数字字符串。\n\n5.  运行该程序。\n\n\n若要使用 Web 应用(STS)，请执行以下操作：\n\n1.  更改 web.config 以设置 castlabs 商家 ID、STS 配置和共享密钥。\n2.  部署到 Azure 网站。\n3.  导航到该网站。\n\n##播放视频\n\n若要播放通过通用加密（PlayReady 和/或 Widevine）加密的视频，可以使用 [Azure Media Player](http://amsplayer.azurewebsites.net/azuremediaplayer.html)。运行控制台应用程序时，将回显内容密钥 ID 和清单 URL。\n\n1.  打开新选项卡并启动 STS：http://[yourStsName].chinacloudsites.cn/api/token/assetid/[yourCastLabsAssetId]/contentkeyid/[thecontentkeyid]。\n2.  转到 [Azure Media Player](http://amsplayer.azurewebsites.net/azuremediaplayer.html)。\n3.  粘贴到流 URL 中。\n4.  单击 **“高级选项”** 复选框。\n5.  在“保护”下拉列表中选择 PlayReady 和/或 Widevine。\n6.  将从 STS 获取的令牌粘贴到“令牌”文本框中。 \n    \n    castLab 许可证服务器不需要在令牌前面添加“Bearer=”前缀。因此，请在提交令牌之前删除该前缀。\n7.  更新播放器。\n8.  视频应正在播放。\n\n<!---HONumber=Mooncake_0307_2016-->"
+}

@@ -1,0 +1,1062 @@
+{
+  "nodes": [
+    {
+      "content": "服务总线与 .NET 和 AMQP 1.0 | Azure",
+      "pos": [
+        27,
+        56
+      ]
+    },
+    {
+      "content": "使用 AMQP 通过 .NET 使用服务总线。",
+      "pos": [
+        74,
+        97
+      ]
+    },
+    {
+      "content": "使用 AMQP 1.0 通过 .NET 使用服务总线",
+      "pos": [
+        311,
+        337
+      ]
+    },
+    {
+      "content": "下载服务总线 SDK",
+      "pos": [
+        429,
+        439
+      ]
+    },
+    {
+      "pos": [
+        441,
+        500
+      ],
+      "content": "AMQP 1.0 支持在服务总线 SDK 2.1 版或更高版本中提供。可以从 <bpt id=\"p1\">[</bpt>NuGet<ept id=\"p1\">][]</ept> 下载最新的 SDK。"
+    },
+    {
+      "content": "将 .NET 应用程序配置为使用 AMQP 1.0",
+      "pos": [
+        505,
+        530
+      ]
+    },
+    {
+      "content": "默认情况下，Service Bus .NET 客户端库使用基于 SOAP 的专用协议与 Service Bus 服务通信。若要使用 AMQP 1.0 而非默认协议，需要对服务总线连接字符串进行显式配置，如下一部分所述。除了此更改之外，在使用 AMQP 1.0 时应用程序代码基本保持不变。",
+      "pos": [
+        532,
+        676
+      ]
+    },
+    {
+      "pos": [
+        678,
+        838
+      ],
+      "content": "在当前版本中，有一些在使用 AMQP 时不受支持的 API 功能。这些不受支持的功能将在后面的<bpt id=\"p1\">[</bpt>不支持的功能、限制和行为差异<ept id=\"p1\">](#unsupported-features-restrictions-and-behavioral-differences)</ept>部分中列出。在使用 AMQP 时，一些高级配置设置还具有不同的含义。"
+    },
+    {
+      "content": "使用 App.config 进行配置",
+      "pos": [
+        844,
+        862
+      ]
+    },
+    {
+      "pos": [
+        864,
+        982
+      ],
+      "content": "应用程序使用 App.config 配置文件存储设置是一个很好的做法。对于服务总线应用程序，你可以使用 App.config 来存储服务总线 <bpt id=\"p1\">**</bpt>ConnectionString<ept id=\"p1\">**</ept> 值的设置。示例 App.config 文件如下所示："
+    },
+    {
+      "pos": [
+        1350,
+        1424
+      ],
+      "content": "<ph id=\"ph1\">`Microsoft.ServiceBus.ConnectionString`</ph> 设置的值是用于配置服务总线连接的服务总线连接字符串。其格式如下所示："
+    },
+    {
+      "pos": [
+        1577,
+        1660
+      ],
+      "content": "其中 <ph id=\"ph1\">`[namespace]`</ph> 和 <ph id=\"ph2\">`SharedAccessKey`</ph> 是从 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">][]</ept>获取的。有关详细信息，请参阅<bpt id=\"p2\">[</bpt>如何使用服务总线队列<ept id=\"p2\">][]</ept>。"
+    },
+    {
+      "pos": [
+        1662,
+        1736
+      ],
+      "content": "使用 AMQP 时，在连接字符串后面追加 <ph id=\"ph1\">`;TransportType=Amqp`</ph>。此表示法将通知客户端库使用 AMQP 1.0 连接到服务总线。"
+    },
+    {
+      "content": "消息序列化",
+      "pos": [
+        1741,
+        1746
+      ]
+    },
+    {
+      "pos": [
+        1748,
+        1986
+      ],
+      "content": "使用默认协议时，.NET 客户端库的默认序列化行为是使用 <bpt id=\"p1\">[</bpt>DataContractSerializer<ept id=\"p1\">][]</ept> 类型序列化 <bpt id=\"p2\">[</bpt>BrokeredMessage<ept id=\"p2\">][]</ept> 实例，以便在客户端库和服务总线服务之间传输。使用 AMQP 传输模式时，客户端库使用 AMQP 类型系统将<bpt id=\"p3\">[</bpt>中转消息<ept id=\"p3\">][BrokeredMessage]</ept>序列化为 AMQP 消息。此序列化使得消息能够由可能在不同平台上运行的接收应用程序接收和解释，例如，使用 JMS API 来访问服务总线的 Java 应用程序。"
+    },
+    {
+      "pos": [
+        1988,
+        2186
+      ],
+      "content": "构造 <bpt id=\"p1\">[</bpt>BrokeredMessage<ept id=\"p1\">][]</ept> 实例时，你可以提供 .NET 对象作为构造函数的参数以充当消息的正文。对于可映射到 AMQP 基元类型的对象，正文将序列化为 AMQP 数据类型。如果该对象不能直接映射到 AMQP 基元类型（即，应用程序定义的自定义类型），则将使用 <bpt id=\"p2\">[</bpt>DataContractSerializer<ept id=\"p2\">][]</ept> 序列化对象，并且已序列化的字节将在 AMQP 数据消息中发送。"
+    },
+    {
+      "content": "为了便于使用非 .NET 客户端进行互操作，仅在消息的正文中使用可直接序列化为 AMQP 类型的 .NET 类型。下表详细介绍了这些类型以及到 AMQP 类型系统的相应映射。",
+      "pos": [
+        2188,
+        2275
+      ]
+    },
+    {
+      "content": ".NET 正文对象类型",
+      "pos": [
+        2279,
+        2290
+      ]
+    },
+    {
+      "content": "映射的 AMQP 类型",
+      "pos": [
+        2293,
+        2304
+      ]
+    },
+    {
+      "content": "AMQP 正文部分类型",
+      "pos": [
+        2307,
+        2318
+      ]
+    },
+    {
+      "content": "bool",
+      "pos": [
+        2558,
+        2562
+      ]
+    },
+    {
+      "content": "布尔值",
+      "pos": [
+        2565,
+        2568
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2571,
+        2577
+      ]
+    },
+    {
+      "content": "字节",
+      "pos": [
+        2582,
+        2584
+      ]
+    },
+    {
+      "content": "ubyte",
+      "pos": [
+        2587,
+        2592
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2595,
+        2601
+      ]
+    },
+    {
+      "content": "ushort",
+      "pos": [
+        2606,
+        2612
+      ]
+    },
+    {
+      "content": "ushort",
+      "pos": [
+        2615,
+        2621
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2624,
+        2630
+      ]
+    },
+    {
+      "content": "uint",
+      "pos": [
+        2635,
+        2639
+      ]
+    },
+    {
+      "content": "uint",
+      "pos": [
+        2642,
+        2646
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2649,
+        2655
+      ]
+    },
+    {
+      "content": "ulong",
+      "pos": [
+        2660,
+        2665
+      ]
+    },
+    {
+      "content": "ulong",
+      "pos": [
+        2668,
+        2673
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2676,
+        2682
+      ]
+    },
+    {
+      "content": "sbyte",
+      "pos": [
+        2687,
+        2692
+      ]
+    },
+    {
+      "content": "字节",
+      "pos": [
+        2695,
+        2697
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2700,
+        2706
+      ]
+    },
+    {
+      "content": "short",
+      "pos": [
+        2711,
+        2716
+      ]
+    },
+    {
+      "content": "short",
+      "pos": [
+        2719,
+        2724
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2727,
+        2733
+      ]
+    },
+    {
+      "content": "int",
+      "pos": [
+        2738,
+        2741
+      ]
+    },
+    {
+      "content": "int",
+      "pos": [
+        2744,
+        2747
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2750,
+        2756
+      ]
+    },
+    {
+      "content": "long",
+      "pos": [
+        2761,
+        2765
+      ]
+    },
+    {
+      "content": "long",
+      "pos": [
+        2768,
+        2772
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2775,
+        2781
+      ]
+    },
+    {
+      "content": "float",
+      "pos": [
+        2786,
+        2791
+      ]
+    },
+    {
+      "content": "float",
+      "pos": [
+        2794,
+        2799
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2802,
+        2808
+      ]
+    },
+    {
+      "content": "double",
+      "pos": [
+        2813,
+        2819
+      ]
+    },
+    {
+      "content": "double",
+      "pos": [
+        2822,
+        2828
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2831,
+        2837
+      ]
+    },
+    {
+      "content": "decimal",
+      "pos": [
+        2842,
+        2849
+      ]
+    },
+    {
+      "content": "decimal128",
+      "pos": [
+        2852,
+        2862
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2865,
+        2871
+      ]
+    },
+    {
+      "content": "char",
+      "pos": [
+        2876,
+        2880
+      ]
+    },
+    {
+      "content": "char",
+      "pos": [
+        2883,
+        2887
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2890,
+        2896
+      ]
+    },
+    {
+      "content": "DateTime",
+      "pos": [
+        2901,
+        2909
+      ]
+    },
+    {
+      "content": "timestamp",
+      "pos": [
+        2912,
+        2921
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2924,
+        2930
+      ]
+    },
+    {
+      "content": "Guid",
+      "pos": [
+        2935,
+        2939
+      ]
+    },
+    {
+      "content": "uuid",
+      "pos": [
+        2942,
+        2946
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2949,
+        2955
+      ]
+    },
+    {
+      "content": "字节",
+      "pos": [
+        2960,
+        2962
+      ]
+    },
+    {
+      "content": "binary",
+      "pos": [
+        2965,
+        2971
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2974,
+        2980
+      ]
+    },
+    {
+      "content": "字符串",
+      "pos": [
+        2985,
+        2988
+      ]
+    },
+    {
+      "content": "字符串",
+      "pos": [
+        2991,
+        2994
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        2997,
+        3003
+      ]
+    },
+    {
+      "content": "System.Collections.IList",
+      "pos": [
+        3008,
+        3032
+      ]
+    },
+    {
+      "content": "list",
+      "pos": [
+        3035,
+        3039
+      ]
+    },
+    {
+      "content": "AMQP 值：集合中包含的项只能是此表中定义的类型。",
+      "pos": [
+        3042,
+        3068
+      ]
+    },
+    {
+      "content": "System.Array",
+      "pos": [
+        3073,
+        3085
+      ]
+    },
+    {
+      "content": "数组",
+      "pos": [
+        3088,
+        3090
+      ]
+    },
+    {
+      "content": "AMQP 值：集合中包含的项只能是此表中定义的类型。",
+      "pos": [
+        3093,
+        3119
+      ]
+    },
+    {
+      "content": "System.Collections.IDictionary",
+      "pos": [
+        3124,
+        3154
+      ]
+    },
+    {
+      "content": "map",
+      "pos": [
+        3157,
+        3160
+      ]
+    },
+    {
+      "content": "AMQP 值：集合中包含的项只能是此表中定义的类型。注意：仅支持字符串键。",
+      "pos": [
+        3163,
+        3200
+      ]
+    },
+    {
+      "content": "Uri",
+      "pos": [
+        3205,
+        3208
+      ]
+    },
+    {
+      "content": "描述型 string（请参阅下表）",
+      "pos": [
+        3211,
+        3228
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        3231,
+        3237
+      ]
+    },
+    {
+      "content": "DateTimeOffset",
+      "pos": [
+        3242,
+        3256
+      ]
+    },
+    {
+      "content": "描述型 long（请参阅下表）",
+      "pos": [
+        3259,
+        3274
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        3277,
+        3283
+      ]
+    },
+    {
+      "content": "TimeSpan",
+      "pos": [
+        3288,
+        3296
+      ]
+    },
+    {
+      "content": "描述型 long（请参阅下文）",
+      "pos": [
+        3299,
+        3314
+      ]
+    },
+    {
+      "content": "AMQP 值",
+      "pos": [
+        3317,
+        3323
+      ]
+    },
+    {
+      "content": "Stream",
+      "pos": [
+        3328,
+        3334
+      ]
+    },
+    {
+      "content": "binary",
+      "pos": [
+        3337,
+        3343
+      ]
+    },
+    {
+      "content": "AMQP 数据（可能有多个）。数据部分包含从流对象读取的原始字节。",
+      "pos": [
+        3346,
+        3379
+      ]
+    },
+    {
+      "content": "其他对象",
+      "pos": [
+        3384,
+        3388
+      ]
+    },
+    {
+      "content": "binary",
+      "pos": [
+        3391,
+        3397
+      ]
+    },
+    {
+      "content": "AMQP 数据（可能有多个）。包含使用 DataContractSerializer 或应用程序提供的序列化程序的对象的已序列化二进制值。",
+      "pos": [
+        3400,
+        3469
+      ]
+    },
+    {
+      "content": ".NET 类型",
+      "pos": [
+        3475,
+        3482
+      ]
+    },
+    {
+      "content": "映射的 AMQP 描述类型",
+      "pos": [
+        3485,
+        3498
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        3501,
+        3503
+      ]
+    },
+    {
+      "content": "Uri",
+      "pos": [
+        3675,
+        3678
+      ]
+    },
+    {
+      "content": "Uri.AbsoluteUri",
+      "pos": [
+        3783,
+        3798
+      ]
+    },
+    {
+      "content": "DateTimeOffset",
+      "pos": [
+        3803,
+        3817
+      ]
+    },
+    {
+      "content": "DateTimeOffset.UtcTicks",
+      "pos": [
+        3944,
+        3967
+      ]
+    },
+    {
+      "content": "TimeSpan",
+      "pos": [
+        3972,
+        3980
+      ]
+    },
+    {
+      "content": "TimeSpan.Ticks",
+      "pos": [
+        4094,
+        4108
+      ]
+    },
+    {
+      "pos": [
+        4115,
+        4204
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"unsupported-features-restrictions-and-behavioral-differences\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>不支持的功能、限制和行为差异"
+    },
+    {
+      "content": "在使用 AMQP 时，服务总线 .NET API 的以下功能目前不受支持：",
+      "pos": [
+        4206,
+        4243
+      ]
+    },
+    {
+      "content": "事务。",
+      "pos": [
+        4249,
+        4252
+      ]
+    },
+    {
+      "content": "通过传输目标发送。",
+      "pos": [
+        4258,
+        4267
+      ]
+    },
+    {
+      "content": "按消息序列号接收。",
+      "pos": [
+        4273,
+        4282
+      ]
+    },
+    {
+      "content": "消息和会话浏览。",
+      "pos": [
+        4288,
+        4296
+      ]
+    },
+    {
+      "content": "会话状态。",
+      "pos": [
+        4302,
+        4307
+      ]
+    },
+    {
+      "content": "基于 Batch 的 API。",
+      "pos": [
+        4313,
+        4328
+      ]
+    },
+    {
+      "content": "扩大接收。",
+      "pos": [
+        4334,
+        4339
+      ]
+    },
+    {
+      "content": "订阅规则的运行时操作。",
+      "pos": [
+        4345,
+        4356
+      ]
+    },
+    {
+      "content": "会话锁定续订。",
+      "pos": [
+        4362,
+        4369
+      ]
+    },
+    {
+      "content": "具体而言，在使用 AMQP 时，目前不支持以下 API：",
+      "pos": [
+        4371,
+        4399
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.MessagingFactory.AcceptMessageSession",
+      "pos": [
+        4404,
+        4472
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.MessagingFactory.CreateMessageSender(System.String,System.String)",
+      "pos": [
+        4479,
+        4575
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.MessageSender.SendBatch(System.Collections.Generic.IEnumerable{Microsoft.ServiceBus.Messaging.BrokeredMessage})",
+      "pos": [
+        4583,
+        4725
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.MessageReceiver.Receive(System.Int64)",
+      "pos": [
+        4733,
+        4801
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.MessageReceiver.ReceiveBatch",
+      "pos": [
+        4808,
+        4867
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.MessageReceiver.CompleteBatch(System.Collections.Generic.IEnumerable{System.Guid})",
+      "pos": [
+        4874,
+        4987
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.MessageReceiver.Peek",
+      "pos": [
+        4994,
+        5045
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.MessageReceiver.PeekBatch",
+      "pos": [
+        5052,
+        5108
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.QueueClient.Peek",
+      "pos": [
+        5116,
+        5163
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.QueueClient.PeekBatch",
+      "pos": [
+        5170,
+        5222
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.TopicClient.SendBatch(System.Collections.Generic.IEnumerable{Microsoft.ServiceBus.Messaging.BrokeredMessage})",
+      "pos": [
+        5230,
+        5370
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.SubscriptionClient.Receive(System.Int64)",
+      "pos": [
+        5378,
+        5449
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.SubscriptionClient.ReceiveBatch",
+      "pos": [
+        5456,
+        5518
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.SubscriptionClient.CompleteBatch(System.Collections.Generic.IEnumerable{System.Guid})",
+      "pos": [
+        5525,
+        5641
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.SubscriptionClient.Peek",
+      "pos": [
+        5648,
+        5702
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.SubscriptionClient.PeekBatch",
+      "pos": [
+        5709,
+        5768
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.SubscriptionClient.AddRule",
+      "pos": [
+        5775,
+        5832
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.SubscriptionClient.RemoveRule(System.String)",
+      "pos": [
+        5839,
+        5914
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.MessageSession.GetState",
+      "pos": [
+        5922,
+        5976
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.MessageSession.SetState(System.IO.Stream)",
+      "pos": [
+        5983,
+        6055
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.MessageSession.RenewLock",
+      "pos": [
+        6062,
+        6117
+      ]
+    },
+    {
+      "content": "Microsoft.ServiceBus.Messaging.BrokeredMessage.RenewLock",
+      "pos": [
+        6125,
+        6181
+      ]
+    },
+    {
+      "content": "在使用 AMQP 时，与默认协议相比，在服务总线 .NET API 的行为方面也有一些细微的差异：",
+      "pos": [
+        6186,
+        6235
+      ]
+    },
+    {
+      "pos": [
+        6241,
+        6269
+      ],
+      "content": "将忽略 <bpt id=\"p1\">[</bpt>OperationTimeout<ept id=\"p1\">][]</ept> 属性。"
+    },
+    {
+      "pos": [
+        6275,
+        6376
+      ],
+      "content": "<ph id=\"ph1\">`MessageReceiver.Receive(TimeSpan.Zero)`</ph> 以 <ph id=\"ph2\">`MessageReceiver.Receive(TimeSpan.FromSeconds(10))`</ph> 的形式实现。"
+    },
+    {
+      "content": "控制 AMQP 协议设置",
+      "pos": [
+        6381,
+        6393
+      ]
+    },
+    {
+      "content": ".NET API 公开了几项设置以控制 AMQP 协议的行为：",
+      "pos": [
+        6395,
+        6426
+      ]
+    },
+    {
+      "pos": [
+        6432,
+        6488
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>MessageReceiver.PrefetchCount<ept id=\"p1\">**</ept>：控制应用于链接的初始信用额度。默认值为 0。"
+    },
+    {
+      "pos": [
+        6494,
+        6600
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>MessagingFactorySettings.AmqpTransportSettings.MaxFrameSize<ept id=\"p1\">**</ept>：控制在打开连接时协商期间提供的最大 AMQP 帧大小。默认值为 65,536 字节。"
+    },
+    {
+      "pos": [
+        6606,
+        6743
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>MessagingFactorySettings.AmqpTransportSettings.BatchFlushInterval<ept id=\"p1\">**</ept>：如果传输可以分批进行，此值确定发送处置的最大延迟。默认情况下由发送方/接收方继承。单个发送方/接收方可以覆盖默认值（即 20 毫秒）。"
+    },
+    {
+      "pos": [
+        6749,
+        6859
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>MessagingFactorySettings.AmqpTransportSettings.UseSslStreamSecurity<ept id=\"p1\">**</ept>：控制是否通过 SSL 连接建立 AMQP 连接。默认值为 <bpt id=\"p2\">**</bpt>true<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        6864,
+        6868
+      ]
+    },
+    {
+      "content": "准备好了解详细信息？ 请访问以下链接：",
+      "pos": [
+        6870,
+        6889
+      ]
+    },
+    {
+      "content": "服务总线 AMQP 概述",
+      "pos": [
+        6894,
+        6906
+      ]
+    },
+    {
+      "content": "适用于 Windows Server 的服务总线中的 AMQP",
+      "pos": [
+        6911,
+        6942
+      ]
+    }
+  ],
+  "content": "<properties \n   pageTitle=\"服务总线与 .NET 和 AMQP 1.0 | Azure\"\n   description=\"使用 AMQP 通过 .NET 使用服务总线。\"\n   services=\"service-bus\"\n   documentationCenter=\"na\"\n   authors=\"sethmanheim\"\n   manager=\"timlt\"\n   editor=\"tysonn\" /> \n<tags \n   ms.service=\"service-bus\"\n   ms.date=\"10/15/2015\"\n   wacn.date=\"01/14/2016\" />\n\n# 使用 AMQP 1.0 通过 .NET 使用服务总线\n\n[AZURE.INCLUDE [service-bus-selector-amqp](../includes/service-bus-selector-amqp.md)]\n\n## 下载服务总线 SDK\n\nAMQP 1.0 支持在服务总线 SDK 2.1 版或更高版本中提供。可以从 [NuGet][] 下载最新的 SDK。\n\n## 将 .NET 应用程序配置为使用 AMQP 1.0\n\n默认情况下，Service Bus .NET 客户端库使用基于 SOAP 的专用协议与 Service Bus 服务通信。若要使用 AMQP 1.0 而非默认协议，需要对服务总线连接字符串进行显式配置，如下一部分所述。除了此更改之外，在使用 AMQP 1.0 时应用程序代码基本保持不变。\n\n在当前版本中，有一些在使用 AMQP 时不受支持的 API 功能。这些不受支持的功能将在后面的[不支持的功能、限制和行为差异](#unsupported-features-restrictions-and-behavioral-differences)部分中列出。在使用 AMQP 时，一些高级配置设置还具有不同的含义。\n\n### 使用 App.config 进行配置\n\n应用程序使用 App.config 配置文件存储设置是一个很好的做法。对于服务总线应用程序，你可以使用 App.config 来存储服务总线 **ConnectionString** 值的设置。示例 App.config 文件如下所示：\n\n    <?xml version=\"1.0\" encoding=\"utf-8\" ?>\n    <configuration>\n        <appSettings>\n            <add key=\"Microsoft.ServiceBus.ConnectionString\"\n                 value=\"Endpoint=sb://[namespace].servicebus.chinacloudapi.cn/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=[SAS key];TransportType=Amqp\" />\n        </appSettings>\n    </configuration>\n\n`Microsoft.ServiceBus.ConnectionString` 设置的值是用于配置服务总线连接的服务总线连接字符串。其格式如下所示：\n\n    Endpoint=sb://[namespace].servicebus.chinacloudapi.cn/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=[SAS key];TransportType=Amqp\n\n其中 `[namespace]` 和 `SharedAccessKey` 是从 [Azure 经典门户][]获取的。有关详细信息，请参阅[如何使用服务总线队列][]。\n\n使用 AMQP 时，在连接字符串后面追加 `;TransportType=Amqp`。此表示法将通知客户端库使用 AMQP 1.0 连接到服务总线。\n\n## 消息序列化\n\n使用默认协议时，.NET 客户端库的默认序列化行为是使用 [DataContractSerializer][] 类型序列化 [BrokeredMessage][] 实例，以便在客户端库和服务总线服务之间传输。使用 AMQP 传输模式时，客户端库使用 AMQP 类型系统将[中转消息][BrokeredMessage]序列化为 AMQP 消息。此序列化使得消息能够由可能在不同平台上运行的接收应用程序接收和解释，例如，使用 JMS API 来访问服务总线的 Java 应用程序。\n\n构造 [BrokeredMessage][] 实例时，你可以提供 .NET 对象作为构造函数的参数以充当消息的正文。对于可映射到 AMQP 基元类型的对象，正文将序列化为 AMQP 数据类型。如果该对象不能直接映射到 AMQP 基元类型（即，应用程序定义的自定义类型），则将使用 [DataContractSerializer][] 序列化对象，并且已序列化的字节将在 AMQP 数据消息中发送。\n\n为了便于使用非 .NET 客户端进行互操作，仅在消息的正文中使用可直接序列化为 AMQP 类型的 .NET 类型。下表详细介绍了这些类型以及到 AMQP 类型系统的相应映射。\n\n| .NET 正文对象类型 | 映射的 AMQP 类型 | AMQP 正文部分类型 |\n|--------------------------------|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|\n| bool | 布尔值 | AMQP 值 |\n| 字节 | ubyte | AMQP 值 |\n| ushort | ushort | AMQP 值 |\n| uint | uint | AMQP 值 |\n| ulong | ulong | AMQP 值 |\n| sbyte | 字节 | AMQP 值 |\n| short | short | AMQP 值 |\n| int | int | AMQP 值 |\n| long | long | AMQP 值 |\n| float | float | AMQP 值 |\n| double | double | AMQP 值 |\n| decimal | decimal128 | AMQP 值 |\n| char | char | AMQP 值 |\n| DateTime | timestamp | AMQP 值 |\n| Guid | uuid | AMQP 值 |\n| 字节 | binary | AMQP 值 |\n| 字符串 | 字符串 | AMQP 值 |\n| System.Collections.IList | list | AMQP 值：集合中包含的项只能是此表中定义的类型。 |\n| System.Array | 数组 | AMQP 值：集合中包含的项只能是此表中定义的类型。 |\n| System.Collections.IDictionary | map | AMQP 值：集合中包含的项只能是此表中定义的类型。注意：仅支持字符串键。 |\n| Uri | 描述型 string（请参阅下表） | AMQP 值 |\n| DateTimeOffset | 描述型 long（请参阅下表） | AMQP 值 |\n| TimeSpan | 描述型 long（请参阅下文） | AMQP 值 |\n| Stream | binary | AMQP 数据（可能有多个）。数据部分包含从流对象读取的原始字节。 |\n| 其他对象 | binary | AMQP 数据（可能有多个）。包含使用 DataContractSerializer 或应用程序提供的序列化程序的对象的已序列化二进制值。 |\n\n| .NET 类型 | 映射的 AMQP 描述类型 | 说明 |\n|----------------|-------------------------------------------------------------------------------------------------------------------------|-------------------------|\n| Uri | `<type name=”uri” class=restricted source=”string”> <descriptor name=”com.microsoft:uri” /></type>` | Uri.AbsoluteUri |\n| DateTimeOffset | `<type name=”datetime-offset” class=restricted source=”long”> <descriptor name=”com.microsoft:datetime-offset” /></type>` | DateTimeOffset.UtcTicks |\n| TimeSpan | `<type name=”timespan” class=restricted source=”long”> <descriptor name=”com.microsoft:timespan” /></type> ` | TimeSpan.Ticks |\n\n## <a name=\"unsupported-features-restrictions-and-behavioral-differences\"></a>不支持的功能、限制和行为差异\n\n在使用 AMQP 时，服务总线 .NET API 的以下功能目前不受支持：\n\n-   事务。\n\n-   通过传输目标发送。\n\n-   按消息序列号接收。\n\n-   消息和会话浏览。\n\n-   会话状态。\n\n-   基于 Batch 的 API。\n\n-   扩大接收。\n\n-   订阅规则的运行时操作。\n\n-   会话锁定续订。\n\n具体而言，在使用 AMQP 时，目前不支持以下 API：\n\n- [Microsoft.ServiceBus.Messaging.MessagingFactory.AcceptMessageSession][]\n- [Microsoft.ServiceBus.Messaging.MessagingFactory.CreateMessageSender(System.String,System.String)][]\n\n- [Microsoft.ServiceBus.Messaging.MessageSender.SendBatch(System.Collections.Generic.IEnumerable{Microsoft.ServiceBus.Messaging.BrokeredMessage})][]\n\n- [Microsoft.ServiceBus.Messaging.MessageReceiver.Receive(System.Int64)][]\n- [Microsoft.ServiceBus.Messaging.MessageReceiver.ReceiveBatch][]\n- [Microsoft.ServiceBus.Messaging.MessageReceiver.CompleteBatch(System.Collections.Generic.IEnumerable{System.Guid})][]\n- [Microsoft.ServiceBus.Messaging.MessageReceiver.Peek][]\n- [Microsoft.ServiceBus.Messaging.MessageReceiver.PeekBatch][]\n\n- [Microsoft.ServiceBus.Messaging.QueueClient.Peek][]\n- [Microsoft.ServiceBus.Messaging.QueueClient.PeekBatch][]\n\n- [Microsoft.ServiceBus.Messaging.TopicClient.SendBatch(System.Collections.Generic.IEnumerable{Microsoft.ServiceBus.Messaging.BrokeredMessage})][]\n\n- [Microsoft.ServiceBus.Messaging.SubscriptionClient.Receive(System.Int64)][]\n- [Microsoft.ServiceBus.Messaging.SubscriptionClient.ReceiveBatch][]\n- [Microsoft.ServiceBus.Messaging.SubscriptionClient.CompleteBatch(System.Collections.Generic.IEnumerable{System.Guid})][]\n- [Microsoft.ServiceBus.Messaging.SubscriptionClient.Peek][]\n- [Microsoft.ServiceBus.Messaging.SubscriptionClient.PeekBatch][]\n- [Microsoft.ServiceBus.Messaging.SubscriptionClient.AddRule][]\n- [Microsoft.ServiceBus.Messaging.SubscriptionClient.RemoveRule(System.String)][]\n\n- [Microsoft.ServiceBus.Messaging.MessageSession.GetState][]\n- [Microsoft.ServiceBus.Messaging.MessageSession.SetState(System.IO.Stream)][]\n- [Microsoft.ServiceBus.Messaging.MessageSession.RenewLock][]\n\n- [Microsoft.ServiceBus.Messaging.BrokeredMessage.RenewLock][]\n\n在使用 AMQP 时，与默认协议相比，在服务总线 .NET API 的行为方面也有一些细微的差异：\n\n-   将忽略 [OperationTimeout][] 属性。\n\n-   `MessageReceiver.Receive(TimeSpan.Zero)` 以 `MessageReceiver.Receive(TimeSpan.FromSeconds(10))` 的形式实现。\n\n## 控制 AMQP 协议设置\n\n.NET API 公开了几项设置以控制 AMQP 协议的行为：\n\n-   **MessageReceiver.PrefetchCount**：控制应用于链接的初始信用额度。默认值为 0。\n\n-   **MessagingFactorySettings.AmqpTransportSettings.MaxFrameSize**：控制在打开连接时协商期间提供的最大 AMQP 帧大小。默认值为 65,536 字节。\n\n-   **MessagingFactorySettings.AmqpTransportSettings.BatchFlushInterval**：如果传输可以分批进行，此值确定发送处置的最大延迟。默认情况下由发送方/接收方继承。单个发送方/接收方可以覆盖默认值（即 20 毫秒）。\n\n-   **MessagingFactorySettings.AmqpTransportSettings.UseSslStreamSecurity**：控制是否通过 SSL 连接建立 AMQP 连接。默认值为 **true**。\n\n## 后续步骤\n\n准备好了解详细信息？ 请访问以下链接：\n\n- [服务总线 AMQP 概述]\n- [适用于 Windows Server 的服务总线中的 AMQP]\n\n  [如何使用服务总线队列]: /documentation/articles/service-bus-dotnet-how-to-use-queues\n  [DataContractSerializer]: https://msdn.microsoft.com/zh-cn/library/azure/system.runtime.serialization.datacontractserializer.aspx\n  [BrokeredMessage]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.aspx\n  [Microsoft.ServiceBus.Messaging.MessagingFactory.AcceptMessageSession]: https://msdn.microsoft.com/zh-cn/library/azure/jj657638.aspx\n  [Microsoft.ServiceBus.Messaging.MessagingFactory.CreateMessageSender(System.String,System.String)]: https://msdn.microsoft.com/zh-cn/library/azure/jj657703.aspx\n  [Microsoft.ServiceBus.Messaging.MessageSender.SendBatch(System.Collections.Generic.IEnumerable{Microsoft.ServiceBus.Messaging.BrokeredMessage})]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagesender.sendbatch.aspx\n  [Microsoft.ServiceBus.Messaging.MessageReceiver.Receive(System.Int64)]: https://msdn.microsoft.com/zh-cn/library/azure/hh322665.aspx\n  [Microsoft.ServiceBus.Messaging.MessageReceiver.ReceiveBatch]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagereceiver.receivebatch.aspx\n  [Microsoft.ServiceBus.Messaging.MessageReceiver.CompleteBatch(System.Collections.Generic.IEnumerable{System.Guid})]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagereceiver.completebatch.aspx\n  [Microsoft.ServiceBus.Messaging.MessageReceiver.Peek]: https://msdn.microsoft.com/zh-cn/library/azure/jj908731.aspx\n  [Microsoft.ServiceBus.Messaging.MessageReceiver.PeekBatch]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagereceiver.peekbatch.aspx\n  [Microsoft.ServiceBus.Messaging.QueueClient.Peek]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.queueclient.peek.aspx\n  [Microsoft.ServiceBus.Messaging.QueueClient.PeekBatch]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.queueclient.peekbatch.aspx\n  [Microsoft.ServiceBus.Messaging.TopicClient.SendBatch(System.Collections.Generic.IEnumerable{Microsoft.ServiceBus.Messaging.BrokeredMessage})]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.topicclient.sendbatch.aspx\n  [Microsoft.ServiceBus.Messaging.SubscriptionClient.Receive(System.Int64)]: https://msdn.microsoft.com/zh-cn/library/azure/hh293110.aspx\n  [Microsoft.ServiceBus.Messaging.SubscriptionClient.ReceiveBatch]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.subscriptionclient.receivebatch.aspx\n  [Microsoft.ServiceBus.Messaging.SubscriptionClient.CompleteBatch(System.Collections.Generic.IEnumerable{System.Guid})]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.subscriptionclient.completebatch.aspx\n  [Microsoft.ServiceBus.Messaging.SubscriptionClient.Peek]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.subscriptionclient.peek.aspx\n  [Microsoft.ServiceBus.Messaging.SubscriptionClient.PeekBatch]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.subscriptionclient.peekbatch.aspx\n  [Microsoft.ServiceBus.Messaging.SubscriptionClient.AddRule]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.subscriptionclient.addrule.aspx\n  [Microsoft.ServiceBus.Messaging.SubscriptionClient.RemoveRule(System.String)]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.subscriptionclient.removerule.aspx\n  [Microsoft.ServiceBus.Messaging.MessageSession.GetState]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagesession.getstate.aspx\n  [Microsoft.ServiceBus.Messaging.MessageSession.SetState(System.IO.Stream)]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagesession.setstate.aspx\n  [Microsoft.ServiceBus.Messaging.MessageSession.RenewLock]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagesession.renewlock.aspx\n  [Microsoft.ServiceBus.Messaging.BrokeredMessage.RenewLock]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.renewlock.aspx\n  [OperationTimeout]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagingfactorysettings.operationtimeout.aspx\n[NuGet]: http://nuget.org/packages/WindowsAzure.ServiceBus/\n\n[Azure 经典门户]: http://manage.windowsazure.cn\n[服务总线 AMQP 概述]: /documentation/articles/service-bus-amqp-overview\n[适用于 Windows Server 的服务总线中的 AMQP]: https://msdn.microsoft.com/zh-cn/library/dn574799.aspx\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

@@ -1,0 +1,425 @@
+{
+  "nodes": [
+    {
+      "content": "PHP Web 角色和辅助角色 | Azure",
+      "pos": [
+        27,
+        50
+      ]
+    },
+    {
+      "content": "有关如何在 Azure 云服务中创建 PHP Web 和辅助角色以及配置 PHP 运行时的指南。",
+      "pos": [
+        69,
+        117
+      ]
+    },
+    {
+      "content": "如何创建 PHP Web 角色和辅助角色",
+      "pos": [
+        330,
+        350
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        355,
+        357
+      ]
+    },
+    {
+      "content": "本指南将说明如何执行以下操作：在 Windows 开发环境中创建 PHP Web 角色或辅助角色，从提供的“内置”版本中选择特定版本的 PHP，更改 PHP 配置，启用扩展，最后部署到 Azure。它还介绍了如何将 Web 角色或辅助角色配置为使用你提供的 PHP 运行时（带自定义配置和扩展）。",
+      "pos": [
+        359,
+        507
+      ]
+    },
+    {
+      "content": "什么是 PHP Web 角色和辅助角色？",
+      "pos": [
+        512,
+        532
+      ]
+    },
+    {
+      "pos": [
+        534,
+        762
+      ],
+      "content": "Azure 提供了三种计算模型以运行应用程序：Azure App Service、Azure 虚拟机和 Azure 云服务。这三种模型都支持 PHP。云服务（包括 Web 角色和辅助角色）提供了<bpt id=\"p1\">*</bpt>平台即服务 (PaaS)<ept id=\"p1\">*</ept>。在云服务中，Web 角色提供专门用于托管前端 Web 应用程序的 Internet Information Services (IIS) Web 服务器。辅助角色可运行独立于用户交互或输入的异步任务、运行时间较长的任务或永久性任务。"
+    },
+    {
+      "pos": [
+        764,
+        855
+      ],
+      "content": "有关这些选项的详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 提供的计算托管选项<ept id=\"p1\">](/documentation/articles/fundamentals-application-models)</ept>。"
+    },
+    {
+      "content": "下载 Azure SDK for PHP",
+      "pos": [
+        860,
+        880
+      ]
+    },
+    {
+      "pos": [
+        882,
+        1073
+      ],
+      "content": "<bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure SDK for PHP]</ept> 由多个组件构成。本文将使用其中两个：Azure PowerShell 和 Azure 模拟器。可以通过 Microsoft Web 平台安装程序安装这两个组件。有关详细信息，请参阅<bpt id=\"p2\">[</bpt>如何安装和配置 Azure PowerShell<ept id=\"p2\">](/documentation/articles/powershell-install-configure)</ept>。"
+    },
+    {
+      "content": "创建云服务项目",
+      "pos": [
+        1078,
+        1085
+      ]
+    },
+    {
+      "pos": [
+        1087,
+        1196
+      ],
+      "content": "创建 PHP Web 角色或辅助角色的第一步是创建 Azure 服务项目。Azure 服务项目用作 Web 角色和辅助角色的逻辑容器，并包含项目的<bpt id=\"p1\">[</bpt><ept id=\"p1\">服务定义 (.csdef)]</ept> 和<bpt id=\"p2\">[</bpt><ept id=\"p2\">服务配置 (.cscfg)]</ept> 文件。"
+    },
+    {
+      "content": "若要创建新的 Azure 服务项目，请以管理员身份运行 Azure PowerShell 并执行以下命令：",
+      "pos": [
+        1198,
+        1251
+      ]
+    },
+    {
+      "pos": [
+        1299,
+        1341
+      ],
+      "content": "此命令将创建可将 Web 角色和辅助角色添加到的新目录 (<ph id=\"ph1\">`myProject`</ph>)。"
+    },
+    {
+      "content": "添加 PHP Web 角色或辅助角色",
+      "pos": [
+        1346,
+        1364
+      ]
+    },
+    {
+      "content": "若要将 PHP Web 角色添加到项目，请从项目的根目录中运行以下命令：",
+      "pos": [
+        1366,
+        1402
+      ]
+    },
+    {
+      "content": "对于辅助角色，请使用此命令：",
+      "pos": [
+        1455,
+        1469
+      ]
+    },
+    {
+      "pos": [
+        1527,
+        1686
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph><ph id=\"ph2\">`roleName`</ph> 参数是可选的。如果省略该参数，则将自动生成角色名称。创建的第一个 Web 角色将为 <ph id=\"ph3\">`WebRole1`</ph>，第二个 Web 角色为 <ph id=\"ph4\">`WebRole2`</ph>，依此类推。创建的第一个辅助角色将为 <ph id=\"ph5\">`WorkerRole1`</ph>，第二个辅助角色为 <ph id=\"ph6\">`WorkerRole2`</ph>，依此类推。"
+    },
+    {
+      "content": "指定内置 PHP 版本",
+      "pos": [
+        1691,
+        1702
+      ]
+    },
+    {
+      "content": "在将 PHP Web 角色或辅助角色添加到项目时，将修改项目的配置文件，以便在部署应用程序的每个 Web 实例或辅助进程实例时在其上安装 PHP。若要查看默认情况下安装的 PHP 的版本，请运行以下命令：",
+      "pos": [
+        1704,
+        1806
+      ]
+    },
+    {
+      "pos": [
+        1865,
+        1946
+      ],
+      "content": "上述命令的输出与下图中所示类似。在此示例中，将 PHP 5.3.17 的 <ph id=\"ph1\">`IsDefault`</ph> 标志设置为 <ph id=\"ph2\">`true`</ph>，这指示它将是安装的默认 PHP 版本。"
+    },
+    {
+      "pos": [
+        2511,
+        2592
+      ],
+      "content": "可以将 PHP 运行时版本设置为列出的任意 PHP 版本。例如，若要将 PHP 版本（对于名为 <ph id=\"ph1\">`roleName`</ph> 的角色）设置为 5.4.0，请使用以下命令："
+    },
+    {
+      "pos": [
+        2665,
+        2695
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>可用的 PHP 版本将来可能会改变。"
+    },
+    {
+      "content": "自定义内置 PHP 运行时",
+      "pos": [
+        2700,
+        2713
+      ]
+    },
+    {
+      "pos": [
+        2715,
+        2773
+      ],
+      "content": "当按上述步骤进行操作时，你可以完全控制所安装的 PHP 运行时的配置，包括修改 <ph id=\"ph1\">`php.ini`</ph> 设置和启用扩展。"
+    },
+    {
+      "content": "若要自定义内置 PHP 运行时，请执行下列步骤：",
+      "pos": [
+        2775,
+        2799
+      ]
+    },
+    {
+      "pos": [
+        2804,
+        2864
+      ],
+      "content": "将一个名为 <ph id=\"ph1\">`php`</ph> 的新文件夹添加到 Web 角色的 <ph id=\"ph2\">`bin`</ph> 目录。对于辅助角色，将该文件夹添加到角色的根目录。"
+    },
+    {
+      "pos": [
+        2868,
+        2950
+      ],
+      "content": "在 <ph id=\"ph1\">`php`</ph> 文件夹中，创建另一个名为 <ph id=\"ph2\">`ext`</ph> 的文件夹。将要启用的任何扩展名为 <ph id=\"ph3\">`.dll`</ph> 的文件（例如，<ph id=\"ph4\">`php_mongo.dll`</ph>）置于此文件夹中。"
+    },
+    {
+      "pos": [
+        2954,
+        3082
+      ],
+      "content": "将 <ph id=\"ph1\">`php.ini`</ph> 文件添加到 <ph id=\"ph2\">`php`</ph> 文件夹中。启用任何自定义扩展，并在此文件中设置任何 PHP 指令。例如，若要打开 <ph id=\"ph3\">`display_errors`</ph> 并启用 <ph id=\"ph4\">`php_mongo.dll`</ph> 扩展，则 <ph id=\"ph5\">`php.ini`</ph> 文件的内容将如下所示："
+    },
+    {
+      "pos": [
+        3145,
+        3222
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>所提供的 <ph id=\"ph2\">`php.ini`</ph> 文件中未显式设置的所有设置都将自动设为其默认值。但请记住，你可以添加整个 <ph id=\"ph3\">`php.ini`</ph> 文件。"
+    },
+    {
+      "content": "使用你自己的 PHP 运行时",
+      "pos": [
+        3227,
+        3241
+      ]
+    },
+    {
+      "content": "在某些情况下，可能需要提供你自己的 PHP 运行时，而不是如上所述那样选择并配置内置 PHP 运行时。例如，可以在 Web 角色或辅助角色中使用你在开发环境中使用的 PHP 运行时，以便更轻松地确保应用程序不会更改生产环境中的行为。",
+      "pos": [
+        3242,
+        3358
+      ]
+    },
+    {
+      "content": "将 Web 角色配置为使用你自己的 PHP 运行时",
+      "pos": [
+        3364,
+        3389
+      ]
+    },
+    {
+      "content": "若要将 Web 角色配置为使用提供的 PHP 运行时，请执行下列步骤：",
+      "pos": [
+        3391,
+        3426
+      ]
+    },
+    {
+      "content": "创建一个 Azure 服务项目并添加 PHP Web 角色，如本主题前面所述。",
+      "pos": [
+        3431,
+        3470
+      ]
+    },
+    {
+      "pos": [
+        3474,
+        3563
+      ],
+      "content": "在位于 Web 角色的根目录中的 <ph id=\"ph1\">`bin`</ph> 文件夹中创建一个 <ph id=\"ph2\">`php`</ph> 文件夹，然后将 PHP 运行时（所有二进制文件、配置文件、子文件夹等）添加到该 <ph id=\"ph3\">`php`</ph> 文件夹中。"
+    },
+    {
+      "pos": [
+        3567,
+        3875
+      ],
+      "content": "（可选）如果 PHP 运行时使用 <bpt id=\"p1\">[</bpt>Microsoft Drivers for PHP for SQL Server<ept id=\"p1\">][sqlsrv drivers]</ept>，则需要将 Web 角色配置为在预配它时安装 <bpt id=\"p2\">[</bpt>SQL Server Native Client 2012<ept id=\"p2\">][sql native client]</ept>。为此，将 <bpt id=\"p3\">[</bpt><ept id=\"p3\">sqlncli.msi x64 安装程序]</ept>添加到 Web 角色的根目录中的 <ph id=\"ph1\">`bin`</ph> 文件夹。下一步中所述的启动脚本将在设置角色时以静默方式运行安装程序。如果你的 PHP 运行时不使用 Microsoft Drivers for PHP for SQL Server，则可从下一步所示的脚本中删除以下行："
+    },
+    {
+      "pos": [
+        3947,
+        4105
+      ],
+      "content": "定义将 <bpt id=\"p1\">[</bpt>Internet Information Services (IIS)<ept id=\"p1\">][iis.net]</ept> 配置为使用 PHP 运行时来处理 <ph id=\"ph1\">`.php`</ph> 页的请求的启动任务。为此，请在文本编辑器中打开 <ph id=\"ph2\">`setup_web.cmd`</ph> 文件（位于 Web 角色的根目录的 <ph id=\"ph3\">`bin`</ph> 文件夹中），并将其内容替换为以下脚本："
+    },
+    {
+      "content": "将应用程序文件添加到 Web 角色的根目录。这将是 Web 服务器的根目录。",
+      "pos": [
+        5448,
+        5486
+      ]
+    },
+    {
+      "pos": [
+        5491,
+        5551
+      ],
+      "content": "按照以下<bpt id=\"p1\">[</bpt>发布应用程序<ept id=\"p1\">](#how-to-publish-your-application)</ept>部分中所述发布你的应用程序。"
+    },
+    {
+      "pos": [
+        5555,
+        5645
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在按照上述使用你自己的 PHP 运行时的步骤进行操作后，可以删除 <ph id=\"ph2\">`download.ps1`</ph> 脚本（位于 Web 角色的根目录的 <ph id=\"ph3\">`bin`</ph> 文件夹中）。"
+    },
+    {
+      "content": "将辅助角色配置为使用你自己的 PHP 运行时",
+      "pos": [
+        5651,
+        5673
+      ]
+    },
+    {
+      "content": "若要将辅助角色配置为使用提供的 PHP 运行时，请执行下列步骤：",
+      "pos": [
+        5675,
+        5707
+      ]
+    },
+    {
+      "content": "创建一个 Azure 服务项目并添加 PHP 辅助角色，如本主题前面所述。",
+      "pos": [
+        5712,
+        5749
+      ]
+    },
+    {
+      "pos": [
+        5753,
+        5825
+      ],
+      "content": "在辅助角色的根目录中创建一个 <ph id=\"ph1\">`php`</ph> 文件夹，然后将 PHP 运行时（所有二进制文件、配置文件、子文件夹等）添加到该 <ph id=\"ph2\">`php`</ph> 文件夹中。"
+    },
+    {
+      "pos": [
+        5829,
+        6119
+      ],
+      "content": "（可选）如果 PHP 运行时使用 <bpt id=\"p1\">[</bpt>Microsoft Drivers for PHP for SQL Server<ept id=\"p1\">][sqlsrv drivers]</ept>，则需要将辅助角色配置为在预配它时安装 <bpt id=\"p2\">[</bpt>SQL Server Native Client 2012<ept id=\"p2\">][sql native client]</ept>。为此，将 <bpt id=\"p3\">[</bpt><ept id=\"p3\">sqlncli.msi x64 安装程序]</ept>添加到辅助角色的根目录。下一步中所述的启动脚本将在设置角色时以静默方式运行安装程序。如果你的 PHP 运行时不使用 Microsoft Drivers for PHP for SQL Server，则可从下一步所示的脚本中删除以下行："
+    },
+    {
+      "pos": [
+        6191,
+        6303
+      ],
+      "content": "定义在设置角色时将 <ph id=\"ph1\">`php.exe`</ph> 可执行文件添加到辅助角色的 PATH 环境变量中的启动任务。为此，请在文本编辑器中打开 <ph id=\"ph2\">`setup_worker.cmd`</ph> 文件（位于辅助角色的根目录中），并将其内容替换为以下脚本："
+    },
+    {
+      "content": "将应用程序文件添加到辅助角色的根目录。",
+      "pos": [
+        6829,
+        6848
+      ]
+    },
+    {
+      "pos": [
+        6853,
+        6913
+      ],
+      "content": "按照以下<bpt id=\"p1\">[</bpt>发布应用程序<ept id=\"p1\">](#how-to-publish-your-application)</ept>部分中所述发布你的应用程序。"
+    },
+    {
+      "content": "在计算和存储模拟器中运行你的应用程序",
+      "pos": [
+        6918,
+        6936
+      ]
+    },
+    {
+      "pos": [
+        6938,
+        7099
+      ],
+      "content": "Azure 模拟器提供了一个本地环境，可在将 Azure 应用程序部署到云之前在该本地环境中测试此应用程序。模拟器与 Azure 环境之间存在一些差异。若要更好地了解该模拟器，请参阅<bpt id=\"p1\">[</bpt>使用 Azure 存储模拟器进行开发和测试<ept id=\"p1\">](/documentation/articles/storage-use-emulator)</ept>。"
+    },
+    {
+      "content": "请注意，你必须本地安装 PHP 才能使用计算模拟器。计算模拟器将使用本地 PHP 安装来运行应用程序。",
+      "pos": [
+        7101,
+        7152
+      ]
+    },
+    {
+      "content": "若要在模拟器中运行你的项目，请从项目的根目录中执行以下命令：",
+      "pos": [
+        7154,
+        7184
+      ]
+    },
+    {
+      "content": "你将看到类似于下面的输出：",
+      "pos": [
+        7228,
+        7241
+      ]
+    },
+    {
+      "pos": [
+        7354,
+        7432
+      ],
+      "content": "通过打开 Web 浏览器并浏览到输出中所示的本地地址（上面的示例输出中的 <ph id=\"ph1\">`http://127.0.0.1:81`</ph>），可以查看正在模拟器上运行的应用程序。"
+    },
+    {
+      "content": "若要停止模拟器，请执行此命令：",
+      "pos": [
+        7434,
+        7449
+      ]
+    },
+    {
+      "content": "发布应用程序",
+      "pos": [
+        7495,
+        7501
+      ]
+    },
+    {
+      "pos": [
+        7503,
+        7768
+      ],
+      "content": "若要发布应用程序，需要先使用 <bpt id=\"p1\">**</bpt>Import-PublishSettingsFile<ept id=\"p1\">**</ept> cmdlet 导入发布设置。然后使用 <bpt id=\"p2\">[</bpt>Publish-AzureServiceProject<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/dn495166.aspx)</ept> cmdlet 发布你的应用程序。有关登录的信息，请参阅<bpt id=\"p3\">[</bpt>如何安装和配置 Azure PowerShell<ept id=\"p3\">](/documentation/articles/powershell-install-configure)</ept>。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        7773,
+        7777
+      ]
+    },
+    {
+      "pos": [
+        7779,
+        7816
+      ],
+      "content": "有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>PHP 开发中心<ept id=\"p1\">](/develop/php/)</ept>。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"PHP Web 角色和辅助角色 | Azure\"\n    description=\"有关如何在 Azure 云服务中创建 PHP Web 和辅助角色以及配置 PHP 运行时的指南。\"\n    services=\"\"\n    documentationCenter=\"php\"\n    authors=\"tfitzmac\"\n    manager=\"wpickett\"\n    editor=\"mollybos\"/>\n\n<tags\n    ms.service=\"cloud-services\"\n    ms.date=\"09/01/2015\"\n    wacn.date=\"01/11/2016\"/>\n\n#如何创建 PHP Web 角色和辅助角色\n\n## 概述\n\n本指南将说明如何执行以下操作：在 Windows 开发环境中创建 PHP Web 角色或辅助角色，从提供的“内置”版本中选择特定版本的 PHP，更改 PHP 配置，启用扩展，最后部署到 Azure。它还介绍了如何将 Web 角色或辅助角色配置为使用你提供的 PHP 运行时（带自定义配置和扩展）。\n\n## 什么是 PHP Web 角色和辅助角色？\n\nAzure 提供了三种计算模型以运行应用程序：Azure App Service、Azure 虚拟机和 Azure 云服务。这三种模型都支持 PHP。云服务（包括 Web 角色和辅助角色）提供了*平台即服务 (PaaS)*。在云服务中，Web 角色提供专门用于托管前端 Web 应用程序的 Internet Information Services (IIS) Web 服务器。辅助角色可运行独立于用户交互或输入的异步任务、运行时间较长的任务或永久性任务。\n\n有关这些选项的详细信息，请参阅 [Azure 提供的计算托管选项](/documentation/articles/fundamentals-application-models)。\n\n## 下载 Azure SDK for PHP\n\n[Azure SDK for PHP] 由多个组件构成。本文将使用其中两个：Azure PowerShell 和 Azure 模拟器。可以通过 Microsoft Web 平台安装程序安装这两个组件。有关详细信息，请参阅[如何安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure)。\n\n## 创建云服务项目\n\n创建 PHP Web 角色或辅助角色的第一步是创建 Azure 服务项目。Azure 服务项目用作 Web 角色和辅助角色的逻辑容器，并包含项目的[服务定义 (.csdef)] 和[服务配置 (.cscfg)] 文件。\n\n若要创建新的 Azure 服务项目，请以管理员身份运行 Azure PowerShell 并执行以下命令：\n\n    PS C:\\>New-AzureServiceProject myProject\n\n此命令将创建可将 Web 角色和辅助角色添加到的新目录 (`myProject`)。\n\n## 添加 PHP Web 角色或辅助角色\n\n若要将 PHP Web 角色添加到项目，请从项目的根目录中运行以下命令：\n\n    PS C:\\myProject> Add-AzurePHPWebRole roleName\n\n对于辅助角色，请使用此命令：\n\n    PS C:\\myProject> Add-AzurePHPWorkerRole roleName\n\n> [AZURE.NOTE]`roleName` 参数是可选的。如果省略该参数，则将自动生成角色名称。创建的第一个 Web 角色将为 `WebRole1`，第二个 Web 角色为 `WebRole2`，依此类推。创建的第一个辅助角色将为 `WorkerRole1`，第二个辅助角色为 `WorkerRole2`，依此类推。\n\n## 指定内置 PHP 版本\n\n在将 PHP Web 角色或辅助角色添加到项目时，将修改项目的配置文件，以便在部署应用程序的每个 Web 实例或辅助进程实例时在其上安装 PHP。若要查看默认情况下安装的 PHP 的版本，请运行以下命令：\n\n    PS C:\\myProject> Get-AzureServiceProjectRoleRuntime\n\n上述命令的输出与下图中所示类似。在此示例中，将 PHP 5.3.17 的 `IsDefault` 标志设置为 `true`，这指示它将是安装的默认 PHP 版本。\n\n    Runtime Version     PackageUri                      IsDefault\n    ------- -------     ----------                      ---------\n    Node 0.6.17         http://nodertncu.blob.core...   False\n    Node 0.6.20         http://nodertncu.blob.core...   True\n    Node 0.8.4          http://nodertncu.blob.core...   False\n    IISNode 0.1.21      http://nodertncu.blob.core...   True\n    Cache 1.8.0         http://nodertncu.blob.core...   True\n    PHP 5.3.17          http://nodertncu.blob.core...   True\n    PHP 5.4.0           http://nodertncu.blob.core...   False\n\n可以将 PHP 运行时版本设置为列出的任意 PHP 版本。例如，若要将 PHP 版本（对于名为 `roleName` 的角色）设置为 5.4.0，请使用以下命令：\n\n    PS C:\\myProject> Set-AzureServiceProjectRole roleName php 5.4.0\n\n> [AZURE.NOTE]可用的 PHP 版本将来可能会改变。\n\n## 自定义内置 PHP 运行时\n\n当按上述步骤进行操作时，你可以完全控制所安装的 PHP 运行时的配置，包括修改 `php.ini` 设置和启用扩展。\n\n若要自定义内置 PHP 运行时，请执行下列步骤：\n\n1. 将一个名为 `php` 的新文件夹添加到 Web 角色的 `bin` 目录。对于辅助角色，将该文件夹添加到角色的根目录。\n2. 在 `php` 文件夹中，创建另一个名为 `ext` 的文件夹。将要启用的任何扩展名为 `.dll` 的文件（例如，`php_mongo.dll`）置于此文件夹中。\n3. 将 `php.ini` 文件添加到 `php` 文件夹中。启用任何自定义扩展，并在此文件中设置任何 PHP 指令。例如，若要打开 `display_errors` 并启用 `php_mongo.dll` 扩展，则 `php.ini` 文件的内容将如下所示：\n\n        display_errors=On\n        extension=php_mongo.dll\n\n> [AZURE.NOTE]所提供的 `php.ini` 文件中未显式设置的所有设置都将自动设为其默认值。但请记住，你可以添加整个 `php.ini` 文件。\n\n## 使用你自己的 PHP 运行时\n在某些情况下，可能需要提供你自己的 PHP 运行时，而不是如上所述那样选择并配置内置 PHP 运行时。例如，可以在 Web 角色或辅助角色中使用你在开发环境中使用的 PHP 运行时，以便更轻松地确保应用程序不会更改生产环境中的行为。\n\n### 将 Web 角色配置为使用你自己的 PHP 运行时\n\n若要将 Web 角色配置为使用提供的 PHP 运行时，请执行下列步骤：\n\n1. 创建一个 Azure 服务项目并添加 PHP Web 角色，如本主题前面所述。\n2. 在位于 Web 角色的根目录中的 `bin` 文件夹中创建一个 `php` 文件夹，然后将 PHP 运行时（所有二进制文件、配置文件、子文件夹等）添加到该 `php` 文件夹中。\n3. （可选）如果 PHP 运行时使用 [Microsoft Drivers for PHP for SQL Server][sqlsrv drivers]，则需要将 Web 角色配置为在预配它时安装 [SQL Server Native Client 2012][sql native client]。为此，将 [sqlncli.msi x64 安装程序]添加到 Web 角色的根目录中的 `bin` 文件夹。下一步中所述的启动脚本将在设置角色时以静默方式运行安装程序。如果你的 PHP 运行时不使用 Microsoft Drivers for PHP for SQL Server，则可从下一步所示的脚本中删除以下行：\n\n        msiexec /i sqlncli.msi /qn IACCEPTSQLNCLILICENSETERMS=YES\n\n4. 定义将 [Internet Information Services (IIS)][iis.net] 配置为使用 PHP 运行时来处理 `.php` 页的请求的启动任务。为此，请在文本编辑器中打开 `setup_web.cmd` 文件（位于 Web 角色的根目录的 `bin` 文件夹中），并将其内容替换为以下脚本：\n\n        @ECHO ON\n        cd \"%~dp0\"\n\n        if \"%EMULATED%\"==\"true\" exit /b 0\n\n        msiexec /i sqlncli.msi /qn IACCEPTSQLNCLILICENSETERMS=YES\n\n        SET PHP_FULL_PATH=%~dp0php\\php-cgi.exe\n        SET NEW_PATH=%PATH%;%RoleRoot%\\base\\x86\n\n        %WINDIR%\\system32\\inetsrv\\appcmd.exe set config -section:system.webServer/fastCgi /+\"[fullPath='%PHP_FULL_PATH%',maxInstances='12',idleTimeout='60000',activityTimeout='3600',requestTimeout='60000',instanceMaxRequests='10000',protocol='NamedPipe',flushNamedPipe='False']\" /commit:apphost\n        %WINDIR%\\system32\\inetsrv\\appcmd.exe set config -section:system.webServer/fastCgi /+\"[fullPath='%PHP_FULL_PATH%'].environmentVariables.[name='PATH',value='%NEW_PATH%']\" /commit:apphost\n        %WINDIR%\\system32\\inetsrv\\appcmd.exe set config -section:system.webServer/fastCgi /+\"[fullPath='%PHP_FULL_PATH%'].environmentVariables.[name='PHP_FCGI_MAX_REQUESTS',value='10000']\" /commit:apphost\n        %WINDIR%\\system32\\inetsrv\\appcmd.exe set config -section:system.webServer/handlers /+\"[name='PHP',path='*.php',verb='GET,HEAD,POST',modules='FastCgiModule',scriptProcessor='%PHP_FULL_PATH%',resourceType='Either',requireAccess='Script']\" /commit:apphost\n        %WINDIR%\\system32\\inetsrv\\appcmd.exe set config -section:system.webServer/fastCgi /\"[fullPath='%PHP_FULL_PATH%'].queueLength:50000\"\n\n5. 将应用程序文件添加到 Web 角色的根目录。这将是 Web 服务器的根目录。\n\n6. 按照以下[发布应用程序](#how-to-publish-your-application)部分中所述发布你的应用程序。\n\n> [AZURE.NOTE]在按照上述使用你自己的 PHP 运行时的步骤进行操作后，可以删除 `download.ps1` 脚本（位于 Web 角色的根目录的 `bin` 文件夹中）。\n\n### 将辅助角色配置为使用你自己的 PHP 运行时\n\n若要将辅助角色配置为使用提供的 PHP 运行时，请执行下列步骤：\n\n1. 创建一个 Azure 服务项目并添加 PHP 辅助角色，如本主题前面所述。\n2. 在辅助角色的根目录中创建一个 `php` 文件夹，然后将 PHP 运行时（所有二进制文件、配置文件、子文件夹等）添加到该 `php` 文件夹中。\n3. （可选）如果 PHP 运行时使用 [Microsoft Drivers for PHP for SQL Server][sqlsrv drivers]，则需要将辅助角色配置为在预配它时安装 [SQL Server Native Client 2012][sql native client]。为此，将 [sqlncli.msi x64 安装程序]添加到辅助角色的根目录。下一步中所述的启动脚本将在设置角色时以静默方式运行安装程序。如果你的 PHP 运行时不使用 Microsoft Drivers for PHP for SQL Server，则可从下一步所示的脚本中删除以下行：\n\n        msiexec /i sqlncli.msi /qn IACCEPTSQLNCLILICENSETERMS=YES\n\n4. 定义在设置角色时将 `php.exe` 可执行文件添加到辅助角色的 PATH 环境变量中的启动任务。为此，请在文本编辑器中打开 `setup_worker.cmd` 文件（位于辅助角色的根目录中），并将其内容替换为以下脚本：\n\n        @echo on\n\n        cd \"%~dp0\"\n\n        echo Granting permissions for Network Service to the web root directory...\n        icacls ..\\ /grant \"Network Service\":(OI)(CI)W\n        if %ERRORLEVEL% neq 0 goto error\n        echo OK\n\n        if \"%EMULATED%\"==\"true\" exit /b 0\n\n        msiexec /i sqlncli.msi /qn IACCEPTSQLNCLILICENSETERMS=YES\n\n        setx Path \"%PATH%;%~dp0php\" /M\n\n        if %ERRORLEVEL% neq 0 goto error\n\n        echo SUCCESS\n        exit /b 0\n\n        :error\n\n        echo FAILED\n        exit /b -1\n\n5. 将应用程序文件添加到辅助角色的根目录。\n\n6. 按照以下[发布应用程序](#how-to-publish-your-application)部分中所述发布你的应用程序。\n\n## 在计算和存储模拟器中运行你的应用程序\n\nAzure 模拟器提供了一个本地环境，可在将 Azure 应用程序部署到云之前在该本地环境中测试此应用程序。模拟器与 Azure 环境之间存在一些差异。若要更好地了解该模拟器，请参阅[使用 Azure 存储模拟器进行开发和测试](/documentation/articles/storage-use-emulator)。\n\n请注意，你必须本地安装 PHP 才能使用计算模拟器。计算模拟器将使用本地 PHP 安装来运行应用程序。\n\n若要在模拟器中运行你的项目，请从项目的根目录中执行以下命令：\n\n    PS C:\\MyProject> Start-AzureEmulator\n\n你将看到类似于下面的输出：\n\n    Creating local package...\n    Starting Emulator...\n    Role is running at http://127.0.0.1:81\n    Started\n\n通过打开 Web 浏览器并浏览到输出中所示的本地地址（上面的示例输出中的 `http://127.0.0.1:81`），可以查看正在模拟器上运行的应用程序。\n\n若要停止模拟器，请执行此命令：\n\n    PS C:\\MyProject> Stop-AzureEmulator\n\n## 发布应用程序\n\n若要发布应用程序，需要先使用 **Import-PublishSettingsFile** cmdlet 导入发布设置。然后使用 [Publish-AzureServiceProject](https://msdn.microsoft.com/zh-cn/library/azure/dn495166.aspx) cmdlet 发布你的应用程序。有关登录的信息，请参阅[如何安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure)。\n\n## 后续步骤\n\n有关详细信息，请参阅 [PHP 开发中心](/develop/php/)。\n\n[Azure SDK for PHP]: /develop/php/\n[install ps and emulators]: http://go.microsoft.com/fwlink/p/?linkid=320376&clcid=0x409\n[服务定义 (.csdef)]: http://msdn.microsoft.com/zh-cn/library/windowsazure/ee758711.aspx\n[服务配置 (.cscfg)]: http://msdn.microsoft.com/zh-cn/library/windowsazure/ee758710.aspx\n[iis.net]: http://www.iis.net/\n[sql native client]: http://msdn.microsoft.com/zh-cn/sqlserver/aa937733.aspx\n[sqlsrv drivers]: http://php.net/sqlsrv\n[sqlncli.msi x64 安装程序]: http://go.microsoft.com/fwlink/?LinkID=239648\n\n<!---HONumber=Mooncake_1207_2015-->"
+}

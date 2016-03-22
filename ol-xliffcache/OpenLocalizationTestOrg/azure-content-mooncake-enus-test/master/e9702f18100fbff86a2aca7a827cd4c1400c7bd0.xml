@@ -1,0 +1,292 @@
+{
+  "nodes": [
+    {
+      "content": "使用 PowerShell 新建 SQL 数据库设置 | Azure",
+      "pos": [
+        28,
+        62
+      ]
+    },
+    {
+      "content": "了解如何使用 PowerShell 创建新的 SQL 数据库。可以通过 PowerShell cmdlet 管理常见的数据库设置任务。",
+      "pos": [
+        82,
+        149
+      ]
+    },
+    {
+      "content": "使用 PowerShell cmdlet 创建新的 SQL 数据库并执行常见的数据库设置任务",
+      "pos": [
+        409,
+        455
+      ]
+    },
+    {
+      "content": "单一数据库",
+      "pos": [
+        460,
+        465
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        471,
+        487
+      ]
+    },
+    {
+      "content": "Azure 门户",
+      "pos": [
+        491,
+        499
+      ]
+    },
+    {
+      "content": "C",
+      "pos": [
+        554,
+        555
+      ]
+    },
+    {
+      "content": "PowerShell",
+      "pos": [
+        618,
+        628
+      ]
+    },
+    {
+      "content": "了解如何使用 PowerShell cmdlet 创建新的 SQL 数据库并执行常见的数据库设置任务。",
+      "pos": [
+        693,
+        744
+      ]
+    },
+    {
+      "pos": [
+        747,
+        887
+      ],
+      "content": "若要运行 PowerShell cmdlet，需要已安装并运行 Azure PowerShell。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何安装和配置 Azure PowerShell<ept id=\"p1\">](/documentation/articles/powershell-install-configure)</ept>。"
+    },
+    {
+      "content": "如果你需要 Azure 订阅，只需单击本页顶部的“试用”，然后再回来完成本文的相关操作即可。",
+      "pos": [
+        891,
+        937
+      ]
+    },
+    {
+      "content": "配置你的凭据，然后选择你的订阅",
+      "pos": [
+        943,
+        958
+      ]
+    },
+    {
+      "content": "现在，你已经运行 Azure 资源管理器模块，因此可以访问创建 SQL 数据库所需的所有 cmdlet。",
+      "pos": [
+        960,
+        1012
+      ]
+    },
+    {
+      "content": "你必须先建立与 Azure 帐户的访问连接，才能运行以下 cmdlet，并且会出现一个要求你输入凭据的登录屏幕。使用登录 Azure 门户时所用的相同电子邮件和密码。",
+      "pos": [
+        1014,
+        1097
+      ]
+    },
+    {
+      "content": "成功登录后，你会在屏幕上看到一些信息，其中包括你登录时使用的 ID，以及你有权访问的 Azure 订阅。",
+      "pos": [
+        1156,
+        1208
+      ]
+    },
+    {
+      "content": "选择 Azure 订阅",
+      "pos": [
+        1215,
+        1226
+      ]
+    },
+    {
+      "pos": [
+        1228,
+        1354
+      ],
+      "content": "若要选择订阅，你需要提供订阅 ID。你可以从前面的步骤中复制该信息，或者，如果你有多个订阅，你可以运行 <bpt id=\"p1\">**</bpt>Get-AzureRmSubscription<ept id=\"p1\">**</ept> cmdlet，然后从结果集中复制所需的订阅信息。获得订阅以后，你可以运行以下 cmdlet："
+    },
+    {
+      "pos": [
+        1441,
+        1576
+      ],
+      "content": "成功运行 <bpt id=\"p1\">**</bpt>Select-AzureRmSubscription<ept id=\"p1\">**</ept> 后，将返回到 PowerShell 提示符处。如果你有多个订阅，可以运行 <bpt id=\"p2\">**</bpt>Get-AzureRmSubscription<ept id=\"p2\">**</ept> 并验证要使用的订阅是否显示 <bpt id=\"p3\">**</bpt>IsCurrent: True<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "content": "数据库设置：创建资源组、服务器和防火墙规则",
+      "pos": [
+        1581,
+        1602
+      ]
+    },
+    {
+      "pos": [
+        1604,
+        1804
+      ],
+      "content": "现在，你已经有了针对所选 Azure 订阅运行 cmdlet 所需的访问权限，因此下一步是建立一个资源组，使其中包含创建数据库所需的服务器。你可以编辑下一个命令，以便使用所选择的有效位置。运行 <bpt id=\"p1\">**</bpt>(Get-AzureRmLocation | where-object {$\\_.Name -eq \"Microsoft.Sql/servers\" }).Locations<ept id=\"p1\">**</ept>，以便获取有效位置的列表。"
+    },
+    {
+      "content": "运行以下命令来创建新资源组：",
+      "pos": [
+        1806,
+        1820
+      ]
+    },
+    {
+      "pos": [
+        1905,
+        1965
+      ],
+      "content": "成功创建新资源组后，你会看到屏幕上显示的信息中包含 <bpt id=\"p1\">**</bpt>ProvisioningState : Succeeded<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "创建服务器",
+      "pos": [
+        1972,
+        1977
+      ]
+    },
+    {
+      "pos": [
+        1980,
+        2203
+      ],
+      "content": "SQL 数据库在 Azure SQL 数据库服务器中创建。运行 <bpt id=\"p1\">**</bpt>New-AzureRmSqlServer<ept id=\"p1\">**</ept> 命令来创建新服务器。将 ServerName 替换为你的服务器的名称。该服务器名称对于所有 Azure SQL Server 必须是唯一的，因此如果名称已被使用，你会在此处收到一个错误。还必须指出的是，该命令可能需要数分钟才能运行完毕。你可以编辑该命令，以便使用所选择的任何有效位置，但你应使用在上一步中创建的资源组使用的相同位置。"
+    },
+    {
+      "pos": [
+        2341,
+        2423
+      ],
+      "content": "当你运行此命令时，会打开一个窗口，要求你提供<bpt id=\"p1\">**</bpt>用户名<ept id=\"p1\">**</ept>和<bpt id=\"p2\">**</bpt>密码<ept id=\"p2\">**</ept>。这不是你的 Azure 凭据，请输入用户名和密码，将其作为你要为新服务器创建的管理员凭据。"
+    },
+    {
+      "content": "成功创建服务器后，会显示服务器详细信息。",
+      "pos": [
+        2425,
+        2445
+      ]
+    },
+    {
+      "content": "配置服务器防火墙规则，允许对服务器进行访问",
+      "pos": [
+        2451,
+        2472
+      ]
+    },
+    {
+      "content": "建立针对服务器访问的防火墙规则。运行以下命令，将开始和结尾的 IP 地址替换为你计算机的有效值。",
+      "pos": [
+        2474,
+        2522
+      ]
+    },
+    {
+      "content": "成功创建规则后，会显示防火墙规则详细信息。",
+      "pos": [
+        2710,
+        2731
+      ]
+    },
+    {
+      "content": "若要允许其他 Azure 服务访问该服务器，请添加一个防火墙规则并将 tartIpAddress 和 EndIpAddress 都设置为 0.0.0.0。请注意，这会允许来自任何 Azure 订阅的 Azure 流量访问该服务器。",
+      "pos": [
+        2733,
+        2848
+      ]
+    },
+    {
+      "pos": [
+        2850,
+        2937
+      ],
+      "content": "有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure SQL 数据库防火墙<ept id=\"p1\">](/documentation/articles/sql-database-firewall-configure)</ept>。"
+    },
+    {
+      "content": "创建新的 SQL 数据库",
+      "pos": [
+        2943,
+        2955
+      ]
+    },
+    {
+      "content": "现在，你已经有了一个资源组、一个服务器，并且配置了防火墙规则，因此可以访问服务器。",
+      "pos": [
+        2957,
+        2998
+      ]
+    },
+    {
+      "content": "下面的命令会通过 S1 性能级别在标准服务层创建新的（空白）SQL 数据库：",
+      "pos": [
+        3000,
+        3038
+      ]
+    },
+    {
+      "content": "成功创建数据库后，会显示数据库详细信息。",
+      "pos": [
+        3216,
+        3236
+      ]
+    },
+    {
+      "content": "创建新的 SQL 数据库 PowerShell 脚本",
+      "pos": [
+        3241,
+        3267
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        4500,
+        4504
+      ]
+    },
+    {
+      "content": "创建新的 SQL 数据库并执行基本的数据库设置任务后，可以执行以下操作：",
+      "pos": [
+        4505,
+        4541
+      ]
+    },
+    {
+      "content": "使用 SQL Server Management Studio (SSMS) 进行连接",
+      "pos": [
+        4546,
+        4589
+      ]
+    },
+    {
+      "content": "其他资源",
+      "pos": [
+        4654,
+        4658
+      ]
+    },
+    {
+      "content": "Azure SQL 数据库",
+      "pos": [
+        4663,
+        4676
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"使用 PowerShell 新建 SQL 数据库设置 | Azure\" \n    description=\"了解如何使用 PowerShell 创建新的 SQL 数据库。可以通过 PowerShell cmdlet 管理常见的数据库设置任务。\" \n    keywords=\"新建 sql 数据库,数据库设置\"\n    services=\"sql-database\" \n    documentationCenter=\"\" \n    authors=\"stevestein\" \n    manager=\"jeffreyg\" \n    editor=\"cgronlun\"/>\n\n<tags\n    ms.service=\"sql-database\"\n    ms.date=\"12/01/2015\"\n    wacn.date=\"01/29/2016\"/>\n\n# 使用 PowerShell cmdlet 创建新的 SQL 数据库并执行常见的数据库设置任务 \n\n**单一数据库**\n\n> [AZURE.SELECTOR]\n- [Azure 门户](/documentation/articles/sql-database-get-started)\n- [C#](/documentation/articles/sql-database-get-started-csharp)\n- [PowerShell](/documentation/articles/sql-database-get-started-powershell)\n\n\n了解如何使用 PowerShell cmdlet 创建新的 SQL 数据库并执行常见的数据库设置任务。\n\n\n若要运行 PowerShell cmdlet，需要已安装并运行 Azure PowerShell。有关详细信息，请参阅[如何安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure)。\n\n- 如果你需要 Azure 订阅，只需单击本页顶部的“试用”，然后再回来完成本文的相关操作即可。\n\n\n## 配置你的凭据，然后选择你的订阅\n\n现在，你已经运行 Azure 资源管理器模块，因此可以访问创建 SQL 数据库所需的所有 cmdlet。\n\n你必须先建立与 Azure 帐户的访问连接，才能运行以下 cmdlet，并且会出现一个要求你输入凭据的登录屏幕。使用登录 Azure 门户时所用的相同电子邮件和密码。\n\n    Add-AzureRmAccount -EnvironmentName AzureChinaCloud\n\n成功登录后，你会在屏幕上看到一些信息，其中包括你登录时使用的 ID，以及你有权访问的 Azure 订阅。\n\n\n### 选择 Azure 订阅\n\n若要选择订阅，你需要提供订阅 ID。你可以从前面的步骤中复制该信息，或者，如果你有多个订阅，你可以运行 **Get-AzureRmSubscription** cmdlet，然后从结果集中复制所需的订阅信息。获得订阅以后，你可以运行以下 cmdlet：\n\n    Select-AzureRmSubscription -SubscriptionId 4cac86b0-1e56-bbbb-aaaa-000000000000\n\n成功运行 **Select-AzureRmSubscription** 后，将返回到 PowerShell 提示符处。如果你有多个订阅，可以运行 **Get-AzureRmSubscription** 并验证要使用的订阅是否显示 **IsCurrent: True**。\n\n## 数据库设置：创建资源组、服务器和防火墙规则\n\n现在，你已经有了针对所选 Azure 订阅运行 cmdlet 所需的访问权限，因此下一步是建立一个资源组，使其中包含创建数据库所需的服务器。你可以编辑下一个命令，以便使用所选择的有效位置。运行 **(Get-AzureRmLocation | where-object {$\\_.Name -eq \"Microsoft.Sql/servers\" }).Locations**，以便获取有效位置的列表。\n\n运行以下命令来创建新资源组：\n\n    New-AzureRmResourceGroup -Name \"resourcegroupsqlgsps\" -Location \"China North\"\n\n成功创建新资源组后，你会看到屏幕上显示的信息中包含 **ProvisioningState : Succeeded**。\n\n\n### 创建服务器 \n\nSQL 数据库在 Azure SQL 数据库服务器中创建。运行 **New-AzureRmSqlServer** 命令来创建新服务器。将 ServerName 替换为你的服务器的名称。该服务器名称对于所有 Azure SQL Server 必须是唯一的，因此如果名称已被使用，你会在此处收到一个错误。还必须指出的是，该命令可能需要数分钟才能运行完毕。你可以编辑该命令，以便使用所选择的任何有效位置，但你应使用在上一步中创建的资源组使用的相同位置。\n\n    New-AzureRmSqlServer -ResourceGroupName \"resourcegroupsqlgsps\" -ServerName \"server1\" -Location \"China North\" -ServerVersion \"12.0\"\n\n当你运行此命令时，会打开一个窗口，要求你提供**用户名**和**密码**。这不是你的 Azure 凭据，请输入用户名和密码，将其作为你要为新服务器创建的管理员凭据。\n\n成功创建服务器后，会显示服务器详细信息。\n\n### 配置服务器防火墙规则，允许对服务器进行访问\n\n建立针对服务器访问的防火墙规则。运行以下命令，将开始和结尾的 IP 地址替换为你计算机的有效值。\n\n    New-AzureRmSqlServerFirewallRule -ResourceGroupName \"resourcegroupsqlgsps\" -ServerName \"server1\" -FirewallRuleName \"rule1\" -StartIpAddress \"192.168.0.0\" -EndIpAddress \"192.168.0.0\"\n\n成功创建规则后，会显示防火墙规则详细信息。\n\n若要允许其他 Azure 服务访问该服务器，请添加一个防火墙规则并将 tartIpAddress 和 EndIpAddress 都设置为 0.0.0.0。请注意，这会允许来自任何 Azure 订阅的 Azure 流量访问该服务器。\n\n有关详细信息，请参阅 [Azure SQL 数据库防火墙](/documentation/articles/sql-database-firewall-configure)。\n\n\n## 创建新的 SQL 数据库\n\n现在，你已经有了一个资源组、一个服务器，并且配置了防火墙规则，因此可以访问服务器。\n\n下面的命令会通过 S1 性能级别在标准服务层创建新的（空白）SQL 数据库：\n\n\n    New-AzureRmSqlDatabase -ResourceGroupName \"resourcegroupsqlgsps\" -ServerName \"server1\" -DatabaseName \"database1\" -Edition \"Standard\" -RequestedServiceObjectiveName \"S1\"\n\n\n成功创建数据库后，会显示数据库详细信息。\n\n## 创建新的 SQL 数据库 PowerShell 脚本\n\n    $SubscriptionId = \"4cac86b0-1e56-bbbb-aaaa-000000000000\"\n    $ResourceGroupName = \"resourcegroupname\"\n    $Location = \"China East\"\n    \n    $ServerName = \"uniqueservername\"\n    \n    $FirewallRuleName = \"rule1\"\n    $FirewallStartIP = \"192.168.0.0\"\n    $FirewallEndIp = \"192.168.0.0\"\n    \n    $DatabaseName = \"database1\"\n    $DatabaseEdition = \"Standard\"\n    $DatabasePerfomanceLevel = \"S1\"\n    \n    \n    Add-AzureRmAccount -EnvironmentName AzureChinaCloud\n    Select-AzureRmSubscription -SubscriptionId $SubscriptionId\n    \n    $ResourceGroup = New-AzureRmResourceGroup -Name $ResourceGroupName -Location $Location\n    \n    $Server = New-AzureRmSqlServer -ResourceGroupName $ResourceGroupName -ServerName $ServerName -Location $Location -ServerVersion \"12.0\"\n    \n    $FirewallRule = New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $ServerName -FirewallRuleName $FirewallRuleName -StartIpAddress $FirewallStartIP -EndIpAddress $FirewallEndIp\n    \n    $SqlDatabase = New-AzureRmSqlDatabase -ResourceGroupName $ResourceGroupName -ServerName $ServerName -DatabaseName $DatabaseName -Edition $DatabaseEdition -RequestedServiceObjectiveName $DatabasePerfomanceLevel\n    \n    $SqlDatabase\n    \n\n\n## 后续步骤\n创建新的 SQL 数据库并执行基本的数据库设置任务后，可以执行以下操作：\n\n- [使用 SQL Server Management Studio (SSMS) 进行连接](/documentation/articles/sql-database-connect-to-database)\n\n\n## 其他资源\n\n- [Azure SQL 数据库](/documentation/services/sql-databases)\n\n<!---HONumber=Mooncake_0118_2016-->\n"
+}

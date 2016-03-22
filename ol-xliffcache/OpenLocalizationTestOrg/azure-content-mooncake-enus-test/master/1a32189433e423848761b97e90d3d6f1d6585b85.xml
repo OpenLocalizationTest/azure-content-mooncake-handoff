@@ -1,0 +1,334 @@
+{
+  "nodes": [
+    {
+      "content": "在 HDInsight 中将 Hadoop Pig 与 .NET 配合使用 | Azure",
+      "pos": [
+        26,
+        71
+      ]
+    },
+    {
+      "content": "了解如何使用 .NET SDK for Hadoop 将 Pig 作业提交到 HDInsight 上的 Hadoop。",
+      "pos": [
+        89,
+        148
+      ]
+    },
+    {
+      "content": "使用 HDInsight 中的 .NET SDK for Hadoop 运行 Pig 作业",
+      "pos": [
+        362,
+        407
+      ]
+    },
+    {
+      "content": "本文档提供使用 .NET SDK for Hadoop 将 Pig 作业提交到 HDInsight 上的 Hadoop 群集的示例。",
+      "pos": [
+        484,
+        550
+      ]
+    },
+    {
+      "content": "HDInsight .NET SDK 提供 .NET 客户端库，可简化从 .NET 中使用 HDInsight 群集的操作。Pig 可让你通过为一系列数据转换建模，来创建 MapReduce 操作。你将学习如何使用基本 C# 应用程序将 Pig 作业提交到 HDInsight 群集。",
+      "pos": [
+        552,
+        694
+      ]
+    },
+    {
+      "pos": [
+        698,
+        721
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"prereq\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>先决条件"
+    },
+    {
+      "content": "若要完成本文中的步骤，你将需要：",
+      "pos": [
+        723,
+        739
+      ]
+    },
+    {
+      "content": "Azure HDInsight（HDInsight 上的 Hadoop）群集",
+      "pos": [
+        743,
+        781
+      ]
+    },
+    {
+      "content": "Visual Studio 2012 或 2013",
+      "pos": [
+        785,
+        810
+      ]
+    },
+    {
+      "pos": [
+        814,
+        844
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"certificate\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>创建管理证书"
+    },
+    {
+      "content": "若要在 Azure HDInsight 上对应用程序进行身份验证，你必须创建自签名证书，将它安装在开发工作站上，同时将它上载到你的 Azure 订阅。",
+      "pos": [
+        846,
+        921
+      ]
+    },
+    {
+      "pos": [
+        923,
+        1025
+      ],
+      "content": "有关如何执行此操作的说明，请参阅<bpt id=\"p1\">[</bpt>创建自签名证书<ept id=\"p1\">](/documentation/articles/hdinsight-administer-use-management-portal-v1#cert)</ept>。"
+    },
+    {
+      "pos": [
+        1029,
+        1065
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>创建证书时，请务必记下使用的友好名称供以后使用。"
+    },
+    {
+      "pos": [
+        1069,
+        1105
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"subscriptionid\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>查找你的订阅 ID"
+    },
+    {
+      "content": "每个 Azure 订阅都是以 GUID 值（称为订阅 ID）标识的。请使用以下步骤来查找此值。",
+      "pos": [
+        1107,
+        1154
+      ]
+    },
+    {
+      "pos": [
+        1159,
+        1209
+      ],
+      "content": "访问 <bpt id=\"p1\">[</bpt>Azure 管理控制台<ept id=\"p1\">](https://manage.windowsazure.cn/)</ept>。"
+    },
+    {
+      "content": "在门户左侧的栏中，选择“设置”。",
+      "pos": [
+        1214,
+        1230
+      ]
+    },
+    {
+      "content": "在页面右侧显示的信息中，找到你要使用的订阅，并记下“订阅 ID”列中的值。",
+      "pos": [
+        1235,
+        1272
+      ]
+    },
+    {
+      "content": "保存该订阅 ID，因为稍后你要用到它。",
+      "pos": [
+        1274,
+        1293
+      ]
+    },
+    {
+      "pos": [
+        1297,
+        1322
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"create\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>创建应用程序"
+    },
+    {
+      "content": "打开 Visual Studio 2012 或 2013",
+      "pos": [
+        1327,
+        1355
+      ]
+    },
+    {
+      "content": "在“文件”菜单中，选择“新建”，然后选择“项目”。",
+      "pos": [
+        1360,
+        1385
+      ]
+    },
+    {
+      "content": "对于新项目，请键入或选择以下值。",
+      "pos": [
+        1390,
+        1406
+      ]
+    },
+    {
+      "content": "属性",
+      "pos": [
+        1429,
+        1431
+      ]
+    },
+    {
+      "content": "值",
+      "pos": [
+        1441,
+        1442
+      ]
+    },
+    {
+      "content": "类别",
+      "pos": [
+        1463,
+        1465
+      ]
+    },
+    {
+      "content": "模板/Visual C#/Windows",
+      "pos": [
+        1475,
+        1495
+      ]
+    },
+    {
+      "content": "模板",
+      "pos": [
+        1516,
+        1518
+      ]
+    },
+    {
+      "content": "控制台应用程序",
+      "pos": [
+        1528,
+        1535
+      ]
+    },
+    {
+      "content": "Name",
+      "pos": [
+        1556,
+        1560
+      ]
+    },
+    {
+      "content": "SubmitPigJob",
+      "pos": [
+        1570,
+        1582
+      ]
+    },
+    {
+      "content": "单击“确定”以创建该项目。",
+      "pos": [
+        1607,
+        1620
+      ]
+    },
+    {
+      "content": "从“工具”菜单中选择“库包管理器”或“Nuget 包管理器”，然后选择“包管理器控制台”。",
+      "pos": [
+        1625,
+        1670
+      ]
+    },
+    {
+      "content": "在控制台中运行以下命令，以安装 .NET SDK 包。",
+      "pos": [
+        1675,
+        1702
+      ]
+    },
+    {
+      "pos": [
+        1776,
+        1826
+      ],
+      "content": "在“解决方案资源管理器”中，双击 <bpt id=\"p1\">**</bpt>Program.cs<ept id=\"p1\">**</ept> 将其打开。将现有代码替换为以下内容。"
+    },
+    {
+      "content": "保存文件。",
+      "pos": [
+        6646,
+        6651
+      ]
+    },
+    {
+      "pos": [
+        6655,
+        6677
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"run\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>运行应用程序"
+    },
+    {
+      "pos": [
+        6679,
+        6766
+      ],
+      "content": "按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 启动应用程序。出现提示时，请输入“订阅 ID”、“证书友好名称”和“HDInsight 群集名称”。应用程序将在运行时生成几行信息，末尾是与下面类似的内容。"
+    },
+    {
+      "pos": [
+        6941,
+        6960
+      ],
+      "content": "按 <bpt id=\"p1\">**</bpt>ENTER<ept id=\"p1\">**</ept> 退出应用程序。"
+    },
+    {
+      "pos": [
+        6964,
+        6986
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"summary\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>摘要"
+    },
+    {
+      "content": "如你所见，.NET SDK for Hadoop 可让你创建 .NET 应用程序，以将 Pig 作业提交到 HDInsight 群集、监视作业状态，以及检索输出。",
+      "pos": [
+        6988,
+        7069
+      ]
+    },
+    {
+      "pos": [
+        7073,
+        7099
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"nextsteps\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>后续步骤"
+    },
+    {
+      "content": "有关 HDInsight 中的 Pig 的一般信息。",
+      "pos": [
+        7101,
+        7127
+      ]
+    },
+    {
+      "content": "将 Pig 与 HDInsight 上的 Hadoop 配合使用",
+      "pos": [
+        7132,
+        7164
+      ]
+    },
+    {
+      "content": "有关 HDInsight 上的 Hadoop 的其他使用方法的信息。",
+      "pos": [
+        7210,
+        7244
+      ]
+    },
+    {
+      "content": "将 Hive 与 HDInsight 上的 Hadoop 配合使用",
+      "pos": [
+        7249,
+        7282
+      ]
+    },
+    {
+      "content": "将 MapReduce 与 HDInsight 上的 Hadoop 配合使用",
+      "pos": [
+        7332,
+        7370
+      ]
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"在 HDInsight 中将 Hadoop Pig 与 .NET 配合使用 | Azure\"\n   description=\"了解如何使用 .NET SDK for Hadoop 将 Pig 作业提交到 HDInsight 上的 Hadoop。\"\n   services=\"hdinsight\"\n   documentationCenter=\".net\"\n   authors=\"Blackmist\"\n   manager=\"paulettm\"\n   editor=\"cgronlun\"/>\n\n<tags\n    ms.service=\"hdinsight\"\n    ms.date=\"12/04/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n#使用 HDInsight 中的 .NET SDK for Hadoop 运行 Pig 作业\n\n[AZURE.INCLUDE [pig-selector](../includes/hdinsight-selector-use-pig.md)]\n\n本文档提供使用 .NET SDK for Hadoop 将 Pig 作业提交到 HDInsight 上的 Hadoop 群集的示例。\n\nHDInsight .NET SDK 提供 .NET 客户端库，可简化从 .NET 中使用 HDInsight 群集的操作。Pig 可让你通过为一系列数据转换建模，来创建 MapReduce 操作。你将学习如何使用基本 C# 应用程序将 Pig 作业提交到 HDInsight 群集。\n\n##<a id=\"prereq\"></a>先决条件\n\n若要完成本文中的步骤，你将需要：\n\n* Azure HDInsight（HDInsight 上的 Hadoop）群集\n\n* Visual Studio 2012 或 2013\n\n##<a id=\"certificate\"></a>创建管理证书\n\n若要在 Azure HDInsight 上对应用程序进行身份验证，你必须创建自签名证书，将它安装在开发工作站上，同时将它上载到你的 Azure 订阅。\n\n有关如何执行此操作的说明，请参阅[创建自签名证书](/documentation/articles/hdinsight-administer-use-management-portal-v1#cert)。\n\n> [AZURE.NOTE]创建证书时，请务必记下使用的友好名称供以后使用。\n\n##<a id=\"subscriptionid\"></a>查找你的订阅 ID\n\n每个 Azure 订阅都是以 GUID 值（称为订阅 ID）标识的。请使用以下步骤来查找此值。\n\n1. 访问 [Azure 管理控制台](https://manage.windowsazure.cn/)。\n\n2. 在门户左侧的栏中，选择“设置”。\n\n3. 在页面右侧显示的信息中，找到你要使用的订阅，并记下“订阅 ID”列中的值。\n\n保存该订阅 ID，因为稍后你要用到它。\n\n##<a id=\"create\"></a>创建应用程序\n\n1. 打开 Visual Studio 2012 或 2013\n\n2. 在“文件”菜单中，选择“新建”，然后选择“项目”。\n\n3. 对于新项目，请键入或选择以下值。\n\n    <table>\n<tr>\n<th>属性</th>\n<th>值</th>\n</tr>\n<tr>\n<th>类别</th>\n<th>模板/Visual C#/Windows</th>\n</tr>\n<tr>\n<th>模板</th>\n<th>控制台应用程序</th>\n</tr>\n<tr>\n<th>Name</th>\n<th>SubmitPigJob</th>\n</tr>\n</table>\n\n4. 单击“确定”以创建该项目。\n\n5. 从“工具”菜单中选择“库包管理器”或“Nuget 包管理器”，然后选择“包管理器控制台”。\n\n6. 在控制台中运行以下命令，以安装 .NET SDK 包。\n\n        Install-Package Microsoft.Windowsazure.Management.HDInsight\n\n7. 在“解决方案资源管理器”中，双击 **Program.cs** 将其打开。将现有代码替换为以下内容。\n\n        using System;\n        using System.Collections.Generic;\n        using System.Linq;\n        using System.Text;\n        using System.Threading.Tasks;\n\n        using System.IO;\n        using System.Threading;\n        using System.Security.Cryptography.X509Certificates;\n\n        using Microsoft.WindowsAzure.Management.HDInsight;\n        using Microsoft.Hadoop.Client;\n\n        namespace SubmitPigJob\n        {\n            class Program\n            {\n                static void Main(string[] args)\n                {\n                    // Get the subscription ID\n                    string subscriptionID = PromptForInput(\"Enter your Azure Subscription ID:\");\n\n                    // Get the certificate name\n                    string certFriendlyName = PromptForInput(\"Enter the management certificate name:\");\n\n                    // Get the cluster name\n                    string clusterName = PromptForInput(\"Enter the HDInsight cluster name:\");\n\n                    // Set the folder that job status is written to\n                    string statusFolderName = @\"/tutorials/usepig/status\";\n\n                    // The Pig Latin statements to run\n                    string queryString = \"LOGS = LOAD 'wasb:///example/data/sample.log';\" +\n                        \"LEVELS = foreach LOGS generate REGEX_EXTRACT($0, '(TRACE|DEBUG|INFO|WARN|ERROR|FATAL)', 1)  as LOGLEVEL;\" +\n                        \"FILTEREDLEVELS = FILTER LEVELS by LOGLEVEL is not null;\" +\n                        \"GROUPEDLEVELS = GROUP FILTEREDLEVELS by LOGLEVEL;\" +\n                        \"FREQUENCIES = foreach GROUPEDLEVELS generate group as LOGLEVEL, COUNT(FILTEREDLEVELS.LOGLEVEL) as COUNT;\" +\n                        \"RESULT = order FREQUENCIES by COUNT desc;\" +\n                        \"DUMP RESULT;\";\n\n                    // Define the Pig job\n                    PigJobCreateParameters myJobDefinition = new PigJobCreateParameters()\n                    {\n                        Query = queryString,\n                        StatusFolder = statusFolderName\n                    };\n\n                    // Get the certificate object from certificate store using the friendly name to identify it\n                    X509Store store = new X509Store();\n                    store.Open(OpenFlags.ReadOnly);\n                    X509Certificate2 cert = store.Certificates.Cast<X509Certificate2>().First(item => item.FriendlyName == certFriendlyName);\n\n                    JobSubmissionCertificateCredential creds = new JobSubmissionCertificateCredential(new Guid(subscriptionID), cert, clusterName);\n\n                    // Create a hadoop client to connect to HDInsight\n                    var jobClient = JobSubmissionClientFactory.Connect(creds);\n\n                    // Run the MapReduce job\n                    Console.WriteLine(\"----- Submit the Pig job ...\");\n                    JobCreationResults mrJobResults = jobClient.CreatePigJob        (myJobDefinition);\n\n                    // Wait for the job to complete\n                    Console.WriteLine(\"----- Wait for the Pig job to complete ...\");\n                    WaitForJobCompletion(mrJobResults, jobClient);\n\n                    // Display the error log\n                    Console.WriteLine(\"----- The Pig job error log.\");\n                    using (Stream stream = jobClient.GetJobErrorLogs(mrJobResults.JobId))\n                    {\n                        var reader = new StreamReader(stream);\n                        Console.WriteLine(reader.ReadToEnd());\n                    }\n\n                    // Display the output log\n                    Console.WriteLine(\"----- The Pig job output log.\");\n                    using (Stream stream = jobClient.GetJobOutput(mrJobResults.JobId))\n                    {\n                        var reader = new StreamReader(stream);\n                        Console.WriteLine(reader.ReadToEnd());\n                    }\n\n                    Console.WriteLine(\"----- Press ENTER to continue.\");\n                    Console.ReadLine();\n                }\n\n                private static void WaitForJobCompletion(JobCreationResults jobResults, IJobSubmissionClient client)\n                {\n                    JobDetails jobInProgress = client.GetJob(jobResults.JobId);\n                    while (jobInProgress.StatusCode != JobStatusCode.Completed && jobInProgress.StatusCode != JobStatusCode.Failed)\n                    {\n                        jobInProgress = client.GetJob(jobInProgress.JobId);\n                        Thread.Sleep(TimeSpan.FromSeconds(10));\n                    }\n                }\n\n                private static string PromptForInput(string message)\n                {\n                    Console.WriteLine(message);\n                    return Console.ReadLine();\n                }\n            }\n        }\n\n\n7. 保存文件。\n\n##<a id=\"run\"></a>运行应用程序\n\n按 **F5** 启动应用程序。出现提示时，请输入“订阅 ID”、“证书友好名称”和“HDInsight 群集名称”。应用程序将在运行时生成几行信息，末尾是与下面类似的内容。\n\n    \n    ----- The Pig job output log.\n    (TRACE,816)\n    (DEBUG,434)\n    (INFO,96)\n    (WARN,11)\n    (ERROR,6)\n    (FATAL,2)\n    \n    ----- Press ENTER to continue.\n    \n\n按 **ENTER** 退出应用程序。\n\n##<a id=\"summary\"></a>摘要\n\n如你所见，.NET SDK for Hadoop 可让你创建 .NET 应用程序，以将 Pig 作业提交到 HDInsight 群集、监视作业状态，以及检索输出。\n\n##<a id=\"nextsteps\"></a>后续步骤\n\n有关 HDInsight 中的 Pig 的一般信息。\n\n* [将 Pig 与 HDInsight 上的 Hadoop 配合使用](/documentation/articles/hdinsight-use-pig)\n\n有关 HDInsight 上的 Hadoop 的其他使用方法的信息。\n\n* [将 Hive 与 HDInsight 上的 Hadoop 配合使用](/documentation/articles/hdinsight-use-hive)\n\n* [将 MapReduce 与 HDInsight 上的 Hadoop 配合使用](/documentation/articles/hdinsight-use-mapreduce)\n\n<!---HONumber=71-->"
+}

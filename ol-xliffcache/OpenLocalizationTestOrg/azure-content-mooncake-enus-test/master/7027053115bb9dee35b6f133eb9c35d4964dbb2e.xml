@@ -1,0 +1,768 @@
+{
+  "nodes": [
+    {
+      "content": "扩展流分析作业以增加吞吐量 | Azure",
+      "pos": [
+        27,
+        48
+      ]
+    },
+    {
+      "content": "了解如何通过配置输入分区、细化查询定义和设置作业流式处理单位来扩展流分析作业。",
+      "pos": [
+        67,
+        106
+      ]
+    },
+    {
+      "content": "扩展 Azure 流分析作业，以增加流数据处理吞吐量",
+      "pos": [
+        374,
+        400
+      ]
+    },
+    {
+      "pos": [
+        404,
+        469
+      ],
+      "content": "了解如何优化分析作业和计算流分析的<bpt id=\"p1\">*</bpt>流式处理单位<ept id=\"p1\">*</ept>，如何通过配置输入分区、优化分析查询定义和设置作业流式处理单位来缩放流分析作业。"
+    },
+    {
+      "content": "流分析作业的组成部分有哪些？",
+      "pos": [
+        474,
+        488
+      ]
+    },
+    {
+      "content": "流分析作业定义包括输入、查询和输出。输入是作业读取数据流的地方，查询是用于转换数据输入流的一种方式，而输出则是作业将作业结果发送到的地方。",
+      "pos": [
+        492,
+        561
+      ]
+    },
+    {
+      "content": "若要对数据进行流式处理，作业需要至少一个输入源。可以将数据流输入源存储在 Azure Service Bus 事件中心或 Azure Blob 存储中。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 流分析简介<ept id=\"p1\">](/documentation/articles/stream-analytics-introduction)</ept>、<bpt id=\"p2\">[</bpt>Azure 流分析入门<ept id=\"p2\">](/documentation/articles/stream-analytics-get-started)</ept>",
+      "pos": [
+        563,
+        786
+      ]
+    },
+    {
+      "content": "。",
+      "pos": [
+        870,
+        871
+      ]
+    },
+    {
+      "content": "配置流式处理单位",
+      "pos": [
+        876,
+        884
+      ]
+    },
+    {
+      "content": "流式处理单位 (SU) 代表执行 Azure 流分析作业的资源和能力。在已经对 CPU、内存以及读取和写入速率进行测量的情况下，可以使用 SU 来描述相对的事件处理能力。每个流式处理单位大致相当于 1MB/秒的吞吐量。",
+      "pos": [
+        888,
+        997
+      ]
+    },
+    {
+      "pos": [
+        999,
+        1192
+      ],
+      "content": "选择特定作业所需的 SU 数目时，得根据输入的分区配置以及为作业定义的查询来决定。在使用 Azure 门户选择作业的流式处理单位数时，你最多可以选择定额数。默认情况下，每个 Azure 订阅的定额为最多 50 个流式处理单位，这适用于特定区域的所有分析作业。若要提高订阅的流式处理单位数，请联系 <bpt id=\"p1\">[</bpt>Microsoft 支持<ept id=\"p1\">](http://support.microsoft.com)</ept>。"
+    },
+    {
+      "content": "作业能够使用的流式处理单位数取决于输入的分区配置以及为作业定义的查询。另请注意，必须使用有效的流单位值。有效值以 1、3、6 开始，往上再按 6 递增，如下所示。",
+      "pos": [
+        1194,
+        1275
+      ]
+    },
+    {
+      "content": "Azure 流分析流单位规模",
+      "pos": [
+        1279,
+        1293
+      ]
+    },
+    {
+      "content": "本文将说明如何计算和优化查询，以便增加分析作业的吞吐量。",
+      "pos": [
+        1340,
+        1368
+      ]
+    },
+    {
+      "content": "计算作业的最大流式处理单位数",
+      "pos": [
+        1373,
+        1387
+      ]
+    },
+    {
+      "content": "流分析作业所能使用的流式处理单位总数取决于为作业定义的查询中的步骤数，以及每一步的分区数。",
+      "pos": [
+        1391,
+        1436
+      ]
+    },
+    {
+      "content": "查询中的步骤",
+      "pos": [
+        1442,
+        1448
+      ]
+    },
+    {
+      "content": "查询可以有一个或多个步骤。每一步都是一个使用 WITH 关键字定义的子查询。位于 WITH 关键字外的唯一查询也计为一步，例如以下查询中的 SELECT 语句：",
+      "pos": [
+        1453,
+        1533
+      ]
+    },
+    {
+      "content": "前面的查询有两步。",
+      "pos": [
+        1833,
+        1842
+      ]
+    },
+    {
+      "pos": [
+        1846,
+        1874
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>此示例查询将在本文后面部分介绍。"
+    },
+    {
+      "content": "对步骤进行分区",
+      "pos": [
+        1880,
+        1887
+      ]
+    },
+    {
+      "content": "对步骤进行分区需要下列条件：",
+      "pos": [
+        1893,
+        1907
+      ]
+    },
+    {
+      "content": "输入源必须进行分区。有关详细信息，请参阅",
+      "pos": [
+        1911,
+        1931
+      ]
+    },
+    {
+      "content": "Azure 流分析开发人员指南",
+      "pos": [
+        1940,
+        1955
+      ]
+    },
+    {
+      "content": "和",
+      "pos": [
+        2021,
+        2022
+      ]
+    },
+    {
+      "content": "事件中心编程指南",
+      "pos": [
+        2030,
+        2038
+      ]
+    },
+    {
+      "content": "。",
+      "pos": [
+        2104,
+        2105
+      ]
+    },
+    {
+      "content": "查询的 SELECT 语句必须从进行了分区的输入源读取。",
+      "pos": [
+        2108,
+        2136
+      ]
+    },
+    {
+      "pos": [
+        2139,
+        2169
+      ],
+      "content": "步骤中的查询必须有 <bpt id=\"p1\">**</bpt>Partition By<ept id=\"p1\">**</ept> 关键字"
+    },
+    {
+      "content": "对查询进行分区时，输入事件将在独立的分区组中进行处理和聚合，而输出事件则是针对每个组生成的。如果需要对聚合进行组合，则必须创建另一个不分区的步骤来进行聚合。",
+      "pos": [
+        2171,
+        2249
+      ]
+    },
+    {
+      "content": "计算作业的最大流式处理单位数",
+      "pos": [
+        2255,
+        2269
+      ]
+    },
+    {
+      "content": "所有未分区的步骤加在一起可以进行扩展，最多可以扩展到每个流分析作业 6 个流式处理单位。若要添加更多流式处理单位，必须对步骤进行分区。每个分区可以有 6 个流式处理单位。",
+      "pos": [
+        2275,
+        2360
+      ]
+    },
+    {
+      "content": "作业的查询",
+      "pos": [
+        2389,
+        2394
+      ]
+    },
+    {
+      "content": "作业的最大流式处理单位数",
+      "pos": [
+        2403,
+        2415
+      ]
+    },
+    {
+      "content": "该查询包含一个步骤。",
+      "pos": [
+        2445,
+        2455
+      ]
+    },
+    {
+      "content": "该步骤未分区。",
+      "pos": [
+        2465,
+        2472
+      ]
+    },
+    {
+      "content": "6",
+      "pos": [
+        2494,
+        2495
+      ]
+    },
+    {
+      "content": "输入数据流被分为 3 个分区。",
+      "pos": [
+        2525,
+        2540
+      ]
+    },
+    {
+      "content": "该查询包含一个步骤。",
+      "pos": [
+        2550,
+        2560
+      ]
+    },
+    {
+      "content": "该步骤已分区。",
+      "pos": [
+        2570,
+        2577
+      ]
+    },
+    {
+      "content": "18",
+      "pos": [
+        2599,
+        2601
+      ]
+    },
+    {
+      "content": "该查询包含两个步骤。",
+      "pos": [
+        2631,
+        2641
+      ]
+    },
+    {
+      "content": "这两个步骤都未分区。",
+      "pos": [
+        2651,
+        2661
+      ]
+    },
+    {
+      "content": "6",
+      "pos": [
+        2683,
+        2684
+      ]
+    },
+    {
+      "content": "数据流输入被分为 3 个分区。",
+      "pos": [
+        2716,
+        2731
+      ]
+    },
+    {
+      "content": "该查询包含两个步骤。输入步骤进行了分区，第二个步骤未分区。",
+      "pos": [
+        2741,
+        2770
+      ]
+    },
+    {
+      "content": "SELECT 语句从已分区输入中读取数据。",
+      "pos": [
+        2780,
+        2801
+      ]
+    },
+    {
+      "content": "24（18 个用于已分区步骤 + 6 个用于未分区步骤）",
+      "pos": [
+        2823,
+        2851
+      ]
+    },
+    {
+      "content": "缩放示例",
+      "pos": [
+        2876,
+        2880
+      ]
+    },
+    {
+      "content": "以下查询计算三分钟时段内通过收费站（总共三个收费亭）的车辆数。此查询可以扩展到 6 个流式处理单位。",
+      "pos": [
+        2885,
+        2935
+      ]
+    },
+    {
+      "content": "若要对查询使用更多的流式处理单位，必须对数据流输入和查询进行分区。如果将数据流分区设置为 3，则可将以下修改的查询扩展到 18 个流式处理单位：",
+      "pos": [
+        3061,
+        3133
+      ]
+    },
+    {
+      "pos": [
+        3284,
+        3450
+      ],
+      "content": "对查询进行分区后，将在独立的分区组中处理和聚合输入事件。此外，还会为每个组生成输出事件。在数据流输入中，当<bpt id=\"p1\">**</bpt>“分组方式”<ept id=\"p1\">**</ept>字段不是“分区键”时，进行分区可能会导致某些意外的结果。例如，在前面的示例查询中，TollBoothId 字段不是 Input1 的“分区键”。可以将 TollBooth #1 提供的数据分布到多个分区中。"
+    },
+    {
+      "content": "将通过流分析对每个 Input1 分区分开进行处理，并会在相同的翻转窗口中为同一收费亭创建多个有关已通过车辆计数的记录。如果不能更改输入分区键，则可通过添加额外的不分区步骤来解决此问题，例如：",
+      "pos": [
+        3452,
+        3548
+      ]
+    },
+    {
+      "content": "此查询可以扩展到 24 个流式处理单位。",
+      "pos": [
+        3849,
+        3869
+      ]
+    },
+    {
+      "pos": [
+        3872,
+        3929
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果要联接两个流，请确保流是按进行联接的列的分区键分区的，并且两个流中的分区数目是相同的。"
+    },
+    {
+      "content": "配置流分析作业分区",
+      "pos": [
+        3935,
+        3944
+      ]
+    },
+    {
+      "content": "调整作业流式处理单位的步骤",
+      "pos": [
+        3951,
+        3964
+      ]
+    },
+    {
+      "pos": [
+        3971,
+        4013
+      ],
+      "content": "登录到<bpt id=\"p1\">[</bpt>管理门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>。"
+    },
+    {
+      "pos": [
+        4017,
+        4034
+      ],
+      "content": "单击左窗格中的<bpt id=\"p1\">**</bpt>“流分析”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "单击想要缩放的流分析作业。",
+      "pos": [
+        4038,
+        4051
+      ]
+    },
+    {
+      "pos": [
+        4055,
+        4071
+      ],
+      "content": "单击页面顶部的<bpt id=\"p1\">**</bpt>“缩放”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "Azure 流分析流单位规模",
+      "pos": [
+        4075,
+        4089
+      ]
+    },
+    {
+      "content": "监视作业性能",
+      "pos": [
+        4140,
+        4146
+      ]
+    },
+    {
+      "content": "使用管理门户时，你可以跟踪作业的吞吐量（以事件数/秒为单位）：",
+      "pos": [
+        4151,
+        4182
+      ]
+    },
+    {
+      "content": "Azure 流分析监视作业",
+      "pos": [
+        4186,
+        4199
+      ]
+    },
+    {
+      "content": "计算预计的工作负荷吞吐量（以事件数/秒为单位）。如果吞吐量少于预期，则可调整输入分区和查询，并可为作业添加额外的流式处理单位。",
+      "pos": [
+        4236,
+        4299
+      ]
+    },
+    {
+      "content": "基于规模的 ASA 吞吐量 - Raspberry Pi 方案",
+      "pos": [
+        4304,
+        4335
+      ]
+    },
+    {
+      "content": "若要了解在典型方案中 ASA 如果根据多个流式处理单位的处理吞吐量进行伸缩，我们在这里进行了一个试验，将传感器数据（客户端）发送到事件中心，由 ASA 对其进行处理，然后将警报或统计信息作为输出发送到另一数据中心。",
+      "pos": [
+        4341,
+        4448
+      ]
+    },
+    {
+      "content": "客户端将综合性的传感器数据发送到事件中心，事件中心再以 JSON 格式将数据发送给 ASA，数据输出也采用 JSON 格式。下面是示例数据看起来的样子：",
+      "pos": [
+        4450,
+        4526
+      ]
+    },
+    {
+      "content": "查询：“关灯时发送警报”",
+      "pos": [
+        4662,
+        4674
+      ]
+    },
+    {
+      "content": "衡量吞吐量：在这种情况下，吞吐量是指由 ASA 在固定的时间（10 分钟）内处理的输入数据的量。若要使输入数据达到最佳的处理吞吐量，必须对数据流输入和查询进行分区。此外，还需在查询中添加 COUNT()，以便衡量所处理的输入事件数。为了确保 ASA 不会单纯地等待输入事件的到来，输入事件中心的每个分区已预先加载了足够的输入数据（大约 300MB）。",
+      "pos": [
+        4836,
+        5011
+      ]
+    },
+    {
+      "content": "下面是结果，可以发现流式处理单位数和事件中心的相应分区计数都增加了。",
+      "pos": [
+        5013,
+        5047
+      ]
+    },
+    {
+      "content": "输入分区数",
+      "pos": [
+        5076,
+        5081
+      ]
+    },
+    {
+      "content": "输出分区数",
+      "pos": [
+        5090,
+        5095
+      ]
+    },
+    {
+      "content": "流式处理单位数",
+      "pos": [
+        5104,
+        5111
+      ]
+    },
+    {
+      "content": "持续的吞吐量",
+      "pos": [
+        5120,
+        5126
+      ]
+    },
+    {
+      "content": "12",
+      "pos": [
+        5147,
+        5149
+      ]
+    },
+    {
+      "content": "12",
+      "pos": [
+        5159,
+        5161
+      ]
+    },
+    {
+      "content": "6",
+      "pos": [
+        5171,
+        5172
+      ]
+    },
+    {
+      "content": "4.06 MB/秒",
+      "pos": [
+        5182,
+        5191
+      ]
+    },
+    {
+      "content": "12",
+      "pos": [
+        5212,
+        5214
+      ]
+    },
+    {
+      "content": "12",
+      "pos": [
+        5224,
+        5226
+      ]
+    },
+    {
+      "content": "12",
+      "pos": [
+        5236,
+        5238
+      ]
+    },
+    {
+      "content": "8.06 MB/秒",
+      "pos": [
+        5248,
+        5257
+      ]
+    },
+    {
+      "content": "48",
+      "pos": [
+        5278,
+        5280
+      ]
+    },
+    {
+      "content": "48",
+      "pos": [
+        5290,
+        5292
+      ]
+    },
+    {
+      "content": "48",
+      "pos": [
+        5302,
+        5304
+      ]
+    },
+    {
+      "content": "38.32 MB/秒",
+      "pos": [
+        5314,
+        5324
+      ]
+    },
+    {
+      "content": "192",
+      "pos": [
+        5345,
+        5348
+      ]
+    },
+    {
+      "content": "192",
+      "pos": [
+        5358,
+        5361
+      ]
+    },
+    {
+      "content": "192",
+      "pos": [
+        5371,
+        5374
+      ]
+    },
+    {
+      "content": "172.67 MB/秒",
+      "pos": [
+        5384,
+        5395
+      ]
+    },
+    {
+      "content": "480",
+      "pos": [
+        5416,
+        5419
+      ]
+    },
+    {
+      "content": "480",
+      "pos": [
+        5429,
+        5432
+      ]
+    },
+    {
+      "content": "480",
+      "pos": [
+        5442,
+        5445
+      ]
+    },
+    {
+      "content": "454.27 MB/秒",
+      "pos": [
+        5455,
+        5466
+      ]
+    },
+    {
+      "content": "720",
+      "pos": [
+        5487,
+        5490
+      ]
+    },
+    {
+      "content": "720",
+      "pos": [
+        5500,
+        5503
+      ]
+    },
+    {
+      "content": "720",
+      "pos": [
+        5513,
+        5516
+      ]
+    },
+    {
+      "content": "609.69 MB/秒",
+      "pos": [
+        5526,
+        5537
+      ]
+    },
+    {
+      "content": "img.stream.analytics.perfgraph",
+      "pos": [
+        5561,
+        5591
+      ]
+    },
+    {
+      "content": "获取帮助",
+      "pos": [
+        5629,
+        5633
+      ]
+    },
+    {
+      "pos": [
+        5637,
+        5747
+      ],
+      "content": "如需进一步的帮助，请尝试我们的 <bpt id=\"p1\">[</bpt>Azure 流分析论坛<ept id=\"p1\">](https://social.msdn.microsoft.com/Forums/zh-CN/home?forum=AzureStreamAnalytics)</ept>。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        5753,
+        5757
+      ]
+    },
+    {
+      "content": "Azure 流分析简介",
+      "pos": [
+        5765,
+        5776
+      ]
+    },
+    {
+      "content": "Azure 流分析入门",
+      "pos": [
+        5836,
+        5847
+      ]
+    },
+    {
+      "content": "缩放 Azure 流分析作业",
+      "pos": [
+        5906,
+        5920
+      ]
+    },
+    {
+      "content": "Azure 流分析查询语言参考",
+      "pos": [
+        5978,
+        5993
+      ]
+    },
+    {
+      "content": "Azure 流分析管理 REST API 参考",
+      "pos": [
+        6060,
+        6083
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"扩展流分析作业以增加吞吐量 | Azure\"\n    description=\"了解如何通过配置输入分区、细化查询定义和设置作业流式处理单位来扩展流分析作业。\"\n    keywords=\"数据流式处理, 流数据处理, 优化分析\"\n    services=\"stream-analytics\"\n    documentationCenter=\"\"\n    authors=\"jeffstokes72\"\n    manager=\"paulettm\"\n    editor=\"cgronlun\"/>\n\n<tags\n    ms.service=\"stream-analytics\"\n    ms.date=\"12/16/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n# 扩展 Azure 流分析作业，以增加流数据处理吞吐量 #\n\n了解如何优化分析作业和计算流分析的*流式处理单位*，如何通过配置输入分区、优化分析查询定义和设置作业流式处理单位来缩放流分析作业。\n\n## 流分析作业的组成部分有哪些？ ##\n流分析作业定义包括输入、查询和输出。输入是作业读取数据流的地方，查询是用于转换数据输入流的一种方式，而输出则是作业将作业结果发送到的地方。\n\n若要对数据进行流式处理，作业需要至少一个输入源。可以将数据流输入源存储在 Azure Service Bus 事件中心或 Azure Blob 存储中。有关详细信息，请参阅 [Azure 流分析简介](/documentation/articles/stream-analytics-introduction)、[Azure 流分析入门](/documentation/articles/stream-analytics-get-started)<!--和 [Azure 流分析开发人员指南](/documentation/articles/stream-analytics-developer-guide)-->。\n\n## 配置流式处理单位 ##\n流式处理单位 (SU) 代表执行 Azure 流分析作业的资源和能力。在已经对 CPU、内存以及读取和写入速率进行测量的情况下，可以使用 SU 来描述相对的事件处理能力。每个流式处理单位大致相当于 1MB/秒的吞吐量。\n\n选择特定作业所需的 SU 数目时，得根据输入的分区配置以及为作业定义的查询来决定。在使用 Azure 门户选择作业的流式处理单位数时，你最多可以选择定额数。默认情况下，每个 Azure 订阅的定额为最多 50 个流式处理单位，这适用于特定区域的所有分析作业。若要提高订阅的流式处理单位数，请联系 [Microsoft 支持](http://support.microsoft.com)。\n\n作业能够使用的流式处理单位数取决于输入的分区配置以及为作业定义的查询。另请注意，必须使用有效的流单位值。有效值以 1、3、6 开始，往上再按 6 递增，如下所示。\n\n![Azure 流分析流单位规模][img.stream.analytics.streaming.units.scale]\n\n本文将说明如何计算和优化查询，以便增加分析作业的吞吐量。\n\n## 计算作业的最大流式处理单位数 ##\n流分析作业所能使用的流式处理单位总数取决于为作业定义的查询中的步骤数，以及每一步的分区数。\n\n### 查询中的步骤 ###\n查询可以有一个或多个步骤。每一步都是一个使用 WITH 关键字定义的子查询。位于 WITH 关键字外的唯一查询也计为一步，例如以下查询中的 SELECT 语句：\n\n    WITH Step1 AS (\n        SELECT COUNT(*) AS Count, TollBoothId\n        FROM Input1 Partition By PartitionId\n        GROUP BY TumblingWindow(minute, 3), TollBoothId, PartitionId\n    )\n\n    SELECT SUM(Count) AS Count, TollBoothId\n    FROM Step1\n    GROUP BY TumblingWindow(minute,3), TollBoothId\n\n前面的查询有两步。\n\n> [AZURE.NOTE]此示例查询将在本文后面部分介绍。\n\n### 对步骤进行分区 ###\n\n对步骤进行分区需要下列条件：\n\n- 输入源必须进行分区。有关详细信息，请参阅 <!--[-->Azure 流分析开发人员指南<!--](/documentation/articles/stream-analytics-developer-guide)-->和<!--[-->事件中心编程指南<!--](/documentation/articles/azure-event-hubs-developer-guide)-->。\n- 查询的 SELECT 语句必须从进行了分区的输入源读取。\n- 步骤中的查询必须有 **Partition By** 关键字\n\n对查询进行分区时，输入事件将在独立的分区组中进行处理和聚合，而输出事件则是针对每个组生成的。如果需要对聚合进行组合，则必须创建另一个不分区的步骤来进行聚合。\n\n### 计算作业的最大流式处理单位数 ###\n\n所有未分区的步骤加在一起可以进行扩展，最多可以扩展到每个流分析作业 6 个流式处理单位。若要添加更多流式处理单位，必须对步骤进行分区。每个分区可以有 6 个流式处理单位。\n\n<table border=\"1\">\n<tr><th>作业的查询</th><th>作业的最大流式处理单位数</th></td>\n\n<tr><td>\n<ul>\n<li>该查询包含一个步骤。</li>\n<li>该步骤未分区。</li>\n</ul>\n</td>\n<td>6</td></tr>\n\n<tr><td>\n<ul>\n<li>输入数据流被分为 3 个分区。</li>\n<li>该查询包含一个步骤。</li>\n<li>该步骤已分区。</li>\n</ul>\n</td>\n<td>18</td></tr>\n\n<tr><td>\n<ul>\n<li>该查询包含两个步骤。</li>\n<li>这两个步骤都未分区。</li>\n</ul>\n</td>\n<td>6</td></tr>\n\n\n\n<tr><td>\n<ul>\n<li>数据流输入被分为 3 个分区。</li>\n<li>该查询包含两个步骤。输入步骤进行了分区，第二个步骤未分区。</li>\n<li>SELECT 语句从已分区输入中读取数据。</li>\n</ul>\n</td>\n<td>24（18 个用于已分区步骤 + 6 个用于未分区步骤）</td></tr>\n</table>\n\n### 缩放示例 ###\n以下查询计算三分钟时段内通过收费站（总共三个收费亭）的车辆数。此查询可以扩展到 6 个流式处理单位。\n\n    SELECT COUNT(*) AS Count, TollBoothId\n    FROM Input1\n    GROUP BY TumblingWindow(minute, 3), TollBoothId, PartitionId\n\n若要对查询使用更多的流式处理单位，必须对数据流输入和查询进行分区。如果将数据流分区设置为 3，则可将以下修改的查询扩展到 18 个流式处理单位：\n\n    SELECT COUNT(*) AS Count, TollBoothId\n    FROM Input1 Partition By PartitionId\n    GROUP BY TumblingWindow(minute, 3), TollBoothId, PartitionId\n\n对查询进行分区后，将在独立的分区组中处理和聚合输入事件。此外，还会为每个组生成输出事件。在数据流输入中，当**“分组方式”**字段不是“分区键”时，进行分区可能会导致某些意外的结果。例如，在前面的示例查询中，TollBoothId 字段不是 Input1 的“分区键”。可以将 TollBooth #1 提供的数据分布到多个分区中。\n\n将通过流分析对每个 Input1 分区分开进行处理，并会在相同的翻转窗口中为同一收费亭创建多个有关已通过车辆计数的记录。如果不能更改输入分区键，则可通过添加额外的不分区步骤来解决此问题，例如：\n\n    WITH Step1 AS (\n        SELECT COUNT(*) AS Count, TollBoothId\n        FROM Input1 Partition By PartitionId\n        GROUP BY TumblingWindow(minute, 3), TollBoothId, PartitionId\n    )\n\n    SELECT SUM(Count) AS Count, TollBoothId\n    FROM Step1\n    GROUP BY TumblingWindow(minute, 3), TollBoothId\n\n此查询可以扩展到 24 个流式处理单位。\n\n>[AZURE.NOTE]如果要联接两个流，请确保流是按进行联接的列的分区键分区的，并且两个流中的分区数目是相同的。\n\n\n## 配置流分析作业分区 ##\n\n**调整作业流式处理单位的步骤**\n\n1. 登录到[管理门户](https://manage.windowsazure.cn)。\n2. 单击左窗格中的**“流分析”**。\n3. 单击想要缩放的流分析作业。\n4. 单击页面顶部的**“缩放”**。\n\n![Azure 流分析流单位规模][img.stream.analytics.streaming.units.scale]\n\n\n## 监视作业性能 ##\n\n使用管理门户时，你可以跟踪作业的吞吐量（以事件数/秒为单位）：\n\n![Azure 流分析监视作业][img.stream.analytics.monitor.job]\n\n计算预计的工作负荷吞吐量（以事件数/秒为单位）。如果吞吐量少于预期，则可调整输入分区和查询，并可为作业添加额外的流式处理单位。\n\n## 基于规模的 ASA 吞吐量 - Raspberry Pi 方案 ##\n\n\n若要了解在典型方案中 ASA 如果根据多个流式处理单位的处理吞吐量进行伸缩，我们在这里进行了一个试验，将传感器数据（客户端）发送到事件中心，由 ASA 对其进行处理，然后将警报或统计信息作为输出发送到另一数据中心。\n\n客户端将综合性的传感器数据发送到事件中心，事件中心再以 JSON 格式将数据发送给 ASA，数据输出也采用 JSON 格式。下面是示例数据看起来的样子：\n\n    {\"devicetime\":\"2014-12-11T02:24:56.8850110Z\",\"hmdt\":42.7,\"temp\":72.6,\"prss\":98187.75,\"lght\":0.38,\"dspl\":\"R-PI Olivier's Office\"}\n\n查询：“关灯时发送警报”\n\n    SELECT AVG(lght),\n     “LightOff” as AlertText\n    FROM input TIMESTAMP\n    BY devicetime\n     WHERE\n        lght< 0.05 GROUP BY TumblingWindow(second, 1)\n\n衡量吞吐量：在这种情况下，吞吐量是指由 ASA 在固定的时间（10 分钟）内处理的输入数据的量。若要使输入数据达到最佳的处理吞吐量，必须对数据流输入和查询进行分区。此外，还需在查询中添加 COUNT()，以便衡量所处理的输入事件数。为了确保 ASA 不会单纯地等待输入事件的到来，输入事件中心的每个分区已预先加载了足够的输入数据（大约 300MB）。\n\n下面是结果，可以发现流式处理单位数和事件中心的相应分区计数都增加了。\n\n<table border=\"1\">\n<tr><th>输入分区数</th><th>输出分区数</th><th>流式处理单位数</th><th>持续的吞吐量\n</th></td>\n\n<tr><td>12</td>\n<td>12</td>\n<td>6</td>\n<td>4.06 MB/秒</td>\n</tr>\n\n<tr><td>12</td>\n<td>12</td>\n<td>12</td>\n<td>8.06 MB/秒</td>\n</tr>\n\n<tr><td>48</td>\n<td>48</td>\n<td>48</td>\n<td>38.32 MB/秒</td>\n</tr>\n\n<tr><td>192</td>\n<td>192</td>\n<td>192</td>\n<td>172.67 MB/秒</td>\n</tr>\n\n<tr><td>480</td>\n<td>480</td>\n<td>480</td>\n<td>454.27 MB/秒</td>\n</tr>\n\n<tr><td>720</td>\n<td>720</td>\n<td>720</td>\n<td>609.69 MB/秒</td>\n</tr>\n</table>\n\n![img.stream.analytics.perfgraph][img.stream.analytics.perfgraph]\n\n## 获取帮助 ##\n如需进一步的帮助，请尝试我们的 [Azure 流分析论坛](https://social.msdn.microsoft.com/Forums/zh-CN/home?forum=AzureStreamAnalytics)。\n\n\n## 后续步骤 ##\n\n- [Azure 流分析简介](/documentation/articles/stream-analytics-introduction)\n- [Azure 流分析入门](/documentation/articles/stream-analytics-get-started)\n- [缩放 Azure 流分析作业](/documentation/articles/stream-analytics-scale-jobs)\n- [Azure 流分析查询语言参考](https://msdn.microsoft.com/zh-cn/library/azure/dn834998.aspx)\n- [Azure 流分析管理 REST API 参考](https://msdn.microsoft.com/zh-cn/library/azure/dn835031.aspx)\n\n\n<!--Image references-->\n\n[img.stream.analytics.monitor.job]: ./media/stream-analytics-scale-jobs/StreamAnalytics.job.monitor.png\n[img.stream.analytics.configure.scale]: ./media/stream-analytics-scale-jobs/StreamAnalytics.configure.scale.png\n[img.stream.analytics.perfgraph]: ./media/stream-analytics-scale-jobs/perf.png\n[img.stream.analytics.streaming.units.scale]: ./media/stream-analytics-scale-jobs/StreamAnalyticsStreamingUnitsExample.jpg\n\n<!--Link references-->\n\n[microsoft.support]: http://support.microsoft.com\n[azure.management.portal]: http://manage.windowsazure.cn\n[azure.event.hubs.developer.guide]: http://msdn.microsoft.com/zh-cn/library/azure/dn789972.aspx\n\n[stream.analytics.developer.guide]: /documentation/articles/stream-analytics-developer-guide\n[stream.analytics.introduction]: /documentation/articles/stream-analytics-introduction\n[stream.analytics.get.started]: /documentation/articles/stream-analytics-get-started\n[stream.analytics.query.language.reference]: http://go.microsoft.com/fwlink/?LinkID=513299\n[stream.analytics.rest.api.reference]: http://go.microsoft.com/fwlink/?LinkId=517301\n \n\n<!---HONumber=Mooncake_0104_2016-->"
+}

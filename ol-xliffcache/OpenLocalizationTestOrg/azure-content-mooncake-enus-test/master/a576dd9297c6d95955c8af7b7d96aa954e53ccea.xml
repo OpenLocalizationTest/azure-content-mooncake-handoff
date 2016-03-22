@@ -1,0 +1,439 @@
+{
+  "nodes": [
+    {
+      "content": "将数据从 Apache Storm 写入 Power BI | Azure",
+      "pos": [
+        24,
+        61
+      ]
+    },
+    {
+      "content": "将数据从 HDInsight 中 Apache Storm 群集上运行的 C# 拓扑写入 Power BI。此外，使用 Power BI 创建报表和实时仪表板。",
+      "pos": [
+        77,
+        157
+      ]
+    },
+    {
+      "content": "使用 Power BI（预览版）从 Apache Storm 拓扑可视化数据",
+      "pos": [
+        382,
+        420
+      ]
+    },
+    {
+      "content": "Power BI 预览版允许你以可视方式将数据显示为报告或仪表板。借助 Power BI REST API 可以轻松地在 Power BI 中使用 HDInsight 群集上 Apache Storm 运行的拓扑中的数据。",
+      "pos": [
+        422,
+        533
+      ]
+    },
+    {
+      "content": "在本文档中，你将学习如何使用 Power BI，基于 Storm 拓扑创建的数据创建报告和仪表板。",
+      "pos": [
+        535,
+        584
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        589,
+        593
+      ]
+    },
+    {
+      "pos": [
+        597,
+        646
+      ],
+      "content": "Azure 订阅。请参阅<bpt id=\"p1\">[</bpt>获取 Azure 试用版<ept id=\"p1\">](/pricing/1rmb-trial/)</ept>。"
+    },
+    {
+      "pos": [
+        650,
+        716
+      ],
+      "content": "具有 <bpt id=\"p1\">[</bpt>Power BI<ept id=\"p1\">](https://powerbi.com)</ept> 访问权限的 Azure Active Directory 用户"
+    },
+    {
+      "content": "Visual Studio（以下版本之一）",
+      "pos": [
+        720,
+        741
+      ]
+    },
+    {
+      "pos": [
+        749,
+        835
+      ],
+      "content": "Visual Studio 2012 <bpt id=\"p1\">[</bpt>Update 4<ept id=\"p1\">](http://www.microsoft.com/download/details.aspx?id=39305)</ept>"
+    },
+    {
+      "pos": [
+        843,
+        1062
+      ],
+      "content": "Visual Studio 2013 <bpt id=\"p1\">[</bpt>Update 4<ept id=\"p1\">](http://www.microsoft.com/download/details.aspx?id=44921)</ept> 或 <bpt id=\"p2\">[</bpt>Visual Studio 2013 Community<ept id=\"p2\">](http://download.microsoft.com/download/7/1/B/71BA74D8-B9A0-4E6C-9159-A8335D54437E/vs_community.exe)</ept>"
+    },
+    {
+      "pos": [
+        1070,
+        1156
+      ],
+      "content": "Visual Studio 2015 <bpt id=\"p1\">[</bpt>CTP6<ept id=\"p1\">](http://visualstudio.com/downloads/visual-studio-2015-ctp-vs)</ept>"
+    },
+    {
+      "pos": [
+        1160,
+        1321
+      ],
+      "content": "HDInsight Tools for Visual Studio：有关安装方面的信息，请参阅 <bpt id=\"p1\">[</bpt>HDInsight Tools for Visual Studio 入门<ept id=\"p1\">](/documentation/articles/hdinsight-hadoop-visual-studio-tools-get-started)</ept>。"
+    },
+    {
+      "content": "工作原理",
+      "pos": [
+        1326,
+        1330
+      ]
+    },
+    {
+      "pos": [
+        1332,
+        1498
+      ],
+      "content": "本示例包含一个 C# Storm 拓扑，该拓扑可随机生成句子、将该句子拆分成单词、统计单词数目，然后将单词和计数发送到 Power BI REST API。<bpt id=\"p1\">[</bpt>PowerBi.Api.Client<ept id=\"p1\">](https://github.com/Vtek/PowerBI.Api.Client)</ept> Nuget 包用来与 Power BI 通信。"
+    },
+    {
+      "content": "此项目中的以下文件实现 Power BI 特定的功能：",
+      "pos": [
+        1500,
+        1527
+      ]
+    },
+    {
+      "pos": [
+        1531,
+        1582
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>PowerBiBolt.cs<ept id=\"p1\">**</ept>：实现用于将数据发送到 Power BI 的 Storm Bolt"
+    },
+    {
+      "pos": [
+        1586,
+        1621
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Data.cs<ept id=\"p1\">**</ept>：描述要发送到 Power BI 的数据对象/行"
+    },
+    {
+      "pos": [
+        1625,
+        1766
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.WARNING]</ph> Power BI 似乎允许多个同名的数据集。如果数据集不存在，并且你的拓扑结构会创建 Power BI Bolt 的多个实例，则可能会发生这种情况。若要避免此问题，请将 Bolt 的并行性提示设置为 1（如本示例中所示），或在部署拓扑之前创建数据集。"
+    },
+    {
+      "content": "此解决方案中包含的 <bpt id=\"p1\">**</bpt>CreateDataset<ept id=\"p1\">**</ept> 控制台应用程序是作为示例提供的，介绍如何在拓扑结构外部创建数据集。",
+      "pos": [
+        1772,
+        1833
+      ]
+    },
+    {
+      "content": "注册 Power BI 应用程序",
+      "pos": [
+        1838,
+        1854
+      ]
+    },
+    {
+      "pos": [
+        1856,
+        2002
+      ],
+      "content": "遵循<bpt id=\"p1\">[</bpt>注册应用<ept id=\"p1\">](https://powerbi.microsoft.com/en-us/documentation/powerbi-developer-register-a-client-app/)</ept>中的步骤创建应用程序注册。在访问 Power BI REST API 时将要用到此注册信息。"
+    },
+    {
+      "pos": [
+        2006,
+        2042
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph> 保存应用程序注册的“客户端 ID”。"
+    },
+    {
+      "content": "下载示例",
+      "pos": [
+        2047,
+        2051
+      ]
+    },
+    {
+      "pos": [
+        2053,
+        2216
+      ],
+      "content": "下载 <bpt id=\"p1\">[</bpt>HDInsight C# Storm Power BI 示例<ept id=\"p1\">](https://github.com/Blackmist/hdinsight-csharp-storm-powerbi)</ept>。若要下载该示例，请使用 <bpt id=\"p2\">[</bpt>git<ept id=\"p2\">](http://git-scm.com/)</ept> 复制/克隆它，或使用“下载”链接下载 .zip 存档。"
+    },
+    {
+      "content": "配置示例",
+      "pos": [
+        2221,
+        2225
+      ]
+    },
+    {
+      "pos": [
+        2230,
+        2322
+      ],
+      "content": "在 Visual Studio 中打开该示例。在“解决方案资源管理器”中，打开“App.config”文件，然后找到 <bpt id=\"p1\">**</bpt>&lt;OAuth .../&gt;<ept id=\"p1\">**</ept> 元素。输入此元素的以下属性的值。"
+    },
+    {
+      "pos": [
+        2330,
+        2357
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>客户端<ept id=\"p1\">**</ept>：先前创建的应用程序注册的客户端 ID。"
+    },
+    {
+      "pos": [
+        2365,
+        2414
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>用户<ept id=\"p1\">**</ept>：有权访问 Power BI 的 Azure Active Directory 帐户。"
+    },
+    {
+      "pos": [
+        2422,
+        2458
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>密码<ept id=\"p1\">**</ept>：Azure Active Directory 帐户的密码。"
+    },
+    {
+      "pos": [
+        2463,
+        2573
+      ],
+      "content": "（可选）。此项目使用的默认数据集名称为 <bpt id=\"p1\">**</bpt>Words<ept id=\"p1\">**</ept>。若要更改此名称，请在“解决方案资源管理器”中右键单击“WordCount”项目，选择“属性”，然后选择“设置”。将“DatasetName”条目更改为所需的值。"
+    },
+    {
+      "content": "保存并关闭文件。",
+      "pos": [
+        2578,
+        2586
+      ]
+    },
+    {
+      "content": "部署示例",
+      "pos": [
+        2591,
+        2595
+      ]
+    },
+    {
+      "content": "在“解决方案资源管理器”中，右键单击“WordCount”项目，然后选择“提交到 Storm on HDInsight”。从“Storm 群集”下拉对话框中选择 选择 HDInsight 群集。",
+      "pos": [
+        2600,
+        2697
+      ]
+    },
+    {
+      "pos": [
+        2705,
+        2754
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 可能需要在几秒钟后，“Storm 群集”下拉对话框中才会填充服务器名称。"
+    },
+    {
+      "content": "如果出现提示，请输入你 Azure 订阅的登录凭据。如果你有多个订阅，请登录包含 Storm on HDInsight 群集的订阅。",
+      "pos": [
+        2764,
+        2830
+      ]
+    },
+    {
+      "content": "成功提交拓扑之后，应该会出现群集的“Storm 拓扑”。从列表中选择“WordCount”拓扑，以查看有关正在运行的拓扑的信息。",
+      "pos": [
+        2835,
+        2899
+      ]
+    },
+    {
+      "content": "拓扑，已选择 WordCount 拓扑",
+      "pos": [
+        2907,
+        2926
+      ]
+    },
+    {
+      "pos": [
+        2998,
+        3107
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 你也可以展开“Azure”&gt;“HDInsight”，右键单击 Storm on HDInsight 群集，然后选择“查看 Storm 拓扑”，来从“服务器资源管理器”查看“Storm 拓扑”。"
+    },
+    {
+      "pos": [
+        3112,
+        3236
+      ],
+      "content": "在查看“拓扑摘要”时不断滚动，直到看到“Bolt”部分。在此部分中，注意 <bpt id=\"p1\">**</bpt>PowerBI<ept id=\"p1\">**</ept> Bolt 的 <bpt id=\"p2\">**</bpt>Executed<ept id=\"p2\">**</ept> 列。使用页面顶部的刷新按钮刷新，直到值更改为非零值。当此数字开始递增时，即表示正在将项写入 Power BI。"
+    },
+    {
+      "content": "创建报告",
+      "pos": [
+        3241,
+        3245
+      ]
+    },
+    {
+      "pos": [
+        3250,
+        3310
+      ],
+      "content": "在浏览器中访问 <bpt id=\"p1\">[</bpt>https://PowerBI.com<ept id=\"p1\">](https://powerbi.com)</ept>。使用你的帐户登录。"
+    },
+    {
+      "pos": [
+        3315,
+        3357
+      ],
+      "content": "在页面左侧展开“数据集”。选择 <bpt id=\"p1\">**</bpt>Words<ept id=\"p1\">**</ept> 条目。这是示例拓扑创建的数据集。"
+    },
+    {
+      "content": "Words 数据集条目",
+      "pos": [
+        3365,
+        3376
+      ]
+    },
+    {
+      "pos": [
+        3435,
+        3540
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>Fields<ept id=\"p1\">**</ept> 区域中，展开 <bpt id=\"p2\">**</bpt>WordCount<ept id=\"p2\">**</ept>。将 <bpt id=\"p3\">**</bpt>Count<ept id=\"p3\">**</ept> 和 <bpt id=\"p4\">**</bpt>Word<ept id=\"p4\">**</ept> 条目拖放到页面的中间部分。这将会创建一个新的图表，其中为每个单词显示一栏，指示该单词的出现次数。"
+    },
+    {
+      "content": "WordCount 图表",
+      "pos": [
+        3548,
+        3560
+      ]
+    },
+    {
+      "pos": [
+        3628,
+        3675
+      ],
+      "content": "在页面的左上角，选择“保存”以创建新的报告。输入 <bpt id=\"p1\">**</bpt>Word Count<ept id=\"p1\">**</ept> 作为报告名称。"
+    },
+    {
+      "pos": [
+        3680,
+        3732
+      ],
+      "content": "选择 Power BI 徽标返回到仪表板。现在，<bpt id=\"p1\">**</bpt>Word Count<ept id=\"p1\">**</ept> 报告将出现在“报告”下面。"
+    },
+    {
+      "content": "创建实时仪表板",
+      "pos": [
+        3737,
+        3744
+      ]
+    },
+    {
+      "pos": [
+        3749,
+        3801
+      ],
+      "content": "在“仪表板”旁边，选择“+”图标创建新仪表板。将新仪表板命名为 <bpt id=\"p1\">**</bpt>Live Word Count<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        3806,
+        3888
+      ],
+      "content": "选择前面创建的 <bpt id=\"p1\">**</bpt>Word Count<ept id=\"p1\">**</ept> 报告。在显示图表时，请选择该图表，然后选择图表右上角的图钉图标。此时，你应该会收到一条通知，指出该图表已固定到仪表板。"
+    },
+    {
+      "content": "显示图钉的图表",
+      "pos": [
+        3896,
+        3903
+      ]
+    },
+    {
+      "pos": [
+        3964,
+        4094
+      ],
+      "content": "选择 Power BI 徽标返回到仪表板。选择 <bpt id=\"p1\">**</bpt>Live Word Count<ept id=\"p1\">**</ept> 仪表板。现在，它应该已包含 Word Count 图表，并且在将新条目从 HDInsight 上运行的 WordCount 拓扑发送到 Power BI 时，仪表板会更新。"
+    },
+    {
+      "content": "实时仪表板",
+      "pos": [
+        4102,
+        4107
+      ]
+    },
+    {
+      "content": "停止 WordCount 拓扑",
+      "pos": [
+        4170,
+        4185
+      ]
+    },
+    {
+      "content": "在你停止该拓扑或者删除 Storm on HDInsight 之前，该拓扑会一直运行。执行以下步骤可停止拓扑。",
+      "pos": [
+        4187,
+        4242
+      ]
+    },
+    {
+      "pos": [
+        4247,
+        4398
+      ],
+      "content": "在 Visual Studio 中，打开 WordCount 拓扑的“拓扑摘要”窗口。如果拓扑摘要尚未打开，请转到“服务器资源管理器”，展开“Azure”和“HDInsight”条目，右键单击 HDInsight 群集，然后选择“查看 Storm 拓扑”。最后，选择 <bpt id=\"p1\">**</bpt>WordCount<ept id=\"p1\">**</ept> 拓扑。"
+    },
+    {
+      "pos": [
+        4403,
+        4432
+      ],
+      "content": "选择“终止”按钮以停止 <bpt id=\"p1\">**</bpt>WordCount<ept id=\"p1\">**</ept> 拓扑。"
+    },
+    {
+      "content": "拓扑摘要中的终止按钮",
+      "pos": [
+        4440,
+        4450
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        4516,
+        4520
+      ]
+    },
+    {
+      "content": "在本文档中，你已学习如何使用 REST 将数据从 Storm 拓扑发送到 Power BI。有关如何使用其他 Azure 技术的信息，请参阅以下文章：",
+      "pos": [
+        4522,
+        4597
+      ]
+    },
+    {
+      "content": "Storm on HDInsight 的示例拓扑",
+      "pos": [
+        4602,
+        4626
+      ]
+    }
+  ],
+  "content": "<properties\n pageTitle=\"将数据从 Apache Storm 写入 Power BI | Azure\"\n description=\"将数据从 HDInsight 中 Apache Storm 群集上运行的 C# 拓扑写入 Power BI。此外，使用 Power BI 创建报表和实时仪表板。\"\n services=\"hdinsight\"\n documentationCenter=\"\"\n authors=\"Blackmist\"\n manager=\"paulettm\"\n editor=\"cgronlun\"\n    tags=\"azure-portal\"/>\n\n<tags\n    ms.service=\"hdinsight\"\n    ms.date=\"01/08/2016\"\n    wacn.date=\"02/26/2016\"/>\n\n# 使用 Power BI（预览版）从 Apache Storm 拓扑可视化数据\n\nPower BI 预览版允许你以可视方式将数据显示为报告或仪表板。借助 Power BI REST API 可以轻松地在 Power BI 中使用 HDInsight 群集上 Apache Storm 运行的拓扑中的数据。\n\n在本文档中，你将学习如何使用 Power BI，基于 Storm 拓扑创建的数据创建报告和仪表板。\n\n## 先决条件\n\n- Azure 订阅。请参阅[获取 Azure 试用版](/pricing/1rmb-trial/)。\n\n* 具有 [Power BI](https://powerbi.com) 访问权限的 Azure Active Directory 用户\n\n* Visual Studio（以下版本之一）\n\n    * Visual Studio 2012 [Update 4](http://www.microsoft.com/download/details.aspx?id=39305)\n\n    * Visual Studio 2013 [Update 4](http://www.microsoft.com/download/details.aspx?id=44921) 或 [Visual Studio 2013 Community](http://download.microsoft.com/download/7/1/B/71BA74D8-B9A0-4E6C-9159-A8335D54437E/vs_community.exe)\n\n    * Visual Studio 2015 [CTP6](http://visualstudio.com/downloads/visual-studio-2015-ctp-vs)\n\n* HDInsight Tools for Visual Studio：有关安装方面的信息，请参阅 [HDInsight Tools for Visual Studio 入门](/documentation/articles/hdinsight-hadoop-visual-studio-tools-get-started)。\n\n## 工作原理\n\n本示例包含一个 C# Storm 拓扑，该拓扑可随机生成句子、将该句子拆分成单词、统计单词数目，然后将单词和计数发送到 Power BI REST API。[PowerBi.Api.Client](https://github.com/Vtek/PowerBI.Api.Client) Nuget 包用来与 Power BI 通信。\n\n此项目中的以下文件实现 Power BI 特定的功能：\n\n* **PowerBiBolt.cs**：实现用于将数据发送到 Power BI 的 Storm Bolt\n\n* **Data.cs**：描述要发送到 Power BI 的数据对象/行\n\n> [AZURE.WARNING] Power BI 似乎允许多个同名的数据集。如果数据集不存在，并且你的拓扑结构会创建 Power BI Bolt 的多个实例，则可能会发生这种情况。若要避免此问题，请将 Bolt 的并行性提示设置为 1（如本示例中所示），或在部署拓扑之前创建数据集。\n> <p>此解决方案中包含的 **CreateDataset** 控制台应用程序是作为示例提供的，介绍如何在拓扑结构外部创建数据集。\n\n## 注册 Power BI 应用程序\n\n遵循[注册应用](https://powerbi.microsoft.com/en-us/documentation/powerbi-developer-register-a-client-app/)中的步骤创建应用程序注册。在访问 Power BI REST API 时将要用到此注册信息。\n\n> [AZURE.IMPORTANT] 保存应用程序注册的“客户端 ID”。\n\n## 下载示例\n\n下载 [HDInsight C# Storm Power BI 示例](https://github.com/Blackmist/hdinsight-csharp-storm-powerbi)。若要下载该示例，请使用 [git](http://git-scm.com/) 复制/克隆它，或使用“下载”链接下载 .zip 存档。\n\n## 配置示例\n\n1. 在 Visual Studio 中打开该示例。在“解决方案资源管理器”中，打开“App.config”文件，然后找到 **<OAuth .../>** 元素。输入此元素的以下属性的值。\n\n    * **客户端**：先前创建的应用程序注册的客户端 ID。\n\n    * **用户**：有权访问 Power BI 的 Azure Active Directory 帐户。\n\n    * **密码**：Azure Active Directory 帐户的密码。\n\n2. （可选）。此项目使用的默认数据集名称为 **Words**。若要更改此名称，请在“解决方案资源管理器”中右键单击“WordCount”项目，选择“属性”，然后选择“设置”。将“DatasetName”条目更改为所需的值。\n\n2. 保存并关闭文件。\n\n## 部署示例\n\n1. 在“解决方案资源管理器”中，右键单击“WordCount”项目，然后选择“提交到 Storm on HDInsight”。从“Storm 群集”下拉对话框中选择 选择 HDInsight 群集。\n\n    > [AZURE.NOTE] 可能需要在几秒钟后，“Storm 群集”下拉对话框中才会填充服务器名称。\n    > <p>如果出现提示，请输入你 Azure 订阅的登录凭据。如果你有多个订阅，请登录包含 Storm on HDInsight 群集的订阅。\n\n2. 成功提交拓扑之后，应该会出现群集的“Storm 拓扑”。从列表中选择“WordCount”拓扑，以查看有关正在运行的拓扑的信息。\n\n    ![拓扑，已选择 WordCount 拓扑](./media/hdinsight-storm-power-bi-topology/topologysummary.png)\n\n    > [AZURE.NOTE] 你也可以展开“Azure”>“HDInsight”，右键单击 Storm on HDInsight 群集，然后选择“查看 Storm 拓扑”，来从“服务器资源管理器”查看“Storm 拓扑”。\n\n3. 在查看“拓扑摘要”时不断滚动，直到看到“Bolt”部分。在此部分中，注意 **PowerBI** Bolt 的 **Executed** 列。使用页面顶部的刷新按钮刷新，直到值更改为非零值。当此数字开始递增时，即表示正在将项写入 Power BI。\n\n## 创建报告\n\n1. 在浏览器中访问 [https://PowerBI.com](https://powerbi.com)。使用你的帐户登录。\n\n2. 在页面左侧展开“数据集”。选择 **Words** 条目。这是示例拓扑创建的数据集。\n\n    ![Words 数据集条目](./media/hdinsight-storm-power-bi-topology/words.png)\n\n3. 在 **Fields** 区域中，展开 **WordCount**。将 **Count** 和 **Word** 条目拖放到页面的中间部分。这将会创建一个新的图表，其中为每个单词显示一栏，指示该单词的出现次数。\n\n    ![WordCount 图表](./media/hdinsight-storm-power-bi-topology/wordcountchart.png)\n\n4. 在页面的左上角，选择“保存”以创建新的报告。输入 **Word Count** 作为报告名称。\n\n5. 选择 Power BI 徽标返回到仪表板。现在，**Word Count** 报告将出现在“报告”下面。\n\n## 创建实时仪表板\n\n1. 在“仪表板”旁边，选择“+”图标创建新仪表板。将新仪表板命名为 **Live Word Count**。\n\n2. 选择前面创建的 **Word Count** 报告。在显示图表时，请选择该图表，然后选择图表右上角的图钉图标。此时，你应该会收到一条通知，指出该图表已固定到仪表板。\n\n    ![显示图钉的图表](./media/hdinsight-storm-power-bi-topology/pushpin.png)\n\n2. 选择 Power BI 徽标返回到仪表板。选择 **Live Word Count** 仪表板。现在，它应该已包含 Word Count 图表，并且在将新条目从 HDInsight 上运行的 WordCount 拓扑发送到 Power BI 时，仪表板会更新。\n\n    ![实时仪表板](./media/hdinsight-storm-power-bi-topology/dashboard.png)\n\n## 停止 WordCount 拓扑\n\n在你停止该拓扑或者删除 Storm on HDInsight 之前，该拓扑会一直运行。执行以下步骤可停止拓扑。\n\n1. 在 Visual Studio 中，打开 WordCount 拓扑的“拓扑摘要”窗口。如果拓扑摘要尚未打开，请转到“服务器资源管理器”，展开“Azure”和“HDInsight”条目，右键单击 HDInsight 群集，然后选择“查看 Storm 拓扑”。最后，选择 **WordCount** 拓扑。\n\n2. 选择“终止”按钮以停止 **WordCount** 拓扑。\n\n    ![拓扑摘要中的终止按钮](./media/hdinsight-storm-power-bi-topology/killtopology.png)\n\n## 后续步骤\n\n在本文档中，你已学习如何使用 REST 将数据从 Storm 拓扑发送到 Power BI。有关如何使用其他 Azure 技术的信息，请参阅以下文章：\n\n* [Storm on HDInsight 的示例拓扑](/documentation/articles/hdinsight-storm-example-topology)\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

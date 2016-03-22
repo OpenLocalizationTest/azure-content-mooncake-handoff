@@ -1,0 +1,68 @@
+{
+  "nodes": [
+    {
+      "pos": [
+        0,
+        199
+      ],
+      "content": "这些步骤创建新的自定义 <bpt id=\"p1\">[</bpt>ApiController<ept id=\"p1\">](http://go.microsoft.com/fwlink/p/?LinkId=512673)</ept>，后者将推送通知发送到应用。你可以在 <bpt id=\"p2\">[</bpt>TableController<ept id=\"p2\">](http://msdn.microsoft.com/zh-cn/library/azure/dn643359.aspx)</ept> 中或者在后端服务内的其他任何位置实施这一相同代码。"
+    },
+    {
+      "content": "在 Visual Studio 的解决方案资源管理器中，右键单击移动服务项目的 Controllers 文件夹，展开“添加”，然后单击“新基架项”。",
+      "pos": [
+        204,
+        278
+      ]
+    },
+    {
+      "content": "这样将显示“添加基架”对话框。",
+      "pos": [
+        284,
+        299
+      ]
+    },
+    {
+      "pos": [
+        304,
+        399
+      ],
+      "content": "展开“Azure 移动服务”并单击“Azure 移动服务自定义控制器”，然后单击“添加”，提供 <ph id=\"ph1\">`NotifyAllUsersController`</ph> 的“控制器名称”，然后再次单击“添加”。"
+    },
+    {
+      "content": "Web API“添加基架”对话框",
+      "pos": [
+        407,
+        423
+      ]
+    },
+    {
+      "pos": [
+        526,
+        571
+      ],
+      "content": "这将创建新的名为 <bpt id=\"p1\">**</bpt>NotifyAllUsersController<ept id=\"p1\">**</ept> 的空控制器类。"
+    },
+    {
+      "pos": [
+        576,
+        632
+      ],
+      "content": "在新的 NotifyAllUsersController.cs 项目文件中，添加以下 <bpt id=\"p1\">**</bpt>using<ept id=\"p1\">**</ept> 语句："
+    },
+    {
+      "content": "添加在控制器上实施 POST 方法的以下代码：",
+      "pos": [
+        712,
+        735
+      ]
+    },
+    {
+      "pos": [
+        1791,
+        1911
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>此 POST 方法可以由具有应用程序密钥的任何客户端调用，这样并不安全。若要保护终结点，请将属性 <ph id=\"ph2\">`[AuthorizeLevel(AuthorizationLevel.User)]`</ph> 应用于要求身份验证的方法或类。"
+    }
+  ],
+  "content": "这些步骤创建新的自定义 [ApiController](http://go.microsoft.com/fwlink/p/?LinkId=512673)，后者将推送通知发送到应用。你可以在 [TableController](http://msdn.microsoft.com/zh-cn/library/azure/dn643359.aspx) 中或者在后端服务内的其他任何位置实施这一相同代码。\n\n1. 在 Visual Studio 的解决方案资源管理器中，右键单击移动服务项目的 Controllers 文件夹，展开“添加”，然后单击“新基架项”。\n\n    这样将显示“添加基架”对话框。\n\n2. 展开“Azure 移动服务”并单击“Azure 移动服务自定义控制器”，然后单击“添加”，提供 `NotifyAllUsersController` 的“控制器名称”，然后再次单击“添加”。\n\n    ![Web API“添加基架”对话框](./media/mobile-services-dotnet-backend-update-server-push-vs2013/add-custom-api-controller.png)\n\n    这将创建新的名为 **NotifyAllUsersController** 的空控制器类。\n\n3. 在新的 NotifyAllUsersController.cs 项目文件中，添加以下 **using** 语句：\n\n        using Newtonsoft.Json.Linq;\n        using System.Threading.Tasks;\n\n4. 添加在控制器上实施 POST 方法的以下代码：\n\n        public async Task<bool> Post(JObject data)\n        {\n            try\n            {\n                // Define the XML paylod for a WNS native toast notification \n                // that contains the value supplied in the POST request.\n                string wnsToast = \n                    string.Format(\"<?xml version=\"1.0\" encoding=\"utf-8\"?>\" +\n                    \"<toast><visual><binding template=\"ToastText01\">\" + \n                    \"<text id=\"1\">{0}</text></binding></visual></toast>\", \n                    data.GetValue(\"toast\").Value<string>());\n\n                // Define the WNS native toast with the payload string.\n                WindowsPushMessage message = new WindowsPushMessage();\n                message.XmlPayload = wnsToast;\n\n                // Send the toast notification.\n                await Services.Push.SendAsync(message);\n                return true;\n            }\n            catch (Exception e)\n            {\n                Services.Log.Error(e.ToString());\n            }\n            return false;\n        }\n\n    >[AZURE.NOTE]此 POST 方法可以由具有应用程序密钥的任何客户端调用，这样并不安全。若要保护终结点，请将属性 `[AuthorizeLevel(AuthorizationLevel.User)]` 应用于要求身份验证的方法或类。\n\n<!---HONumber=74-->"
+}

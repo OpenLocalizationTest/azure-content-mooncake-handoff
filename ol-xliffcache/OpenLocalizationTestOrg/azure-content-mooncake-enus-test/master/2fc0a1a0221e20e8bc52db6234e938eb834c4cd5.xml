@@ -1,0 +1,600 @@
+{
+  "nodes": [
+    {
+      "content": "管理对资源的访问权限",
+      "pos": [
+        26,
+        36
+      ]
+    },
+    {
+      "content": "使用基于角色的访问控制 (RBAC) 来管理用户对 Azure 中部署的资源的权限。",
+      "pos": [
+        54,
+        96
+      ]
+    },
+    {
+      "content": "管理对资源的访问权限",
+      "pos": [
+        323,
+        333
+      ]
+    },
+    {
+      "content": "使用 Azure 资源管理器可以确保组织中的用户拥有用于管理或访问资源的适当权限。资源管理器利用基于角色的访问控制 (RBAC)，因此，你可以轻松地向各个资源或资源组应用安全策略。例如，可以授予用户访问订阅中特定虚拟机的权限，允许用户管理订阅中的所有 Web 应用，但但不允许管理其他资源。",
+      "pos": [
+        335,
+        480
+      ]
+    },
+    {
+      "pos": [
+        482,
+        603
+      ],
+      "content": "本主题重点介绍用于分配角色和权限的命令。有关基于角色的访问控制的概述，请参阅 <bpt id=\"p1\">[</bpt>Azure 门户中基于角色的访问控制<ept id=\"p1\">](/documentation/articles/role-based-access-control-configure)</ept>。"
+    },
+    {
+      "content": "概念",
+      "pos": [
+        608,
+        610
+      ]
+    },
+    {
+      "content": "对于基于角色的访问控制，你需要了解几个重要概念：",
+      "pos": [
+        612,
+        636
+      ]
+    },
+    {
+      "content": "主体 - 被授予权限的实体，例如用户、安全组或应用程序。",
+      "pos": [
+        641,
+        669
+      ]
+    },
+    {
+      "content": "角色 - 允许的操作集",
+      "pos": [
+        673,
+        684
+      ]
+    },
+    {
+      "content": "范围 - 角色应用到的级别，例如订阅、资源组或资源。",
+      "pos": [
+        688,
+        714
+      ]
+    },
+    {
+      "content": "角色分配 - 将主体添加到角色并设置范围的过程。",
+      "pos": [
+        718,
+        742
+      ]
+    },
+    {
+      "content": "角色示例：",
+      "pos": [
+        747,
+        752
+      ]
+    },
+    {
+      "content": "为了理解 RBAC 的概念，让我们探讨常见角色定义的一些示例：",
+      "pos": [
+        753,
+        784
+      ]
+    },
+    {
+      "content": "角色",
+      "pos": [
+        788,
+        790
+      ]
+    },
+    {
+      "content": "允许的操作",
+      "pos": [
+        793,
+        798
+      ]
+    },
+    {
+      "content": "读取器",
+      "pos": [
+        835,
+        838
+      ]
+    },
+    {
+      "content": "**/read（读取任何内容）",
+      "pos": [
+        841,
+        856
+      ]
+    },
+    {
+      "content": "所有者",
+      "pos": [
+        860,
+        863
+      ]
+    },
+    {
+      "content": "*（读取/写入任何内容）",
+      "pos": [
+        866,
+        878
+      ]
+    },
+    {
+      "pos": [
+        881,
+        958
+      ],
+      "content": "若要将“读取者”角色分配给名为 <bpt id=\"p1\">**</bpt>ExampleGroup<ept id=\"p1\">**</ept> 的资源组的“用户 A”，并将“所有者”角色分配给整个订阅的“用户 B”，请进行以下分配："
+    },
+    {
+      "content": "角色",
+      "pos": [
+        962,
+        964
+      ]
+    },
+    {
+      "content": "主体",
+      "pos": [
+        967,
+        969
+      ]
+    },
+    {
+      "content": "范围",
+      "pos": [
+        972,
+        974
+      ]
+    },
+    {
+      "content": "读取器",
+      "pos": [
+        1017,
+        1020
+      ]
+    },
+    {
+      "content": "用户 A",
+      "pos": [
+        1023,
+        1027
+      ]
+    },
+    {
+      "content": "/subscriptions/{subscriptionId}/resourceGroups/examplegroup",
+      "pos": [
+        1030,
+        1089
+      ]
+    },
+    {
+      "content": "所有者",
+      "pos": [
+        1094,
+        1097
+      ]
+    },
+    {
+      "content": "用户 B",
+      "pos": [
+        1100,
+        1104
+      ]
+    },
+    {
+      "content": "/subscriptions/{subscriptionId}",
+      "pos": [
+        1107,
+        1138
+      ]
+    },
+    {
+      "content": "示例方案",
+      "pos": [
+        1145,
+        1149
+      ]
+    },
+    {
+      "content": "在本主题中，你将了解如何通过 Azure PowerShell、适用于 Mac、Linux 和 Windows 的 Azure CLI 以及 REST API 执行以下常见方案。",
+      "pos": [
+        1151,
+        1240
+      ]
+    },
+    {
+      "content": "查看订阅中的可用角色，以及允许这些角色执行的操作。",
+      "pos": [
+        1245,
+        1270
+      ]
+    },
+    {
+      "content": "向整个订阅中某个组的成员授予“读取者”权限。",
+      "pos": [
+        1274,
+        1296
+      ]
+    },
+    {
+      "content": "向某个应用程序授予“参与者”权限，以允许该应用程序管理资源组中的资源。",
+      "pos": [
+        1300,
+        1335
+      ]
+    },
+    {
+      "content": "向单个用户授予对特定 Web 应用的“所有者”权限。",
+      "pos": [
+        1339,
+        1365
+      ]
+    },
+    {
+      "content": "列出资源组的审核日志。",
+      "pos": [
+        1369,
+        1380
+      ]
+    },
+    {
+      "content": "如何使用 PowerShell 管理访问权限",
+      "pos": [
+        1386,
+        1408
+      ]
+    },
+    {
+      "content": "查看可用角色",
+      "pos": [
+        1518,
+        1524
+      ]
+    },
+    {
+      "pos": [
+        1525,
+        1576
+      ],
+      "content": "若要查看订阅的所有可用角色，请运行 <bpt id=\"p1\">**</bpt>Get-AzureRmRoleDefinition<ept id=\"p1\">**</ept> 命令。"
+    },
+    {
+      "content": "向订阅的某个组授予“读取者”权限。",
+      "pos": [
+        2795,
+        2812
+      ]
+    },
+    {
+      "pos": [
+        2816,
+        2894
+      ],
+      "content": "在运行 <bpt id=\"p1\">**</bpt>Get-AzureRmRoleDefinition<ept id=\"p1\">**</ept> 命令时提供角色名称，以查看相应的“读者”角色定义。检查允许的操作是否为你想要分配的操作。"
+    },
+    {
+      "pos": [
+        3313,
+        3392
+      ],
+      "content": "通过运行 <bpt id=\"p1\">**</bpt>Get-AzureRmADGroup<ept id=\"p1\">**</ept> 命令获取所需的安全组。提供该组在订阅中的实际名称。下面显示了 ExampleAuditorGroup。"
+    },
+    {
+      "content": "为审核员安全组创建角色分配。当命令完成时，将返回新的角色分配。",
+      "pos": [
+        3476,
+        3507
+      ]
+    },
+    {
+      "content": "向资源组的应用程序授予“参与者”权限。",
+      "pos": [
+        3643,
+        3662
+      ]
+    },
+    {
+      "pos": [
+        3666,
+        3745
+      ],
+      "content": "在运行 <bpt id=\"p1\">**</bpt>Get-AzureRmRoleDefinition<ept id=\"p1\">**</ept> 命令时提供角色名称，以查看相应的“参与者”角色定义。检查允许的操作是否为你想要分配的操作。"
+    },
+    {
+      "pos": [
+        3805,
+        3896
+      ],
+      "content": "运行 <bpt id=\"p1\">**</bpt>Get-AzureRmADServicePrincipal<ept id=\"p1\">**</ept> 命令并提供订阅中应用程序的名称，以获取服务主体对象 ID。下面显示了 ExampleApplication。"
+    },
+    {
+      "pos": [
+        3996,
+        4045
+      ],
+      "content": "通过运行 <bpt id=\"p1\">**</bpt>New-AzureRmRoleAssignment<ept id=\"p1\">**</ept> 命令为服务主体创建角色分配。"
+    },
+    {
+      "pos": [
+        4180,
+        4326
+      ],
+      "content": "有关设置 Azure Active Directory 应用程序和服务主体的更全面说明，请参阅<bpt id=\"p1\">[</bpt>使用 Azure 资源管理器对服务主体进行身份验证<ept id=\"p1\">](/documentation/articles/resource-group-authenticate-service-principal)</ept>。"
+    },
+    {
+      "content": "向资源的用户授予“所有者”权限。",
+      "pos": [
+        4331,
+        4347
+      ]
+    },
+    {
+      "pos": [
+        4351,
+        4430
+      ],
+      "content": "在运行 <bpt id=\"p1\">**</bpt>Get-AzureRmRoleDefinition<ept id=\"p1\">**</ept> 命令时提供角色名称，以查看相应的“所有者”角色定义。检查允许的操作是否为你想要分配的操作。"
+    },
+    {
+      "content": "为用户创建角色分配。",
+      "pos": [
+        4484,
+        4494
+      ]
+    },
+    {
+      "content": "列出资源组的审核日志。",
+      "pos": [
+        4700,
+        4711
+      ]
+    },
+    {
+      "content": "若要获取资源组的审核日志，请运行 <bpt id=\"p1\">**</bpt>Get AzureRmLog<ept id=\"p1\">**</ept> 命令（对于 Azure PowerShell 1.0 预览版之前的版本，运行 <bpt id=\"p2\">**</bpt>Get-AzureResourceGroupLog<ept id=\"p2\">**</ept>）。",
+      "pos": [
+        4712,
+        4818
+      ]
+    },
+    {
+      "content": "如何使用适用于 Mac、Linux 和 Windows 的 Azure CLI",
+      "pos": [
+        4885,
+        4924
+      ]
+    },
+    {
+      "pos": [
+        4926,
+        5061
+      ],
+      "content": "如果你未安装适用于 Mac、Linux 和 Windows 的 Azure CLI，或者没有配置要与 Azure CLI 配合使用的组织帐户，请参阅<bpt id=\"p1\">[</bpt>安装和配置 Azure CLI<ept id=\"p1\">](/documentation/articles/xplat-cli-install)</ept>。"
+    },
+    {
+      "content": "使用你的凭据登录到 Azure 帐户。该命令将返回登录的结果。",
+      "pos": [
+        5066,
+        5097
+      ]
+    },
+    {
+      "content": "如果你有多个订阅，请提供要用于部署的订阅 ID。",
+      "pos": [
+        5217,
+        5241
+      ]
+    },
+    {
+      "content": "切换到 Azure 资源管理器模块。你将收到新模式确认。",
+      "pos": [
+        5300,
+        5328
+      ]
+    },
+    {
+      "content": "查看可用角色",
+      "pos": [
+        5408,
+        5414
+      ]
+    },
+    {
+      "content": "查看订阅的所有可用角色。将返回角色定义的列表。",
+      "pos": [
+        5415,
+        5438
+      ]
+    },
+    {
+      "content": "向订阅的某个组授予“读取者”权限。",
+      "pos": [
+        5465,
+        5482
+      ]
+    },
+    {
+      "content": "获取“读取者”角色的角色定义。检查允许的操作是否为你想要分配的操作。",
+      "pos": [
+        5486,
+        5520
+      ]
+    },
+    {
+      "content": "通过根据名称搜索组，获取所需的安全组及其 objectId。以下示例显示了 ExampleAuditorGroup。",
+      "pos": [
+        5806,
+        5864
+      ]
+    },
+    {
+      "content": "为安全组创建角色分配。",
+      "pos": [
+        6271,
+        6282
+      ]
+    },
+    {
+      "content": "向资源组的应用程序授予“参与者”权限。",
+      "pos": [
+        6592,
+        6611
+      ]
+    },
+    {
+      "content": "获取“参与者”角色的角色定义。检查允许的操作是否为你想要分配的操作。",
+      "pos": [
+        6615,
+        6649
+      ]
+    },
+    {
+      "content": "获取应用程序的 ObjectId。提供要检索的应用程序的名称。",
+      "pos": [
+        6691,
+        6722
+      ]
+    },
+    {
+      "content": "为应用程序创建角色分配。",
+      "pos": [
+        6785,
+        6797
+      ]
+    },
+    {
+      "content": "向特定 Web 应用的用户授予“所有者”权限。",
+      "pos": [
+        6933,
+        6956
+      ]
+    },
+    {
+      "content": "获取“所有者”角色的角色定义。检查允许的操作是否为你想要分配的操作。",
+      "pos": [
+        6960,
+        6994
+      ]
+    },
+    {
+      "content": "为用户创建角色分配。",
+      "pos": [
+        7030,
+        7040
+      ]
+    },
+    {
+      "content": "列出资源组的审核日志。",
+      "pos": [
+        7227,
+        7238
+      ]
+    },
+    {
+      "content": "若要获取资源组的审核日志，请运行 <bpt id=\"p1\">**</bpt>azure group log show<ept id=\"p1\">**</ept> 命令，并提供所需资源组的名称。",
+      "pos": [
+        7239,
+        7296
+      ]
+    },
+    {
+      "content": "如何使用 REST API",
+      "pos": [
+        7350,
+        7363
+      ]
+    },
+    {
+      "pos": [
+        7364,
+        7510
+      ],
+      "content": "若要通过 Azure 资源管理器 REST API 管理基于角色的访问控制，必须在发送请求时设置常见标头和参数（包括身份验证令牌）。有关信息，请参阅<bpt id=\"p1\">[</bpt>常见参数和标头<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/dn906885.aspx)</ept>。"
+    },
+    {
+      "content": "若要发现支持的 api 版本，请运行：",
+      "pos": [
+        7515,
+        7534
+      ]
+    },
+    {
+      "pos": [
+        7633,
+        7667
+      ],
+      "content": "对于本主题，可以使用版本 <ph id=\"ph1\">`2014-10-01-preview`</ph>。"
+    },
+    {
+      "content": "创建角色分配",
+      "pos": [
+        7672,
+        7678
+      ]
+    },
+    {
+      "content": "获取可用的角色定义。",
+      "pos": [
+        7679,
+        7689
+      ]
+    },
+    {
+      "content": "创建角色分配。",
+      "pos": [
+        7842,
+        7849
+      ]
+    },
+    {
+      "content": "删除角色分配",
+      "pos": [
+        8327,
+        8333
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        8517,
+        8521
+      ]
+    },
+    {
+      "pos": [
+        8525,
+        8763
+      ],
+      "content": "若要了解有关使用服务主体管理订阅中的应用程序的访问权限的详细信息，请参阅<bpt id=\"p1\">[</bpt>通过 Azure 资源管理器对服务主体进行身份验证<ept id=\"p1\">](/documentation/articles/resource-group-authenticate-service-principal)</ept>和<bpt id=\"p2\">[</bpt>使用 Azure 经典门户创建新的 Azure 服务主体<ept id=\"p2\">](/documentation/articles/resource-group-create-service-principal-portal)</ept>。"
+    },
+    {
+      "pos": [
+        8766,
+        8851
+      ],
+      "content": "若要了解有关组织中的审核操作的详细信息，请参阅<bpt id=\"p1\">[</bpt>使用资源管理器执行审核操作<ept id=\"p1\">](/documentation/articles/resource-group-audit)</ept>。"
+    },
+    {
+      "pos": [
+        8854,
+        8951
+      ],
+      "content": "你可以使用自定义策略对订阅应用限制和约定。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>使用策略来管理资源和控制访问<ept id=\"p1\">](/documentation/articles/resource-manager-policy)</ept>。"
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"管理对资源的访问权限\"\n   description=\"使用基于角色的访问控制 (RBAC) 来管理用户对 Azure 中部署的资源的权限。\"\n   services=\"azure-resource-manager\"\n   documentationCenter=\"na\"\n   authors=\"tfitzmac\"\n   manager=\"wpickett\"\n   editor=\"\"/>\n\n<tags\n   ms.service=\"azure-resource-manager\"\n   ms.date=\"10/28/2015\"\n   wacn.date=\"01/21/2016\"/>\n\n# 管理对资源的访问权限\n\n使用 Azure 资源管理器可以确保组织中的用户拥有用于管理或访问资源的适当权限。资源管理器利用基于角色的访问控制 (RBAC)，因此，你可以轻松地向各个资源或资源组应用安全策略。例如，可以授予用户访问订阅中特定虚拟机的权限，允许用户管理订阅中的所有 Web 应用，但但不允许管理其他资源。\n\n本主题重点介绍用于分配角色和权限的命令。有关基于角色的访问控制的概述，请参阅 [Azure 门户中基于角色的访问控制](/documentation/articles/role-based-access-control-configure)。\n\n## 概念\n\n对于基于角色的访问控制，你需要了解几个重要概念：\n\n1. 主体 - 被授予权限的实体，例如用户、安全组或应用程序。\n2. 角色 - 允许的操作集\n3. 范围 - 角色应用到的级别，例如订阅、资源组或资源。\n3. 角色分配 - 将主体添加到角色并设置范围的过程。\n\n## 角色示例：\n为了理解 RBAC 的概念，让我们探讨常见角色定义的一些示例：\n\n| 角色 | 允许的操作 |\n| ------- | ----------------- |\n| 读取器 | **/read（读取任何内容）|\n| 所有者 | *（读取/写入任何内容）|\n\n若要将“读取者”角色分配给名为 **ExampleGroup** 的资源组的“用户 A”，并将“所有者”角色分配给整个订阅的“用户 B”，请进行以下分配：\n\n| 角色 | 主体 | 范围 |\n| --------|-------------|---------- |\n| 读取器 | 用户 A | /subscriptions/{subscriptionId}/resourceGroups/examplegroup |\n| 所有者 | 用户 B | /subscriptions/{subscriptionId} |\n\n## 示例方案\n\n在本主题中，你将了解如何通过 Azure PowerShell、适用于 Mac、Linux 和 Windows 的 Azure CLI 以及 REST API 执行以下常见方案。\n\n1. 查看订阅中的可用角色，以及允许这些角色执行的操作。\n2. 向整个订阅中某个组的成员授予“读取者”权限。\n3. 向某个应用程序授予“参与者”权限，以允许该应用程序管理资源组中的资源。\n4. 向单个用户授予对特定 Web 应用的“所有者”权限。\n5. 列出资源组的审核日志。\n\n\n## 如何使用 PowerShell 管理访问权限\n\n[AZURE.INCLUDE [powershell-preview-inline-include](../includes/powershell-preview-inline-include.md)]\n\n\n### 查看可用角色\n若要查看订阅的所有可用角色，请运行 **Get-AzureRmRoleDefinition** 命令。\n\n    PS C:\\> Get-AzureRmRoleDefinition\n    \n    Name             : API Management Service Contributor\n    Id               : /subscriptions/{subscription-id}/providers/Microsoft.Authorization/roleDefinitions/{guid}\n    IsCustom         : False\n    Description      : Lets you manage API Management services, but not access to them.\n    Actions          : {Microsoft.ApiManagement/Services/*, Microsoft.Authorization/*/read,\n                       Microsoft.Resources/subscriptions/resourceGroups/read,\n                       Microsoft.Resources/subscriptions/resourceGroups/resources/read...}\n    NotActions       : {}\n    AssignableScopes : {/}\n\n    Name             : Application Insights Component Contributor\n    Id               : /subscriptions/{subscription-id}/providers/Microsoft.Authorization/roleDefinitions/{guid}\n    IsCustom         : False\n    Description      : Lets you manage Application Insights components, but not access to them.\n    Actions          : {Microsoft.Insights/components/*, Microsoft.Insights/webtests/*, Microsoft.Authorization/*/read,\n                       Microsoft.Resources/subscriptions/resourceGroups/read...}\n    NotActions       : {}\n    AssignableScopes : {/}\n    ...\n\n### 向订阅的某个组授予“读取者”权限。\n1. 在运行 **Get-AzureRmRoleDefinition** 命令时提供角色名称，以查看相应的“读者”角色定义。检查允许的操作是否为你想要分配的操作。\n\n        PS C:\\> Get-AzureRmRoleDefinition Reader\n   \n        Name             : Reader\n        Id               : /subscriptions/{subscription-id}/providers/Microsoft.Authorization/roleDefinitions/{guid}\n        IsCustom         : False\n        Description      : Lets you view everything, but not make any changes.\n        Actions          : {*/read}\n        NotActions       : {}\n        AssignableScopes : {/}\n\n2. 通过运行 **Get-AzureRmADGroup** 命令获取所需的安全组。提供该组在订阅中的实际名称。下面显示了 ExampleAuditorGroup。\n\n        PS C:\\> $group = Get-AzureRmAdGroup -SearchString ExampleAuditorGroup\n\n3. 为审核员安全组创建角色分配。当命令完成时，将返回新的角色分配。\n\n        PS C:\\> New-AzureRmRoleAssignment -ObjectId $group.Id -Scope /subscriptions/{subscriptionId}/ -RoleDefinitionName Reader\n\n\n###向资源组的应用程序授予“参与者”权限。\n1. 在运行 **Get-AzureRmRoleDefinition** 命令时提供角色名称，以查看相应的“参与者”角色定义。检查允许的操作是否为你想要分配的操作。\n\n        PS C:\\> Get-AzureRmRoleDefinition Contributor\n\n2. 运行 **Get-AzureRmADServicePrincipal** 命令并提供订阅中应用程序的名称，以获取服务主体对象 ID。下面显示了 ExampleApplication。\n\n        PS C:\\> $service = Get-AzureRmADServicePrincipal -SearchString ExampleApplicationName\n\n3. 通过运行 **New-AzureRmRoleAssignment** 命令为服务主体创建角色分配。\n\n        PS C:\\> New-AzureRmRoleAssignment -ObjectId $service.Id -ResourceGroupName ExampleGroupName -RoleDefinitionName Contributor\n\n有关设置 Azure Active Directory 应用程序和服务主体的更全面说明，请参阅[使用 Azure 资源管理器对服务主体进行身份验证](/documentation/articles/resource-group-authenticate-service-principal)。\n\n###向资源的用户授予“所有者”权限。\n1. 在运行 **Get-AzureRmRoleDefinition** 命令时提供角色名称，以查看相应的“所有者”角色定义。检查允许的操作是否为你想要分配的操作。\n\n        PS C:\\> Get-AzureRmRoleDefinition Owner\n\n2. 为用户创建角色分配。\n\n        PS C:\\> New-AzureRmRoleAssignment -UserPrincipalName \"someone@example.com\" -ResourceGroupName {groupName} -ResourceType \"Microsoft.Web/sites\" -ResourceName \"mysite\" -RoleDefinitionName Owner\n\n\n###列出资源组的审核日志。\n若要获取资源组的审核日志，请运行 **Get AzureRmLog** 命令（对于 Azure PowerShell 1.0 预览版之前的版本，运行 **Get-AzureResourceGroupLog**）。\n\n      PS C:\\> Get-AzureRmLog -ResourceGroup ExampleGroupName\n\n## 如何使用适用于 Mac、Linux 和 Windows 的 Azure CLI\n\n如果你未安装适用于 Mac、Linux 和 Windows 的 Azure CLI，或者没有配置要与 Azure CLI 配合使用的组织帐户，请参阅[安装和配置 Azure CLI](/documentation/articles/xplat-cli-install)。\n\n1. 使用你的凭据登录到 Azure 帐户。该命令将返回登录的结果。\n\n        azure login -e AzureChinaCloud -u <username> -p <password>\n\n        ...\n        info:    login command OK\n\n2. 如果你有多个订阅，请提供要用于部署的订阅 ID。\n\n        azure account set <YourSubscriptionNameOrId>\n\n3. 切换到 Azure 资源管理器模块。你将收到新模式确认。\n\n        azure config mode arm\n        \n        info:     New mode is arm\n\n### 查看可用角色\n查看订阅的所有可用角色。将返回角色定义的列表。\n\n    azure role list\n\n### 向订阅的某个组授予“读取者”权限。\n1. 获取“读取者”角色的角色定义。检查允许的操作是否为你想要分配的操作。\n\n        azure role show Reader\n        \n        info:    Executing command role show\n        + Getting role definitions\n        data:    Name    Actions  NotActions\n        data:    ------  -------  ----------\n        data:    Reader  */read\n        info:    role show command OK\n\n2. 通过根据名称搜索组，获取所需的安全组及其 objectId。以下示例显示了 ExampleAuditorGroup。\n\n        azure ad group show --search ExampleAuditorGroup\n        \n        info:    Executing command ad group show\n        + Getting group list\n        data:    Display Name:      ExampleAuditorGroup\n        data:    ObjectId:          1c272299-9729-462a-8d52-7efe5ece0c5c\n        data:    Security Enabled:  true\n        data:    Mail Enabled:\n        data:\n        info:    ad group show command OK\n\n3. 为安全组创建角色分配。\n\n        azure role assignment create --objectId {group-object-id} -o Reader -c /subscriptions/{subscriptionId}/\n        \n        info:    Executing command role assignment create\n        + Getting role definition id\n        + Creating role assignment\n        info:    role assignment create command OK\n\n\n### 向资源组的应用程序授予“参与者”权限。\n1. 获取“参与者”角色的角色定义。检查允许的操作是否为你想要分配的操作。\n\n        azure role show Contributor\n\n2. 获取应用程序的 ObjectId。提供要检索的应用程序的名称。\n\n        azure ad sp show --search ExampleApplicationName\n\n2. 为应用程序创建角色分配。\n\n        azure role assignment create --ObjectId {service-principal-object-id} -o Contributor -c /subscriptions/{subscriptionId}/\n\n\n###向特定 Web 应用的用户授予“所有者”权限。\n1. 获取“所有者”角色的角色定义。检查允许的操作是否为你想要分配的操作。\n\n        azure role show Owner\n\n2. 为用户创建角色分配。\n\n        azure role assignment create --mail \"someone@example.com\" -o Owner -c /subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.Web/sites/{mySiteName}\n\n\n###列出资源组的审核日志。\n若要获取资源组的审核日志，请运行 **azure group log show** 命令，并提供所需资源组的名称。\n\n         azure group log show ExampleGroupName\n\n\n## 如何使用 REST API\n若要通过 Azure 资源管理器 REST API 管理基于角色的访问控制，必须在发送请求时设置常见标头和参数（包括身份验证令牌）。有关信息，请参阅[常见参数和标头](https://msdn.microsoft.com/zh-cn/library/azure/dn906885.aspx)。\n   \n若要发现支持的 api 版本，请运行：\n\n      GET https://management.azure.com/providers/Microsoft.Authorization?api-version=2015-01-01\n\n对于本主题，可以使用版本 `2014-10-01-preview`。\n\n###创建角色分配\n获取可用的角色定义。\n\n    GET https://management.azure.com/subscriptions/{subscription-id}/providers/Microsoft.Authorization/roleDefinitions?api-version=2014-10-01-preview\n\n创建角色分配。\n\n    PUT https://management.azure.com/subscriptions/{subscription-id}/providers/Microsoft.Authorization/roleAssignments/{role-assignment-id}?api-version=2014-10-01-preview\n    {\n      \"properties\": {\n          \"roleDefinitionId\": \"/subscriptions/{subscription-id}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c\",\n          \"principalId\": \"{principal-object-id}\",\n          \"scope\": \"/subscriptions/{subscription-id}\"\n       }\n    }\n\n\n###删除角色分配\n\n      Delete  https://management.azure.com/subscriptions/{subscription-id}/providers/Microsoft.Authorization/roleAssignments/{role-assignment-id}?api-version=2014-10-01-preview\n\n\n## 后续步骤\n\n- 若要了解有关使用服务主体管理订阅中的应用程序的访问权限的详细信息，请参阅[通过 Azure 资源管理器对服务主体进行身份验证](/documentation/articles/resource-group-authenticate-service-principal)和[使用 Azure 经典门户创建新的 Azure 服务主体](/documentation/articles/resource-group-create-service-principal-portal)。\n- 若要了解有关组织中的审核操作的详细信息，请参阅[使用资源管理器执行审核操作](/documentation/articles/resource-group-audit)。\n- 你可以使用自定义策略对订阅应用限制和约定。有关详细信息，请参阅[使用策略来管理资源和控制访问](/documentation/articles/resource-manager-policy)。\n\n \n\n<!---HONumber=Mooncake_1207_2015-->"
+}

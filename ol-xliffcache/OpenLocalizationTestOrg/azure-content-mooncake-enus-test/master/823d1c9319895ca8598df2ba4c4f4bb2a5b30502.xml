@@ -1,0 +1,579 @@
+{
+  "nodes": [
+    {
+      "content": "使用 Azure PowerShell 创建 Linux VM | Azure",
+      "pos": [
+        27,
+        66
+      ]
+    },
+    {
+      "content": "了解如何使用 Azure PowerShell 创建和预配置 Linux VM。",
+      "pos": [
+        85,
+        125
+      ]
+    },
+    {
+      "content": "使用 Azure PowerShell 创建和预配置 Linux 虚拟机",
+      "pos": [
+        378,
+        414
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        418,
+        434
+      ]
+    },
+    {
+      "content": "PowerShell",
+      "pos": [
+        438,
+        448
+      ]
+    },
+    {
+      "pos": [
+        527,
+        613
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]"
+    },
+    {
+      "content": "下列步骤演示如何通过使用填空方法创建 Azure PowerShell 命令集来创建 Linux 虚拟机。如果你不熟悉 Azure PowerShell 或只想知道为成功的配置指定什么值，则此方法很有用。",
+      "pos": [
+        616,
+        718
+      ]
+    },
+    {
+      "pos": [
+        720,
+        817
+      ],
+      "content": "你将通过将几组命令块复制到文本文件或 PowerShell ISE 中，然后填写变量值并删除 &lt; and &gt; 字符来生成命令集。请参阅本文末尾的两个<bpt id=\"p1\">[</bpt>示例<ept id=\"p1\">](#examples)</ept>，了解最终结果。"
+    },
+    {
+      "pos": [
+        819,
+        962
+      ],
+      "content": "有关基于 Windows 的虚拟机的配套主题，请参阅<bpt id=\"p1\">[</bpt>使用 Azure PowerShell 创建基于 Windows 的虚拟机<ept id=\"p1\">](/documentation/articles/virtual-machines-ps-create-preconfigure-windows-vms)</ept>。"
+    },
+    {
+      "content": "安装 Azure PowerShell",
+      "pos": [
+        967,
+        986
+      ]
+    },
+    {
+      "pos": [
+        988,
+        1105
+      ],
+      "content": "如果你尚未安装，请<bpt id=\"p1\">[</bpt>安装并配置 Azure PowerShell<ept id=\"p1\">](/documentation/articles/powershell-install-configure)</ept>。然后，打开 Azure PowerShell 命令提示符。"
+    },
+    {
+      "content": "设置订阅和存储帐户",
+      "pos": [
+        1110,
+        1119
+      ]
+    },
+    {
+      "content": "通过在 Azure PowerShell 命令提示符下运行以下命令设置你的 Azure 订阅和存储帐户。",
+      "pos": [
+        1121,
+        1173
+      ]
+    },
+    {
+      "pos": [
+        1175,
+        1245
+      ],
+      "content": "你可以从 <bpt id=\"p1\">**</bpt>Get-AzureSubscription<ept id=\"p1\">**</ept> 命令输出的 <bpt id=\"p2\">**</bpt>SubscriptionName<ept id=\"p2\">**</ept> 属性获取相应的订阅名称。"
+    },
+    {
+      "pos": [
+        1247,
+        1342
+      ],
+      "content": "发出 Select-AzureSubscription 命令后，你可以从 <bpt id=\"p1\">**</bpt>Get-AzureStorageAccount<ept id=\"p1\">**</ept> 命令输出的 <bpt id=\"p2\">**</bpt>Label<ept id=\"p2\">**</ept> 属性获取相应的存储帐户名称。"
+    },
+    {
+      "content": "将引号内的所有内容（包括 &lt; and &gt; 字符）替换为相应的名称。",
+      "pos": [
+        1344,
+        1377
+      ]
+    },
+    {
+      "content": "找到你要使用的映像",
+      "pos": [
+        1641,
+        1650
+      ]
+    },
+    {
+      "content": "接下来，你需要确定要使用的映像的 ImageFamily 值。你可以使用以下命令获取可用 ImageFamily 值的列表。",
+      "pos": [
+        1652,
+        1714
+      ]
+    },
+    {
+      "content": "下面是基于 Linux 的计算机的 ImageFamily 值的一些示例：",
+      "pos": [
+        1767,
+        1804
+      ]
+    },
+    {
+      "content": "Ubuntu Server 12.10",
+      "pos": [
+        1808,
+        1827
+      ]
+    },
+    {
+      "content": "CoreOS Alpha",
+      "pos": [
+        1830,
+        1842
+      ]
+    },
+    {
+      "content": "SUSE Linux Enterprise Server 12",
+      "pos": [
+        1845,
+        1876
+      ]
+    },
+    {
+      "content": "打开所选文本编辑器的一个新实例或 PowerShell 集成脚本环境 (ISE) 的一个实例。将以下内容复制到新的文本文件或 PowerShell ISE，并替换 ImageFamily 值。",
+      "pos": [
+        1878,
+        1974
+      ]
+    },
+    {
+      "content": "指定名称、大小和（可选）可用性集",
+      "pos": [
+        2158,
+        2174
+      ]
+    },
+    {
+      "content": "通过选择这两个命令块之一启动命令集（必需）。",
+      "pos": [
+        2176,
+        2198
+      ]
+    },
+    {
+      "pos": [
+        2200,
+        2220
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>选项 1<ept id=\"p1\">**</ept>：指定虚拟机名称和大小。"
+    },
+    {
+      "pos": [
+        2415,
+        2439
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>选项 2<ept id=\"p1\">**</ept>：指定名称、大小和可用性集名称。"
+    },
+    {
+      "pos": [
+        2692,
+        2811
+      ],
+      "content": "有关 D、DS 或 G 系列虚拟机的 InstanceSize 值，请参阅 <bpt id=\"p1\">[</bpt>Azure 的虚拟机和云服务大小<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/dn197896.aspx)</ept>。"
+    },
+    {
+      "content": "设置用户访问安全选项",
+      "pos": [
+        2817,
+        2827
+      ]
+    },
+    {
+      "pos": [
+        2829,
+        2963
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>选项 1<ept id=\"p1\">**</ept>：指定初始 Linux 用户名和密码（必需）。选择一个强密码。若要检查其强度，请参阅<bpt id=\"p2\">[</bpt>密码检查器：使用强密码<ept id=\"p2\">](https://www.microsoft.com/security/pc-security/password-checker.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        3202,
+        3232
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>选项 2<ept id=\"p1\">**</ept>：指定一组已在订阅中部署的 SSH 密钥对。"
+    },
+    {
+      "pos": [
+        3312,
+        3410
+      ],
+      "content": "有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何在 Azure 中将 SSH 用于 Linux<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-use-ssh-key)</ept>。"
+    },
+    {
+      "pos": [
+        3412,
+        3442
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>选项 3<ept id=\"p1\">**</ept>：指定已在订阅中部署的 SSH 公钥的列表。"
+    },
+    {
+      "pos": [
+        3527,
+        3666
+      ],
+      "content": "有关基于 Linux 的虚拟机的其他预配置选项，请参阅 <bpt id=\"p1\">[</bpt>Add-AzureProvisioningConfig<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/dn495299.aspx)</ept> 中 <bpt id=\"p2\">**</bpt>Linux<ept id=\"p2\">**</ept> 参数集的语法。"
+    },
+    {
+      "content": "可选：分配一个静态 DIP",
+      "pos": [
+        3672,
+        3685
+      ]
+    },
+    {
+      "content": "（可选）为虚拟机分配一个特定 IP 地址（称为静态 DIP）。",
+      "pos": [
+        3687,
+        3718
+      ]
+    },
+    {
+      "content": "可以使用以下命令来验证特定 IP 地址是否可用。",
+      "pos": [
+        3778,
+        3802
+      ]
+    },
+    {
+      "content": "可选：将虚拟机分配到特定子网",
+      "pos": [
+        3881,
+        3895
+      ]
+    },
+    {
+      "content": "将虚拟机分配到 Azure 虚拟网络中的特定子网。",
+      "pos": [
+        3898,
+        3923
+      ]
+    },
+    {
+      "content": "可选：添加数据磁盘",
+      "pos": [
+        3997,
+        4006
+      ]
+    },
+    {
+      "content": "将以下代码添加到命令集以将数据磁盘添加到虚拟机。",
+      "pos": [
+        4012,
+        4036
+      ]
+    },
+    {
+      "content": "可选：将虚拟机添加到现有负载平衡集",
+      "pos": [
+        4347,
+        4364
+      ]
+    },
+    {
+      "content": "将以下代码添加到命令集以将虚拟机添加到用于外部流量的现有负载平衡集。",
+      "pos": [
+        4367,
+        4401
+      ]
+    },
+    {
+      "content": "决定如何启动虚拟机创建过程",
+      "pos": [
+        4996,
+        5009
+      ]
+    },
+    {
+      "content": "通过选择以下命令块之一将命令块添加到命令集以启动虚拟机创建过程。",
+      "pos": [
+        5012,
+        5044
+      ]
+    },
+    {
+      "pos": [
+        5046,
+        5068
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>选项 1<ept id=\"p1\">**</ept>：在现有云服务中创建虚拟机。"
+    },
+    {
+      "content": "云服务的短名称是在 Azure 门户的 Azure 云服务列表中或 Azure 门户的资源组列表中显示的名称。",
+      "pos": [
+        5146,
+        5201
+      ]
+    },
+    {
+      "pos": [
+        5203,
+        5231
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>选项 2<ept id=\"p1\">**</ept>：在现有的云服务和虚拟网络中创建虚拟机。"
+    },
+    {
+      "content": "运行命令集",
+      "pos": [
+        5400,
+        5405
+      ]
+    },
+    {
+      "content": "复查你在文本编辑器或 PowerShell ISE 中生成的 Azure PowerShell 命令集并确保你指定了所有变量，并且它们具有正确的值。另请确保你已删除所有 &lt; and &gt; 字符。",
+      "pos": [
+        5407,
+        5503
+      ]
+    },
+    {
+      "content": "将该命令集复制到剪贴板，然后右键单击打开的 Azure PowerShell 命令提示符。这将发出作为一系列 PowerShell 命令的命令集，并创建 Azure 虚拟机。",
+      "pos": [
+        5505,
+        5592
+      ]
+    },
+    {
+      "pos": [
+        5594,
+        5687
+      ],
+      "content": "创建虚拟机后，请参阅<bpt id=\"p1\">[</bpt>如何登录到运行 Linux 的虚拟机<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-how-to-log-on)</ept>。"
+    },
+    {
+      "content": "如果要重复使用此命令集，你可以：",
+      "pos": [
+        5689,
+        5705
+      ]
+    },
+    {
+      "content": "将此命令集保存为 PowerShell 脚本文件 (*.ps1)",
+      "pos": [
+        5709,
+        5741
+      ]
+    },
+    {
+      "content": "在 Azure 门户的“自动化”部分中将此命令集保存为 Azure Automation Runbook",
+      "pos": [
+        5744,
+        5796
+      ]
+    },
+    {
+      "pos": [
+        5801,
+        5824
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"examples\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>示例"
+    },
+    {
+      "content": "以下是使用上述步骤生成 Azure PowerShell 命令集以在 Azure 中创建基于 Linux 的虚拟机的两个示例。",
+      "pos": [
+        5826,
+        5889
+      ]
+    },
+    {
+      "content": "示例 1",
+      "pos": [
+        5895,
+        5899
+      ]
+    },
+    {
+      "content": "我需要 PowerShell 命令集来为 MySQL 服务器创建满足以下条件的初始 Linux 虚拟机：",
+      "pos": [
+        5901,
+        5953
+      ]
+    },
+    {
+      "content": "使用 Ubuntu Server 12.10 映像。",
+      "pos": [
+        5957,
+        5983
+      ]
+    },
+    {
+      "content": "具有名称 AZMYSQL1。",
+      "pos": [
+        5986,
+        6000
+      ]
+    },
+    {
+      "content": "具有 500 GB 的附加数据磁盘。",
+      "pos": [
+        6003,
+        6021
+      ]
+    },
+    {
+      "content": "具有静态 IP 地址 192.168.244.4。",
+      "pos": [
+        6024,
+        6049
+      ]
+    },
+    {
+      "content": "位于 AZDatacenter 虚拟网络的 BackEnd 子网中。",
+      "pos": [
+        6052,
+        6086
+      ]
+    },
+    {
+      "content": "位于 Azure-TailspinToys 云服务中。",
+      "pos": [
+        6089,
+        6116
+      ]
+    },
+    {
+      "content": "下面是用于创建此虚拟机的相应 Azure PowerShell 命令集，为了便于阅读，每个程序块之间留有空行。",
+      "pos": [
+        6118,
+        6173
+      ]
+    },
+    {
+      "content": "示例 2",
+      "pos": [
+        7159,
+        7163
+      ]
+    },
+    {
+      "content": "我需要 PowerShell 命令集来为 Apache 服务器创建满足以下条件的 Linux 虚拟机：",
+      "pos": [
+        7165,
+        7216
+      ]
+    },
+    {
+      "content": "使用 SUSE Linux Enterprise Server 12 映像。",
+      "pos": [
+        7220,
+        7258
+      ]
+    },
+    {
+      "content": "具有名称 LOB1。",
+      "pos": [
+        7261,
+        7271
+      ]
+    },
+    {
+      "content": "具有 50 GB 的附加数据磁盘。",
+      "pos": [
+        7274,
+        7291
+      ]
+    },
+    {
+      "content": "是用于标准 Web 流量的 LOBServers 负载平衡器集的成员。",
+      "pos": [
+        7294,
+        7329
+      ]
+    },
+    {
+      "content": "位于 AZDatacenter 虚拟网络的 FrontEnd 子网中。",
+      "pos": [
+        7332,
+        7367
+      ]
+    },
+    {
+      "content": "位于 Azure-TailspinToys 云服务中。",
+      "pos": [
+        7370,
+        7397
+      ]
+    },
+    {
+      "content": "下面是用于创建此虚拟机的相应 Azure PowerShell 命令集。",
+      "pos": [
+        7399,
+        7435
+      ]
+    },
+    {
+      "content": "其他资源",
+      "pos": [
+        8742,
+        8746
+      ]
+    },
+    {
+      "content": "虚拟机文档",
+      "pos": [
+        8749,
+        8754
+      ]
+    },
+    {
+      "content": "Azure 虚拟机常见问题",
+      "pos": [
+        8801,
+        8814
+      ]
+    },
+    {
+      "content": "Azure 虚拟机概述",
+      "pos": [
+        8870,
+        8881
+      ]
+    },
+    {
+      "content": "如何安装和配置 Azure PowerShell",
+      "pos": [
+        8934,
+        8958
+      ]
+    },
+    {
+      "content": "如何登录到运行 Linux 的虚拟机",
+      "pos": [
+        9016,
+        9034
+      ]
+    },
+    {
+      "content": "使用 Azure PowerShell 创建和预配置基于 Windows 的虚拟机",
+      "pos": [
+        9100,
+        9141
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"使用 Azure PowerShell 创建 Linux VM | Azure\"\n    description=\"了解如何使用 Azure PowerShell 创建和预配置 Linux VM。\"\n    services=\"virtual-machines\"\n    documentationCenter=\"\"\n    authors=\"cynthn\"\n    manager=\"timlt\"\n    editor=\"\"\n    tags=\"azure-service-management\"/>\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"11/11/2015\"\n    wacn.date=\"12/31/2015\"/>\n\n\n# 使用 Azure PowerShell 创建和预配置 Linux 虚拟机\n\n> [AZURE.SELECTOR]\n- [PowerShell](/documentation/articles/virtual-machines-ps-create-preconfigure-linux-vms)\n\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]\n \n下列步骤演示如何通过使用填空方法创建 Azure PowerShell 命令集来创建 Linux 虚拟机。如果你不熟悉 Azure PowerShell 或只想知道为成功的配置指定什么值，则此方法很有用。\n\n你将通过将几组命令块复制到文本文件或 PowerShell ISE 中，然后填写变量值并删除 < and > 字符来生成命令集。请参阅本文末尾的两个[示例](#examples)，了解最终结果。\n\n有关基于 Windows 的虚拟机的配套主题，请参阅[使用 Azure PowerShell 创建基于 Windows 的虚拟机](/documentation/articles/virtual-machines-ps-create-preconfigure-windows-vms)。\n\n## 安装 Azure PowerShell\n\n如果你尚未安装，请[安装并配置 Azure PowerShell](/documentation/articles/powershell-install-configure)。然后，打开 Azure PowerShell 命令提示符。\n\n## 设置订阅和存储帐户\n\n通过在 Azure PowerShell 命令提示符下运行以下命令设置你的 Azure 订阅和存储帐户。\n\n你可以从 **Get-AzureSubscription** 命令输出的 **SubscriptionName** 属性获取相应的订阅名称。\n\n发出 Select-AzureSubscription 命令后，你可以从 **Get-AzureStorageAccount** 命令输出的 **Label** 属性获取相应的存储帐户名称。\n\n将引号内的所有内容（包括 < and > 字符）替换为相应的名称。\n\n    $subscr=\"<subscription name>\"\n    $staccount=\"<storage account name>\"\n    Select-AzureSubscription -SubscriptionName $subscr –Current\n    Set-AzureSubscription -Environment AzureChinaCloud -SubscriptionName $subscr -CurrentStorageAccountName $staccount\n\n\n## 找到你要使用的映像\n\n接下来，你需要确定要使用的映像的 ImageFamily 值。你可以使用以下命令获取可用 ImageFamily 值的列表。\n\n    Get-AzureVMImage | select ImageFamily -Unique\n\n下面是基于 Linux 的计算机的 ImageFamily 值的一些示例：\n\n- Ubuntu Server 12.10\n- CoreOS Alpha\n- SUSE Linux Enterprise Server 12\n\n打开所选文本编辑器的一个新实例或 PowerShell 集成脚本环境 (ISE) 的一个实例。将以下内容复制到新的文本文件或 PowerShell ISE，并替换 ImageFamily 值。\n\n    $family=\"<ImageFamily value>\"\n    $image=Get-AzureVMImage | where { $_.ImageFamily -eq $family } | sort PublishedDate -Descending | select -ExpandProperty ImageName -First 1\n\n## 指定名称、大小和（可选）可用性集\n\n通过选择这两个命令块之一启动命令集（必需）。\n\n**选项 1**：指定虚拟机名称和大小。\n\n    $vmname=\"<machine name>\"\n    $vmsize=\"<Specify one: Small, Medium, Large, ExtraLarge, A5, A6, A7, A8, A9>\"\n    $vm1=New-AzureVMConfig -Name $vmname -InstanceSize $vmsize -ImageName $image\n\n**选项 2**：指定名称、大小和可用性集名称。\n\n    $vmname=\"<machine name>\"\n    $vmsize=\"<Specify one: Small, Medium, Large, ExtraLarge, A5, A6, A7, A8, A9>\"\n    $availset=\"<set name>\"\n    $vm1=New-AzureVMConfig -Name $vmname -InstanceSize $vmsize -ImageName $image -AvailabilitySetName $availset\n\n有关 D、DS 或 G 系列虚拟机的 InstanceSize 值，请参阅 [Azure 的虚拟机和云服务大小](https://msdn.microsoft.com/zh-cn/library/azure/dn197896.aspx)。\n\n\n## 设置用户访问安全选项\n\n**选项 1**：指定初始 Linux 用户名和密码（必需）。选择一个强密码。若要检查其强度，请参阅[密码检查器：使用强密码](https://www.microsoft.com/security/pc-security/password-checker.aspx)。\n\n    $cred=Get-Credential -Message \"Type the name and password of the initial Linux account.\"\n    $vm1 | Add-AzureProvisioningConfig -Linux -LinuxUser $cred.GetNetworkCredential().Username -Password $cred.GetNetworkCredential().Password\n\n**选项 2**：指定一组已在订阅中部署的 SSH 密钥对。\n\n    $vm1 | Add-AzureProvisioningConfig -Linux -SSHKeyPairs \"<SSH key pairs>\"\n\n有关详细信息，请参阅[如何在 Azure 中将 SSH 用于 Linux](/documentation/articles/virtual-machines-linux-use-ssh-key)。\n\n**选项 3**：指定已在订阅中部署的 SSH 公钥的列表。\n\n    $vm1 | Add-AzureProvisioningConfig -Linux - SSHPublicKeys \"<SSH public keys>\"\n\n有关基于 Linux 的虚拟机的其他预配置选项，请参阅 [Add-AzureProvisioningConfig](https://msdn.microsoft.com/zh-cn/library/azure/dn495299.aspx) 中 **Linux** 参数集的语法。\n\n\n## 可选：分配一个静态 DIP\n\n（可选）为虚拟机分配一个特定 IP 地址（称为静态 DIP）。\n\n    $vm1 | Set-AzureStaticVNetIP -IPAddress <IP address>\n\n可以使用以下命令来验证特定 IP 地址是否可用。\n\n    Test-AzureStaticVNetIP –VNetName <VNet name> –IPAddress <IP address>\n\n## 可选：将虚拟机分配到特定子网 \n\n将虚拟机分配到 Azure 虚拟网络中的特定子网。\n\n    $vm1 | Set-AzureSubnet -SubnetNames \"<name of the subnet>\"\n\n    \n## 可选：添加数据磁盘\n    \n将以下代码添加到命令集以将数据磁盘添加到虚拟机。\n\n    $disksize=<size of the disk in GB>\n    $disklabel=\"<the label on the disk>\"\n    $lun=<Logical Unit Number (LUN) of the disk>\n    $hcaching=\"<Specify one: ReadOnly, ReadWrite, None>\"\n    $vm1 | Add-AzureDataDisk -CreateNew -DiskSizeInGB $disksize -DiskLabel $disklabel -LUN $lun -HostCaching $hcaching\n\n## 可选：将虚拟机添加到现有负载平衡集 \n\n将以下代码添加到命令集以将虚拟机添加到用于外部流量的现有负载平衡集。\n\n    $prot=\"<Specify one: tcp, udp>\"\n    $localport=<port number of the internal port>\n    $pubport=<port number of the external port>\n    $endpointname=\"<name of the endpoint>\"\n    $lbsetname=\"<name of the existing load-balanced set>\"\n    $probeprotocol=\"<Specify one: tcp, http>\"\n    $probeport=<TCP or HTTP port number of probe traffic>\n    $probepath=\"<URL path for probe traffic>\"\n    $vm1 | Add-AzureEndpoint -Name $endpointname -Protocol $prot -LocalPort $localport -PublicPort $pubport -LBSetName $lbsetname -ProbeProtocol $probeprotocol -ProbePort $probeport -ProbePath $probepath\n\n## 决定如何启动虚拟机创建过程 \n\n通过选择以下命令块之一将命令块添加到命令集以启动虚拟机创建过程。\n\n**选项 1**：在现有云服务中创建虚拟机。\n\n    New-AzureVM –ServiceName \"<short name of the cloud service>\" -VMs $vm1\n\n云服务的短名称是在 Azure 门户的 Azure 云服务列表中或 Azure 门户的资源组列表中显示的名称。\n\n**选项 2**：在现有的云服务和虚拟网络中创建虚拟机。\n\n    $svcname=\"<short name of the cloud service>\"\n    $vnetname=\"<name of the virtual network>\"\n    New-AzureVM –ServiceName $svcname -VMs $vm1 -VNetName $vnetname\n\n## 运行命令集\n\n复查你在文本编辑器或 PowerShell ISE 中生成的 Azure PowerShell 命令集并确保你指定了所有变量，并且它们具有正确的值。另请确保你已删除所有 < and > 字符。\n\n将该命令集复制到剪贴板，然后右键单击打开的 Azure PowerShell 命令提示符。这将发出作为一系列 PowerShell 命令的命令集，并创建 Azure 虚拟机。\n\n创建虚拟机后，请参阅[如何登录到运行 Linux 的虚拟机](/documentation/articles/virtual-machines-linux-how-to-log-on)。\n\n如果要重复使用此命令集，你可以：\n\n- 将此命令集保存为 PowerShell 脚本文件 (*.ps1)\n- 在 Azure 门户的“自动化”部分中将此命令集保存为 Azure Automation Runbook\n\n## <a id=\"examples\"></a>示例\n\n以下是使用上述步骤生成 Azure PowerShell 命令集以在 Azure 中创建基于 Linux 的虚拟机的两个示例。\n\n### 示例 1\n\n我需要 PowerShell 命令集来为 MySQL 服务器创建满足以下条件的初始 Linux 虚拟机：\n\n- 使用 Ubuntu Server 12.10 映像。\n- 具有名称 AZMYSQL1。\n- 具有 500 GB 的附加数据磁盘。\n- 具有静态 IP 地址 192.168.244.4。\n- 位于 AZDatacenter 虚拟网络的 BackEnd 子网中。\n- 位于 Azure-TailspinToys 云服务中。\n\n下面是用于创建此虚拟机的相应 Azure PowerShell 命令集，为了便于阅读，每个程序块之间留有空行。\n\n    $family=\"Ubuntu Server 12.10\"\n    $image=Get-AzureVMImage | where { $_.ImageFamily -eq $family } | sort PublishedDate -Descending | select -ExpandProperty ImageName -First 1\n\n    $vmname=\"AZMYSQL1\"\n    $vmsize=\"Large\"\n    $vm1=New-AzureVMConfig -Name $vmname -InstanceSize $vmsize -ImageName $image\n\n    $cred=Get-Credential -Message \"Type the name and password of the initial Linux account.\"\n    $vm1 | Add-AzureProvisioningConfig -Linux -LinuxUser $cred.GetNetworkCredential().Username -Password $cred.GetNetworkCredential().Password\n\n    $vm1 | Set-AzureSubnet -SubnetNames \"BackEnd\"\n\n    $vm1 | Set-AzureStaticVNetIP -IPAddress 192.168.244.4\n\n    $disksize=500\n    $disklabel=\"MySQLData\"\n    $lun=0\n    $hcaching=\"None\"\n    $vm1 | Add-AzureDataDisk -CreateNew -DiskSizeInGB $disksize -DiskLabel $disklabel -LUN $lun -HostCaching $hcaching\n\n    $svcname=\"Azure-TailspinToys\"\n    $vnetname=\"AZDatacenter\"\n    New-AzureVM –ServiceName $svcname -VMs $vm1 -VNetName $vnetname\n\n### 示例 2\n\n我需要 PowerShell 命令集来为 Apache 服务器创建满足以下条件的 Linux 虚拟机：\n\n- 使用 SUSE Linux Enterprise Server 12 映像。\n- 具有名称 LOB1。\n- 具有 50 GB 的附加数据磁盘。\n- 是用于标准 Web 流量的 LOBServers 负载平衡器集的成员。\n- 位于 AZDatacenter 虚拟网络的 FrontEnd 子网中。\n- 位于 Azure-TailspinToys 云服务中。\n\n下面是用于创建此虚拟机的相应 Azure PowerShell 命令集。\n\n    $family=\"SUSE Linux Enterprise Server 12\"\n    $image=Get-AzureVMImage | where { $_.ImageFamily -eq $family } | sort PublishedDate -Descending | select -ExpandProperty ImageName -First 1\n\n    $vmname=\"LOB1\"\n    $vmsize=\"Medium\"\n    $vm1=New-AzureVMConfig -Name $vmname -InstanceSize $vmsize -ImageName $image\n\n    $cred=Get-Credential -Message \"Type the name and password of the initial Linux account.\"\n    $vm1 | Add-AzureProvisioningConfig -Linux -LinuxUser $cred.GetNetworkCredential().Username -Password $cred.GetNetworkCredential().Password\n\n    $vm1 | Set-AzureSubnet -SubnetNames \"FrontEnd\"\n\n    $disksize=50\n    $disklabel=\"LOBApp\"\n    $lun=0\n    $hcaching=\"ReadWrite\"\n    $vm1 | Add-AzureDataDisk -CreateNew -DiskSizeInGB $disksize -DiskLabel $disklabel -LUN $lun -HostCaching $hcaching\n\n    $prot=\"tcp\"\n    $localport=80\n    $pubport=80\n    $endpointname=\"LOB1\"\n    $lbsetname=\"LOBServers\"\n    $probeprotocol=\"tcp\"\n    $probeport=80\n    $probepath=\"/\"\n    $vm1 | Add-AzureEndpoint -Name $endpointname -Protocol $prot -LocalPort $localport -PublicPort $pubport -LBSetName $lbsetname -ProbeProtocol $probeprotocol -ProbePort $probeport -ProbePath $probepath\n\n    $svcname=\"Azure-TailspinToys\"\n    $vnetname=\"AZDatacenter\"\n    New-AzureVM –ServiceName $svcname -VMs $vm1 -VNetName $vnetname\n\n## 其他资源\n\n[虚拟机文档](/documentation/services/virtual-machines/)\n\n[Azure 虚拟机常见问题](/documentation/articles/virtual-machines-questions)\n\n[Azure 虚拟机概述](/documentation/articles/virtual-machines-about/)\n\n[如何安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure)\n\n[如何登录到运行 Linux 的虚拟机](/documentation/articles/virtual-machines-linux-how-to-log-on)\n\n[使用 Azure PowerShell 创建和预配置基于 Windows 的虚拟机](/documentation/articles/virtual-machines-ps-create-preconfigure-windows-vms)\n\n<!---HONumber=Mooncake_1221_2015-->"
+}

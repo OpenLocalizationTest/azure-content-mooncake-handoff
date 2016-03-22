@@ -1,0 +1,355 @@
+{
+  "nodes": [
+    {
+      "content": "在 Azure 中创建和上载 SUSE Linux VHD",
+      "pos": [
+        27,
+        56
+      ]
+    },
+    {
+      "content": "了解如何创建和上载包含 SUSE Linux 操作系统的 Azure 虚拟硬盘 (VHD)。",
+      "pos": [
+        75,
+        121
+      ]
+    },
+    {
+      "content": "为 Azure 准备 SLES 或 openSUSE 虚拟机",
+      "pos": [
+        403,
+        433
+      ]
+    },
+    {
+      "pos": [
+        435,
+        518
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-both-include.md)</ept>]"
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        522,
+        526
+      ]
+    },
+    {
+      "pos": [
+        530,
+        695
+      ],
+      "content": "本文假定你已在虚拟硬盘中安装了 SUSE 或 openSUSE Linux 操作系统。存在多个用于创建 .vhd 文件的工具，例如 Hyper-V 等虚拟化解决方案。有关说明，请参阅<bpt id=\"p1\">[</bpt>安装 Hyper-V 角色和配置虚拟机<ept id=\"p1\">](http://technet.microsoft.com/library/hh846766.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        700,
+        868
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>SUSE Studio<ept id=\"p1\">](http://www.susestudio.com)</ept> 可以轻松地创建和管理 Azure 和 Hyper-V 的 SLES/openSUSE 映像。这是自定义你自己的 SUSE 和 openSUSE 映像的推荐方法。SUSE Studio 库中的以下正式映像可下载或克隆到你自己的 SUSE Studio 中："
+    },
+    {
+      "content": "SUSE Studio 库中的 SLES 11 SP3 for Azure",
+      "pos": [
+        875,
+        912
+      ]
+    },
+    {
+      "content": "SUSE Studio 库中的 openSUSE 13.1 for Azure",
+      "pos": [
+        981,
+        1020
+      ]
+    },
+    {
+      "pos": [
+        1091,
+        1205
+      ],
+      "content": "作为构建你自己的 VHD 的替代方法，SUSE 也会为 <bpt id=\"p1\">[</bpt>VMDepot<ept id=\"p1\">](https://vmdepot.msopentech.com/User/Show?user=1007)</ept> 中的 SLES 发布 BYOS（自带订阅）映像。"
+    },
+    {
+      "content": "SLES/openSUSE 安装说明",
+      "pos": [
+        1210,
+        1228
+      ]
+    },
+    {
+      "pos": [
+        1234,
+        1319
+      ],
+      "content": "Azure 不支持 VHDX 格式，仅支持<bpt id=\"p1\">**</bpt>固定大小的 VHD<ept id=\"p1\">**</ept>。可使用 Hyper-V 管理器或 convert-vhd cmdlet 将磁盘转换为 VHD 格式。"
+    },
+    {
+      "pos": [
+        1323,
+        1515
+      ],
+      "content": "在安装 Linux 系统时，建议使用标准分区而不是 LVM（通常是许多安装的默认值）。这将避免 LVM 与克隆 VM 发生名称冲突，特别是在 OS 磁盘需要连接到另一台 VM 以进行故障排除的情况下。如果首选，LVM 或 <bpt id=\"p1\">[</bpt>RAID<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-configure-raid)</ept> 可以在数据磁盘上使用。"
+    },
+    {
+      "content": "不要在操作系统磁盘上配置交换分区。可以配置 Linux 代理，以在临时资源磁盘上创建交换文件。可以在下面的步骤中找到有关此内容的详细信息。",
+      "pos": [
+        1519,
+        1588
+      ]
+    },
+    {
+      "content": "所有 VHD 的大小必须是 1 MB 的倍数。",
+      "pos": [
+        1592,
+        1615
+      ]
+    },
+    {
+      "content": "准备 SUSE Linux Enterprise Server 11 SP3",
+      "pos": [
+        1621,
+        1659
+      ]
+    },
+    {
+      "content": "在 Hyper-V 管理器的中间窗格中，选择虚拟机。",
+      "pos": [
+        1667,
+        1693
+      ]
+    },
+    {
+      "pos": [
+        1698,
+        1717
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“连接”<ept id=\"p1\">**</ept>以打开虚拟机窗口。"
+    },
+    {
+      "content": "注册 SUSE Linux Enterprise 系统以允许其下载更新并安装程序包。",
+      "pos": [
+        1722,
+        1764
+      ]
+    },
+    {
+      "content": "使用最新修补程序更新系统：",
+      "pos": [
+        1769,
+        1782
+      ]
+    },
+    {
+      "content": "从 SLES 存储库安装 Azure Linux 代理：",
+      "pos": [
+        1817,
+        1845
+      ]
+    },
+    {
+      "content": "在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开“/boot/grub/menu.lst”，并确保默认内核包含以下参数：",
+      "pos": [
+        1894,
+        1981
+      ]
+    },
+    {
+      "content": "这将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。",
+      "pos": [
+        2042,
+        2087
+      ]
+    },
+    {
+      "pos": [
+        2093,
+        2165
+      ],
+      "content": "建议编辑文件“/etc/sysconfig/network/dhcp”，并将 <ph id=\"ph1\">`DHCLIENT_SET_HOSTNAME`</ph> 参数更改为以下值："
+    },
+    {
+      "content": "在“/etc/sudoers”中，注释掉或删除以下行（如果存在）：",
+      "pos": [
+        2207,
+        2240
+      ]
+    },
+    {
+      "content": "请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。",
+      "pos": [
+        2418,
+        2455
+      ]
+    },
+    {
+      "content": "不要在操作系统磁盘上创建交换空间",
+      "pos": [
+        2461,
+        2477
+      ]
+    },
+    {
+      "pos": [
+        2483,
+        2628
+      ],
+      "content": "Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是<bpt id=\"p1\">*</bpt>临时<ept id=\"p1\">*</ept>磁盘，并可能在取消设置虚拟机时被清空。在安装 Azure Linux 代理（请参见前一步骤）后，相应地在 /etc/waagent.conf 中修改以下参数："
+    },
+    {
+      "content": "运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：",
+      "pos": [
+        2871,
+        2911
+      ]
+    },
+    {
+      "pos": [
+        3006,
+        3062
+      ],
+      "content": "在 Hyper-V 管理器中单击<bpt id=\"p1\">**</bpt>“操作”-&gt;“关闭”<ept id=\"p1\">**</ept>。Linux VHD 现已准备好上载到 Azure。"
+    },
+    {
+      "content": "准备 openSUSE 13.1+",
+      "pos": [
+        3080,
+        3097
+      ]
+    },
+    {
+      "content": "在 Hyper-V 管理器的中间窗格中，选择虚拟机",
+      "pos": [
+        3105,
+        3130
+      ]
+    },
+    {
+      "pos": [
+        3135,
+        3153
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“连接”<ept id=\"p1\">**</ept>以打开虚拟机窗口"
+    },
+    {
+      "pos": [
+        3158,
+        3219
+      ],
+      "content": "在 shell 上，运行命令“<ph id=\"ph1\">`zypper lr`</ph>”。如果此命令返回类似于以下内容的输出（请注意版本号可能会有所不同）："
+    },
+    {
+      "content": "则按预期配置存储库，不需要进行任何调整。",
+      "pos": [
+        3604,
+        3624
+      ]
+    },
+    {
+      "content": "如果该命令返回“未定义存储库...”，则使用以下命令来添加这些存储库：",
+      "pos": [
+        3630,
+        3665
+      ]
+    },
+    {
+      "pos": [
+        3978,
+        4044
+      ],
+      "content": "然后，可以通过再次运行命令“<ph id=\"ph1\">`zypper lr`</ph>”来验证已添加存储库。如果未启用某个相关的更新存储库，请使用以下命令启用该存储库："
+    },
+    {
+      "content": "将内核更新为可用的最新版本：",
+      "pos": [
+        4102,
+        4116
+      ]
+    },
+    {
+      "content": "或使用所有最新修补程序更新系统：",
+      "pos": [
+        4163,
+        4179
+      ]
+    },
+    {
+      "content": "安装 Azure Linux 代理",
+      "pos": [
+        4215,
+        4232
+      ]
+    },
+    {
+      "content": "在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开“/boot/grub/menu.lst”，并确保默认内核包含以下参数：",
+      "pos": [
+        4282,
+        4369
+      ]
+    },
+    {
+      "content": "这将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。此外，从内核引导行删除以下参数（如果它们存在）：",
+      "pos": [
+        4430,
+        4499
+      ]
+    },
+    {
+      "pos": [
+        4555,
+        4627
+      ],
+      "content": "建议编辑文件“/etc/sysconfig/network/dhcp”，并将 <ph id=\"ph1\">`DHCLIENT_SET_HOSTNAME`</ph> 参数更改为以下值："
+    },
+    {
+      "pos": [
+        4669,
+        4711
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>重要提示：<ept id=\"p1\">**</ept>在“/etc/sudoers”中，注释掉或删除以下行（如果存在）："
+    },
+    {
+      "content": "请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。",
+      "pos": [
+        4889,
+        4926
+      ]
+    },
+    {
+      "content": "不要在操作系统磁盘上创建交换空间",
+      "pos": [
+        4932,
+        4948
+      ]
+    },
+    {
+      "pos": [
+        4954,
+        5099
+      ],
+      "content": "Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是<bpt id=\"p1\">*</bpt>临时<ept id=\"p1\">*</ept>磁盘，并可能在取消设置虚拟机时被清空。在安装 Azure Linux 代理（请参见前一步骤）后，相应地在 /etc/waagent.conf 中修改以下参数："
+    },
+    {
+      "content": "运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：",
+      "pos": [
+        5342,
+        5382
+      ]
+    },
+    {
+      "content": "确保在启动时运行 Azure Linux 代理：",
+      "pos": [
+        5477,
+        5501
+      ]
+    },
+    {
+      "pos": [
+        5556,
+        5612
+      ],
+      "content": "在 Hyper-V 管理器中单击<bpt id=\"p1\">**</bpt>“操作”-&gt;“关闭”<ept id=\"p1\">**</ept>。Linux VHD 现已准备好上载到 Azure。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"在 Azure 中创建和上载 SUSE Linux VHD\"\n    description=\"了解如何创建和上载包含 SUSE Linux 操作系统的 Azure 虚拟硬盘 (VHD)。\"\n    services=\"virtual-machines\"\n    documentationCenter=\"\"\n    authors=\"szarkos\"\n    manager=\"timlt\"\n    editor=\"tysonn\"\n    tags=\"azure-resource-manager,azure-service-management\"/>\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"11/13/2015\"\n    wacn.date=\"12/17/2015\"/>\n\n# 为 Azure 准备 SLES 或 openSUSE 虚拟机\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-both-include.md)]\n\n##先决条件##\n\n本文假定你已在虚拟硬盘中安装了 SUSE 或 openSUSE Linux 操作系统。存在多个用于创建 .vhd 文件的工具，例如 Hyper-V 等虚拟化解决方案。有关说明，请参阅[安装 Hyper-V 角色和配置虚拟机](http://technet.microsoft.com/library/hh846766.aspx)。\n\n - [SUSE Studio](http://www.susestudio.com) 可以轻松地创建和管理 Azure 和 Hyper-V 的 SLES/openSUSE 映像。这是自定义你自己的 SUSE 和 openSUSE 映像的推荐方法。SUSE Studio 库中的以下正式映像可下载或克隆到你自己的 SUSE Studio 中：\n\n  - [SUSE Studio 库中的 SLES 11 SP3 for Azure](http://susestudio.com/a/02kbT4/sles-11-sp3-for-windows-azure)\n  - [SUSE Studio 库中的 openSUSE 13.1 for Azure](https://susestudio.com/a/02kbT4/opensuse-13-1-for-windows-azure)\n\n\n- 作为构建你自己的 VHD 的替代方法，SUSE 也会为 [VMDepot](https://vmdepot.msopentech.com/User/Show?user=1007) 中的 SLES 发布 BYOS（自带订阅）映像。\n\n\n**SLES/openSUSE 安装说明**\n\n- Azure 不支持 VHDX 格式，仅支持**固定大小的 VHD**。可使用 Hyper-V 管理器或 convert-vhd cmdlet 将磁盘转换为 VHD 格式。\n\n- 在安装 Linux 系统时，建议使用标准分区而不是 LVM（通常是许多安装的默认值）。这将避免 LVM 与克隆 VM 发生名称冲突，特别是在 OS 磁盘需要连接到另一台 VM 以进行故障排除的情况下。如果首选，LVM 或 [RAID](/documentation/articles/virtual-machines-linux-configure-raid) 可以在数据磁盘上使用。\n\n- 不要在操作系统磁盘上配置交换分区。可以配置 Linux 代理，以在临时资源磁盘上创建交换文件。可以在下面的步骤中找到有关此内容的详细信息。\n\n- 所有 VHD 的大小必须是 1 MB 的倍数。\n\n\n## 准备 SUSE Linux Enterprise Server 11 SP3 ##\n\n1. 在 Hyper-V 管理器的中间窗格中，选择虚拟机。\n\n2. 单击**“连接”**以打开虚拟机窗口。\n\n3. 注册 SUSE Linux Enterprise 系统以允许其下载更新并安装程序包。\n\n4. 使用最新修补程序更新系统：\n\n        # sudo zypper update\n\n5. 从 SLES 存储库安装 Azure Linux 代理：\n\n        # sudo zypper install WALinuxAgent\n\n6. 在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开“/boot/grub/menu.lst”，并确保默认内核包含以下参数：\n\n        console=ttyS0 earlyprintk=ttyS0 rootdelay=300\n\n    这将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。\n\n7.  建议编辑文件“/etc/sysconfig/network/dhcp”，并将 `DHCLIENT_SET_HOSTNAME` 参数更改为以下值：\n\n        DHCLIENT_SET_HOSTNAME=\"no\"\n\n8.  在“/etc/sudoers”中，注释掉或删除以下行（如果存在）：\n\n        Defaults targetpw   # ask for the password of the target user i.e. root\n        ALL    ALL=(ALL) ALL   # WARNING! Only use this together with 'Defaults targetpw'!\n\n9.  请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。\n\n10. 不要在操作系统磁盘上创建交换空间\n\n    Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是*临时*磁盘，并可能在取消设置虚拟机时被清空。在安装 Azure Linux 代理（请参见前一步骤）后，相应地在 /etc/waagent.conf 中修改以下参数：\n\n        ResourceDisk.Format=y\n        ResourceDisk.Filesystem=ext4\n        ResourceDisk.MountPoint=/mnt/resource\n        ResourceDisk.EnableSwap=y\n        ResourceDisk.SwapSizeMB=2048    ## NOTE: set this to whatever you need it to be.\n\n11. 运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：\n\n        # sudo waagent -force -deprovision\n        # export HISTSIZE=0\n        # logout\n\n12. 在 Hyper-V 管理器中单击**“操作”->“关闭”**。Linux VHD 现已准备好上载到 Azure。\n\n\n----------\n\n## 准备 openSUSE 13.1+ ##\n\n1. 在 Hyper-V 管理器的中间窗格中，选择虚拟机\n\n2. 单击**“连接”**以打开虚拟机窗口\n\n3. 在 shell 上，运行命令“`zypper lr`”。如果此命令返回类似于以下内容的输出（请注意版本号可能会有所不同）：\n\n        # | Alias                 | Name                  | Enabled | Refresh\n        --+-----------------------+-----------------------+---------+--------\n        1 | Cloud:Tools_13.1      | Cloud:Tools_13.1      | Yes     | Yes\n        2 | openSUSE_13.1_OSS     | openSUSE_13.1_OSS     | Yes     | Yes\n        3 | openSUSE_13.1_Updates | openSUSE_13.1_Updates | Yes     | Yes\n\n    则按预期配置存储库，不需要进行任何调整。\n\n    如果该命令返回“未定义存储库...”，则使用以下命令来添加这些存储库：\n\n        # sudo zypper ar -f http://download.opensuse.org/repositories/Cloud:Tools/openSUSE_13.1 Cloud:Tools_13.1\n        # sudo zypper ar -f http://download.opensuse.org/distribution/13.1/repo/oss openSUSE_13.1_OSS\n        # sudo zypper ar -f http://download.opensuse.org/update/13.1 openSUSE_13.1_Updates\n\n    然后，可以通过再次运行命令“`zypper lr`”来验证已添加存储库。如果未启用某个相关的更新存储库，请使用以下命令启用该存储库：\n\n        # sudo zypper mr -e [NUMBER OF REPOSITORY]\n\n\n4. 将内核更新为可用的最新版本：\n\n        # sudo zypper up kernel-default\n\n    或使用所有最新修补程序更新系统：\n\n        # sudo zypper update\n\n5.  安装 Azure Linux 代理\n\n        # sudo zypper install WALinuxAgent\n\n6.  在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开“/boot/grub/menu.lst”，并确保默认内核包含以下参数：\n\n        console=ttyS0 earlyprintk=ttyS0 rootdelay=300\n\n    这将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。此外，从内核引导行删除以下参数（如果它们存在）：\n\n        libata.atapi_enabled=0 reserve=0x1f0,0x8\n\n7.  建议编辑文件“/etc/sysconfig/network/dhcp”，并将 `DHCLIENT_SET_HOSTNAME` 参数更改为以下值：\n\n        DHCLIENT_SET_HOSTNAME=\"no\"\n\n8.  **重要提示：**在“/etc/sudoers”中，注释掉或删除以下行（如果存在）：\n\n        Defaults targetpw   # ask for the password of the target user i.e. root\n        ALL    ALL=(ALL) ALL   # WARNING! Only use this together with 'Defaults targetpw'!\n\n9.  请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。\n\n10. 不要在操作系统磁盘上创建交换空间\n\n    Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是*临时*磁盘，并可能在取消设置虚拟机时被清空。在安装 Azure Linux 代理（请参见前一步骤）后，相应地在 /etc/waagent.conf 中修改以下参数：\n\n        ResourceDisk.Format=y\n        ResourceDisk.Filesystem=ext4\n        ResourceDisk.MountPoint=/mnt/resource\n        ResourceDisk.EnableSwap=y\n        ResourceDisk.SwapSizeMB=2048    ## NOTE: set this to whatever you need it to be.\n\n11. 运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：\n\n        # sudo waagent -force -deprovision\n        # export HISTSIZE=0\n        # logout\n\n12. 确保在启动时运行 Azure Linux 代理：\n\n        # sudo systemctl enable waagent.service\n\n13. 在 Hyper-V 管理器中单击**“操作”->“关闭”**。Linux VHD 现已准备好上载到 Azure。\n\n<!---HONumber=Mooncake_1207_2015-->"
+}

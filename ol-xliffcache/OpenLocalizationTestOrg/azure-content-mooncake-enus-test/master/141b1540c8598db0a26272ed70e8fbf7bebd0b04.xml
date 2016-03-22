@@ -1,0 +1,103 @@
+{
+  "nodes": [
+    {
+      "content": "在 Visual Studio 中，打开你在完成“数据处理入门”教程后修改的项目。",
+      "pos": [
+        5,
+        46
+      ]
+    },
+    {
+      "pos": [
+        51,
+        99
+      ],
+      "content": "按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 键运行应用程序，然后在“插入 TodoItem”中键入文本，然后单击“保存”。"
+    },
+    {
+      "content": "重复以上步骤至少三次，因此你将在 TodoItem 表中存储三个以上的项。",
+      "pos": [
+        104,
+        141
+      ]
+    },
+    {
+      "pos": [
+        146,
+        202
+      ],
+      "content": "在 MainPage.xaml.cs 文件中，将 <bpt id=\"p1\">**</bpt>RefreshTodoItems<ept id=\"p1\">**</ept> 方法替换为以下代码："
+    },
+    {
+      "content": "在数据绑定过程中执行此查询时，将返回未标记为已完成的前三个项。",
+      "pos": [
+        617,
+        648
+      ]
+    },
+    {
+      "pos": [
+        653,
+        669
+      ],
+      "content": "按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 键以运行应用。"
+    },
+    {
+      "content": "请注意，仅显示 TodoItem 表的前三个结果。",
+      "pos": [
+        675,
+        700
+      ]
+    },
+    {
+      "pos": [
+        705,
+        760
+      ],
+      "content": "（可选）使用消息检查软件（例如浏览器开发人员工具或 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Fiddler]</ept>）来查看发送到移动服务的请求的 URI。"
+    },
+    {
+      "pos": [
+        766,
+        809
+      ],
+      "content": "请注意，<ph id=\"ph1\">`Take(3)`</ph> 方法已转换成查询 URI 中的查询选项 <ph id=\"ph2\">`$top=3`</ph>。"
+    },
+    {
+      "pos": [
+        814,
+        851
+      ],
+      "content": "使用以下代码，再一次更新 <bpt id=\"p1\">**</bpt>RefreshTodoItems<ept id=\"p1\">**</ept> 方法："
+    },
+    {
+      "content": "此查询将跳过前三个结果，返回其后的三个结果。实际上这是数据的第二“页”，其页大小为三个项。",
+      "pos": [
+        1363,
+        1408
+      ]
+    },
+    {
+      "pos": [
+        1415,
+        1617
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>本教程将硬编码分页值传递给 <ph id=\"ph2\">&lt;strong&gt;</ph>Take<ph id=\"ph3\">&lt;/strong&gt;</ph> 和 <ph id=\"ph4\">&lt;strong&gt;</ph>Skip<ph id=\"ph5\">&lt;/strong&gt;</ph> 方法，因此使用的是简化的方案。在实际应用中，你可以对页导航控件或类似的 UI 使用类似于上面的查询，让用户导航到上一页和下一页。你还可以调用 <ph id=\"ph6\">&lt;strong&gt;</ph>includeTotalCount<ph id=\"ph7\">&lt;/strong&gt;</ph> 方法，以获取服务器上的可用项总数以及分页的数据。"
+    },
+    {
+      "content": "（可选）再次查看发送到移动服务的请求的 URI。",
+      "pos": [
+        1622,
+        1646
+      ]
+    },
+    {
+      "pos": [
+        1652,
+        1696
+      ],
+      "content": "请注意，<ph id=\"ph1\">`Skip(3)`</ph> 方法已转换成查询 URI 中的查询选项 <ph id=\"ph2\">`$skip=3`</ph>。"
+    }
+  ],
+  "content": "\n\n1. 在 Visual Studio 中，打开你在完成“数据处理入门”教程后修改的项目。\n\n2. 按 **F5** 键运行应用程序，然后在“插入 TodoItem”中键入文本，然后单击“保存”。\n\n3. 重复以上步骤至少三次，因此你将在 TodoItem 表中存储三个以上的项。\n\n4. 在 MainPage.xaml.cs 文件中，将 **RefreshTodoItems** 方法替换为以下代码：\n\n        private async void RefreshTodoItems()\n        {\n            // Define a filtered query that returns the top 3 items.\n            IMobileServiceTableQuery<TodoItem> query = todoTable\n                            .Where(todoItem => todoItem.Complete == false)\n                           .Take(3);\n            items = await query.ToCollectionAsync();\n            ListItems.ItemsSource = items;\n        }\n\n    在数据绑定过程中执行此查询时，将返回未标记为已完成的前三个项。\n\n5. 按 **F5** 键以运行应用。\n\n    请注意，仅显示 TodoItem 表的前三个结果。\n\n6. （可选）使用消息检查软件（例如浏览器开发人员工具或 [Fiddler]）来查看发送到移动服务的请求的 URI。\n\n    请注意，`Take(3)` 方法已转换成查询 URI 中的查询选项 `$top=3`。\n\n7. 使用以下代码，再一次更新 **RefreshTodoItems** 方法：\n            \n        private async void RefreshTodoItems()\n        {\n            // Define a filtered query that skips the first 3 items and \n            // then returns the next 3 items.\n            IMobileServiceTableQuery<TodoItem> query = todoTable\n                           .Where(todoItem => todoItem.Complete == false)\n                           .Skip(3)\n                           .Take(3);\n            items = await query.ToCollectionAsync();\n            ListItems.ItemsSource = items;\n        }\n\n    此查询将跳过前三个结果，返回其后的三个结果。实际上这是数据的第二“页”，其页大小为三个项。\n\n    >[AZURE.NOTE]本教程将硬编码分页值传递给 <strong>Take</strong> 和 <strong>Skip</strong> 方法，因此使用的是简化的方案。在实际应用中，你可以对页导航控件或类似的 UI 使用类似于上面的查询，让用户导航到上一页和下一页。你还可以调用 <strong>includeTotalCount</strong> 方法，以获取服务器上的可用项总数以及分页的数据。\n\n8. （可选）再次查看发送到移动服务的请求的 URI。\n\n    请注意，`Skip(3)` 方法已转换成查询 URI 中的查询选项 `$skip=3`。\n\n<!-- URLs -->\n[Fiddler]: http://go.microsoft.com/fwlink/?LinkID=262412\n\n<!---HONumber=74-->"
+}

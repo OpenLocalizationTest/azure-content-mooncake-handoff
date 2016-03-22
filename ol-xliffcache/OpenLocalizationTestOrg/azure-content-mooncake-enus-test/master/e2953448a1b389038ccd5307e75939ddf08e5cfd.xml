@@ -1,0 +1,304 @@
+{
+  "nodes": [
+    {
+      "content": "将 Windows 虚拟机从 Amazon Web Services 迁移到 Azure",
+      "pos": [
+        27,
+        71
+      ]
+    },
+    {
+      "content": "使用 Azure Site Recovery 将运行在 Amazon Web Services (AWS) 中的 Windows 虚拟机迁移到 Azure。",
+      "pos": [
+        90,
+        168
+      ]
+    },
+    {
+      "content": "将 Amazon Web Services (AWS) 中的 Windows 虚拟机迁移到 Azure",
+      "pos": [
+        387,
+        438
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        444,
+        446
+      ]
+    },
+    {
+      "pos": [
+        448,
+        607
+      ],
+      "content": "Azure Site Recovery 可在许多部署中安排虚拟机的复制、故障转移和恢复，为业务连续性和灾难恢复 (BCDR) 策略发挥作用。有关部署方案的完整列表，请参阅 <bpt id=\"p1\">[</bpt>Azure Site Recovery 概述<ept id=\"p1\">](/documentation/articles/site-recovery-overview)</ept>。"
+    },
+    {
+      "pos": [
+        609,
+        804
+      ],
+      "content": "本文介绍如何使用 Site Recovery 将在 AWS 中运行的 Windows 实例迁移到 Azure，或进行故障转移。本文采用<bpt id=\"p1\">[</bpt>在本地 VMware 虚拟机或物理服务器与 Azure 之间设置保护<ept id=\"p1\">](/documentation/articles/site-recovery-vmware-to-azure)</ept>中描述的大多数步骤。我们建议你通读该文以获取有关部署中每一步骤的详细说明。"
+    },
+    {
+      "content": "入门",
+      "pos": [
+        809,
+        811
+      ]
+    },
+    {
+      "content": "以下是开始之前需要满足的条件：",
+      "pos": [
+        813,
+        828
+      ]
+    },
+    {
+      "pos": [
+        832,
+        890
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>配置服务器<ept id=\"p1\">**</ept>：充当配置服务器的 Azure 虚拟机。配置服务器协调本地计算机和 Azure 服务器之间的通信。"
+    },
+    {
+      "pos": [
+        893,
+        947
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>主目标服务器<ept id=\"p1\">**</ept>：充当主目标服务器的 Azure 虚拟机。此服务器接收并保留来自受保护计算机的复制数据。"
+    },
+    {
+      "pos": [
+        950,
+        1010
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>进程服务器<ept id=\"p1\">**</ept>：运行 Windows Server 2012 R2 的虚拟机。受保护的虚拟机向此服务器发送复制数据。"
+    },
+    {
+      "pos": [
+        1013,
+        1041
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>EC2 VM 实例<ept id=\"p1\">**</ept>：你想要迁移然后再保护的实例。"
+    },
+    {
+      "pos": [
+        1045,
+        1139
+      ],
+      "content": "在<bpt id=\"p1\">[</bpt>我需要做什么？<ept id=\"p1\">](/documentation/articles/site-recovery-vmware-to-azure#what-do-i-need)</ept>中了解有关这些组件的更多信息"
+    },
+    {
+      "pos": [
+        1142,
+        1323
+      ],
+      "content": "你还应阅读<bpt id=\"p1\">[</bpt>容量规划<ept id=\"p1\">](/documentation/articles/site-recovery-vmware-to-azure#capacity-planning)</ept>准则并且确保在你开始之前满足所有<bpt id=\"p2\">[</bpt>部署先决条件<ept id=\"p2\">](/documentation/articles/site-recovery-vmware-to-azure#before-you-start)</ept>。"
+    },
+    {
+      "content": "部署步骤",
+      "pos": [
+        1328,
+        1332
+      ]
+    },
+    {
+      "content": "创建保管库",
+      "pos": [
+        1338,
+        1343
+      ]
+    },
+    {
+      "pos": [
+        1425,
+        1539
+      ],
+      "content": "作为 Azure 虚拟机<bpt id=\"p1\">[</bpt>部署配置服务器<ept id=\"p1\">](/documentation/articles/site-recovery-vmware-to-azure#step-2-deploy-a-configuration-server)</ept>。"
+    },
+    {
+      "pos": [
+        1543,
+        1658
+      ],
+      "content": "作为 Azure 虚拟机<bpt id=\"p1\">[</bpt>部署主目标服务器<ept id=\"p1\">](/documentation/articles/site-recovery-vmware-to-azure#step-2-deploy-a-configuration-server)</ept>。"
+    },
+    {
+      "pos": [
+        1662,
+        1776
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>部署进程服务器<ept id=\"p1\">](/documentation/articles/site-recovery-vmware-to-azure#step-4-deploy-the-on-premises-process-server)</ept>。请注意："
+    },
+    {
+      "pos": [
+        1784,
+        1907
+      ],
+      "content": "你应将进程服务器部署在与 EC2 实例相同的子网/Amazon 虚拟私有云中。\n  ![EC2 实例](./media/site-recovery-migrate-aws-to-azure/ASR_AWSMigration1.png)",
+      "leadings": [
+        "",
+        "      "
+      ],
+      "nodes": [
+        {
+          "content": "你应将进程服务器部署在与 EC2 实例相同的子网/Amazon 虚拟私有云中。",
+          "pos": [
+            0,
+            39
+          ]
+        },
+        {
+          "content": "EC2 实例",
+          "pos": [
+            44,
+            50
+          ]
+        }
+      ]
+    },
+    {
+      "content": "在部署进程服务器之后，验证它能与你要迁移的 EC2 实例通信。",
+      "pos": [
+        1915,
+        1946
+      ]
+    },
+    {
+      "content": "你要保护的每个虚拟机需要安装移动服务。此服务将数据发送到进程服务器。可以手动安装移动服务，也可以在启用了虚拟机保护后由进程服务器自动推送并安装。要迁移的 EC2 实例上的防火墙规则应配置为允许此服务的推送安装。EC2 实例的安全组应具有以下规则：",
+      "pos": [
+        1953,
+        2076
+      ]
+    },
+    {
+      "content": "防火墙规则",
+      "pos": [
+        2088,
+        2093
+      ]
+    },
+    {
+      "pos": [
+        2168,
+        2266
+      ],
+      "content": "在进程服务器部署完毕并在 Site Recovery 保管库中注册到配置服务器之后，它应该出现在 Site Recovery 控制台中的<bpt id=\"p1\">**</bpt>配置服务器<ept id=\"p1\">**</ept>选项卡下。此步骤可能最多需要 15 分钟。"
+    },
+    {
+      "content": "进程服务器",
+      "pos": [
+        2282,
+        2287
+      ]
+    },
+    {
+      "pos": [
+        2359,
+        2472
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>安装最新更新<ept id=\"p1\">](/documentation/articles/site-recovery-vmware-to-azure#step-5-install-latest-updates)</ept>。确保已安装的所有组件服务器都是最新的。"
+    },
+    {
+      "pos": [
+        2476,
+        2643
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>创建保护组<ept id=\"p1\">](/documentation/articles/site-recovery-vmware-to-azure#step-7-create-a-protection-group)</ept>。要开始使用 Site Recovery 保护迁移的实例，你需要设置一个保护组。你指定保护组的复制设置，这些设置将被应用到添加到该组的所有实例。"
+    },
+    {
+      "pos": [
+        2648,
+        2779
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>设置虚拟机<ept id=\"p1\">](/documentation/articles/site-recovery-vmware-to-azure#step-8-set-up-machines-you-want-to-protect)</ept>。你需要在每个实例上安装移动服务（自动或手动皆可）。"
+    },
+    {
+      "pos": [
+        2783,
+        2900
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>为虚拟机启用保护<ept id=\"p1\">](/documentation/articles/site-recovery-vmware-to-azure#step-9-enable-protection)</ept>。通过将实例添加到保护组来为这些实例启用保护。请注意："
+    },
+    {
+      "content": "可以使用实例的专用 IP 地址发现你要迁移到 Azure 的 EC2 实例，该地址可以在 EC2 控制台中获取。",
+      "pos": [
+        2908,
+        2964
+      ]
+    },
+    {
+      "pos": [
+        2972,
+        3087
+      ],
+      "content": "在你创建的保护组的选项卡上，单击“添加计算机”>“物理计算机”\n ![EC2 发现](./media/site-recovery-migrate-aws-to-azure/ASR_AWSMigration4.png)",
+      "leadings": [
+        "",
+        "       "
+      ],
+      "nodes": [
+        {
+          "content": "在你创建的保护组的选项卡上，单击“添加计算机”&gt;“物理计算机”",
+          "pos": [
+            0,
+            31
+          ]
+        },
+        {
+          "content": "EC2 发现",
+          "pos": [
+            35,
+            41
+          ]
+        }
+      ]
+    },
+    {
+      "content": "指定实例的专用 IP 地址。",
+      "pos": [
+        3094,
+        3108
+      ]
+    },
+    {
+      "content": "EC2 发现",
+      "pos": [
+        3121,
+        3127
+      ]
+    },
+    {
+      "content": "系统将启用保护，并且依据保护组的初始复制设置运行初始复制",
+      "pos": [
+        3201,
+        3229
+      ]
+    },
+    {
+      "pos": [
+        3233,
+        3478
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>运行非计划的故障转移<ept id=\"p1\">](/documentation/articles/site-recovery-failover#run-an-unplanned-failover)</ept>。在初始复制完成后，可以运行非计划的从 AWS 到 Azure 的故障转移。（可选）你可以创建一个恢复计划并运行非计划的故障转移，从 AWS 向 Azure 迁移多个虚拟机。<bpt id=\"p2\">[</bpt>详细了解<ept id=\"p2\">](/documentation/articles/site-recovery-create-recovery-plans)</ept>恢复计划。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        3491,
+        3495
+      ]
+    },
+    {
+      "pos": [
+        3497,
+        3601
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt>Site Recovery 论坛<ept id=\"p1\">](https://social.msdn.microsoft.com/forums/zh-cn/home?forum=hypervrecovmgr)</ept>中发布任何评论或问题"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"将 Windows 虚拟机从 Amazon Web Services 迁移到 Azure\"\n    description=\"使用 Azure Site Recovery 将运行在 Amazon Web Services (AWS) 中的 Windows 虚拟机迁移到 Azure。\"\n    services=\"site-recovery\"\n    documentationCenter=\"\"\n    authors=\"rayne-wiselman\"\n    manager=\"jwhit\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"site-recovery\"\n    ms.date=\"08/26/2015\"\n    wacn.date=\"10/22/2015\"/>\n\n#  将 Amazon Web Services (AWS) 中的 Windows 虚拟机迁移到 Azure\n\n\n## 概述\n\nAzure Site Recovery 可在许多部署中安排虚拟机的复制、故障转移和恢复，为业务连续性和灾难恢复 (BCDR) 策略发挥作用。有关部署方案的完整列表，请参阅 [Azure Site Recovery 概述](/documentation/articles/site-recovery-overview)。\n\n本文介绍如何使用 Site Recovery 将在 AWS 中运行的 Windows 实例迁移到 Azure，或进行故障转移。本文采用[在本地 VMware 虚拟机或物理服务器与 Azure 之间设置保护](/documentation/articles/site-recovery-vmware-to-azure)中描述的大多数步骤。我们建议你通读该文以获取有关部署中每一步骤的详细说明。\n\n## 入门\n\n以下是开始之前需要满足的条件：\n\n- **配置服务器**：充当配置服务器的 Azure 虚拟机。配置服务器协调本地计算机和 Azure 服务器之间的通信。\n- **主目标服务器**：充当主目标服务器的 Azure 虚拟机。此服务器接收并保留来自受保护计算机的复制数据。\n- **进程服务器**：运行 Windows Server 2012 R2 的虚拟机。受保护的虚拟机向此服务器发送复制数据。\n- **EC2 VM 实例**：你想要迁移然后再保护的实例。\n\n- 在[我需要做什么？](/documentation/articles/site-recovery-vmware-to-azure#what-do-i-need)中了解有关这些组件的更多信息\n- 你还应阅读[容量规划](/documentation/articles/site-recovery-vmware-to-azure#capacity-planning)准则并且确保在你开始之前满足所有[部署先决条件](/documentation/articles/site-recovery-vmware-to-azure#before-you-start)。\n\n## 部署步骤\n\n1. [创建保管库](/documentation/articles/site-recovery-vmware-to-azure#step-1-create-a-vault)\n2. 作为 Azure 虚拟机[部署配置服务器](/documentation/articles/site-recovery-vmware-to-azure#step-2-deploy-a-configuration-server)。\n3. 作为 Azure 虚拟机[部署主目标服务器](/documentation/articles/site-recovery-vmware-to-azure#step-2-deploy-a-configuration-server)。\n4. [部署进程服务器](/documentation/articles/site-recovery-vmware-to-azure#step-4-deploy-the-on-premises-process-server)。请注意：\n\n    - 你应将进程服务器部署在与 EC2 实例相同的子网/Amazon 虚拟私有云中。\n        ![EC2 实例](./media/site-recovery-migrate-aws-to-azure/ASR_AWSMigration1.png)\n\n    - 在部署进程服务器之后，验证它能与你要迁移的 EC2 实例通信。\n    - 你要保护的每个虚拟机需要安装移动服务。此服务将数据发送到进程服务器。可以手动安装移动服务，也可以在启用了虚拟机保护后由进程服务器自动推送并安装。要迁移的 EC2 实例上的防火墙规则应配置为允许此服务的推送安装。EC2 实例的安全组应具有以下规则：\n\n        ![防火墙规则](./media/site-recovery-migrate-aws-to-azure/ASR_AWSMigration2.png)\n\n    - 在进程服务器部署完毕并在 Site Recovery 保管库中注册到配置服务器之后，它应该出现在 Site Recovery 控制台中的**配置服务器**选项卡下。此步骤可能最多需要 15 分钟。\n    \n        ![进程服务器](./media/site-recovery-migrate-aws-to-azure/ASR_AWSMigration3.png)\n\n5. [安装最新更新](/documentation/articles/site-recovery-vmware-to-azure#step-5-install-latest-updates)。确保已安装的所有组件服务器都是最新的。\n6. [创建保护组](/documentation/articles/site-recovery-vmware-to-azure#step-7-create-a-protection-group)。要开始使用 Site Recovery 保护迁移的实例，你需要设置一个保护组。你指定保护组的复制设置，这些设置将被应用到添加到该组的所有实例。 \n7. [设置虚拟机](/documentation/articles/site-recovery-vmware-to-azure#step-8-set-up-machines-you-want-to-protect)。你需要在每个实例上安装移动服务（自动或手动皆可）。\n8. [为虚拟机启用保护](/documentation/articles/site-recovery-vmware-to-azure#step-9-enable-protection)。通过将实例添加到保护组来为这些实例启用保护。请注意：\n\n    - 可以使用实例的专用 IP 地址发现你要迁移到 Azure 的 EC2 实例，该地址可以在 EC2 控制台中获取。\n    -  在你创建的保护组的选项卡上，单击“添加计算机”>“物理计算机”\n        ![EC2 发现](./media/site-recovery-migrate-aws-to-azure/ASR_AWSMigration4.png)\n    - 指定实例的专用 IP 地址。\n        - ![EC2 发现](./media/site-recovery-migrate-aws-to-azure/ASR_AWSMigration5.png)\n    - 系统将启用保护，并且依据保护组的初始复制设置运行初始复制\n9. [运行非计划的故障转移](/documentation/articles/site-recovery-failover#run-an-unplanned-failover)。在初始复制完成后，可以运行非计划的从 AWS 到 Azure 的故障转移。（可选）你可以创建一个恢复计划并运行非计划的故障转移，从 AWS 向 Azure 迁移多个虚拟机。[详细了解](/documentation/articles/site-recovery-create-recovery-plans)恢复计划。\n        \n## 后续步骤\n\n在 [Site Recovery 论坛](https://social.msdn.microsoft.com/forums/zh-cn/home?forum=hypervrecovmgr)中发布任何评论或问题\n\n<!---HONumber=74-->"
+}

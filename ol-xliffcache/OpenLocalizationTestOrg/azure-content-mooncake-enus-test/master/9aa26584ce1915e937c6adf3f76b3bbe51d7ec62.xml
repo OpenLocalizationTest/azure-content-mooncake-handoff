@@ -1,0 +1,68 @@
+{
+  "nodes": [
+    {
+      "pos": [
+        5,
+        76
+      ],
+      "content": "接下来，取消注释或添加以下代码行，然后将 <ph id=\"ph1\">`&lt;yourClient&gt;`</ph> 替换为将项目连接到移动服务时添加到 service.js 文件的变量："
+    },
+    {
+      "pos": [
+        170,
+        212
+      ],
+      "content": "此代码使用缓存过滤器为新的数据库表创建一个代理对象 (<bpt id=\"p1\">**</bpt>todoTable<ept id=\"p1\">**</ept>）。"
+    },
+    {
+      "pos": [
+        218,
+        249
+      ],
+      "content": "将 <bpt id=\"p1\">**</bpt>InsertTodoItem<ept id=\"p1\">**</ept> 函数替换为以下代码："
+    },
+    {
+      "content": "此代码在表中插入一个新项。",
+      "pos": [
+        609,
+        622
+      ]
+    },
+    {
+      "pos": [
+        627,
+        660
+      ],
+      "content": "将 <bpt id=\"p1\">**</bpt>RefreshTodoItems<ept id=\"p1\">**</ept> 函数替换为以下代码："
+    },
+    {
+      "pos": [
+        1120,
+        1175
+      ],
+      "content": "这将设置到 todoTable 中项集合的绑定，其中包含从移动服务返回的所有 <bpt id=\"p1\">**</bpt>TodoItem<ept id=\"p1\">**</ept> 对象。"
+    },
+    {
+      "pos": [
+        1180,
+        1218
+      ],
+      "content": "将 <bpt id=\"p1\">**</bpt>UpdateCheckedTodoItem<ept id=\"p1\">**</ept> 函数替换为以下代码："
+    },
+    {
+      "content": "这会将项更新发送给移动服务。",
+      "pos": [
+        1556,
+        1570
+      ]
+    },
+    {
+      "content": "既然此应用已更新从而将移动服务用于后端存储，就可以针对移动服务测试该应用。",
+      "pos": [
+        1572,
+        1609
+      ]
+    }
+  ],
+  "content": "\n\n1. 接下来，取消注释或添加以下代码行，然后将 `<yourClient>` 替换为将项目连接到移动服务时添加到 service.js 文件的变量：\n\n        var todoTable = <yourClient>.withFilter(noCachingFilter).getTable('TodoItem');\n\n    此代码使用缓存过滤器为新的数据库表创建一个代理对象 (**todoTable**）。 \n\n3. 将 **InsertTodoItem** 函数替换为以下代码：\n\n        var insertTodoItem = function (todoItem) {\n            // Inserts a new row into the database. When the operation completes\n            // and Mobile Services has assigned an id, the item is added to the binding list.\n            todoTable.insert(todoItem).done(function (item) {\n                todoItems.push(item);\n            });\n        };\n\n    此代码在表中插入一个新项。\n\n3. 将 **RefreshTodoItems** 函数替换为以下代码：\n\n        var refreshTodoItems = function () {\n            // This code refreshes the entries in the list by querying the table.\n            // Results are filtered to remove completed items.\n            todoTable.where({ complete: false })\n                .read().done(function (results) {\n                todoItems = new WinJS.Binding.List(results);\n                listItems.winControl.itemDataSource = todoItems.dataSource;\n            });\n        };\n\n    这将设置到 todoTable 中项集合的绑定，其中包含从移动服务返回的所有 **TodoItem** 对象。\n\n4. 将 **UpdateCheckedTodoItem** 函数替换为以下代码：\n        \n        var updateCheckedTodoItem = function (todoItem) {\n            // This code takes a freshly completed TodoItem and updates the database. \n            todoTable.update(todoItem);\n            // Remove the completed item from the filtered list.\n            todoItems.splice(todoItems.indexOf(todoItem), 1);\n        };\n\n    这会将项更新发送给移动服务。\n\n既然此应用已更新从而将移动服务用于后端存储，就可以针对移动服务测试该应用。\n\n<!---HONumber=74-->"
+}

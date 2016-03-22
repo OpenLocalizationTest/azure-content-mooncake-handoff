@@ -1,0 +1,971 @@
+{
+  "nodes": [
+    {
+      "content": "混合云测试环境 | Azure",
+      "pos": [
+        28,
+        43
+      ]
+    },
+    {
+      "content": "了解如何创建混合云环境，以便 IT 专业人员或开发人员使用简化的本地网络完成测试。",
+      "pos": [
+        63,
+        104
+      ]
+    },
+    {
+      "content": "设置用于测试的混合云环境",
+      "pos": [
+        367,
+        379
+      ]
+    },
+    {
+      "pos": [
+        381,
+        467
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]"
+    },
+    {
+      "content": "本主题将指导你逐步使用 Azure 创建混合云环境，以便进行测试。这是生成的配置。",
+      "pos": [
+        471,
+        512
+      ]
+    },
+    {
+      "content": "这会通过你在 Internet 上的位置模拟真实的混合生产环境。它包括：",
+      "pos": [
+        612,
+        648
+      ]
+    },
+    {
+      "content": "简化的本地网络（Corpnet 子网）。",
+      "pos": [
+        653,
+        673
+      ]
+    },
+    {
+      "content": "在 Azure 中托管的跨界虚拟网络 (TestVNET)。",
+      "pos": [
+        677,
+        707
+      ]
+    },
+    {
+      "content": "站点到站点 VPN 连接。",
+      "pos": [
+        711,
+        724
+      ]
+    },
+    {
+      "content": "TestVNET 虚拟网络中的辅助域控制器。",
+      "pos": [
+        728,
+        750
+      ]
+    },
+    {
+      "content": "此配置提供了基础和通用的起始点，你可以据此执行以下操作：",
+      "pos": [
+        752,
+        780
+      ]
+    },
+    {
+      "content": "在混合云环境中开发和测试应用程序。",
+      "pos": [
+        785,
+        802
+      ]
+    },
+    {
+      "content": "针对基于混合云的 IT 工作负载，创建一部分位于 Corpnet 子网上，一部分位于 TestVNET 虚拟网络中的计算机的测试配置。",
+      "pos": [
+        806,
+        873
+      ]
+    },
+    {
+      "content": "设置此混合云测试环境需要完成以下五个主要阶段：",
+      "pos": [
+        875,
+        898
+      ]
+    },
+    {
+      "content": "在 Corpnet 子网上配置计算机。",
+      "pos": [
+        904,
+        923
+      ]
+    },
+    {
+      "content": "配置 RRAS1。",
+      "pos": [
+        928,
+        937
+      ]
+    },
+    {
+      "content": "创建跨界 Azure 虚拟网络。",
+      "pos": [
+        942,
+        958
+      ]
+    },
+    {
+      "content": "创建站点到站点 VPN 连接。",
+      "pos": [
+        963,
+        978
+      ]
+    },
+    {
+      "content": "配置 DC2。",
+      "pos": [
+        983,
+        990
+      ]
+    },
+    {
+      "pos": [
+        993,
+        1052
+      ],
+      "content": "如果你还没有 Azure 订阅，可以通过<bpt id=\"p1\">[</bpt>试用 Azure<ept id=\"p1\">](/pricing/1rmb-trial/)</ept> 注册试用版。"
+    },
+    {
+      "pos": [
+        1055,
+        1176
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> Azure 中的虚拟机和虚拟网关在运行时会持续产生货币成本。此成本是针对你的试用版。若要在不使用的情况下降低运行此测试环境的成本，请参阅本主题中的<bpt id=\"p1\">[</bpt>最大程度地降低此环境的持续使用成本<ept id=\"p1\">](#costs)</ept>，了解详细信息。"
+    },
+    {
+      "pos": [
+        1178,
+        1376
+      ],
+      "content": "此配置要求使用一个由最多四台计算机组成的测试子网，这些计算机使用公共 IP 地址直接连接到 Internet。如果没有这些资源，你也可以<bpt id=\"p1\">[</bpt>设置用于测试的模拟混合云环境<ept id=\"p1\">](/documentation/articles/virtual-networks-setup-simulated-hybrid-cloud-environment-testing)</ept>。模拟混合云测试环境只需要 Azure 订阅。"
+    },
+    {
+      "content": "阶段 1：在 Corpnet 子网上配置计算机",
+      "pos": [
+        1381,
+        1404
+      ]
+    },
+    {
+      "pos": [
+        1406,
+        1619
+      ],
+      "content": "按照<bpt id=\"p1\">[</bpt>测试实验室指南：Windows Server 2012 R2 的基本配置<ept id=\"p1\">](http://www.microsoft.com/download/details.aspx?id=39638)</ept>的“配置 Corpnet 子网的步骤”一节中的说明，在名为 Corpnet 的子网上配置 DC1、APP1 和 CLIENT1 计算机。<bpt id=\"p2\">**</bpt>此子网必须与组织网络隔离，因为它将通过 RRAS1 计算机直接连接到 Internet。<ept id=\"p2\">**</ept>"
+    },
+    {
+      "content": "接下来，使用 CORP\\\\User1 凭据登录到 DC1。若要配置 CORP 域，以便计算机和用户使用其本地域控制器进行身份验证，请从管理员级 Windows PowerShell 命令提示符运行这些命令。",
+      "pos": [
+        1621,
+        1724
+      ]
+    },
+    {
+      "content": "这是你当前的配置。",
+      "pos": [
+        1943,
+        1952
+      ]
+    },
+    {
+      "content": "阶段 2：配置 RRAS1",
+      "pos": [
+        2056,
+        2069
+      ]
+    },
+    {
+      "content": "RRAS1 在 Corpnet 子网和 TestVNET 虚拟网络的计算机之间提供通信路由和 VPN 设备服务。RRAS1 必须安装两个网络适配器。",
+      "pos": [
+        2071,
+        2145
+      ]
+    },
+    {
+      "content": "首先，在 RRAS1 上安装操作系统。",
+      "pos": [
+        2147,
+        2166
+      ]
+    },
+    {
+      "content": "启动 Windows Server 2012 R2 的安装。",
+      "pos": [
+        2172,
+        2202
+      ]
+    },
+    {
+      "content": "按照说明操作以完成安装过程，指定本地管理员帐户的强密码。使用本地管理员帐户登录。",
+      "pos": [
+        2207,
+        2247
+      ]
+    },
+    {
+      "content": "将 RRAS1 连接到具有 Internet 访问权限的网络，并运行 Windows 更新，为 Windows Server 2012 R2 安装最新的更新。",
+      "pos": [
+        2252,
+        2331
+      ]
+    },
+    {
+      "content": "将一个网络适配器连接到 Corpnet 子网，将另一个直接连接到 Internet。RRAS1 可以位于 Internet 防火墙后面，但不能在网络地址转换器 (NAT) 后面。",
+      "pos": [
+        2336,
+        2425
+      ]
+    },
+    {
+      "content": "接下来，配置 RRAS1 的 TCP/IP 属性。你将需要一个公共的 IP 地址配置，包括 Internet 服务提供商 (ISP) 的地址、子网掩码（或前缀长度），以及默认网关和 DNS 服务器。",
+      "pos": [
+        2427,
+        2526
+      ]
+    },
+    {
+      "pos": [
+        2528,
+        2649
+      ],
+      "content": "在 RRAS1 上的管理员级 Windows PowerShell 命令提示符处使用这些命令。在运行这些命令之前，请填写变量值并删除 &lt; and &gt; 字符。你可以从 <bpt id=\"p1\">**</bpt>Get-NetAdapter<ept id=\"p1\">**</ept> 命令的显示中获取网络适配器的当前名称。"
+    },
+    {
+      "content": "对于最后一个命令，请验证是否有四个响应来自 IP 地址 10.0.0.1。",
+      "pos": [
+        3992,
+        4029
+      ]
+    },
+    {
+      "content": "这是你当前的配置。",
+      "pos": [
+        4031,
+        4040
+      ]
+    },
+    {
+      "content": "阶段 3：创建跨界 Azure 虚拟网络",
+      "pos": [
+        4143,
+        4163
+      ]
+    },
+    {
+      "pos": [
+        4165,
+        4253
+      ],
+      "content": "首先，使用 Azure 订阅凭据登录到 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">](https://manage.windowsazure.cn/)</ept>，然后创建名为 TestVNET 的虚拟网络。"
+    },
+    {
+      "content": "在 Azure 管理门户的任务栏中，单击“新建”&gt;“网络服务”&gt;“虚拟网络”&gt;“自定义创建”。",
+      "pos": [
+        4259,
+        4306
+      ]
+    },
+    {
+      "content": "在“虚拟网络详细信息”页的“名称”中键入“TestVNET”。",
+      "pos": [
+        4311,
+        4342
+      ]
+    },
+    {
+      "content": "在“位置”中，选择你所在位置的相应数据中心。",
+      "pos": [
+        4347,
+        4369
+      ]
+    },
+    {
+      "content": "单击“下一步”箭头。",
+      "pos": [
+        4374,
+        4384
+      ]
+    },
+    {
+      "content": "在“DNS 服务器和 VPN 连接”页的“DNS 服务器”中，在“选择或输入名称”中键入“DC1”，在“IP 地址”中键入“10.0.0.1”，然后选择“配置站点到站点 VPN”。",
+      "pos": [
+        4389,
+        4479
+      ]
+    },
+    {
+      "content": "在“本地网络”中，选择“指定新的本地网络”。",
+      "pos": [
+        4484,
+        4506
+      ]
+    },
+    {
+      "content": "单击“下一步”箭头。",
+      "pos": [
+        4512,
+        4522
+      ]
+    },
+    {
+      "content": "在“站点到站点连接”页上执行以下操作：",
+      "pos": [
+        4527,
+        4546
+      ]
+    },
+    {
+      "content": "在“名称”中，键入“Corpnet”。",
+      "pos": [
+        4553,
+        4572
+      ]
+    },
+    {
+      "content": "在“VPN 设备 IP 地址”中，键入分配给 RRAS1 的 Internet 接口的公共 IP 地址。",
+      "pos": [
+        4580,
+        4632
+      ]
+    },
+    {
+      "content": "在“地址空间”的“起始 IP”列中，键入“10.0.0.0”。在“CIDR (地址计数)”中，选择“/8”，然后单击“添加地址空间”。",
+      "pos": [
+        4639,
+        4706
+      ]
+    },
+    {
+      "content": "单击“下一步”箭头。",
+      "pos": [
+        4711,
+        4721
+      ]
+    },
+    {
+      "content": "在“虚拟网络地址空间”页上执行以下操作：",
+      "pos": [
+        4726,
+        4746
+      ]
+    },
+    {
+      "content": "在“地址空间”的“起始 IP”中，选择“192.168.0.0”。",
+      "pos": [
+        4753,
+        4786
+      ]
+    },
+    {
+      "content": "在“子网”中单击“子网 1”，然后将名称替换为“TestSubnet”。",
+      "pos": [
+        4793,
+        4829
+      ]
+    },
+    {
+      "content": "在 TestSubnet 的“CIDR (地址计数)”列中，单击“/24 (256)”。",
+      "pos": [
+        4837,
+        4881
+      ]
+    },
+    {
+      "pos": [
+        4888,
+        4903
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“添加网关子网”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "单击“完成”图标。请等到虚拟网络创建完以后再继续。",
+      "pos": [
+        4908,
+        4933
+      ]
+    },
+    {
+      "pos": [
+        4935,
+        5053
+      ],
+      "content": "接下来，请按<bpt id=\"p1\">[</bpt>如何安装和配置 Azure PowerShell<ept id=\"p1\">](/documentation/articles/powershell-install-configure)</ept> 中的说明在本地计算机上安装 Azure PowerShell。"
+    },
+    {
+      "pos": [
+        5055,
+        5216
+      ],
+      "content": "接下来，请为 TestVNET 虚拟网络创建新的云服务。你必须选取一个唯一的名称。例如，你可将其命名为TestVNET-<bpt id=\"p1\">*</bpt>UniqueSequence<ept id=\"p1\">*</ept>，其中 <bpt id=\"p2\">*</bpt>UniqueSequence<ept id=\"p2\">*</ept> 是你组织的缩写。例如，如果你的组织名称为 Tailspin Toys，则可以将云服务命名为 TestVNET-Tailspin。"
+    },
+    {
+      "content": "你可以使用以下 Azure PowerShell 命令在本地计算机上测试该名称的唯一性。",
+      "pos": [
+        5218,
+        5262
+      ]
+    },
+    {
+      "content": "如果此命令返回“False”，则你建议的名称是唯一的。使用此命令创建云服务。",
+      "pos": [
+        5323,
+        5361
+      ]
+    },
+    {
+      "content": "接下来，为 TestVNET 虚拟网络创建新的存储帐户。你必须选取一个唯一的名称。你可以使用此命令测试存储帐户名称的唯一性。",
+      "pos": [
+        5479,
+        5541
+      ]
+    },
+    {
+      "content": "如果此命令返回“False”，则你建议的名称是唯一的。使用以下命令创建并设置存储帐户。",
+      "pos": [
+        5604,
+        5647
+      ]
+    },
+    {
+      "content": "这是你当前的配置。",
+      "pos": [
+        5863,
+        5872
+      ]
+    },
+    {
+      "content": "阶段 4：创建站点到站点 VPN 连接",
+      "pos": [
+        5977,
+        5996
+      ]
+    },
+    {
+      "content": "首先，创建一个虚拟网络网关。",
+      "pos": [
+        5998,
+        6012
+      ]
+    },
+    {
+      "content": "在本地计算机上的 Azure 管理门户中，单击左窗格中的“网络”，然后验证 TestVNET 的“状态”列是否已设置为“已创建”。",
+      "pos": [
+        6018,
+        6083
+      ]
+    },
+    {
+      "content": "单击“TestVNET”。在“仪表板”页上，你会看到状态“未创建网关”。",
+      "pos": [
+        6088,
+        6124
+      ]
+    },
+    {
+      "content": "在任务栏中，单击“创建网关”，然后单击“动态路由”。出现提示时单击“是”。请一直等到网关完成且其状态更改为“正在连接”。这可能需要几分钟的时间。",
+      "pos": [
+        6129,
+        6201
+      ]
+    },
+    {
+      "content": "记下“仪表板”页中的“网关 IP 地址”。这是 TestVNET 虚拟网络的 Azure VPN 网关的公共 IP 地址。你需要此 IP 地址来配置 RRAS1。",
+      "pos": [
+        6206,
+        6287
+      ]
+    },
+    {
+      "content": "在任务栏中，单击“管理密钥”，然后单击密钥旁边的复制图标，将密钥复制到剪贴板中。将此密钥粘贴到文档中并进行保存。你需要此密钥值来配置 RRAS1。",
+      "pos": [
+        6292,
+        6365
+      ]
+    },
+    {
+      "content": "接下来，使用路由和远程访问服务配置 RRAS1，让其充当 Corpnet 子网的 VPN 设备。以本地管理员身份登录到 RRAS1，并在 Windows PowerShell 命令提示符下运行这些命令。",
+      "pos": [
+        6368,
+        6469
+      ]
+    },
+    {
+      "content": "接下来对 RRAS1 进行配置，以便接收来自 Azure VPN 网关的站点到站点 VPN 连接。重新启动 RRAS1，然后以本地管理员身份登录，并在 Windows PowerShell 命令提示符下运行这些命令。你需要提供 Azure VPN 网关的 IP 地址和密钥值。",
+      "pos": [
+        6629,
+        6767
+      ]
+    },
+    {
+      "content": "接下来，转到本地计算机上的 Azure 管理门户并等待，一直等到 TestVNET 虚拟网络显示状态“已连接”。",
+      "pos": [
+        7484,
+        7540
+      ]
+    },
+    {
+      "content": "接下来，将 RRAS1 配置为支持到各个 Internet 位置的已转换流量。在 RRAS1 上执行以下操作：",
+      "pos": [
+        7542,
+        7597
+      ]
+    },
+    {
+      "content": "在“开始”屏幕中，键入“rras”，然后单击“路由和远程访问”。",
+      "pos": [
+        7603,
+        7635
+      ]
+    },
+    {
+      "content": "在控制台树中，打开服务器名称，然后单击“IPv4”。",
+      "pos": [
+        7641,
+        7667
+      ]
+    },
+    {
+      "content": "右键单击“常规”，然后单击“新建路由协议”。",
+      "pos": [
+        7672,
+        7694
+      ]
+    },
+    {
+      "content": "单击“NAT”，然后单击“确定”。",
+      "pos": [
+        7699,
+        7716
+      ]
+    },
+    {
+      "content": "在控制台树中，右键单击“NAT”，然后依次单击“新建接口”、“Corpnet”，再单击“确定”两次。",
+      "pos": [
+        7721,
+        7771
+      ]
+    },
+    {
+      "content": "右键单击“NAT”，然后依次单击“新建接口”、“Internet”、“确定”。",
+      "pos": [
+        7776,
+        7815
+      ]
+    },
+    {
+      "content": "在“NAT”选项卡上，单击“连接到 Internet 的公用接口”，选择“在此接口上启用 NAT”，然后单击“确定”。",
+      "pos": [
+        7820,
+        7879
+      ]
+    },
+    {
+      "content": "接下来，将 DC1、APP1 和 CLIENT1 配置为使用 RRAS1 作为其默认网关。",
+      "pos": [
+        7882,
+        7927
+      ]
+    },
+    {
+      "content": "在 DC1 的管理员级 Windows PowerShell 命令提示符下运行这些命令。",
+      "pos": [
+        7930,
+        7974
+      ]
+    },
+    {
+      "pos": [
+        8119,
+        8170
+      ],
+      "content": "如果接口名称不是“Ethernet”，请使用 <bpt id=\"p1\">**</bpt>Get-NetAdapter<ept id=\"p1\">**</ept> 命令确定接口名称。"
+    },
+    {
+      "content": "在 APP1 的管理员级 Windows PowerShell 命令提示符下运行此命令。",
+      "pos": [
+        8172,
+        8216
+      ]
+    },
+    {
+      "content": "在 CLIENT1 的管理员级 Windows PowerShell 命令提示符下运行此命令。",
+      "pos": [
+        8312,
+        8359
+      ]
+    },
+    {
+      "content": "这是你当前的配置。",
+      "pos": [
+        8382,
+        8391
+      ]
+    },
+    {
+      "content": "阶段 5：配置 DC2",
+      "pos": [
+        8497,
+        8508
+      ]
+    },
+    {
+      "content": "首先，在本地计算机的 Azure PowerShell 命令提示符下使用这些命令创建适用于 DC2 的 Azure 虚拟机。",
+      "pos": [
+        8510,
+        8572
+      ]
+    },
+    {
+      "content": "接下来，登录到新的 DC2 虚拟机上。",
+      "pos": [
+        9525,
+        9544
+      ]
+    },
+    {
+      "content": "在 Azure 管理门户的左窗格中，单击“虚拟机”，然后单击 DC2 的“状态”列中的“正在运行”。",
+      "pos": [
+        9550,
+        9600
+      ]
+    },
+    {
+      "content": "在任务栏中，单击“连接”。",
+      "pos": [
+        9605,
+        9618
+      ]
+    },
+    {
+      "content": "当系统提示你打开 DC2.rdp 时，单击“打开”。",
+      "pos": [
+        9624,
+        9650
+      ]
+    },
+    {
+      "content": "遇到远程桌面连接消息框提示时，单击“连接”。",
+      "pos": [
+        9655,
+        9677
+      ]
+    },
+    {
+      "content": "当系统提示你输入凭据时，请使用以下凭据：",
+      "pos": [
+        9682,
+        9702
+      ]
+    },
+    {
+      "pos": [
+        9709,
+        9731
+      ],
+      "content": "名称：*<bpt id=\"p1\">*</bpt>DC2\\*<ept id=\"p1\">*</ept>[本地管理员帐户名称]"
+    },
+    {
+      "content": "密码：[本地管理员帐户密码]",
+      "pos": [
+        9738,
+        9752
+      ]
+    },
+    {
+      "content": "当系统使用引用证书的远程桌面连接消息框提示你时，单击“是”。",
+      "pos": [
+        9757,
+        9787
+      ]
+    },
+    {
+      "content": "接下来，配置 Windows 防火墙规则，以允许进行基本的连接测试所需的流量。在 DC2 上的管理员级 Windows PowerShell 命令提示符下运行以下命令：",
+      "pos": [
+        9789,
+        9873
+      ]
+    },
+    {
+      "content": "使用 ping 命令时，会从 IP 地址 10.0.0.1 传回四个成功的答复。这是对站点到站点 VPN 连接的流量测试。",
+      "pos": [
+        10011,
+        10072
+      ]
+    },
+    {
+      "content": "接下来，将额外的数据磁盘添加为驱动器盘符为 F: 的新卷。",
+      "pos": [
+        10074,
+        10103
+      ]
+    },
+    {
+      "pos": [
+        10109,
+        10151
+      ],
+      "content": "在服务器管理器的左窗格中，单击<bpt id=\"p1\">**</bpt>“文件和存储服务”<ept id=\"p1\">**</ept>，然后单击<bpt id=\"p2\">**</bpt>“磁盘”<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "在内容窗格的“磁盘”组中，单击“磁盘 2”（其“分区”设置为“未知”）。",
+      "pos": [
+        10156,
+        10192
+      ]
+    },
+    {
+      "pos": [
+        10197,
+        10222
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“任务”<ept id=\"p1\">**</ept>，然后单击<bpt id=\"p2\">**</bpt>“新建卷”<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "pos": [
+        10227,
+        10255
+      ],
+      "content": "在新建卷向导的“开始之前”页上，单击<bpt id=\"p1\">**</bpt>“下一步”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "在“选择服务器和磁盘”页上，单击“磁盘 2”，然后单击“下一步”。出现提示时，单击“确定”。",
+      "pos": [
+        10260,
+        10306
+      ]
+    },
+    {
+      "pos": [
+        10311,
+        10335
+      ],
+      "content": "在“指定卷的大小”页上，单击<bpt id=\"p1\">**</bpt>“下一步”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        10340,
+        10369
+      ],
+      "content": "在“分配到驱动器号或文件夹”页上，单击<bpt id=\"p1\">**</bpt>“下一步”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        10374,
+        10400
+      ],
+      "content": "在“选择文件系统设置”页上，单击<bpt id=\"p1\">**</bpt>“下一步”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        10405,
+        10426
+      ],
+      "content": "在“确认选择”页上，单击<bpt id=\"p1\">**</bpt>“创建”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        10431,
+        10446
+      ],
+      "content": "完成后，单击<bpt id=\"p1\">**</bpt>“关闭”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "接下来，将 DC2 配置为 corp.contoso.com 域的副本域控制器。在 DC2 上的 Windows PowerShell 命令提示符下运行这些命令。",
+      "pos": [
+        10448,
+        10529
+      ]
+    },
+    {
+      "content": "请注意，系统会提示你输入 CORP\\\\User1 密码和目录服务还原模式 (DSRM) 密码，然后重新启动 DC2。",
+      "pos": [
+        10791,
+        10849
+      ]
+    },
+    {
+      "content": "由于 TestVNET 虚拟网络有自己的 DNS 服务器 (DC2)，因此必须将 TestVNET 虚拟网络配置为使用此 DNS 服务器。",
+      "pos": [
+        10851,
+        10920
+      ]
+    },
+    {
+      "content": "在 Azure 管理门户的左窗格中，单击“网络”，然后单击“TestVNET”。",
+      "pos": [
+        10926,
+        10966
+      ]
+    },
+    {
+      "pos": [
+        10971,
+        10982
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“配置”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "在“DNS 服务器”中，删除“10.0.0.1”条目。",
+      "pos": [
+        10987,
+        11014
+      ]
+    },
+    {
+      "content": "在“DNS 服务器”中添加一个条目，该条目使用“DC2”作为名称，使用“192.168.0.4”作为 IP 地址。",
+      "pos": [
+        11019,
+        11076
+      ]
+    },
+    {
+      "pos": [
+        11082,
+        11102
+      ],
+      "content": "在底部的命令栏中，单击<bpt id=\"p1\">**</bpt>“保存”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "在 Azure 管理门户的左窗格中，单击“虚拟机”，然后单击 DC2 旁边的“状态”列。",
+      "pos": [
+        11107,
+        11151
+      ]
+    },
+    {
+      "pos": [
+        11156,
+        11187
+      ],
+      "content": "在命令栏中，单击<bpt id=\"p1\">**</bpt>“重新启动”<ept id=\"p1\">**</ept>。等待 DC2 重新启动。"
+    },
+    {
+      "content": "这是你当前的配置。",
+      "pos": [
+        11190,
+        11199
+      ]
+    },
+    {
+      "content": "现在，你的混合云环境已准备好进行测试。",
+      "pos": [
+        11301,
+        11320
+      ]
+    },
+    {
+      "pos": [
+        11324,
+        11360
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"costs\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 最大程度地降低此环境的持续使用成本"
+    },
+    {
+      "pos": [
+        11362,
+        11572
+      ],
+      "content": "若要将在此环境中运行虚拟机的成本降到最低，请尽快执行所需的测试和演示，然后删除它们或关闭虚拟机（在不使用时进行）。例如，你可以在每个营业日结束时使用 Azure 自动化和 Runbook 来自动关闭 Test\\_VNET 虚拟网络中的虚拟机。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 自动化入门<ept id=\"p1\">](/documentation/articles/automation-create-runbook-from-samples)</ept>。"
+    },
+    {
+      "pos": [
+        11574,
+        11729
+      ],
+      "content": "在实施时，Azure VPN 网关将由两台 Azure 虚拟机组成，因此会产生持续的货币成本。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>定价 - 虚拟网络<ept id=\"p1\">](/home/features/networking/#price)</ept>。若要将 VPN 网关的成本降到最低，请创建测试环境并尽快执行所需测试和演示，或者通过这些步骤删除该网关。"
+    },
+    {
+      "content": "在本地计算机上的 Azure 管理门户中，依次单击左窗格中的“网络”、“TestVNET”、“仪表板”。",
+      "pos": [
+        11735,
+        11787
+      ]
+    },
+    {
+      "content": "在任务栏中，单击“删除网关”。出现提示时单击“是”。等待，直到网关删除完毕且其状态更改为“未创建网关”。",
+      "pos": [
+        11792,
+        11844
+      ]
+    },
+    {
+      "content": "如果你删除网关后又想要还原测试环境，则必须先创建新的网关。",
+      "pos": [
+        11846,
+        11875
+      ]
+    },
+    {
+      "content": "从本地计算机上的 Azure 管理门户中，单击左窗格中的“网络”，然后单击“TestVNET”。在“仪表板”页上，你会看到状态“未创建网关”。",
+      "pos": [
+        11881,
+        11952
+      ]
+    },
+    {
+      "content": "在任务栏中，单击“创建网关”，然后单击“动态路由”。出现提示时单击“是”。请一直等到网关完成且其状态更改为“正在连接”。这可能需要几分钟的时间。",
+      "pos": [
+        11957,
+        12029
+      ]
+    },
+    {
+      "content": "记下“仪表板”页中的“网关 IP 地址”。这是 TestVNET 虚拟网络的 Azure VPN 网关的全新公共 IP 地址。你需要此 IP 地址来重新配置 RRAS1。",
+      "pos": [
+        12034,
+        12119
+      ]
+    },
+    {
+      "content": "在任务栏中，单击“管理密钥”，然后单击密钥旁边的复制图标，将密钥复制到剪贴板中。将此密钥值粘贴到文档中并进行保存。你需要此密钥值来重新配置 RRAS1。",
+      "pos": [
+        12124,
+        12200
+      ]
+    },
+    {
+      "content": "接下来，以本地管理员身份登录到 RRAS1，然后在管理员级 Windows PowerShell 命令提示符下运行这些命令，以便使用新的公共 IP 地址和预共享的密钥重新配置 RRAS1。",
+      "pos": [
+        12203,
+        12297
+      ]
+    },
+    {
+      "content": "接下来，请转到本地计算机上的 Azure 管理门户中等待，一直等到 TestVNET 虚拟网络显示状态为“已连接”。",
+      "pos": [
+        12457,
+        12515
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        12521,
+        12525
+      ]
+    },
+    {
+      "pos": [
+        12529,
+        12848
+      ],
+      "content": "在此环境中设置 <bpt id=\"p1\">[</bpt>SharePoint intranet 场<ept id=\"p1\">](/documentation/articles/virtual-networks-setup-sharepoint-hybrid-cloud-testing)</ept>、<bpt id=\"p2\">[</bpt>基于 Web 的 LOB 应用程序<ept id=\"p2\">](/documentation/articles/virtual-networks-setup-lobapp-hybrid-cloud-testing)</ept>或者 <bpt id=\"p3\">[</bpt>Office 365 目录同步 (DirSync) 服务器<ept id=\"p3\">](/documentation/articles/virtual-networks-setup-dirsync-hybrid-cloud-testing)</ept>。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"混合云测试环境 | Azure\" \n    description=\"了解如何创建混合云环境，以便 IT 专业人员或开发人员使用简化的本地网络完成测试。\" \n    services=\"virtual-network\" \n    documentationCenter=\"\" \n    authors=\"JoeDavies-MSFT\" \n    manager=\"timlt\" \n    editor=\"\"\n    tags=\"azure-service-management\"/>\n\n<tags\n    ms.service=\"virtual-network\"\n    ms.date=\"01/28/2016\"\n    wacn.date=\"03/17/2016\"/>\n\n# 设置用于测试的混合云环境\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]\n \n\n本主题将指导你逐步使用 Azure 创建混合云环境，以便进行测试。这是生成的配置。\n\n![](./media/virtual-networks-setup-hybrid-cloud-environment-testing/CreateHybridCloudVNet_5.png)\n\n这会通过你在 Internet 上的位置模拟真实的混合生产环境。它包括：\n\n-  简化的本地网络（Corpnet 子网）。\n-  在 Azure 中托管的跨界虚拟网络 (TestVNET)。\n-  站点到站点 VPN 连接。\n-  TestVNET 虚拟网络中的辅助域控制器。\n\n此配置提供了基础和通用的起始点，你可以据此执行以下操作：\n\n-  在混合云环境中开发和测试应用程序。\n-  针对基于混合云的 IT 工作负载，创建一部分位于 Corpnet 子网上，一部分位于 TestVNET 虚拟网络中的计算机的测试配置。\n\n设置此混合云测试环境需要完成以下五个主要阶段：\n\n1.  在 Corpnet 子网上配置计算机。\n2.  配置 RRAS1。\n3.  创建跨界 Azure 虚拟网络。\n4.  创建站点到站点 VPN 连接。\n5.  配置 DC2。 \n\n如果你还没有 Azure 订阅，可以通过[试用 Azure](/pricing/1rmb-trial/) 注册试用版。\n\n>[AZURE.NOTE] Azure 中的虚拟机和虚拟网关在运行时会持续产生货币成本。此成本是针对你的试用版。若要在不使用的情况下降低运行此测试环境的成本，请参阅本主题中的[最大程度地降低此环境的持续使用成本](#costs)，了解详细信息。\n\n此配置要求使用一个由最多四台计算机组成的测试子网，这些计算机使用公共 IP 地址直接连接到 Internet。如果没有这些资源，你也可以[设置用于测试的模拟混合云环境](/documentation/articles/virtual-networks-setup-simulated-hybrid-cloud-environment-testing)。模拟混合云测试环境只需要 Azure 订阅。\n\n## 阶段 1：在 Corpnet 子网上配置计算机\n\n按照[测试实验室指南：Windows Server 2012 R2 的基本配置](http://www.microsoft.com/download/details.aspx?id=39638)的“配置 Corpnet 子网的步骤”一节中的说明，在名为 Corpnet 的子网上配置 DC1、APP1 和 CLIENT1 计算机。**此子网必须与组织网络隔离，因为它将通过 RRAS1 计算机直接连接到 Internet。**\n\n接下来，使用 CORP\\\\User1 凭据登录到 DC1。若要配置 CORP 域，以便计算机和用户使用其本地域控制器进行身份验证，请从管理员级 Windows PowerShell 命令提示符运行这些命令。\n\n    New-ADReplicationSite -Name \"TestLab\" \n    New-ADReplicationSite -Name \"TestVNET\"\n    New-ADReplicationSubnet -Name \"10.0.0.0/8\" -Site \"TestLab\"\n    New-ADReplicationSubnet -Name \"192.168.0.0/16\" -Site \"TestVNET\n\n这是你当前的配置。\n\n![](./media/virtual-networks-setup-hybrid-cloud-environment-testing/CreateHybridCloudVNet_1.png)\n \n## 阶段 2：配置 RRAS1\n\nRRAS1 在 Corpnet 子网和 TestVNET 虚拟网络的计算机之间提供通信路由和 VPN 设备服务。RRAS1 必须安装两个网络适配器。\n\n首先，在 RRAS1 上安装操作系统。\n\n1.  启动 Windows Server 2012 R2 的安装。\n2.  按照说明操作以完成安装过程，指定本地管理员帐户的强密码。使用本地管理员帐户登录。\n3.  将 RRAS1 连接到具有 Internet 访问权限的网络，并运行 Windows 更新，为 Windows Server 2012 R2 安装最新的更新。\n4.  将一个网络适配器连接到 Corpnet 子网，将另一个直接连接到 Internet。RRAS1 可以位于 Internet 防火墙后面，但不能在网络地址转换器 (NAT) 后面。\n\n接下来，配置 RRAS1 的 TCP/IP 属性。你将需要一个公共的 IP 地址配置，包括 Internet 服务提供商 (ISP) 的地址、子网掩码（或前缀长度），以及默认网关和 DNS 服务器。\n\n在 RRAS1 上的管理员级 Windows PowerShell 命令提示符处使用这些命令。在运行这些命令之前，请填写变量值并删除 < and > 字符。你可以从 **Get-NetAdapter** 命令的显示中获取网络适配器的当前名称。\n\n    $corpnetAdapterName=\"<Name of the adapter attached to the Corpnet subnet>\"\n    $internetAdapterName=\"<Name of the adapter attached to the Internet>\"\n    [Ipaddress]$publicIP=\"<Your public IP address>\"\n    $publicIPpreflength=<Prefix length of your public IP address>\n    [IPAddress]$publicDG=\"<Your ISP default gateway>\"\n    [IPAddress]$publicDNS=\"<Your ISP DNS server(s)>\"\n    Rename-NetAdapter -Name $corpnetAdapterName -NewName Corpnet\n    Rename-NetAdapter -Name $internetAdapterName -NewName Internet\n    New-NetIPAddress -InterfaceAlias \"Internet\" -IPAddress $publicIP -PrefixLength $publicIPpreflength -DefaultGateway $publicDG\n    Set-DnsClientServerAddress -InterfaceAlias Internet -ServerAddresses $publicDNS\n    New-NetIPAddress -InterfaceAlias \"Corpnet\" -IPAddress 10.0.0.2 -AddressFamily IPv4 -PrefixLength 24\n    Set-DnsClientServerAddress -InterfaceAlias \"Corpnet\" -ServerAddresses 10.0.0.1\n    Set-DnsClient -InterfaceAlias \"Corpnet\" -ConnectionSpecificSuffix corp.contoso.com\n    New-NetFirewallRule -DisplayName \"Allow ICMPv4-Input\" -Protocol ICMPv4\n    New-NetFirewallRule -DisplayName \"Allow ICMPv4-Output\" -Protocol ICMPv4 -Direction Outbound\n    Disable-NetAdapterBinding -Name \"Internet\" -ComponentID ms_msclient\n    Disable-NetAdapterBinding -Name \"Internet\" -ComponentID ms_server\n    ping dc1.corp.contoso.com\n\n对于最后一个命令，请验证是否有四个响应来自 IP 地址 10.0.0.1。\n\n这是你当前的配置。\n\n![](./media/virtual-networks-setup-hybrid-cloud-environment-testing/CreateHybridCloudVNet_2.png)\n\n## 阶段 3：创建跨界 Azure 虚拟网络\n\n首先，使用 Azure 订阅凭据登录到 [Azure 管理门户](https://manage.windowsazure.cn/)，然后创建名为 TestVNET 的虚拟网络。\n\n1.  在 Azure 管理门户的任务栏中，单击“新建”>“网络服务”>“虚拟网络”>“自定义创建”。\n2.  在“虚拟网络详细信息”页的“名称”中键入“TestVNET”。\n3.  在“位置”中，选择你所在位置的相应数据中心。\n4.  单击“下一步”箭头。\n5.  在“DNS 服务器和 VPN 连接”页的“DNS 服务器”中，在“选择或输入名称”中键入“DC1”，在“IP 地址”中键入“10.0.0.1”，然后选择“配置站点到站点 VPN”。\n6.  在“本地网络”中，选择“指定新的本地网络”。 \n7.  单击“下一步”箭头。\n8.  在“站点到站点连接”页上执行以下操作：\n    - 在“名称”中，键入“Corpnet”。 \n    - 在“VPN 设备 IP 地址”中，键入分配给 RRAS1 的 Internet 接口的公共 IP 地址。\n    - 在“地址空间”的“起始 IP”列中，键入“10.0.0.0”。在“CIDR (地址计数)”中，选择“/8”，然后单击“添加地址空间”。\n9.  单击“下一步”箭头。\n10. 在“虚拟网络地址空间”页上执行以下操作：\n    - 在“地址空间”的“起始 IP”中，选择“192.168.0.0”。\n    - 在“子网”中单击“子网 1”，然后将名称替换为“TestSubnet”。 \n    - 在 TestSubnet 的“CIDR (地址计数)”列中，单击“/24 (256)”。\n    - 单击**“添加网关子网”**。\n11. 单击“完成”图标。请等到虚拟网络创建完以后再继续。\n\n接下来，请按[如何安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure) 中的说明在本地计算机上安装 Azure PowerShell。\n\n接下来，请为 TestVNET 虚拟网络创建新的云服务。你必须选取一个唯一的名称。例如，你可将其命名为TestVNET-*UniqueSequence*，其中 *UniqueSequence* 是你组织的缩写。例如，如果你的组织名称为 Tailspin Toys，则可以将云服务命名为 TestVNET-Tailspin。\n\n你可以使用以下 Azure PowerShell 命令在本地计算机上测试该名称的唯一性。\n\n    Test-AzureName -Service <Proposed cloud service name>\n\n如果此命令返回“False”，则你建议的名称是唯一的。使用此命令创建云服务。\n\n    New-AzureService -Service <Unique cloud service name> -Location \"<Same location name as your virtual network>\"\n\n接下来，为 TestVNET 虚拟网络创建新的存储帐户。你必须选取一个唯一的名称。你可以使用此命令测试存储帐户名称的唯一性。\n\n    Test-AzureName -Storage <Proposed storage account name>\n\n如果此命令返回“False”，则你建议的名称是唯一的。使用以下命令创建并设置存储帐户。\n\n    New-AzureStorageAccount -StorageAccountName <Unique storage account name> -Location \"<Same location name as your virtual network>\"\n    Set-AzureStorageAccount -StorageAccountName <Unique storage account name>\n\n这是你当前的配置。\n\n![](./media/virtual-networks-setup-hybrid-cloud-environment-testing/CreateHybridCloudVNet_3.png)\n\n \n## 阶段 4：创建站点到站点 VPN 连接\n\n首先，创建一个虚拟网络网关。\n\n1.  在本地计算机上的 Azure 管理门户中，单击左窗格中的“网络”，然后验证 TestVNET 的“状态”列是否已设置为“已创建”。\n2.  单击“TestVNET”。在“仪表板”页上，你会看到状态“未创建网关”。\n3.  在任务栏中，单击“创建网关”，然后单击“动态路由”。出现提示时单击“是”。请一直等到网关完成且其状态更改为“正在连接”。这可能需要几分钟的时间。\n4.  记下“仪表板”页中的“网关 IP 地址”。这是 TestVNET 虚拟网络的 Azure VPN 网关的公共 IP 地址。你需要此 IP 地址来配置 RRAS1。\n5.  在任务栏中，单击“管理密钥”，然后单击密钥旁边的复制图标，将密钥复制到剪贴板中。将此密钥粘贴到文档中并进行保存。你需要此密钥值来配置 RRAS1。 \n\n接下来，使用路由和远程访问服务配置 RRAS1，让其充当 Corpnet 子网的 VPN 设备。以本地管理员身份登录到 RRAS1，并在 Windows PowerShell 命令提示符下运行这些命令。\n\n    Import-Module ServerManager\n    Install-WindowsFeature RemoteAccess -IncludeManagementTools\n    Add-WindowsFeature -name Routing -IncludeManagementTools\n\n接下来对 RRAS1 进行配置，以便接收来自 Azure VPN 网关的站点到站点 VPN 连接。重新启动 RRAS1，然后以本地管理员身份登录，并在 Windows PowerShell 命令提示符下运行这些命令。你需要提供 Azure VPN 网关的 IP 地址和密钥值。\n\n    $PresharedKey=\"<Key value>\"\n    Import-Module RemoteAccess\n    Install-RemoteAccess -VpnType VpnS2S\n    Add-VpnS2SInterface -Protocol IKEv2 -AuthenticationMethod PSKOnly -Persistent -NumberOfTries 3 -ResponderAuthenticationMethod PSKOnly -Name S2StoTestVNET -Destination \"<IP address of the Azure VPN gateway>\" -IPv4Subnet @(\"192.168.0.0/24:100\") -SharedSecret $PresharedKey\n    Set-VpnServerIPsecConfiguration -EncryptionType MaximumEncryption\n    Set-VpnServerIPsecConfiguration -SADataSizeForRenegotiationKilobytes 33553408\n    New-ItemProperty -Path HKLM:\\System\\CurrentControlSet\\Services\\RemoteAccess\\Parameters\\IKEV2 -Name SkipConfigPayload -PropertyType DWord -Value 1\n    Restart-Service RemoteAccess\n\n接下来，转到本地计算机上的 Azure 管理门户并等待，一直等到 TestVNET 虚拟网络显示状态“已连接”。\n\n接下来，将 RRAS1 配置为支持到各个 Internet 位置的已转换流量。在 RRAS1 上执行以下操作：\n\n1.  在“开始”屏幕中，键入“rras”，然后单击“路由和远程访问”。 \n2.  在控制台树中，打开服务器名称，然后单击“IPv4”。\n3.  右键单击“常规”，然后单击“新建路由协议”。\n4.  单击“NAT”，然后单击“确定”。\n5.  在控制台树中，右键单击“NAT”，然后依次单击“新建接口”、“Corpnet”，再单击“确定”两次。\n6.  右键单击“NAT”，然后依次单击“新建接口”、“Internet”、“确定”。\n7.  在“NAT”选项卡上，单击“连接到 Internet 的公用接口”，选择“在此接口上启用 NAT”，然后单击“确定”。\n\n\n接下来，将 DC1、APP1 和 CLIENT1 配置为使用 RRAS1 作为其默认网关。\n \n在 DC1 的管理员级 Windows PowerShell 命令提示符下运行这些命令。\n\n    New-NetRoute -DestinationPrefix \"0.0.0.0/0\" -InterfaceAlias \"Ethernet\" -NextHop 10.0.0.2\n    Set-DhcpServerv4OptionValue -Router 10.0.0.2\n\n如果接口名称不是“Ethernet”，请使用 **Get-NetAdapter** 命令确定接口名称。\n\n在 APP1 的管理员级 Windows PowerShell 命令提示符下运行此命令。\n\n    New-NetRoute -DestinationPrefix \"0.0.0.0/0\" -InterfaceAlias \"Ethernet\" -NextHop 10.0.0.2\n\n在 CLIENT1 的管理员级 Windows PowerShell 命令提示符下运行此命令。\n\n    ipconfig /renew\n\n这是你当前的配置。\n \n\n![](./media/virtual-networks-setup-hybrid-cloud-environment-testing/CreateHybridCloudVNet_4.png)\n\n\n## 阶段 5：配置 DC2\n\n首先，在本地计算机的 Azure PowerShell 命令提示符下使用这些命令创建适用于 DC2 的 Azure 虚拟机。\n\n    $ServiceName=\"<Your cloud service name from Phase 3>\"\n    $image = Get-AzureVMImage | where { $_.ImageFamily -eq \"Windows Server 2012 R2 Datacenter\" } | sort PublishedDate -Descending | select -ExpandProperty ImageName -First 1\n    $vm1=New-AzureVMConfig -Name DC2 -InstanceSize Medium -ImageName $image\n    $cred=Get-Credential -Message \"Type the name and password of the local administrator account for DC2.\"\n    $vm1 | Add-AzureProvisioningConfig -Windows -AdminUsername $cred.GetNetworkCredential().Username -Password $cred.GetNetworkCredential().Password \n    $vm1 | Add-AzureProvisioningConfig -Windows -AdminUsername $LocalAdminName -Password $LocalAdminPW  \n    $vm1 | Set-AzureSubnet -SubnetNames TestSubnet\n    $vm1 | Set-AzureStaticVNetIP -IPAddress 192.168.0.4\n    $vm1 | Add-AzureDataDisk -CreateNew -DiskSizeInGB 20 -DiskLabel ADFiles -LUN 0 -HostCaching None\n    New-AzureVM -ServiceName $ServiceName -VMs $vm1 -VNetName TestVNET\n\n\n接下来，登录到新的 DC2 虚拟机上。\n\n1.  在 Azure 管理门户的左窗格中，单击“虚拟机”，然后单击 DC2 的“状态”列中的“正在运行”。\n2.  在任务栏中，单击“连接”。 \n3.  当系统提示你打开 DC2.rdp 时，单击“打开”。\n4.  遇到远程桌面连接消息框提示时，单击“连接”。\n5.  当系统提示你输入凭据时，请使用以下凭据：\n    - 名称：**DC2\\**[本地管理员帐户名称]\n    - 密码：[本地管理员帐户密码]\n6.  当系统使用引用证书的远程桌面连接消息框提示你时，单击“是”。\n\n接下来，配置 Windows 防火墙规则，以允许进行基本的连接测试所需的流量。在 DC2 上的管理员级 Windows PowerShell 命令提示符下运行以下命令：\n\n    Set-NetFirewallRule -DisplayName \"File and Printer Sharing (Echo Request - ICMPv4-In)\" -enabled True\n    ping dc1.corp.contoso.com\n\n使用 ping 命令时，会从 IP 地址 10.0.0.1 传回四个成功的答复。这是对站点到站点 VPN 连接的流量测试。\n\n接下来，将额外的数据磁盘添加为驱动器盘符为 F: 的新卷。\n\n1.  在服务器管理器的左窗格中，单击**“文件和存储服务”**，然后单击**“磁盘”**。\n2.  在内容窗格的“磁盘”组中，单击“磁盘 2”（其“分区”设置为“未知”）。\n3.  单击**“任务”**，然后单击**“新建卷”**。\n4.  在新建卷向导的“开始之前”页上，单击**“下一步”**。\n5.  在“选择服务器和磁盘”页上，单击“磁盘 2”，然后单击“下一步”。出现提示时，单击“确定”。\n6.  在“指定卷的大小”页上，单击**“下一步”**。\n7.  在“分配到驱动器号或文件夹”页上，单击**“下一步”**。\n8.  在“选择文件系统设置”页上，单击**“下一步”**。\n9.  在“确认选择”页上，单击**“创建”**。\n10. 完成后，单击**“关闭”**。\n\n接下来，将 DC2 配置为 corp.contoso.com 域的副本域控制器。在 DC2 上的 Windows PowerShell 命令提示符下运行这些命令。\n\n    Install-WindowsFeature AD-Domain-Services -IncludeManagementTools\n    Install-ADDSDomainController -Credential (Get-Credential CORP\\User1) -DomainName \"corp.contoso.com\" -InstallDns:$true -DatabasePath \"F:\\NTDS\" -LogPath \"F:\\Logs\" -SysvolPath \"F:\\SYSVOL\"\n\n请注意，系统会提示你输入 CORP\\\\User1 密码和目录服务还原模式 (DSRM) 密码，然后重新启动 DC2。\n\n由于 TestVNET 虚拟网络有自己的 DNS 服务器 (DC2)，因此必须将 TestVNET 虚拟网络配置为使用此 DNS 服务器。\n\n1.  在 Azure 管理门户的左窗格中，单击“网络”，然后单击“TestVNET”。\n2.  单击**“配置”**。\n3.  在“DNS 服务器”中，删除“10.0.0.1”条目。\n4.  在“DNS 服务器”中添加一个条目，该条目使用“DC2”作为名称，使用“192.168.0.4”作为 IP 地址。 \n5.  在底部的命令栏中，单击**“保存”**。\n6.  在 Azure 管理门户的左窗格中，单击“虚拟机”，然后单击 DC2 旁边的“状态”列。\n7.  在命令栏中，单击**“重新启动”**。等待 DC2 重新启动。\n\n\n这是你当前的配置。\n\n![](./media/virtual-networks-setup-hybrid-cloud-environment-testing/CreateHybridCloudVNet_5.png)\n\n \n现在，你的混合云环境已准备好进行测试。\n\n##<a id=\"costs\"></a> 最大程度地降低此环境的持续使用成本\n\n若要将在此环境中运行虚拟机的成本降到最低，请尽快执行所需的测试和演示，然后删除它们或关闭虚拟机（在不使用时进行）。例如，你可以在每个营业日结束时使用 Azure 自动化和 Runbook 来自动关闭 Test\\_VNET 虚拟网络中的虚拟机。有关详细信息，请参阅 [Azure 自动化入门](/documentation/articles/automation-create-runbook-from-samples)。\n\n在实施时，Azure VPN 网关将由两台 Azure 虚拟机组成，因此会产生持续的货币成本。有关详细信息，请参阅[定价 - 虚拟网络](/home/features/networking/#price)。若要将 VPN 网关的成本降到最低，请创建测试环境并尽快执行所需测试和演示，或者通过这些步骤删除该网关。\n\n1.  在本地计算机上的 Azure 管理门户中，依次单击左窗格中的“网络”、“TestVNET”、“仪表板”。\n2.  在任务栏中，单击“删除网关”。出现提示时单击“是”。等待，直到网关删除完毕且其状态更改为“未创建网关”。\n\n如果你删除网关后又想要还原测试环境，则必须先创建新的网关。\n\n1.  从本地计算机上的 Azure 管理门户中，单击左窗格中的“网络”，然后单击“TestVNET”。在“仪表板”页上，你会看到状态“未创建网关”。\n2.  在任务栏中，单击“创建网关”，然后单击“动态路由”。出现提示时单击“是”。请一直等到网关完成且其状态更改为“正在连接”。这可能需要几分钟的时间。\n3.  记下“仪表板”页中的“网关 IP 地址”。这是 TestVNET 虚拟网络的 Azure VPN 网关的全新公共 IP 地址。你需要此 IP 地址来重新配置 RRAS1。\n4.  在任务栏中，单击“管理密钥”，然后单击密钥旁边的复制图标，将密钥复制到剪贴板中。将此密钥值粘贴到文档中并进行保存。你需要此密钥值来重新配置 RRAS1。 \n\n接下来，以本地管理员身份登录到 RRAS1，然后在管理员级 Windows PowerShell 命令提示符下运行这些命令，以便使用新的公共 IP 地址和预共享的密钥重新配置 RRAS1。\n\n    $PresharedKey=\"<Key value>\"\n    Set-VpnS2SInterface -Name S2StoTestVNET -Destination \"<IP address of the Azure VPN gateway>\" -SharedSecret $PresharedKey\n\n接下来，请转到本地计算机上的 Azure 管理门户中等待，一直等到 TestVNET 虚拟网络显示状态为“已连接”。\n \n## 后续步骤\n\n- 在此环境中设置 [SharePoint intranet 场](/documentation/articles/virtual-networks-setup-sharepoint-hybrid-cloud-testing)、[基于 Web 的 LOB 应用程序](/documentation/articles/virtual-networks-setup-lobapp-hybrid-cloud-testing)或者 [Office 365 目录同步 (DirSync) 服务器](/documentation/articles/virtual-networks-setup-dirsync-hybrid-cloud-testing)。\n\n<!---HONumber=Mooncake_0307_2016-->"
+}

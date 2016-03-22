@@ -1,0 +1,558 @@
+{
+  "nodes": [
+    {
+      "content": "将 AMQP 1.0 用于 Java 服务总线 API | Azure",
+      "pos": [
+        28,
+        63
+      ]
+    },
+    {
+      "content": "了解如何将 Java 消息服务 (JMS) 用于 Azure 服务总线和高级消息队列",
+      "pos": [
+        83,
+        125
+      ]
+    },
+    {
+      "content": "如何将 Java 消息服务 (JMS) API 用于服务总线和 AMQP 1.0",
+      "pos": [
+        347,
+        387
+      ]
+    },
+    {
+      "content": "高级消息队列协议 (AMQP) 1.0 是一个高效、可靠的线级消息传送协议，可用于构建可靠的跨平台消息传送应用程序。AMQP 1.0 支持已在 2012 年 10 月添加到 Azure 服务总线中，并已在 2013 年 5 月转为正式版 (GA)。",
+      "pos": [
+        389,
+        513
+      ]
+    },
+    {
+      "content": "添加 AMQP 1.0 意味着现在可以通过一系列使用高效二进制协议的平台综合利用 Service Bus 的队列及发布/订阅中转消息传送功能。此外，您还可以生成由结合使用多个语言、框架和操作系统构建的组件组成的应用程序。",
+      "pos": [
+        515,
+        625
+      ]
+    },
+    {
+      "content": "本操作方法指南说明了如何从使用常用的 Java 消息服务 (JMS) API 标准的 Java 应用程序中使用 Service Bus 中转消息传送功能（队列和发布/订阅主题）。",
+      "pos": [
+        627,
+        716
+      ]
+    },
+    {
+      "content": "服务总线入门",
+      "pos": [
+        721,
+        727
+      ]
+    },
+    {
+      "pos": [
+        729,
+        938
+      ],
+      "content": "此指南假定你已具有包含名为“queue1”的队列的 Service Bus 命名空间。 如果没有，则可以使用 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">](http://manage.windowsazure.cn)</ept>创建命名空间和队列。有关如何创建服务总线命名空间和队列的详细信息，请参阅<bpt id=\"p2\">[</bpt>如何使用服务总线队列<ept id=\"p2\">](/documentation/articles/service-bus-dotnet-how-to-use-queues)</ept>。"
+    },
+    {
+      "content": "下载 AMQP 1.0 JMS 客户端库",
+      "pos": [
+        944,
+        964
+      ]
+    },
+    {
+      "pos": [
+        966,
+        1159
+      ],
+      "content": "有关从哪里下载 Apache Qpid JMS AMQP 1.0 客户端库的最新版本的信息，请访问 <bpt id=\"p1\">[</bpt>http://people.apache.org/~rgodfrey/qpid-java-amqp-1-0-client-jms.html<ept id=\"p1\">](http://people.apache.org/~rgodfrey/qpid-java-amqp-1-0-client-jms.html)</ept>。"
+    },
+    {
+      "content": "使用 Service Bus 构建和运行 JMS 应用程序时必须将以下 4 个 JAR 文件从 Apache Qpid JMS AMQP 1.0 分发存档添加到 Java CLASSPATH：",
+      "pos": [
+        1161,
+        1257
+      ]
+    },
+    {
+      "content": "geronimo-jms\\_1.1\\_spec-1.0.jar",
+      "pos": [
+        1264,
+        1295
+      ]
+    },
+    {
+      "content": "qpid-amqp-1-0-client-[version].jar",
+      "pos": [
+        1301,
+        1335
+      ]
+    },
+    {
+      "content": "qpid-amqp-1-0-client-jms-[version].jar",
+      "pos": [
+        1341,
+        1379
+      ]
+    },
+    {
+      "content": "qpid-amqp-1-0-common-[version].jar",
+      "pos": [
+        1385,
+        1419
+      ]
+    },
+    {
+      "content": "为 Java 应用程序编码",
+      "pos": [
+        1424,
+        1437
+      ]
+    },
+    {
+      "content": "Java 命名和目录接口 (JNDI)",
+      "pos": [
+        1443,
+        1462
+      ]
+    },
+    {
+      "content": "JMS 使用 Java 命名和目录接口 (JNDI) 创建逻辑名称和物理名称之间的分隔。将使用 JNDI 解析以下两种类型的 JMS 对象：ConnectionFactory 和 Destination。JNDI 使用一个提供程序模型，你可以在其中插入不同目录服务来处理名称解析任务。Apache Qpid JMS AMQP 1.0 库附带一个使用以下格式的属性文件配置的、基于属性文件的简单 JNDI 提供程序。",
+      "pos": [
+        1464,
+        1671
+      ]
+    },
+    {
+      "content": "配置 ConnectionFactory",
+      "pos": [
+        2133,
+        2153
+      ]
+    },
+    {
+      "pos": [
+        2155,
+        2213
+      ],
+      "content": "用于在 Qpid 属性文件 JNDI 提供程序中定义 <bpt id=\"p1\">**</bpt>ConnectionFactory<ept id=\"p1\">**</ept> 的条目的格式如下："
+    },
+    {
+      "pos": [
+        2272,
+        2321
+      ],
+      "content": "其中，<bpt id=\"p1\">**</bpt>[jndi\\_name]<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>[ConnectionURL]<ept id=\"p2\">**</ept> 具有以下含义："
+    },
+    {
+      "pos": [
+        2325,
+        2420
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>[jndi\\_name]<ept id=\"p1\">**</ept>：ConnectionFactory 的逻辑名称。这是将使用 JNDI IntialContext.lookup() 方法在 Java 应用程序中解析的名称。"
+    },
+    {
+      "pos": [
+        2423,
+        2474
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>[ConnectionURL]<ept id=\"p1\">**</ept>：向 AMQP 中转站提供包含所需信息的 JMS 库的 URL。"
+    },
+    {
+      "pos": [
+        2476,
+        2500
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>ConnectionURL<ept id=\"p1\">**</ept> 的格式如下："
+    },
+    {
+      "pos": [
+        2581,
+        2638
+      ],
+      "content": "其中，<bpt id=\"p1\">**</bpt>[namespace]<ept id=\"p1\">**</ept>、<bpt id=\"p2\">**</bpt>[username]<ept id=\"p2\">**</ept> 和 <bpt id=\"p3\">**</bpt>[password]<ept id=\"p3\">**</ept> 的含义如下："
+    },
+    {
+      "pos": [
+        2642,
+        2667
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>[namespace]<ept id=\"p1\">**</ept>：服务总线命名空间。"
+    },
+    {
+      "pos": [
+        2670,
+        2695
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>[username]<ept id=\"p1\">**</ept>：服务总线颁发者名称。"
+    },
+    {
+      "pos": [
+        2698,
+        2733
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>[password]<ept id=\"p1\">**</ept>：服务总线颁发者密钥的 URL 编码格式。"
+    },
+    {
+      "pos": [
+        2737,
+        2889
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>必须手动为密码进行 URL 编码。在 <bpt id=\"p1\">[</bpt>http://www.w3schools.com/tags/ref\\_urlencode.asp<ept id=\"p1\">](http://www.w3schools.com/tags/ref_urlencode.asp)</ept> 上提供了一个有用的 URL 编码实用工具。"
+    },
+    {
+      "content": "配置目标",
+      "pos": [
+        2896,
+        2900
+      ]
+    },
+    {
+      "content": "用于在 Qpid 属性文件 JNDI 提供程序中定义目标的项的格式如下：",
+      "pos": [
+        2902,
+        2938
+      ]
+    },
+    {
+      "content": "或",
+      "pos": [
+        2984,
+        2985
+      ]
+    },
+    {
+      "pos": [
+        3032,
+        3081
+      ],
+      "content": "其中，<bpt id=\"p1\">**</bpt>[jndi\\_name]<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>[physical\\_name]<ept id=\"p2\">**</ept> 的含义如下："
+    },
+    {
+      "pos": [
+        3085,
+        3164
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>[jndi\\_name]<ept id=\"p1\">**</ept>：目标的逻辑名称。这是将使用 JNDI IntialContext.lookup() 方法在 Java 应用程序中解析的名称。"
+    },
+    {
+      "pos": [
+        3167,
+        3215
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>[physical\\_name]<ept id=\"p1\">**</ept>：应用程序向其发送或从该处接收消息的服务总线实体的名称。"
+    },
+    {
+      "pos": [
+        3220,
+        3411
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在从 Service Bus 主题订阅中接收时，在 JNDI 中指定的物理名称应该是该主题的名称。在 JMS 应用程序代码中创建可持久订阅时提供该订阅名称。<bpt id=\"p1\">[</bpt>服务总线 AMQP 1.0 开发人员指南<ept id=\"p1\">](/documenatation/articles/service-bus-amqp-dotnet)</ept>提供了有关从 JMS 使用服务总线主题订阅的更多详细信息。"
+    },
+    {
+      "content": "编写 JMS 应用程序",
+      "pos": [
+        3417,
+        3428
+      ]
+    },
+    {
+      "pos": [
+        3430,
+        3543
+      ],
+      "content": "将 JMS 用于服务总线时不需要特殊的 API 或选项。但是，有一些限制，我们将在后面说明。与使用任何 JMS 应用程序一样，若要解析 <bpt id=\"p1\">**</bpt>ConnectionFactory<ept id=\"p1\">**</ept> 和目标，首先要做的事情是配置 JNDI 环境。"
+    },
+    {
+      "content": "配置 JNDI InitialContext",
+      "pos": [
+        3550,
+        3572
+      ]
+    },
+    {
+      "pos": [
+        3574,
+        3751
+      ],
+      "content": "JNDI 环境是通过将配置信息的哈希表传入到 javax.naming.InitialContext 类的构造函数中来配置的。哈希表中的两个必需元素是初始上下文工厂的类名称和提供程序 URL。以下代码演示了如何配置 JNDI 环境以将基于 Qpid 属性文件的 JNDI 提供程序用于名为 <bpt id=\"p1\">**</bpt>servicebus.properties<ept id=\"p1\">**</ept> 的属性文件。"
+    },
+    {
+      "content": "使用服务总线队列的简单 JMS 应用程序",
+      "pos": [
+        4056,
+        4076
+      ]
+    },
+    {
+      "content": "以下示例程序将 JMS TextMessages 发送到 JNDI 逻辑名称为 QUEUE 的 Service Bus 队列，然后接收返回的消息。",
+      "pos": [
+        4078,
+        4151
+      ]
+    },
+    {
+      "content": "运行应用程序",
+      "pos": [
+        8015,
+        8021
+      ]
+    },
+    {
+      "content": "运行应用程序将生成以下输出：",
+      "pos": [
+        8023,
+        8037
+      ]
+    },
+    {
+      "content": "JMS 和 .NET 之间的跨平台消息传送",
+      "pos": [
+        8509,
+        8530
+      ]
+    },
+    {
+      "content": "本指南说明了如何使用 JMS 向 Service Bus 发送消息以及从 Service Bus 接收消息。但是，AMQP 1.0 的关键优势之一是它支持通过以不同语言编写的组件生成应用程序，从而能够可靠和完全无损地交换消息。",
+      "pos": [
+        8532,
+        8645
+      ]
+    },
+    {
+      "pos": [
+        8647,
+        8821
+      ],
+      "content": "通过使用前面所述的示例 JMS 应用程序和从随附的指南<bpt id=\"p1\">[</bpt>如何将 AMQP 1.0 用于 .NET 服务总线 .NET API<ept id=\"p1\">](/documentation/articles/service-bus-dotnet-advanced-message-queuing)</ept> 中选取的类似 .NET 应用程序，你可以在 .NET 和 Java 之间交换消息。"
+    },
+    {
+      "pos": [
+        8823,
+        8932
+      ],
+      "content": "有关使用服务总线和 AMQP 1.0 的跨平台消息传送的详细信息，请参阅<bpt id=\"p1\">[</bpt>服务总线 AMQP 1.0 开发人员指南<ept id=\"p1\">](/documenatation/articles/service-bus-amqp-dotnet)</ept>。"
+    },
+    {
+      "content": "JMS 到 .NET",
+      "pos": [
+        8938,
+        8948
+      ]
+    },
+    {
+      "content": "演示 JMS 到 .NET 消息传送：",
+      "pos": [
+        8950,
+        8969
+      ]
+    },
+    {
+      "content": "启动 .NET 示例应用程序而不使用任何命令行参数。",
+      "pos": [
+        8973,
+        8999
+      ]
+    },
+    {
+      "content": "使用“sendonly”命令行参数启动 Java 示例应用程序。在此模式下，应用程序不会从队列接收消息，而只会发送消息。",
+      "pos": [
+        9002,
+        9062
+      ]
+    },
+    {
+      "pos": [
+        9065,
+        9104
+      ],
+      "content": "在 Java 应用程序控制台中按 <bpt id=\"p1\">**</bpt>Enter<ept id=\"p1\">**</ept> 多次，这将导致消息发送。"
+    },
+    {
+      "content": "这些消息由 .NET 应用程序接收。",
+      "pos": [
+        9107,
+        9125
+      ]
+    },
+    {
+      "content": "从 JMS 应用程序输出",
+      "pos": [
+        9132,
+        9144
+      ]
+    },
+    {
+      "content": "从 .NET 应用程序输出",
+      "pos": [
+        9433,
+        9446
+      ]
+    },
+    {
+      "content": ".NET 到 JMS",
+      "pos": [
+        9745,
+        9755
+      ]
+    },
+    {
+      "content": "演示 NET 到 JMS 消息传送：",
+      "pos": [
+        9757,
+        9775
+      ]
+    },
+    {
+      "content": "使用“sendonly”命令行参数启动 .NET 示例应用程序。在此模式下，应用程序不会从队列接收消息，而只会发送消息。",
+      "pos": [
+        9779,
+        9839
+      ]
+    },
+    {
+      "content": "启动 Java 示例应用程序而不使用任何命令行参数。",
+      "pos": [
+        9842,
+        9868
+      ]
+    },
+    {
+      "pos": [
+        9871,
+        9910
+      ],
+      "content": "在 .NET 应用程序控制台中按 <bpt id=\"p1\">**</bpt>Enter<ept id=\"p1\">**</ept> 多次，这将导致消息发送。"
+    },
+    {
+      "content": "这些消息由 Java 应用程序接收。",
+      "pos": [
+        9913,
+        9931
+      ]
+    },
+    {
+      "content": "从 .NET 应用程序输出",
+      "pos": [
+        9938,
+        9951
+      ]
+    },
+    {
+      "content": "从 JMS 应用程序输出",
+      "pos": [
+        10263,
+        10275
+      ]
+    },
+    {
+      "content": "不受支持的功能和限制",
+      "pos": [
+        10606,
+        10616
+      ]
+    },
+    {
+      "content": "在将 JMS over AMQP 1.0 用于 Service Bus 时存在以下限制，即：",
+      "pos": [
+        10618,
+        10664
+      ]
+    },
+    {
+      "pos": [
+        10668,
+        10801
+      ],
+      "content": "每个<bpt id=\"p1\">**</bpt>会话<ept id=\"p1\">**</ept>只允许一个 <bpt id=\"p2\">**</bpt>MessageProducer<ept id=\"p2\">**</ept> 或 <bpt id=\"p3\">**</bpt>MessageConsumer<ept id=\"p3\">**</ept>。如果你需要在应用程序中创建多个 <bpt id=\"p4\">**</bpt>MessageProducers<ept id=\"p4\">**</ept> 或 <bpt id=\"p5\">**</bpt>MessageConsumers<ept id=\"p5\">**</ept>，请分别为它们创建专用<bpt id=\"p6\">**</bpt>会话<ept id=\"p6\">**</ept>。"
+    },
+    {
+      "content": "当前不支持易失性主题订阅。",
+      "pos": [
+        10804,
+        10817
+      ]
+    },
+    {
+      "pos": [
+        10820,
+        10847
+      ],
+      "content": "当前不支持 <bpt id=\"p1\">**</bpt>MessageSelectors<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        10850,
+        10957
+      ],
+      "content": "当前不支持临时目标（即 <bpt id=\"p1\">**</bpt>TemporaryQueue<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>TemporaryTopic<ept id=\"p2\">**</ept>），以及使用这些目标的 <bpt id=\"p3\">**</bpt>QueueRequestor<ept id=\"p3\">**</ept> 和 <bpt id=\"p4\">**</bpt>TopicRequestor<ept id=\"p4\">**</ept> API。"
+    },
+    {
+      "content": "不支持事务处理会话和分布式事务。",
+      "pos": [
+        10960,
+        10976
+      ]
+    },
+    {
+      "content": "摘要",
+      "pos": [
+        10981,
+        10983
+      ]
+    },
+    {
+      "content": "本操作方法指南演示了如何通过使用常用 JMS API 和 AMQP 1.0 通过 Java 使用 Service Bus 中转消息传送功能（队列和发布/订阅主题）。",
+      "pos": [
+        10985,
+        11067
+      ]
+    },
+    {
+      "pos": [
+        11069,
+        11257
+      ],
+      "content": "也可以通过其他语言（包括 .NET、C、Python 和 PHP）使用 Service Bus AMQP 1.0。使用这些不同语言构建的组件可以使用服务总线中的 AMQP 1.0 支持可靠且完全无损地交换消息。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>服务总线 AMQP 1.0 开发人员指南<ept id=\"p1\">](/documenatation/articles/service-bus-amqp-dotnet)</ept>。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        11262,
+        11266
+      ]
+    },
+    {
+      "content": "Azure Service Bus 中的 AMQP 1.0 支持",
+      "pos": [
+        11271,
+        11303
+      ]
+    },
+    {
+      "content": "如何将 AMQP 1.0 与服务总线 .NET API 一起使用",
+      "pos": [
+        11359,
+        11391
+      ]
+    },
+    {
+      "content": "服务总线 AMQP 1.0 开发人员指南",
+      "pos": [
+        11465,
+        11485
+      ]
+    },
+    {
+      "content": "如何使用 Service Bus 队列",
+      "pos": [
+        11540,
+        11559
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"将 AMQP 1.0 用于 Java 服务总线 API | Azure\" \n    description=\"了解如何将 Java 消息服务 (JMS) 用于 Azure 服务总线和高级消息队列\"\n    services=\"service-bus\"\n    documentationCenter=\"java\"\n    authors=\"sethmanheim\"  \n    manager=\"timlt\" \n    editor=\"\"/>\n\n<tags \n    ms.service=\"service-bus\" \n    ms.date=\"11/06/2015\" \n    wacn.date=\"01/14/2016\"/>\n\n\n# 如何将 Java 消息服务 (JMS) API 用于服务总线和 AMQP 1.0\n\n高级消息队列协议 (AMQP) 1.0 是一个高效、可靠的线级消息传送协议，可用于构建可靠的跨平台消息传送应用程序。AMQP 1.0 支持已在 2012 年 10 月添加到 Azure 服务总线中，并已在 2013 年 5 月转为正式版 (GA)。\n\n添加 AMQP 1.0 意味着现在可以通过一系列使用高效二进制协议的平台综合利用 Service Bus 的队列及发布/订阅中转消息传送功能。此外，您还可以生成由结合使用多个语言、框架和操作系统构建的组件组成的应用程序。\n\n本操作方法指南说明了如何从使用常用的 Java 消息服务 (JMS) API 标准的 Java 应用程序中使用 Service Bus 中转消息传送功能（队列和发布/订阅主题）。\n\n## 服务总线入门\n\n此指南假定你已具有包含名为“queue1”的队列的 Service Bus 命名空间。 如果没有，则可以使用 [Azure 经典门户](http://manage.windowsazure.cn)创建命名空间和队列。有关如何创建服务总线命名空间和队列的详细信息，请参阅[如何使用服务总线队列](/documentation/articles/service-bus-dotnet-how-to-use-queues)。\n\n### 下载 AMQP 1.0 JMS 客户端库\n\n有关从哪里下载 Apache Qpid JMS AMQP 1.0 客户端库的最新版本的信息，请访问 [http://people.apache.org/~rgodfrey/qpid-java-amqp-1-0-client-jms.html](http://people.apache.org/~rgodfrey/qpid-java-amqp-1-0-client-jms.html)。\n\n使用 Service Bus 构建和运行 JMS 应用程序时必须将以下 4 个 JAR 文件从 Apache Qpid JMS AMQP 1.0 分发存档添加到 Java CLASSPATH：\n\n*    geronimo-jms\\_1.1\\_spec-1.0.jar\n*    qpid-amqp-1-0-client-[version].jar\n*    qpid-amqp-1-0-client-jms-[version].jar\n*    qpid-amqp-1-0-common-[version].jar\n\n## 为 Java 应用程序编码\n\n### Java 命名和目录接口 (JNDI)\n\nJMS 使用 Java 命名和目录接口 (JNDI) 创建逻辑名称和物理名称之间的分隔。将使用 JNDI 解析以下两种类型的 JMS 对象：ConnectionFactory 和 Destination。JNDI 使用一个提供程序模型，你可以在其中插入不同目录服务来处理名称解析任务。Apache Qpid JMS AMQP 1.0 库附带一个使用以下格式的属性文件配置的、基于属性文件的简单 JNDI 提供程序。\n\n```\n\n    # servicebus.properties – sample JNDI configuration\n        \n    # Register a ConnectionFactory in JNDI using the form:\n    # connectionfactory.[jndi_name] = [ConnectionURL]\n    connectionfactory.SBCF = amqps://[username]:[password]@[namespace].servicebus.chinacloudapi.cn\n        \n    # Register some queues in JNDI using the form\n    # queue.[jndi_name] = [physical_name]\n    # topic.[jndi_name] = [physical_name]\n    queue.QUEUE = queue1\n```\n\n#### 配置 ConnectionFactory\n\n用于在 Qpid 属性文件 JNDI 提供程序中定义 **ConnectionFactory** 的条目的格式如下：\n\n```\nconnectionfactory.[jndi_name] = [ConnectionURL]\n```\n\n其中，**[jndi\\_name]** 和 **[ConnectionURL]** 具有以下含义：\n\n- **[jndi\\_name]**：ConnectionFactory 的逻辑名称。这是将使用 JNDI IntialContext.lookup() 方法在 Java 应用程序中解析的名称。\n- **[ConnectionURL]**：向 AMQP 中转站提供包含所需信息的 JMS 库的 URL。\n\n**ConnectionURL** 的格式如下：\n\n```\namqps://[username]:[password]@[namespace].servicebus.chinacloudapi.cn\n```\n\n其中，**[namespace]**、**[username]** 和 **[password]** 的含义如下：\n\n- **[namespace]**：服务总线命名空间。\n- **[username]**：服务总线颁发者名称。\n- **[password]**：服务总线颁发者密钥的 URL 编码格式。\n\n> [AZURE.NOTE]必须手动为密码进行 URL 编码。在 [http://www.w3schools.com/tags/ref\\_urlencode.asp](http://www.w3schools.com/tags/ref_urlencode.asp) 上提供了一个有用的 URL 编码实用工具。\n\n#### 配置目标\n\n用于在 Qpid 属性文件 JNDI 提供程序中定义目标的项的格式如下：\n\n```\nqueue.[jndi_name] = [physical_name]\n```\n或\n\n```\ntopic.[jndi_name] = [physical_name]\n```\n\n其中，**[jndi\\_name]** 和 **[physical\\_name]** 的含义如下：\n\n- **[jndi\\_name]**：目标的逻辑名称。这是将使用 JNDI IntialContext.lookup() 方法在 Java 应用程序中解析的名称。\n- **[physical\\_name]**：应用程序向其发送或从该处接收消息的服务总线实体的名称。\n\n\n> [AZURE.NOTE]在从 Service Bus 主题订阅中接收时，在 JNDI 中指定的物理名称应该是该主题的名称。在 JMS 应用程序代码中创建可持久订阅时提供该订阅名称。[服务总线 AMQP 1.0 开发人员指南](/documenatation/articles/service-bus-amqp-dotnet)提供了有关从 JMS 使用服务总线主题订阅的更多详细信息。\n\n### 编写 JMS 应用程序\n\n将 JMS 用于服务总线时不需要特殊的 API 或选项。但是，有一些限制，我们将在后面说明。与使用任何 JMS 应用程序一样，若要解析 **ConnectionFactory** 和目标，首先要做的事情是配置 JNDI 环境。\n\n#### 配置 JNDI InitialContext\n\nJNDI 环境是通过将配置信息的哈希表传入到 javax.naming.InitialContext 类的构造函数中来配置的。哈希表中的两个必需元素是初始上下文工厂的类名称和提供程序 URL。以下代码演示了如何配置 JNDI 环境以将基于 Qpid 属性文件的 JNDI 提供程序用于名为 **servicebus.properties** 的属性文件。\n\n```\nHashtable<String, String> env = new Hashtable<String, String>(); \nenv.put(Context.INITIAL_CONTEXT_FACTORY, \"org.apache.qpid.amqp_1_0.jms.jndi.PropertiesFileInitialContextFactory\"); \nenv.put(Context.PROVIDER_URL, \"servicebus.properties\"); \nInitialContext context = new InitialContext(env);\n``` \n\n### 使用服务总线队列的简单 JMS 应用程序\n\n以下示例程序将 JMS TextMessages 发送到 JNDI 逻辑名称为 QUEUE 的 Service Bus 队列，然后接收返回的消息。\n\n    // SimpleSenderReceiver.java\n    \n    import javax.jms.*;\n    import javax.naming.Context;\n    import javax.naming.InitialContext;\n    import java.io.BufferedReader;\n    import java.io.InputStreamReader;\n    import java.util.Hashtable;\n    import java.util.Random;\n    \n    public class SimpleSenderReceiver implements MessageListener {\n        private static boolean runReceiver = true;\n        private Connection connection;\n        private Session sendSession;\n        private Session receiveSession;\n        private MessageProducer sender;\n        private MessageConsumer receiver;\n        private static Random randomGenerator = new Random();\n    \n        public SimpleSenderReceiver() throws Exception {\n            // Configure JNDI environment\n            Hashtable<String, String> env = new Hashtable<String, String>();\n            env.put(Context.INITIAL_CONTEXT_FACTORY, \n                    \"org.apache.qpid.amqp_1_0.jms.jndi.PropertiesFileInitialContextFactory\");\n            env.put(Context.PROVIDER_URL, \"servicebus.properties\");\n            Context context = new InitialContext(env);\n    \n            // Lookup ConnectionFactory and Queue\n            ConnectionFactory cf = (ConnectionFactory) context.lookup(\"SBCF\");\n            Destination queue = (Destination) context.lookup(\"QUEUE\");\n    \n            // Create Connection\n            connection = cf.createConnection();\n    \n            // Create sender-side Session and MessageProducer\n            sendSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);\n            sender = sendSession.createProducer(queue);\n    \n            if (runReceiver) {\n                // Create receiver-side Session, MessageConsumer,and MessageListener\n                receiveSession = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);\n                receiver = receiveSession.createConsumer(queue);\n                receiver.setMessageListener(this);\n                connection.start();\n            }\n        }\n    \n        public static void main(String[] args) {\n            try {\n    \n                if ((args.length > 0) && args[0].equalsIgnoreCase(\"sendonly\")) {\n                    runReceiver = false;\n                }\n    \n                SimpleSenderReceiver simpleSenderReceiver = new SimpleSenderReceiver();\n                System.out.println(\"Press [enter] to send a message. Type 'exit' + [enter] to quit.\");\n                BufferedReader commandLine = new java.io.BufferedReader(new InputStreamReader(System.in));\n    \n                while (true) {\n                    String s = commandLine.readLine();\n                    if (s.equalsIgnoreCase(\"exit\")) {\n                        simpleSenderReceiver.close();\n                        System.exit(0);\n                    } else {\n                        simpleSenderReceiver.sendMessage();\n                    }\n                }\n            } catch (Exception e) {\n                e.printStackTrace();\n            }\n        }\n    \n        private void sendMessage() throws JMSException {\n            TextMessage message = sendSession.createTextMessage();\n            message.setText(\"Test AMQP message from JMS\");\n            long randomMessageID = randomGenerator.nextLong() >>>1;\n            message.setJMSMessageID(\"ID:\" + randomMessageID);\n            sender.send(message);\n            System.out.println(\"Sent message with JMSMessageID = \" + message.getJMSMessageID());\n        }\n    \n        public void close() throws JMSException {\n            connection.close();\n        }\n    \n        public void onMessage(Message message) {\n            try {\n                System.out.println(\"Received message with JMSMessageID = \" + message.getJMSMessageID());\n                message.acknowledge();\n            } catch (Exception e) {\n                e.printStackTrace();\n            }\n        }\n    }   \n\n### 运行应用程序\n\n运行应用程序将生成以下输出：\n\n```\n> java SimpleSenderReceiver\nPress [enter] to send a message. Type 'exit' + [enter] to quit.\n    \nSent message with JMSMessageID = ID:2867600614942270318\nReceived message with JMSMessageID = ID:2867600614942270318\n    \nSent message with JMSMessageID = ID:7578408152750301483\nReceived message with JMSMessageID = ID:7578408152750301483\n    \nSent message with JMSMessageID = ID:956102171969368961\nReceived message with JMSMessageID = ID:956102171969368961\nexit\n```\n\n## JMS 和 .NET 之间的跨平台消息传送\n\n本指南说明了如何使用 JMS 向 Service Bus 发送消息以及从 Service Bus 接收消息。但是，AMQP 1.0 的关键优势之一是它支持通过以不同语言编写的组件生成应用程序，从而能够可靠和完全无损地交换消息。\n\n通过使用前面所述的示例 JMS 应用程序和从随附的指南[如何将 AMQP 1.0 用于 .NET 服务总线 .NET API](/documentation/articles/service-bus-dotnet-advanced-message-queuing) 中选取的类似 .NET 应用程序，你可以在 .NET 和 Java 之间交换消息。\n\n有关使用服务总线和 AMQP 1.0 的跨平台消息传送的详细信息，请参阅[服务总线 AMQP 1.0 开发人员指南](/documenatation/articles/service-bus-amqp-dotnet)。\n\n### JMS 到 .NET\n\n演示 JMS 到 .NET 消息传送：\n\n* 启动 .NET 示例应用程序而不使用任何命令行参数。\n* 使用“sendonly”命令行参数启动 Java 示例应用程序。在此模式下，应用程序不会从队列接收消息，而只会发送消息。\n* 在 Java 应用程序控制台中按 **Enter** 多次，这将导致消息发送。\n* 这些消息由 .NET 应用程序接收。\n\n#### 从 JMS 应用程序输出\n\n```\n> java SimpleSenderReceiver sendonly\nPress [enter] to send a message. Type 'exit' + [enter] to quit.\nSent message with JMSMessageID = ID:4364096528752411591\nSent message with JMSMessageID = ID:459252991689389983\nSent message with JMSMessageID = ID:1565011046230456854\nexit\n```\n\n#### 从 .NET 应用程序输出\n\n```\n\n    > SimpleSenderReceiver.exe  \n    Press [enter] to send a message. Type 'exit' + [enter] to quit.\n    Received message with MessageID = 4364096528752411591\n    Received message with MessageID = 459252991689389983\n    Received message with MessageID = 1565011046230456854\n    exit\n```\n\n### .NET 到 JMS\n\n演示 NET 到 JMS 消息传送：\n\n* 使用“sendonly”命令行参数启动 .NET 示例应用程序。在此模式下，应用程序不会从队列接收消息，而只会发送消息。\n* 启动 Java 示例应用程序而不使用任何命令行参数。\n* 在 .NET 应用程序控制台中按 **Enter** 多次，这将导致消息发送。\n* 这些消息由 Java 应用程序接收。\n\n#### 从 .NET 应用程序输出\n\n```\n> SimpleSenderReceiver.exe sendonly\nPress [enter] to send a message. Type 'exit' + [enter] to quit.\nSent message with MessageID = d64e681a310a48a1ae0ce7b017bf1cf3  \nSent message with MessageID = 98a39664995b4f74b32e2a0ecccc46bb\nSent message with MessageID = acbca67f03c346de9b7893026f97ddeb\nexit\n```\n\n#### 从 JMS 应用程序输出\n\n```\n> java SimpleSenderReceiver \nPress [enter] to send a message. Type 'exit' + [enter] to quit.\nReceived message with JMSMessageID = ID:d64e681a310a48a1ae0ce7b017bf1cf3\nReceived message with JMSMessageID = ID:98a39664995b4f74b32e2a0ecccc46bb\nReceived message with JMSMessageID = ID:acbca67f03c346de9b7893026f97ddeb\nexit\n```\n\n## 不受支持的功能和限制\n\n在将 JMS over AMQP 1.0 用于 Service Bus 时存在以下限制，即：\n\n* 每个**会话**只允许一个 **MessageProducer** 或 **MessageConsumer**。如果你需要在应用程序中创建多个 **MessageProducers** 或 **MessageConsumers**，请分别为它们创建专用**会话**。\n* 当前不支持易失性主题订阅。\n* 当前不支持 **MessageSelectors**。\n* 当前不支持临时目标（即 **TemporaryQueue** 和 **TemporaryTopic**），以及使用这些目标的 **QueueRequestor** 和 **TopicRequestor** API。\n* 不支持事务处理会话和分布式事务。\n\n## 摘要\n\n本操作方法指南演示了如何通过使用常用 JMS API 和 AMQP 1.0 通过 Java 使用 Service Bus 中转消息传送功能（队列和发布/订阅主题）。\n\n也可以通过其他语言（包括 .NET、C、Python 和 PHP）使用 Service Bus AMQP 1.0。使用这些不同语言构建的组件可以使用服务总线中的 AMQP 1.0 支持可靠且完全无损地交换消息。有关详细信息，请参阅[服务总线 AMQP 1.0 开发人员指南](/documenatation/articles/service-bus-amqp-dotnet)。\n\n## 后续步骤\n\n* [Azure Service Bus 中的 AMQP 1.0 支持](/documentation/articles/service-bus-amqp-overview)\n* [如何将 AMQP 1.0 与服务总线 .NET API 一起使用](/documentation/articles/service-bus-dotnet-advanced-message-queuing)\n* [服务总线 AMQP 1.0 开发人员指南](/documenatation/articles/service-bus-amqp-dotnet)\n* [如何使用 Service Bus 队列](/documentation/articles/service-bus-dotnet-how-to-use-queues)\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

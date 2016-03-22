@@ -1,0 +1,348 @@
+{
+  "nodes": [
+    {
+      "content": "构建使用表存储的 .NET 后端移动服务 | Azure 移动服务",
+      "pos": [
+        28,
+        61
+      ]
+    },
+    {
+      "content": "了解如何对 .NET 后端移动服务使用 Azure 表存储。",
+      "pos": [
+        81,
+        111
+      ]
+    },
+    {
+      "content": "构建使用表存储的 .NET 后端移动服务",
+      "pos": [
+        337,
+        357
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        459,
+        465
+      ]
+    },
+    {
+      "content": "本主题说明如何将非关系数据存储用于 .NET 后端移动服务。在本教程中，你将要修改移动服务快速入门项目，以使用 Azure 表存储而不是默认的 SQL 数据库数据存储。",
+      "pos": [
+        468,
+        552
+      ]
+    },
+    {
+      "pos": [
+        554,
+        597
+      ],
+      "content": "在学习本教程之前，需要先完成<bpt id=\"p1\">[</bpt><ept id=\"p1\">移动服务入门]</ept>教程。你还需要一个 Azure 存储帐户。"
+    },
+    {
+      "content": "在 .NET 后端移动服务中配置 Azure 表存储",
+      "pos": [
+        601,
+        627
+      ]
+    },
+    {
+      "content": "首先，需要配置移动服务和 .NET 后端代码项目以连接到 Azure 存储空间。",
+      "pos": [
+        629,
+        669
+      ]
+    },
+    {
+      "content": "在 Visual Studio 中的“解决方案资源管理器”内，右键单击 .NET 后端项目，然后选择“管理 NuGet 包”。",
+      "pos": [
+        674,
+        737
+      ]
+    },
+    {
+      "pos": [
+        742,
+        843
+      ],
+      "content": "在左窗格中，依次选择“联机”类别、“仅限稳定版本”，搜索 <bpt id=\"p1\">**</bpt>MobileServices<ept id=\"p1\">**</ept>，单击“Azure 移动服务 .NET 后端 Azure 存储空间扩展”包对应的“安装”，然后接受许可协议。"
+    },
+    {
+      "content": "这会将 Azure 存储空间服务支持添加到 .NET 后端移动服务项目。",
+      "pos": [
+        967,
+        1003
+      ]
+    },
+    {
+      "pos": [
+        1008,
+        1092
+      ],
+      "content": "如果你尚未创建你的存储帐户，请参阅<bpt id=\"p1\">[</bpt>如何创建存储帐户<ept id=\"p1\">](/documentation/articles/storage-create-storage-account)</ept>。"
+    },
+    {
+      "pos": [
+        1097,
+        1138
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 经典门户]</ept>中，单击“存储”，单击存储帐户，然后单击“管理密钥”。"
+    },
+    {
+      "content": "记下“存储帐户名称”和“访问密钥”。",
+      "pos": [
+        1143,
+        1161
+      ]
+    },
+    {
+      "pos": [
+        1167,
+        1261
+      ],
+      "content": "在移动服务中，单击“配置”选项卡，向下滚动到“连接字符串”并输入新的连接字符串（其“名称”为 <ph id=\"ph1\">`StorageConnectionString`</ph>，其“值”为存储帐户连接字符串且格式如下）。"
+    },
+    {
+      "pos": [
+        1469,
+        1533
+      ],
+      "content": "在上述字符串中，使用门户中的值替换 <ph id=\"ph1\">`&lt;ACCOUNT_NAME&gt;`</ph> 和 <ph id=\"ph2\">`&lt;ACCESS_KEY&gt;`</ph> 的值，然后单击“保存”。"
+    },
+    {
+      "content": "存储帐户连接字符串将以加密形式存储在应用设置中。你可以在运行时在任何表控制器中访问此字符串。",
+      "pos": [
+        1539,
+        1585
+      ]
+    },
+    {
+      "content": "在 Visual Studio 的解决方案资源管理器中，打开移动服务项目的 Web.config 文件，并添加以下新连接字符串：",
+      "pos": [
+        1590,
+        1654
+      ]
+    },
+    {
+      "pos": [
+        1754,
+        1805
+      ],
+      "content": "将 <ph id=\"ph1\">`&lt;STORAGE_CONNECTION_STRING&gt;`</ph> 占位符替换为步骤 6 中的连接字符串。"
+    },
+    {
+      "content": "移动服务在本地计算机上运行时将使用此连接字符串，使你可以在发布之前测试代码。在 Azure 中运行时，移动服务将改用门户中设置的连接字符串值，并忽略项目中的连接字符串。",
+      "pos": [
+        1811,
+        1895
+      ]
+    },
+    {
+      "pos": [
+        1900,
+        1940
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"modify-service\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>修改数据类型和表控制器"
+    },
+    {
+      "content": "由于 TodoList 快速入门项目设计用于处理使用 Entity Framework 的 SQL 数据库，因此你需要在项目中进行一些更新才能使用表存储。",
+      "pos": [
+        1942,
+        2019
+      ]
+    },
+    {
+      "pos": [
+        2024,
+        2090
+      ],
+      "content": "将 <bpt id=\"p1\">**</bpt>TodoItem<ept id=\"p1\">**</ept> 数据类型修改为派生自 <bpt id=\"p2\">**</bpt>StorageData<ept id=\"p2\">**</ept> 而不是 <bpt id=\"p3\">**</bpt>EntityData<ept id=\"p3\">**</ept>，如下所示。"
+    },
+    {
+      "pos": [
+        2254,
+        2336
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph><bpt id=\"p1\">**</bpt>StorageData<ept id=\"p1\">**</ept> 类型的 Id 属性需要一个复合键，该键是格式为 <bpt id=\"p2\">*</bpt>partitionId<ept id=\"p2\">*</ept>,<bpt id=\"p3\">*</bpt>rowValue<ept id=\"p3\">*</ept> 的字符串。"
+    },
+    {
+      "pos": [
+        2341,
+        2381
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>TodoItemController<ept id=\"p1\">**</ept> 中添加以下 using 语句。"
+    },
+    {
+      "pos": [
+        2472,
+        2524
+      ],
+      "content": "将 <bpt id=\"p1\">**</bpt>TodoItemController<ept id=\"p1\">**</ept> 的 <bpt id=\"p2\">**</bpt>Initialize<ept id=\"p2\">**</ept> 方法替换为以下内容。"
+    },
+    {
+      "content": "这将使用存储帐户连接字符串为请求的控制站创建新的存储域管理器。",
+      "pos": [
+        3159,
+        3190
+      ]
+    },
+    {
+      "pos": [
+        3195,
+        3230
+      ],
+      "content": "将现有的 <bpt id=\"p1\">**</bpt>GetAllTodoItems<ept id=\"p1\">**</ept> 方法替换为以下代码。"
+    },
+    {
+      "content": "不同于 SQL 数据库，此版本不返回 IQueryable",
+      "pos": [
+        3466,
+        3495
+      ]
+    },
+    {
+      "content": "，因此可以绑定到结果，但无法在查询中进一步编写。",
+      "pos": [
+        3504,
+        3528
+      ]
+    },
+    {
+      "content": "更新客户端应用",
+      "pos": [
+        3533,
+        3540
+      ]
+    },
+    {
+      "content": "需要在客户端上进行一项更改，使快速入门应用能够处理使用表存储的 .NET 后端。这是因为表存储提供程序需要复合键。",
+      "pos": [
+        3542,
+        3599
+      ]
+    },
+    {
+      "content": "打开包含数据访问代码的客户端代码文件，并查找执行插入操作的方法。",
+      "pos": [
+        3604,
+        3636
+      ]
+    },
+    {
+      "pos": [
+        3641,
+        3709
+      ],
+      "content": "更新正在添加的 TodoItem 实例，以显式设置采用字符串格式 <ph id=\"ph1\">`&lt;partitionID&gt;,&lt;rowValue&gt;`</ph> 的 Id 字段。"
+    },
+    {
+      "content": "这是一个说明如何在 C# 应用中设置此 ID 的示例，其中 partition 部分是固定的，row 部分基于 GUID 。",
+      "pos": [
+        3715,
+        3777
+      ]
+    },
+    {
+      "content": "现在，可以测试应用。",
+      "pos": [
+        3851,
+        3861
+      ]
+    },
+    {
+      "pos": [
+        3866,
+        3903
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"test-application\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>测试应用程序"
+    },
+    {
+      "content": "（可选）重新发布移动服务 .NET 后端项目。",
+      "pos": [
+        3908,
+        3931
+      ]
+    },
+    {
+      "content": "你也可以先在本地测试移动服务，然后将 .NET 后端项目发布到 Azure。无论是在本地还是在 Azure 中测试，移动服务都使用 Azure 表存储。",
+      "pos": [
+        3942,
+        4018
+      ]
+    },
+    {
+      "content": "运行已连接到移动服务的快速入门客户端应用。",
+      "pos": [
+        4023,
+        4044
+      ]
+    },
+    {
+      "content": "请注意，你看不见以前使用快速入门教程添加的项。这是因为表存储目前是空的。",
+      "pos": [
+        4050,
+        4086
+      ]
+    },
+    {
+      "content": "添加新项以生成数据库更改。",
+      "pos": [
+        4091,
+        4104
+      ]
+    },
+    {
+      "content": "应用和移动服务的行为应如同以往，不过，数据现在将存储在非关系存储而不是 SQL 数据库中。",
+      "pos": [
+        4111,
+        4156
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        4160,
+        4164
+      ]
+    },
+    {
+      "content": "现在你已知道，为 .NET 后端使用表存储是如此简单，接下来建议你了解其他一些后端存储选项：",
+      "pos": [
+        4166,
+        4212
+      ]
+    },
+    {
+      "content": "使用混合连接来连接到本地 SQL Server",
+      "pos": [
+        4217,
+        4240
+      ]
+    },
+    {
+      "content": "混合连接可让移动服务安全地连接到本地资产。这样，移动客户端便可以使用 Azure 访问你的本地数据。支持的资产包括静态 TCP 端口上运行的任何资源，例如 Microsoft SQL Server、MySQL、HTTP Web API 和大多数自定义 Web 服务。",
+      "pos": [
+        4333,
+        4466
+      ]
+    },
+    {
+      "content": "使用移动服务将图像上载到 Azure 存储空间",
+      "pos": [
+        4471,
+        4494
+      ]
+    },
+    {
+      "content": "说明如何扩展 TodoList 示例项目，以便将图像从应用上载到 Azure Blob 存储。",
+      "pos": [
+        4603,
+        4650
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"构建使用表存储的 .NET 后端移动服务 | Azure 移动服务\" \n    description=\"了解如何对 .NET 后端移动服务使用 Azure 表存储。\" \n    services=\"mobile-services\" \n    documentationCenter=\"\" \n    authors=\"ggailey777\" \n    manager=\"dwrede\" \n    editor=\"\"/>\n\n<tags \n    ms.service=\"mobile-services\" \n    ms.date=\"12/11/2015\"\n    wacn.date=\"01/29/2016\"/>\n\n# 构建使用表存储的 .NET 后端移动服务\n\n[AZURE.INCLUDE [mobile-service-note-mobile-apps](../includes/mobile-services-note-mobile-apps.md)]\n\n&nbsp;\n\n\n本主题说明如何将非关系数据存储用于 .NET 后端移动服务。在本教程中，你将要修改移动服务快速入门项目，以使用 Azure 表存储而不是默认的 SQL 数据库数据存储。\n\n在学习本教程之前，需要先完成[移动服务入门]教程。你还需要一个 Azure 存储帐户。\n\n##在 .NET 后端移动服务中配置 Azure 表存储\n\n首先，需要配置移动服务和 .NET 后端代码项目以连接到 Azure 存储空间。\n\n1. 在 Visual Studio 中的“解决方案资源管理器”内，右键单击 .NET 后端项目，然后选择“管理 NuGet 包”。\n\n2. 在左窗格中，依次选择“联机”类别、“仅限稳定版本”，搜索 **MobileServices**，单击“Azure 移动服务 .NET 后端 Azure 存储空间扩展”包对应的“安装”，然后接受许可协议。\n\n    ![](./media/mobile-services-dotnet-backend-store-data-table-storage/mobile-add-storage-nuget-package-dotnet.png)\n\n    这会将 Azure 存储空间服务支持添加到 .NET 后端移动服务项目。\n\n3. 如果你尚未创建你的存储帐户，请参阅[如何创建存储帐户](/documentation/articles/storage-create-storage-account)。\n\n4. 在 [Azure 经典门户]中，单击“存储”，单击存储帐户，然后单击“管理密钥”。\n\n5. 记下“存储帐户名称”和“访问密钥”。\n \n6. 在移动服务中，单击“配置”选项卡，向下滚动到“连接字符串”并输入新的连接字符串（其“名称”为 `StorageConnectionString`，其“值”为存储帐户连接字符串且格式如下）。\n\n        DefaultEndpointsProtocol=https;AccountName=<ACCOUNT_NAME>;AccountKey=<ACCESS_KEY>;\n\n    ![](./media/mobile-services-dotnet-backend-store-data-table-storage/mobile-blob-storage-app-settings.png)\n\n7. 在上述字符串中，使用门户中的值替换 `<ACCOUNT_NAME>` 和 `<ACCESS_KEY>` 的值，然后单击“保存”。\n\n    存储帐户连接字符串将以加密形式存储在应用设置中。你可以在运行时在任何表控制器中访问此字符串。\n\n8. 在 Visual Studio 的解决方案资源管理器中，打开移动服务项目的 Web.config 文件，并添加以下新连接字符串：\n\n        <add name=\"StorageConnectionString\" connectionString=\"<STORAGE_CONNECTION_STRING>\" />\n\n9. 将 `<STORAGE_CONNECTION_STRING>` 占位符替换为步骤 6 中的连接字符串。\n\n    移动服务在本地计算机上运行时将使用此连接字符串，使你可以在发布之前测试代码。在 Azure 中运行时，移动服务将改用门户中设置的连接字符串值，并忽略项目中的连接字符串。\n\n## <a name=\"modify-service\"></a>修改数据类型和表控制器\n\n由于 TodoList 快速入门项目设计用于处理使用 Entity Framework 的 SQL 数据库，因此你需要在项目中进行一些更新才能使用表存储。\n\n1. 将 **TodoItem** 数据类型修改为派生自 **StorageData** 而不是 **EntityData**，如下所示。\n\n        public class TodoItem : StorageData\n        {\n            public string Text { get; set; }\n            public bool Complete { get; set; }\n        }\n\n    >[AZURE.NOTE]**StorageData** 类型的 Id 属性需要一个复合键，该键是格式为 *partitionId*,*rowValue* 的字符串。\n\n2. 在 **TodoItemController** 中添加以下 using 语句。\n\n        using System.Web.Http.OData.Query;\n        using System.Collections.Generic;\n\n3. 将 **TodoItemController** 的 **Initialize** 方法替换为以下内容。\n\n        protected override void Initialize(HttpControllerContext controllerContext)\n        {\n            base.Initialize(controllerContext);\n\n            // Create a new Azure Storage domain manager using the stored \n            // connection string and the name of the table exposed by the controller.\n            string connectionStringName = \"StorageConnectionString\";\n            var tableName = controllerContext.ControllerDescriptor.ControllerName.ToLowerInvariant();\n            DomainManager = new StorageDomainManager<TodoItem>(connectionStringName, \n                tableName, Request, Services);          \n        }\n\n    这将使用存储帐户连接字符串为请求的控制站创建新的存储域管理器。\n\n3. 将现有的 **GetAllTodoItems** 方法替换为以下代码。\n\n        public Task<IEnumerable<TodoItem>> GetAllTodoItems(ODataQueryOptions options)\n        {\n            // Call QueryAsync, passing the supplied query options.\n            return DomainManager.QueryAsync(options);\n        } \n\n    不同于 SQL 数据库，此版本不返回 IQueryable<TEntity>，因此可以绑定到结果，但无法在查询中进一步编写。\n\n## 更新客户端应用\n\n需要在客户端上进行一项更改，使快速入门应用能够处理使用表存储的 .NET 后端。这是因为表存储提供程序需要复合键。\n\n1. 打开包含数据访问代码的客户端代码文件，并查找执行插入操作的方法。\n\n2. 更新正在添加的 TodoItem 实例，以显式设置采用字符串格式 `<partitionID>,<rowValue>` 的 Id 字段。\n\n    这是一个说明如何在 C# 应用中设置此 ID 的示例，其中 partition 部分是固定的，row 部分基于 GUID 。\n\n         todoItem.Id = string.Format(\"partition,{0}\", Guid.NewGuid());\n\n现在，可以测试应用。\n\n## <a name=\"test-application\"></a>测试应用程序\n\n1. （可选）重新发布移动服务 .NET 后端项目。 \n    \n    你也可以先在本地测试移动服务，然后将 .NET 后端项目发布到 Azure。无论是在本地还是在 Azure 中测试，移动服务都使用 Azure 表存储。\n\n2. 运行已连接到移动服务的快速入门客户端应用。\n\n    请注意，你看不见以前使用快速入门教程添加的项。这是因为表存储目前是空的。\n\n3. 添加新项以生成数据库更改。\n \n    应用和移动服务的行为应如同以往，不过，数据现在将存储在非关系存储而不是 SQL 数据库中。\n\n##后续步骤\n\n现在你已知道，为 .NET 后端使用表存储是如此简单，接下来建议你了解其他一些后端存储选项：\n\n+ [使用混合连接来连接到本地 SQL Server](/documentation/articles/mobile-services-dotnet-backend-hybrid-connections-get-started)</br>混合连接可让移动服务安全地连接到本地资产。这样，移动客户端便可以使用 Azure 访问你的本地数据。支持的资产包括静态 TCP 端口上运行的任何资源，例如 Microsoft SQL Server、MySQL、HTTP Web API 和大多数自定义 Web 服务。\n\n+ [使用移动服务将图像上载到 Azure 存储空间](/documentation/articles/mobile-services-dotnet-backend-windows-store-dotnet-upload-data-blob-storaged)</br>说明如何扩展 TodoList 示例项目，以便将图像从应用上载到 Azure Blob 存储。\n\n<!-- Anchors. -->\n[Create a non-relational store]: #create-store\n[Modify data and controllers]: #modify-service\n[Test the application]: #test-application\n\n\n<!-- Images. -->\n\n\n<!-- URLs. -->\n[移动服务入门]: /documentation/articles/mobile-services-dotnet-backend-windows-store-dotnet-get-started\n[Azure 经典门户]: https://manage.windowsazure.cn/\n[What is the Table Service]: /documentation/articles/storage-dotnet-how-to-use-tables/#what-is\n[MongoLab Add-on Page]: /gallery/store/mongolab/mongolab\n \n\n<!---HONumber=Mooncake_0118_2016-->"
+}

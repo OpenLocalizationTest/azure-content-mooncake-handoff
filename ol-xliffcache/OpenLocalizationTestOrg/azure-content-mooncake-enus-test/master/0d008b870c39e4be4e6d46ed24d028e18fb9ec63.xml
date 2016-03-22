@@ -1,0 +1,96 @@
+{
+  "nodes": [
+    {
+      "content": "本部分说明如何从 .NET 控制台应用以标记模板通知的形式发送突发新闻。",
+      "pos": [
+        1,
+        37
+      ]
+    },
+    {
+      "pos": [
+        39,
+        162
+      ],
+      "content": "如果你使用的是移动服务，请参阅<bpt id=\"p1\">[</bpt>推送入门<ept id=\"p1\">](/documentation/articles/mobile-services-dotnet-backend-windows-universal-dotnet-get-started-push/)</ept>教程。"
+    },
+    {
+      "pos": [
+        164,
+        362
+      ],
+      "content": "如果你使用的是 Java 或 PHP，请参阅<bpt id=\"p1\">[</bpt>如何从 Java/PHP 使用通知中心<ept id=\"p1\">](/documentation/articles/notification-hubs-java-backend-how-to)</ept>。你可使用<bpt id=\"p2\">[</bpt>通知中心 REST 接口<ept id=\"p2\">](http://msdn.microsoft.com/library/windowsazure/dn223264.aspx)</ept>通过任何后端发送通知。"
+    },
+    {
+      "pos": [
+        364,
+        418
+      ],
+      "content": "如果你在完成<bpt id=\"p1\">[</bpt>通知中心入门<ept id=\"p1\">][get-started]</ept>时创建了用于发送通知的控制台应用，则跳过步骤 1-3。"
+    },
+    {
+      "content": "在 Visual Studio 中创建新的 Visual C# 控制台应用程序：",
+      "pos": [
+        423,
+        463
+      ]
+    },
+    {
+      "pos": [
+        482,
+        562
+      ],
+      "content": "在 Visual Studio 主菜单中，依次单击“工具”、“库程序包管理器”和“程序包管理器控制台”，然后在控制台窗口中键入以下命令并按 <bpt id=\"p1\">**</bpt>Enter<ept id=\"p1\">**</ept>："
+    },
+    {
+      "pos": [
+        630,
+        777
+      ],
+      "content": "这将使用 <ph id=\"ph1\">&lt;a href=\"http://www.nuget.org/packages/Microsoft.Azure.NotificationHubs/\"&gt;</ph>Microsoft.Azure.Notification Hubs NuGet 包<ph id=\"ph2\">&lt;/a&gt;</ph>添加对 Azure 通知中心 SDK 的引用。"
+    },
+    {
+      "pos": [
+        782,
+        815
+      ],
+      "content": "打开文件 Program.cs 并添加以下 <ph id=\"ph1\">`using`</ph> 语句："
+    },
+    {
+      "pos": [
+        869,
+        905
+      ],
+      "content": "在 <ph id=\"ph1\">`Program`</ph> 类中，添加以下方法，或替换此方法（如果已存在）："
+    },
+    {
+      "content": "此代码将针对字符串数组中的所有 6 个标记发送模板通知。使用标记是为了确保设备仅接收注册类别的通知。",
+      "pos": [
+        2069,
+        2119
+      ]
+    },
+    {
+      "pos": [
+        2124,
+        2257
+      ],
+      "content": "在上面的代码中，将 <ph id=\"ph1\">`&lt;hub name&gt;`</ph> 和 <ph id=\"ph2\">`&lt;connection string with full access&gt;`</ph> 占位符替换为你的通知中心名称和从通知中心仪表板获取的 <bpt id=\"p1\">*</bpt>DefaultFullSharedAccessSignature<ept id=\"p1\">*</ept> 的连接字符串。"
+    },
+    {
+      "pos": [
+        2262,
+        2282
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>Main<ept id=\"p1\">**</ept> 方法中添加以下行："
+    },
+    {
+      "content": "生成控制台应用。",
+      "pos": [
+        2359,
+        2367
+      ]
+    }
+  ],
+  "content": "\n本部分说明如何从 .NET 控制台应用以标记模板通知的形式发送突发新闻。\n\n如果你使用的是移动服务，请参阅[推送入门](/documentation/articles/mobile-services-dotnet-backend-windows-universal-dotnet-get-started-push/)教程。\n\n如果你使用的是 Java 或 PHP，请参阅[如何从 Java/PHP 使用通知中心](/documentation/articles/notification-hubs-java-backend-how-to)。你可使用[通知中心 REST 接口](http://msdn.microsoft.com/library/windowsazure/dn223264.aspx)通过任何后端发送通知。\n\n如果你在完成[通知中心入门][get-started]时创建了用于发送通知的控制台应用，则跳过步骤 1-3。\n\n1. 在 Visual Studio 中创建新的 Visual C# 控制台应用程序： \n\n    ![][13]\n\n2. 在 Visual Studio 主菜单中，依次单击“工具”、“库程序包管理器”和“程序包管理器控制台”，然后在控制台窗口中键入以下命令并按 **Enter**：\n\n        Install-Package Microsoft.Azure.NotificationHubs\n    \n    这将使用 <a href=\"http://www.nuget.org/packages/Microsoft.Azure.NotificationHubs/\">Microsoft.Azure.Notification Hubs NuGet 包</a>添加对 Azure 通知中心 SDK 的引用。\n\n3. 打开文件 Program.cs 并添加以下 `using` 语句：\n\n        using Microsoft.Azure.NotificationHubs;\n\n4. 在 `Program` 类中，添加以下方法，或替换此方法（如果已存在）：\n\n        private static async void SendTemplateNotificationAsync()\n        {\n            // Define the notification hub.\n            NotificationHubClient hub = \n                NotificationHubClient.CreateClientFromConnectionString(\n                    \"<connection string with full access>\", \"<hub name>\");\n\n            // Create an array of breaking news categories.\n            var categories = new string[] { \"World\", \"Politics\", \"Business\", \n                                            \"Technology\", \"Science\", \"Sports\"};\n\n            // Sending the notification as a template notification. All template registrations that contain \n            // \"messageParam\" and the proper tags will receive the notifications. \n            // This includes APNS, GCM, WNS, and MPNS template registrations.\n\n            Dictionary<string, string> templateParams = new Dictionary<string, string>();\n\n            foreach (var category in categories)\n            {\n                templateParams[\"messageParam\"] = \"Breaking \" + category + \" News!\";            \n                await hub.SendTemplateNotificationAsync(templateParams, category);\n            }\n         }\n\n    此代码将针对字符串数组中的所有 6 个标记发送模板通知。使用标记是为了确保设备仅接收注册类别的通知。\n\n6. 在上面的代码中，将 `<hub name>` 和 `<connection string with full access>` 占位符替换为你的通知中心名称和从通知中心仪表板获取的 *DefaultFullSharedAccessSignature* 的连接字符串。\n\n7. 在 **Main** 方法中添加以下行：\n\n         SendTemplateNotificationAsync();\n         Console.ReadLine();\n\n8. 生成控制台应用。\n\n<!-- Anchors -->\n[From a console app]: #console\n[From Mobile Services]: #mobile-services\n[Run the app and generate notifications]: #test-app\n\n<!-- Images. -->\n[13]: ./media/notification-hubs-back-end/notification-hub-create-console-app.png\n\n[15]: ./media/notification-hubs-back-end/notification-hub-scheduler1.png\n[16]: ./media/notification-hubs-back-end/notification-hub-scheduler2.png\n\n<!-- URLs. -->\n[get-started]: /documentation/articles/notification-hubs/notification-hubs-windows-store-dotnet-get-started\n\n[wns object]: http://go.microsoft.com/fwlink/p/?LinkId=260591\n[Notification Hubs Guidance]: http://msdn.microsoft.com/library/jj927170.aspx\n[Notification Hubs How-To for Windows Store]: http://msdn.microsoft.com/library/jj927172.aspx\n[Notification Hubs REST interface]: http://msdn.microsoft.com/library/windowsazure/dn223264.aspx\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

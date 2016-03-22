@@ -1,0 +1,313 @@
+{
+  "nodes": [
+    {
+      "content": "实现故障转移流式处理方案 | Azure",
+      "pos": [
+        28,
+        48
+      ]
+    },
+    {
+      "content": "本主题演示如何实现故障转移流式处理方案。",
+      "pos": [
+        68,
+        88
+      ]
+    },
+    {
+      "content": "实现故障转移流式处理方案",
+      "pos": [
+        308,
+        320
+      ]
+    },
+    {
+      "content": "本演练演示如何将内容 (blob) 从一个资产复制到另一个资产，以便处理按需流式处理的冗余。此方案适用于想要将其 CDN 设置为当我们的某个数据中心出现中断时，在两个数据中心之间进行故障转移的客户。本演练使用 Azure 媒体服务 SDK、Azure 媒体服务 REST API 和 Azure 存储空间 SDK 来演示以下任务。",
+      "pos": [
+        322,
+        487
+      ]
+    },
+    {
+      "content": "在“数据中心 A”中设置一个媒体服务帐户。",
+      "pos": [
+        492,
+        513
+      ]
+    },
+    {
+      "content": "将一个夹层文件上载到源资产中。",
+      "pos": [
+        517,
+        532
+      ]
+    },
+    {
+      "content": "将该资产编码成多比特率 MP4 文件。",
+      "pos": [
+        536,
+        555
+      ]
+    },
+    {
+      "content": "为源资产创建一个只读 SAS 定位器，以获取对关联到源资产的存储帐户中的容器的读取权限。",
+      "pos": [
+        560,
+        604
+      ]
+    },
+    {
+      "content": "从上一步创建的只读 SAS 定位器中获取源资产的容器名称。我们需要使用这些信息在存储帐户（本主题后面将会介绍）之间复制 BLOB。",
+      "pos": [
+        608,
+        673
+      ]
+    },
+    {
+      "content": "为通过编码任务创建的资产创建源定位器。",
+      "pos": [
+        677,
+        696
+      ]
+    },
+    {
+      "content": "然后，若要处理故障转移，请执行以下操作：",
+      "pos": [
+        699,
+        719
+      ]
+    },
+    {
+      "content": "在“数据中心 B”中设置一个媒体服务帐户。",
+      "pos": [
+        724,
+        745
+      ]
+    },
+    {
+      "content": "在目标媒体服务帐户中创建一个目标空资产。",
+      "pos": [
+        749,
+        769
+      ]
+    },
+    {
+      "content": "为目标空资产创建一个写入 SAS 定位器，以获取对关联到目标资产的目标存储帐户中的容器的写入权限。",
+      "pos": [
+        773,
+        822
+      ]
+    },
+    {
+      "content": "使用 Azure 存储空间 SDK 在“数据中心 A”中的源存储帐户与“数据中心 B”中的目标存储帐户（这些存储帐户与所需资产关联）之间复制 blob（资产文件）。",
+      "pos": [
+        826,
+        908
+      ]
+    },
+    {
+      "content": "将复制到目标 blob 容器的 blob（资产文件）与目标资产关联。",
+      "pos": [
+        912,
+        946
+      ]
+    },
+    {
+      "content": "在“数据中心 B”中为资产创建源定位器，并指定为“数据中心 A”中的资产生成的定位器 ID。",
+      "pos": [
+        951,
+        997
+      ]
+    },
+    {
+      "content": "这样，便会提供 URL 的相对路径相同（只有基本 URL 不同）的流式处理 URL。",
+      "pos": [
+        1002,
+        1044
+      ]
+    },
+    {
+      "content": "然后，若要处理任何中断情况，可以在这些源定位器之上创建 CDN。",
+      "pos": [
+        1048,
+        1080
+      ]
+    },
+    {
+      "content": "请注意以下事项：",
+      "pos": [
+        1082,
+        1090
+      ]
+    },
+    {
+      "content": "当前版本的媒体服务 SDK 不支持使用指定的定位器 ID 创建定位器。若要完成此任务，我们将使用媒体服务 REST API。",
+      "pos": [
+        1094,
+        1156
+      ]
+    },
+    {
+      "content": "当前版本的媒体服务 SDK 不支持以编程方式生成会将资产与资产文件关联的 IAssetFile 信息。若要完成此任务，我们将使用 CreateFileInfos 媒体服务 REST API。",
+      "pos": [
+        1159,
+        1254
+      ]
+    },
+    {
+      "content": "不支持使用存储加密资产 (AssetCreationOptions.StorageEncrypted) 进行复制（因为两个媒体服务帐户中的加密密钥将会有所不同）。",
+      "pos": [
+        1258,
+        1339
+      ]
+    },
+    {
+      "pos": [
+        1343,
+        1462
+      ],
+      "content": "如果你想要利用动态打包，则必须先获取至少一个按需流式处理保留单位。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>动态打包资产<ept id=\"p1\">](/documentation/articles/media-services-dynamic-packaging-overview)</ept>。"
+    },
+    {
+      "pos": [
+        1467,
+        1572
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>请考虑将媒体服务<bpt id=\"p1\">[</bpt>复制器工具<ept id=\"p1\">](http://replicator.codeplex.com/)</ept>用作备用选项，以手动实现故障转移流式处理方案。此工具可用于在两个媒体服务帐户之间复制资产。"
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        1576,
+        1580
+      ]
+    },
+    {
+      "pos": [
+        1585,
+        1684
+      ],
+      "content": "在新的或现有的 Azure 订阅中拥有两个媒体服务帐户。请参阅<bpt id=\"p1\">[</bpt>如何创建媒体服务帐户<ept id=\"p1\">](/documentation/articles/media-services-create-account)</ept>。"
+    },
+    {
+      "content": "操作系统：Windows 7、Windows 2008 R2 或 Windows 8。",
+      "pos": [
+        1687,
+        1730
+      ]
+    },
+    {
+      "content": ".NET Framework 4.5 或 .NET Framework 4。",
+      "pos": [
+        1733,
+        1771
+      ]
+    },
+    {
+      "content": "Visual Studio 2010 SP1 或更高版本（专业版、高级专业版、旗舰版或学习版）。",
+      "pos": [
+        1774,
+        1822
+      ]
+    },
+    {
+      "content": "设置项目",
+      "pos": [
+        1827,
+        1831
+      ]
+    },
+    {
+      "content": "在本部分中，你将创建和设置一个 C# 控制台应用程序项目。",
+      "pos": [
+        1833,
+        1862
+      ]
+    },
+    {
+      "content": "使用 Visual Studio 创建包含 C# 控制台应用程序项目的新解决方案。针对“名称”输入“HandleRedundancyForOnDemandStreaming”，然后单击“确定”。",
+      "pos": [
+        1867,
+        1964
+      ]
+    },
+    {
+      "content": "在与 HandleRedundancyForOnDemandStreaming.csproj 项目文件相同的级别上创建 SupportFiles 文件夹。在 SupportFiles 文件夹下创建 OutputFiles 和 MP4Files 文件夹。将一个 .mp4 文件复制到 MP4Files 文件夹（在本示例中使用 BigBuckBunny.mp4 文件）。",
+      "pos": [
+        1968,
+        2151
+      ]
+    },
+    {
+      "pos": [
+        2156,
+        2303
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>Nuget<ept id=\"p1\">**</ept> 添加对媒体服务相关 DLL 的引用。在 Visual Studio 主菜单中，选择“工具”-&gt;“库程序包管理器”-&gt;“程序包管理器控制台”。在控制台窗口中，键入 Install-Package windowsazure.mediaservices，然后按 Enter。"
+    },
+    {
+      "content": "添加此项目所需的其他引用：System.Configuration、System.Runtime.Serialization 和 System.Web。",
+      "pos": [
+        2307,
+        2383
+      ]
+    },
+    {
+      "content": "将默认添加到 Programs.cs 文件中的 using 语句替换为以下语句：",
+      "pos": [
+        2387,
+        2427
+      ]
+    },
+    {
+      "content": "将 appSettings 节添加到 .config 文件，并根据媒体服务和 Storage 密钥与名称值更新值。",
+      "pos": [
+        3050,
+        3107
+      ]
+    },
+    {
+      "content": "添加用于处理按需流式处理冗余的代码。",
+      "pos": [
+        3992,
+        4010
+      ]
+    },
+    {
+      "content": "将以下类级字段添加到 Program 类。",
+      "pos": [
+        4017,
+        4038
+      ]
+    },
+    {
+      "content": "请使用以下定义替换默认的 Main 方法定义：",
+      "pos": [
+        6131,
+        6154
+      ]
+    },
+    {
+      "content": "下面定义了从 Main 调用的方法定义。",
+      "pos": [
+        10790,
+        10810
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        44033,
+        44037
+      ]
+    },
+    {
+      "content": "现在，你可以使用流量管理器在两个数据中心之间路由请求，因此可在任何中断情况下进行故障转移。",
+      "pos": [
+        44039,
+        44084
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"实现故障转移流式处理方案 | Azure\" \n    description=\"本主题演示如何实现故障转移流式处理方案。\" \n    services=\"media-services\" \n    documentationCenter=\"\" \n    authors=\"Juliako\" \n    manager=\"dwrede\" \n    editor=\"\"/>\n\n<tags\n    ms.service=\"media-services\"\n    ms.date=\"02/03/2016\"  \n    wacn.date=\"03/17/2016\"/>\n\n#实现故障转移流式处理方案\n\n本演练演示如何将内容 (blob) 从一个资产复制到另一个资产，以便处理按需流式处理的冗余。此方案适用于想要将其 CDN 设置为当我们的某个数据中心出现中断时，在两个数据中心之间进行故障转移的客户。本演练使用 Azure 媒体服务 SDK、Azure 媒体服务 REST API 和 Azure 存储空间 SDK 来演示以下任务。\n\n1. 在“数据中心 A”中设置一个媒体服务帐户。\n1. 将一个夹层文件上载到源资产中。\n1. 将该资产编码成多比特率 MP4 文件。 \n1. 为源资产创建一个只读 SAS 定位器，以获取对关联到源资产的存储帐户中的容器的读取权限。\n1. 从上一步创建的只读 SAS 定位器中获取源资产的容器名称。我们需要使用这些信息在存储帐户（本主题后面将会介绍）之间复制 BLOB。\n1. 为通过编码任务创建的资产创建源定位器。 \n\n然后，若要处理故障转移，请执行以下操作：\n\n1. 在“数据中心 B”中设置一个媒体服务帐户。\n1. 在目标媒体服务帐户中创建一个目标空资产。\n1. 为目标空资产创建一个写入 SAS 定位器，以获取对关联到目标资产的目标存储帐户中的容器的写入权限。\n1. 使用 Azure 存储空间 SDK 在“数据中心 A”中的源存储帐户与“数据中心 B”中的目标存储帐户（这些存储帐户与所需资产关联）之间复制 blob（资产文件）。\n1. 将复制到目标 blob 容器的 blob（资产文件）与目标资产关联。 \n1. 在“数据中心 B”中为资产创建源定位器，并指定为“数据中心 A”中的资产生成的定位器 ID。 \n1. 这样，便会提供 URL 的相对路径相同（只有基本 URL 不同）的流式处理 URL。 \n \n然后，若要处理任何中断情况，可以在这些源定位器之上创建 CDN。\n\n请注意以下事项：\n\n- 当前版本的媒体服务 SDK 不支持使用指定的定位器 ID 创建定位器。若要完成此任务，我们将使用媒体服务 REST API。\n- 当前版本的媒体服务 SDK 不支持以编程方式生成会将资产与资产文件关联的 IAssetFile 信息。若要完成此任务，我们将使用 CreateFileInfos 媒体服务 REST API。 \n- 不支持使用存储加密资产 (AssetCreationOptions.StorageEncrypted) 进行复制（因为两个媒体服务帐户中的加密密钥将会有所不同）。 \n- 如果你想要利用动态打包，则必须先获取至少一个按需流式处理保留单位。有关详细信息，请参阅[动态打包资产](/documentation/articles/media-services-dynamic-packaging-overview)。\n \n\n>[AZURE.NOTE]请考虑将媒体服务[复制器工具](http://replicator.codeplex.com/)用作备用选项，以手动实现故障转移流式处理方案。此工具可用于在两个媒体服务帐户之间复制资产。\n\n##先决条件\n \n- 在新的或现有的 Azure 订阅中拥有两个媒体服务帐户。请参阅[如何创建媒体服务帐户](/documentation/articles/media-services-create-account)。\n- 操作系统：Windows 7、Windows 2008 R2 或 Windows 8。\n- .NET Framework 4.5 或 .NET Framework 4。\n- Visual Studio 2010 SP1 或更高版本（专业版、高级专业版、旗舰版或学习版）。\n \n##设置项目\n\n在本部分中，你将创建和设置一个 C# 控制台应用程序项目。\n\n1. 使用 Visual Studio 创建包含 C# 控制台应用程序项目的新解决方案。针对“名称”输入“HandleRedundancyForOnDemandStreaming”，然后单击“确定”。\n1. 在与 HandleRedundancyForOnDemandStreaming.csproj 项目文件相同的级别上创建 SupportFiles 文件夹。在 SupportFiles 文件夹下创建 OutputFiles 和 MP4Files 文件夹。将一个 .mp4 文件复制到 MP4Files 文件夹（在本示例中使用 BigBuckBunny.mp4 文件）。 \n1. 使用 **Nuget** 添加对媒体服务相关 DLL 的引用。在 Visual Studio 主菜单中，选择“工具”->“库程序包管理器”->“程序包管理器控制台”。在控制台窗口中，键入 Install-Package windowsazure.mediaservices，然后按 Enter。\n1. 添加此项目所需的其他引用：System.Configuration、System.Runtime.Serialization 和 System.Web。\n1. 将默认添加到 Programs.cs 文件中的 using 语句替换为以下语句：\n\n        using System;\n        using System.Configuration;\n        using System.Globalization;\n        using System.IO;\n        using System.Net;\n        using System.Runtime.Serialization.Json;\n        using System.Text;\n        using System.Threading;\n        using System.Threading.Tasks;\n        using System.Web;\n        using System.Xml;\n        using System.Linq;\n        using Microsoft.WindowsAzure;\n        using Microsoft.WindowsAzure.MediaServices.Client;\n        using Microsoft.WindowsAzure.Storage;\n        using Microsoft.WindowsAzure.Storage.Blob;\n        using Microsoft.WindowsAzure.Storage.Auth;\n\n\n\n1. 将 appSettings 节添加到 .config 文件，并根据媒体服务和 Storage 密钥与名称值更新值。\n\n        <appSettings>\n          <add key=\"MediaServicesAccountNameSource\" value=\"Media-Services-Account-Name-Source\"/>\n          <add key=\"MediaServicesAccountKeySource\" value=\"Media-Services-Account-Key-Source\"/>\n          <add key=\"MediaServicesStorageAccountNameSource\" value=\"Media-Services-Storage-Account-Name-Source\"/>\n          <add key=\"MediaServicesStorageAccountKeySource\" value=\"Media-Services-Storage-Account-Key-Source\"/>\n          <add key=\"MediaServicesAccountNameTarget\" value=\"Media-Services-Account-Name-Target\" />\n          <add key=\"MediaServicesAccountKeyTarget\" value=\" Media-Services-Account-Key-Target\" />\n          <add key=\"MediaServicesStorageAccountNameTarget\" value=\" Media-Services-Storage-Account-Name-Target\" />\n          <add key=\"MediaServicesStorageAccountKeyTarget\" value=\" Media-Services-Storage-Account-Key-Target\" />\n        </appSettings>\n\n##添加用于处理按需流式处理冗余的代码。\n\n\n\n1. 将以下类级字段添加到 Program 类。\n    \n        // Read values from the App.config file.\n        private static readonly string MediaServicesAccountNameSource = ConfigurationManager.AppSettings[\"MediaServicesAccountNameSource\"];\n        private static readonly string MediaServicesAccountKeySource = ConfigurationManager.AppSettings[\"MediaServicesAccountKeySource\"];\n        private static readonly string StorageNameSource = ConfigurationManager.AppSettings[\"MediaServicesStorageAccountNameSource\"];\n        private static readonly string StorageKeySource = ConfigurationManager.AppSettings[\"MediaServicesStorageAccountKeySource\"];\n        \n        private static readonly string MediaServicesAccountNameTarget = ConfigurationManager.AppSettings[\"MediaServicesAccountNameTarget\"];\n        private static readonly string MediaServicesAccountKeyTarget = ConfigurationManager.AppSettings[\"MediaServicesAccountKeyTarget\"];\n        private static readonly string StorageNameTarget = ConfigurationManager.AppSettings[\"MediaServicesStorageAccountNameTarget\"];\n        private static readonly string StorageKeyTarget = ConfigurationManager.AppSettings[\"MediaServicesStorageAccountKeyTarget\"];\n        \n        // Base support files path.  Update this field to point to the base path  \n        // for the local support files folder that you create. \n        private static readonly string SupportFiles = Path.GetFullPath(@\"../..\\SupportFiles\");\n        \n        // Paths to support files (within the above base path). \n        private static readonly string SingleInputMp4Path = Path.GetFullPath(SupportFiles + @\"\\MP4Files\\BigBuckBunny.mp4\");\n        private static readonly string OutputFilesFolder = Path.GetFullPath(SupportFiles + @\"\\OutputFiles\");\n        \n        // Class-level field used to keep a reference to the service context.\n        static private CloudMediaContext _contextSource = null;\n        static private CloudMediaContext _contextTarget = null;\n        static private MediaServicesCredentials _cachedCredentialsSource = null;\n        static private MediaServicesCredentials _cachedCredentialsTarget = null;\n\n\n\n1. 请使用以下定义替换默认的 Main 方法定义：\n        \n        static void Main(string[] args)\n        {\n            _cachedCredentialsSource = new MediaServicesCredentials(\n                            MediaServicesAccountNameSource,\n                            MediaServicesAccountKeySource);\n        \n            _cachedCredentialsTarget = new MediaServicesCredentials(\n                            MediaServicesAccountNameTarget,\n                            MediaServicesAccountKeyTarget);\n        \n            // Get server context.    \n            _contextSource = new CloudMediaContext(_cachedCredentialsSource);\n            _contextTarget = new CloudMediaContext(_cachedCredentialsTarget);\n        \n        \n            IAsset assetSingleFile = CreateAssetAndUploadSingleFile(_contextSource,\n                                        AssetCreationOptions.None,\n                                        SingleInputMp4Path);\n        \n            IJob job = CreateEncodingJob(_contextSource, assetSingleFile);\n        \n            if (job.State != JobState.Error)\n            {\n                IAsset sourceOutputAsset = job.OutputMediaAssets[0];\n                // Get the locator for Smooth Streaming\n                var sourceOriginLocator = GetStreamingOriginLocator(_contextSource, sourceOutputAsset);\n        \n                Console.WriteLine(\"Locator Id: {0}\", sourceOriginLocator.Id);\n        \n        \n                // 1.Create a read-only SAS locator for the source asset to have read access to the container in the source Storage account (associated with the source Media Services account)\n                var readSasLocator = GetSasReadLocator(_contextSource, sourceOutputAsset);\n        \n        \n                // 2.Get the container name of the source asset from the read-only SAS locator created in the previous step\n                string containerName = (new Uri(readSasLocator.Path)).Segments[1];\n        \n        \n                // 3.Create a target empty asset in the target Media Services account\n                var targetAsset = CreateTargetEmptyAsset(_contextTarget, containerName);\n        \n                // 4.Create a write SAS locator for the target empty asset to have write access to the container in the target Storage account (associated with the target Media Services account)\n                ILocator writeSasLocator = CreateSasWriteLocator(_contextTarget, targetAsset);\n        \n                // Get asset container name.\n                string targetContainerName = (new Uri(writeSasLocator.Path)).Segments[1];\n        \n        \n                // 5.Copy the blobs in the source container (source asset) to the target container (target empty asset)\n                CopyBlobsFromDifferentStorage(containerName, targetContainerName, StorageNameSource, StorageKeySource, StorageNameTarget, StorageKeyTarget);\n        \n        \n                // 6.Use the CreateFileInfos Media Services REST API to automatically generate all the IAssetFile's for the target asset. \n                //      This API call is not supported in the current Media Services SDK for .NET. \n                CreateFileInfosForAssetWithRest(_contextTarget, targetAsset, MediaServicesAccountNameTarget, MediaServicesAccountKeyTarget);\n        \n                // Check if the AssetFiles are now  associated with the asset.\n                Console.WriteLine(\"Asset files assocated with the {0} asset:\", targetAsset.Name);\n                foreach (var af in targetAsset.AssetFiles)\n                {\n                    Console.WriteLine(af.Name);\n                }\n        \n                // 7.Copy the Origin locator of the source asset to the target asset by using the same Id\n                var replicatedLocatorPath = CreateOriginLocatorWithRest(_contextTarget,\n                            MediaServicesAccountNameTarget, MediaServicesAccountKeyTarget,\n                            sourceOriginLocator.Id, targetAsset.Id);\n        \n                // Create a full URL to the manifest file. Use this for playback\n                // in streaming media clients. \n                string originalUrlForClientStreaming = sourceOriginLocator.Path + GetPrimaryFile(sourceOutputAsset).Name + \"/manifest\";\n        \n                Console.WriteLine(\"Original Locator Path: {0}\\n\", originalUrlForClientStreaming);\n        \n                string replicatedUrlForClientStreaming = replicatedLocatorPath + GetPrimaryFile(sourceOutputAsset).Name + \"/manifest\";\n        \n                Console.WriteLine(\"Replicated Locator Path: {0}\", replicatedUrlForClientStreaming);\n        \n                readSasLocator.Delete();\n                writeSasLocator.Delete();\n        }\n\n1. 下面定义了从 Main 调用的方法定义。\n        \n        public static IAsset CreateAssetAndUploadSingleFile(CloudMediaContext context,\n                                                        AssetCreationOptions assetCreationOptions,\n                                                        string singleFilePath)\n        {\n            // For the AssetCreationOptions you can specify \n            // encryption options.\n            //      None:  no encryption. By default, storage encryption is used. If you want to \n            //        create an unencrypted asset, you must set this option.\n            //      StorageEncrypted:  storage encryption. Encrypts a clear input file \n            //        before it is uploaded to Azure storage. This is the default if not specified\n            //      CommonEncryptionProtected:  for Common Encryption Protected (CENC) files. An \n            //        example is a set of files that are already PlayReady encrypted. \n        \n            var assetName = \"UploadSingleFile_\" + DateTime.UtcNow.ToString();\n        \n            var asset = context.Assets.Create(assetName, assetCreationOptions);\n        \n            Console.WriteLine(\"Asset name: \" + asset.Name);\n        \n            var fileName = Path.GetFileName(singleFilePath);\n        \n            var assetFile = asset.AssetFiles.Create(fileName);\n        \n            Console.WriteLine(\"Created assetFile {0}\", assetFile.Name);\n        \n            Console.WriteLine(\"Upload {0}\", assetFile.Name);\n        \n            assetFile.Upload(singleFilePath);\n            Console.WriteLine(\"Done uploading of {0}\", assetFile.Name);\n        \n            return asset;\n        }\n        \n        public static IJob CreateEncodingJob(CloudMediaContext context, IAsset asset)\n        {\n            // Declare a new job.\n            IJob job = context.Jobs.Create(\"My encoding job\");\n        \n            // Get a media processor reference, and pass to it the name of the \n            // processor to use for the specific task.\n            IMediaProcessor processor = GetLatestMediaProcessorByName(context,\n                                                    \"Media Encoder Standard\");\n        \n            // Create a task with the encoding details, using a string preset.\n            // In this case \"H264 Multiple Bitrate 720p\" preset is used.\n            ITask task = job.Tasks.AddNew(\"My encoding task\",\n                processor,\n                \"H264 Multiple Bitrate 720p\",\n                TaskOptions.ProtectedConfiguration);\n        \n            // Specify the input asset to be encoded.\n            task.InputAssets.Add(asset);\n        \n            // Add an output asset to contain the results of the job. \n            // This output is specified as AssetCreationOptions.None, which \n            // means the output asset is in the clear (unencrypted). \n            var outputAssetName = \"OutputAsset_\" + Guid.NewGuid();\n            task.OutputAssets.AddNew(outputAssetName,\n                AssetCreationOptions.None);\n        \n            // Use the following event handler to check job progress.  \n            job.StateChanged += new\n                    EventHandler<JobStateChangedEventArgs>(StateChanged);\n        \n            // Launch the job.\n            job.Submit();\n        \n            // Optionally log job details. This displays basic job details\n            // to the console and saves them to a JobDetails-{JobId}.txt file \n            // in your output folder.\n            LogJobDetails(context, job.Id);\n        \n            // Check job execution and wait for job to finish. \n            Task progressJobTask = job.GetExecutionProgressTask(CancellationToken.None);\n            progressJobTask.Wait();\n        \n            // Get an updated job reference.\n            job = GetJob(context, job.Id);\n        \n            // Since we the output asset contains a set of Smooth Streaming files,\n            // set the .ism file to be the primary file\n            if (job.State != JobState.Error)\n                SetPrimaryFile(job.OutputMediaAssets[0]);\n        \n            return job;\n        }\n        \n        // Create a locator URL to a streaming media asset \n        // on an origin server.\n        public static ILocator GetStreamingOriginLocator(CloudMediaContext context, IAsset assetToStream)\n        {\n            // Get a reference to the streaming manifest file from the  \n            // collection of files in the asset. \n            IAssetFile manifestFile = GetPrimaryFile(assetToStream);\n        \n            // Create a 30-day readonly access policy. \n            // You cannot create a streaming locator using an AccessPolicy that includes write or delete permissions.            \n        \n            IAccessPolicy policy = context.AccessPolicies.Create(\"Streaming policy\",\n                TimeSpan.FromDays(30),\n                AccessPermissions.Read);\n        \n            // Create a locator to the streaming content on an origin. \n            ILocator originLocator = context.Locators.CreateLocator(LocatorType.OnDemandOrigin,\n                assetToStream,\n                policy,\n                DateTime.UtcNow.AddMinutes(-5));\n        \n            // Return the locator. \n            return originLocator;\n        }\n        \n        public static ILocator GetSasReadLocator(CloudMediaContext context, IAsset asset)\n        {\n            IAccessPolicy accessPolicy = context.AccessPolicies.Create(\"File Download Policy\",\n                TimeSpan.FromDays(30), AccessPermissions.Read);\n        \n            ILocator sasLocator = context.Locators.CreateLocator(LocatorType.Sas,\n                asset, accessPolicy);\n        \n            return sasLocator;\n        }\n        \n        public static ILocator CreateSasWriteLocator(CloudMediaContext context, IAsset asset)\n        {\n        \n            IAccessPolicy writePolicy = context.AccessPolicies.Create(\"Write Policy\",\n                TimeSpan.FromDays(30), AccessPermissions.Write);\n        \n            ILocator sasLocator = context.Locators.CreateLocator(LocatorType.Sas,\n                asset, writePolicy);\n        \n            return sasLocator;\n        }\n        \n        public static IAsset CreateTargetEmptyAsset(CloudMediaContext context, string containerName)\n        {\n            // Create a new asset.\n            IAsset assetToBeProcessed = context.Assets.Create(containerName,\n                AssetCreationOptions.None);\n        \n            return assetToBeProcessed;\n        }\n        \n        public static void CreateFileInfosForAssetWithRest(CloudMediaContext context, IAsset asset, string mediaServicesAccountNameTarget,\n            string mediaServicesAccountKeyTarget)\n        {\n            string apiServer = \"\";\n            string scope = \"\";\n            string acsBaseAddress = \"\";\n        \n            string acsToken = GetAcsBearerToken(mediaServicesAccountNameTarget,\n                                    mediaServicesAccountKeyTarget, scope, acsBaseAddress);\n        \n            if (!string.IsNullOrEmpty(acsToken))\n            {\n                CreateFileInfos(apiServer, acsToken, asset.Id);\n            }\n        }\n        \n        public static string CreateOriginLocatorWithRest(CloudMediaContext context, string mediaServicesAccountNameTarget,\n            string mediaServicesAccountKeyTarget, string locatorIdToReplicate, string targetAssetId)\n        {\n            //Make sure we are not asking for a duplicate:\n            var locator = context.Locators.Where(l => l.Id == locatorIdToReplicate).FirstOrDefault();\n            if (locator != null)\n                return \"\";\n        \n            string locatorNewPath = \"\";\n            string apiServer = \"\";\n            string scope = \"\";\n            string acsBaseAddress = \"\";\n        \n            string acsToken = GetAcsBearerToken(mediaServicesAccountNameTarget,\n                                    mediaServicesAccountKeyTarget, scope, acsBaseAddress);\n        \n            if (!string.IsNullOrEmpty(acsToken))\n            {\n                var asset = context.Assets.Where(a => a.Id == targetAssetId).FirstOrDefault();\n\n                // You cannot create a streaming locator using an AccessPolicy that includes write or delete permissions.            \n                var accessPolicy = context.AccessPolicies.Create(\"RestTest\", TimeSpan.FromDays(100),\n                                                                    AccessPermissions.Read);\n                if (asset != null)\n                {\n                    string redirectedServiceUri = null;\n        \n                    var xmlResponse = CreateLocator(apiServer, out redirectedServiceUri, acsToken,\n                                                                asset.Id, accessPolicy.Id,\n                                                                (int)LocatorType.OnDemandOrigin,\n                                                                DateTime.UtcNow.AddMinutes(-10), locatorIdToReplicate);\n        \n                    Console.WriteLine(\"Redirected to: \" + redirectedServiceUri);\n                    if (xmlResponse != null)\n                    {\n                        Console.WriteLine(String.Format(\"Locator Id: {0}\",\n                                                        xmlResponse.GetElementsByTagName(\"Id\")[0].InnerText));\n                        Console.WriteLine(String.Format(\"Locator Path: {0}\",\n                                xmlResponse.GetElementsByTagName(\"Path\")[0].InnerText));\n        \n        \n                        locatorNewPath = xmlResponse.GetElementsByTagName(\"Path\")[0].InnerText;\n                    }\n                }\n            }\n        \n            return locatorNewPath;\n        }\n        \n        \n        public static void SetPrimaryFile(IAsset asset)\n        {\n        \n            var ismAssetFiles = asset.AssetFiles.ToList().\n                        Where(f => f.Name.EndsWith(\".ism\", StringComparison.OrdinalIgnoreCase))\n                        .ToArray();\n        \n            if (ismAssetFiles.Count() != 1)\n                throw new ArgumentException(\"The asset should have only one, .ism file\");\n        \n            ismAssetFiles.First().IsPrimary = true;\n            ismAssetFiles.First().Update();\n        }\n        \n        public static IAssetFile GetPrimaryFile(IAsset asset)\n        {\n            var theManifest =\n                    from f in asset.AssetFiles\n                    where f.Name.EndsWith(\".ism\")\n                    select f;\n        \n            // Cast the reference to a true IAssetFile type. \n            IAssetFile manifestFile = theManifest.First();\n        \n            return manifestFile;\n        }\n        \n        public static IAsset RefreshAsset(CloudMediaContext context, IAsset asset)\n        {\n            asset = context.Assets.Where(a => a.Id == asset.Id).FirstOrDefault();\n            return asset;\n        }\n        \n        \n        public static void CopyBlobsFromDifferentStorage(string sourceContainerName, string targetContainerName,\n                                            string srcAccountName, string srcAccountKey,\n                                            string destAccountName, string destAccountKey)\n        {\n            var srcAccount = new CloudStorageAccount(new StorageCredentials(srcAccountName, srcAccountKey), true);\n            var destAccount = new CloudStorageAccount(new StorageCredentials(destAccountName, destAccountKey), true);\n        \n            var cloudBlobClient = srcAccount.CreateCloudBlobClient();\n            var targetBlobClient = destAccount.CreateCloudBlobClient();\n        \n            var sourceContainer = cloudBlobClient.GetContainerReference(sourceContainerName);\n            var targetContainer = targetBlobClient.GetContainerReference(targetContainerName);\n            targetContainer.CreateIfNotExists();\n        \n        \n            string blobToken = sourceContainer.GetSharedAccessSignature(new SharedAccessBlobPolicy()\n            {\n                // Specify the expiration time for the signature.\n                SharedAccessExpiryTime = DateTime.Now.AddDays(1),\n                // Specify the permissions granted by the signature.\n                Permissions = SharedAccessBlobPermissions.Write | SharedAccessBlobPermissions.Read\n            });\n        \n        \n            foreach (var sourceBlob in sourceContainer.ListBlobs())\n            {\n                string fileName = (sourceBlob as ICloudBlob).Name;\n                var sourceCloudBlob = sourceContainer.GetBlockBlobReference(fileName);\n                sourceCloudBlob.FetchAttributes();\n        \n                if (sourceCloudBlob.Properties.Length > 0)\n                {\n                    var destinationBlob = targetContainer.GetBlockBlobReference(fileName);\n                    destinationBlob.StartCopyFromBlob(new Uri(sourceBlob.Uri.AbsoluteUri + blobToken));\n        \n                    while (true)\n                    {\n                        // The StartCopyFromBlob is an async operation, \n                        // so we want to check if the copy operation is completed before proceeding. \n                        // To do that, we call FetchAttributes on the blob and check the CopyStatus. \n                        destinationBlob.FetchAttributes();\n                        if (destinationBlob.CopyState.Status != CopyStatus.Pending)\n                        {\n                            break;\n                        }\n                        //It's still not completed. So wait for some time.\n                        System.Threading.Thread.Sleep(1000);\n                    }\n                }\n        \n                Console.WriteLine(fileName);\n            }\n        \n            Console.WriteLine(\"Done copying.\");\n        }\n        private static IMediaProcessor GetLatestMediaProcessorByName(CloudMediaContext context, string mediaProcessorName)\n        {\n    \n            var processor = context.MediaProcessors.Where(p => p.Name == mediaProcessorName).\n                ToList().OrderBy(p => new Version(p.Version)).LastOrDefault();\n        \n            if (processor == null)\n                throw new ArgumentException(string.Format(\"Unknown media processor\", mediaProcessorName));\n        \n            return processor;\n        }\n        \n        // This method is a handler for events that track job progress.   \n        private static void StateChanged(object sender, JobStateChangedEventArgs e)\n        {\n            Console.WriteLine(\"Job state changed event:\");\n            Console.WriteLine(\"  Previous state: \" + e.PreviousState);\n            Console.WriteLine(\"  Current state: \" + e.CurrentState);\n        \n            switch (e.CurrentState)\n            {\n                case JobState.Finished:\n                    Console.WriteLine();\n                    Console.WriteLine(\"********************\");\n                    Console.WriteLine(\"Job is finished.\");\n                    Console.WriteLine(\"Please wait while local tasks or downloads complete...\");\n                    Console.WriteLine(\"********************\");\n                    Console.WriteLine();\n                    Console.WriteLine();\n                    break;\n                case JobState.Canceling:\n                case JobState.Queued:\n                case JobState.Scheduled:\n                case JobState.Processing:\n                    Console.WriteLine(\"Please wait...\\n\");\n                    break;\n                case JobState.Canceled:\n                case JobState.Error:\n                    // Cast sender as a job.\n                    IJob job = (IJob)sender;\n                    // Display or log error details as needed.\n                    LogJobStop(null, job.Id);\n                    break;\n                default:\n                    break;\n            }\n        }\n        \n        private static void LogJobStop(CloudMediaContext context, string jobId)\n        {\n            StringBuilder builder = new StringBuilder();\n            IJob job = GetJob(context, jobId);\n        \n            builder.AppendLine(\"\\nThe job stopped due to cancellation or an error.\");\n            builder.AppendLine(\"***************************\");\n            builder.AppendLine(\"Job ID: \" + job.Id);\n            builder.AppendLine(\"Job Name: \" + job.Name);\n            builder.AppendLine(\"Job State: \" + job.State.ToString());\n            builder.AppendLine(\"Job started (server UTC time): \" + job.StartTime.ToString());\n            // Log job errors if they exist.  \n            if (job.State == JobState.Error)\n            {\n                builder.Append(\"Error Details: \\n\");\n                foreach (ITask task in job.Tasks)\n                {\n                    foreach (ErrorDetail detail in task.ErrorDetails)\n                    {\n                        builder.AppendLine(\"  Task Id: \" + task.Id);\n                        builder.AppendLine(\"    Error Code: \" + detail.Code);\n                        builder.AppendLine(\"    Error Message: \" + detail.Message + \"\\n\");\n                    }\n                }\n            }\n            builder.AppendLine(\"***************************\\n\");\n            // Write the output to a local file and to the console. The template \n            // for an error output file is:  JobStop-{JobId}.txt\n            string outputFile = OutputFilesFolder + @\"\\JobStop-\" + JobIdAsFileName(job.Id) + \".txt\";\n            WriteToFile(outputFile, builder.ToString());\n            Console.Write(builder.ToString());\n        }\n        \n        private static void LogJobDetails(CloudMediaContext context, string jobId)\n        {\n            StringBuilder builder = new StringBuilder();\n            IJob job = GetJob(context, jobId);\n        \n            builder.AppendLine(\"\\nJob ID: \" + job.Id);\n            builder.AppendLine(\"Job Name: \" + job.Name);\n            builder.AppendLine(\"Job submitted (client UTC time): \" + DateTime.UtcNow.ToString());\n        \n            // Write the output to a local file and to the console. The template \n            // for an error output file is:  JobDetails-{JobId}.txt\n            string outputFile = OutputFilesFolder + @\"\\JobDetails-\" + JobIdAsFileName(job.Id) + \".txt\";\n            WriteToFile(outputFile, builder.ToString());\n            Console.Write(builder.ToString());\n        }\n        \n        // Replace \":\" with \"_\" in Job id values so they can \n        // be used as log file names.  \n        private static string JobIdAsFileName(string jobID)\n        {\n            return jobID.Replace(\":\", \"_\");\n        }\n        \n        // Write method output to the output files folder.\n        private static void WriteToFile(string outFilePath, string fileContent)\n        {\n            StreamWriter sr = File.CreateText(outFilePath);\n            sr.WriteLine(fileContent);\n            sr.Close();\n        }\n        \n        private static IJob GetJob(CloudMediaContext context, string jobId)\n        {\n            // Use a Linq select query to get an updated \n            // reference by Id. \n            var jobInstance =\n                from j in context.Jobs\n                where j.Id == jobId\n                select j;\n        \n            // Return the job reference as an Ijob. \n            IJob job = jobInstance.FirstOrDefault();\n        \n            return job;\n        }\n        \n        private static IAsset GetAsset(CloudMediaContext context, string assetId)\n        {\n            // Use a LINQ Select query to get an asset.\n            var assetInstance =\n                from a in context.Assets\n                where a.Id == assetId\n                select a;\n        \n            // Reference the asset as an IAsset.\n            IAsset asset = assetInstance.FirstOrDefault();\n        \n            return asset;\n        }\n        \n        public static void DeleteAllAssets(CloudMediaContext context)\n        {\n            // Loop through and delete all assets.\n            foreach (IAsset asset in context.Assets)\n            {\n                DeleteLocatorsForAsset(context, asset);\n        \n                asset.Delete();\n            }\n        }\n        \n        public static void DeleteLocatorsForAsset(CloudMediaContext context, IAsset asset)\n        {\n            string assetId = asset.Id;\n            var locators = from a in context.Locators\n                            where a.AssetId == assetId\n                            select a;\n            foreach (var locator in locators)\n            {\n                Console.WriteLine(\"Deleting locator {0} for asset {1}\", locator.Path, assetId);\n        \n                locator.Delete();\n            }\n        }\n        \n        public static void DeleteAccessPolicy(CloudMediaContext context, string existingPolicyId)\n        {\n            // To delete a specific access policy, get a reference to the policy.  \n            // based on the policy Id passed to the method.\n            var policyInstance =\n                    from p in context.AccessPolicies\n                    where p.Id == existingPolicyId\n                    select p;\n        \n            IAccessPolicy policy = policyInstance.FirstOrDefault();\n        \n            policy.Delete();\n        \n        }\n        \n        //////////////////////////////////////////////////////\n        /// The following methods use REST calls.\n        //////////////////////////////////////////////////////\n        \n        public static string GetAcsBearerToken(string clientId, string clientSecret, string scope, string accessControlServiceUri)\n        {\n            if (string.IsNullOrEmpty(clientId))\n                throw new ArgumentNullException(\"clientId\");\n        \n            if (string.IsNullOrEmpty(clientSecret))\n                throw new ArgumentNullException(\"clientSecret\");\n        \n            if (string.IsNullOrEmpty(scope))\n            {\n                scope = \"urn:WindowsAzureMediaServices\";\n            }\n            else if (!scope.ToLower().StartsWith(\"urn:\"))\n            {\n                scope = \"urn:\" + scope;\n            }\n        \n            if (string.IsNullOrEmpty(accessControlServiceUri))\n            {\n                accessControlServiceUri = \"https://wamsprodglobal001acs.accesscontrol.chinacloudapi.cn/v2/OAuth2-13\";\n            }\n            else if (!accessControlServiceUri.ToLower().EndsWith(\"/v2/oauth2-13\"))\n            {\n                accessControlServiceUri = accessControlServiceUri.TrimEnd('/') + \"/v2/OAuth2-13\";\n            }\n        \n            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(accessControlServiceUri);\n            request.Method = \"POST\";\n            request.ContentType = \"application/x-www-form-urlencoded\";\n            request.KeepAlive = true;\n            string acsBearerToken = null;\n        \n            var requestBytes = Encoding.ASCII.GetBytes(\"grant_type=client_credentials&client_id=\" +\n                clientId + \"&client_secret=\" + HttpUtility.UrlEncode(clientSecret) +\n                \"&scope=\" + HttpUtility.UrlEncode(scope));\n            request.ContentLength = requestBytes.Length;\n        \n            var requestStream = request.GetRequestStream();\n            requestStream.Write(requestBytes, 0, requestBytes.Length);\n            requestStream.Close();\n        \n            var response = (HttpWebResponse)request.GetResponse();\n        \n            if (response.StatusCode == HttpStatusCode.OK)\n            {\n                using (Stream responseStream = response.GetResponseStream())\n                {\n                    using (StreamReader stream = new StreamReader(responseStream))\n                    {\n                        string responseString = stream.ReadToEnd();\n                        var reader = JsonReaderWriterFactory.CreateJsonReader(Encoding.UTF8.GetBytes(responseString),\n                            new XmlDictionaryReaderQuotas());\n        \n                        while (reader.Read())\n                        {\n                            if ((reader.Name == \"access_token\") && (reader.NodeType == XmlNodeType.Element))\n                            {\n                                if (reader.Read())\n                                {\n                                    acsBearerToken = reader.Value;\n                                    break;\n                                }\n                            }\n                        }\n                    }\n                }\n            }\n        \n            return acsBearerToken;\n        }\n        \n        public static XmlDocument CreateLocator(string mediaServicesApiServerUri,\n                                                out string redirectedMediaServicesApiServerUri,\n                                                string acsBearerToken, string assetId,\n                                                string accessPolicyId, int locatorType,\n                                                DateTime startTime, string locatorIdToReplicate = null,\n                                                bool autoRedirect = true)\n        {\n            if (string.IsNullOrEmpty(mediaServicesApiServerUri))\n            {\n                mediaServicesApiServerUri = \"https://media.chinacloudapi.cn/api/\";\n            }\n            if (!mediaServicesApiServerUri.EndsWith(\"/\"))\n                mediaServicesApiServerUri = mediaServicesApiServerUri + \"/\";\n        \n            if (string.IsNullOrEmpty(acsBearerToken)) throw new ArgumentNullException(\"acsBearerToken\");\n            if (string.IsNullOrEmpty(assetId)) throw new ArgumentNullException(\"assetId\");\n            if (string.IsNullOrEmpty(accessPolicyId)) throw new ArgumentNullException(\"accessPolicyId\");\n        \n            redirectedMediaServicesApiServerUri = null;\n            XmlDocument xmlResponse = null;\n        \n            StringBuilder sb = new StringBuilder();\n            sb.Append(\"{ \"AssetId\" : \"\" + assetId + \"\"\");\n            sb.Append(\", \"AccessPolicyId\" : \"\" + accessPolicyId + \"\"\");\n            sb.Append(\", \"Type\" : \"\" + locatorType + \"\"\");\n            if (startTime != DateTime.MinValue)\n                sb.Append(\", \"StartTime\" : \"\" + startTime.ToString(\"G\", CultureInfo.CreateSpecificCulture(\"zh-CN\")) + \"\"\");\n            if (!string.IsNullOrEmpty(locatorIdToReplicate))\n                sb.Append(\", \"Id\" : \"\" + locatorIdToReplicate + \"\"\");\n            sb.Append(\"}\");\n        \n            string requestbody = sb.ToString();\n        \n            try\n            {\n                var request = GenerateRequest(\"POST\", mediaServicesApiServerUri, \"Locators\",\n                    null, acsBearerToken, requestbody);\n                var response = (HttpWebResponse)request.GetResponse();\n        \n                switch (response.StatusCode)\n                {\n                    case HttpStatusCode.MovedPermanently:\n                        //Recurse once with the mediaServicesApiServerUri redirect Location:\n                        if (autoRedirect)\n                        {\n                            redirectedMediaServicesApiServerUri = response.Headers[\"Location\"];\n                            string secondRedirection = null;\n                            xmlResponse = CreateLocator(redirectedMediaServicesApiServerUri,\n                                                        out secondRedirection, acsBearerToken,\n                                                        assetId, accessPolicyId, locatorType,\n                                                        startTime, locatorIdToReplicate, false);\n                        }\n                        else\n                        {\n                            Console.WriteLine(\"Redirection to {0} failed.\",\n                                mediaServicesApiServerUri);\n                            return null;\n                        }\n                        break;\n                    case HttpStatusCode.Created:\n                        using (Stream responseStream = response.GetResponseStream())\n                        {\n                            using (StreamReader stream = new StreamReader(responseStream))\n                            {\n                                string responseString = stream.ReadToEnd();\n                                var reader = JsonReaderWriterFactory.\n                                    CreateJsonReader(Encoding.UTF8.GetBytes(responseString),\n                                        new XmlDictionaryReaderQuotas());\n        \n                                xmlResponse = new XmlDocument();\n                                reader.Read();\n                                xmlResponse.LoadXml(reader.ReadInnerXml());\n                            }\n                        }\n                        break;\n        \n                    default:\n                        Console.WriteLine(response.StatusDescription);\n                        break;\n                }\n            }\n            catch (WebException ex)\n            {\n                Console.WriteLine(ex.Message);\n            }\n        \n            return xmlResponse;\n        }\n        \n        public static void CreateFileInfos(string mediaServicesApiServerUri,\n                                    string acsBearerToken,\n                                    string assetId\n                                    )\n        {\n            if (String.IsNullOrEmpty(mediaServicesApiServerUri))\n            {\n                mediaServicesApiServerUri = \"https://media.chinacloudapi.cn/api/\";\n            }\n            if (!mediaServicesApiServerUri.EndsWith(\"/\"))\n                mediaServicesApiServerUri = mediaServicesApiServerUri + \"/\";\n        \n            if (String.IsNullOrEmpty(acsBearerToken)) throw new ArgumentNullException(\"acsBearerToken\");\n            if (String.IsNullOrEmpty(assetId)) throw new ArgumentNullException(\"assetId\");\n        \n        \n            string id = assetId.Replace(\":\", \"%\");\n        \n            UriBuilder builder = new UriBuilder(mediaServicesApiServerUri);\n            builder.Path = Path.Combine(builder.Path, \"CreateFileInfos\");\n            builder.Query = String.Format(CultureInfo.InvariantCulture, \"assetid='{0}'\", assetId);\n        \n            try\n            {\n                var request = GenerateRequest(\"GET\", mediaServicesApiServerUri, \"CreateFileInfos\",\n                    String.Format(CultureInfo.InvariantCulture, \"assetid='{0}'\", assetId), acsBearerToken, null);\n        \n                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())\n                {\n                    if (response.StatusCode == HttpStatusCode.MovedPermanently)\n                    {\n                        string redirectedMediaServicesApiUrl = response.Headers[\"Location\"];\n        \n                        CreateFileInfos(redirectedMediaServicesApiUrl, acsBearerToken, assetId);\n                    }\n                    else if ((response.StatusCode != HttpStatusCode.OK) &&\n                        (response.StatusCode != HttpStatusCode.Accepted) &&\n                        (response.StatusCode != HttpStatusCode.Created) &&\n                        (response.StatusCode != HttpStatusCode.NoContent))\n                    {\n                        // TODO: Throw a more specific exception.\n                        throw new Exception(\"Invalid response received \");\n                    }\n                }\n            }\n            catch (WebException ex)\n            {\n                Console.WriteLine(ex.Message);\n            }\n        }\n        \n        \n        private static HttpWebRequest GenerateRequest(string verb,\n                                                        string mediaServicesApiServerUri,\n                                                        string resourcePath, string query,\n                                                        string acsBearerToken, string requestbody)\n        {\n            var uriBuilder = new UriBuilder(mediaServicesApiServerUri);\n            uriBuilder.Path += resourcePath;\n            if (query != null)\n            {\n                uriBuilder.Query = query;\n            }\n            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uriBuilder.Uri);\n            request.AllowAutoRedirect = false; //We manage our own redirects.\n            request.Method = verb;\n        \n            if (resourcePath == \"$metadata\")\n                request.MediaType = \"application/xml\";\n            else\n            {\n                request.ContentType = \"application/json;odata=verbose\";\n                request.Accept = \"application/json;odata=verbose\";\n            }\n        \n            request.Headers.Add(\"DataServiceVersion\", \"3.0\");\n            request.Headers.Add(\"MaxDataServiceVersion\", \"3.0\");\n            request.Headers.Add(\"x-ms-version\", \"2.1\");\n            request.Headers.Add(HttpRequestHeader.Authorization, \"Bearer \" + acsBearerToken);\n        \n            if (requestbody != null)\n            {\n                var requestBytes = Encoding.ASCII.GetBytes(requestbody);\n                request.ContentLength = requestBytes.Length;\n        \n                var requestStream = request.GetRequestStream();\n                requestStream.Write(requestBytes, 0, requestBytes.Length);\n                requestStream.Close();\n            }\n            else\n            {\n                request.ContentLength = 0;\n            }\n            return request;\n        }\n        \n\n##后续步骤\n\n现在，你可以使用流量管理器在两个数据中心之间路由请求，因此可在任何中断情况下进行故障转移。\n\n<!---HONumber=Mooncake_0307_2016-->"
+}

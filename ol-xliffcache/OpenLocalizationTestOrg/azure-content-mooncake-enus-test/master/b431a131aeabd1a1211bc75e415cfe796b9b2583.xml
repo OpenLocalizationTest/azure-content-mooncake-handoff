@@ -1,0 +1,250 @@
+{
+  "nodes": [
+    {
+      "content": "如何为高级 Azure Redis 缓存配置数据暂留",
+      "pos": [
+        28,
+        54
+      ]
+    },
+    {
+      "content": "了解如何为高级级别的 Azure Redis 缓存实例配置和管理数据暂留",
+      "pos": [
+        74,
+        110
+      ]
+    },
+    {
+      "content": "如何为高级 Azure Redis 缓存配置数据暂留",
+      "pos": [
+        318,
+        344
+      ]
+    },
+    {
+      "content": "Azure Redis 缓存具有不同的缓存产品（包括新推出的高级层），使缓存大小和功能的选择更加灵活。",
+      "pos": [
+        346,
+        397
+      ]
+    },
+    {
+      "content": "Azure Redis 缓存高级级别包括群集、暂留和虚拟网络支持。本文介绍如何配置高级 Azure Redis 缓存实例中的暂留。",
+      "pos": [
+        399,
+        464
+      ]
+    },
+    {
+      "pos": [
+        466,
+        651
+      ],
+      "content": "有关其他高级缓存功能的信息，请参阅<bpt id=\"p1\">[</bpt>如何配置高级 Azure Redis 缓存的群集功能<ept id=\"p1\">](/documentation/articles/cache-how-to-premium-clustering)</ept>和<bpt id=\"p2\">[</bpt>如何配置高级 Azure Redis 缓存的虚拟网络支持<ept id=\"p2\">](/documentation/articles/cache-how-to-premium-vnet)</ept>。"
+    },
+    {
+      "content": "什么是数据暂留？",
+      "pos": [
+        656,
+        664
+      ]
+    },
+    {
+      "content": "Redis 暂留可让你保留存储在 Redis 中的数据。你还可获取快照并备份数据，以便在出现硬件故障时进行加载。这相对于基本级别或标准级别是一项巨大优势，因为基本级别或标准级别将所有数据存储在内存中，在出现故障的情况下，如果缓存节点停机，则可能导致数据丢失。",
+      "pos": [
+        665,
+        794
+      ]
+    },
+    {
+      "pos": [
+        796,
+        999
+      ],
+      "content": "Azure Redis 缓存使用 <bpt id=\"p1\">[</bpt>RDB 模型<ept id=\"p1\">](http://redis.io/topics/persistence)</ept>提供的 Redis 持久性，允许将数据存储在 Azure 存储帐户中。配置暂留以后，Azure Redis 缓存会按照可配置的备份频率，将 Redis 缓存的快照以 Redis 二进制格式暂留在磁盘上。如果发生了灾难性事件，导致主缓存和副缓存都无法使用，则会使用最新快照重新构造缓存。"
+    },
+    {
+      "content": "可以在创建缓存过程中通过“新建 Redis 缓存”边栏选项卡配置持久性；另外还可以在现有高级缓存的“设置”边栏选项卡上进行这项配置。",
+      "pos": [
+        1001,
+        1067
+      ]
+    },
+    {
+      "content": "创建高级缓存",
+      "pos": [
+        1072,
+        1078
+      ]
+    },
+    {
+      "content": "在 Azure 中国区，只能通过 Azure PowerShell 或 Azure CLI 管理 Redis 缓存",
+      "pos": [
+        1080,
+        1137
+      ]
+    },
+    {
+      "content": "使用以下 PowerShell 脚本创建具有 Redis 持久性的高级缓存：",
+      "pos": [
+        1268,
+        1306
+      ]
+    },
+    {
+      "content": "以下部分中的步骤说明如何在新的高级缓存上配置 Redis 持久性。",
+      "pos": [
+        1971,
+        2004
+      ]
+    },
+    {
+      "content": "配置 Redis 持久性",
+      "pos": [
+        2009,
+        2021
+      ]
+    },
+    {
+      "pos": [
+        2023,
+        2083
+      ],
+      "content": "可以使用 <bpt id=\"p1\">**</bpt>Set-AzureRmRedisCache<ept id=\"p1\">**</ept> PowerShell 命令来配置 Redis 数据持久性："
+    },
+    {
+      "pos": [
+        2445,
+        2555
+      ],
+      "content": "在此 PowerShell 命令中可以看到，对于 <bpt id=\"p1\">**</bpt>-RedisConfiguration<ept id=\"p1\">**</ept> 参数，将“rdb-backup-enabled”设置为 true 可以启用 RDB，设置为 false 可以禁用 RDB。"
+    },
+    {
+      "pos": [
+        2557,
+        2739
+      ],
+      "content": "若要配置备份间隔，可以将“rdb-backup-frequency”设置为 15（表示 <bpt id=\"p1\">**</bpt>15 分钟<ept id=\"p1\">**</ept>）、30（表示 <bpt id=\"p2\">**</bpt>30 分钟<ept id=\"p2\">**</ept>）、60（表示 <bpt id=\"p3\">**</bpt>60 分钟<ept id=\"p3\">**</ept>）、360（表示 <bpt id=\"p4\">**</bpt>6 小时<ept id=\"p4\">**</ept>）、720（表示 <bpt id=\"p5\">**</bpt>12 小时<ept id=\"p5\">**</ept>）或 1440（表示 <bpt id=\"p6\">**</bpt>24 小时<ept id=\"p6\">**</ept>）。在上一个备份操作成功完成以后，此时间间隔就会开始倒计时，同时会启动新的备份。"
+    },
+    {
+      "content": "若要配置存储帐户，可以将“rdb-storage-connection-string”设置为 Azure 中国区的某个连接字符串。在上述命令中可以看到，你需要在连接字符串中指定 BlobEndpoint、QueueEndpoint 和 TableEndpoint。",
+      "pos": [
+        2741,
+        2873
+      ]
+    },
+    {
+      "pos": [
+        2876,
+        2939
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>如果重新生成了持久性帐户的存储密钥，则必须更新“rdb-backup-frequency”。"
+    },
+    {
+      "content": "一旦备份频率间隔时间已过，则会启动下一次备份（或新缓存的首次备份）。",
+      "pos": [
+        2941,
+        2975
+      ]
+    },
+    {
+      "content": "保留常见问题",
+      "pos": [
+        2982,
+        2988
+      ]
+    },
+    {
+      "content": "以下列表包含有关 Azure Redis 缓存保留常见问题的解答。",
+      "pos": [
+        2990,
+        3023
+      ]
+    },
+    {
+      "content": "能否在此前已创建的缓存的基础上启用保留？",
+      "pos": [
+        3028,
+        3048
+      ]
+    },
+    {
+      "content": "是的，可以在创建缓存时或者在现有高级缓存上配置 Redis 持久性。",
+      "pos": [
+        3050,
+        3084
+      ]
+    },
+    {
+      "content": "能否在创建缓存后更改备份频率？",
+      "pos": [
+        3089,
+        3104
+      ]
+    },
+    {
+      "content": "是的，可以在 Azure PowerShell 更改备份频率。以下是一个命令示例，通过修改 rdb-backup-frequency 可以改变备份频率。",
+      "pos": [
+        3106,
+        3182
+      ]
+    },
+    {
+      "content": "为何我的备份频率为 60 分钟，而两次备份的间隔却超过 60 分钟？",
+      "pos": [
+        3547,
+        3581
+      ]
+    },
+    {
+      "content": "在上一次备份过程成功完成之前，本次备份不会开始，其频率所对应的时间间隔也不会开始计算。如果备份频率为 60 分钟，而备份过程需要 15 分钟才能成功完成，则在上一次备份开始以后，要再过 75 分钟才会开始下一次备份。",
+      "pos": [
+        3583,
+        3691
+      ]
+    },
+    {
+      "content": "进行新备份以后，旧备份会发生什么情况",
+      "pos": [
+        3696,
+        3714
+      ]
+    },
+    {
+      "content": "除最新备份外的所有备份都会自动删除。这种删除可能不会即刻发生，但旧备份是不会无限期保留下去的。",
+      "pos": [
+        3716,
+        3763
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        3768,
+        3772
+      ]
+    },
+    {
+      "content": "了解如何使用更多的高级版缓存功能。",
+      "pos": [
+        3773,
+        3790
+      ]
+    },
+    {
+      "content": "如何为高级 Azure Redis 缓存配置群集功能",
+      "pos": [
+        3797,
+        3823
+      ]
+    },
+    {
+      "content": "如何为高级 Azure Redis 缓存配置虚拟网络支持",
+      "pos": [
+        3887,
+        3915
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"如何为高级 Azure Redis 缓存配置数据暂留\" \n    description=\"了解如何为高级级别的 Azure Redis 缓存实例配置和管理数据暂留\" \n    services=\"redis-cache\" \n    documentationCenter=\"\" \n    authors=\"steved0x\" \n    manager=\"dwrede\" \n    editor=\"\"/>\n\n<tags\n    ms.service=\"cache\"\n    ms.date=\"12/03/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n# 如何为高级 Azure Redis 缓存配置数据暂留\n\nAzure Redis 缓存具有不同的缓存产品（包括新推出的高级层），使缓存大小和功能的选择更加灵活。\n\nAzure Redis 缓存高级级别包括群集、暂留和虚拟网络支持。本文介绍如何配置高级 Azure Redis 缓存实例中的暂留。\n\n有关其他高级缓存功能的信息，请参阅[如何配置高级 Azure Redis 缓存的群集功能](/documentation/articles/cache-how-to-premium-clustering)和[如何配置高级 Azure Redis 缓存的虚拟网络支持](/documentation/articles/cache-how-to-premium-vnet)。\n\n## 什么是数据暂留？\nRedis 暂留可让你保留存储在 Redis 中的数据。你还可获取快照并备份数据，以便在出现硬件故障时进行加载。这相对于基本级别或标准级别是一项巨大优势，因为基本级别或标准级别将所有数据存储在内存中，在出现故障的情况下，如果缓存节点停机，则可能导致数据丢失。\n\nAzure Redis 缓存使用 [RDB 模型](http://redis.io/topics/persistence)提供的 Redis 持久性，允许将数据存储在 Azure 存储帐户中。配置暂留以后，Azure Redis 缓存会按照可配置的备份频率，将 Redis 缓存的快照以 Redis 二进制格式暂留在磁盘上。如果发生了灾难性事件，导致主缓存和副缓存都无法使用，则会使用最新快照重新构造缓存。\n\n可以在创建缓存过程中通过“新建 Redis 缓存”边栏选项卡配置持久性；另外还可以在现有高级缓存的“设置”边栏选项卡上进行这项配置。\n\n## 创建高级缓存\n\n在 Azure 中国区，只能通过 Azure PowerShell 或 Azure CLI 管理 Redis 缓存\n\n\n[AZURE.INCLUDE [azurerm-azurechinacloud-environment-parameter](../includes/azurerm-azurechinacloud-environment-parameter.md)]\n\n\n使用以下 PowerShell 脚本创建具有 Redis 持久性的高级缓存：\n\n    $VerbosePreference = \"Continue\"\n\n    # Create a new cache with date string to make name unique. \n    $cacheName = \"MovieCache\" + $(Get-Date -Format ('ddhhmm')) \n    $location = \"China North\"\n    $resourceGroupName = \"Default-Web-WestUS\"\n    \n    $movieCache = New-AzureRmRedisCache -Location $location -Name $cacheName  -ResourceGroupName $resourceGroupName -Size 6GB -Sku Premium -RedisConfiguration @{\"rdb-backup-enabled\"=\"true\"; \"rdb-backup-frequency\"=\"60\"; \"rdb-backup-max-snapshot-count\"=\"1\"; \"rdb-storage-connection-string\"=\"DefaultEndpointsProtocol=[http|https];AccountName=myAccountName;AccountKey=myAccountKey;EndpointSuffix=core.chinacloudapi.cn\"}\n\n以下部分中的步骤说明如何在新的高级缓存上配置 Redis 持久性。\n\n## 配置 Redis 持久性\n\n可以使用 **Set-AzureRmRedisCache** PowerShell 命令来配置 Redis 数据持久性：\n\n    Set-AzureRmRedisCache -Name $cacheName  -ResourceGroupName $resourceGroupName -RedisConfiguration @{\"rdb-backup-enabled\"=\"true\"; \"rdb-backup-frequency\"=\"60\"; \"rdb-backup-max-snapshot-count\"=\"1\"; \"rdb-storage-connection-string\"=\"DefaultEndpointsProtocol=[http|https];AccountName=myAccountName;AccountKey=myAccountKey;EndpointSuffix=core.chinacloudapi.cn\"}\n\n在此 PowerShell 命令中可以看到，对于 **-RedisConfiguration** 参数，将“rdb-backup-enabled”设置为 true 可以启用 RDB，设置为 false 可以禁用 RDB。\n\n若要配置备份间隔，可以将“rdb-backup-frequency”设置为 15（表示 **15 分钟**）、30（表示 **30 分钟**）、60（表示 **60 分钟**）、360（表示 **6 小时**）、720（表示 **12 小时**）或 1440（表示 **24 小时**）。在上一个备份操作成功完成以后，此时间间隔就会开始倒计时，同时会启动新的备份。\n\n若要配置存储帐户，可以将“rdb-storage-connection-string”设置为 Azure 中国区的某个连接字符串。在上述命令中可以看到，你需要在连接字符串中指定 BlobEndpoint、QueueEndpoint 和 TableEndpoint。\n\n>[AZURE.IMPORTANT]如果重新生成了持久性帐户的存储密钥，则必须更新“rdb-backup-frequency”。\n\n一旦备份频率间隔时间已过，则会启动下一次备份（或新缓存的首次备份）。\n\n\n\n## 保留常见问题\n\n以下列表包含有关 Azure Redis 缓存保留常见问题的解答。\n\n## 能否在此前已创建的缓存的基础上启用保留？\n\n是的，可以在创建缓存时或者在现有高级缓存上配置 Redis 持久性。\n\n## 能否在创建缓存后更改备份频率？\n\n是的，可以在 Azure PowerShell 更改备份频率。以下是一个命令示例，通过修改 rdb-backup-frequency 可以改变备份频率。\n\n    Set-AzureRmRedisCache -Name $cacheName  -ResourceGroupName $resourceGroupName -RedisConfiguration @{\"rdb-backup-enabled\"=\"true\"; \"rdb-backup-frequency\"=\"60\"; \"rdb-backup-max-snapshot-count\"=\"1\"; \"rdb-storage-connection-string\"=\"DefaultEndpointsProtocol=[http|https];AccountName=myAccountName;AccountKey=myAccountKey;EndpointSuffix=core.chinacloudapi.cn\"}\n\n## 为何我的备份频率为 60 分钟，而两次备份的间隔却超过 60 分钟？\n\n在上一次备份过程成功完成之前，本次备份不会开始，其频率所对应的时间间隔也不会开始计算。如果备份频率为 60 分钟，而备份过程需要 15 分钟才能成功完成，则在上一次备份开始以后，要再过 75 分钟才会开始下一次备份。\n\n## 进行新备份以后，旧备份会发生什么情况\n\n除最新备份外的所有备份都会自动删除。这种删除可能不会即刻发生，但旧备份是不会无限期保留下去的。\n\n## 后续步骤\n了解如何使用更多的高级版缓存功能。\n\n-   [如何为高级 Azure Redis 缓存配置群集功能](/documentation/articles/cache-how-to-premium-clustering)\n-   [如何为高级 Azure Redis 缓存配置虚拟网络支持](/documentation/articles/cache-how-to-premium-vnet)\n  \n<!-- IMAGES -->\n\n[redis-cache-new-cache-menu]: ./media/cache-how-to-premium-persistence/redis-cache-new-cache-menu.png\n\n[redis-cache-premium-pricing-tier]: ./media/cache-how-to-premium-persistence/redis-cache-premium-pricing-tier.png\n\n[redis-cache-persistence]: ./media/cache-how-to-premium-persistence/redis-cache-persistence.png\n\n[redis-cache-persistence-selected]: ./media/cache-how-to-premium-persistence/redis-cache-persistence-selected.png\n\n[redis-cache-settings]: ./media/cache-how-to-premium-persistence/redis-cache-settings.png\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

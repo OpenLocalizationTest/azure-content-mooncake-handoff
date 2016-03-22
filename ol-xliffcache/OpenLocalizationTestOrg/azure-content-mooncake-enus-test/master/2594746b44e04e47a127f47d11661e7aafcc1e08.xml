@@ -1,0 +1,1363 @@
+{
+  "nodes": [
+    {
+      "content": "使用 Azure SDK for Java 在 Azure 中创建 Web 应用",
+      "pos": [
+        28,
+        68
+      ]
+    },
+    {
+      "content": "了解如何使用 Azure SDK for Java 以编程方式在 Azure Web 应用上创建 Web 应用。",
+      "pos": [
+        88,
+        144
+      ]
+    },
+    {
+      "content": "使用 Azure SDK for Java 在 Azure 中创建 Web 应用",
+      "pos": [
+        406,
+        446
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        545,
+        547
+      ]
+    },
+    {
+      "pos": [
+        549,
+        643
+      ],
+      "content": "本演练演示如何创建一个 Azure SDK for Java 应用程序，以便在 <bpt id=\"p1\">[</bpt>Azure Web 应用<ept id=\"p1\">][]</ept>中创建一个 Web 应用，然后将一个应用程序部署到该应用。它由两个部分组成："
+    },
+    {
+      "content": "第 1 部分演示如何生成创建 Web 应用的 Java 应用程序。",
+      "pos": [
+        647,
+        680
+      ]
+    },
+    {
+      "content": "第 2 部分演示如何创建简单的 JSP \"Hello World\" 应用程序，然后使用 FTP 客户端将代码部署到 Azure Web 应用。",
+      "pos": [
+        683,
+        754
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        760,
+        764
+      ]
+    },
+    {
+      "content": "软件安装",
+      "pos": [
+        770,
+        774
+      ]
+    },
+    {
+      "pos": [
+        776,
+        1029
+      ],
+      "content": "本文中的 AzureWebDemo 应用程序代码是使用 Azure Java SDK 0.7.0 编写的，你可以使用 <bpt id=\"p1\">[</bpt>Web 平台安装程序<ept id=\"p1\">][]</ept> (WebPI) 进行安装。此外，请确保使用最新版本的 Azure Toolkit for Eclipse。安装 SDK 之后，通过在“Maven 存储库”中运行“更新索引”更新 Eclipse 项目中的依赖项，然后在“依赖项”窗口中重新添加每个包的最新版本。可以通过单击“帮助 &gt; 安装详细信息”验证 Eclipse 中已安装软件的版本；至少应具有以下版本："
+    },
+    {
+      "content": "Package for Azure Libraries for Java 0.7.0.20150309",
+      "pos": [
+        1033,
+        1084
+      ]
+    },
+    {
+      "content": "Eclipse IDE for Java EE Developers 4.4.2.20150219",
+      "pos": [
+        1087,
+        1136
+      ]
+    },
+    {
+      "content": "在 Azure 中创建并配置云资源",
+      "pos": [
+        1143,
+        1160
+      ]
+    },
+    {
+      "content": "在开始此过程之前，你需要拥有有效的 Azure 订阅，并在 Azure 上设置默认的 Active Directory (AD)。",
+      "pos": [
+        1162,
+        1227
+      ]
+    },
+    {
+      "content": "在 Azure 中创建 Active Directory (AD)",
+      "pos": [
+        1234,
+        1267
+      ]
+    },
+    {
+      "pos": [
+        1269,
+        1396
+      ],
+      "content": "如果你的 Azure 订阅中还没有 Active Directory (AD)，请使用你的 Microsoft 帐户登录 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">][]</ept>。如果你有多个订阅，请单击“订阅”并选择要用于此项目的订阅的默认目录。然后单击“应用”切换到该订阅视图。"
+    },
+    {
+      "content": "从左侧菜单中选择“Active Directory”。单击“新建 &gt; 目录 &gt; 自定义创建”。",
+      "pos": [
+        1401,
+        1448
+      ]
+    },
+    {
+      "content": "在“添加目录”中，选择“创建新目录”。",
+      "pos": [
+        1453,
+        1472
+      ]
+    },
+    {
+      "content": "在“名称”中输入目录名称。",
+      "pos": [
+        1477,
+        1490
+      ]
+    },
+    {
+      "pos": [
+        1495,
+        1611
+      ],
+      "content": "在“域”中输入域名。这是默认情况下你的目录附带的基本域名，它采用 <ph id=\"ph1\">`&lt;domain_name&gt;.partner.onmschina.cn`</ph> 格式。可以根据目录名称或你拥有的其他域名将它命名。以后，可以添加你的组织已在使用的其他域名。"
+    },
+    {
+      "content": "在“国家或地区”中选择你的区域设置。",
+      "pos": [
+        1616,
+        1634
+      ]
+    },
+    {
+      "pos": [
+        1636,
+        1671
+      ],
+      "content": "有关 AD 的详细信息，请参阅<bpt id=\"p1\">[</bpt>什么是 Azure AD 目录<ept id=\"p1\">][]</ept>？"
+    },
+    {
+      "content": "创建 Azure 的管理证书",
+      "pos": [
+        1678,
+        1692
+      ]
+    },
+    {
+      "content": "Azure SDK for Java 使用管理证书在 Azure 订阅中进行身份验证。对于使用服务管理 API 代表订阅所有者管理订阅资源的客户端应用程序，你可以使用这些 X.509 v3 证书来对其进行身份验证。",
+      "pos": [
+        1694,
+        1801
+      ]
+    },
+    {
+      "pos": [
+        1803,
+        1880
+      ],
+      "content": "此过程中的代码使用自签名证书在 Azure 上进行身份验证。对于此过程，你需要事先创建一个证书并将其上载到 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">][]</ept>。这包括以下步骤："
+    },
+    {
+      "content": "生成表示客户端证书的 PFX 文件，并将其保存在本地。",
+      "pos": [
+        1884,
+        1911
+      ]
+    },
+    {
+      "content": "从 PFX 文件生成管理证书（CER 文件）。",
+      "pos": [
+        1914,
+        1937
+      ]
+    },
+    {
+      "content": "将 CER 文件上载到你的 Azure 订阅。",
+      "pos": [
+        1940,
+        1963
+      ]
+    },
+    {
+      "content": "将 PFX 文件转换为 JKS，因为 Java 以这种格式来使用证书进行身份验证。",
+      "pos": [
+        1966,
+        2007
+      ]
+    },
+    {
+      "content": "编写引用本地 JKS 文件的应用程序身份验证代码。",
+      "pos": [
+        2010,
+        2035
+      ]
+    },
+    {
+      "pos": [
+        2037,
+        2119
+      ],
+      "content": "完成此过程后，CER 证书将驻留在 Azure 订阅中，JKS 证书将驻留在本地驱动器中。有关管理证书的详细信息，请参阅<bpt id=\"p1\">[</bpt>创建并上载 Azure 的管理证书<ept id=\"p1\">][]</ept>。"
+    },
+    {
+      "content": "创建证书",
+      "pos": [
+        2127,
+        2131
+      ]
+    },
+    {
+      "content": "若要创建自己的自签名证书，请在操作系统上打开一个命令控制台并运行以下命令。",
+      "pos": [
+        2133,
+        2170
+      ]
+    },
+    {
+      "pos": [
+        2174,
+        2274
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>运行此命令的计算机必须已安装 JDK。此外，keytool 的路径取决于安装 JDK 的位置。有关详细信息，请参阅 Java 联机文档中的<bpt id=\"p2\">[</bpt>密钥和证书管理工具 (keytool)<ept id=\"p2\">][]</ept>。"
+    },
+    {
+      "content": "创建 .pfx 文件：",
+      "pos": [
+        2276,
+        2287
+      ]
+    },
+    {
+      "content": "创建 .cer 文件：",
+      "pos": [
+        2549,
+        2560
+      ]
+    },
+    {
+      "content": "其中：",
+      "pos": [
+        2774,
+        2777
+      ]
+    },
+    {
+      "pos": [
+        2781,
+        2817
+      ],
+      "content": "<ph id=\"ph1\">`&lt;java-install-dir&gt;`</ph> 是 Java 安装目录的路径。"
+    },
+    {
+      "pos": [
+        2820,
+        2870
+      ],
+      "content": "<ph id=\"ph1\">`&lt;keystore-id&gt;`</ph> 是密钥库条目标识符（例如 <ph id=\"ph2\">`AzureRemoteAccess`</ph>）。"
+    },
+    {
+      "pos": [
+        2873,
+        2927
+      ],
+      "content": "<ph id=\"ph1\">`&lt;cert-store-dir&gt;`</ph> 是要存储证书的目录的路径（例如 <ph id=\"ph2\">`C:/Certificates`</ph>）。"
+    },
+    {
+      "pos": [
+        2930,
+        2981
+      ],
+      "content": "<ph id=\"ph1\">`&lt;cert-file-name&gt;`</ph> 是证书文件的名称（例如 <ph id=\"ph2\">`AzureWebDemoCert`</ph>）。"
+    },
+    {
+      "pos": [
+        2984,
+        3042
+      ],
+      "content": "<ph id=\"ph1\">`&lt;password&gt;`</ph> 是选择用于保护证书的密码；它的长度必须至少为 6 个字符。可以不输入密码，但不建议这样做。"
+    },
+    {
+      "pos": [
+        3045,
+        3096
+      ],
+      "content": "<ph id=\"ph1\">`&lt;dname&gt;`</ph> 是要与别名关联的 X.500 可分辨名称，它用作自签名证书中的颁发者和使用者字段。"
+    },
+    {
+      "pos": [
+        3098,
+        3130
+      ],
+      "content": "有关详细信息，请参阅<bpt id=\"p1\">[</bpt>创建并上载 Azure 的管理证书<ept id=\"p1\">][]</ept>。"
+    },
+    {
+      "content": "上载证书",
+      "pos": [
+        3138,
+        3142
+      ]
+    },
+    {
+      "content": "若要将自签名证书上载到 Azure，请转到管理门户中的“设置”页，然后单击“管理证书”选项卡。单击页面底部的“上载”，然后导航到你创建的 CER 文件的所在位置。",
+      "pos": [
+        3144,
+        3225
+      ]
+    },
+    {
+      "content": "将 PFX 文件转换为 JKS",
+      "pos": [
+        3233,
+        3248
+      ]
+    },
+    {
+      "pos": [
+        3250,
+        3342
+      ],
+      "content": "在 Windows 命令提示符下（以管理员身份运行），键入 cd 转到包含证书的目录，然后运行以下命令，其中，<ph id=\"ph1\">`&lt;java-install-dir&gt;`</ph> 是计算机安装 Java 的目录："
+    },
+    {
+      "content": "出现提示时，输入目标密钥库密码；这将是 JKS 文件的密码。",
+      "pos": [
+        3561,
+        3591
+      ]
+    },
+    {
+      "content": "出现提示时，输入源密钥库密码；这是你为 PFX 文件指定的密码。",
+      "pos": [
+        3596,
+        3628
+      ]
+    },
+    {
+      "content": "两个密码不一定要相同。可以不输入密码，但不建议这样做。",
+      "pos": [
+        3630,
+        3657
+      ]
+    },
+    {
+      "content": "构建 Web 应用创建应用程序",
+      "pos": [
+        3663,
+        3678
+      ]
+    },
+    {
+      "content": "创建 Eclipse 工作区和 Maven 项目",
+      "pos": [
+        3684,
+        3708
+      ]
+    },
+    {
+      "content": "在本部分中，你将要给名为 AzureWebDemo 的 Web 应用创建应用程序创建工作区和 Maven 项目。",
+      "pos": [
+        3710,
+        3766
+      ]
+    },
+    {
+      "content": "创建新的 Maven 项目。单击“文件 &gt; 新建 &gt; Maven 项目”。在“新建 Maven 项目”中，选择“创建简单项目”和“使用默认工作区位置”。",
+      "pos": [
+        3771,
+        3847
+      ]
+    },
+    {
+      "content": "在“新建 Maven 项目”的第二页上，指定以下信息：",
+      "pos": [
+        3852,
+        3879
+      ]
+    },
+    {
+      "pos": [
+        3887,
+        3922
+      ],
+      "content": "组 ID：<ph id=\"ph1\">`com.&lt;username&gt;.azure.webdemo`</ph>"
+    },
+    {
+      "content": "项目 ID：AzureWebDemo",
+      "pos": [
+        3929,
+        3947
+      ]
+    },
+    {
+      "content": "版本：0.0.1-SNAPSHOT",
+      "pos": [
+        3954,
+        3971
+      ]
+    },
+    {
+      "content": "打包：jar",
+      "pos": [
+        3978,
+        3984
+      ]
+    },
+    {
+      "content": "名称：AzureWebDemo",
+      "pos": [
+        3991,
+        4006
+      ]
+    },
+    {
+      "content": "单击“完成”。",
+      "pos": [
+        4012,
+        4019
+      ]
+    },
+    {
+      "content": "在项目资源管理器中打开新项目的 pom.xml 文件。选择“依赖项”选项卡。由于这是一个新项目，因此尚未列出任何包。",
+      "pos": [
+        4024,
+        4082
+      ]
+    },
+    {
+      "content": "打开“Maven 存储库”视图。单击“窗口 &gt; 显示视图 &gt; 其他 &gt; Maven &gt; Maven 存储库”，然后单击“确定”。“Maven 存储库”视图将出现在 IDE 的底部。",
+      "pos": [
+        4087,
+        4177
+      ]
+    },
+    {
+      "content": "打开“全局存储库”，右键单击“中央”存储库，然后选择“重新生成索引”。",
+      "pos": [
+        4182,
+        4217
+      ]
+    },
+    {
+      "content": "此步骤可能需要几分钟时间，具体取决于你的连接速度。重新生成索引后，“中央”Maven 存储库中应会显示 Azure 包。",
+      "pos": [
+        4239,
+        4299
+      ]
+    },
+    {
+      "pos": [
+        4304,
+        4379
+      ],
+      "content": "在“依赖项”中，单击“添加”。在“输入组 ID...”中输入 <ph id=\"ph1\">`azure-management`</ph>。选择基础管理和 Azure Web 应用管理的包："
+    },
+    {
+      "pos": [
+        4489,
+        4585
+      ],
+      "content": "**注意：**如果在新版本发布后更新依赖项，\n则需要重新添加此列表中的每个依赖项。\n单击“添加”后，选择每个依赖项，\n则会在“依赖项”列表中显示新的版本号。",
+      "leadings": [
+        "",
+        "    > ",
+        "    > ",
+        "    > "
+      ],
+      "nodes": [
+        {
+          "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>如果在新版本发布后更新依赖项，",
+          "pos": [
+            0,
+            22
+          ]
+        },
+        {
+          "content": "则需要重新添加此列表中的每个依赖项。",
+          "pos": [
+            23,
+            41
+          ]
+        },
+        {
+          "content": "单击“添加”后，选择每个依赖项，",
+          "pos": [
+            42,
+            58
+          ]
+        },
+        {
+          "content": "则会在“依赖项”列表中显示新的版本号。",
+          "pos": [
+            59,
+            78
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        4587,
+        4620
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“确定”<ept id=\"p1\">**</ept>。Azure 包随即会出现在“依赖项”列表中。"
+    },
+    {
+      "content": "编写 Java 代码，以通过调用 Azure SDK 来创建 Web 应用",
+      "pos": [
+        4627,
+        4664
+      ]
+    },
+    {
+      "content": "接下来，请编写调用 Azure SDK for Java 中的 API 的代码，以创建 Azure Web 应用。",
+      "pos": [
+        4666,
+        4723
+      ]
+    },
+    {
+      "content": "创建一个 Java 类以用于包含主入口点代码。在项目资源管理器中，右键单击项目节点，然后选择“新建 &gt; 类”。",
+      "pos": [
+        4728,
+        4783
+      ]
+    },
+    {
+      "pos": [
+        4788,
+        4863
+      ],
+      "content": "在“新建 Java 类”中，将类命名为 <ph id=\"ph1\">`WebCreator`</ph>，并选中“public static void main”复选框。所选内容应如下所示："
+    },
+    {
+      "content": "单击“完成”。WebCreator.java 文件将在项目资源管理器中出现。",
+      "pos": [
+        4880,
+        4918
+      ]
+    },
+    {
+      "content": "调用 Azure API 以创建 Azure Web 应用",
+      "pos": [
+        4925,
+        4954
+      ]
+    },
+    {
+      "content": "添加所需的导入",
+      "pos": [
+        4962,
+        4969
+      ]
+    },
+    {
+      "content": "在 WebCreator.java 中添加以下导入；使用这些导入可以访问使用 Azure API 的管理库中的类：",
+      "pos": [
+        4971,
+        5028
+      ]
+    },
+    {
+      "content": "定义主入口点类",
+      "pos": [
+        5889,
+        5896
+      ]
+    },
+    {
+      "pos": [
+        5898,
+        6011
+      ],
+      "content": "因为 AzureWebDemo 应用程序的目的是创建 Azure Web 应用，所以请将此应用程序的主类命名为 <ph id=\"ph1\">`WebAppCreator`</ph>。此类提供调用 Azure 服务管理 API 的主入口点代码，以创建 Web 应用。"
+    },
+    {
+      "content": "为 Web 应用和 Web 空间添加以下参数定义。你将需要提供你自己的 Azure 订阅 ID 和证书信息。",
+      "pos": [
+        6013,
+        6067
+      ]
+    },
+    {
+      "content": "其中：",
+      "pos": [
+        6793,
+        6796
+      ]
+    },
+    {
+      "pos": [
+        6800,
+        6842
+      ],
+      "content": "<ph id=\"ph1\">`&lt;subscription-id&gt;`</ph> 是要用于创建资源的 Azure 订阅 ID。"
+    },
+    {
+      "pos": [
+        6845,
+        7006
+      ],
+      "content": "<ph id=\"ph1\">`&lt;certificate-store-path&gt;`</ph> 是你的本地证书存储区目录中的 JKS 文件的路径和文件名。例如，对于 Linux，则为 <ph id=\"ph2\">`C:/Certificates/CertificateName.jks`</ph>；对于 Windows，则为 <ph id=\"ph3\">`C:\\Certificates\\CertificateName.jks`</ph>。"
+    },
+    {
+      "pos": [
+        7009,
+        7053
+      ],
+      "content": "<ph id=\"ph1\">`&lt;certificate-password&gt;`</ph> 是你在创建 JKS 证书时指定的密码。"
+    },
+    {
+      "pos": [
+        7056,
+        7194
+      ],
+      "content": "<ph id=\"ph1\">`webAppName`</ph> 可以是你选择的任何名称；此过程使用名称 <ph id=\"ph2\">`WebDemoWebApp`</ph>。完整的域名称是 <ph id=\"ph3\">`webAppName`</ph>，并追加了 <ph id=\"ph4\">`domainName`</ph>，因此在这种情况下，完整的域是 <ph id=\"ph5\">`webdemowebapp.chinacloudsites.cn`</ph>。"
+    },
+    {
+      "pos": [
+        7197,
+        7222
+      ],
+      "content": "<ph id=\"ph1\">`domainName`</ph> 应按照以上所示进行指定。"
+    },
+    {
+      "pos": [
+        7226,
+        7362
+      ],
+      "content": "**注意：**每次运行此应用程序时，\n你需要更改 `webAppName` 和 `appServicePlanName` 的值（或在 Azure 门户上删除 Web 应用），\n然后再次运行应用程序。否则，\n由于 Azure 上已存在相同的资源，所以执行会失败。",
+      "leadings": [
+        "",
+        "> ",
+        "> ",
+        "> "
+      ],
+      "nodes": [
+        {
+          "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>每次运行此应用程序时，",
+          "pos": [
+            0,
+            18
+          ]
+        },
+        {
+          "content": "你需要更改 <ph id=\"ph1\">`webAppName`</ph> 和 <ph id=\"ph2\">`appServicePlanName`</ph> 的值（或在 Azure 门户上删除 Web 应用），",
+          "pos": [
+            19,
+            87
+          ]
+        },
+        {
+          "content": "然后再次运行应用程序。否则，",
+          "pos": [
+            88,
+            102
+          ]
+        },
+        {
+          "content": "由于 Azure 上已存在相同的资源，所以执行会失败。",
+          "pos": [
+            103,
+            130
+          ]
+        }
+      ]
+    },
+    {
+      "content": "定义 Web 创建方法",
+      "pos": [
+        7370,
+        7381
+      ]
+    },
+    {
+      "pos": [
+        7383,
+        7600
+      ],
+      "content": "接下来，定义用于创建 Web 应用的方法。此方法 (<ph id=\"ph1\">`createWebApp`</ph>) 指定 Web 应用的参数和 Web 空间。它还会创建并配置 Azure Web 应用管理客户端，该客户端由 <bpt id=\"p1\">[</bpt>WebSiteManagementClient<ept id=\"p1\">][]</ept> 对象进行定义。管理客户端对于创建 Web 应用至关重要。它提供 RESTful web 服务，使应用程序能够通过调用服务管理 API 来管理 Web 应用（执行创建、更新和删除等操作）。"
+    },
+    {
+      "content": "代码将输出指示成功或失败的 HTTP 响应状态；如果成功，则输出创建的 Web 应用的名称。",
+      "pos": [
+        10725,
+        10771
+      ]
+    },
+    {
+      "content": "定义 main() 方法",
+      "pos": [
+        10779,
+        10791
+      ]
+    },
+    {
+      "content": "提供调用 createWebApp() 的 main() 方法代码，以创建 Web 应用。",
+      "pos": [
+        10793,
+        10838
+      ]
+    },
+    {
+      "pos": [
+        10840,
+        10870
+      ],
+      "content": "最后，从 <ph id=\"ph1\">`main`</ph> 调用 <ph id=\"ph2\">`createWebApp`</ph>："
+    },
+    {
+      "content": "运行应用程序并验证 Web 应用创建",
+      "pos": [
+        11190,
+        11208
+      ]
+    },
+    {
+      "content": "若要验证应用程序是否运行，请单击“运行 &gt; 运行”。在应用程序完成运行后，你应该会在 Eclipse 控制台中看到以下输出：",
+      "pos": [
+        11210,
+        11272
+      ]
+    },
+    {
+      "content": "Web app created - HTTP response 200",
+      "pos": [
+        11292,
+        11327
+      ]
+    },
+    {
+      "content": "登录到 Azure 管理门户并单击“Web Apps”。在数分钟内，新 Web 应用应会出现在“Web Apps”列表中。",
+      "pos": [
+        11417,
+        11478
+      ]
+    },
+    {
+      "content": "将应用程序部署到 Web 应用",
+      "pos": [
+        11484,
+        11499
+      ]
+    },
+    {
+      "pos": [
+        11501,
+        11697
+      ],
+      "content": "运行 AzureWebDemo 并创建新 Web 应用后，请登录管理门户，单击“Web Apps”，然后在“Web Apps”列表中选择“WebDemoWebApp”。在 Web 应用的仪表板页上，单击“浏览”（或单击 URL <ph id=\"ph1\">`webdemowebapp.chinacloudsites.cn`</ph>）导航到该 Web 应用。你将会看到一个空白的占位符页，因为尚未将任何内容发布到 Web 应用。"
+    },
+    {
+      "content": "接下来，你要创建一个“Hello World”应用程序并将其部署到 Web 应用。",
+      "pos": [
+        11699,
+        11740
+      ]
+    },
+    {
+      "content": "创建 JSP Hello World 应用程序",
+      "pos": [
+        11747,
+        11770
+      ]
+    },
+    {
+      "content": "创建应用程序",
+      "pos": [
+        11777,
+        11783
+      ]
+    },
+    {
+      "content": "为了演示如何将应用程序部署到 Web，以下过程说明了如何创建简单的 \"Hello World\" Java 应用程序，并将其上载到应用程序创建的 Azure Web 应用。",
+      "pos": [
+        11785,
+        11870
+      ]
+    },
+    {
+      "pos": [
+        11875,
+        11941
+      ],
+      "content": "单击“文件 &gt; 新建 &gt; 动态 Web 项目”。将它命名为 <ph id=\"ph1\">`JSPHello`</ph>。不需要在此对话框中更改其他任何设置。单击“完成”。"
+    },
+    {
+      "pos": [
+        11958,
+        12063
+      ],
+      "content": "在项目资源管理器中，展开“JSPHello”项目，右键单击“WebContent”，然后单击“新建 &gt; JSP 文件”。在“新建 JSP 文件”对话框中，将新文件命名为 <ph id=\"ph1\">`index.jsp`</ph>。单击“下一步”。"
+    },
+    {
+      "content": "在“选择 JSP 模板”对话框中，选择“新建 JSP 文件 (html)”，然后单击“完成”。",
+      "pos": [
+        12068,
+        12115
+      ]
+    },
+    {
+      "pos": [
+        12120,
+        12168
+      ],
+      "content": "在 index.jsp 中，在 <ph id=\"ph1\">`&lt;head&gt;`</ph> 和 <ph id=\"ph2\">`&lt;body&gt;`</ph> 标记部分中添加以下代码："
+    },
+    {
+      "content": "在 localhost 中运行 Hello World 应用程序",
+      "pos": [
+        12354,
+        12386
+      ]
+    },
+    {
+      "content": "在运行此应用程序之前，你需要配置几个属性。",
+      "pos": [
+        12388,
+        12409
+      ]
+    },
+    {
+      "content": "右键单击“JSPHello”项目并选择“属性”。",
+      "pos": [
+        12414,
+        12438
+      ]
+    },
+    {
+      "content": "在“属性”对话框中：选择“Java 生成路径”，选择“顺序和导出”选项卡，选中“JRE 系统库”，然后单击“上移”将其移至列表顶部。",
+      "pos": [
+        12443,
+        12509
+      ]
+    },
+    {
+      "content": "同样在“属性”对话框中：选择“目标运行时”，然后单击“新建”。",
+      "pos": [
+        12526,
+        12557
+      ]
+    },
+    {
+      "pos": [
+        12562,
+        12714
+      ],
+      "content": "在“新建服务器运行时环境”对话框中，选择一个服务器（如“Apache Tomcat v7.0”），然后单击“下一步”。在“Tomcat 服务器”对话框中，将“名称”设置为 <ph id=\"ph1\">`Apache Tomcat v7.0`</ph>，并将“Tomcat 安装目录”设置为在其中安装所要使用的 Tomcat 服务器版本的目录。"
+    },
+    {
+      "content": "单击“完成”。",
+      "pos": [
+        12732,
+        12739
+      ]
+    },
+    {
+      "content": "随后你将返回“属性”对话框的“目标运行时”页。选择“Apache Tomcat v7.0”，然后单击“确定”。",
+      "pos": [
+        12744,
+        12799
+      ]
+    },
+    {
+      "content": "在 Eclipse 的“运行”菜单中，单击“运行”。在“运行方式”对话框中，选择“在服务器上运行”。在“在服务器上运行”对话框中，选择“Tomcat v7.0 服务器”：",
+      "pos": [
+        12816,
+        12901
+      ]
+    },
+    {
+      "content": "单击“完成”。",
+      "pos": [
+        12919,
+        12926
+      ]
+    },
+    {
+      "pos": [
+        12931,
+        13032
+      ],
+      "content": "当应用程序运行时，你应该会在 Eclipse (<ph id=\"ph1\">`http://localhost:8080/JSPHello/`</ph>) 的 localhost 窗口中看到显示的“JSPHello”页，其中显示了以下消息："
+    },
+    {
+      "content": "将应用程序导出为 WAR",
+      "pos": [
+        13101,
+        13113
+      ]
+    },
+    {
+      "content": "将 Web 项目文件导出为 Web 存档 (WAR) 文件，以便可以将它部署到 Web 应用。以下 web 项目文件驻留在 WebContent 文件夹中：",
+      "pos": [
+        13115,
+        13193
+      ]
+    },
+    {
+      "content": "右键单击 WebContent 文件夹并选择“导出”。",
+      "pos": [
+        13238,
+        13265
+      ]
+    },
+    {
+      "content": "在“导出选择”对话框中，单击“Web &gt; WAR 文件”，然后单击“下一步”。",
+      "pos": [
+        13270,
+        13309
+      ]
+    },
+    {
+      "content": "在“WAR 导出”对话框中，选择当前项目中的 src 目录，并在末尾添加 WAR 文件名。例如：",
+      "pos": [
+        13314,
+        13362
+      ]
+    },
+    {
+      "pos": [
+        13412,
+        13510
+      ],
+      "content": "有关部署 WAR 文件的详细信息，请参阅<bpt id=\"p1\">[</bpt>将 Java 应用程序添加到 Azure Web 应用<ept id=\"p1\">](/documentation/articles/web-sites-java-add-app)</ept>。"
+    },
+    {
+      "content": "使用 FTP 部署 Hello World 应用程序",
+      "pos": [
+        13517,
+        13543
+      ]
+    },
+    {
+      "content": "选择第三方 FTP 客户端来发布应用程序。此过程将介绍FileZilla，这是一个带有便捷式图形 UI 的常用工具。",
+      "pos": [
+        13545,
+        13603
+      ]
+    },
+    {
+      "pos": [
+        13607,
+        13750
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>Azure Toolkit for Eclipse 支持部署到存储帐户和云服务，但当前不支持部署到 Web 应用。你可以使用 Azure 部署项目部署到存储帐户和云服务，但不能部署到 Web 应用。使用其他方法（例如 FTP 或 GitHub）将文件传输到 Web 应用。"
+    },
+    {
+      "pos": [
+        13754,
+        13899
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>我们不建议通过 Windows 命令提示符（Windows 随附的命令行 FTP.EXE 实用工具）使用 FTP。使用活动 FTP 的 FTP 客户端（如 FTP.EXE）通常无法通过防火墙工作。活动 FTP 指定基于 LAN 的内部地址，FTP 服务器可能无法连接到该地址。"
+    },
+    {
+      "content": "有关使用 FTP 部署到 Azure Web 应用的详细信息，请参阅以下主题：",
+      "pos": [
+        13901,
+        13940
+      ]
+    },
+    {
+      "content": "使用 FTP 实用工具部署",
+      "pos": [
+        13945,
+        13958
+      ]
+    },
+    {
+      "content": "设置部署凭据",
+      "pos": [
+        14009,
+        14015
+      ]
+    },
+    {
+      "pos": [
+        14017,
+        14067
+      ],
+      "content": "确保已运行 <bpt id=\"p1\">**</bpt>AzureWebDemo<ept id=\"p1\">**</ept> 应用程序来创建 Web 应用。你会将文件转移到此位置。"
+    },
+    {
+      "content": "登录到管理门户并单击“Web Apps”。确保“WebDemoWebApp”已显示在 Web Apps 列表中，并确保它正在运行。单击“WebDemoWebApp”以打开其“仪表板”页。",
+      "pos": [
+        14072,
+        14165
+      ]
+    },
+    {
+      "content": "在“仪表板”页的“速览”下，单击“设置部署凭据”（如果你已有部署凭据，则此选项应为“重置部署凭据”）。",
+      "pos": [
+        14170,
+        14221
+      ]
+    },
+    {
+      "content": "部署凭据与某个 Microsoft 帐户关联。需要指定可用于使用 Git 和 FTP 进行部署的用户名和密码。可以使用这些凭据部署到与你的 Microsoft 帐户关联的所有 Azure 订阅中的任何 Web 应用。在对话框中提供 Git 和 FTP 部署凭据，并记下用户名和密码以供将来使用。",
+      "pos": [
+        14227,
+        14374
+      ]
+    },
+    {
+      "content": "获取 FTP 连接信息",
+      "pos": [
+        14382,
+        14393
+      ]
+    },
+    {
+      "content": "若要使用 FTP 将应用程序文件部署到新建的 Web 应用，你需要获取连接信息。可通过两种方法获取连接信息。一种方法是访问 Web 应用的“仪表板”页；另一种方法是下载 Web 应用的发布配置文件。发布配置文件是一个 XML 文件，它提供 Azure 中 Web 应用的 FTP 主机名和登录凭据等信息。你可以使用此用户名和密码部署到与 Azure 帐户关联的所有订阅中的任何 Web 应用，而不仅仅是此 Web 应用。",
+      "pos": [
+        14395,
+        14605
+      ]
+    },
+    {
+      "content": "从 Web 应用的“仪表板”页获取 FTP 连接信息：",
+      "pos": [
+        14607,
+        14634
+      ]
+    },
+    {
+      "pos": [
+        14639,
+        14736
+      ],
+      "content": "在“速览”下，查找并复制“FTP 主机名”。这是类似于 <ph id=\"ph1\">`ftp://cnws-prod-sha-001.ftp.chinacloudsites.chinacloudapi.cn`</ph> 的 URI。"
+    },
+    {
+      "pos": [
+        14741,
+        14837
+      ],
+      "content": "在“速览”下，查找并复制“部署/FTP 用户”。此值的形式为 <bpt id=\"p1\">*</bpt>WebsiteName\\\\DeploymentUsername<ept id=\"p1\">*</ept>；例如 <ph id=\"ph1\">`WebDemoWebsite\\deployer77`</ph>。"
+    },
+    {
+      "content": "从 Web 应用的发布配置文件获取 FTP 连接信息：",
+      "pos": [
+        14839,
+        14866
+      ]
+    },
+    {
+      "content": "在 Web 应用的“仪表板”中的“速览”下，单击“下载发布配置文件”。这会将一个 .publishsettings 文件下载到本地驱动器。",
+      "pos": [
+        14871,
+        14940
+      ]
+    },
+    {
+      "pos": [
+        14945,
+        15043
+      ],
+      "content": "在 XML 编辑器或文本编辑器中打开 .publishsettings 文件并找到包含 <ph id=\"ph1\">`publishMethod=\"FTP\"`</ph> 的 <ph id=\"ph2\">`&lt;publishProfile&gt;`</ph> 元素。该元素应类似于："
+    },
+    {
+      "pos": [
+        15420,
+        15480
+      ],
+      "content": "请注意， Web 应用的 <ph id=\"ph1\">`publishProfile`</ph> 设置将按如下所示映射到 FileZilla 站点管理员设置："
+    },
+    {
+      "pos": [
+        15484,
+        15522
+      ],
+      "content": "<ph id=\"ph1\">`publishUrl`</ph> 与你在“主机”中设置的“FTP 主机名”的值相同。"
+    },
+    {
+      "pos": [
+        15525,
+        15594
+      ],
+      "content": "<ph id=\"ph1\">`publishMethod=\"FTP\"`</ph> 表示你已将“协议”设置为“FTP - 文件传输协议”，已将“加密”设置为“使用普通 FTP”。"
+    },
+    {
+      "pos": [
+        15597,
+        15701
+      ],
+      "content": "<ph id=\"ph1\">`userName`</ph> 和 <ph id=\"ph2\">`userPWD`</ph> 是你在重置部署凭据时指定的实际用户名和密码值的密钥。<ph id=\"ph3\">`userName`</ph> 与“部署/FTP 用户”相同。它们将映射到 FileZilla 中的“用户”和“密码”。"
+    },
+    {
+      "pos": [
+        15704,
+        15767
+      ],
+      "content": "<ph id=\"ph1\">`ftpPassiveMode=\"True\"`</ph> 表示 FTP 站点使用被动 FTP 传输；在“传输设置”选项卡上选择“被动”。"
+    },
+    {
+      "content": "配置 Web 应用以托管 Java 应用程序",
+      "pos": [
+        15775,
+        15797
+      ]
+    },
+    {
+      "content": "发布应用程序之前，你需要更改几项配置设置，使 Web 应用可以托管 Java 应用程序。",
+      "pos": [
+        15799,
+        15843
+      ]
+    },
+    {
+      "content": "在管理门户中，转到 Web 应用的“仪表板”页，然后单击“配置”。在“配置”页上指定以下设置。",
+      "pos": [
+        15848,
+        15895
+      ]
+    },
+    {
+      "content": "在“Java 版本”中，默认值为“关闭”；选择你的应用程序所针对的 Java 版本，例如 1.7.0\\_51。完成此操作后，还请确保“Web 容器”已设置为 Tomcat 服务器的版本。",
+      "pos": [
+        15900,
+        15993
+      ]
+    },
+    {
+      "content": "在“默认文档”中，添加 index.jsp 并将其上移至列表的顶部。（ Web 应用的默认文件为 hostingstart.html。）",
+      "pos": [
+        15998,
+        16066
+      ]
+    },
+    {
+      "content": "单击“保存”。",
+      "pos": [
+        16071,
+        16078
+      ]
+    },
+    {
+      "content": "使用 FileZilla 发布应用程序（可选）",
+      "pos": [
+        16085,
+        16108
+      ]
+    },
+    {
+      "pos": [
+        16110,
+        16474
+      ],
+      "content": "可用于发布应用程序的另一个工具是 FileZilla，这是一个带有便捷式图形 UI 的常用第三方 FTP 客户端。如果尚未安装，则可以从 <bpt id=\"p1\">[</bpt>http://filezilla-project.org/<ept id=\"p1\">](http://filezilla-project.org/)</ept> 中下载并安装 FileZilla。有关使用客户端的详细信息，请参阅 <bpt id=\"p2\">[</bpt>FileZilla 文档<ept id=\"p2\">](https://wiki.filezilla-project.org/Documentation)</ept> 和 <bpt id=\"p3\">[</bpt>FTP 客户端 - 第 4 部分：FileZilla<ept id=\"p3\">](http://blogs.msdn.com/b/robert_mcmurray/archive/2008/12/17/ftp-clients-part-4-filezilla.aspx)</ept> 上的此博客条目。"
+    },
+    {
+      "content": "在 FileZilla 中，单击“文件 &gt; 站点管理员”。",
+      "pos": [
+        16479,
+        16508
+      ]
+    },
+    {
+      "pos": [
+        16512,
+        16599
+      ],
+      "content": "在“站点管理员”对话框中，单击“新建站点”。随后，“选择条目”中会出现新的空白 FTP 站点，提示你提供名称。对于此过程，请将它命名为 <ph id=\"ph1\">`AzureWebDemo-FTP`</ph>。"
+    },
+    {
+      "pos": [
+        16605,
+        16851
+      ],
+      "content": "在“常规”选项卡上，指定以下设置：\n -“主机”：输入从仪表板中复制的“FTP 主机名”\n -“端口”：（将其留空，因为这是被动传输并且服务器会确定使用的端口。）\n -“协议”：FTP 文件传输协议 \n -“加密”：使用普通的 FTP \n -“登录类型”：普通 \n -“用户”：输入从仪表板中复制的部署/FTP 用户。这是完整的 FTP 用户名，其形式为 *webappname\\\\username*。\n -“密码”：输入在设置部署凭据时指定的密码。",
+      "leadings": [
+        "",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   "
+      ],
+      "nodes": [
+        {
+          "content": "在“常规”选项卡上，指定以下设置：",
+          "pos": [
+            0,
+            17
+          ]
+        },
+        {
+          "content": "-“主机”：输入从仪表板中复制的“FTP 主机名”",
+          "pos": [
+            19,
+            44
+          ]
+        },
+        {
+          "content": "-“端口”：（将其留空，因为这是被动传输并且服务器会确定使用的端口。）",
+          "pos": [
+            46,
+            81
+          ]
+        },
+        {
+          "content": "-“协议”：FTP 文件传输协议",
+          "pos": [
+            83,
+            99
+          ]
+        },
+        {
+          "content": "-“加密”：使用普通的 FTP",
+          "pos": [
+            102,
+            117
+          ]
+        },
+        {
+          "content": "-“登录类型”：普通",
+          "pos": [
+            120,
+            130
+          ]
+        },
+        {
+          "content": "-“用户”：输入从仪表板中复制的部署/FTP 用户。这是完整的 FTP 用户名，其形式为 <bpt id=\"p1\">*</bpt>webappname\\\\username<ept id=\"p1\">*</ept>。",
+          "pos": [
+            133,
+            201
+          ]
+        },
+        {
+          "content": "-“密码”：输入在设置部署凭据时指定的密码。",
+          "pos": [
+            203,
+            225
+          ]
+        }
+      ]
+    },
+    {
+      "content": "在“传输设置”选项卡上，选择“被动”。",
+      "pos": [
+        16857,
+        16876
+      ]
+    },
+    {
+      "pos": [
+        16881,
+        16956
+      ],
+      "content": "单击“连接”。如果成功，FileZilla 的控制台则会显示 <ph id=\"ph1\">`Status: Connected`</ph> 消息并发布 <ph id=\"ph2\">`LIST`</ph> 命令，以列出目录内容。"
+    },
+    {
+      "content": "在“本地”站点面板中，选择 JSPHello.war 文件所在的源目录；路径与以下路径类似：",
+      "pos": [
+        16961,
+        17007
+      ]
+    },
+    {
+      "pos": [
+        17048,
+        17176
+      ],
+      "content": "在“远程”站点面板中，选择目标文件夹。WAR 文件将会部署到 Web 应用根目录下的 <ph id=\"ph1\">`webapps`</ph> 目录中。导航到 <ph id=\"ph2\">`/site/wwwroot`</ph>，右键单击 <ph id=\"ph3\">`wwwroot`</ph>，然后选择“创建目录”。将目录命名为 <ph id=\"ph4\">`webapps`</ph>，然后进入该目录。"
+    },
+    {
+      "pos": [
+        17181,
+        17301
+      ],
+      "content": "将 JSPHello.war 传输到 <ph id=\"ph1\">`/site/wwwroot/webapps`</ph>。在“本地”文件列表中选择 JSPHello.war，右键单击它，然后选择“上载”。随后它应该会出现在 <ph id=\"ph2\">`/site/wwwroot/webapps`</ph> 中。"
+    },
+    {
+      "content": "将 JSPHello.war 复制到 webapps 目录后，Tomcat 服务器将自动解包（解压缩）该 WAR 文件中的文件。尽管 Tomcat 服务器马上就会解包，但文件可能需要在很长时间（可能是几小时）之后才会出现在 FTP 客户端中。",
+      "pos": [
+        17306,
+        17427
+      ]
+    },
+    {
+      "content": "在 Web 应用上运行 Hello World 应用程序",
+      "pos": [
+        17435,
+        17463
+      ]
+    },
+    {
+      "pos": [
+        17468,
+        17578
+      ],
+      "content": "上载 WAR 文件并确认 Tomcat 服务器已创建解包的 <ph id=\"ph1\">`JSPHello`</ph> 目录后，请浏览到 <ph id=\"ph2\">`http://webdemowebapp.chinacloudsites.cn/JSPHello`</ph> 以运行该应用程序。"
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>如果从管理门户单击“浏览”，则可能获得默认网页，",
+      "pos": [
+        17586,
+        17617
+      ]
+    },
+    {
+      "content": "网页显示“已成功创建此基于 Java 的 Web 应用。",
+      "pos": [
+        17622,
+        17650
+      ]
+    },
+    {
+      "content": "” 你可能需要刷新网页才能查看应用程序输出，",
+      "pos": [
+        17655,
+        17677
+      ]
+    },
+    {
+      "content": "而不是默认网页。",
+      "pos": [
+        17682,
+        17690
+      ]
+    },
+    {
+      "content": "当应用程序运行时，你应会看到具有以下输出的网页：",
+      "pos": [
+        17695,
+        17719
+      ]
+    },
+    {
+      "content": "清理 Azure 资源",
+      "pos": [
+        17788,
+        17799
+      ]
+    },
+    {
+      "content": "此过程创建 Azure Web 应用。只要 Web 应用存在，你就要支付资源的费用。除非你打算继续使用该 Web 应用进行测试或开发，否则应考虑停止或删除它。已停止的 Web 应用仍会产生较小的费用，但你随时可以重新启动它。删除某个 Web 应用会清除已上载到该 Web 应用的所有数据。",
+      "pos": [
+        17801,
+        17945
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"使用 Azure SDK for Java 在 Azure 中创建 Web 应用\" \n    description=\"了解如何使用 Azure SDK for Java 以编程方式在 Azure Web 应用上创建 Web 应用。\" \n    tags=\"azure-classic-portal\"\n    services=\"app-service\\web\" \n    documentationCenter=\"Java\" \n    authors=\"donntrenton\" \n    manager=\"wpickett\" \n    editor=\"jimbe\"/>\n\n<tags\n    ms.service=\"multiple\"\n    ms.date=\"10/12/2015\"\n    wacn.date=\"01/21/2016\"/>\n\n\n# 使用 Azure SDK for Java 在 Azure 中创建 Web 应用\n\n<!-- Azure Active Directory workflow is not yet available on the Azure Management Portal -->\n\n## 概述\n\n本演练演示如何创建一个 Azure SDK for Java 应用程序，以便在 [Azure Web 应用][]中创建一个 Web 应用，然后将一个应用程序部署到该应用。它由两个部分组成：\n\n- 第 1 部分演示如何生成创建 Web 应用的 Java 应用程序。\n- 第 2 部分演示如何创建简单的 JSP \"Hello World\" 应用程序，然后使用 FTP 客户端将代码部署到 Azure Web 应用。\n\n\n## 先决条件\n\n### 软件安装\n\n本文中的 AzureWebDemo 应用程序代码是使用 Azure Java SDK 0.7.0 编写的，你可以使用 [Web 平台安装程序][] (WebPI) 进行安装。此外，请确保使用最新版本的 Azure Toolkit for Eclipse。安装 SDK 之后，通过在“Maven 存储库”中运行“更新索引”更新 Eclipse 项目中的依赖项，然后在“依赖项”窗口中重新添加每个包的最新版本。可以通过单击“帮助 > 安装详细信息”验证 Eclipse 中已安装软件的版本；至少应具有以下版本：\n\n- Package for Azure Libraries for Java 0.7.0.20150309\n- Eclipse IDE for Java EE Developers 4.4.2.20150219\n\n\n### 在 Azure 中创建并配置云资源\n\n在开始此过程之前，你需要拥有有效的 Azure 订阅，并在 Azure 上设置默认的 Active Directory (AD)。\n\n\n### 在 Azure 中创建 Active Directory (AD)\n\n如果你的 Azure 订阅中还没有 Active Directory (AD)，请使用你的 Microsoft 帐户登录 [Azure 管理门户][]。如果你有多个订阅，请单击“订阅”并选择要用于此项目的订阅的默认目录。然后单击“应用”切换到该订阅视图。\n\n1. 从左侧菜单中选择“Active Directory”。单击“新建 > 目录 > 自定义创建”。\n\n2. 在“添加目录”中，选择“创建新目录”。\n\n3. 在“名称”中输入目录名称。\n\n4. 在“域”中输入域名。这是默认情况下你的目录附带的基本域名，它采用 `<domain_name>.partner.onmschina.cn` 格式。可以根据目录名称或你拥有的其他域名将它命名。以后，可以添加你的组织已在使用的其他域名。\n\n5. 在“国家或地区”中选择你的区域设置。\n\n有关 AD 的详细信息，请参阅[什么是 Azure AD 目录][]？\n\n\n### 创建 Azure 的管理证书\n\nAzure SDK for Java 使用管理证书在 Azure 订阅中进行身份验证。对于使用服务管理 API 代表订阅所有者管理订阅资源的客户端应用程序，你可以使用这些 X.509 v3 证书来对其进行身份验证。\n\n此过程中的代码使用自签名证书在 Azure 上进行身份验证。对于此过程，你需要事先创建一个证书并将其上载到 [Azure 管理门户][]。这包括以下步骤：\n\n- 生成表示客户端证书的 PFX 文件，并将其保存在本地。\n- 从 PFX 文件生成管理证书（CER 文件）。\n- 将 CER 文件上载到你的 Azure 订阅。\n- 将 PFX 文件转换为 JKS，因为 Java 以这种格式来使用证书进行身份验证。\n- 编写引用本地 JKS 文件的应用程序身份验证代码。\n\n完成此过程后，CER 证书将驻留在 Azure 订阅中，JKS 证书将驻留在本地驱动器中。有关管理证书的详细信息，请参阅[创建并上载 Azure 的管理证书][]。\n\n\n#### 创建证书\n\n若要创建自己的自签名证书，请在操作系统上打开一个命令控制台并运行以下命令。\n\n> **注意：**运行此命令的计算机必须已安装 JDK。此外，keytool 的路径取决于安装 JDK 的位置。有关详细信息，请参阅 Java 联机文档中的[密钥和证书管理工具 (keytool)][]。\n\n创建 .pfx 文件：\n\n    <java-install-dir>/bin/keytool -genkey -alias <keystore-id>\n     -keystore <cert-store-dir>/<cert-file-name>.pfx -storepass <password>\n     -validity 3650 -keyalg RSA -keysize 2048 -storetype pkcs12\n     -dname \"CN=Self Signed Certificate 20141118170652\"\n\n创建 .cer 文件：\n\n    <java-install-dir>/bin/keytool -export -alias <keystore-id>\n     -storetype pkcs12 -keystore <cert-store-dir>/<cert-file-name>.pfx\n     -storepass <password> -rfc -file <cert-store-dir>/<cert-file-name>.cer\n\n其中：\n\n- `<java-install-dir>` 是 Java 安装目录的路径。\n- `<keystore-id>` 是密钥库条目标识符（例如 `AzureRemoteAccess`）。\n- `<cert-store-dir>` 是要存储证书的目录的路径（例如 `C:/Certificates`）。\n- `<cert-file-name>` 是证书文件的名称（例如 `AzureWebDemoCert`）。\n- `<password>` 是选择用于保护证书的密码；它的长度必须至少为 6 个字符。可以不输入密码，但不建议这样做。\n- `<dname>` 是要与别名关联的 X.500 可分辨名称，它用作自签名证书中的颁发者和使用者字段。\n\n有关详细信息，请参阅[创建并上载 Azure 的管理证书][]。\n\n\n#### 上载证书\n\n若要将自签名证书上载到 Azure，请转到管理门户中的“设置”页，然后单击“管理证书”选项卡。单击页面底部的“上载”，然后导航到你创建的 CER 文件的所在位置。\n\n\n#### 将 PFX 文件转换为 JKS\n\n在 Windows 命令提示符下（以管理员身份运行），键入 cd 转到包含证书的目录，然后运行以下命令，其中，`<java-install-dir>` 是计算机安装 Java 的目录：\n\n    <java-install-dir>/bin/keytool.exe -importkeystore\n     -srckeystore <cert-store-dir>/<cert-file-name>.pfx\n     -destkeystore <cert-store-dir>/<cert-file-name>.jks\n     -srcstoretype pkcs12 -deststoretype JKS\n\n1. 出现提示时，输入目标密钥库密码；这将是 JKS 文件的密码。\n\n2. 出现提示时，输入源密钥库密码；这是你为 PFX 文件指定的密码。\n\n两个密码不一定要相同。可以不输入密码，但不建议这样做。\n\n\n## 构建 Web 应用创建应用程序\n\n### 创建 Eclipse 工作区和 Maven 项目\n\n在本部分中，你将要给名为 AzureWebDemo 的 Web 应用创建应用程序创建工作区和 Maven 项目。\n\n1. 创建新的 Maven 项目。单击“文件 > 新建 > Maven 项目”。在“新建 Maven 项目”中，选择“创建简单项目”和“使用默认工作区位置”。\n\n2. 在“新建 Maven 项目”的第二页上，指定以下信息：\n\n    - 组 ID：`com.<username>.azure.webdemo`\n    - 项目 ID：AzureWebDemo\n    - 版本：0.0.1-SNAPSHOT\n    - 打包：jar\n    - 名称：AzureWebDemo\n\n    单击“完成”。\n\n3. 在项目资源管理器中打开新项目的 pom.xml 文件。选择“依赖项”选项卡。由于这是一个新项目，因此尚未列出任何包。\n\n4. 打开“Maven 存储库”视图。单击“窗口 > 显示视图 > 其他 > Maven > Maven 存储库”，然后单击“确定”。“Maven 存储库”视图将出现在 IDE 的底部。\n\n5. 打开“全局存储库”，右键单击“中央”存储库，然后选择“重新生成索引”。\n\n    ![][1]\n    \n    此步骤可能需要几分钟时间，具体取决于你的连接速度。重新生成索引后，“中央”Maven 存储库中应会显示 Azure 包。\n\n6. 在“依赖项”中，单击“添加”。在“输入组 ID...”中输入 `azure-management`。选择基础管理和 Azure Web 应用管理的包：\n\n        com.microsoft.azure  azure-management\n        com.microsoft.azure  azure-management-websites\n\n    > **注意：**如果在新版本发布后更新依赖项，\n    > 则需要重新添加此列表中的每个依赖项。\n    > 单击“添加”后，选择每个依赖项，\n    > 则会在“依赖项”列表中显示新的版本号。\n\n单击**“确定”**。Azure 包随即会出现在“依赖项”列表中。\n\n\n### 编写 Java 代码，以通过调用 Azure SDK 来创建 Web 应用\n\n接下来，请编写调用 Azure SDK for Java 中的 API 的代码，以创建 Azure Web 应用。\n\n1. 创建一个 Java 类以用于包含主入口点代码。在项目资源管理器中，右键单击项目节点，然后选择“新建 > 类”。\n\n2. 在“新建 Java 类”中，将类命名为 `WebCreator`，并选中“public static void main”复选框。所选内容应如下所示：\n\n    ![][2]\n\n3. 单击“完成”。WebCreator.java 文件将在项目资源管理器中出现。\n\n\n### 调用 Azure API 以创建 Azure Web 应用\n\n\n#### 添加所需的导入\n\n在 WebCreator.java 中添加以下导入；使用这些导入可以访问使用 Azure API 的管理库中的类：\n\n    // General imports\n    import java.net.URI;\n    import java.util.ArrayList;\n    \n    // Imports for Exceptions\n    import java.io.IOException;\n    import java.net.URISyntaxException;\n    import javax.xml.parsers.ParserConfigurationException;\n    import com.microsoft.windowsazure.exception.ServiceException;\n    import org.xml.sax.SAXException;\n    \n    // Imports for Azure Websites management configuration\n    import com.microsoft.windowsazure.Configuration;\n    import com.microsoft.windowsazure.management.configuration.ManagementConfiguration;\n    \n    // Service management imports for Azure Websites creation\n    import com.microsoft.windowsazure.management.websites.*;\n    import com.microsoft.windowsazure.management.websites.models.*;\n    \n    // Imports for authentication\n    import com.microsoft.windowsazure.core.utils.KeyStoreType;\n\n\n#### 定义主入口点类\n\n因为 AzureWebDemo 应用程序的目的是创建 Azure Web 应用，所以请将此应用程序的主类命名为 `WebAppCreator`。此类提供调用 Azure 服务管理 API 的主入口点代码，以创建 Web 应用。\n\n为 Web 应用和 Web 空间添加以下参数定义。你将需要提供你自己的 Azure 订阅 ID 和证书信息。\n\n    public class WebAppCreator {\n    \n        // Parameter definitions used for authentication.\n        private static String uri = \"https://management.core.chinacloudapi.cn/\";\n        private static String subscriptionId = \"<subscription-id>\";\n        private static String keyStoreLocation = \"<certificate-store-path>\";\n        private static String keyStorePassword = \"<certificate-password>\";\n    \n        // Define Web app parameter values.\n        private static String webAppName = \"WebDemoWebApp\";\n        private static String domainName = \".chinacloudsites.cn\";\n        private static String webSpaceName = WebSpaceNames.WESTUSWEBSPACE;\n        private static String appServicePlanName = \"WebDemoAppServicePlan\";\n\n其中：\n\n- `<subscription-id>` 是要用于创建资源的 Azure 订阅 ID。\n- `<certificate-store-path>` 是你的本地证书存储区目录中的 JKS 文件的路径和文件名。例如，对于 Linux，则为 `C:/Certificates/CertificateName.jks`；对于 Windows，则为 `C:\\Certificates\\CertificateName.jks`。\n- `<certificate-password>` 是你在创建 JKS 证书时指定的密码。\n- `webAppName` 可以是你选择的任何名称；此过程使用名称 `WebDemoWebApp`。完整的域名称是 `webAppName`，并追加了 `domainName`，因此在这种情况下，完整的域是 `webdemowebapp.chinacloudsites.cn`。\n- `domainName` 应按照以上所示进行指定。\n\n> **注意：**每次运行此应用程序时，\n> 你需要更改 `webAppName` 和 `appServicePlanName` 的值（或在 Azure 门户上删除 Web 应用），\n> 然后再次运行应用程序。否则，\n> 由于 Azure 上已存在相同的资源，所以执行会失败。\n\n\n#### 定义 Web 创建方法\n\n接下来，定义用于创建 Web 应用的方法。此方法 (`createWebApp`) 指定 Web 应用的参数和 Web 空间。它还会创建并配置 Azure Web 应用管理客户端，该客户端由 [WebSiteManagementClient][] 对象进行定义。管理客户端对于创建 Web 应用至关重要。它提供 RESTful web 服务，使应用程序能够通过调用服务管理 API 来管理 Web 应用（执行创建、更新和删除等操作）。\n\n    private static void createWebApp() throws Exception {\n\n        // Specify configuration settings for the Azure Websites management client.\n        Configuration config = ManagementConfiguration.configure(\n            new URI(uri),\n            subscriptionId,\n            keyStoreLocation,  // Path to the JKS file\n            keyStorePassword,  // Password for the JKS file\n            KeyStoreType.jks   // Flag that you are using a JKS keystore\n        );\n\n        // Create the Azure Websites management client to call Azure APIs\n        // and pass it the Azure Websites management configuration object.\n        WebSiteManagementClient webAppManagementClient = WebSiteManagementService.create(config);\n\n        // Create an App Service plan for the Web app with the specified parameters.\n        WebHostingPlanCreateParameters appServicePlanParams = new WebHostingPlanCreateParameters();\n        appServicePlanParams.setName(appServicePlanName);\n        appServicePlanParams.setSKU(SkuOptions.Free);\n        webAppManagementClient.getWebHostingPlansOperations().create(webSpaceName, appServicePlanParams);\n\n        // Set webspace parameters.\n        WebSiteCreateParameters.WebSpaceDetails webSpaceDetails = new WebSiteCreateParameters.WebSpaceDetails();\n        webSpaceDetails.setGeoRegion(GeoRegionNames.WESTUS);\n        webSpaceDetails.setPlan(WebSpacePlanNames.VIRTUALDEDICATEDPLAN);\n        webSpaceDetails.setName(webSpaceName);\n\n        // Set Web app parameters.\n        // Note that the server farm name takes the App Service plan name.\n        WebSiteCreateParameters webAppCreateParameters = new WebSiteCreateParameters();\n        webAppCreateParameters.setName(webAppName);\n        webAppCreateParameters.setServerFarm(appServicePlanName);\n        webAppCreateParameters.setWebSpace(webSpaceDetails);\n\n        // Set usage metrics attributes.\n        WebSiteGetUsageMetricsResponse.UsageMetric usageMetric = new WebSiteGetUsageMetricsResponse.UsageMetric();\n        usageMetric.setSiteMode(WebSiteMode.Basic);\n        usageMetric.setComputeMode(WebSiteComputeMode.Shared);\n\n        // Define the Web app object.\n        ArrayList<String> fullWebAppName = new ArrayList<String>();\n        fullWebAppName.add(webAppName + domainName);\n        WebSite webApp = new WebSite();\n        webApp.setHostNames(fullWebAppName);\n\n        // Create the Web app.\n        WebSiteCreateResponse webAppCreateResponse = webAppManagementClient.getWebSitesOperations().create(webSpaceName, webAppCreateParameters);\n\n        // Output the HTTP status code of the response; 200 indicates the request succeeded; 4xx indicates failure.\n        System.out.println(\"----------\");\n        System.out.println(\" Web app created - HTTP response \" + webAppCreateResponse.getStatusCode() + \"\\n\");\n\n        // Output the name of the Web app that this application created.\n        String shinyNewWebAppName = webAppCreateResponse.getWebSite().getName();\n        System.out.println(\"----------\\n\");\n        System.out.println(\"Name of Web app created: \" + shinyNewWebAppName + \"\\n\");\n        System.out.println(\"----------\\n\");\n    }\n\n代码将输出指示成功或失败的 HTTP 响应状态；如果成功，则输出创建的 Web 应用的名称。\n\n\n#### 定义 main() 方法\n\n提供调用 createWebApp() 的 main() 方法代码，以创建 Web 应用。\n\n最后，从 `main` 调用 `createWebApp`：\n\n        public static void main(String[] args)\n            throws IOException, URISyntaxException, ServiceException,\n            ParserConfigurationException, SAXException, Exception {\n\n            // Create Web app\n            createWebApp();\n\n        }  // end of main()\n\n    }  // end of WebAppCreator class\n\n\n#### 运行应用程序并验证 Web 应用创建\n\n若要验证应用程序是否运行，请单击“运行 > 运行”。在应用程序完成运行后，你应该会在 Eclipse 控制台中看到以下输出：\n\n    ----------\n   Web app created - HTTP response 200\n    \n    ----------\n    \n    Name of Web app created: WebDemoWebApp\n    \n    ----------\n\n登录到 Azure 管理门户并单击“Web Apps”。在数分钟内，新 Web 应用应会出现在“Web Apps”列表中。\n\n\n## 将应用程序部署到 Web 应用\n\n运行 AzureWebDemo 并创建新 Web 应用后，请登录管理门户，单击“Web Apps”，然后在“Web Apps”列表中选择“WebDemoWebApp”。在 Web 应用的仪表板页上，单击“浏览”（或单击 URL `webdemowebapp.chinacloudsites.cn`）导航到该 Web 应用。你将会看到一个空白的占位符页，因为尚未将任何内容发布到 Web 应用。\n\n接下来，你要创建一个“Hello World”应用程序并将其部署到 Web 应用。\n\n\n### 创建 JSP Hello World 应用程序\n\n#### 创建应用程序\n\n为了演示如何将应用程序部署到 Web，以下过程说明了如何创建简单的 \"Hello World\" Java 应用程序，并将其上载到应用程序创建的 Azure Web 应用。\n\n1. 单击“文件 > 新建 > 动态 Web 项目”。将它命名为 `JSPHello`。不需要在此对话框中更改其他任何设置。单击“完成”。\n\n    ![][3]\n\n2. 在项目资源管理器中，展开“JSPHello”项目，右键单击“WebContent”，然后单击“新建 > JSP 文件”。在“新建 JSP 文件”对话框中，将新文件命名为 `index.jsp`。单击“下一步”。\n\n3. 在“选择 JSP 模板”对话框中，选择“新建 JSP 文件 (html)”，然后单击“完成”。\n\n4. 在 index.jsp 中，在 `<head>` 和 `<body>` 标记部分中添加以下代码：\n\n        <head>\n          ...\n          java.util.Date date = new java.util.Date();\n        </head>\n    \n        <body>\n          Hello, the time is <%= date %> \n        </body>\n\n\n#### 在 localhost 中运行 Hello World 应用程序\n\n在运行此应用程序之前，你需要配置几个属性。\n\n1. 右键单击“JSPHello”项目并选择“属性”。\n\n2. 在“属性”对话框中：选择“Java 生成路径”，选择“顺序和导出”选项卡，选中“JRE 系统库”，然后单击“上移”将其移至列表顶部。\n\n    ![][4]\n\n3. 同样在“属性”对话框中：选择“目标运行时”，然后单击“新建”。\n\n4. 在“新建服务器运行时环境”对话框中，选择一个服务器（如“Apache Tomcat v7.0”），然后单击“下一步”。在“Tomcat 服务器”对话框中，将“名称”设置为 `Apache Tomcat v7.0`，并将“Tomcat 安装目录”设置为在其中安装所要使用的 Tomcat 服务器版本的目录。\n\n    ![][5]\n\n    单击“完成”。\n\n5. 随后你将返回“属性”对话框的“目标运行时”页。选择“Apache Tomcat v7.0”，然后单击“确定”。\n\n    ![][6]\n\n6. 在 Eclipse 的“运行”菜单中，单击“运行”。在“运行方式”对话框中，选择“在服务器上运行”。在“在服务器上运行”对话框中，选择“Tomcat v7.0 服务器”：\n\n    ![][7]\n\n    单击“完成”。\n\n7. 当应用程序运行时，你应该会在 Eclipse (`http://localhost:8080/JSPHello/`) 的 localhost 窗口中看到显示的“JSPHello”页，其中显示了以下消息：\n\n    `Hello World, the time is Tue Mar 24 23:21:10 GMT 2015`\n\n\n#### 将应用程序导出为 WAR\n\n将 Web 项目文件导出为 Web 存档 (WAR) 文件，以便可以将它部署到 Web 应用。以下 web 项目文件驻留在 WebContent 文件夹中：\n\n    META-INF\n    WEB-INF\n    index.jsp\n\n1. 右键单击 WebContent 文件夹并选择“导出”。\n\n2. 在“导出选择”对话框中，单击“Web > WAR 文件”，然后单击“下一步”。\n\n3. 在“WAR 导出”对话框中，选择当前项目中的 src 目录，并在末尾添加 WAR 文件名。例如：\n\n    `<project-path>/JSPHello/src/JSPHello.war`\n\n有关部署 WAR 文件的详细信息，请参阅[将 Java 应用程序添加到 Azure Web 应用](/documentation/articles/web-sites-java-add-app)。\n\n\n### 使用 FTP 部署 Hello World 应用程序\n\n选择第三方 FTP 客户端来发布应用程序。此过程将介绍FileZilla，这是一个带有便捷式图形 UI 的常用工具。\n\n> **注意：**Azure Toolkit for Eclipse 支持部署到存储帐户和云服务，但当前不支持部署到 Web 应用。你可以使用 Azure 部署项目部署到存储帐户和云服务，但不能部署到 Web 应用。使用其他方法（例如 FTP 或 GitHub）将文件传输到 Web 应用。\n\n> **注意：**我们不建议通过 Windows 命令提示符（Windows 随附的命令行 FTP.EXE 实用工具）使用 FTP。使用活动 FTP 的 FTP 客户端（如 FTP.EXE）通常无法通过防火墙工作。活动 FTP 指定基于 LAN 的内部地址，FTP 服务器可能无法连接到该地址。\n\n有关使用 FTP 部署到 Azure Web 应用的详细信息，请参阅以下主题：\n\n- [使用 FTP 实用工具部署](/documentation/articles/web-sites-deploy)\n\n\n#### 设置部署凭据\n\n确保已运行 **AzureWebDemo** 应用程序来创建 Web 应用。你会将文件转移到此位置。\n\n1. 登录到管理门户并单击“Web Apps”。确保“WebDemoWebApp”已显示在 Web Apps 列表中，并确保它正在运行。单击“WebDemoWebApp”以打开其“仪表板”页。\n\n2. 在“仪表板”页的“速览”下，单击“设置部署凭据”（如果你已有部署凭据，则此选项应为“重置部署凭据”）。\n\n    部署凭据与某个 Microsoft 帐户关联。需要指定可用于使用 Git 和 FTP 进行部署的用户名和密码。可以使用这些凭据部署到与你的 Microsoft 帐户关联的所有 Azure 订阅中的任何 Web 应用。在对话框中提供 Git 和 FTP 部署凭据，并记下用户名和密码以供将来使用。\n\n\n#### 获取 FTP 连接信息\n\n若要使用 FTP 将应用程序文件部署到新建的 Web 应用，你需要获取连接信息。可通过两种方法获取连接信息。一种方法是访问 Web 应用的“仪表板”页；另一种方法是下载 Web 应用的发布配置文件。发布配置文件是一个 XML 文件，它提供 Azure 中 Web 应用的 FTP 主机名和登录凭据等信息。你可以使用此用户名和密码部署到与 Azure 帐户关联的所有订阅中的任何 Web 应用，而不仅仅是此 Web 应用。\n\n从 Web 应用的“仪表板”页获取 FTP 连接信息：\n\n1. 在“速览”下，查找并复制“FTP 主机名”。这是类似于 `ftp://cnws-prod-sha-001.ftp.chinacloudsites.chinacloudapi.cn` 的 URI。\n\n2. 在“速览”下，查找并复制“部署/FTP 用户”。此值的形式为 *WebsiteName\\\\DeploymentUsername*；例如 `WebDemoWebsite\\deployer77`。\n\n从 Web 应用的发布配置文件获取 FTP 连接信息：\n\n1. 在 Web 应用的“仪表板”中的“速览”下，单击“下载发布配置文件”。这会将一个 .publishsettings 文件下载到本地驱动器。\n\n2. 在 XML 编辑器或文本编辑器中打开 .publishsettings 文件并找到包含 `publishMethod=\"FTP\"` 的 `<publishProfile>` 元素。该元素应类似于：\n\n        <publishProfile\n            profileName=\"WebDemoWebApp - FTP\"\n            publishMethod=\"FTP\"\n            publishUrl=\"ftp://waws-prod-bay-NNN.ftp.azurewebsites.chinacloudapi.cn/site/wwwroot\"\n            ftpPassiveMode=\"True\"\n            userName=\"WebDemoWebApp\\$WebDemoWebApp\"\n            userPWD=\"<deployment-password>\"\n            ...\n        </publishProfile>\n\n3. 请注意， Web 应用的 `publishProfile` 设置将按如下所示映射到 FileZilla 站点管理员设置：\n\n- `publishUrl` 与你在“主机”中设置的“FTP 主机名”的值相同。\n- `publishMethod=\"FTP\"` 表示你已将“协议”设置为“FTP - 文件传输协议”，已将“加密”设置为“使用普通 FTP”。\n- `userName` 和 `userPWD` 是你在重置部署凭据时指定的实际用户名和密码值的密钥。`userName` 与“部署/FTP 用户”相同。它们将映射到 FileZilla 中的“用户”和“密码”。\n- `ftpPassiveMode=\"True\"` 表示 FTP 站点使用被动 FTP 传输；在“传输设置”选项卡上选择“被动”。\n\n\n#### 配置 Web 应用以托管 Java 应用程序\n\n发布应用程序之前，你需要更改几项配置设置，使 Web 应用可以托管 Java 应用程序。\n\n1. 在管理门户中，转到 Web 应用的“仪表板”页，然后单击“配置”。在“配置”页上指定以下设置。\n\n2. 在“Java 版本”中，默认值为“关闭”；选择你的应用程序所针对的 Java 版本，例如 1.7.0\\_51。完成此操作后，还请确保“Web 容器”已设置为 Tomcat 服务器的版本。\n\n3. 在“默认文档”中，添加 index.jsp 并将其上移至列表的顶部。（ Web 应用的默认文件为 hostingstart.html。）\n\n4. 单击“保存”。\n\n#### 使用 FileZilla 发布应用程序（可选）\n\n可用于发布应用程序的另一个工具是 FileZilla，这是一个带有便捷式图形 UI 的常用第三方 FTP 客户端。如果尚未安装，则可以从 [http://filezilla-project.org/](http://filezilla-project.org/) 中下载并安装 FileZilla。有关使用客户端的详细信息，请参阅 [FileZilla 文档](https://wiki.filezilla-project.org/Documentation) 和 [FTP 客户端 - 第 4 部分：FileZilla](http://blogs.msdn.com/b/robert_mcmurray/archive/2008/12/17/ftp-clients-part-4-filezilla.aspx) 上的此博客条目。\n\n1. 在 FileZilla 中，单击“文件 > 站点管理员”。\n2. 在“站点管理员”对话框中，单击“新建站点”。随后，“选择条目”中会出现新的空白 FTP 站点，提示你提供名称。对于此过程，请将它命名为 `AzureWebDemo-FTP`。\n\n    在“常规”选项卡上，指定以下设置：\n    -“主机”：输入从仪表板中复制的“FTP 主机名”\n    -“端口”：（将其留空，因为这是被动传输并且服务器会确定使用的端口。）\n    -“协议”：FTP 文件传输协议 \n    -“加密”：使用普通的 FTP \n    -“登录类型”：普通 \n    -“用户”：输入从仪表板中复制的部署/FTP 用户。这是完整的 FTP 用户名，其形式为 *webappname\\\\username*。\n    -“密码”：输入在设置部署凭据时指定的密码。\n\n    在“传输设置”选项卡上，选择“被动”。\n\n3. 单击“连接”。如果成功，FileZilla 的控制台则会显示 `Status: Connected` 消息并发布 `LIST` 命令，以列出目录内容。\n\n4. 在“本地”站点面板中，选择 JSPHello.war 文件所在的源目录；路径与以下路径类似：\n\n    `<project-path>/JSPHello/src/`\n\n5. 在“远程”站点面板中，选择目标文件夹。WAR 文件将会部署到 Web 应用根目录下的 `webapps` 目录中。导航到 `/site/wwwroot`，右键单击 `wwwroot`，然后选择“创建目录”。将目录命名为 `webapps`，然后进入该目录。\n\n6. 将 JSPHello.war 传输到 `/site/wwwroot/webapps`。在“本地”文件列表中选择 JSPHello.war，右键单击它，然后选择“上载”。随后它应该会出现在 `/site/wwwroot/webapps` 中。\n\n7. 将 JSPHello.war 复制到 webapps 目录后，Tomcat 服务器将自动解包（解压缩）该 WAR 文件中的文件。尽管 Tomcat 服务器马上就会解包，但文件可能需要在很长时间（可能是几小时）之后才会出现在 FTP 客户端中。\n\n\n#### 在 Web 应用上运行 Hello World 应用程序\n\n1. 上载 WAR 文件并确认 Tomcat 服务器已创建解包的 `JSPHello` 目录后，请浏览到 `http://webdemowebapp.chinacloudsites.cn/JSPHello` 以运行该应用程序。\n\n    > **注意：**如果从管理门户单击“浏览”，则可能获得默认网页，\n    网页显示“已成功创建此基于 Java 的 Web 应用。\n    ” 你可能需要刷新网页才能查看应用程序输出，\n    而不是默认网页。\n\n2. 当应用程序运行时，你应会看到具有以下输出的网页：\n\n    `Hello World, the time is Tue Mar 24 23:21:10 GMT 2015`\n\n\n#### 清理 Azure 资源\n\n此过程创建 Azure Web 应用。只要 Web 应用存在，你就要支付资源的费用。除非你打算继续使用该 Web 应用进行测试或开发，否则应考虑停止或删除它。已停止的 Web 应用仍会产生较小的费用，但你随时可以重新启动它。删除某个 Web 应用会清除已上载到该 Web 应用的所有数据。\n\n\n\n  [1]: ./media/java-create-azure-website-using-java-sdk/eclipse-maven-repositories-rebuild-index.png\n  [2]: ./media/java-create-azure-website-using-java-sdk/eclipse-new-java-class.png\n  [3]: ./media/java-create-azure-website-using-java-sdk/eclipse-new-dynamic-web-project.png\n  [4]: ./media/java-create-azure-website-using-java-sdk/eclipse-java-build-path.png\n  [5]: ./media/java-create-azure-website-using-java-sdk/eclipse-targeted-runtimes-tomcat-server.png\n  [6]: ./media/java-create-azure-website-using-java-sdk/eclipse-targeted-runtimes-properties-page.png\n  [7]: ./media/java-create-azure-website-using-java-sdk/eclipse-run-on-server.png\n  [8]: ./media/java-create-azure-website-using-java-sdk/kudu-console-drag-drop.png\n  [9]: ./media/java-create-azure-website-using-java-sdk/kudu-console-jsphello-war-1.png\n  [10]: ./media/java-create-azure-website-using-java-sdk/kudu-console-jsphello-war-2.png\n \n\n[Azure Web 应用]: /documentation/services/web-sites/\n[Web 平台安装程序]: http://go.microsoft.com/fwlink/?LinkID=252838\n[Azure Toolkit for Eclipse]: https://msdn.microsoft.com/zh-cn/library/azure/hh690946.aspx\n[Azure Management Portal]: https://manage.windowsazure.cn\n[什么是 Azure AD 目录]: http://technet.microsoft.com/zh-cn/library/jj573650.aspx\n[创建并上载 Azure 的管理证书]: /documentation/articles/cloud-services-certs-create/\n[密钥和证书管理工具 (keytool)]: http://docs.oracle.com/javase/6/docs/technotes/tools/windows/keytool.html\n[WebSiteManagementClient]: http://azure.github.io/azure-sdk-for-java/com/microsoft/azure/management/websites/WebSiteManagementClient.html\n[WebSpaceNames]: http://azure.github.io/azure-sdk-for-java/com/microsoft/windowsazure/management/websites/models/WebSpaceNames.html\n[Azure 管理门户]: https://manage.windowsazure.cn\n\n<!---HONumber=79-->"
+}

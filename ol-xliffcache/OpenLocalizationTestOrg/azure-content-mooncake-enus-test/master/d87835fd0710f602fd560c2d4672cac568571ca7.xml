@@ -1,0 +1,2118 @@
+{
+  "nodes": [
+    {
+      "content": "如何使用诊断 (.NET) | Azure",
+      "pos": [
+        28,
+        49
+      ]
+    },
+    {
+      "content": "了解如何在 Azure 中使用诊断数据进行调试、度量性能、进行监视以及流量分析等操作。",
+      "pos": [
+        69,
+        112
+      ]
+    },
+    {
+      "content": "在 Azure 云服务和虚拟机中启用诊断",
+      "pos": [
+        340,
+        360
+      ]
+    },
+    {
+      "pos": [
+        362,
+        535
+      ],
+      "content": "通过 Azure Diagnostics 1.2 和 1.3，可以从 Azure 中运行的辅助角色、Web 角色或虚拟机收集诊断数据。本指南介绍如何使用 Azure Diagnostics 1.2 和 1.3。有关创建日志记录和跟踪策略以及使用诊断和其他技术排查问题的其他深入指南，请参阅<bpt id=\"p1\">[</bpt>有关开发 Azure 应用程序的故障排除最佳实践<ept id=\"p1\">][]</ept>。"
+    },
+    {
+      "content": "概述",
+      "pos": [
+        540,
+        542
+      ]
+    },
+    {
+      "content": "Azure Diagnostics 1.2 和 1.3 是可让你从 Azure 中运行的辅助角色、Web 角色或虚拟机收集诊断遥测数据的 Azure 扩展。遥测数据存储在 Azure 存储帐户中，可用于调试和故障排除、测量性能、监视资源使用情况、流量分析和容量规划以及审核。",
+      "pos": [
+        544,
+        681
+      ]
+    },
+    {
+      "content": "Azure Diagnostics 1.2 可与适用于 .NET 2.4 及更低版本的 Azure SDK 配合使用。Azure Diagnostics 1.3 可与适用于 .NET 2.5 及更低版本的 Azure SDK 配合使用。",
+      "pos": [
+        683,
+        801
+      ]
+    },
+    {
+      "content": "如果你以前用过 Diagnostics 版本 1.0，应该知道，它与 Diagnostics 1.2 和 1.3 相比具有明显的差异：",
+      "pos": [
+        803,
+        870
+      ]
+    },
+    {
+      "content": "除了可以部署在云服务中以外，Diagnostics 1.2 和 1.3 还可以部署在虚拟机上。",
+      "pos": [
+        876,
+        923
+      ]
+    },
+    {
+      "content": "Diagnostics 1.0 是 Azure SDK 的一部分，在部署云服务时进行部署。Diagnostics 1.2 和 1.3 是一个扩展，它从云服务部署单独部署。",
+      "pos": [
+        928,
+        1013
+      ]
+    },
+    {
+      "content": "Diagnostics 1.2 和 1.3 可用于收集 ETW 和 .NET EventSource 事件。",
+      "pos": [
+        1018,
+        1072
+      ]
+    },
+    {
+      "pos": [
+        1074,
+        1119
+      ],
+      "content": "有关更详细的比较，请参阅本文末尾的<bpt id=\"p1\">[</bpt>比较 Azure Diagnostics 版本<ept id=\"p1\">][]</ept>。"
+    },
+    {
+      "content": "Azure Diagnostics 可以收集以下类型的遥测数据：",
+      "pos": [
+        1121,
+        1153
+      ]
+    },
+    {
+      "content": "数据源",
+      "pos": [
+        1155,
+        1158
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        1159,
+        1161
+      ]
+    },
+    {
+      "content": "IIS Logs",
+      "pos": [
+        1170,
+        1178
+      ]
+    },
+    {
+      "content": "有关 IIS Web 应用的信息。",
+      "pos": [
+        1179,
+        1196
+      ]
+    },
+    {
+      "content": "Azure Diagnostics基础结构日志",
+      "pos": [
+        1197,
+        1220
+      ]
+    },
+    {
+      "content": "有关 Diagnostics 自身的信息。",
+      "pos": [
+        1221,
+        1242
+      ]
+    },
+    {
+      "content": "IIS 失败请求日志",
+      "pos": [
+        1243,
+        1253
+      ]
+    },
+    {
+      "content": "有关 IIS 站点或应用程序的失败请求的信息。",
+      "pos": [
+        1254,
+        1277
+      ]
+    },
+    {
+      "content": "Windows 事件日志",
+      "pos": [
+        1278,
+        1290
+      ]
+    },
+    {
+      "content": "发送到 Windows 事件日志记录系统的信息。",
+      "pos": [
+        1291,
+        1315
+      ]
+    },
+    {
+      "content": "性能计数器",
+      "pos": [
+        1316,
+        1321
+      ]
+    },
+    {
+      "content": "操作系统和自定义性能计数器。",
+      "pos": [
+        1322,
+        1336
+      ]
+    },
+    {
+      "content": "故障转储",
+      "pos": [
+        1337,
+        1341
+      ]
+    },
+    {
+      "content": "有关应用程序崩溃时进程状态的信息。",
+      "pos": [
+        1342,
+        1359
+      ]
+    },
+    {
+      "content": "自定义错误日志",
+      "pos": [
+        1360,
+        1367
+      ]
+    },
+    {
+      "content": "应用程序或服务创建的日志。",
+      "pos": [
+        1368,
+        1381
+      ]
+    },
+    {
+      "content": "NET EventSource",
+      "pos": [
+        1382,
+        1397
+      ]
+    },
+    {
+      "pos": [
+        1399,
+        1537
+      ],
+      "content": "使用 .NET 的代码生成的事件 <ph id=\"ph1\">&lt;a href=\"http://msdn.microsoft.com/zh-cn/library/system.diagnostics.tracing.eventsource(v=vs.110).aspx\"&gt;</ph>EventSource 类<ph id=\"ph2\">&lt;/a&gt;</ph>"
+    },
+    {
+      "content": "基于清单的 ETW",
+      "pos": [
+        1538,
+        1547
+      ]
+    },
+    {
+      "content": "任何进程生成的 ETW 事件。",
+      "pos": [
+        1548,
+        1563
+      ]
+    },
+    {
+      "content": "如何在辅助角色中启用诊断",
+      "pos": [
+        1568,
+        1580
+      ]
+    },
+    {
+      "content": "本演练介绍如何实现使用 .NET EventSource 类发出遥测数据的 Azure 辅助角色。Azure Diagnostics 用于收集遥测数据，并将其存储在一个 Azure 存储帐户中。创建辅助角色时，Visual Studio 将在适用于 .NET 2.4 和更低版本的 Azure SDK 中，自动启用 Diagnostics 1.0 作为解决方案的一部分。以下说明介绍了创建辅助角色、从解决方案禁用 Diagnostics 1.0，以及在辅助角色中部署 Diagnostics 1.2 或 1.3 的过程。",
+      "pos": [
+        1582,
+        1842
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        1847,
+        1851
+      ]
+    },
+    {
+      "pos": [
+        1855,
+        2001
+      ],
+      "content": "本文假定你具有 Azure 订阅，并将 Visual Studio 2013 与  Azure SDK 结合使用。如果你没有 Azure 订阅，你可以注册<bpt id=\"p1\">[</bpt>试用版<ept id=\"p1\">](/pricing/1rmb-trial)</ept>。请确保<bpt id=\"p2\">[</bpt>安装并配置 Azure PowerShell 0.8.7 或更高版本<ept id=\"p2\">][]</ept>。"
+    },
+    {
+      "content": "步骤 1：创建辅助角色",
+      "pos": [
+        2007,
+        2018
+      ]
+    },
+    {
+      "pos": [
+        2023,
+        2049
+      ],
+      "content": "启动 <bpt id=\"p1\">**</bpt>Visual Studio 2013<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        2054,
+        2128
+      ],
+      "content": "从面向 .NET Framework 4.5 的<bpt id=\"p1\">**</bpt>云<ept id=\"p1\">**</ept>模板创建一个新的 <bpt id=\"p2\">**</bpt>Azure 云服务<ept id=\"p2\">**</ept>项目。将该项目命名为“WadExample”。"
+    },
+    {
+      "content": "选择“辅助角色”并单击“确定”。随后将创建该项目。",
+      "pos": [
+        2133,
+        2158
+      ]
+    },
+    {
+      "pos": [
+        2164,
+        2211
+      ],
+      "content": "在“解决方案资源管理器”中，双击 <bpt id=\"p1\">**</bpt>WorkerRole1<ept id=\"p1\">**</ept> properties 文件。"
+    },
+    {
+      "content": "在“配置”选项卡中，取消选中“启用诊断”以禁用 Diagnostics 1.0（Azure SDK 2.4 和更低版本）。",
+      "pos": [
+        2216,
+        2277
+      ]
+    },
+    {
+      "content": "生成你的解决方案，以确认不会出错。",
+      "pos": [
+        2282,
+        2299
+      ]
+    },
+    {
+      "content": "步骤 2：检测代码",
+      "pos": [
+        2305,
+        2314
+      ]
+    },
+    {
+      "pos": [
+        2315,
+        2565
+      ],
+      "content": "将 WorkerRole.cs 的内容替换为以下代码。继承自 <bpt id=\"p1\">[</bpt>EventSource 类<ept id=\"p1\">][]</ept>的 SampleEventSourceWriter 类实现四个日志记录方法：<bpt id=\"p2\">**</bpt>SendEnums<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>MessageMethod<ept id=\"p3\">**</ept>、<bpt id=\"p4\">**</bpt>SetOther<ept id=\"p4\">**</ept> 和 <bpt id=\"p5\">**</bpt>HighFreq<ept id=\"p5\">**</ept>。<bpt id=\"p6\">**</bpt>WriteEvent<ept id=\"p6\">**</ept> 方法的第一个参数定义相关事件的 ID。Run 方法实现一个无限循环，该循环每隔 10 秒调用 <bpt id=\"p7\">**</bpt>SampleEventSourceWriter<ept id=\"p7\">**</ept> 类中实现的每个日志记录方法。"
+    },
+    {
+      "content": "步骤 3：部署辅助角色",
+      "pos": [
+        4991,
+        5002
+      ]
+    },
+    {
+      "pos": [
+        5007,
+        5078
+      ],
+      "content": "从 Visual Studio 中选择 <bpt id=\"p1\">**</bpt>WadExample<ept id=\"p1\">**</ept> 项目，然后从“生成”菜单中选择“发布”，以将辅助角色部署到 Azure。"
+    },
+    {
+      "content": "选择你的订阅。",
+      "pos": [
+        5083,
+        5090
+      ]
+    },
+    {
+      "content": "在“Azure 发布设置”对话框中，选择“新建...”。",
+      "pos": [
+        5095,
+        5123
+      ]
+    },
+    {
+      "content": "在“创建云服务和存储帐户”对话框中输入一个名称（例如“WadExample”），然后选择区域或地缘组。",
+      "pos": [
+        5128,
+        5179
+      ]
+    },
+    {
+      "content": "将“环境”设置为“过渡”。",
+      "pos": [
+        5184,
+        5197
+      ]
+    },
+    {
+      "content": "适当地修改任何其他设置，然后单击“发布”。",
+      "pos": [
+        5202,
+        5223
+      ]
+    },
+    {
+      "content": "完成部署后，在 Azure 门户中验证你的云服务是否处于“正在运行”状态。",
+      "pos": [
+        5228,
+        5265
+      ]
+    },
+    {
+      "content": "步骤 4：创建 Diagnostics 配置文件并安装扩展",
+      "pos": [
+        5271,
+        5300
+      ]
+    },
+    {
+      "content": "通过执行以下 PowerShell 命令来下载公共配置文件架构定义：",
+      "pos": [
+        5305,
+        5339
+      ]
+    },
+    {
+      "content": "右键单击 WorkerRole1 项目并选择“添加”-&gt;“新建项...”-&gt;“Visual C# 项”-&gt;“数据”-&gt;“XML 文件”，将 XML 文件添加到 WorkerRole1 项目中。将该文件命名为“WadExample.xml”。",
+      "pos": [
+        5556,
+        5676
+      ]
+    },
+    {
+      "content": "CloudServices\\_diag\\_add\\_xml",
+      "pos": [
+        5684,
+        5713
+      ]
+    },
+    {
+      "pos": [
+        5778,
+        5940
+      ],
+      "content": "将 WadConfig.xsd 与配置文件相关联。确保 WadExample.xml 编辑器窗口是活动的窗口。按 <bpt id=\"p1\">**</bpt>F4<ept id=\"p1\">**</ept> 打开“属性”窗口。在“属性”窗口中单击“架构”属性。在“架构”属性中单击“...”。单击“添加...”按钮并导航到 XSD 文件的保存位置，然后选择文件 WadConfig.xsd。单击“确定”。"
+    },
+    {
+      "content": "将 WadExample.xml 配置文件的内容替换为以下 XML 并保存该文件。此配置文件定义两个要收集的性能计数器：一个对应于 CPU 使用率，另一个对应于内存使用率。配置将定义对应于 SampleEventSourceWriter 类中方法的四个事件。",
+      "pos": [
+        5945,
+        6074
+      ]
+    },
+    {
+      "content": "步骤 5：在辅助角色上安装 Diagnostics",
+      "pos": [
+        7466,
+        7491
+      ]
+    },
+    {
+      "content": "用于在 Web 或辅助角色上管理 Diagnostics 的 PowerShell cmdlet 为：Set-AzureServiceDiagnosticsExtension、Get-AzureServiceDiagnosticsExtension 和 Remove-AzureServiceDiagnosticsExtension。",
+      "pos": [
+        7492,
+        7659
+      ]
+    },
+    {
+      "content": "打开 Azure PowerShell。",
+      "pos": [
+        7665,
+        7685
+      ]
+    },
+    {
+      "pos": [
+        7690,
+        7766
+      ],
+      "content": "执行脚本以在辅助角色上安装 Diagnostics（将 <bpt id=\"p1\">*</bpt>StorageAccountKey<ept id=\"p1\">*</ept> 替换为 wadexample 存储帐户的存储帐户密钥）："
+    },
+    {
+      "content": "步骤 6：查看遥测数据",
+      "pos": [
+        8314,
+        8325
+      ]
+    },
+    {
+      "pos": [
+        8326,
+        8533
+      ],
+      "content": "在 Visual Studio <bpt id=\"p1\">**</bpt>服务器资源管理器<ept id=\"p1\">**</ept>中，导航到 wadexample 存储帐户。在云服务大约运行 5 分钟后，你应该会看到表 <bpt id=\"p2\">**</bpt>WADEnumsTable<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>WADHighFreqTable<ept id=\"p3\">**</ept>、<bpt id=\"p4\">**</bpt>WADMessageTable<ept id=\"p4\">**</ept>、<bpt id=\"p5\">**</bpt>WADPerformanceCountersTable<ept id=\"p5\">**</ept> 和 <bpt id=\"p6\">**</bpt>WADSetOtherTable<ept id=\"p6\">**</ept>。双击其中一个表即可查看已收集的遥测数据。"
+    },
+    {
+      "content": "CloudServices\\_diag\\_tables",
+      "pos": [
+        8537,
+        8564
+      ]
+    },
+    {
+      "content": "如何在虚拟机中启用诊断",
+      "pos": [
+        8634,
+        8645
+      ]
+    },
+    {
+      "pos": [
+        8647,
+        8801
+      ],
+      "content": "本演练介绍如何从开发计算机将 Diagnostics 远程安装到 Azure 虚拟机。你还将了解如何实施在该 Azure 虚拟机上运行的应用程序，并使用 .NET <bpt id=\"p1\">[</bpt>EventSource 类<ept id=\"p1\">][]</ept>发出遥测数据。Azure Diagnostics 用于收集遥测数据，并将其存储在一个 Azure 存储帐户中。"
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        8807,
+        8811
+      ]
+    },
+    {
+      "pos": [
+        8812,
+        8940
+      ],
+      "content": "本演练假定你具有 Azure 订阅，并将 Visual Studio 2013 与  Azure SDK 结合使用。如果你没有 Azure 订阅，你可以注册<bpt id=\"p1\">[</bpt>试用版<ept id=\"p1\">][]</ept>。请确保<bpt id=\"p2\">[</bpt>安装并配置 Azure PowerShell 0.8.7 或更高版本<ept id=\"p2\">][]</ept>。"
+    },
+    {
+      "content": "步骤 1：创建虚拟机",
+      "pos": [
+        8946,
+        8956
+      ]
+    },
+    {
+      "content": "在开发计算机上启动 Visual Studio 2013。",
+      "pos": [
+        8961,
+        8990
+      ]
+    },
+    {
+      "content": "在 Visual Studio 服务器资源管理器中，展开“Azure”，右键单击“虚拟机”然后选择“创建虚拟机”。",
+      "pos": [
+        8995,
+        9052
+      ]
+    },
+    {
+      "content": "在“选择订阅”对话框中选择你的 Azure 订阅，然后单击“下一步”。",
+      "pos": [
+        9057,
+        9092
+      ]
+    },
+    {
+      "content": "在“选择虚拟机映像”对话框中选择“Windows Server 2012 R2 Datacenter 2014 年 11 月版”，然后单击“下一步”。",
+      "pos": [
+        9097,
+        9172
+      ]
+    },
+    {
+      "content": "在“虚拟机基本设置”中，将虚拟机名称设置为“wadexample”。设置管理员用户名和密码，然后单击“下一步”。",
+      "pos": [
+        9177,
+        9233
+      ]
+    },
+    {
+      "content": "在“云服务设置”对话框中，创建名为“wadexampleVM”的新云服务。创建一个名为“wadexample”的新存储帐户，然后单击“下一步”。",
+      "pos": [
+        9238,
+        9310
+      ]
+    },
+    {
+      "content": "单击“创建”。",
+      "pos": [
+        9315,
+        9322
+      ]
+    },
+    {
+      "content": "步骤 2：创建应用程序",
+      "pos": [
+        9328,
+        9339
+      ]
+    },
+    {
+      "content": "在开发计算机上启动 Visual Studio 2013。",
+      "pos": [
+        9344,
+        9373
+      ]
+    },
+    {
+      "pos": [
+        9378,
+        9544
+      ],
+      "content": "创建面向 .NET Framework 4.5 的新 Visual C# 控制台应用程序。将该项目命名为“WadExampleVM”。\n![CloudServices\\_diag\\_new\\_project](./media/cloud-services-dotnet-diagnostics/NewProject.png)",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "创建面向 .NET Framework 4.5 的新 Visual C# 控制台应用程序。将该项目命名为“WadExampleVM”。",
+          "pos": [
+            0,
+            67
+          ]
+        },
+        {
+          "content": "CloudServices\\_diag\\_new\\_project",
+          "pos": [
+            70,
+            103
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        9549,
+        9774
+      ],
+      "content": "将 Program.cs 的内容替换为以下代码。类 <bpt id=\"p1\">**</bpt>SampleEventSourceWriter<ept id=\"p1\">**</ept> 实现四个日志记录方法：<bpt id=\"p2\">**</bpt>SendEnums<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>MessageMethod<ept id=\"p3\">**</ept>、<bpt id=\"p4\">**</bpt>SetOther<ept id=\"p4\">**</ept> 和 <bpt id=\"p5\">**</bpt>HighFreq<ept id=\"p5\">**</ept>。WriteEvent 方法的第一个参数定义相关事件的 ID。Run 方法实现一个无限循环，该循环每隔 10 秒调用 <bpt id=\"p6\">**</bpt>SampleEventSourceWriter<ept id=\"p6\">**</ept> 类中实现的每个日志记录方法。"
+    },
+    {
+      "content": "保存该文件，然后从“生成”菜单中选择“生成解决方案”以生成代码。",
+      "pos": [
+        11788,
+        11820
+      ]
+    },
+    {
+      "content": "步骤 3：部署应用程序",
+      "pos": [
+        11827,
+        11838
+      ]
+    },
+    {
+      "content": "在“解决方案资源管理器”中右键单击“WadExampleVM”项目，然后选择“在文件资源管理器中打开文件夹”。",
+      "pos": [
+        11843,
+        11898
+      ]
+    },
+    {
+      "pos": [
+        11903,
+        11947
+      ],
+      "content": "导航到 <bpt id=\"p1\">*</bpt>bin/Debug<ept id=\"p1\">*</ept> 文件夹，并复制所有文件 (WadExampleVM.*)"
+    },
+    {
+      "content": "在“服务器资源管理器”中，右键单击虚拟机并选择“使用远程桌面连接”。",
+      "pos": [
+        11952,
+        11986
+      ]
+    },
+    {
+      "content": "连接到 VM 后，创建名为 WadExampleVM 的文件夹，并将应用程序文件粘贴到该文件夹中。",
+      "pos": [
+        11991,
+        12040
+      ]
+    },
+    {
+      "content": "启动应用程序 WadExampleVM.exe。你应会看到一个空白控制台窗口。",
+      "pos": [
+        12045,
+        12084
+      ]
+    },
+    {
+      "content": "步骤 4：创建 Diagnostics 配置并安装扩展",
+      "pos": [
+        12090,
+        12117
+      ]
+    },
+    {
+      "content": "通过执行以下 PowerShell 命令，将公共配置文件架构定义下载到开发计算机：",
+      "pos": [
+        12122,
+        12163
+      ]
+    },
+    {
+      "content": "在 Visual Studio 中打开一个新的 XML 文件：可以在已打开的项目中，或者在未打开项目的 Visual Studio 实例中执行此操作。在 Visual Studio 中，选择“添加”-&gt;“新建项...”-&gt;“Visual C# 项”-&gt;“数据”-&gt;“XML 文件”。将该文件命名为“WadExample.xml”",
+      "pos": [
+        12376,
+        12540
+      ]
+    },
+    {
+      "pos": [
+        12545,
+        12707
+      ],
+      "content": "将 WadConfig.xsd 与配置文件相关联。确保 WadExample.xml 编辑器窗口是活动的窗口。按 <bpt id=\"p1\">**</bpt>F4<ept id=\"p1\">**</ept> 打开“属性”窗口。在“属性”窗口中单击“架构”属性。在“架构”属性中单击“...”。单击“添加...”按钮并导航到 XSD 文件的保存位置，然后选择文件 WadConfig.xsd。单击“确定”。"
+    },
+    {
+      "content": "将 WadExample.xml 配置文件的内容替换为以下 XML 并保存该文件。此配置文件定义两个要收集的性能计数器：一个对应于 CPU 使用率，另一个对应于内存使用率。配置将定义对应于 SampleEventSourceWriter 类中方法的四个事件。",
+      "pos": [
+        12712,
+        12841
+      ]
+    },
+    {
+      "content": "步骤 5：将 Diagnostics 远程安装到 Azure 虚拟机上",
+      "pos": [
+        14233,
+        14268
+      ]
+    },
+    {
+      "content": "用于在 VM 上管理 Diagnostics 的 PowerShell cmdlet 为：Set-AzureVMDiagnosticsExtension、Get-AzureVMDiagnosticsExtension 和 Remove-AzureVMDiagnosticsExtension。",
+      "pos": [
+        14269,
+        14415
+      ]
+    },
+    {
+      "content": "在开发人员计算机上，打开 Azure PowerShell。",
+      "pos": [
+        14421,
+        14451
+      ]
+    },
+    {
+      "pos": [
+        14456,
+        14536
+      ],
+      "content": "执行脚本以在 VM 上远程安装 Diagnostics（将 <bpt id=\"p1\">*</bpt>StorageAccountKey<ept id=\"p1\">*</ept> 替换为 wadexamplevm 存储帐户的存储帐户密钥）："
+    },
+    {
+      "content": "步骤 6：查看遥测数据",
+      "pos": [
+        15241,
+        15252
+      ]
+    },
+    {
+      "pos": [
+        15253,
+        15461
+      ],
+      "content": "在 Visual Studio <bpt id=\"p1\">**</bpt>服务器资源管理器<ept id=\"p1\">**</ept>中，导航到 wadexample 存储帐户。在 VM 大约运行 5 分钟后，你应该会看到表 <bpt id=\"p2\">**</bpt>WADEnumsTable<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>WADHighFreqTable<ept id=\"p3\">**</ept>、<bpt id=\"p4\">**</bpt>WADMessageTable<ept id=\"p4\">**</ept>、<bpt id=\"p5\">**</bpt>WADPerformanceCountersTable<ept id=\"p5\">**</ept> 和 <bpt id=\"p6\">**</bpt>WADSetOtherTable<ept id=\"p6\">**</ept>。双击其中一个表即可查看已收集的遥测数据。"
+    },
+    {
+      "content": "CloudServices\\_diag\\_wadexamplevm\\_tables",
+      "pos": [
+        15465,
+        15506
+      ]
+    },
+    {
+      "content": "配置文件架构",
+      "pos": [
+        15578,
+        15584
+      ]
+    },
+    {
+      "pos": [
+        15586,
+        15685
+      ],
+      "content": "Diagnostics 配置文件定义启动诊断监视器时用于初始化诊断配置设置的值。以下位置提供了一个示例配置文件以及有关其架构的详细文档：<bpt id=\"p1\">[</bpt>Azure Diagnostics 1.2 配置架构<ept id=\"p1\">][]</ept>。"
+    },
+    {
+      "content": "故障排除",
+      "pos": [
+        15690,
+        15694
+      ]
+    },
+    {
+      "content": "Azure Diagnostics 不启动",
+      "pos": [
+        15700,
+        15721
+      ]
+    },
+    {
+      "content": "Diagnostics 由两个组件构成：来宾代理插件和监视代理。来宾代理插件的日志文件位于以下文件中：",
+      "pos": [
+        15722,
+        15773
+      ]
+    },
+    {
+      "pos": [
+        15775,
+        15903
+      ],
+      "content": "<bpt id=\"p1\">*</bpt>%SystemDrive%\\\\ WindowsAzure\\\\Logs\\\\Plugins\\\\Microsoft.Azure.Diagnostics.PaaSDiagnostics&lt;Diagnostics 版本&gt;<ept id=\"p1\">*</ept>\\\\CommandExecution.log"
+    },
+    {
+      "content": "该插件会返回以下错误代码：",
+      "pos": [
+        15905,
+        15918
+      ]
+    },
+    {
+      "content": "退出代码",
+      "pos": [
+        15920,
+        15924
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        15925,
+        15927
+      ]
+    },
+    {
+      "content": "0",
+      "pos": [
+        15936,
+        15937
+      ]
+    },
+    {
+      "content": "成功。",
+      "pos": [
+        15938,
+        15941
+      ]
+    },
+    {
+      "content": "-1",
+      "pos": [
+        15942,
+        15944
+      ]
+    },
+    {
+      "content": "常规错误。",
+      "pos": [
+        15945,
+        15950
+      ]
+    },
+    {
+      "content": "-2",
+      "pos": [
+        15951,
+        15953
+      ]
+    },
+    {
+      "content": "无法加载 rcf 文件。",
+      "pos": [
+        15954,
+        15966
+      ]
+    },
+    {
+      "content": "这是一个内部错误，仅当在 VM 上不正确地手动调用了来宾代理插件启动器时才会发生该错误。",
+      "pos": [
+        15969,
+        16013
+      ]
+    },
+    {
+      "content": "-3",
+      "pos": [
+        16014,
+        16016
+      ]
+    },
+    {
+      "content": "无法加载 Diagnostics 配置文件。",
+      "pos": [
+        16017,
+        16039
+      ]
+    },
+    {
+      "content": "解决方案：这是配置文件未通过架构验证的结果。解决方案是提供符合架构的配置文件。",
+      "pos": [
+        16045,
+        16084
+      ]
+    },
+    {
+      "content": "-4",
+      "pos": [
+        16085,
+        16087
+      ]
+    },
+    {
+      "content": "监视代理 Diagnostics 的另一个实例已在使用本地资源目录。",
+      "pos": [
+        16088,
+        16122
+      ]
+    },
+    {
+      "content": "解决方案：为 <bpt id=\"p1\">**</bpt>LocalResourceDirectory<ept id=\"p1\">**</ept> 指定不同的值。",
+      "pos": [
+        16128,
+        16169
+      ]
+    },
+    {
+      "content": "-6",
+      "pos": [
+        16170,
+        16172
+      ]
+    },
+    {
+      "content": "来宾代理插件启动器尝试使用无效的命令行启动 Diagnostics。",
+      "pos": [
+        16173,
+        16207
+      ]
+    },
+    {
+      "content": "这是一个内部错误，仅当在 VM 上不正确地手动调用了来宾代理插件启动器时才会发生该错误。",
+      "pos": [
+        16213,
+        16257
+      ]
+    },
+    {
+      "content": "-10",
+      "pos": [
+        16258,
+        16261
+      ]
+    },
+    {
+      "content": "Diagnostics 插件退出并返回未处理的异常。",
+      "pos": [
+        16262,
+        16288
+      ]
+    },
+    {
+      "content": "-11",
+      "pos": [
+        16289,
+        16292
+      ]
+    },
+    {
+      "content": "来宾代理程序无法创建负责启动和监视监视代理的进程。",
+      "pos": [
+        16293,
+        16318
+      ]
+    },
+    {
+      "content": "解决方案：验证是否有足够的系统资源用于启动新进程。",
+      "pos": [
+        16324,
+        16349
+      ]
+    },
+    {
+      "content": "-101",
+      "pos": [
+        16353,
+        16357
+      ]
+    },
+    {
+      "content": "调用 Diagnostics 插件时参数无效。",
+      "pos": [
+        16358,
+        16381
+      ]
+    },
+    {
+      "content": "这是一个内部错误，仅当在 VM 上不正确地手动调用了来宾代理插件启动器时才会发生该错误。",
+      "pos": [
+        16387,
+        16431
+      ]
+    },
+    {
+      "content": "-102",
+      "pos": [
+        16432,
+        16436
+      ]
+    },
+    {
+      "content": "插件进程将无法初始化自身。",
+      "pos": [
+        16437,
+        16450
+      ]
+    },
+    {
+      "content": "解决方案：验证是否有足够的系统资源用于启动新进程。",
+      "pos": [
+        16456,
+        16481
+      ]
+    },
+    {
+      "content": "-103",
+      "pos": [
+        16482,
+        16486
+      ]
+    },
+    {
+      "content": "插件进程将无法初始化自身。具体而言，它无法创建记录器对象。",
+      "pos": [
+        16487,
+        16516
+      ]
+    },
+    {
+      "content": "解决方案：验证是否有足够的系统资源用于启动新进程。",
+      "pos": [
+        16522,
+        16547
+      ]
+    },
+    {
+      "content": "-104",
+      "pos": [
+        16548,
+        16552
+      ]
+    },
+    {
+      "content": "无法加载来宾代理提供的 rcf 文件。",
+      "pos": [
+        16553,
+        16572
+      ]
+    },
+    {
+      "content": "这是一个内部错误，仅当在 VM 上不正确地手动调用了来宾代理插件启动器时才会发生该错误。",
+      "pos": [
+        16578,
+        16622
+      ]
+    },
+    {
+      "content": "-105",
+      "pos": [
+        16623,
+        16627
+      ]
+    },
+    {
+      "content": "Diagnostics 插件无法打开 Diagnostics 配置文件。",
+      "pos": [
+        16628,
+        16664
+      ]
+    },
+    {
+      "content": "这是一个内部错误，仅当在 VM 上不正确地手动调用了 Diagnostics 插件时才会发生该错误。",
+      "pos": [
+        16670,
+        16720
+      ]
+    },
+    {
+      "content": "-106",
+      "pos": [
+        16721,
+        16725
+      ]
+    },
+    {
+      "content": "无法读取 Diagnostics 配置文件。",
+      "pos": [
+        16726,
+        16748
+      ]
+    },
+    {
+      "content": "解决方案：这是配置文件未通过架构验证的结果。因此，解决方案是提供符合架构的配置文件。可以在 VM 上的文件夹 <bpt id=\"p1\">*</bpt>%SystemDrive%/WindowsAzure/Config<ept id=\"p1\">*</ept> 中，找到提供给 Diagnostics 扩展的 XML。打开相应的 XML 文件并搜索 <bpt id=\"p2\">**</bpt>Microsoft.Azure.Diagnostics<ept id=\"p2\">**</ept>，然后搜索 <bpt id=\"p3\">**</bpt>xmlCfg<ept id=\"p3\">**</ept> 字段。数据采用 base64 编码，因此你需要<bpt id=\"p4\">[</bpt>将其解码<ept id=\"p4\">](http://www.bing.com/search?q=base64+decoder)</ept>，以查看 Diagnostics 加载的 XML。",
+      "pos": [
+        16754,
+        17036
+      ]
+    },
+    {
+      "content": "-107",
+      "pos": [
+        17040,
+        17044
+      ]
+    },
+    {
+      "content": "传递给监视代理的资源目录无效。",
+      "pos": [
+        17045,
+        17060
+      ]
+    },
+    {
+      "content": "这是一个内部错误，仅当在 VM 上不正确地手动调用了监视代理时才会发生该错误。",
+      "pos": [
+        17066,
+        17105
+      ]
+    },
+    {
+      "content": "-108",
+      "pos": [
+        17110,
+        17114
+      ]
+    },
+    {
+      "content": "无法将 Diagnostics 配置文件转换为监视代理配置文件。",
+      "pos": [
+        17116,
+        17148
+      ]
+    },
+    {
+      "content": "这是一个内部错误，仅当使用无效的配置文件手动调用了 Diagnostics 插件时才会发生该错误。",
+      "pos": [
+        17154,
+        17203
+      ]
+    },
+    {
+      "content": "-110",
+      "pos": [
+        17204,
+        17208
+      ]
+    },
+    {
+      "content": "常规 Diagnostics 配置错误。",
+      "pos": [
+        17209,
+        17229
+      ]
+    },
+    {
+      "content": "这是一个内部错误，仅当使用无效的配置文件手动调用了 Diagnostics 插件时才会发生该错误。",
+      "pos": [
+        17235,
+        17284
+      ]
+    },
+    {
+      "content": "-111",
+      "pos": [
+        17285,
+        17289
+      ]
+    },
+    {
+      "content": "无法启动监视代理。",
+      "pos": [
+        17290,
+        17299
+      ]
+    },
+    {
+      "content": "解决方案：验证是否提供了足够的系统资源。",
+      "pos": [
+        17305,
+        17325
+      ]
+    },
+    {
+      "content": "-112",
+      "pos": [
+        17326,
+        17330
+      ]
+    },
+    {
+      "content": "常规错误",
+      "pos": [
+        17331,
+        17335
+      ]
+    },
+    {
+      "content": "未将 Diagnostics 数据记录到存储中",
+      "pos": [
+        17342,
+        17365
+      ]
+    },
+    {
+      "content": "丢失事件数据的最常见原因是错误地定义了存储帐户信息。",
+      "pos": [
+        17366,
+        17392
+      ]
+    },
+    {
+      "content": "解决方案：更正 Diagnostics 配置文件，然后重新安装 Diagnostics。",
+      "pos": [
+        17394,
+        17438
+      ]
+    },
+    {
+      "content": "事件数据在上载到存储帐户之前，会存储在文件夹中。有关 <bpt id=\"p1\">**</bpt>LocalResourceDirectory<ept id=\"p1\">**</ept> 的详细信息，请参阅上文。",
+      "pos": [
+        17439,
+        17505
+      ]
+    },
+    {
+      "content": "如果在此文件夹中没有任何文件监视代理将无法启动。这通常是由于配置文件无效而导致的，应该已在 CommandExecution.log 中报告。如果监视代理已成功收集事件数据，你将会看到配置文件中为每个事件定义的 .tsf 文件。",
+      "pos": [
+        17507,
+        17621
+      ]
+    },
+    {
+      "content": "监视代理将在文件 MaEventTable.tsf 中记录它所遇到的任何错误。若要检查此文件的内容，请运行以下命令：",
+      "pos": [
+        17623,
+        17681
+      ]
+    },
+    {
+      "content": "该工具将生成一个名为 maeventtable.csv 的文件，你可以打开并检查日志，以确定失败的原因。",
+      "pos": [
+        17823,
+        17875
+      ]
+    },
+    {
+      "content": "常见问题",
+      "pos": [
+        17881,
+        17885
+      ]
+    },
+    {
+      "content": "下面是一些常见问题及其回答：",
+      "pos": [
+        17886,
+        17900
+      ]
+    },
+    {
+      "content": "Q.",
+      "pos": [
+        17904,
+        17906
+      ]
+    },
+    {
+      "content": "如何将我的 Visual Studio 解决方案从 Azure Diagnostics 1.0 升级到 Azure Diagnostics 1.1？",
+      "pos": [
+        17909,
+        17983
+      ]
+    },
+    {
+      "content": "A.",
+      "pos": [
+        17987,
+        17989
+      ]
+    },
+    {
+      "content": "将 Visual Studio 解决方案从 Diagnostics 1.0 升级到 Diagnostics 1.1（或更高版本）是一个手动过程：",
+      "pos": [
+        17992,
+        18064
+      ]
+    },
+    {
+      "content": "在 Visual Studio 解决方案中禁用 Diagnostics，以阻止随角色一起部署 Diagnostics 1.0",
+      "pos": [
+        18068,
+        18130
+      ]
+    },
+    {
+      "content": "如果代码使用了跟踪侦听器，则你需要将代码修改为使用 .NET EventSource。Diagnostics 1.1 和更高版本不支持跟踪侦听器。",
+      "pos": [
+        18134,
+        18207
+      ]
+    },
+    {
+      "content": "修改部署过程以安装 Diagnostics 1.1 扩展",
+      "pos": [
+        18211,
+        18239
+      ]
+    },
+    {
+      "content": "Q.",
+      "pos": [
+        18243,
+        18245
+      ]
+    },
+    {
+      "content": "如果我已在角色或 VM 上安装了 Diagnostics 1.1 扩展，如何升级到 Diagnostics 1.2 或 1.3？",
+      "pos": [
+        18248,
+        18312
+      ]
+    },
+    {
+      "content": "A.",
+      "pos": [
+        18316,
+        18318
+      ]
+    },
+    {
+      "content": "如果你在安装 Diagnostics 1.1 时指定了“Version ”1.<bpt id=\"p1\">*</bpt>“”，则下一次重新启动角色或 VM 时，Diagnostics 会自动更新到与正则表达式 “1.<ept id=\"p1\">*</ept>”",
+      "pos": [
+        18321,
+        18411
+      ]
+    },
+    {
+      "content": "匹配的最新版本。如果你在安装 Diagnostics 1.1 时指定了“-Version ”1.1“”，可以通过重新执行 Set- cmdlet 并指定想要安装的版本，来更新到更高的版本。",
+      "pos": [
+        18412,
+        18506
+      ]
+    },
+    {
+      "content": "Q.",
+      "pos": [
+        18510,
+        18512
+      ]
+    },
+    {
+      "content": "如何为表命名？",
+      "pos": [
+        18515,
+        18522
+      ]
+    },
+    {
+      "content": "A.",
+      "pos": [
+        18526,
+        18528
+      ]
+    },
+    {
+      "content": "根据以下约定为表命名：",
+      "pos": [
+        18531,
+        18542
+      ]
+    },
+    {
+      "content": "下面是一个示例：",
+      "pos": [
+        18851,
+        18859
+      ]
+    },
+    {
+      "content": "这会生成 4 个表：",
+      "pos": [
+        19242,
+        19252
+      ]
+    },
+    {
+      "content": "事件",
+      "pos": [
+        19254,
+        19256
+      ]
+    },
+    {
+      "content": "表名称",
+      "pos": [
+        19257,
+        19260
+      ]
+    },
+    {
+      "content": "provider=”prov1” &amp;lt;Event id=”1” /&amp;gt;",
+      "pos": [
+        19269,
+        19308
+      ]
+    },
+    {
+      "content": "WADEvent+MD5(“prov1”)+”1”",
+      "pos": [
+        19309,
+        19334
+      ]
+    },
+    {
+      "content": "provider=”prov1” &amp;lt;Event id=”2” eventDestination=”dest1” /&amp;gt;",
+      "pos": [
+        19335,
+        19399
+      ]
+    },
+    {
+      "content": "WADdest1",
+      "pos": [
+        19400,
+        19408
+      ]
+    },
+    {
+      "content": "provider=”prov1” &amp;lt;DefaultEvents /&amp;gt;",
+      "pos": [
+        19409,
+        19449
+      ]
+    },
+    {
+      "content": "WADDefault+MD5(“prov1”)",
+      "pos": [
+        19450,
+        19473
+      ]
+    },
+    {
+      "content": "provider=”prov2” &amp;lt;DefaultEvents eventDestination=”dest2” /&amp;gt;",
+      "pos": [
+        19474,
+        19539
+      ]
+    },
+    {
+      "content": "WADdest2",
+      "pos": [
+        19540,
+        19548
+      ]
+    },
+    {
+      "content": "比较 Azure Diagnostics 版本",
+      "pos": [
+        19553,
+        19576
+      ]
+    },
+    {
+      "content": "下表比较了 Azure Diagnostics 版本 1.0 和 1.1/1.2/1.3 支持的功能：",
+      "pos": [
+        19578,
+        19629
+      ]
+    },
+    {
+      "content": "支持的角色类型|Diagnostics 1.0|Diagnostics 1.1/1.2/1.3",
+      "pos": [
+        19631,
+        19678
+      ]
+    },
+    {
+      "content": "---|---",
+      "pos": [
+        19679,
+        19686
+      ]
+    },
+    {
+      "content": "Web 角色|是|是",
+      "pos": [
+        19687,
+        19697
+      ]
+    },
+    {
+      "content": "辅助角色|是|是",
+      "pos": [
+        19698,
+        19706
+      ]
+    },
+    {
+      "content": "IaaS|否|是",
+      "pos": [
+        19707,
+        19715
+      ]
+    },
+    {
+      "content": "配置和部署",
+      "pos": [
+        19717,
+        19722
+      ]
+    },
+    {
+      "content": "Diagnostics 1.0",
+      "pos": [
+        19723,
+        19738
+      ]
+    },
+    {
+      "content": "Diagnostics 1.1/1.2/1.3",
+      "pos": [
+        19739,
+        19762
+      ]
+    },
+    {
+      "content": "与 Visual Studio 集成 - 集成在 Azure Web/辅助角色开发体验中。",
+      "pos": [
+        19775,
+        19820
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        19821,
+        19822
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        19823,
+        19824
+      ]
+    },
+    {
+      "content": "PowerShell 脚本 - 用于在角色上管理 Diagnostics 的安装和配置的脚本。",
+      "pos": [
+        19825,
+        19872
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        19873,
+        19874
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        19875,
+        19876
+      ]
+    },
+    {
+      "content": "数据源",
+      "pos": [
+        19878,
+        19881
+      ]
+    },
+    {
+      "content": "默认集合",
+      "pos": [
+        19882,
+        19886
+      ]
+    },
+    {
+      "content": "格式",
+      "pos": [
+        19887,
+        19889
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        19890,
+        19892
+      ]
+    },
+    {
+      "content": "Diagnostics 1.0",
+      "pos": [
+        19893,
+        19908
+      ]
+    },
+    {
+      "content": "Diagnostics 1.1/1.2",
+      "pos": [
+        19909,
+        19928
+      ]
+    },
+    {
+      "content": "Diagnostics 1.3",
+      "pos": [
+        19929,
+        19944
+      ]
+    },
+    {
+      "content": "System.Diagnostics.Trace 日志",
+      "pos": [
+        19973,
+        20000
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20001,
+        20002
+      ]
+    },
+    {
+      "content": "表",
+      "pos": [
+        20003,
+        20004
+      ]
+    },
+    {
+      "content": "记录从您的代码发送到跟踪侦听器的跟踪消息（必须将跟踪侦听器添加到 web.config 或 app.config 文件）。日志数据将以 scheduledTransferPeriod 指定的传输间隔传输到存储表 WADLogsTable。",
+      "pos": [
+        20005,
+        20124
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20125,
+        20126
+      ]
+    },
+    {
+      "content": "否（使用 EventSource）",
+      "pos": [
+        20127,
+        20144
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20145,
+        20146
+      ]
+    },
+    {
+      "content": "IIS 日志",
+      "pos": [
+        20147,
+        20153
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20154,
+        20155
+      ]
+    },
+    {
+      "content": "Blob",
+      "pos": [
+        20156,
+        20160
+      ]
+    },
+    {
+      "content": "记录有关 IIS Web 应用的信息。日志数据将以 scheduledTransferPeriod 指定的传输间隔传输到您指定的容器。",
+      "pos": [
+        20161,
+        20228
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20229,
+        20230
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20231,
+        20232
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20233,
+        20234
+      ]
+    },
+    {
+      "content": "Azure Diagnostics基础结构日志",
+      "pos": [
+        20235,
+        20258
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20259,
+        20260
+      ]
+    },
+    {
+      "content": "表",
+      "pos": [
+        20261,
+        20262
+      ]
+    },
+    {
+      "content": "记录有关诊断基础结构、RemoteAccess 模块和 RemoteForwarder 模块的信息。日志数据将以 scheduledTransferPeriodtransfer 指定的间隔传输到存储表 WADDiagnosticInfrastructureLogsTable。",
+      "pos": [
+        20263,
+        20401
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20402,
+        20403
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20404,
+        20405
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20406,
+        20407
+      ]
+    },
+    {
+      "content": "IIS 失败请求日志",
+      "pos": [
+        20408,
+        20418
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        20419,
+        20420
+      ]
+    },
+    {
+      "content": "Blob",
+      "pos": [
+        20421,
+        20425
+      ]
+    },
+    {
+      "content": "记录有关 IIS 站点或应用程序的失败请求的信息。还必须通过在 Web.config 文件中的 system.WebServer 下设置跟踪选项来启用。日志数据将以 scheduledTransferPeriod 指定的传输间隔传输到您指定的容器。",
+      "pos": [
+        20426,
+        20550
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20551,
+        20552
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20553,
+        20554
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20555,
+        20556
+      ]
+    },
+    {
+      "content": "Windows 事件日志",
+      "pos": [
+        20557,
+        20569
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        20570,
+        20571
+      ]
+    },
+    {
+      "content": "表",
+      "pos": [
+        20572,
+        20573
+      ]
+    },
+    {
+      "content": "记录有关操作系统、应用程序或驱动程序运行状况的信息。必须显式指定性能计数器。添加性能计数器后，性能计数器数据将以 scheduledTransferPeriod 指定的传输间隔传输到存储表 WADPerformanceCountersTable。",
+      "pos": [
+        20574,
+        20697
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20698,
+        20699
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20700,
+        20701
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20702,
+        20703
+      ]
+    },
+    {
+      "content": "性能计数器",
+      "pos": [
+        20704,
+        20709
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        20710,
+        20711
+      ]
+    },
+    {
+      "content": "表",
+      "pos": [
+        20712,
+        20713
+      ]
+    },
+    {
+      "content": "记录有关操作系统、应用程序或驱动程序运行状况的信息。必须显式指定性能计数器。添加性能计数器后，性能计数器数据将以 scheduledTransferPeriod 指定的传输间隔传输到存储表 WADPerformanceCountersTable。",
+      "pos": [
+        20714,
+        20837
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20838,
+        20839
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20840,
+        20841
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20842,
+        20843
+      ]
+    },
+    {
+      "content": "故障转储",
+      "pos": [
+        20844,
+        20848
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        20849,
+        20850
+      ]
+    },
+    {
+      "content": "Blob",
+      "pos": [
+        20851,
+        20855
+      ]
+    },
+    {
+      "content": "记录有关系统崩溃时操作系统的状态的信息。小型故障转储将在本地收集。可以启用完全转储。日志数据将以 scheduledTransferPeriod 指定的传输间隔传输到您指定的容器。由于 ASP.NET 能够处理大多数异常，因此故障转储通常仅对辅助角色或 VM 有用。",
+      "pos": [
+        20856,
+        20989
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20990,
+        20991
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20992,
+        20993
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        20994,
+        20995
+      ]
+    },
+    {
+      "content": "自定义错误日志",
+      "pos": [
+        20996,
+        21003
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        21004,
+        21005
+      ]
+    },
+    {
+      "content": "Blob",
+      "pos": [
+        21006,
+        21010
+      ]
+    },
+    {
+      "content": "通过使用本地存储资源，可立即将自定义数据记录和传输到您指定的容器。",
+      "pos": [
+        21011,
+        21044
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        21045,
+        21046
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        21047,
+        21048
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        21049,
+        21050
+      ]
+    },
+    {
+      "content": "EventSource",
+      "pos": [
+        21051,
+        21062
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        21063,
+        21064
+      ]
+    },
+    {
+      "content": "表",
+      "pos": [
+        21065,
+        21066
+      ]
+    },
+    {
+      "content": "记录你的代码使用 .NET EventSource 类生成的事件。",
+      "pos": [
+        21067,
+        21100
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        21101,
+        21102
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        21103,
+        21104
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        21105,
+        21106
+      ]
+    },
+    {
+      "content": "基于清单的 ETW",
+      "pos": [
+        21107,
+        21116
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        21117,
+        21118
+      ]
+    },
+    {
+      "content": "表",
+      "pos": [
+        21119,
+        21120
+      ]
+    },
+    {
+      "content": "任何进程生成的 ETW 事件。",
+      "pos": [
+        21121,
+        21136
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        21137,
+        21138
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        21139,
+        21140
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        21141,
+        21142
+      ]
+    },
+    {
+      "content": "其他资源",
+      "pos": [
+        21148,
+        21152
+      ]
+    },
+    {
+      "content": "有关开发 Azure 应用程序的问题排查最佳实践",
+      "pos": [
+        21157,
+        21181
+      ]
+    },
+    {
+      "content": "使用 Azure 诊断收集日志记录数据",
+      "pos": [
+        21188,
+        21207
+      ]
+    },
+    {
+      "content": "调试 Azure 应用程序",
+      "pos": [
+        21214,
+        21227
+      ]
+    },
+    {
+      "content": "为 Azure 云服务和虚拟机配置诊断",
+      "pos": [
+        21234,
+        21253
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"如何使用诊断 (.NET) | Azure\" \n    description=\"了解如何在 Azure 中使用诊断数据进行调试、度量性能、进行监视以及流量分析等操作。\" \n    services=\"cloud-services\" \n    documentationCenter=\".net\" \n    authors=\"rboucher\" \n    manager=\"jwhit\" \n    editor=\"\"/>\n\n<tags \n    ms.service=\"cloud-services\" \n    ms.date=\"08/25/2015\" \n    wacn.date=\"01/21/2016\"/>\n\n\n\n# 在 Azure 云服务和虚拟机中启用诊断\n\n通过 Azure Diagnostics 1.2 和 1.3，可以从 Azure 中运行的辅助角色、Web 角色或虚拟机收集诊断数据。本指南介绍如何使用 Azure Diagnostics 1.2 和 1.3。有关创建日志记录和跟踪策略以及使用诊断和其他技术排查问题的其他深入指南，请参阅[有关开发 Azure 应用程序的故障排除最佳实践][]。\n\n## 概述\n\nAzure Diagnostics 1.2 和 1.3 是可让你从 Azure 中运行的辅助角色、Web 角色或虚拟机收集诊断遥测数据的 Azure 扩展。遥测数据存储在 Azure 存储帐户中，可用于调试和故障排除、测量性能、监视资源使用情况、流量分析和容量规划以及审核。\n\nAzure Diagnostics 1.2 可与适用于 .NET 2.4 及更低版本的 Azure SDK 配合使用。Azure Diagnostics 1.3 可与适用于 .NET 2.5 及更低版本的 Azure SDK 配合使用。\n\n如果你以前用过 Diagnostics 版本 1.0，应该知道，它与 Diagnostics 1.2 和 1.3 相比具有明显的差异：\n\n1.  除了可以部署在云服务中以外，Diagnostics 1.2 和 1.3 还可以部署在虚拟机上。\n2.  Diagnostics 1.0 是 Azure SDK 的一部分，在部署云服务时进行部署。Diagnostics 1.2 和 1.3 是一个扩展，它从云服务部署单独部署。\n3.  Diagnostics 1.2 和 1.3 可用于收集 ETW 和 .NET EventSource 事件。\n\n有关更详细的比较，请参阅本文末尾的[比较 Azure Diagnostics 版本][]。\n\nAzure Diagnostics 可以收集以下类型的遥测数据：\n\n数据源|说明\n---|---\nIIS Logs|有关 IIS Web 应用的信息。\nAzure Diagnostics基础结构日志|有关 Diagnostics 自身的信息。\nIIS 失败请求日志|有关 IIS 站点或应用程序的失败请求的信息。\nWindows 事件日志|发送到 Windows 事件日志记录系统的信息。\n性能计数器|操作系统和自定义性能计数器。\n故障转储|有关应用程序崩溃时进程状态的信息。\n自定义错误日志|应用程序或服务创建的日志。\nNET EventSource |使用 .NET 的代码生成的事件 <a href=\"http://msdn.microsoft.com/zh-cn/library/system.diagnostics.tracing.eventsource(v=vs.110).aspx\">EventSource 类</a>\n基于清单的 ETW|任何进程生成的 ETW 事件。\n\n## 如何在辅助角色中启用诊断\n\n本演练介绍如何实现使用 .NET EventSource 类发出遥测数据的 Azure 辅助角色。Azure Diagnostics 用于收集遥测数据，并将其存储在一个 Azure 存储帐户中。创建辅助角色时，Visual Studio 将在适用于 .NET 2.4 和更低版本的 Azure SDK 中，自动启用 Diagnostics 1.0 作为解决方案的一部分。以下说明介绍了创建辅助角色、从解决方案禁用 Diagnostics 1.0，以及在辅助角色中部署 Diagnostics 1.2 或 1.3 的过程。\n\n###先决条件  \n\n本文假定你具有 Azure 订阅，并将 Visual Studio 2013 与  Azure SDK 结合使用。如果你没有 Azure 订阅，你可以注册[试用版](/pricing/1rmb-trial)。请确保[安装并配置 Azure PowerShell 0.8.7 或更高版本][]。\n\n### 步骤 1：创建辅助角色\n1.  启动 **Visual Studio 2013**。\n2.  从面向 .NET Framework 4.5 的**云**模板创建一个新的 **Azure 云服务**项目。将该项目命名为“WadExample”。\n3.  选择“辅助角色”并单击“确定”。随后将创建该项目。 \n4.  在“解决方案资源管理器”中，双击 **WorkerRole1** properties 文件。\n5.  在“配置”选项卡中，取消选中“启用诊断”以禁用 Diagnostics 1.0（Azure SDK 2.4 和更低版本）。\n6.  生成你的解决方案，以确认不会出错。\n\n### 步骤 2：检测代码\n将 WorkerRole.cs 的内容替换为以下代码。继承自 [EventSource 类][]的 SampleEventSourceWriter 类实现四个日志记录方法：**SendEnums**、**MessageMethod**、**SetOther** 和 **HighFreq**。**WriteEvent** 方法的第一个参数定义相关事件的 ID。Run 方法实现一个无限循环，该循环每隔 10 秒调用 **SampleEventSourceWriter** 类中实现的每个日志记录方法。\n\n    using Microsoft.WindowsAzure.ServiceRuntime;\n    using System;\n    using System.Diagnostics;\n    using System.Diagnostics.Tracing;\n    using System.Net;\n    using System.Threading;\n\n    namespace WorkerRole1\n    {\n    sealed class SampleEventSourceWriter : EventSource\n    {\n        public static SampleEventSourceWriter Log = new SampleEventSourceWriter();\n        public void SendEnums(MyColor color, MyFlags flags) { if (IsEnabled())  WriteEvent(1, (int)color, (int)flags); }// Cast enums to int for efficient logging.\n        public void MessageMethod(string Message) { if (IsEnabled())  WriteEvent(2, Message); }\n        public void SetOther(bool flag, int myInt) { if (IsEnabled())  WriteEvent(3, flag, myInt); }\n        public void HighFreq(int value) { if (IsEnabled()) WriteEvent(4, value); }\n\n    }\n\n    enum MyColor\n    {\n        Red,\n        Blue,\n        Green\n    }\n\n    [Flags]\n    enum MyFlags\n    {\n        Flag1 = 1,\n        Flag2 = 2,\n        Flag3 = 4\n    }\n\n    public class WorkerRole : RoleEntryPoint\n    {\n        public override void Run()\n        {\n            // This is a sample worker implementation. Replace with your logic.\n            Trace.TraceInformation(\"WorkerRole1 entry point called\");\n\n            int value = 0;\n\n            while (true)\n            {\n                Thread.Sleep(10000);\n                Trace.TraceInformation(\"Working\");\n\n                // Emit several events every time we go through the loop\n                for (int i = 0; i < 6; i++)\n                {\n                    SampleEventSourceWriter.Log.SendEnums(MyColor.Blue, MyFlags.Flag2 | MyFlags.Flag3);\n                }\n\n                for (int i = 0; i < 3; i++)\n                {\n                    SampleEventSourceWriter.Log.MessageMethod(\"This is a message.\");\n                    SampleEventSourceWriter.Log.SetOther(true, 123456789);\n                }\n\n                if (value == int.MaxValue) value = 0;\n                SampleEventSourceWriter.Log.HighFreq(value++);\n            }\n        }\n\n        public override bool OnStart()\n        {\n            // Set the maximum number of concurrent connections \n            ServicePointManager.DefaultConnectionLimit = 12;\n\n            // For information on handling configuration changes\n            // see the MSDN topic at http://msdn.microsoft.com/zh-cn/library/hh180152.aspx.\n\n            return base.OnStart();\n        }\n    }\n    }\n\n\n### 步骤 3：部署辅助角色\n1.  从 Visual Studio 中选择 **WadExample** 项目，然后从“生成”菜单中选择“发布”，以将辅助角色部署到 Azure。\n2.  选择你的订阅。\n3.  在“Azure 发布设置”对话框中，选择“新建...”。\n4.  在“创建云服务和存储帐户”对话框中输入一个名称（例如“WadExample”），然后选择区域或地缘组。\n5.  将“环境”设置为“过渡”。\n6.  适当地修改任何其他设置，然后单击“发布”。\n7.  完成部署后，在 Azure 门户中验证你的云服务是否处于“正在运行”状态。\n\n### 步骤 4：创建 Diagnostics 配置文件并安装扩展\n1.  通过执行以下 PowerShell 命令来下载公共配置文件架构定义：\n    \n        (Get-AzureServiceAvailableExtension -ExtensionName 'PaaSDiagnostics' -ProviderNamespace 'Microsoft.Azure.Diagnostics').PublicConfigurationSchema | Out-File -Encoding utf8 -FilePath 'WadConfig.xsd' \n\n2.  右键单击 WorkerRole1 项目并选择“添加”->“新建项...”->“Visual C# 项”->“数据”->“XML 文件”，将 XML 文件添加到 WorkerRole1 项目中。将该文件命名为“WadExample.xml”。\n\n    ![CloudServices\\_diag\\_add\\_xml](./media/cloud-services-dotnet-diagnostics/AddXmlFile.png)\n\n3.  将 WadConfig.xsd 与配置文件相关联。确保 WadExample.xml 编辑器窗口是活动的窗口。按 **F4** 打开“属性”窗口。在“属性”窗口中单击“架构”属性。在“架构”属性中单击“...”。单击“添加...”按钮并导航到 XSD 文件的保存位置，然后选择文件 WadConfig.xsd。单击“确定”。\n4.  将 WadExample.xml 配置文件的内容替换为以下 XML 并保存该文件。此配置文件定义两个要收集的性能计数器：一个对应于 CPU 使用率，另一个对应于内存使用率。配置将定义对应于 SampleEventSourceWriter 类中方法的四个事件。\n\n    \n        <?xml version=\"1.0\" encoding=\"utf-8\"?>\n        <PublicConfig xmlns=\"http://schemas.microsoft.com/ServiceHosting/2010/10/DiagnosticsConfiguration\">\n            <WadCfg>\n                <DiagnosticMonitorConfiguration overallQuotaInMB=\"25000\">\n                <PerformanceCounters scheduledTransferPeriod=\"PT1M\">\n                    <PerformanceCounterConfiguration counterSpecifier=\"\\Processor(_Total)\\% Processor Time\" sampleRate=\"PT1M\" unit=\"percent\" />\n                    <PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\Committed Bytes\" sampleRate=\"PT1M\" unit=\"bytes\"/>\n                    </PerformanceCounters>\n                    <EtwProviders>\n                        <EtwEventSourceProviderConfiguration provider=\"SampleEventSourceWriter\" scheduledTransferPeriod=\"PT5M\">\n                            <Event id=\"1\" eventDestination=\"EnumsTable\"/>\n                            <Event id=\"2\" eventDestination=\"MessageTable\"/>\n                            <Event id=\"3\" eventDestination=\"SetOtherTable\"/>\n                            <Event id=\"4\" eventDestination=\"HighFreqTable\"/>\n                            <DefaultEvents eventDestination=\"DefaultTable\" />\n                        </EtwEventSourceProviderConfiguration>\n                    </EtwProviders>\n                </DiagnosticMonitorConfiguration>\n            </WadCfg>\n        </PublicConfig>\n    \n\n### 步骤 5：在辅助角色上安装 Diagnostics\n用于在 Web 或辅助角色上管理 Diagnostics 的 PowerShell cmdlet 为：Set-AzureServiceDiagnosticsExtension、Get-AzureServiceDiagnosticsExtension 和 Remove-AzureServiceDiagnosticsExtension。\n\n1.  打开 Azure PowerShell。\n2.  执行脚本以在辅助角色上安装 Diagnostics（将 *StorageAccountKey* 替换为 wadexample 存储帐户的存储帐户密钥）：\n\n        $storage_name = \"wadexample\"\n        $key = \"<StorageAccountKey>\"\n        $config_path=\"c:\\users<user>\\documents\\visual studio 2013\\Projects\\WadExample\\WorkerRole1\\WadExample.xml\"\n        $service_name=\"wadexample\"\n        $storageContext = New-AzureStorageContext -Environment AzureChinaCloud -StorageAccountName $storage_name -StorageAccountKey $key \n        Set-AzureServiceDiagnosticsExtension -StorageContext $storageContext -DiagnosticsConfigurationPath $config_path -ServiceName $service_name -Slot Staging -Role WorkerRole1\n\n\n### 步骤 6：查看遥测数据\n在 Visual Studio **服务器资源管理器**中，导航到 wadexample 存储帐户。在云服务大约运行 5 分钟后，你应该会看到表 **WADEnumsTable**、**WADHighFreqTable**、**WADMessageTable**、**WADPerformanceCountersTable** 和 **WADSetOtherTable**。双击其中一个表即可查看已收集的遥测数据。\n\n![CloudServices\\_diag\\_tables](./media/cloud-services-dotnet-diagnostics/WadExampleTables.png)\n\n## 如何在虚拟机中启用诊断\n\n本演练介绍如何从开发计算机将 Diagnostics 远程安装到 Azure 虚拟机。你还将了解如何实施在该 Azure 虚拟机上运行的应用程序，并使用 .NET [EventSource 类][]发出遥测数据。Azure Diagnostics 用于收集遥测数据，并将其存储在一个 Azure 存储帐户中。\n\n### 先决条件\n本演练假定你具有 Azure 订阅，并将 Visual Studio 2013 与  Azure SDK 结合使用。如果你没有 Azure 订阅，你可以注册[试用版][]。请确保[安装并配置 Azure PowerShell 0.8.7 或更高版本][]。\n\n### 步骤 1：创建虚拟机\n1.  在开发计算机上启动 Visual Studio 2013。\n2.  在 Visual Studio 服务器资源管理器中，展开“Azure”，右键单击“虚拟机”然后选择“创建虚拟机”。\n3.  在“选择订阅”对话框中选择你的 Azure 订阅，然后单击“下一步”。\n4.  在“选择虚拟机映像”对话框中选择“Windows Server 2012 R2 Datacenter 2014 年 11 月版”，然后单击“下一步”。\n5.  在“虚拟机基本设置”中，将虚拟机名称设置为“wadexample”。设置管理员用户名和密码，然后单击“下一步”。\n6.  在“云服务设置”对话框中，创建名为“wadexampleVM”的新云服务。创建一个名为“wadexample”的新存储帐户，然后单击“下一步”。\n7.  单击“创建”。\n\n### 步骤 2：创建应用程序\n1.  在开发计算机上启动 Visual Studio 2013。\n2.  创建面向 .NET Framework 4.5 的新 Visual C# 控制台应用程序。将该项目命名为“WadExampleVM”。\n    ![CloudServices\\_diag\\_new\\_project](./media/cloud-services-dotnet-diagnostics/NewProject.png)\n3.  将 Program.cs 的内容替换为以下代码。类 **SampleEventSourceWriter** 实现四个日志记录方法：**SendEnums**、**MessageMethod**、**SetOther** 和 **HighFreq**。WriteEvent 方法的第一个参数定义相关事件的 ID。Run 方法实现一个无限循环，该循环每隔 10 秒调用 **SampleEventSourceWriter** 类中实现的每个日志记录方法。\n\n        using System;\n        using System.Diagnostics;\n        using System.Diagnostics.Tracing;\n        using System.Threading;\n\n        namespace WadExampleVM\n        {\n        sealed class SampleEventSourceWriter : EventSource\n        {\n            public static SampleEventSourceWriter Log = new SampleEventSourceWriter();\n            public void SendEnums(MyColor color, MyFlags flags) { if (IsEnabled())  WriteEvent(1, (int)color, (int)flags); }// Cast enums to int for efficient logging.\n            public void MessageMethod(string Message) { if (IsEnabled())  WriteEvent(2, Message); }\n            public void SetOther(bool flag, int myInt) { if (IsEnabled())  WriteEvent(3, flag, myInt); }\n            public void HighFreq(int value) { if (IsEnabled()) WriteEvent(4, value); }\n\n        }\n\n        enum MyColor\n        {\n            Red,\n            Blue,\n            Green\n        }\n\n        [Flags]\n        enum MyFlags\n        {\n            Flag1 = 1,\n            Flag2 = 2,\n            Flag3 = 4\n        }\n\n        class Program\n        {\n        static void Main(string[] args)\n        {\n            Trace.TraceInformation(\"My application entry point called\");\n            \n            int value = 0;\n\n            while (true)\n            {\n                Thread.Sleep(10000);\n                Trace.TraceInformation(\"Working\");\n\n                // Emit several events every time we go through the loop\n                for (int i = 0; i < 6; i++)\n                {\n                    SampleEventSourceWriter.Log.SendEnums(MyColor.Blue, MyFlags.Flag2 | MyFlags.Flag3);\n                }\n\n                for (int i = 0; i < 3; i++)\n                {\n                    SampleEventSourceWriter.Log.MessageMethod(\"This is a message.\");\n                    SampleEventSourceWriter.Log.SetOther(true, 123456789);\n                }\n\n                if (value == int.MaxValue) value = 0;\n                SampleEventSourceWriter.Log.HighFreq(value++);\n            }\n\n        }\n        }\n        }\n\n\n4.  保存该文件，然后从“生成”菜单中选择“生成解决方案”以生成代码。\n\n\n### 步骤 3：部署应用程序\n1.  在“解决方案资源管理器”中右键单击“WadExampleVM”项目，然后选择“在文件资源管理器中打开文件夹”。\n2.  导航到 *bin/Debug* 文件夹，并复制所有文件 (WadExampleVM.*)\n3.  在“服务器资源管理器”中，右键单击虚拟机并选择“使用远程桌面连接”。\n4.  连接到 VM 后，创建名为 WadExampleVM 的文件夹，并将应用程序文件粘贴到该文件夹中。\n5.  启动应用程序 WadExampleVM.exe。你应会看到一个空白控制台窗口。\n\n### 步骤 4：创建 Diagnostics 配置并安装扩展\n1.  通过执行以下 PowerShell 命令，将公共配置文件架构定义下载到开发计算机：\n\n        (Get-AzureServiceAvailableExtension -ExtensionName 'PaaSDiagnostics' -ProviderNamespace 'Microsoft.Azure.Diagnostics').PublicConfigurationSchema | Out-File -Encoding utf8 -FilePath 'WadConfig.xsd' \n\n2.  在 Visual Studio 中打开一个新的 XML 文件：可以在已打开的项目中，或者在未打开项目的 Visual Studio 实例中执行此操作。在 Visual Studio 中，选择“添加”->“新建项...”->“Visual C# 项”->“数据”->“XML 文件”。将该文件命名为“WadExample.xml”\n3.  将 WadConfig.xsd 与配置文件相关联。确保 WadExample.xml 编辑器窗口是活动的窗口。按 **F4** 打开“属性”窗口。在“属性”窗口中单击“架构”属性。在“架构”属性中单击“...”。单击“添加...”按钮并导航到 XSD 文件的保存位置，然后选择文件 WadConfig.xsd。单击“确定”。\n4.  将 WadExample.xml 配置文件的内容替换为以下 XML 并保存该文件。此配置文件定义两个要收集的性能计数器：一个对应于 CPU 使用率，另一个对应于内存使用率。配置将定义对应于 SampleEventSourceWriter 类中方法的四个事件。\n\n    \n        <?xml version=\"1.0\" encoding=\"utf-8\"?>\n        <PublicConfig xmlns=\"http://schemas.microsoft.com/ServiceHosting/2010/10/DiagnosticsConfiguration\">\n            <WadCfg>\n                <DiagnosticMonitorConfiguration overallQuotaInMB=\"25000\">\n                <PerformanceCounters scheduledTransferPeriod=\"PT1M\">\n                    <PerformanceCounterConfiguration counterSpecifier=\"\\Processor(_Total)\\% Processor Time\" sampleRate=\"PT1M\" unit=\"percent\" />\n                    <PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\Committed Bytes\" sampleRate=\"PT1M\" unit=\"bytes\"/>\n                    </PerformanceCounters>\n                    <EtwProviders>\n                        <EtwEventSourceProviderConfiguration provider=\"SampleEventSourceWriter\" scheduledTransferPeriod=\"PT5M\">\n                            <Event id=\"1\" eventDestination=\"EnumsTable\"/>\n                            <Event id=\"2\" eventDestination=\"MessageTable\"/>\n                            <Event id=\"3\" eventDestination=\"SetOtherTable\"/>\n                            <Event id=\"4\" eventDestination=\"HighFreqTable\"/>\n                            <DefaultEvents eventDestination=\"DefaultTable\" />\n                        </EtwEventSourceProviderConfiguration>\n                    </EtwProviders>\n                </DiagnosticMonitorConfiguration>\n            </WadCfg>\n        </PublicConfig>\n    \n\n### 步骤 5：将 Diagnostics 远程安装到 Azure 虚拟机上\n用于在 VM 上管理 Diagnostics 的 PowerShell cmdlet 为：Set-AzureVMDiagnosticsExtension、Get-AzureVMDiagnosticsExtension 和 Remove-AzureVMDiagnosticsExtension。\n\n1.  在开发人员计算机上，打开 Azure PowerShell。\n2.  执行脚本以在 VM 上远程安装 Diagnostics（将 *StorageAccountKey* 替换为 wadexamplevm 存储帐户的存储帐户密钥）：\n\n        $storage_name = \"wadexamplevm\"\n        $key = \"<StorageAccountKey>\"\n        $config_path=\"c:\\users<user>\\documents\\visual studio 2013\\Projects\\WadExampleVM\\WadExampleVM\\WadExample.xml\"\n        $service_name=\"wadexamplevm\"\n        $vm_name=\"WadExample\"\n        $storageContext = New-AzureStorageContext -Environment AzureChinaCloud -StorageAccountName $storage_name -StorageAccountKey $key \n        $VM1 = Get-AzureVM -ServiceName $service_name -Name $vm_name\n        $VM2 = Set-AzureVMDiagnosticsExtension -DiagnosticsConfigurationPath $config_path -Version \"1.*\" -VM $VM1 -StorageContext $storageContext\n        $VM3 = Update-AzureVM -ServiceName $service_name -Name $vm_name -VM $VM2.VM\n\n\n### 步骤 6：查看遥测数据\n在 Visual Studio **服务器资源管理器**中，导航到 wadexample 存储帐户。在 VM 大约运行 5 分钟后，你应该会看到表 **WADEnumsTable**、**WADHighFreqTable**、**WADMessageTable**、**WADPerformanceCountersTable** 和 **WADSetOtherTable**。双击其中一个表即可查看已收集的遥测数据。\n\n![CloudServices\\_diag\\_wadexamplevm\\_tables](./media/cloud-services-dotnet-diagnostics/WadExampleVMTables.png)\n\n## 配置文件架构\n\nDiagnostics 配置文件定义启动诊断监视器时用于初始化诊断配置设置的值。以下位置提供了一个示例配置文件以及有关其架构的详细文档：[Azure Diagnostics 1.2 配置架构][]。\n\n## 故障排除\n\n### Azure Diagnostics 不启动\nDiagnostics 由两个组件构成：来宾代理插件和监视代理。来宾代理插件的日志文件位于以下文件中：\n\n*%SystemDrive%\\\\ WindowsAzure\\\\Logs\\\\Plugins\\\\Microsoft.Azure.Diagnostics.PaaSDiagnostics<Diagnostics 版本>*\\\\CommandExecution.log\n\n该插件会返回以下错误代码：\n\n退出代码|说明\n---|---\n0|成功。\n-1|常规错误。\n-2|无法加载 rcf 文件。<p>这是一个内部错误，仅当在 VM 上不正确地手动调用了来宾代理插件启动器时才会发生该错误。\n-3|无法加载 Diagnostics 配置文件。<p><p>解决方案：这是配置文件未通过架构验证的结果。解决方案是提供符合架构的配置文件。\n-4|监视代理 Diagnostics 的另一个实例已在使用本地资源目录。<p><p>解决方案：为 **LocalResourceDirectory** 指定不同的值。\n-6|来宾代理插件启动器尝试使用无效的命令行启动 Diagnostics。<p><p>这是一个内部错误，仅当在 VM 上不正确地手动调用了来宾代理插件启动器时才会发生该错误。\n-10|Diagnostics 插件退出并返回未处理的异常。\n-11|来宾代理程序无法创建负责启动和监视监视代理的进程。<p><p>解决方案：验证是否有足够的系统资源用于启动新进程。<p>\n-101|调用 Diagnostics 插件时参数无效。<p><p>这是一个内部错误，仅当在 VM 上不正确地手动调用了来宾代理插件启动器时才会发生该错误。\n-102|插件进程将无法初始化自身。<p><p>解决方案：验证是否有足够的系统资源用于启动新进程。\n-103|插件进程将无法初始化自身。具体而言，它无法创建记录器对象。<p><p>解决方案：验证是否有足够的系统资源用于启动新进程。\n-104|无法加载来宾代理提供的 rcf 文件。<p><p>这是一个内部错误，仅当在 VM 上不正确地手动调用了来宾代理插件启动器时才会发生该错误。\n-105|Diagnostics 插件无法打开 Diagnostics 配置文件。<p><p>这是一个内部错误，仅当在 VM 上不正确地手动调用了 Diagnostics 插件时才会发生该错误。\n-106|无法读取 Diagnostics 配置文件。<p><p>解决方案：这是配置文件未通过架构验证的结果。因此，解决方案是提供符合架构的配置文件。可以在 VM 上的文件夹 *%SystemDrive%/WindowsAzure/Config* 中，找到提供给 Diagnostics 扩展的 XML。打开相应的 XML 文件并搜索 **Microsoft.Azure.Diagnostics**，然后搜索 **xmlCfg** 字段。数据采用 base64 编码，因此你需要[将其解码](http://www.bing.com/search?q=base64+decoder)，以查看 Diagnostics 加载的 XML。<p>\n-107|传递给监视代理的资源目录无效。<p><p>这是一个内部错误，仅当在 VM 上不正确地手动调用了监视代理时才会发生该错误。</p>\n-108 |无法将 Diagnostics 配置文件转换为监视代理配置文件。<p><p>这是一个内部错误，仅当使用无效的配置文件手动调用了 Diagnostics 插件时才会发生该错误。\n-110|常规 Diagnostics 配置错误。<p><p>这是一个内部错误，仅当使用无效的配置文件手动调用了 Diagnostics 插件时才会发生该错误。\n-111|无法启动监视代理。<p><p>解决方案：验证是否提供了足够的系统资源。\n-112|常规错误\n\n\n### 未将 Diagnostics 数据记录到存储中\n丢失事件数据的最常见原因是错误地定义了存储帐户信息。\n\n解决方案：更正 Diagnostics 配置文件，然后重新安装 Diagnostics。\n事件数据在上载到存储帐户之前，会存储在文件夹中。有关 **LocalResourceDirectory** 的详细信息，请参阅上文。\n\n如果在此文件夹中没有任何文件监视代理将无法启动。这通常是由于配置文件无效而导致的，应该已在 CommandExecution.log 中报告。如果监视代理已成功收集事件数据，你将会看到配置文件中为每个事件定义的 .tsf 文件。\n\n监视代理将在文件 MaEventTable.tsf 中记录它所遇到的任何错误。若要检查此文件的内容，请运行以下命令：\n\n        %SystemDrive%\\Packages\\Plugins\\Microsoft.Azure.Diagnostics.[IaaS | PaaS]Diagnostics\\1.3.0.0\\Monitor\\x64\\table2csv maeventtable.tsf\n\n该工具将生成一个名为 maeventtable.csv 的文件，你可以打开并检查日志，以确定失败的原因。\n\n\n## 常见问题\n下面是一些常见问题及其回答：\n\n**Q.** 如何将我的 Visual Studio 解决方案从 Azure Diagnostics 1.0 升级到 Azure Diagnostics 1.1？\n\n**A.** 将 Visual Studio 解决方案从 Diagnostics 1.0 升级到 Diagnostics 1.1（或更高版本）是一个手动过程： \n- 在 Visual Studio 解决方案中禁用 Diagnostics，以阻止随角色一起部署 Diagnostics 1.0 \n- 如果代码使用了跟踪侦听器，则你需要将代码修改为使用 .NET EventSource。Diagnostics 1.1 和更高版本不支持跟踪侦听器。 \n- 修改部署过程以安装 Diagnostics 1.1 扩展\n\n**Q.** 如果我已在角色或 VM 上安装了 Diagnostics 1.1 扩展，如何升级到 Diagnostics 1.2 或 1.3？\n\n**A.** 如果你在安装 Diagnostics 1.1 时指定了“Version ”1.*“”，则下一次重新启动角色或 VM 时，Diagnostics 会自动更新到与正则表达式 “1.*” 匹配的最新版本。如果你在安装 Diagnostics 1.1 时指定了“-Version ”1.1“”，可以通过重新执行 Set- cmdlet 并指定想要安装的版本，来更新到更高的版本。\n\n**Q.** 如何为表命名？\n\n**A.** 根据以下约定为表命名：\n\n        if (String.IsNullOrEmpty(eventDestination)) {\n            if (e == \"DefaultEvents\")\n                tableName = \"WADDefault\" + MD5(provider);\n            else\n                tableName = \"WADEvent\" + MD5(provider) + eventId;\n        }\n        else\n            tableName = \"WAD\" + eventDestination;\n\n下面是一个示例：\n\n        <EtwEventSourceProviderConfiguration provider=\"prov1\">\n          <Event id=\"1\" />\n          <Event id=\"2\" eventDestination=\"dest1\" />\n          <DefaultEvents />\n        </EtwEventSourceProviderConfiguration>\n        <EtwEventSourceProviderConfiguration provider=\"prov2\">\n          <DefaultEvents eventDestination=\"dest2\" />\n        </EtwEventSourceProviderConfiguration>\n\n这会生成 4 个表：\n\n事件|表名称\n---|---\nprovider=”prov1” &lt;Event id=”1” /&gt;|WADEvent+MD5(“prov1”)+”1”\nprovider=”prov1” &lt;Event id=”2” eventDestination=”dest1” /&gt;|WADdest1\nprovider=”prov1” &lt;DefaultEvents /&gt;|WADDefault+MD5(“prov1”)\nprovider=”prov2” &lt;DefaultEvents eventDestination=”dest2” /&gt;|WADdest2\n\n## 比较 Azure Diagnostics 版本\n\n下表比较了 Azure Diagnostics 版本 1.0 和 1.1/1.2/1.3 支持的功能：\n\n支持的角色类型|Diagnostics 1.0|Diagnostics 1.1/1.2/1.3\n---|---\nWeb 角色|是|是\n辅助角色|是|是\nIaaS|否|是\n\n配置和部署|Diagnostics 1.0|Diagnostics 1.1/1.2/1.3\n---|---|---\n与 Visual Studio 集成 - 集成在 Azure Web/辅助角色开发体验中。|是|否\nPowerShell 脚本 - 用于在角色上管理 Diagnostics 的安装和配置的脚本。|是|是\n\n数据源|默认集合|格式|说明|Diagnostics 1.0|Diagnostics 1.1/1.2|Diagnostics 1.3\n---|---|---|---|---|---|---\nSystem.Diagnostics.Trace 日志|是|表|记录从您的代码发送到跟踪侦听器的跟踪消息（必须将跟踪侦听器添加到 web.config 或 app.config 文件）。日志数据将以 scheduledTransferPeriod 指定的传输间隔传输到存储表 WADLogsTable。|是|否（使用 EventSource）|是\nIIS 日志|是|Blob|记录有关 IIS Web 应用的信息。日志数据将以 scheduledTransferPeriod 指定的传输间隔传输到您指定的容器。|是|是|是\nAzure Diagnostics基础结构日志|是|表|记录有关诊断基础结构、RemoteAccess 模块和 RemoteForwarder 模块的信息。日志数据将以 scheduledTransferPeriodtransfer 指定的间隔传输到存储表 WADDiagnosticInfrastructureLogsTable。|是|是|是\nIIS 失败请求日志|否|Blob|记录有关 IIS 站点或应用程序的失败请求的信息。还必须通过在 Web.config 文件中的 system.WebServer 下设置跟踪选项来启用。日志数据将以 scheduledTransferPeriod 指定的传输间隔传输到您指定的容器。|是|是|是\nWindows 事件日志|否|表|记录有关操作系统、应用程序或驱动程序运行状况的信息。必须显式指定性能计数器。添加性能计数器后，性能计数器数据将以 scheduledTransferPeriod 指定的传输间隔传输到存储表 WADPerformanceCountersTable。|是|是|是\n性能计数器|否|表|记录有关操作系统、应用程序或驱动程序运行状况的信息。必须显式指定性能计数器。添加性能计数器后，性能计数器数据将以 scheduledTransferPeriod 指定的传输间隔传输到存储表 WADPerformanceCountersTable。|是|是|是\n故障转储|否|Blob|记录有关系统崩溃时操作系统的状态的信息。小型故障转储将在本地收集。可以启用完全转储。日志数据将以 scheduledTransferPeriod 指定的传输间隔传输到您指定的容器。由于 ASP.NET 能够处理大多数异常，因此故障转储通常仅对辅助角色或 VM 有用。|是|是|是\n自定义错误日志|否|Blob|通过使用本地存储资源，可立即将自定义数据记录和传输到您指定的容器。|是|是|是\nEventSource|否|表|记录你的代码使用 .NET EventSource 类生成的事件。|否|是|是\n基于清单的 ETW|否|表|任何进程生成的 ETW 事件。|否|是|是\n\n\n## 其他资源\n\n- [有关开发 Azure 应用程序的问题排查最佳实践][]\n- [使用 Azure 诊断收集日志记录数据][]\n- [调试 Azure 应用程序][]\n- [为 Azure 云服务和虚拟机配置诊断][]\n\n  \n\n[Overview]: #overview\n[How to Enable Diagnostics in a Worker Role]: #worker-role\n[How to Enable Diagnostics in a Virtual Machine]: #virtual-machine\n[Sample Configuration File and Schema]: #configuration-file-schema\n[Troubleshooting]: #troubleshooting\n[Frequently Asked Questions]: #faq\n[比较 Azure Diagnostics 版本]: #comparing\n[Additional Resources]: #additional\n[EventSource 类]: http://msdn.microsoft.com/zh-cn/library/system.diagnostics.tracing.eventsource(v=vs.110).aspx\n  \n[为 Azure 云服务和虚拟机配置诊断]: http://msdn.microsoft.com/zh-cn/library/windowsazure/dn186185.aspx\n[调试 Azure 应用程序]: http://msdn.microsoft.com/zh-cn/library/windowsazure/ee405479.aspx\n[使用 Azure 诊断收集日志记录数据]: http://msdn.microsoft.com/zh-cn/library/windowsazure/gg433048.aspx\n[有关开发 Azure 应用程序的故障排除最佳实践]: http://msdn.microsoft.com/zh-cn/library/windowsazure/hh771389.aspx\n[有关开发 Azure 应用程序的问题排查最佳实践]: http://msdn.microsoft.com/zh-cn/library/windowsazure/hh771389.aspx\n[试用版]: /pricing/1rmb-trial\n[安装并配置 Azure PowerShell 0.8.7 或更高版本]: /documentation/articles/powershell-install-configure\n[Azure Diagnostics 1.2 配置架构]: http://msdn.microsoft.com/zh-cn/library/azure/dn782207.aspx\n[Set-AzureServiceDiagnosticsExtension]: http://msdn.microsoft.com/zh-cn/library/dn495270.aspx\n[Get-AzureServiceDiagnosticsExtension]: http://msdn.microsoft.com/zh-cn/library/dn495145.aspx\n[Remove-AzureServiceDiagnosticsExtension]: http://msdn.microsoft.com/zh-cn/library/dn495168.aspx\n\n<!---HONumber=74-->"
+}

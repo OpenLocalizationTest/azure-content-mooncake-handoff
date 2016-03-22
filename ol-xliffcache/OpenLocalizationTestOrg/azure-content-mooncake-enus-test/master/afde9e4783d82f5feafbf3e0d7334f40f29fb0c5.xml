@@ -1,0 +1,110 @@
+{
+  "nodes": [
+    {
+      "content": "轮询长时运行的操作",
+      "pos": [
+        28,
+        37
+      ]
+    },
+    {
+      "content": "本主题展示了如何轮询长时运行的操作。",
+      "pos": [
+        57,
+        75
+      ]
+    },
+    {
+      "content": "使用 Azure 媒体服务传送实时流",
+      "pos": [
+        296,
+        314
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        318,
+        320
+      ]
+    },
+    {
+      "content": "Azure 媒体服务提供了相应的 API 用来请求媒体服务启动操作（例如创建、启动、停止或删除频道）。这些操作是长时运行的。",
+      "pos": [
+        322,
+        384
+      ]
+    },
+    {
+      "pos": [
+        386,
+        690
+      ],
+      "content": "媒体服务 .NET SDK 提供了用来发送请求并等待操作完成的 API（在内部，这些 API 以特定的时间间隔轮询操作进度）。例如，当调用 channel.Start() 时，该方法将在频道启动后返回。你还可以使用异步版本：await channel.StartAsync()（有关基于任务的异步模式的信息，请参阅 <bpt id=\"p1\">[</bpt>TAP<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/hh873175(v=vs.110).aspx)</ept>)。发送操作请求并且在操作完成之前一直轮询操作状态的 API 称作“轮询方法”。建议为富客户端应用程序和/或有状态服务使用这些方法（特别是异步版本）。"
+    },
+    {
+      "content": "某些情况下，应用程序不能等待长时运行的 http 请求并且希望手动轮询操作进度。一个典型的示例是与无状态 web 服务进行交互的浏览器：当浏览器请求创建频道时，web 服务会启动一个长时运行的操作并将操作 ID 返回到浏览器。然后，浏览器可以根据该 ID 询问 web 服务来获取操作状态。媒体服务 .NET SDK 提供了非常适用于此情况的 API。这些 API 称为“非轮询方法”。",
+      "pos": [
+        692,
+        885
+      ]
+    },
+    {
+      "content": "\"非轮询方法\"具有以下命名模式：Send<bpt id=\"p1\">*</bpt>OperationName<ept id=\"p1\">*</ept>Operation（例如，SendCreateOperation）。Send<bpt id=\"p2\">*</bpt>OperationName<ept id=\"p2\">*</ept>Operation 方法返回 <bpt id=\"p3\">**</bpt>IOperation<ept id=\"p3\">**</ept> 对象；返回的对象包含可以用来跟踪操作的信息。Send<bpt id=\"p4\">*</bpt>OperationName<ept id=\"p4\">*</ept>OperationAsync 方法将返回 <bpt id=\"p5\">**</bpt>Task<ph id=\"ph1\">&lt;IOperation&gt;</ph><ept id=\"p5\">**</ept>。",
+      "pos": [
+        886,
+        1087
+      ]
+    },
+    {
+      "pos": [
+        1089,
+        1151
+      ],
+      "content": "当前，以下类支持非轮询方法：<bpt id=\"p1\">**</bpt>Channel<ept id=\"p1\">**</ept>、<bpt id=\"p2\">**</bpt>StreamingEndpoint<ept id=\"p2\">**</ept> 和 <bpt id=\"p3\">**</bpt>Program<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "pos": [
+        1153,
+        1309
+      ],
+      "content": "若要轮询操作状态，请对 <bpt id=\"p1\">**</bpt>OperationBaseCollection<ept id=\"p1\">**</ept> 类使用 <bpt id=\"p2\">**</bpt>GetOperation<ept id=\"p2\">**</ept> 方法。使用以下时间间隔来检查操作状态：对于 <bpt id=\"p3\">**</bpt>Channel<ept id=\"p3\">**</ept> 和 <bpt id=\"p4\">**</bpt>StreamingEndpoint<ept id=\"p4\">**</ept> 操作，使用 30 秒；对于 <bpt id=\"p5\">**</bpt>Program<ept id=\"p5\">**</ept> 操作，使用 10 秒。"
+    },
+    {
+      "content": "示例",
+      "pos": [
+        1314,
+        1316
+      ]
+    },
+    {
+      "pos": [
+        1318,
+        1402
+      ],
+      "content": "以下示例定义了一个名为 <bpt id=\"p1\">**</bpt>ChannelOperations<ept id=\"p1\">**</ept> 的类。可以将该类定义用作你的 web 服务类定义的起点。为简单起见，以下示例使用了方法的非异步版本。"
+    },
+    {
+      "content": "示例还展示了客户端可以如何使用该类。",
+      "pos": [
+        1404,
+        1422
+      ]
+    },
+    {
+      "content": "ChannelOperations 类定义",
+      "pos": [
+        1427,
+        1448
+      ]
+    },
+    {
+      "content": "客户端代码",
+      "pos": [
+        6802,
+        6807
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"轮询长时运行的操作\" \n    description=\"本主题展示了如何轮询长时运行的操作。\" \n    services=\"media-services\" \n    documentationCenter=\"\" \n    authors=\"juliako\" \n    manager=\"dwrede\" \n    editor=\"\"/>\n\n<tags\n    ms.service=\"media-services\"\n    ms.date=\"02/03/2016\"  \n    wacn.date=\"03/17/2016\"/>\n\n\n#使用 Azure 媒体服务传送实时流\n\n##概述\n\nAzure 媒体服务提供了相应的 API 用来请求媒体服务启动操作（例如创建、启动、停止或删除频道）。这些操作是长时运行的。\n\n媒体服务 .NET SDK 提供了用来发送请求并等待操作完成的 API（在内部，这些 API 以特定的时间间隔轮询操作进度）。例如，当调用 channel.Start() 时，该方法将在频道启动后返回。你还可以使用异步版本：await channel.StartAsync()（有关基于任务的异步模式的信息，请参阅 [TAP](https://msdn.microsoft.com/zh-cn/library/hh873175(v=vs.110).aspx))。发送操作请求并且在操作完成之前一直轮询操作状态的 API 称作“轮询方法”。建议为富客户端应用程序和/或有状态服务使用这些方法（特别是异步版本）。\n\n某些情况下，应用程序不能等待长时运行的 http 请求并且希望手动轮询操作进度。一个典型的示例是与无状态 web 服务进行交互的浏览器：当浏览器请求创建频道时，web 服务会启动一个长时运行的操作并将操作 ID 返回到浏览器。然后，浏览器可以根据该 ID 询问 web 服务来获取操作状态。媒体服务 .NET SDK 提供了非常适用于此情况的 API。这些 API 称为“非轮询方法”。\n\"非轮询方法\"具有以下命名模式：Send*OperationName*Operation（例如，SendCreateOperation）。Send*OperationName*Operation 方法返回 **IOperation** 对象；返回的对象包含可以用来跟踪操作的信息。Send*OperationName*OperationAsync 方法将返回 **Task<IOperation>**。\n\n当前，以下类支持非轮询方法：**Channel**、**StreamingEndpoint** 和 **Program**。\n\n若要轮询操作状态，请对 **OperationBaseCollection** 类使用 **GetOperation** 方法。使用以下时间间隔来检查操作状态：对于 **Channel** 和 **StreamingEndpoint** 操作，使用 30 秒；对于 **Program** 操作，使用 10 秒。\n\n\n##示例\n\n以下示例定义了一个名为 **ChannelOperations** 的类。可以将该类定义用作你的 web 服务类定义的起点。为简单起见，以下示例使用了方法的非异步版本。\n\n示例还展示了客户端可以如何使用该类。\n\n###ChannelOperations 类定义\n\n    /// <summary> \n    /// The ChannelOperations class only implements \n    /// the Channel’s creation operation. \n    /// </summary> \n    public class ChannelOperations\n    {\n        // Read values from the App.config file.\n        private static readonly string _mediaServicesAccountName =\n            ConfigurationManager.AppSettings[\"MediaServicesAccountName\"];\n        private static readonly string _mediaServicesAccountKey =\n            ConfigurationManager.AppSettings[\"MediaServicesAccountKey\"];\n    \n        private static readonly String _defaultScope = \"urn:WindowsAzureMediaServices\";\n\n        // Azure China uses a different API server and a different ACS Base Address from the Global.\n        private static readonly String _chinaApiServerUrl = \"https://wamsshaclus001rest-hs.chinacloudapp.cn/API/\";\n        private static readonly String _chinaAcsBaseAddressUrl = \"https://wamsprodglobal001acs.accesscontrol.chinacloudapi.cn\";\n\n        // Field for service context.\n        private static CloudMediaContext _context = null;\n        private static MediaServicesCredentials _cachedCredentials = null;\n    \n        public ChannelOperations()\n        {\n                _cachedCredentials = new MediaServicesCredentials(_mediaServicesAccountName,\n                    _mediaServicesAccountKey, _defaultScope, _chinaAcsBaseAddressUrl);\n    \n                // Create the API server Uri\n                _apiServer = new Uri(_chinaApiServerUrl);\n\n                _context = new CloudMediaContext(_apiServer, _cachedCredentials);    }\n    \n        /// <summary>  \n        /// Initiates the creation of a new channel.  \n        /// </summary>  \n        /// <param name=\"channelName\">Name to be given to the new channel</param>  \n        /// <returns>  \n        /// Operation Id for the long running operation being executed by Media Services. \n        /// Use this operation Id to poll for the channel creation status. \n        /// </returns> \n        public string StartChannelCreation(string channelName)\n        {\n            var operation = _context.Channels.SendCreateOperation(\n                new ChannelCreationOptions\n                {\n                    Name = channelName,\n                    Input = CreateChannelInput(),\n                    Preview = CreateChannelPreview(),\n                    Output = CreateChannelOutput()\n                });\n    \n            return operation.Id;\n        }\n    \n        /// <summary> \n        /// Checks if the operation has been completed. \n        /// If the operation succeeded, the created channel Id is returned in the out parameter.\n        /// </summary> \n        /// <param name=\"operationId\">The operation Id.</param> \n        /// <param name=\"channel\">\n        /// If the operation succeeded, \n        /// the created channel Id is returned in the out parameter.</param>\n        /// <returns>Returns false if the operation is still in progress; otherwise, true.</returns> \n        public bool IsCompleted(string operationId, out string channelId)\n        {\n            IOperation operation = _context.Operations.GetOperation(operationId);\n            bool completed = false;\n    \n            channelId = null;\n    \n            switch (operation.State)\n            {\n                case OperationState.Failed:\n                    // Handle the failure. \n                    // For example, throw an exception. \n                    // Use the following information in the exception: operationId, operation.ErrorMessage.\n                    break;\n                case OperationState.Succeeded:\n                    completed = true;\n                    channelId = operation.TargetEntityId;\n                    break;\n                case OperationState.InProgress:\n                    completed = false;\n                    break;\n            }\n            return completed;\n        }\n    \n    \n        private static ChannelInput CreateChannelInput()\n        {\n            return new ChannelInput\n            {\n                StreamingProtocol = StreamingProtocol.RTMP,\n                AccessControl = new ChannelAccessControl\n                {\n                    IPAllowList = new List<IPRange>\n                    {\n                        new IPRange\n                        {\n                            Name = \"TestChannelInput001\",\n                            Address = IPAddress.Parse(\"0.0.0.0\"),\n                            SubnetPrefixLength = 0\n                        }\n                    }\n                }\n            };\n        }\n    \n        private static ChannelPreview CreateChannelPreview()\n        {\n            return new ChannelPreview\n            {\n                AccessControl = new ChannelAccessControl\n                {\n                    IPAllowList = new List<IPRange>\n                    {\n                        new IPRange\n                        {\n                            Name = \"TestChannelPreview001\",\n                            Address = IPAddress.Parse(\"0.0.0.0\"),\n                            SubnetPrefixLength = 0\n                        }\n                    }\n                }\n            };\n        }\n    \n        private static ChannelOutput CreateChannelOutput()\n        {\n            return new ChannelOutput\n            {\n                Hls = new ChannelOutputHls { FragmentsPerSegment = 1 }\n            };\n        }\n    }\n\n###客户端代码\n\n    ChannelOperations channelOperations = new ChannelOperations();\n    string opId = channelOperations.StartChannelCreation(\"MyChannel001\");\n    \n    string channelId = null;\n    bool isCompleted = false;\n    \n    while (isCompleted == false)\n    {\n        System.Threading.Thread.Sleep(TimeSpan.FromSeconds(30));\n        isCompleted = channelOperations.IsCompleted(opId, out channelId);\n    }\n    \n    // If we got here, we should have the newly created channel id.\n    Console.WriteLine(channelId);\n \n\n<!---HONumber=Mooncake_0307_2016-->"
+}

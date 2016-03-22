@@ -1,0 +1,985 @@
+{
+  "nodes": [
+    {
+      "content": "流分析入门：实时检测欺诈行为 | Azure",
+      "pos": [
+        27,
+        49
+      ]
+    },
+    {
+      "content": "了解如何通过流分析创建实时欺诈行为检测解决方案。使用事件中心进行实时事件处理。",
+      "pos": [
+        68,
+        107
+      ]
+    },
+    {
+      "content": "Azure 流分析入门：实时检测欺诈行为",
+      "pos": [
+        375,
+        395
+      ]
+    },
+    {
+      "content": "了解如何创建端到端解决方案，以便通过 Azure 流分析实时检测欺诈行为。将事件引入 Azure 事件中心、编写用于聚合或提醒的流分析查询，以及将结果发送到输出接收器，以便通过实时处理来分析数据。虽然介绍的是电信方面的实时异常检测，但作为示例的技术同样适用于其他类型的欺诈检测，例如盗窃信用卡或身份的情况。",
+      "pos": [
+        397,
+        550
+      ]
+    },
+    {
+      "pos": [
+        552,
+        680
+      ],
+      "content": "流分析是一种完全托管的服务，可以在云中通过流式数据进行低延迟、高度可用、可伸缩且复杂的事件处理。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 流分析简介<ept id=\"p1\">](/documentation/articles/stream-analytics-introduction)</ept>。"
+    },
+    {
+      "content": "方案：实时进行远程通信和 SIM 欺诈行为检测",
+      "pos": [
+        686,
+        709
+      ]
+    },
+    {
+      "content": "电信公司的传入呼叫数据量很大。电信公司需要从其数据中获取以下信息：",
+      "pos": [
+        711,
+        744
+      ]
+    },
+    {
+      "content": "将这些数据削减到一个可管理的数量，然后分析特定时间和特定地理区域客户的使用情况。",
+      "pos": [
+        747,
+        787
+      ]
+    },
+    {
+      "content": "实时检测 SIM 欺诈行为（在差不多同一时间出现多个同一身份发起的呼叫，但这些呼叫却位于不同的地理区域），以便快速进行应对，向客户发送通知或关闭相应的服务。",
+      "pos": [
+        790,
+        868
+      ]
+    },
+    {
+      "content": "在标准的物联网 (IoT) 方案中，会生成大量的遥测或传感器数据，客户需要对这些数据进行聚合分析，或者需要在出现异常情况时对其用户实时进行提醒。",
+      "pos": [
+        870,
+        942
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        947,
+        951
+      ]
+    },
+    {
+      "pos": [
+        953,
+        1100
+      ],
+      "content": "此方案需要利用位于 GitHub 上的事件生成器。可以在<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](https://github.com/Azure/azure-stream-analytics/tree/master/DataGenerators/TelcoGenerator)</ept>下载它，然后按照本教程中的步骤设置你的解决方案。"
+    },
+    {
+      "content": "创建 Azure 事件中心输入和使用者组",
+      "pos": [
+        1105,
+        1125
+      ]
+    },
+    {
+      "pos": [
+        1127,
+        1272
+      ],
+      "content": "示例应用程序将会生成事件并将其推送到进行实时处理的事件中心实例。为流分析引入事件时，Service Bus 事件中心是首选的方法。你可以在 <bpt id=\"p1\">[</bpt>Azure Service Bus 文档<ept id=\"p1\">](/documentation/services/service-bus/)</ept>中了解有关事件中心的更多信息。"
+    },
+    {
+      "content": "创建事件中心的步骤：",
+      "pos": [
+        1274,
+        1284
+      ]
+    },
+    {
+      "pos": [
+        1290,
+        1431
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">](https://manage.windowsazure.cn/)</ept>中单击<bpt id=\"p2\">**</bpt>“新建”<ept id=\"p2\">**</ept>&gt;<bpt id=\"p3\">**</bpt>“应用程序服务”<ept id=\"p3\">**</ept>&gt;<bpt id=\"p4\">**</bpt>“Service Bus”<ept id=\"p4\">**</ept>&gt;<bpt id=\"p5\">**</bpt>“事件中心”<ept id=\"p5\">**</ept>&gt;<bpt id=\"p6\">**</bpt>“快速创建”<ept id=\"p6\">**</ept>。提供创建新的事件中心所需的名称、区域以及新的或现有的命名空间。"
+    },
+    {
+      "pos": [
+        1438,
+        1623
+      ],
+      "content": "最佳做法是让每个流分析作业都从单个事件中心使用者组进行读取。我们将在下面向你详细介绍创建使用者组的过程，你可以<bpt id=\"p1\">[</bpt>了解有关使用者组的详细信息<ept id=\"p1\">](/documentation/articles/event-hubs-overview/)</ept>。若要创建使用者组，请导航到新创建的事件中心并单击<bpt id=\"p2\">**</bpt>“使用者组”<ept id=\"p2\">**</ept>选项卡，然后单击页面底部的<bpt id=\"p3\">**</bpt>“创建”<ept id=\"p3\">**</ept>，为使用者组提供一个名称。"
+    },
+    {
+      "pos": [
+        1628,
+        1672
+      ],
+      "content": "若要授予对事件中心的访问权限，需创建共享访问策略。单击事件中心的<bpt id=\"p1\">**</bpt>“配置”<ept id=\"p1\">**</ept>选项卡。"
+    },
+    {
+      "pos": [
+        1677,
+        1710
+      ],
+      "content": "在<bpt id=\"p1\">**</bpt>“共享访问策略”<ept id=\"p1\">**</ept>下，使用<bpt id=\"p2\">**</bpt>管理<ept id=\"p2\">**</ept>权限创建一个新策略。"
+    },
+    {
+      "content": "共享访问策略：你可以在其中使用管理权限创建策略。",
+      "pos": [
+        1718,
+        1742
+      ]
+    },
+    {
+      "content": "单击页面底部的“保存”。",
+      "pos": [
+        1832,
+        1844
+      ]
+    },
+    {
+      "pos": [
+        1849,
+        1892
+      ],
+      "content": "导航到<bpt id=\"p1\">**</bpt>“仪表板”<ept id=\"p1\">**</ept>，单击页面底部的<bpt id=\"p2\">**</bpt>“连接信息”<ept id=\"p2\">**</ept>，然后复制并保存连接信息。"
+    },
+    {
+      "content": "配置并启动事件生成器应用程序",
+      "pos": [
+        1897,
+        1911
+      ]
+    },
+    {
+      "content": "我们提供了一个客户端应用程序，该程序会生成示例性的传入呼叫元数据并将其推送到事件中心。按照以下步骤来设置此应用程序。",
+      "pos": [
+        1913,
+        1971
+      ]
+    },
+    {
+      "pos": [
+        1977,
+        2185
+      ],
+      "content": "从 <bpt id=\"p1\">[</bpt>https://github.com/Azure/azure-stream-analytics/tree/master/DataGenerators/TelcoGenerator<ept id=\"p1\">](https://github.com/Azure/azure-stream-analytics/tree/master/DataGenerators/TelcoGenerator)</ept> 下载 TelcoGenerator 解决方案。"
+    },
+    {
+      "content": "将 App.Config 中 Microsoft.ServiceBus.ConnectionString 和 EventHubName 的值替换为事件中心的连接字符串和名称。",
+      "pos": [
+        2190,
+        2277
+      ]
+    },
+    {
+      "content": "生成解决方案，以便触发下载操作来下载所需的 NuGet 包。",
+      "pos": [
+        2282,
+        2312
+      ]
+    },
+    {
+      "content": "启动应用程序。用法如下：",
+      "pos": [
+        2317,
+        2329
+      ]
+    },
+    {
+      "content": "以下示例将生成 1000 个事件，在为时 2 小时的过程中，有 20% 的可能性会出现欺诈行为。",
+      "pos": [
+        2417,
+        2465
+      ]
+    },
+    {
+      "content": "你会看到记录被发送到事件中心。将在此实时欺诈检测应用程序中使用的某些关键字段定义如下：",
+      "pos": [
+        2499,
+        2542
+      ]
+    },
+    {
+      "content": "记录",
+      "pos": [
+        2546,
+        2548
+      ]
+    },
+    {
+      "content": "定义",
+      "pos": [
+        2551,
+        2553
+      ]
+    },
+    {
+      "content": "CallrecTime",
+      "pos": [
+        2592,
+        2603
+      ]
+    },
+    {
+      "content": "调用开始时间的时间戳。",
+      "pos": [
+        2606,
+        2617
+      ]
+    },
+    {
+      "content": "SwitchNum",
+      "pos": [
+        2622,
+        2631
+      ]
+    },
+    {
+      "content": "用于连接呼叫的电话交换机。",
+      "pos": [
+        2634,
+        2647
+      ]
+    },
+    {
+      "content": "CallingNum",
+      "pos": [
+        2652,
+        2662
+      ]
+    },
+    {
+      "content": "呼叫方的电话号码。",
+      "pos": [
+        2665,
+        2674
+      ]
+    },
+    {
+      "content": "CallingIMSI",
+      "pos": [
+        2679,
+        2690
+      ]
+    },
+    {
+      "content": "国际移动用户标识 (IMSI)。呼叫方的唯一标识符。",
+      "pos": [
+        2693,
+        2719
+      ]
+    },
+    {
+      "content": "CalledNum",
+      "pos": [
+        2724,
+        2733
+      ]
+    },
+    {
+      "content": "呼叫接收人的电话号码。",
+      "pos": [
+        2736,
+        2747
+      ]
+    },
+    {
+      "content": "CalledIMSI",
+      "pos": [
+        2752,
+        2762
+      ]
+    },
+    {
+      "content": "国际移动用户标识 (IMSI)。呼叫接收人的唯一标识符。",
+      "pos": [
+        2765,
+        2793
+      ]
+    },
+    {
+      "content": "创建流分析作业",
+      "pos": [
+        2801,
+        2808
+      ]
+    },
+    {
+      "content": "现在，我们已获得远程通信事件流，因此可以设置一个流分析作业来实时分析这些事件。",
+      "pos": [
+        2809,
+        2848
+      ]
+    },
+    {
+      "content": "预配流分析作业",
+      "pos": [
+        2854,
+        2861
+      ]
+    },
+    {
+      "pos": [
+        2867,
+        2910
+      ],
+      "content": "在 Azure 门户中，单击<bpt id=\"p1\">**</bpt>“新建 &gt; 数据服务 &gt; 流分析 &gt; 快速创建”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        2915,
+        2939
+      ],
+      "content": "指定以下值，然后单击<bpt id=\"p1\">**</bpt>“创建流分析作业”<ept id=\"p1\">**</ept>："
+    },
+    {
+      "pos": [
+        2947,
+        2963
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>作业名称<ept id=\"p1\">**</ept>：输入作业名称。"
+    },
+    {
+      "pos": [
+        2971,
+        3040
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>区域<ept id=\"p1\">**</ept>：选择要在其中运行作业的区域。考虑将作业和事件中心放在同一区域，以确保获得更好的性能，并确保在不同区域之间传输数据时不需付费。"
+    },
+    {
+      "pos": [
+        3048,
+        3123
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>存储帐户<ept id=\"p1\">**</ept>：选择要使用的 Azure 存储帐户，以便为所有在此区域运行的流分析作业存储监视数据。你可以选择现有存储帐户，也可以创建新的存储帐户。"
+    },
+    {
+      "pos": [
+        3129,
+        3154
+      ],
+      "content": "单击左窗格中的<bpt id=\"p1\">**</bpt>“流分析”<ept id=\"p1\">**</ept>，列出流分析作业。"
+    },
+    {
+      "content": "流分析服务图标",
+      "pos": [
+        3162,
+        3169
+      ]
+    },
+    {
+      "pos": [
+        3248,
+        3318
+      ],
+      "content": "新作业在显示时的状态为<bpt id=\"p1\">**</bpt>“已创建”<ept id=\"p1\">**</ept>。请注意，页面底部的<bpt id=\"p2\">**</bpt>“启动”<ept id=\"p2\">**</ept>按钮已禁用。你必须先配置作业输入、输出和查询，然后才能启动作业。"
+    },
+    {
+      "content": "指定作业输入",
+      "pos": [
+        3324,
+        3330
+      ]
+    },
+    {
+      "pos": [
+        3335,
+        3403
+      ],
+      "content": "在流分析作业中，单击页面顶部的<bpt id=\"p1\">**</bpt>“输入”<ept id=\"p1\">**</ept>，然后单击<bpt id=\"p2\">**</bpt>“添加输入”<ept id=\"p2\">**</ept>。此时会打开一个对话框，引导你完成设置输入所需的一系列步骤。"
+    },
+    {
+      "pos": [
+        3408,
+        3430
+      ],
+      "content": "选择<bpt id=\"p1\">**</bpt>“数据流”<ept id=\"p1\">**</ept>，然后单击右侧的按钮。"
+    },
+    {
+      "pos": [
+        3435,
+        3458
+      ],
+      "content": "选择<bpt id=\"p1\">**</bpt>“事件中心”<ept id=\"p1\">**</ept>，然后单击右侧的按钮。"
+    },
+    {
+      "content": "在第三页中键入或选择以下值：",
+      "pos": [
+        3463,
+        3477
+      ]
+    },
+    {
+      "pos": [
+        3485,
+        3542
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>输入别名<ept id=\"p1\">**</ept>：输入此作业输入的友好名称，如 <bpt id=\"p2\">*</bpt>CallStream<ept id=\"p2\">*</ept>。请注意，你需要在后面的查询中使用此名称。"
+    },
+    {
+      "pos": [
+        3549,
+        3596
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>事件中心<ept id=\"p1\">**</ept>：如果你创建的事件中心与流分析作业属于同一订阅，请选择事件中心所在的命名空间。"
+    },
+    {
+      "pos": [
+        3602,
+        3726
+      ],
+      "content": "如果你的事件中心属于其他订阅，请选择<bpt id=\"p1\">**</bpt>“使用其他订阅的事件中心”<ept id=\"p1\">**</ept>，然后手动输入以下项目的相关信息：<bpt id=\"p2\">**</bpt>Service Bus 命名空间<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>事件中心名称<ept id=\"p3\">**</ept>、<bpt id=\"p4\">**</bpt>事件中心策略名称<ept id=\"p4\">**</ept>、<bpt id=\"p5\">**</bpt>事件中心策略密钥<ept id=\"p5\">**</ept>以及<bpt id=\"p6\">**</bpt>事件中心分区计数<ept id=\"p6\">**</ept>。"
+    },
+    {
+      "pos": [
+        3734,
+        3755
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>事件中心名称<ept id=\"p1\">**</ept>：选择事件中心的名称。"
+    },
+    {
+      "pos": [
+        3763,
+        3795
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>事件中心策略名称<ept id=\"p1\">**</ept>：选择此前在本教程中创建的事件中心策略。"
+    },
+    {
+      "pos": [
+        3803,
+        3833
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>事件中心使用者组<ept id=\"p1\">**</ept>：键入此前在本教程中创建的使用者组。"
+    },
+    {
+      "content": "单击右侧按钮。",
+      "pos": [
+        3838,
+        3845
+      ]
+    },
+    {
+      "content": "指定以下值：",
+      "pos": [
+        3850,
+        3856
+      ]
+    },
+    {
+      "pos": [
+        3864,
+        3882
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>事件序列化程序格式<ept id=\"p1\">**</ept>：JSON"
+    },
+    {
+      "pos": [
+        3889,
+        3900
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>编码<ept id=\"p1\">**</ept>：UTF8"
+    },
+    {
+      "content": "单击相应勾选按钮以添加此源，并确保流分析可以成功连接到事件中心。",
+      "pos": [
+        3905,
+        3937
+      ]
+    },
+    {
+      "content": "指定作业查询",
+      "pos": [
+        3943,
+        3949
+      ]
+    },
+    {
+      "pos": [
+        3951,
+        4101
+      ],
+      "content": "流分析支持简单的声明性查询模型，用于描述实时处理的转换。若要了解有关语言的详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 流分析查询语言参考<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/dn834998.aspx)</ept>。本教程将帮助你创作和测试多个可通过实时调用数据流完成的查询。"
+    },
+    {
+      "content": "可选：示例输入数据",
+      "pos": [
+        4108,
+        4117
+      ]
+    },
+    {
+      "pos": [
+        4118,
+        4314
+      ],
+      "content": "若要针对实际的作业数据来验证查询，可使用<bpt id=\"p1\">**</bpt>“示例数据”<ept id=\"p1\">**</ept>功能从流中提取事件，然后创建包含要测试事件的 .JSON 文件。以下步骤演示了如何执行此操作，我们还提供了一个用于测试的示例性 <bpt id=\"p2\">[</bpt>Telco.json<ept id=\"p2\">](https://github.com/Azure/azure-stream-analytics/blob/master/Sample%20Data/telco.json)</ept> 文件。"
+    },
+    {
+      "pos": [
+        4320,
+        4349
+      ],
+      "content": "选择事件中心输入，然后单击页面底部的<bpt id=\"p1\">**</bpt>“示例数据”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        4354,
+        4403
+      ],
+      "content": "在出现的对话框中，指定开始收集数据的<bpt id=\"p1\">**</bpt>“开始时间”<ept id=\"p1\">**</ept>，以及使用额外数据的<bpt id=\"p2\">**</bpt>“持续时间”<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "pos": [
+        4408,
+        4490
+      ],
+      "content": "单击相应的勾选按钮，开始对输入中的数据取样。生成数据文件可能需要一到两分钟。完成此过程以后，单击<bpt id=\"p1\">**</bpt>“详细信息”<ept id=\"p1\">**</ept>，然后即可下载和保存所生成的 .JSON 文件。"
+    },
+    {
+      "content": "在 JSON 文件中下载并保存已处理的数据",
+      "pos": [
+        4498,
+        4519
+      ]
+    },
+    {
+      "content": "传递查询",
+      "pos": [
+        4610,
+        4614
+      ]
+    },
+    {
+      "content": "如果你想要将每个事件存档，则可使用传递查询来读取事件或消息负载中的所有字段。开始时，可以进行简单的传递查询来投射事件中的所有字段。",
+      "pos": [
+        4616,
+        4681
+      ]
+    },
+    {
+      "pos": [
+        4687,
+        4707
+      ],
+      "content": "单击流分析作业页顶部的<bpt id=\"p1\">**</bpt>“查询”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "将以下内容添加到代码编辑器：",
+      "pos": [
+        4712,
+        4726
+      ]
+    },
+    {
+      "content": "请确保输入源的名称与你此前指定的输入的名称相匹配。",
+      "pos": [
+        4768,
+        4793
+      ]
+    },
+    {
+      "pos": [
+        4799,
+        4817
+      ],
+      "content": "单击查询编辑器下的<bpt id=\"p1\">**</bpt>“测试”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        4822,
+        4951
+      ],
+      "content": "提供测试文件，可以使用在前面的步骤中创建的文件，也可以使用 <bpt id=\"p1\">[</bpt>Telco.json<ept id=\"p1\">](https://github.com/Azure/azure-stream-analytics/blob/master/Sample%20Data/telco.json)</ept>。"
+    },
+    {
+      "content": "单击勾选按钮，然后就会看到结果显示在查询定义下方。",
+      "pos": [
+        4956,
+        4981
+      ]
+    },
+    {
+      "content": "查询定义结果",
+      "pos": [
+        4989,
+        4995
+      ]
+    },
+    {
+      "content": "列投影",
+      "pos": [
+        5079,
+        5082
+      ]
+    },
+    {
+      "content": "现在，我们需要将返回的字段缩减成较小的集合。",
+      "pos": [
+        5084,
+        5106
+      ]
+    },
+    {
+      "content": "在代码编辑器中将查询更改为：",
+      "pos": [
+        5112,
+        5126
+      ]
+    },
+    {
+      "pos": [
+        5231,
+        5258
+      ],
+      "content": "单击查询编辑器下的<bpt id=\"p1\">**</bpt>“重新运行”<ept id=\"p1\">**</ept>以查看查询结果。"
+    },
+    {
+      "content": "查询编辑器中的输出。",
+      "pos": [
+        5266,
+        5276
+      ]
+    },
+    {
+      "content": "按区域计算传入呼叫数：带聚合功能的翻转窗口",
+      "pos": [
+        5362,
+        5383
+      ]
+    },
+    {
+      "pos": [
+        5385,
+        5520
+      ],
+      "content": "为了比较每个区域的传入呼叫数，我们将利用 <bpt id=\"p1\">[</bpt>TumblingWindow<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/dn835055.aspx)</ept> 来获取每 5 秒钟就按 SwitchNum 进行分组的传入呼叫的计数。"
+    },
+    {
+      "content": "在代码编辑器中将查询更改为：",
+      "pos": [
+        5526,
+        5540
+      ]
+    },
+    {
+      "pos": [
+        5724,
+        5894
+      ],
+      "content": "此查询使用 <bpt id=\"p1\">**</bpt>Timestamp By<ept id=\"p1\">**</ept> 关键字在要用于临时计算的负载中指定时间戳字段。如果未指定此字段，将根据每个事件到达事件中心的时间执行开窗操作。请参阅<bpt id=\"p2\">[</bpt>流分析查询语言参考中的“到达时间与应用程序时间”<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/dn834998.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        5900,
+        5947
+      ],
+      "content": "请注意，你可以使用 <bpt id=\"p1\">**</bpt>System.Timestamp<ept id=\"p1\">**</ept> 属性访问每个窗口结束时的时间戳。"
+    },
+    {
+      "pos": [
+        5953,
+        5980
+      ],
+      "content": "单击查询编辑器下的<bpt id=\"p1\">**</bpt>“重新运行”<ept id=\"p1\">**</ept>以查看查询结果。"
+    },
+    {
+      "content": "Timestand By 的查询结果",
+      "pos": [
+        5988,
+        6006
+      ]
+    },
+    {
+      "content": "使用自联接进行 SIM 欺诈行为检测",
+      "pos": [
+        6092,
+        6110
+      ]
+    },
+    {
+      "pos": [
+        6112,
+        6262
+      ],
+      "content": "为了确定可能存在的欺诈性使用情况，我们需要查找从同一个用户发出但发出位置却位于不同的地区且间隔时间不到 5 秒钟的呼叫。我们会让呼叫事件流进行自我<bpt id=\"p1\">[</bpt>联接<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/dn835026.aspx)</ept>，看是否存在此类情况。"
+    },
+    {
+      "content": "在代码编辑器中将查询更改为：",
+      "pos": [
+        6268,
+        6282
+      ]
+    },
+    {
+      "pos": [
+        6715,
+        6742
+      ],
+      "content": "单击查询编辑器下的<bpt id=\"p1\">**</bpt>“重新运行”<ept id=\"p1\">**</ept>以查看查询结果。"
+    },
+    {
+      "content": "联接的查询结果",
+      "pos": [
+        6750,
+        6757
+      ]
+    },
+    {
+      "content": "创建输出接收器",
+      "pos": [
+        6842,
+        6849
+      ]
+    },
+    {
+      "content": "现在，我们已经定义了事件流、用于引入事件的事件中心输入，以及用于通过流执行转换的查询，最后一步是为作业定义输出接收器。我们会针对欺诈行为将事件写入 Blob 存储。",
+      "pos": [
+        6851,
+        6933
+      ]
+    },
+    {
+      "content": "按照下面的步骤为 Blob 存储创建容器（如果还没有）。",
+      "pos": [
+        6935,
+        6963
+      ]
+    },
+    {
+      "pos": [
+        6969,
+        7032
+      ],
+      "content": "使用现有存储帐户，或者通过单击<bpt id=\"p1\">**</bpt>“新建 &gt; 数据服务 &gt; 存储 &gt; 快速创建”<ept id=\"p1\">**</ept>并遵循相关说明进行操作来创建新的存储帐户。"
+    },
+    {
+      "pos": [
+        7037,
+        7073
+      ],
+      "content": "选择存储帐户，单击页面顶部的<bpt id=\"p1\">**</bpt>“容器”<ept id=\"p1\">**</ept>，然后单击<bpt id=\"p2\">**</bpt>“添加”<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "pos": [
+        7078,
+        7119
+      ],
+      "content": "指定容器的<bpt id=\"p1\">**</bpt>“名称”<ept id=\"p1\">**</ept>，然后将其<bpt id=\"p2\">**</bpt>“访问权限”<ept id=\"p2\">**</ept>设置为“公共 Blob”。"
+    },
+    {
+      "content": "指定作业输出",
+      "pos": [
+        7124,
+        7130
+      ]
+    },
+    {
+      "pos": [
+        7136,
+        7204
+      ],
+      "content": "在流分析作业中，单击页面顶部的<bpt id=\"p1\">**</bpt>“输出”<ept id=\"p1\">**</ept>，然后单击<bpt id=\"p2\">**</bpt>“添加输出”<ept id=\"p2\">**</ept>。此时会打开一个对话框，引导你完成设置输出所需的一系列步骤。"
+    },
+    {
+      "pos": [
+        7209,
+        7235
+      ],
+      "content": "选择<bpt id=\"p1\">**</bpt>“Blob 存储”<ept id=\"p1\">**</ept>，然后单击右侧的按钮。"
+    },
+    {
+      "content": "在第三页中键入或选择以下值：",
+      "pos": [
+        7240,
+        7254
+      ]
+    },
+    {
+      "pos": [
+        7262,
+        7284
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>输出别名<ept id=\"p1\">**</ept>：输入此作业输出的友好名称。"
+    },
+    {
+      "pos": [
+        7291,
+        7427
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>订阅<ept id=\"p1\">**</ept>：如果你创建的 Blob 存储与流分析作业属于同一订阅，请选择<bpt id=\"p2\">**</bpt>“使用当前订阅中的存储帐户”<ept id=\"p2\">**</ept>。如果你的存储属于其他订阅，请选择<bpt id=\"p3\">**</bpt>“使用其他订阅中的存储帐户”<ept id=\"p3\">**</ept>，然后针对<bpt id=\"p4\">**</bpt>“存储帐户”<ept id=\"p4\">**</ept>、<bpt id=\"p5\">**</bpt>“存储帐户密钥”<ept id=\"p5\">**</ept>、<bpt id=\"p6\">**</bpt>“容器”<ept id=\"p6\">**</ept>手动输入相关信息。"
+    },
+    {
+      "pos": [
+        7434,
+        7453
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>存储帐户<ept id=\"p1\">**</ept>：选择存储帐户的名称。"
+    },
+    {
+      "pos": [
+        7460,
+        7475
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>容器<ept id=\"p1\">**</ept>：选择容器的名称。"
+    },
+    {
+      "pos": [
+        7482,
+        7514
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>文件名前缀<ept id=\"p1\">**</ept>：键入写入 blob 输出时要使用的文件前缀。"
+    },
+    {
+      "content": "单击右侧按钮。",
+      "pos": [
+        7520,
+        7527
+      ]
+    },
+    {
+      "content": "指定以下值：",
+      "pos": [
+        7532,
+        7538
+      ]
+    },
+    {
+      "pos": [
+        7546,
+        7564
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>事件序列化程序格式<ept id=\"p1\">**</ept>：JSON"
+    },
+    {
+      "pos": [
+        7571,
+        7582
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>编码<ept id=\"p1\">**</ept>：UTF8"
+    },
+    {
+      "content": "单击相应勾选按钮以添加此源，并确保流分析可以成功连接到存储帐户。",
+      "pos": [
+        7588,
+        7620
+      ]
+    },
+    {
+      "content": "启动要进行实时处理的作业",
+      "pos": [
+        7625,
+        7637
+      ]
+    },
+    {
+      "content": "由于作业输入、查询和输出均已指定，因此我们可以启动流分析作业来实时检测欺诈行为。",
+      "pos": [
+        7639,
+        7679
+      ]
+    },
+    {
+      "pos": [
+        7685,
+        7715
+      ],
+      "content": "在作业<bpt id=\"p1\">**</bpt>“仪表板”<ept id=\"p1\">**</ept>上，单击页面底部的<bpt id=\"p2\">**</bpt>“启动”<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "pos": [
+        7720,
+        7797
+      ],
+      "content": "在出现的对话框中，选择<bpt id=\"p1\">**</bpt>“作业开始时间”<ept id=\"p1\">**</ept>，然后单击对话框底部的勾选按钮。作业状态将更改为<bpt id=\"p2\">**</bpt>“正在启动”<ept id=\"p2\">**</ept>，然后很快会转变为<bpt id=\"p3\">**</bpt>“正在运行”<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "content": "查看欺诈检测输出",
+      "pos": [
+        7802,
+        7810
+      ]
+    },
+    {
+      "pos": [
+        7812,
+        7981
+      ],
+      "content": "在将欺诈性事件实时写入到输出中时，使用 <bpt id=\"p1\">[</bpt>Azure 存储资源管理器<ept id=\"p1\">](https://azurestorageexplorer.codeplex.com/)</ept>或 <bpt id=\"p2\">[</bpt>Azure 资源管理器<ept id=\"p2\">](http://www.cerebrata.com/products/azure-explorer/introduction)</ept>之类的工具查看这些事件。"
+    },
+    {
+      "content": "欺诈行为检测：实时查看欺诈性事件",
+      "pos": [
+        7985,
+        8001
+      ]
+    },
+    {
+      "content": "获取支持",
+      "pos": [
+        8098,
+        8102
+      ]
+    },
+    {
+      "pos": [
+        8103,
+        8213
+      ],
+      "content": "如需进一步的帮助，请尝试我们的 <bpt id=\"p1\">[</bpt>Azure 流分析论坛<ept id=\"p1\">](https://social.msdn.microsoft.com/Forums/zh-CN/home?forum=AzureStreamAnalytics)</ept>。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        8219,
+        8223
+      ]
+    },
+    {
+      "content": "Azure 流分析简介",
+      "pos": [
+        8228,
+        8239
+      ]
+    },
+    {
+      "content": "Azure 流分析入门",
+      "pos": [
+        8299,
+        8310
+      ]
+    },
+    {
+      "content": "缩放 Azure 流分析作业",
+      "pos": [
+        8369,
+        8383
+      ]
+    },
+    {
+      "content": "Azure 流分析查询语言参考",
+      "pos": [
+        8441,
+        8456
+      ]
+    },
+    {
+      "content": "Azure 流分析管理 REST API 参考",
+      "pos": [
+        8523,
+        8546
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"流分析入门：实时检测欺诈行为 | Azure\"\n    description=\"了解如何通过流分析创建实时欺诈行为检测解决方案。使用事件中心进行实时事件处理。\"\n    keywords=\"异常检测,欺诈检测,实时异常检测\"\n    services=\"stream-analytics\"\n    documentationCenter=\"\"\n    authors=\"jeffstokes72\"\n    manager=\"paulettm\"\n    editor=\"cgronlun\" />\n\n<tags\n    ms.service=\"stream-analytics\"\n    ms.date=\"12/04/2015\"\n    wacn.date=\"01/29/2016\"/>\n\n\n\n# Azure 流分析入门：实时检测欺诈行为\n\n了解如何创建端到端解决方案，以便通过 Azure 流分析实时检测欺诈行为。将事件引入 Azure 事件中心、编写用于聚合或提醒的流分析查询，以及将结果发送到输出接收器，以便通过实时处理来分析数据。虽然介绍的是电信方面的实时异常检测，但作为示例的技术同样适用于其他类型的欺诈检测，例如盗窃信用卡或身份的情况。\n\n流分析是一种完全托管的服务，可以在云中通过流式数据进行低延迟、高度可用、可伸缩且复杂的事件处理。有关详细信息，请参阅 [Azure 流分析简介](/documentation/articles/stream-analytics-introduction)。\n\n\n## 方案：实时进行远程通信和 SIM 欺诈行为检测\n\n电信公司的传入呼叫数据量很大。电信公司需要从其数据中获取以下信息：\n* 将这些数据削减到一个可管理的数量，然后分析特定时间和特定地理区域客户的使用情况。\n* 实时检测 SIM 欺诈行为（在差不多同一时间出现多个同一身份发起的呼叫，但这些呼叫却位于不同的地理区域），以便快速进行应对，向客户发送通知或关闭相应的服务。\n\n在标准的物联网 (IoT) 方案中，会生成大量的遥测或传感器数据，客户需要对这些数据进行聚合分析，或者需要在出现异常情况时对其用户实时进行提醒。\n\n## 先决条件\n\n此方案需要利用位于 GitHub 上的事件生成器。可以在[此处](https://github.com/Azure/azure-stream-analytics/tree/master/DataGenerators/TelcoGenerator)下载它，然后按照本教程中的步骤设置你的解决方案。\n\n## 创建 Azure 事件中心输入和使用者组\n\n示例应用程序将会生成事件并将其推送到进行实时处理的事件中心实例。为流分析引入事件时，Service Bus 事件中心是首选的方法。你可以在 [Azure Service Bus 文档](/documentation/services/service-bus/)中了解有关事件中心的更多信息。\n\n创建事件中心的步骤：\n\n1.  在 [Azure 门户](https://manage.windowsazure.cn/)中单击**“新建”**>**“应用程序服务”**>**“Service Bus”**>**“事件中心”**>**“快速创建”**。提供创建新的事件中心所需的名称、区域以及新的或现有的命名空间。  \n2.  最佳做法是让每个流分析作业都从单个事件中心使用者组进行读取。我们将在下面向你详细介绍创建使用者组的过程，你可以[了解有关使用者组的详细信息](/documentation/articles/event-hubs-overview/)。若要创建使用者组，请导航到新创建的事件中心并单击**“使用者组”**选项卡，然后单击页面底部的**“创建”**，为使用者组提供一个名称。\n3.  若要授予对事件中心的访问权限，需创建共享访问策略。单击事件中心的**“配置”**选项卡。\n4.  在**“共享访问策略”**下，使用**管理**权限创建一个新策略。\n\n    ![共享访问策略：你可以在其中使用管理权限创建策略。](./media/stream-analytics-get-started/stream-ananlytics-shared-access-policies.png)\n\n5.  单击页面底部的“保存”。\n6.  导航到**“仪表板”**，单击页面底部的**“连接信息”**，然后复制并保存连接信息。\n\n## 配置并启动事件生成器应用程序\n\n我们提供了一个客户端应用程序，该程序会生成示例性的传入呼叫元数据并将其推送到事件中心。按照以下步骤来设置此应用程序。\n\n1.  从 [https://github.com/Azure/azure-stream-analytics/tree/master/DataGenerators/TelcoGenerator](https://github.com/Azure/azure-stream-analytics/tree/master/DataGenerators/TelcoGenerator) 下载 TelcoGenerator 解决方案。\n2.  将 App.Config 中 Microsoft.ServiceBus.ConnectionString 和 EventHubName 的值替换为事件中心的连接字符串和名称。\n3.  生成解决方案，以便触发下载操作来下载所需的 NuGet 包。\n4.  启动应用程序。用法如下：\n\n        telcodatagen [#NumCDRsPerHour] [SIM Card Fraud Probability] [#DurationHours]\n\n以下示例将生成 1000 个事件，在为时 2 小时的过程中，有 20% 的可能性会出现欺诈行为。\n\n    TelcoDataGen.exe 1000 .2 2\n\n你会看到记录被发送到事件中心。将在此实时欺诈检测应用程序中使用的某些关键字段定义如下：\n\n| 记录 | 定义 |\n| ------------- | ------------- |\n| CallrecTime | 调用开始时间的时间戳。 |\n| SwitchNum | 用于连接呼叫的电话交换机。 |\n| CallingNum | 呼叫方的电话号码。 |\n| CallingIMSI | 国际移动用户标识 (IMSI)。呼叫方的唯一标识符。 |\n| CalledNum | 呼叫接收人的电话号码。 |\n| CalledIMSI | 国际移动用户标识 (IMSI)。呼叫接收人的唯一标识符。 |\n\n\n## 创建流分析作业\n现在，我们已获得远程通信事件流，因此可以设置一个流分析作业来实时分析这些事件。\n\n### 预配流分析作业\n\n1.  在 Azure 门户中，单击**“新建 > 数据服务 > 流分析 > 快速创建”**。\n2.  指定以下值，然后单击**“创建流分析作业”**：\n\n    * **作业名称**：输入作业名称。\n\n    * **区域**：选择要在其中运行作业的区域。考虑将作业和事件中心放在同一区域，以确保获得更好的性能，并确保在不同区域之间传输数据时不需付费。\n\n    * **存储帐户**：选择要使用的 Azure 存储帐户，以便为所有在此区域运行的流分析作业存储监视数据。你可以选择现有存储帐户，也可以创建新的存储帐户。\n\n3.  单击左窗格中的**“流分析”**，列出流分析作业。\n\n    ![流分析服务图标](./media/stream-analytics-get-started/stream-analytics-service-icon.png)\n\n4.  新作业在显示时的状态为**“已创建”**。请注意，页面底部的**“启动”**按钮已禁用。你必须先配置作业输入、输出和查询，然后才能启动作业。\n\n### 指定作业输入\n1.  在流分析作业中，单击页面顶部的**“输入”**，然后单击**“添加输入”**。此时会打开一个对话框，引导你完成设置输入所需的一系列步骤。\n2.  选择**“数据流”**，然后单击右侧的按钮。\n3.  选择**“事件中心”**，然后单击右侧的按钮。\n4.  在第三页中键入或选择以下值：\n\n    * **输入别名**：输入此作业输入的友好名称，如 *CallStream*。请注意，你需要在后面的查询中使用此名称。\n    * **事件中心**：如果你创建的事件中心与流分析作业属于同一订阅，请选择事件中心所在的命名空间。\n\n    如果你的事件中心属于其他订阅，请选择**“使用其他订阅的事件中心”**，然后手动输入以下项目的相关信息：**Service Bus 命名空间**、**事件中心名称**、**事件中心策略名称**、**事件中心策略密钥**以及**事件中心分区计数**。\n\n    * **事件中心名称**：选择事件中心的名称。\n\n    * **事件中心策略名称**：选择此前在本教程中创建的事件中心策略。\n\n    * **事件中心使用者组**：键入此前在本教程中创建的使用者组。\n5.  单击右侧按钮。\n6.  指定以下值：\n\n    * **事件序列化程序格式**：JSON\n    * **编码**：UTF8\n7.  单击相应勾选按钮以添加此源，并确保流分析可以成功连接到事件中心。\n\n### 指定作业查询\n\n流分析支持简单的声明性查询模型，用于描述实时处理的转换。若要了解有关语言的详细信息，请参阅 [Azure 流分析查询语言参考](https://msdn.microsoft.com/zh-cn/library/dn834998.aspx)。本教程将帮助你创作和测试多个可通过实时调用数据流完成的查询。\n\n#### 可选：示例输入数据\n若要针对实际的作业数据来验证查询，可使用**“示例数据”**功能从流中提取事件，然后创建包含要测试事件的 .JSON 文件。以下步骤演示了如何执行此操作，我们还提供了一个用于测试的示例性 [Telco.json](https://github.com/Azure/azure-stream-analytics/blob/master/Sample%20Data/telco.json) 文件。\n\n1.  选择事件中心输入，然后单击页面底部的**“示例数据”**。\n2.  在出现的对话框中，指定开始收集数据的**“开始时间”**，以及使用额外数据的**“持续时间”**。\n3.  单击相应的勾选按钮，开始对输入中的数据取样。生成数据文件可能需要一到两分钟。完成此过程以后，单击**“详细信息”**，然后即可下载和保存所生成的 .JSON 文件。\n\n    ![在 JSON 文件中下载并保存已处理的数据](./media/stream-analytics-get-started/stream-analytics-download-save-json-file.png)\n\n#### 传递查询\n\n如果你想要将每个事件存档，则可使用传递查询来读取事件或消息负载中的所有字段。开始时，可以进行简单的传递查询来投射事件中的所有字段。\n\n1.  单击流分析作业页顶部的**“查询”**。\n2.  将以下内容添加到代码编辑器：\n\n        SELECT * FROM CallStream\n\n    > 请确保输入源的名称与你此前指定的输入的名称相匹配。\n\n3.  单击查询编辑器下的**“测试”**。\n4.  提供测试文件，可以使用在前面的步骤中创建的文件，也可以使用 [Telco.json](https://github.com/Azure/azure-stream-analytics/blob/master/Sample%20Data/telco.json)。\n5.  单击勾选按钮，然后就会看到结果显示在查询定义下方。\n\n    ![查询定义结果](./media/stream-analytics-get-started/stream-analytics-sim-fraud-output.png)\n\n\n### 列投影\n\n现在，我们需要将返回的字段缩减成较小的集合。\n\n1.  在代码编辑器中将查询更改为：\n\n        SELECT CallRecTime, SwitchNum, CallingIMSI, CallingNum, CalledNum\n        FROM CallStream\n\n2.  单击查询编辑器下的**“重新运行”**以查看查询结果。\n\n    ![查询编辑器中的输出。](./media/stream-analytics-get-started/stream-analytics-query-editor-output.png)\n\n### 按区域计算传入呼叫数：带聚合功能的翻转窗口\n\n为了比较每个区域的传入呼叫数，我们将利用 [TumblingWindow](https://msdn.microsoft.com/zh-cn/library/azure/dn835055.aspx) 来获取每 5 秒钟就按 SwitchNum 进行分组的传入呼叫的计数。\n\n1.  在代码编辑器中将查询更改为：\n\n        SELECT System.Timestamp as WindowEnd, SwitchNum, COUNT(*) as CallCount\n        FROM CallStream TIMESTAMP BY CallRecTime\n        GROUP BY TUMBLINGWINDOW(s, 5), SwitchNum\n\n    此查询使用 **Timestamp By** 关键字在要用于临时计算的负载中指定时间戳字段。如果未指定此字段，将根据每个事件到达事件中心的时间执行开窗操作。请参阅[流分析查询语言参考中的“到达时间与应用程序时间”](https://msdn.microsoft.com/zh-cn/library/azure/dn834998.aspx)。\n\n    请注意，你可以使用 **System.Timestamp** 属性访问每个窗口结束时的时间戳。\n\n2.  单击查询编辑器下的**“重新运行”**以查看查询结果。\n\n    ![Timestand By 的查询结果](./media/stream-analytics-get-started/stream-ananlytics-query-editor-rerun.png)\n\n### 使用自联接进行 SIM 欺诈行为检测\n\n为了确定可能存在的欺诈性使用情况，我们需要查找从同一个用户发出但发出位置却位于不同的地区且间隔时间不到 5 秒钟的呼叫。我们会让呼叫事件流进行自我[联接](https://msdn.microsoft.com/zh-cn/library/azure/dn835026.aspx)，看是否存在此类情况。\n\n1.  在代码编辑器中将查询更改为：\n\n        SELECT System.Timestamp as Time, CS1.CallingIMSI, CS1.CallingNum as CallingNum1,\n        CS2.CallingNum as CallingNum2, CS1.SwitchNum as Switch1, CS2.SwitchNum as Switch2\n        FROM CallStream CS1 TIMESTAMP BY CallRecTime\n        JOIN CallStream CS2 TIMESTAMP BY CallRecTime\n        ON CS1.CallingIMSI = CS2.CallingIMSI\n        AND DATEDIFF(ss, CS1, CS2) BETWEEN 1 AND 5\n        WHERE CS1.SwitchNum != CS2.SwitchNum\n\n2.  单击查询编辑器下的**“重新运行”**以查看查询结果。\n\n    ![联接的查询结果](./media/stream-analytics-get-started/stream-ananlytics-query-editor-join.png)\n\n### 创建输出接收器\n\n现在，我们已经定义了事件流、用于引入事件的事件中心输入，以及用于通过流执行转换的查询，最后一步是为作业定义输出接收器。我们会针对欺诈行为将事件写入 Blob 存储。\n\n按照下面的步骤为 Blob 存储创建容器（如果还没有）。\n\n1.  使用现有存储帐户，或者通过单击**“新建 > 数据服务 > 存储 > 快速创建”**并遵循相关说明进行操作来创建新的存储帐户。\n2.  选择存储帐户，单击页面顶部的**“容器”**，然后单击**“添加”**。\n3.  指定容器的**“名称”**，然后将其**“访问权限”**设置为“公共 Blob”。\n\n## 指定作业输出\n\n1.  在流分析作业中，单击页面顶部的**“输出”**，然后单击**“添加输出”**。此时会打开一个对话框，引导你完成设置输出所需的一系列步骤。\n2.  选择**“Blob 存储”**，然后单击右侧的按钮。\n3.  在第三页中键入或选择以下值：\n\n    * **输出别名**：输入此作业输出的友好名称。\n    * **订阅**：如果你创建的 Blob 存储与流分析作业属于同一订阅，请选择**“使用当前订阅中的存储帐户”**。如果你的存储属于其他订阅，请选择**“使用其他订阅中的存储帐户”**，然后针对**“存储帐户”**、**“存储帐户密钥”**、**“容器”**手动输入相关信息。\n    * **存储帐户**：选择存储帐户的名称。\n    * **容器**：选择容器的名称。\n    * **文件名前缀**：键入写入 blob 输出时要使用的文件前缀。\n\n4.  单击右侧按钮。\n5.  指定以下值：\n\n    * **事件序列化程序格式**：JSON\n    * **编码**：UTF8\n\n6.  单击相应勾选按钮以添加此源，并确保流分析可以成功连接到存储帐户。\n\n## 启动要进行实时处理的作业\n\n由于作业输入、查询和输出均已指定，因此我们可以启动流分析作业来实时检测欺诈行为。\n\n1.  在作业**“仪表板”**上，单击页面底部的**“启动”**。\n2.  在出现的对话框中，选择**“作业开始时间”**，然后单击对话框底部的勾选按钮。作业状态将更改为**“正在启动”**，然后很快会转变为**“正在运行”**。\n\n## 查看欺诈检测输出\n\n在将欺诈性事件实时写入到输出中时，使用 [Azure 存储资源管理器](https://azurestorageexplorer.codeplex.com/)或 [Azure 资源管理器](http://www.cerebrata.com/products/azure-explorer/introduction)之类的工具查看这些事件。\n\n![欺诈行为检测：实时查看欺诈性事件](./media/stream-analytics-get-started/stream-ananlytics-view-real-time-fraudent-events.png)\n\n## 获取支持\n如需进一步的帮助，请尝试我们的 [Azure 流分析论坛](https://social.msdn.microsoft.com/Forums/zh-CN/home?forum=AzureStreamAnalytics)。\n\n\n## 后续步骤\n\n- [Azure 流分析简介](/documentation/articles/stream-analytics-introduction)\n- [Azure 流分析入门](/documentation/articles/stream-analytics-get-started)\n- [缩放 Azure 流分析作业](/documentation/articles/stream-analytics-scale-jobs)\n- [Azure 流分析查询语言参考](https://msdn.microsoft.com/zh-cn/library/azure/dn834998.aspx)\n- [Azure 流分析管理 REST API 参考](https://msdn.microsoft.com/zh-cn/library/azure/dn835031.aspx)\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

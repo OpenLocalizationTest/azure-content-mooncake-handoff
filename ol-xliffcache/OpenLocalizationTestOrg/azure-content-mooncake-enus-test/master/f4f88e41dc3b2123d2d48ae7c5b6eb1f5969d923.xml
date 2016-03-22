@@ -1,0 +1,453 @@
+{
+  "nodes": [
+    {
+      "content": "在 Azure 中创建和上载 Linux VHD",
+      "pos": [
+        27,
+        51
+      ]
+    },
+    {
+      "content": "了解如何创建和上载包含 Linux 操作系统的 Azure 虚拟硬盘 (VHD)。",
+      "pos": [
+        70,
+        111
+      ]
+    },
+    {
+      "pos": [
+        393,
+        428
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"nonendorsed\"&gt;</ph> <ph id=\"ph2\">&lt;/a&gt;</ph>有关未认可分发的信息"
+    },
+    {
+      "pos": [
+        432,
+        515
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-both-include.md)</ept>]"
+    },
+    {
+      "pos": [
+        518,
+        691
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>重要提示<ept id=\"p1\">**</ept>：仅当使用某个<bpt id=\"p2\">[</bpt>认可的分发<ept id=\"p2\">](/documentation/articles/virtual-machines-linux-endorsed-distributions)</ept>时，Azure 平台 SLA 才适用于运行 Linux 操作系统的虚拟机。在 Azure 平台映像库中提供的所有 Linux 分发都是具有所需配置的认可的分发。"
+    },
+    {
+      "content": "Azure 上的 Linux - 认可的分发",
+      "pos": [
+        696,
+        718
+      ]
+    },
+    {
+      "content": "Azure 中对 Linux 映像的支持",
+      "pos": [
+        794,
+        814
+      ]
+    },
+    {
+      "content": "所有正在 Azure 上运行的分发都需要满足多个先决条件才能在平台上正常运行。本文并未涵盖所有信息，因为每个分发都是不同的；即使你满足以下所有条件，你也可能仍需显著调整你的 Linux 系统以确保其在平台上正常运行。",
+      "pos": [
+        859,
+        967
+      ]
+    },
+    {
+      "pos": [
+        969,
+        1133
+      ],
+      "content": "正是出于这个原因，建议你如果可能，从某个我们的 <bpt id=\"p1\">[</bpt>Azure 上的 Linux - 认可的分发<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-endorsed-distributions)</ept>开始操作。以下文章将指导你完成如何准备 Azure 上支持的各种认可的 Linux 分发："
+    },
+    {
+      "content": "基于 CentOS 的分发",
+      "pos": [
+        1140,
+        1153
+      ]
+    },
+    {
+      "content": "Oracle Linux",
+      "pos": [
+        1235,
+        1247
+      ]
+    },
+    {
+      "content": "SLES 和 openSUSE",
+      "pos": [
+        1329,
+        1344
+      ]
+    },
+    {
+      "content": "Ubuntu",
+      "pos": [
+        1424,
+        1430
+      ]
+    },
+    {
+      "content": "本文的其余部分将重点介绍有关在 Azure 上运行 Linux 分发的一般准则。",
+      "pos": [
+        1508,
+        1548
+      ]
+    },
+    {
+      "pos": [
+        1554,
+        1593
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"linuxinstall\"&gt;</ph> <ph id=\"ph2\">&lt;/a&gt;</ph>常规 Linux 安装说明"
+    },
+    {
+      "pos": [
+        1600,
+        1685
+      ],
+      "content": "Azure 不支持 VHDX 格式，仅支持<bpt id=\"p1\">**</bpt>固定大小的 VHD<ept id=\"p1\">**</ept>。可使用 Hyper-V 管理器或 convert-vhd cmdlet 将磁盘转换为 VHD 格式。"
+    },
+    {
+      "pos": [
+        1689,
+        1881
+      ],
+      "content": "在安装 Linux 系统时，建议使用标准分区而不是 LVM（通常是许多安装的默认值）。这将避免 LVM 与克隆 VM 发生名称冲突，特别是在 OS 磁盘需要连接到另一台 VM 以进行故障排除的情况下。如果首选，LVM 或 <bpt id=\"p1\">[</bpt>RAID<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-configure-raid)</ept> 可以在数据磁盘上使用。"
+    },
+    {
+      "content": "由于低于 2.6.37 的 Linux 内核版本中的 bug，更大的 VM 不支持 NUMA。此问题主要影响使用上游 Red Hat 2.6.32 内核的分发。手动安装的 Azure Linux 代理 (waagent) 将自动在 Linux 内核的 GRUB 配置中禁用 NUMA。",
+      "pos": [
+        1885,
+        2027
+      ]
+    },
+    {
+      "content": "不要在操作系统磁盘上配置交换分区。可以配置 Linux 代理，以在临时资源磁盘上创建交换文件。可以在下面的步骤中找到有关此内容的详细信息。",
+      "pos": [
+        2031,
+        2100
+      ]
+    },
+    {
+      "content": "所有 VHD 的大小必须是 1 MB 的倍数。",
+      "pos": [
+        2104,
+        2127
+      ]
+    },
+    {
+      "content": "安装不带 Hyper-V 的 Linux",
+      "pos": [
+        2134,
+        2154
+      ]
+    },
+    {
+      "pos": [
+        2160,
+        2395
+      ],
+      "content": "在某些情况下，Linux 安装程序可能无法在初始 ramdisk（initrd 或 initramfs）中包含 Hyper-V 驱动程序，除非它检测到它正在运行 Hyper-V 环境。使用不同虚拟化系统（即 Virtualbox、KVM 等）来准备 Linux 映像时，可能需要重新生成 initrd 以确保至少 <ph id=\"ph1\">`hv_vmbus`</ph> 和 <ph id=\"ph2\">`hv_storvsc`</ph> 内核模块可在初始 ramdisk 上使用。至少在基于上游 Red Hat 分发的系统上这是一个已知问题。"
+    },
+    {
+      "pos": [
+        2397,
+        2496
+      ],
+      "content": "重新生成 initrd 或 initramfs 映像的机制可能会因分发而有所不同。请查阅分发的文档或相应过程的支持。下面是有关如何使用 <ph id=\"ph1\">`mkinitrd`</ph> 实用工具重新生成 initrd 的示例："
+    },
+    {
+      "content": "首先，备份现有 initrd 映像：",
+      "pos": [
+        2498,
+        2516
+      ]
+    },
+    {
+      "pos": [
+        2597,
+        2646
+      ],
+      "content": "接下来，使用 <ph id=\"ph1\">`hv_vmbus`</ph> 和 <ph id=\"ph2\">`hv_storvsc`</ph> 内核模块重新生成 initrd："
+    },
+    {
+      "content": "调整 VHD 大小",
+      "pos": [
+        2753,
+        2762
+      ]
+    },
+    {
+      "pos": [
+        2768,
+        2875
+      ],
+      "content": "Azure 上的 VHD 映像必须已将虚拟大小调整为 1MB。通常情况下，使用 Hyper-V 创建的 VHD 应已正确调整。如果未正确调整 VHD，则在你尝试基于 VHD 创建<bpt id=\"p1\">*</bpt>映像<ept id=\"p1\">*</ept>时，可能会收到如下错误消息："
+    },
+    {
+      "pos": [
+        3060,
+        3240
+      ],
+      "content": "若要修正此问题，可使用 Hyper-V 管理器控制台或 <bpt id=\"p1\">[</bpt>Resize-VHD<ept id=\"p1\">](http://technet.microsoft.com/zh-cn/library/hh848535.aspx)</ept> Powershell cmdlet 调整 VM 大小。如果你未在 Windows 环境中运行，则建议使用 qemu-img 转换（如果需要）并调整 VHD 大小。"
+    },
+    {
+      "pos": [
+        3244,
+        3407
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>qemu-img 版本（&gt;=2.2.1）中有一个已知 bug，会导致 VHD 格式不正确。我们会在即将发布的 qemu-img 版本中解决此问题。现在建议使用 qemu-img 版本 2.2.0 或较低版本。参考：https://bugs.launchpad.net/qemu/+bug/1490611"
+    },
+    {
+      "pos": [
+        3414,
+        3557
+      ],
+      "content": "直接使用工具（如 <ph id=\"ph1\">`qemu-img`</ph> 或 <ph id=\"ph2\">`vbox-manage`</ph>）调整 VHD 大小可能会生成无法启动的 VHD。因此，建议先将 VHD 转换为 RAW 磁盘映像。如果已将 VM 映像创建为 RAW 磁盘映像（对于 KVM 等某些虚拟机监控程序，这是默认设置），则可以跳过此步骤："
+    },
+    {
+      "pos": [
+        3633,
+        3735
+      ],
+      "content": "计算磁盘映像所需的大小，以确保虚拟大小已调整为 1MB。以下 bash shell 脚本可以对此有帮助。此脚本使用“<ph id=\"ph1\">`qemu-img info`</ph>”来确定磁盘映像的虚拟大小，然后将大小计算到下个 1MB："
+    },
+    {
+      "content": "使用 $rounded\\_size 调整原始磁盘大小，如上述脚本所设置：",
+      "pos": [
+        4071,
+        4107
+      ]
+    },
+    {
+      "content": "现在，将 RAW 磁盘重新转换为固定大小 VHD：",
+      "pos": [
+        4168,
+        4193
+      ]
+    },
+    {
+      "content": "Linux 内核要求",
+      "pos": [
+        4289,
+        4299
+      ]
+    },
+    {
+      "pos": [
+        4304,
+        4560
+      ],
+      "content": "Hyper-V 和 Azure 的 Linux 集成服务 (LIS) 驱动程序会直接影响上游 Linux 内核。包括最新 Linux 内核版本（即 3.x）在内的许多分发已提供这些驱动程序，或以其他方式为其内核提供了这些驱动程序的向后移植版本。这些驱动程序会不断地在上游内核中使用新的修补程序和功能进行更新，因此，如果可能，请运行<bpt id=\"p1\">[</bpt>认可的分发<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-endorsed-distributions)</ept>以包含这些修补程序和更新。"
+    },
+    {
+      "pos": [
+        4562,
+        4813
+      ],
+      "content": "如果你正在运行 Red Hat Enterprise Linux 版本 <bpt id=\"p1\">**</bpt>6.0-6.3<ept id=\"p1\">**</ept> 的一个变体，则需要为 Hyper-V 安装最新的 LIS 驱动程序。可<bpt id=\"p2\">[</bpt>在此处<ept id=\"p2\">](http://www.microsoft.com/zh-cn/download/search.aspx?q=linux%20integration%20services)</ept>找到这些驱动程序。从 RHEL <bpt id=\"p3\">**</bpt>6.4+<ept id=\"p3\">**</ept>（和派生产品）开始，LIS 驱动程序已包含在内核中，因此，无需其他安装包即在 Azure 上运行这些系统。"
+    },
+    {
+      "pos": [
+        4815,
+        5095
+      ],
+      "content": "如果需要自定义内核，建议使用较新的内核版本（即 <bpt id=\"p1\">**</bpt>3.8+<ept id=\"p1\">**</ept>）。对于这些分发或维护自己的内核的供应商，将需要执行一些操作，以便定期将 LIS 驱动程序从上游内核向后移植到自定义内核。即使你已运行相对较新的内核版本，也强烈建议你跟踪 LIS 驱动程序中的任何上游修复，并根据需要向后移植这些修复。LIS 驱动程序源文件的位置可在 Linux 内核源树中的 <bpt id=\"p2\">[</bpt>MAINTAINER<ept id=\"p2\">](https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/MAINTAINERS)</ept> 文件中找到："
+    },
+    {
+      "content": "至少，缺少以下修补程序已知会在 Azure 上导致问题，因此必须在内核中包含这些修补程序。对于所有分发而言，此列表绝并非详尽或完整：",
+      "pos": [
+        5471,
+        5537
+      ]
+    },
+    {
+      "content": "ata\\_piix：默认情况下，将磁盘交由 Hyper-V 驱动程序处理",
+      "pos": [
+        5542,
+        5578
+      ]
+    },
+    {
+      "content": "storvsc：解释 RESET 路径中传输中的数据包",
+      "pos": [
+        5722,
+        5749
+      ]
+    },
+    {
+      "content": "storvsc：避免使用 WRITE\\_SAME",
+      "pos": [
+        5897,
+        5921
+      ]
+    },
+    {
+      "content": "storvsc：对 RAID 和虚拟主机适配器驱动程序禁用 WRITE SAME",
+      "pos": [
+        6070,
+        6110
+      ]
+    },
+    {
+      "content": "storvsc：NULL 指针取消引用修补程序",
+      "pos": [
+        6259,
+        6282
+      ]
+    },
+    {
+      "content": "storvsc：环形缓冲区故障可能会导致 I/O 冻结",
+      "pos": [
+        6431,
+        6458
+      ]
+    },
+    {
+      "content": "Azure Linux 代理",
+      "pos": [
+        6609,
+        6623
+      ]
+    },
+    {
+      "pos": [
+        6628,
+        6834
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Azure Linux 代理<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-agent-user-guide)</ept> (waagent) 是在 Azure 中正确设置 Linux 虚拟机所必需的。你可以在 <bpt id=\"p2\">[</bpt>Linux 代理 GitHub 存储库<ept id=\"p2\">](https://github.com/Azure/WALinuxAgent)</ept>中获取最新版本、文件问题或提交拉取请求。"
+    },
+    {
+      "content": "根据 Apache 2.0 许可证发布 Linux 代理。许多分发已为该代理提供 RPM 或 deb 包，因此，在某些情况下不费吹灰之力即可安装和更新该代理。",
+      "pos": [
+        6838,
+        6917
+      ]
+    },
+    {
+      "content": "Azure Linux 代理需要 Python v2.6 以上版本。",
+      "pos": [
+        6921,
+        6955
+      ]
+    },
+    {
+      "content": "该代理还需要 python-pyasn1 模块。大多数分发提供此模块作为可以安装的单独包。",
+      "pos": [
+        6959,
+        7004
+      ]
+    },
+    {
+      "content": "在某些情况下，Azure Linux 代理可能与 NetworkManager 不兼容。分发提供的许多 RPM/Deb 包会将 NetworkManager 配置为与 waagent 包冲突，因此当你安装 Linux 代理包时将卸载 NetworkManager。",
+      "pos": [
+        7008,
+        7140
+      ]
+    },
+    {
+      "content": "一般 Linux 系统要求",
+      "pos": [
+        7146,
+        7159
+      ]
+    },
+    {
+      "content": "修改 GRUB 或 GRUB2 中的内核引导行，以便包含以下参数。这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题：",
+      "pos": [
+        7166,
+        7245
+      ]
+    },
+    {
+      "content": "这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。",
+      "pos": [
+        7306,
+        7352
+      ]
+    },
+    {
+      "pos": [
+        7358,
+        7380
+      ],
+      "content": "除此之外，建议<bpt id=\"p1\">*</bpt>删除<ept id=\"p1\">*</ept>以下参数（如果存在）："
+    },
+    {
+      "content": "图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。",
+      "pos": [
+        7423,
+        7465
+      ]
+    },
+    {
+      "pos": [
+        7471,
+        7546
+      ],
+      "content": "根据需要可以配置 <ph id=\"ph1\">`crashkernel`</ph> 选项，但请注意此参数会使虚拟机中的可用内存量减少 128MB 或更多，这在较小的虚拟机上可能会出现问题。"
+    },
+    {
+      "content": "安装 Azure Linux 代理",
+      "pos": [
+        7550,
+        7567
+      ]
+    },
+    {
+      "pos": [
+        7573,
+        7769
+      ],
+      "content": "Azure Linux 代理是在 Azure 上设置 Linux 映像所必需的。许多分发将该代理提供为 RPM 或 Deb 包（该包通常称为“WALinuxAgent”或“walinuxagent”）。还可以按照 <bpt id=\"p1\">[</bpt>Linux 代理指南<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-agent-user-guide)</ept>中的步骤手动安装该代理。"
+    },
+    {
+      "content": "请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。",
+      "pos": [
+        7773,
+        7810
+      ]
+    },
+    {
+      "content": "不要在操作系统磁盘上创建交换空间",
+      "pos": [
+        7814,
+        7830
+      ]
+    },
+    {
+      "pos": [
+        7836,
+        7981
+      ],
+      "content": "Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是<bpt id=\"p1\">*</bpt>临时<ept id=\"p1\">*</ept>磁盘，并可能在取消设置虚拟机时被清空。在安装 Azure Linux 代理（请参见前一步骤）后，相应地在 /etc/waagent.conf 中修改以下参数："
+    },
+    {
+      "content": "在“/etc/sudoers”中，必须删除或注释掉以下行（如果存在）：",
+      "pos": [
+        8222,
+        8257
+      ]
+    },
+    {
+      "content": "最后一步，请运行以下命令以取消设置虚拟机：",
+      "pos": [
+        8317,
+        8338
+      ]
+    },
+    {
+      "content": "然后，需要关闭虚拟机并将 VHD 上载到 Azure。",
+      "pos": [
+        8431,
+        8458
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"在 Azure 中创建和上载 Linux VHD\"\n    description=\"了解如何创建和上载包含 Linux 操作系统的 Azure 虚拟硬盘 (VHD)。\"\n    services=\"virtual-machines\"\n    documentationCenter=\"\"\n    authors=\"szarkos\"\n    manager=\"timlt\"\n    editor=\"tysonn\"\n    tags=\"azure-resource-manager,azure-service-management\"/>\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"10/05/2015\"\n    wacn.date=\"12/17/2015\"/>\n\n# <a id=\"nonendorsed\"> </a>有关未认可分发的信息 #\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-both-include.md)]\n\n\n**重要提示**：仅当使用某个[认可的分发](/documentation/articles/virtual-machines-linux-endorsed-distributions)时，Azure 平台 SLA 才适用于运行 Linux 操作系统的虚拟机。在 Azure 平台映像库中提供的所有 Linux 分发都是具有所需配置的认可的分发。\n\n- [Azure 上的 Linux - 认可的分发](/documentation/articles/virtual-machines-linux-endorsed-distributions)\n- [Azure 中对 Linux 映像的支持](http://support2.microsoft.com/kb/2941892)\n\n所有正在 Azure 上运行的分发都需要满足多个先决条件才能在平台上正常运行。本文并未涵盖所有信息，因为每个分发都是不同的；即使你满足以下所有条件，你也可能仍需显著调整你的 Linux 系统以确保其在平台上正常运行。\n\n正是出于这个原因，建议你如果可能，从某个我们的 [Azure 上的 Linux - 认可的分发](/documentation/articles/virtual-machines-linux-endorsed-distributions)开始操作。以下文章将指导你完成如何准备 Azure 上支持的各种认可的 Linux 分发：\n\n- **[基于 CentOS 的分发](/documentation/articles/virtual-machines-linux-create-upload-vhd-centos)**\n- **[Oracle Linux](/documentation/articles/virtual-machines-linux-create-upload-vhd-oracle)**\n- **[SLES 和 openSUSE](/documentation/articles/virtual-machines-linux-create-upload-vhd-suse)**\n- **[Ubuntu](/documentation/articles/virtual-machines-linux-create-upload-vhd-ubuntu)**\n\n本文的其余部分将重点介绍有关在 Azure 上运行 Linux 分发的一般准则。\n\n\n## <a id=\"linuxinstall\"> </a>常规 Linux 安装说明 ##\n\n- Azure 不支持 VHDX 格式，仅支持**固定大小的 VHD**。可使用 Hyper-V 管理器或 convert-vhd cmdlet 将磁盘转换为 VHD 格式。\n\n- 在安装 Linux 系统时，建议使用标准分区而不是 LVM（通常是许多安装的默认值）。这将避免 LVM 与克隆 VM 发生名称冲突，特别是在 OS 磁盘需要连接到另一台 VM 以进行故障排除的情况下。如果首选，LVM 或 [RAID](/documentation/articles/virtual-machines-linux-configure-raid) 可以在数据磁盘上使用。\n\n- 由于低于 2.6.37 的 Linux 内核版本中的 bug，更大的 VM 不支持 NUMA。此问题主要影响使用上游 Red Hat 2.6.32 内核的分发。手动安装的 Azure Linux 代理 (waagent) 将自动在 Linux 内核的 GRUB 配置中禁用 NUMA。\n\n- 不要在操作系统磁盘上配置交换分区。可以配置 Linux 代理，以在临时资源磁盘上创建交换文件。可以在下面的步骤中找到有关此内容的详细信息。\n\n- 所有 VHD 的大小必须是 1 MB 的倍数。\n\n\n### 安装不带 Hyper-V 的 Linux ###\n\n在某些情况下，Linux 安装程序可能无法在初始 ramdisk（initrd 或 initramfs）中包含 Hyper-V 驱动程序，除非它检测到它正在运行 Hyper-V 环境。使用不同虚拟化系统（即 Virtualbox、KVM 等）来准备 Linux 映像时，可能需要重新生成 initrd 以确保至少 `hv_vmbus` 和 `hv_storvsc` 内核模块可在初始 ramdisk 上使用。至少在基于上游 Red Hat 分发的系统上这是一个已知问题。\n\n重新生成 initrd 或 initramfs 映像的机制可能会因分发而有所不同。请查阅分发的文档或相应过程的支持。下面是有关如何使用 `mkinitrd` 实用工具重新生成 initrd 的示例：\n\n首先，备份现有 initrd 映像：\n\n    # cd /boot\n    # sudo cp initrd-`uname -r`.img  initrd-`uname -r`.img.bak\n\n接下来，使用 `hv_vmbus` 和 `hv_storvsc` 内核模块重新生成 initrd：\n\n    # sudo mkinitrd --preload=hv_storvsc --preload=hv_vmbus -v -f initrd-`uname -r`.img `uname -r`\n\n\n### 调整 VHD 大小 ###\n\nAzure 上的 VHD 映像必须已将虚拟大小调整为 1MB。通常情况下，使用 Hyper-V 创建的 VHD 应已正确调整。如果未正确调整 VHD，则在你尝试基于 VHD 创建*映像*时，可能会收到如下错误消息：\n\n    \"The VHD http://<mystorageaccount>.blob.core.chinacloudapi.cn/vhds/MyLinuxVM.vhd has an unsupported virtual size of 21475270656 bytes. The size must be a whole number (in MBs).”\n\n若要修正此问题，可使用 Hyper-V 管理器控制台或 [Resize-VHD](http://technet.microsoft.com/zh-cn/library/hh848535.aspx) Powershell cmdlet 调整 VM 大小。如果你未在 Windows 环境中运行，则建议使用 qemu-img 转换（如果需要）并调整 VHD 大小。\n\n> [AZURE.NOTE]qemu-img 版本（>=2.2.1）中有一个已知 bug，会导致 VHD 格式不正确。我们会在即将发布的 qemu-img 版本中解决此问题。现在建议使用 qemu-img 版本 2.2.0 或较低版本。参考：https://bugs.launchpad.net/qemu/+bug/1490611\n\n\n 1. 直接使用工具（如 `qemu-img` 或 `vbox-manage`）调整 VHD 大小可能会生成无法启动的 VHD。因此，建议先将 VHD 转换为 RAW 磁盘映像。如果已将 VM 映像创建为 RAW 磁盘映像（对于 KVM 等某些虚拟机监控程序，这是默认设置），则可以跳过此步骤：\n\n        # qemu-img convert -f vpc -O raw MyLinuxVM.vhd MyLinuxVM.raw\n\n 2. 计算磁盘映像所需的大小，以确保虚拟大小已调整为 1MB。以下 bash shell 脚本可以对此有帮助。此脚本使用“`qemu-img info`”来确定磁盘映像的虚拟大小，然后将大小计算到下个 1MB：\n\n        rawdisk=\"MyLinuxVM.raw\"\n        vhddisk=\"MyLinuxVM.vhd\"\n\n        MB=$((1024*1024))\n        size=$(qemu-img info -f raw --output json \"$rawdisk\" | \\\n               gawk 'match($0, /\"virtual-size\": ([0-9]+),/, val) {print val[1]}')\n\n        rounded_size=$((($size/$MB + 1)*$MB))\n        echo \"Rounded Size = $rounded_size\"\n\n 3. 使用 $rounded\\_size 调整原始磁盘大小，如上述脚本所设置：\n\n        # qemu-img resize MyLinuxVM.raw $rounded_size\n\n 4. 现在，将 RAW 磁盘重新转换为固定大小 VHD：\n\n        # qemu-img convert -f raw -o subformat=fixed -O vpc MyLinuxVM.raw MyLinuxVM.vhd\n\n\n\n## Linux 内核要求 ##\n\nHyper-V 和 Azure 的 Linux 集成服务 (LIS) 驱动程序会直接影响上游 Linux 内核。包括最新 Linux 内核版本（即 3.x）在内的许多分发已提供这些驱动程序，或以其他方式为其内核提供了这些驱动程序的向后移植版本。这些驱动程序会不断地在上游内核中使用新的修补程序和功能进行更新，因此，如果可能，请运行[认可的分发](/documentation/articles/virtual-machines-linux-endorsed-distributions)以包含这些修补程序和更新。\n\n如果你正在运行 Red Hat Enterprise Linux 版本 **6.0-6.3** 的一个变体，则需要为 Hyper-V 安装最新的 LIS 驱动程序。可[在此处](http://www.microsoft.com/zh-cn/download/search.aspx?q=linux%20integration%20services)找到这些驱动程序。从 RHEL **6.4+**（和派生产品）开始，LIS 驱动程序已包含在内核中，因此，无需其他安装包即在 Azure 上运行这些系统。\n\n如果需要自定义内核，建议使用较新的内核版本（即 **3.8+**）。对于这些分发或维护自己的内核的供应商，将需要执行一些操作，以便定期将 LIS 驱动程序从上游内核向后移植到自定义内核。即使你已运行相对较新的内核版本，也强烈建议你跟踪 LIS 驱动程序中的任何上游修复，并根据需要向后移植这些修复。LIS 驱动程序源文件的位置可在 Linux 内核源树中的 [MAINTAINER](https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/MAINTAINERS) 文件中找到：\n\n    F:  arch/x86/include/asm/mshyperv.h\n    F:  arch/x86/include/uapi/asm/hyperv.h\n    F:  arch/x86/kernel/cpu/mshyperv.c\n    F:  drivers/hid/hid-hyperv.c\n    F:  drivers/hv/\n    F:  drivers/input/serio/hyperv-keyboard.c\n    F:  drivers/net/hyperv/\n    F:  drivers/scsi/storvsc_drv.c\n    F:  drivers/video/fbdev/hyperv_fb.c\n    F:  include/linux/hyperv.h\n    F:  tools/hv/\n\n至少，缺少以下修补程序已知会在 Azure 上导致问题，因此必须在内核中包含这些修补程序。对于所有分发而言，此列表绝并非详尽或完整：\n\n- [ata\\_piix：默认情况下，将磁盘交由 Hyper-V 驱动程序处理](https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/drivers/ata/ata_piix.c?id=cd006086fa5d91414d8ff9ff2b78fbb593878e3c)\n- [storvsc：解释 RESET 路径中传输中的数据包](https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/drivers/scsi/storvsc_drv.c?id=5c1b10ab7f93d24f29b5630286e323d1c5802d5c)\n- [storvsc：避免使用 WRITE\\_SAME](https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/commit/drivers/scsi/storvsc_drv.c?id=3e8f4f4065901c8dfc51407e1984495e1748c090)\n- [storvsc：对 RAID 和虚拟主机适配器驱动程序禁用 WRITE SAME](https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/commit/drivers/scsi/storvsc_drv.c?id=54b2b50c20a61b51199bedb6e5d2f8ec2568fb43)\n- [storvsc：NULL 指针取消引用修补程序](https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/commit/drivers/scsi/storvsc_drv.c?id=b12bb60d6c350b348a4e1460cd68f97ccae9822e)\n- [storvsc：环形缓冲区故障可能会导致 I/O 冻结](https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/commit/drivers/scsi/storvsc_drv.c?id=e86fb5e8ab95f10ec5f2e9430119d5d35020c951)\n\n\n## Azure Linux 代理 ##\n\n[Azure Linux 代理](/documentation/articles/virtual-machines-linux-agent-user-guide) (waagent) 是在 Azure 中正确设置 Linux 虚拟机所必需的。你可以在 [Linux 代理 GitHub 存储库](https://github.com/Azure/WALinuxAgent)中获取最新版本、文件问题或提交拉取请求。\n\n- 根据 Apache 2.0 许可证发布 Linux 代理。许多分发已为该代理提供 RPM 或 deb 包，因此，在某些情况下不费吹灰之力即可安装和更新该代理。\n\n- Azure Linux 代理需要 Python v2.6 以上版本。\n\n- 该代理还需要 python-pyasn1 模块。大多数分发提供此模块作为可以安装的单独包。\n\n- 在某些情况下，Azure Linux 代理可能与 NetworkManager 不兼容。分发提供的许多 RPM/Deb 包会将 NetworkManager 配置为与 waagent 包冲突，因此当你安装 Linux 代理包时将卸载 NetworkManager。\n\n\n## 一般 Linux 系统要求 ##\n\n- 修改 GRUB 或 GRUB2 中的内核引导行，以便包含以下参数。这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题：\n\n        console=ttyS0 earlyprintk=ttyS0 rootdelay=300\n\n    这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。\n\n    除此之外，建议*删除*以下参数（如果存在）：\n\n        rhgb quiet crashkernel=auto\n\n    图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。\n\n    根据需要可以配置 `crashkernel` 选项，但请注意此参数会使虚拟机中的可用内存量减少 128MB 或更多，这在较小的虚拟机上可能会出现问题。\n\n- 安装 Azure Linux 代理\n\n    Azure Linux 代理是在 Azure 上设置 Linux 映像所必需的。许多分发将该代理提供为 RPM 或 Deb 包（该包通常称为“WALinuxAgent”或“walinuxagent”）。还可以按照 [Linux 代理指南](/documentation/articles/virtual-machines-linux-agent-user-guide)中的步骤手动安装该代理。\n\n- 请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。\n\n- 不要在操作系统磁盘上创建交换空间\n\n    Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是*临时*磁盘，并可能在取消设置虚拟机时被清空。在安装 Azure Linux 代理（请参见前一步骤）后，相应地在 /etc/waagent.conf 中修改以下参数：\n\n        ResourceDisk.Format=y\n        ResourceDisk.Filesystem=ext4\n        ResourceDisk.MountPoint=/mnt/resource\n        ResourceDisk.EnableSwap=y\n        ResourceDisk.SwapSizeMB=2048    ## NOTE: set this to whatever you need it to be.\n\n- 在“/etc/sudoers”中，必须删除或注释掉以下行（如果存在）：\n\n        Defaults targetpw\n        ALL    ALL=(ALL) ALL\n\n- 最后一步，请运行以下命令以取消设置虚拟机：\n\n        # sudo waagent -force -deprovision\n        # export HISTSIZE=0\n        # logout\n\n- 然后，需要关闭虚拟机并将 VHD 上载到 Azure。\n\n<!---HONumber=Mooncake_1207_2015-->"
+}

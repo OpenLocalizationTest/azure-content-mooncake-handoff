@@ -1,0 +1,285 @@
+{
+  "nodes": [
+    {
+      "content": "为 AlwaysOn 可用性组配置 ILB 侦听器 | Azure",
+      "pos": [
+        28,
+        61
+      ]
+    },
+    {
+      "content": "本教程使用通过经典部署模型创建的资源，并使用内部负载平衡器 (ILB) 在 Azure 中创建 AlwaysOn 可用性组侦听器。",
+      "pos": [
+        80,
+        145
+      ]
+    },
+    {
+      "content": "在 Azure 中配置 AlwaysOn 可用性组的 ILB 侦听器",
+      "pos": [
+        411,
+        445
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        449,
+        465
+      ]
+    },
+    {
+      "content": "内部侦听器",
+      "pos": [
+        469,
+        474
+      ]
+    },
+    {
+      "content": "外部侦听器",
+      "pos": [
+        583,
+        588
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        701,
+        703
+      ]
+    },
+    {
+      "pos": [
+        705,
+        753
+      ],
+      "content": "本主题说明如何使用<bpt id=\"p1\">**</bpt>内部负载平衡器 (ILB)<ept id=\"p1\">**</ept> 为 AlwaysOn 可用性组配置侦听器。"
+    },
+    {
+      "pos": [
+        755,
+        849
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]资源管理器模型。"
+    },
+    {
+      "pos": [
+        853,
+        1061
+      ],
+      "content": "你的可用性组可以仅包含本地副本或 Azure 副本，也可以跨越本地和 Azure 以实现混合配置。Azure 副本可以位于同一区域，也可以跨越使用多个虚拟网络 (VNet) 的多个区域。以下步骤假设你已<bpt id=\"p1\">[</bpt>配置了一个可用性组<ept id=\"p1\">](/documentation/articles/virtual-machines-sql-server-alwayson-availability-groups-gui)</ept>但是没有配置侦听器。"
+    },
+    {
+      "content": "内部侦听器的准则和限制",
+      "pos": [
+        1066,
+        1077
+      ]
+    },
+    {
+      "content": "请注意有关 Azure 中使用 ILB 的可用性组侦听器的以下准则：",
+      "pos": [
+        1078,
+        1112
+      ]
+    },
+    {
+      "content": "Windows Server 2008 R2、Windows Server 2012 和 Windows Server 2012 R2 支持可用性组侦听器。",
+      "pos": [
+        1116,
+        1194
+      ]
+    },
+    {
+      "pos": [
+        1198,
+        1414
+      ],
+      "content": "每个云服务只支持一个内部可用性组侦听器，因为该侦听器将配置给 ILB，而每个云服务只有一个 ILB。但是，可以创建多个外部侦听器。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>在 Azure 中配置 AlwaysOn 可用性组的外部侦听器<ept id=\"p1\">](/documentation/articles/virtual-machines-sql-server-configure-public-alwayson-availability-group-listener)</ept>。"
+    },
+    {
+      "content": "不支持在你在其中也有使用云服务的公共 VIP 的外部侦听器的同一云服务中创建内部侦听器。",
+      "pos": [
+        1418,
+        1462
+      ]
+    },
+    {
+      "content": "确定侦听器的可访问性",
+      "pos": [
+        1467,
+        1477
+      ]
+    },
+    {
+      "pos": [
+        1593,
+        1782
+      ],
+      "content": "本文重点介绍如何创建使用<bpt id=\"p1\">**</bpt>内部负载平衡器 (ILB)<ept id=\"p1\">**</ept> 的侦听器。如果你需要一个公共/外部侦听器，请参阅本文的另一个版本，其中提供了有关设置<bpt id=\"p2\">[</bpt>外部侦听器<ept id=\"p2\">](/documentation/articles/virtual-machines-sql-server-configure-public-alwayson-availability-group-listener)</ept>的步骤"
+    },
+    {
+      "content": "创建支持直接服务器返回的负载平衡 VM 终结点",
+      "pos": [
+        1787,
+        1810
+      ]
+    },
+    {
+      "content": "对于 ILB，必须先创建内部负载平衡器。以下脚本将执行此操作。",
+      "pos": [
+        1812,
+        1843
+      ]
+    },
+    {
+      "pos": [
+        1960,
+        2010
+      ],
+      "content": "对于 <bpt id=\"p1\">**</bpt>ILB<ept id=\"p1\">**</ept>，应该分配一个静态 IP 地址。首先，通过运行以下命令检查当前 VNet 配置："
+    },
+    {
+      "pos": [
+        2063,
+        2124
+      ],
+      "content": "先记下包含副本所在虚拟机的子网的 <bpt id=\"p1\">**</bpt>Subnet<ept id=\"p1\">**</ept> 名称。脚本中的 <bpt id=\"p2\">**</bpt>$SubnetName<ept id=\"p2\">**</ept> 参数将要使用此值。"
+    },
+    {
+      "pos": [
+        2130,
+        2343
+      ],
+      "content": "然后，记下包含副本所在虚拟机的子网的 <bpt id=\"p1\">**</bpt>VirtualNetworkSite<ept id=\"p1\">**</ept> 名称和起始 <bpt id=\"p2\">**</bpt>AddressPrefix<ept id=\"p2\">**</ept>。再通过将这两个值传递给 <bpt id=\"p3\">**</bpt>Test-AzureStaticVNetIP<ept id=\"p3\">**</ept> 命令并检查 <bpt id=\"p4\">**</bpt>AvailableAddresses<ept id=\"p4\">**</ept> 来查找可用的 IP 地址。例如，如果 VNet 名为 <bpt id=\"p5\">*</bpt>MyVNet<ept id=\"p5\">*</ept>，并包含起始自 <bpt id=\"p6\">*</bpt>172.16.0.128<ept id=\"p6\">*</ept> 的子网地址范围，则以下命令将列出可用地址："
+    },
+    {
+      "pos": [
+        2444,
+        2485
+      ],
+      "content": "选择一个可用地址，并在以下脚本的 <bpt id=\"p1\">**</bpt>$ILBStaticIP<ept id=\"p1\">**</ept> 参数中使用它。"
+    },
+    {
+      "content": "将以下 PowerShell 脚本复制到文本编辑器中，并根据你的环境设置变量值（注意，这里为某些参数提供了默认值）。请注意，使用地缘组的现有部署不能添加 ILB。",
+      "pos": [
+        2491,
+        2572
+      ]
+    },
+    {
+      "content": "此外，如果可用性组跨 Azure 区域，则你必须在每个数据中心内对云服务和节点运行该脚本一次。",
+      "pos": [
+        2664,
+        2711
+      ]
+    },
+    {
+      "content": "设置变量后，将脚本从文本编辑器复制到 Azure PowerShell 会话中运行。如果提示符仍然显示 &gt;&gt;，请再次按 Enter，以确保脚本开始运行。注意：",
+      "pos": [
+        3934,
+        4013
+      ]
+    },
+    {
+      "pos": [
+        4016,
+        4139
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>Azure 管理门户目前不支持内部负载平衡器，因此你在门户中看不到 ILB 或终结点。但是，如果负载平衡器在某个内部 IP 地址上运行，则 <bpt id=\"p1\">**</bpt>Get-AzureEndpoint<ept id=\"p1\">**</ept> 将返回该地址。否则，将返回 null。"
+    },
+    {
+      "content": "如果需要，请验证是否已安装 KB2854082",
+      "pos": [
+        4144,
+        4167
+      ]
+    },
+    {
+      "content": "在可用性组节点中打开防火墙端口",
+      "pos": [
+        4256,
+        4271
+      ]
+    },
+    {
+      "pos": [
+        4273,
+        4353
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>防火墙<ept id=\"p1\">](../includes/virtual-machines-ag-listener-open-firewall.md)</ept>]"
+    },
+    {
+      "content": "创建可用性组侦听器",
+      "pos": [
+        4358,
+        4367
+      ]
+    },
+    {
+      "pos": [
+        4369,
+        4451
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>防火墙<ept id=\"p1\">](../includes/virtual-machines-ag-listener-create-listener.md)</ept>]"
+    },
+    {
+      "content": "对于 ILB，必须使用前面创建的内部负载平衡器 (ILB) 的 IP 地址。在 PowerShell 中使用以下脚本获取此 IP 地址。",
+      "pos": [
+        4457,
+        4525
+      ]
+    },
+    {
+      "content": "在某个 VM 上，将以下 PowerShell 脚本复制到文本编辑器中，将变量设置为之前记下的值。",
+      "pos": [
+        4733,
+        4782
+      ]
+    },
+    {
+      "content": "设置变量之后，打开提升的 Windows PowerShell 窗口，然后从文本编辑器复制脚本，并将其粘贴到 Azure PowerShell 会话中运行。如果提示符仍然显示 &gt;&gt;，请再次按 Enter，以确保脚本开始运行。",
+      "pos": [
+        5859,
+        5971
+      ]
+    },
+    {
+      "content": "在每个 VM 上重复此过程。此脚本将使用云服务的 IP 地址来配置 IP 地址资源，同时设置探测端口等其他参数。在 IP 地址资源联机后，它可以响应我们在本教程前面部分创建的负载平衡终结点在探测端口上的轮询。",
+      "pos": [
+        5977,
+        6081
+      ]
+    },
+    {
+      "content": "使侦听器联机",
+      "pos": [
+        6086,
+        6092
+      ]
+    },
+    {
+      "content": "后续操作项",
+      "pos": [
+        6196,
+        6201
+      ]
+    },
+    {
+      "content": "测试可用性组侦听器（在同一 VNet 中）",
+      "pos": [
+        6290,
+        6311
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        6411,
+        6415
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"为 AlwaysOn 可用性组配置 ILB 侦听器 | Azure\"\n    description=\"本教程使用通过经典部署模型创建的资源，并使用内部负载平衡器 (ILB) 在 Azure 中创建 AlwaysOn 可用性组侦听器。\"\n    services=\"virtual-machines\"\n    documentationCenter=\"na\"\n    authors=\"rothja\"\n    manager=\"jeffreyg\"\n    editor=\"monicar\" \n    tags=\"azure-service-management\"/>\n<tags \n    ms.service=\"virtual-machines\"\n    ms.date=\"11/06/2015\"\n    wacn.date=\"12/31/2015\" />\n\n# 在 Azure 中配置 AlwaysOn 可用性组的 ILB 侦听器\n\n> [AZURE.SELECTOR]\n- [内部侦听器](/documentation/articles/virtual-machines-sql-server-configure-ilb-alwayson-availability-group-listener)\n- [外部侦听器](/documentation/articles/virtual-machines-sql-server-configure-public-alwayson-availability-group-listener)\n\n## 概述\n\n本主题说明如何使用**内部负载平衡器 (ILB)** 为 AlwaysOn 可用性组配置侦听器。\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]资源管理器模型。\n \n\n你的可用性组可以仅包含本地副本或 Azure 副本，也可以跨越本地和 Azure 以实现混合配置。Azure 副本可以位于同一区域，也可以跨越使用多个虚拟网络 (VNet) 的多个区域。以下步骤假设你已[配置了一个可用性组](/documentation/articles/virtual-machines-sql-server-alwayson-availability-groups-gui)但是没有配置侦听器。\n\n## 内部侦听器的准则和限制\n请注意有关 Azure 中使用 ILB 的可用性组侦听器的以下准则：\n\n- Windows Server 2008 R2、Windows Server 2012 和 Windows Server 2012 R2 支持可用性组侦听器。\n\n- 每个云服务只支持一个内部可用性组侦听器，因为该侦听器将配置给 ILB，而每个云服务只有一个 ILB。但是，可以创建多个外部侦听器。有关详细信息，请参阅[在 Azure 中配置 AlwaysOn 可用性组的外部侦听器](/documentation/articles/virtual-machines-sql-server-configure-public-alwayson-availability-group-listener)。\n\n- 不支持在你在其中也有使用云服务的公共 VIP 的外部侦听器的同一云服务中创建内部侦听器。\n\n## 确定侦听器的可访问性\n\n[AZURE.INCLUDE [ag-listener-accessibility](../includes/virtual-machines-ag-listener-determine-accessibility.md)]\n\n本文重点介绍如何创建使用**内部负载平衡器 (ILB)** 的侦听器。如果你需要一个公共/外部侦听器，请参阅本文的另一个版本，其中提供了有关设置[外部侦听器](/documentation/articles/virtual-machines-sql-server-configure-public-alwayson-availability-group-listener)的步骤\n\n## 创建支持直接服务器返回的负载平衡 VM 终结点\n\n对于 ILB，必须先创建内部负载平衡器。以下脚本将执行此操作。\n\n[AZURE.INCLUDE [load-balanced-endpoints](../includes/virtual-machines-ag-listener-load-balanced-endpoints.md)]\n\n8. 对于 **ILB**，应该分配一个静态 IP 地址。首先，通过运行以下命令检查当前 VNet 配置：\n\n        (Get-AzureVNetConfig).XMLConfiguration\n\n9. 先记下包含副本所在虚拟机的子网的 **Subnet** 名称。脚本中的 **$SubnetName** 参数将要使用此值。\n\n10. 然后，记下包含副本所在虚拟机的子网的 **VirtualNetworkSite** 名称和起始 **AddressPrefix**。再通过将这两个值传递给 **Test-AzureStaticVNetIP** 命令并检查 **AvailableAddresses** 来查找可用的 IP 地址。例如，如果 VNet 名为 *MyVNet*，并包含起始自 *172.16.0.128* 的子网地址范围，则以下命令将列出可用地址：\n\n        (Test-AzureStaticVNetIP -VNetName \"MyVNet\"-IPAddress 172.16.0.128).AvailableAddresses\n\n11. 选择一个可用地址，并在以下脚本的 **$ILBStaticIP** 参数中使用它。\n\n12. 将以下 PowerShell 脚本复制到文本编辑器中，并根据你的环境设置变量值（注意，这里为某些参数提供了默认值）。请注意，使用地缘组的现有部署不能添加 ILB。<!--有关 ILB 要求的详细信息，请参阅[内部负载平衡器](/documentation/articles/load-balancer-internal-overview)。-->此外，如果可用性组跨 Azure 区域，则你必须在每个数据中心内对云服务和节点运行该脚本一次。\n\n        # Define variables\n        $ServiceName = \"<MyCloudService>\" # the name of the cloud service that contains the availability group nodes\n        $AGNodes = \"<VM1>\",\"<VM2>\",\"<VM3>\" # all availability group nodes containing replicas in the same cloud service, separated by commas\n        $SubnetName = \"<MySubnetName>\" # subnet name that the replicas use in the VNet\n        $ILBStaticIP = \"<MyILBStaticIPAddress>\" # static IP address for the ILB in the subnet\n        $ILBName = \"AGListenerLB\" # customize the ILB name or use this default value\n        \n        # Create the ILB\n        Add-AzureInternalLoadBalancer -InternalLoadBalancerName $ILBName -SubnetName $SubnetName -ServiceName $ServiceName -StaticVNetIPAddress $ILBStaticIP\n        \n        # Configure a load balanced endpoint for each node in $AGNodes using ILB\n        ForEach ($node in $AGNodes)\n        {\n            Get-AzureVM -ServiceName $ServiceName -Name $node | Add-AzureEndpoint -Name \"ListenerEndpoint\" -LBSetName \"ListenerEndpointLB\" -Protocol tcp -LocalPort 1433 -PublicPort 1433 -ProbePort 59999 -ProbeProtocol tcp -ProbeIntervalInSeconds 10 -InternalLoadBalancerName $ILBName -DirectServerReturn $true | Update-AzureVM \n        }\n\n13. 设置变量后，将脚本从文本编辑器复制到 Azure PowerShell 会话中运行。如果提示符仍然显示 >>，请再次按 Enter，以确保脚本开始运行。注意：\n\n>[AZURE.NOTE]Azure 管理门户目前不支持内部负载平衡器，因此你在门户中看不到 ILB 或终结点。但是，如果负载平衡器在某个内部 IP 地址上运行，则 **Get-AzureEndpoint** 将返回该地址。否则，将返回 null。\n\n## 如果需要，请验证是否已安装 KB2854082\n\n[AZURE.INCLUDE [kb2854082](../includes/virtual-machines-ag-listener-kb2854082.md)]\n\n## 在可用性组节点中打开防火墙端口\n\n[AZURE.INCLUDE [防火墙](../includes/virtual-machines-ag-listener-open-firewall.md)]\n\n## 创建可用性组侦听器\n\n[AZURE.INCLUDE [防火墙](../includes/virtual-machines-ag-listener-create-listener.md)]\n\n10. 对于 ILB，必须使用前面创建的内部负载平衡器 (ILB) 的 IP 地址。在 PowerShell 中使用以下脚本获取此 IP 地址。\n\n        # Define variables\n        $ServiceName=\"<MyServiceName>\" # the name of the cloud service that contains the AG nodes\n        (Get-AzureInternalLoadBalancer -ServiceName $ServiceName).IPAddress\n\n11. 在某个 VM 上，将以下 PowerShell 脚本复制到文本编辑器中，将变量设置为之前记下的值。\n\n        # Define variables\n        $ClusterNetworkName = \"<MyClusterNetworkName>\" # the cluster network name (Use Get-ClusterNetwork on Windows Server 2012 of higher to find the name)\n        $IPResourceName = \"<IPResourceName>\" # the IP Address resource name \n        $ILBIP = “<X.X.X.X>” # the IP Address of the Internal Load Balancer (ILB)\n        \n        Import-Module FailoverClusters\n        \n        # If you are using Windows Server 2012 or higher, use the Get-Cluster Resource command. If you are using Windows Server 2008 R2, use the cluster res command. Both commands are commented out. Choose the one applicable to your environment and remove the # at the beginning of the line to convert the comment to an executable line of code. \n        \n        # Get-ClusterResource $IPResourceName | Set-ClusterParameter -Multiple @{\"Address\"=\"$ILBIP\";\"ProbePort\"=\"59999\";\"SubnetMask\"=\"255.255.255.255\";\"Network\"=\"$ClusterNetworkName\";\"EnableDhcp\"=0}\n        # cluster res $IPResourceName /priv enabledhcp=0 address=$ILBIP probeport=59999  subnetmask=255.255.255.255\n\n12. 设置变量之后，打开提升的 Windows PowerShell 窗口，然后从文本编辑器复制脚本，并将其粘贴到 Azure PowerShell 会话中运行。如果提示符仍然显示 >>，请再次按 Enter，以确保脚本开始运行。\n\n13. 在每个 VM 上重复此过程。此脚本将使用云服务的 IP 地址来配置 IP 地址资源，同时设置探测端口等其他参数。在 IP 地址资源联机后，它可以响应我们在本教程前面部分创建的负载平衡终结点在探测端口上的轮询。\n\n## 使侦听器联机\n\n[AZURE.INCLUDE [Bring-Listener-Online](../includes/virtual-machines-ag-listener-bring-online.md)]\n\n## 后续操作项\n\n[AZURE.INCLUDE [Follow-up](../includes/virtual-machines-ag-listener-follow-up.md)]\n\n## 测试可用性组侦听器（在同一 VNet 中）\n\n[AZURE.INCLUDE [Test-Listener-Within-VNET](../includes/virtual-machines-ag-listener-test.md)]\n\n## 后续步骤\n\n[AZURE.INCLUDE [Listener-Next-Steps](../includes/virtual-machines-ag-listener-next-steps.md)]\n\n<!---HONumber=Mooncake_1221_2015-->"
+}

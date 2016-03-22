@@ -1,0 +1,341 @@
+{
+  "nodes": [
+    {
+      "content": "连接到 SQL Server 虚拟机（经典）| Azure",
+      "pos": [
+        28,
+        57
+      ]
+    },
+    {
+      "content": "本主题使用通过经典部署模型创建的资源并介绍了如何在 Azure 中连接到虚拟机上运行的 SQL Server。方案根据网络配置和客户端位置的不同而异。",
+      "pos": [
+        76,
+        151
+      ]
+    },
+    {
+      "content": "连接到 Azure 上的 SQL Server 虚拟机（经典部署）",
+      "pos": [
+        418,
+        451
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        456,
+        458
+      ]
+    },
+    {
+      "content": "连接到 Azure 虚拟机上运行的 SQL Server 与连接到本地 SQL Server 所要执行的配置步骤差别不大。你仍然需要完成涉及防火墙、身份验证和数据库登录的配置步骤。",
+      "pos": [
+        460,
+        550
+      ]
+    },
+    {
+      "pos": [
+        552,
+        731
+      ],
+      "content": "但在 SQL Server 连接方面，有一些 Azure VM 特定的设置。本文将介绍一些<bpt id=\"p1\">[</bpt>常规连接方案<ept id=\"p1\">](#connection-scenarios)</ept>，并提供<bpt id=\"p2\">[</bpt>在 Azure VM 中配置 SQL Server 连接的详细步骤<ept id=\"p2\">](#steps-for-configuring-sql-server-connectivity-in-an-azure-vm)</ept>。"
+    },
+    {
+      "pos": [
+        733,
+        851
+      ],
+      "content": "本文的重点在于连接。关于预配和连接的完整演练，请参阅<bpt id=\"p1\">[</bpt>在 Azure 上预配 SQL Server 虚拟机<ept id=\"p1\">](/documentation/articles/virtual-machines-provision-sql-server)</ept>。"
+    },
+    {
+      "pos": [
+        853,
+        947
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]资源管理器模型。"
+    },
+    {
+      "pos": [
+        951,
+        991
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"connection-scenarios\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 连接方案"
+    },
+    {
+      "content": "客户端连接虚拟机上运行的 SQL Server 的方式取决于客户端的位置与计算机/网络配置。这些方案包括：",
+      "pos": [
+        993,
+        1046
+      ]
+    },
+    {
+      "content": "连接到同一云服务中的 SQL Server",
+      "pos": [
+        1051,
+        1072
+      ]
+    },
+    {
+      "content": "通过 Internet 连接到 SQL Server",
+      "pos": [
+        1127,
+        1153
+      ]
+    },
+    {
+      "content": "连接到同一虚拟网络中的 SQL Server",
+      "pos": [
+        1200,
+        1222
+      ]
+    },
+    {
+      "pos": [
+        1280,
+        1364
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"connect-to-sql-server-in-the-same-cloud-service\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 连接到同一云服务中的 SQL Server"
+    },
+    {
+      "pos": [
+        1366,
+        1481
+      ],
+      "content": "可以在同一云服务中创建多个虚拟机。若要了解此虚拟机方案，请参阅<bpt id=\"p1\">[</bpt>如何将虚拟机连接到虚拟网络或云服务<ept id=\"p1\">](/documentation/articles/cloud-services-connect-virtual-machine)</ept>。"
+    },
+    {
+      "pos": [
+        1483,
+        1598
+      ],
+      "content": "首先，根据<bpt id=\"p1\">[</bpt>此文章中的步骤来配置连接<ept id=\"p1\">](#steps-for-configuring-sql-server-connectivity-in-an-azure-vm)</ept>。请注意，如果要连接同一云服务中的计算机，则不需要设置公共终结点。"
+    },
+    {
+      "pos": [
+        1600,
+        1758
+      ],
+      "content": "可以在客户端连接字符串中使用 VM <bpt id=\"p1\">**</bpt>主机名<ept id=\"p1\">**</ept>。主机名是你在创建 VM 期间为 VM 指定的名称。例如，如果 SQL VM 名为 <bpt id=\"p2\">**</bpt>mysqlvm<ept id=\"p2\">**</ept>，云服务 DNS 名称为 <bpt id=\"p3\">**</bpt>mycloudservice.chinacloudapp.cn<ept id=\"p3\">**</ept>，则同一云服务中的客户端 VM 可以使用以下连接字符串进行连接："
+    },
+    {
+      "pos": [
+        1857,
+        1938
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"connect-to-sql-server-over-the-internet\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 通过 Internet 连接到 SQL Server"
+    },
+    {
+      "content": "如果你想要通过 Internet 连接到 SQL Server 数据库引擎，则必须创建虚拟机终结点以进行传入 TCP 通信。此 Azure 配置步骤将传入 TCP 端口通信定向到虚拟机可以访问的 TCP 端口。",
+      "pos": [
+        1940,
+        2045
+      ]
+    },
+    {
+      "pos": [
+        2047,
+        2248
+      ],
+      "content": "首先，根据<bpt id=\"p1\">[</bpt>此文章中的步骤来配置连接<ept id=\"p1\">](#steps-for-configuring-sql-server-connectivity-in-an-azure-vm)</ept>。然后，可访问 Internet 的任何客户端可通过指定云服务 DNS 名称（例如 <bpt id=\"p2\">**</bpt>mycloudservice.chinacloudapp.cn<ept id=\"p2\">**</ept>）和 VM 终结点（例如 <bpt id=\"p3\">**</bpt>57500<ept id=\"p3\">**</ept>）来连接到 SQL Server 实例。"
+    },
+    {
+      "pos": [
+        2374,
+        2636
+      ],
+      "content": "尽管客户端可通过 Internet 进行连接，但这并不意味着任何人都可以连接到 SQL Server。外部客户端必须有正确的用户名和密码。为了提高安全性，请不要对公共虚拟机终结点使用常用的 1433 端口。如果可能，请考虑在终结点上添加 ACL 以将流量限制为你允许的客户端。有关在终结点上使用 ACL 的说明，请参阅<bpt id=\"p1\">[</bpt>管理终结点上的 ACL<ept id=\"p1\">](/documentation/articles/virtual-machines-set-up-endpoints#manage-the-acl-on-an-endpoint)</ept>。"
+    },
+    {
+      "pos": [
+        2639,
+        2822
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 请务必注意，使用这种方法与 SQL Server 进行通信时，所有返回的数据被将视为数据中心的传出流量。这需要按一般的<bpt id=\"p1\">[</bpt>出站数据传输价格<ept id=\"p1\">](/pricing/details/data-transfer)</ept>付费。即使在同一 Azure 数据中心内的另一个计算机或云服务中使用这种方法，也是如此，因为流量还是会通过 Azure 的公共负载平衡器。"
+    },
+    {
+      "pos": [
+        2827,
+        2914
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"connect-to-sql-server-in-the-same-virtual-network\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 连接到同一虚拟网络中的 SQL Server"
+    },
+    {
+      "pos": [
+        2916,
+        3015
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>虚拟网络<ept id=\"p1\">](/documentation/articles/virtual-networks-overview)</ept>支持其他方案。你可以连接同一虚拟网络中的 VM，即使这些 VM 位于不同的云服务中。"
+    },
+    {
+      "content": "虚拟网络还可让你将 Azure VM 加入域。这是对 SQL Server 使用 Windows 身份验证的唯一方式。其他连接方案需要使用用户名和密码进行 SQL 身份验证。",
+      "pos": [
+        3017,
+        3104
+      ]
+    },
+    {
+      "pos": [
+        3106,
+        3261
+      ],
+      "content": "首先，根据<bpt id=\"p1\">[</bpt>此文章中的步骤来配置连接<ept id=\"p1\">](#steps-for-configuring-sql-server-connectivity-in-an-azure-vm)</ept>。如果你要配置域环境和 Windows 身份验证，则不需要使用本文中的步骤来配置 SQL 身份验证和登录。此外，在此方案中，公共终结点不是必需的。"
+    },
+    {
+      "content": "假设你已配置 DNS，你可以在连接字符串中指定 SQL Server VM 的主机名来连接 SQL Server 实例。以下示例假设同时已配置 Windows 身份验证，并且用户已获得访问 SQL Server 实例的权限。",
+      "pos": [
+        3263,
+        3375
+      ]
+    },
+    {
+      "content": "请注意，在此方案中，你还可以指定 VM 的 IP 地址。",
+      "pos": [
+        3425,
+        3453
+      ]
+    },
+    {
+      "pos": [
+        3457,
+        3564
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"steps-for-configuring-sql-server-connectivity-in-an-azure-vm\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 在 Azure VM 中配置 SQL Server 连接的步骤"
+    },
+    {
+      "content": "以下步骤演示如何使用 SQL Server Management Studio (SSMS) 通过 Internet 连接到 SQL Server 实例。但是，这些步骤同样适用于使你的 SQL Server 虚拟机可以通过本地和 Azure 中运行的应用程序访问。",
+      "pos": [
+        3566,
+        3698
+      ]
+    },
+    {
+      "content": "你必须先完成下列各部分中描述的下列任务，然后才能从其他 VM 或 Internet 连接到 SQL Server 的实例：",
+      "pos": [
+        3700,
+        3761
+      ]
+    },
+    {
+      "content": "为虚拟机创建 TCP 终结点",
+      "pos": [
+        3766,
+        3780
+      ]
+    },
+    {
+      "content": "在 Windows 防火墙中打开 TCP 端口",
+      "pos": [
+        3833,
+        3856
+      ]
+    },
+    {
+      "content": "将 SQL Server 配置为侦听 TCP 协议",
+      "pos": [
+        3950,
+        3975
+      ]
+    },
+    {
+      "content": "配置混合模式的 SQL Server 身份验证",
+      "pos": [
+        4033,
+        4056
+      ]
+    },
+    {
+      "content": "创建 SQL Server 身份验证登录名",
+      "pos": [
+        4114,
+        4135
+      ]
+    },
+    {
+      "content": "确定虚拟机的 DNS 名称",
+      "pos": [
+        4182,
+        4195
+      ]
+    },
+    {
+      "content": "从其他计算机连接到数据库引擎",
+      "pos": [
+        4248,
+        4262
+      ]
+    },
+    {
+      "content": "下图中概述了此连接路径：",
+      "pos": [
+        4320,
+        4332
+      ]
+    },
+    {
+      "content": "连接到 SQL Server 虚拟机",
+      "pos": [
+        4336,
+        4354
+      ]
+    },
+    {
+      "pos": [
+        4442,
+        4574
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>连接到 VM 中的 SQL Server（经典 TCP 终结点）<ept id=\"p1\">](../includes/virtual-machines-sql-server-connection-steps-classic-tcp-endpoint.md)</ept>]"
+    },
+    {
+      "pos": [
+        4576,
+        4675
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>连接到 VM 中的 SQL Server<ept id=\"p1\">](../includes/virtual-machines-sql-server-connection-steps.md)</ept>]"
+    },
+    {
+      "pos": [
+        4677,
+        4790
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>连接到 VM 中的 SQL Server（经典步骤）<ept id=\"p1\">](../includes/virtual-machines-sql-server-connection-steps-classic.md)</ept>]"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        4795,
+        4799
+      ]
+    },
+    {
+      "pos": [
+        4801,
+        4913
+      ],
+      "content": "若要查看预配说明以及这些连接步骤，请参阅<bpt id=\"p1\">[</bpt>在 Azure 上预配 SQL Server 虚拟机<ept id=\"p1\">](/documentation/articles/virtual-machines-provision-sql-server)</ept>。"
+    },
+    {
+      "pos": [
+        4915,
+        5170
+      ],
+      "content": "如果你还打算针对高可用性和灾难恢复使用 AlwaysOn 可用性组，你应该考虑实施侦听器。数据库客户端将连接到侦听器，而不是直接连接到一个 SQL Server 实例。侦听器将客户端路由到可用性组中的主副本。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>在 Azure 中配置 AlwaysOn 可用性组的 ILB 侦听器<ept id=\"p1\">](/documentation/articles/virtual-machines-sql-server-configure-ilb-alwayson-availability-group-listener)</ept>。"
+    },
+    {
+      "pos": [
+        5172,
+        5333
+      ],
+      "content": "请务必查看 Azure 虚拟机上运行的 SQL Server 的所有安全最佳实践。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 虚拟机中 SQL Server 的安全注意事项<ept id=\"p1\">](/documentation/articles/virtual-machines-sql-server-security-considerations)</ept>。"
+    },
+    {
+      "pos": [
+        5335,
+        5478
+      ],
+      "content": "有关其他与在 Azure VM 中运行 SQL Server 相关的主题，请参阅 <bpt id=\"p1\">[</bpt>Azure 虚拟机上的 SQL Server<ept id=\"p1\">](/documentation/articles/virtual-machines-sql-server-infrastructure-services)</ept>。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"连接到 SQL Server 虚拟机（经典）| Azure\"\n    description=\"本主题使用通过经典部署模型创建的资源并介绍了如何在 Azure 中连接到虚拟机上运行的 SQL Server。方案根据网络配置和客户端位置的不同而异。\"\n    services=\"virtual-machines\"\n    documentationCenter=\"na\"\n    authors=\"rothja\"\n    manager=\"jeffreyg\"\n    editor=\"monicar\"    \n    tags=\"azure-service-management\"/>\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"12/18/2015\"\n    wacn.date=\"02/26/2016\"/>\n\n# 连接到 Azure 上的 SQL Server 虚拟机（经典部署）\n\n## 概述\n\n连接到 Azure 虚拟机上运行的 SQL Server 与连接到本地 SQL Server 所要执行的配置步骤差别不大。你仍然需要完成涉及防火墙、身份验证和数据库登录的配置步骤。\n\n但在 SQL Server 连接方面，有一些 Azure VM 特定的设置。本文将介绍一些[常规连接方案](#connection-scenarios)，并提供[在 Azure VM 中配置 SQL Server 连接的详细步骤](#steps-for-configuring-sql-server-connectivity-in-an-azure-vm)。\n\n本文的重点在于连接。关于预配和连接的完整演练，请参阅[在 Azure 上预配 SQL Server 虚拟机](/documentation/articles/virtual-machines-provision-sql-server)。\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]资源管理器模型。\n\n##<a name=\"connection-scenarios\"></a> 连接方案\n\n客户端连接虚拟机上运行的 SQL Server 的方式取决于客户端的位置与计算机/网络配置。这些方案包括：\n\n- [连接到同一云服务中的 SQL Server](#connect-to-sql-server-in-the-same-cloud-service)\n- [通过 Internet 连接到 SQL Server](#connect-to-sql-server-over-the-internet)\n- [连接到同一虚拟网络中的 SQL Server](#connect-to-sql-server-in-the-same-virtual-network)\n\n###<a name=\"connect-to-sql-server-in-the-same-cloud-service\"></a> 连接到同一云服务中的 SQL Server\n\n可以在同一云服务中创建多个虚拟机。若要了解此虚拟机方案，请参阅[如何将虚拟机连接到虚拟网络或云服务](/documentation/articles/cloud-services-connect-virtual-machine)。\n\n首先，根据[此文章中的步骤来配置连接](#steps-for-configuring-sql-server-connectivity-in-an-azure-vm)。请注意，如果要连接同一云服务中的计算机，则不需要设置公共终结点。\n\n可以在客户端连接字符串中使用 VM **主机名**。主机名是你在创建 VM 期间为 VM 指定的名称。例如，如果 SQL VM 名为 **mysqlvm**，云服务 DNS 名称为 **mycloudservice.chinacloudapp.cn**，则同一云服务中的客户端 VM 可以使用以下连接字符串进行连接：\n\n    \"Server=mysqlvm;Integrated Security=false;User ID=<login_name>;Password=<your_password>\"\n\n###<a name=\"connect-to-sql-server-over-the-internet\"></a> 通过 Internet 连接到 SQL Server\n\n如果你想要通过 Internet 连接到 SQL Server 数据库引擎，则必须创建虚拟机终结点以进行传入 TCP 通信。此 Azure 配置步骤将传入 TCP 端口通信定向到虚拟机可以访问的 TCP 端口。\n\n首先，根据[此文章中的步骤来配置连接](#steps-for-configuring-sql-server-connectivity-in-an-azure-vm)。然后，可访问 Internet 的任何客户端可通过指定云服务 DNS 名称（例如 **mycloudservice.chinacloudapp.cn**）和 VM 终结点（例如 **57500**）来连接到 SQL Server 实例。\n\n    \"Server=mycloudservice.chinacloudapp.cn,57500;Integrated Security=false;User ID=<login_name>;Password=<your_password>\"\n\n尽管客户端可通过 Internet 进行连接，但这并不意味着任何人都可以连接到 SQL Server。外部客户端必须有正确的用户名和密码。为了提高安全性，请不要对公共虚拟机终结点使用常用的 1433 端口。如果可能，请考虑在终结点上添加 ACL 以将流量限制为你允许的客户端。有关在终结点上使用 ACL 的说明，请参阅[管理终结点上的 ACL](/documentation/articles/virtual-machines-set-up-endpoints#manage-the-acl-on-an-endpoint)。\n\n>[AZURE.NOTE] 请务必注意，使用这种方法与 SQL Server 进行通信时，所有返回的数据被将视为数据中心的传出流量。这需要按一般的[出站数据传输价格](/pricing/details/data-transfer)付费。即使在同一 Azure 数据中心内的另一个计算机或云服务中使用这种方法，也是如此，因为流量还是会通过 Azure 的公共负载平衡器。\n\n###<a name=\"connect-to-sql-server-in-the-same-virtual-network\"></a> 连接到同一虚拟网络中的 SQL Server\n\n[虚拟网络](/documentation/articles/virtual-networks-overview)支持其他方案。你可以连接同一虚拟网络中的 VM，即使这些 VM 位于不同的云服务中。\n\n虚拟网络还可让你将 Azure VM 加入域。这是对 SQL Server 使用 Windows 身份验证的唯一方式。其他连接方案需要使用用户名和密码进行 SQL 身份验证。\n\n首先，根据[此文章中的步骤来配置连接](#steps-for-configuring-sql-server-connectivity-in-an-azure-vm)。如果你要配置域环境和 Windows 身份验证，则不需要使用本文中的步骤来配置 SQL 身份验证和登录。此外，在此方案中，公共终结点不是必需的。\n\n假设你已配置 DNS，你可以在连接字符串中指定 SQL Server VM 的主机名来连接 SQL Server 实例。以下示例假设同时已配置 Windows 身份验证，并且用户已获得访问 SQL Server 实例的权限。\n\n    \"Server=mysqlvm;Integrated Security=true\" \n\n请注意，在此方案中，你还可以指定 VM 的 IP 地址。\n\n##<a name=\"steps-for-configuring-sql-server-connectivity-in-an-azure-vm\"></a> 在 Azure VM 中配置 SQL Server 连接的步骤\n\n以下步骤演示如何使用 SQL Server Management Studio (SSMS) 通过 Internet 连接到 SQL Server 实例。但是，这些步骤同样适用于使你的 SQL Server 虚拟机可以通过本地和 Azure 中运行的应用程序访问。\n\n你必须先完成下列各部分中描述的下列任务，然后才能从其他 VM 或 Internet 连接到 SQL Server 的实例：\n\n- [为虚拟机创建 TCP 终结点](#create-a-tcp-endpoint-for-the-virtual-machine)\n- [在 Windows 防火墙中打开 TCP 端口](#open-tcp-ports-in-the-windows-firewall-for-the-default-instance-of-the-database-engine)\n- [将 SQL Server 配置为侦听 TCP 协议](#configure-sql-server-to-listen-on-the-tcp-protocol)\n- [配置混合模式的 SQL Server 身份验证](#configure-sql-server-for-mixed-mode-authentication)\n- [创建 SQL Server 身份验证登录名](#create-sql-server-authentication-logins)\n- [确定虚拟机的 DNS 名称](#determine-the-dns-name-of-the-virtual-machine)\n- [从其他计算机连接到数据库引擎](#connect-to-the-database-engine-from-another-computer)\n\n下图中概述了此连接路径：\n\n![连接到 SQL Server 虚拟机](./media/virtual-machines-sql-server-connection-steps/SQLServerinVMConnectionMap.png)\n\n[AZURE.INCLUDE [连接到 VM 中的 SQL Server（经典 TCP 终结点）](../includes/virtual-machines-sql-server-connection-steps-classic-tcp-endpoint.md)]\n\n[AZURE.INCLUDE [连接到 VM 中的 SQL Server](../includes/virtual-machines-sql-server-connection-steps.md)]\n\n[AZURE.INCLUDE [连接到 VM 中的 SQL Server（经典步骤）](../includes/virtual-machines-sql-server-connection-steps-classic.md)]\n\n## 后续步骤\n\n若要查看预配说明以及这些连接步骤，请参阅[在 Azure 上预配 SQL Server 虚拟机](/documentation/articles/virtual-machines-provision-sql-server)。\n\n如果你还打算针对高可用性和灾难恢复使用 AlwaysOn 可用性组，你应该考虑实施侦听器。数据库客户端将连接到侦听器，而不是直接连接到一个 SQL Server 实例。侦听器将客户端路由到可用性组中的主副本。有关详细信息，请参阅[在 Azure 中配置 AlwaysOn 可用性组的 ILB 侦听器](/documentation/articles/virtual-machines-sql-server-configure-ilb-alwayson-availability-group-listener)。\n\n请务必查看 Azure 虚拟机上运行的 SQL Server 的所有安全最佳实践。有关详细信息，请参阅 [Azure 虚拟机中 SQL Server 的安全注意事项](/documentation/articles/virtual-machines-sql-server-security-considerations)。\n\n有关其他与在 Azure VM 中运行 SQL Server 相关的主题，请参阅 [Azure 虚拟机上的 SQL Server](/documentation/articles/virtual-machines-sql-server-infrastructure-services)。\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

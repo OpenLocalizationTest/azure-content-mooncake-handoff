@@ -1,0 +1,677 @@
+{
+  "nodes": [
+    {
+      "content": "数据连接：事件流中的数据流输入 | Azure",
+      "pos": [
+        27,
+        50
+      ]
+    },
+    {
+      "content": "了解如何设置连接到流分析的名为“输入”的数据连接。输入包括来自事件的数据流，也包括引用数据。",
+      "pos": [
+        69,
+        115
+      ]
+    },
+    {
+      "content": "数据连接：了解从事件到流分析的数据流输入",
+      "pos": [
+        377,
+        397
+      ]
+    },
+    {
+      "content": "连接到流分析的数据连接是数据源提供的事件所组成的数据流。这称为“输入”。 流分析与 Azure 数据流源（事件中心、IoT 中心和 Blob 存储）进行第一类集成，这些数据流源可能与你的分析作业来自同一个 Azure 订阅，也可能来自不同的 Azure 订阅。",
+      "pos": [
+        399,
+        529
+      ]
+    },
+    {
+      "content": "数据输入类型：数据流和引用数据",
+      "pos": [
+        534,
+        549
+      ]
+    },
+    {
+      "content": "将数据推送到数据源时，流分析作业会使用该数据并对其进行实时处理。输入分为两种不同类型：数据流输入和引用数据输入。",
+      "pos": [
+        550,
+        606
+      ]
+    },
+    {
+      "content": "数据流输入",
+      "pos": [
+        612,
+        617
+      ]
+    },
+    {
+      "content": "数据流是一段时间内不受限制的事件序列。流分析作业必须包含至少一种可供作业使用和转换的数据流输入。Blob 存储、事件中心和 IoT 中心均可作为数据流输入源。事件中心用于从多个设备和服务（例如传感器提供的社交媒体活动源、股票交易信息或数据）收集事件流。IoT 中心经过优化以从物联网 (IoT) 方案中连接的设备收集数据。Blob 存储可用作按流的形式引入大量数据的输入源。",
+      "pos": [
+        618,
+        805
+      ]
+    },
+    {
+      "content": "引用数据",
+      "pos": [
+        811,
+        815
+      ]
+    },
+    {
+      "pos": [
+        816,
+        998
+      ],
+      "content": "流分析支持称为引用数据的第二类输入。此类数据为辅助数据，处于静态或者缓慢变化状态，通常用于执行关联性操作和查找操作。目前只支持使用 Azure Blob 存储作为引用数据的输入源。引用数据源 blob 存在 50 MB 的大小限制。若要了解如何创建引用数据输入，请参阅<bpt id=\"p1\">[</bpt>使用引用数据<ept id=\"p1\">](stream-analytics-use-reference-data.md)</ept>"
+    },
+    {
+      "content": "通过事件中心创建数据流输入",
+      "pos": [
+        1003,
+        1016
+      ]
+    },
+    {
+      "pos": [
+        1018,
+        1278
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Azure 事件中心<ept id=\"p1\">](/services/event-hubs/)</ept>是具有高扩展性的发布-订阅事件引入器。事件中心每秒可收集数百万个事件，使你能够处理和分析互连设备与应用程序生成的海量数据。事件中心是最常见的流分析输入。事件中心和流分析一起为客户提供端到端的解决方案以进行实时分析。事件中心允许客户实时将事件输入到 Azure 中，流分析作业可实时处理这些事件。例如，客户可以将 Web 点击操作、传感器读数、联机日志事件发送到事件中心，然后创建流分析作业，将事件中心用作输入数据流，以便进行实时筛选、聚合和关联操作。"
+    },
+    {
+      "pos": [
+        1280,
+        1450
+      ],
+      "content": "需要注意的是，来自流分析中事件中心的事件默认时间戳是事件到达事件中心的时间戳，即 EventEnqueuedUtcTime。若要在事件负载中使用时间戳以流方式处理数据，必须使用 <bpt id=\"p1\">[</bpt>TIMESTAMP BY<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/dn834998.aspx)</ept> 关键字。"
+    },
+    {
+      "content": "使用者组",
+      "pos": [
+        1456,
+        1460
+      ]
+    },
+    {
+      "pos": [
+        1462,
+        1707
+      ],
+      "content": "应对每个流分析事件中心输入进行配置，使之拥有自己的使用者组。如果作业包含自联接或多个输入，部分输入可能会由下游的多个读取器读取，这会影响单个使用者组中的读取器数目。为了避免超出针对事件中心设置的每个分区每个使用者组 5 个读取器的限制，最好是为每个流分析作业指定一个使用者组。请注意还有一项限制，即每个事件中心最多只能有 20 个使用者组。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>事件中心编程指南<ept id=\"p1\">](/documentation/articles/event-hubs-programming-guide)</ept>。"
+    },
+    {
+      "content": "将事件中心配置为输入数据流",
+      "pos": [
+        1712,
+        1725
+      ]
+    },
+    {
+      "content": "下表在属性说明中介绍了事件中心输入选项卡中的每个属性：",
+      "pos": [
+        1727,
+        1754
+      ]
+    },
+    {
+      "content": "属性名称",
+      "pos": [
+        1758,
+        1762
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        1765,
+        1767
+      ]
+    },
+    {
+      "content": "输入别名",
+      "pos": [
+        1788,
+        1792
+      ]
+    },
+    {
+      "content": "一个友好名称会用于作业查询，以便引用此输入",
+      "pos": [
+        1795,
+        1816
+      ]
+    },
+    {
+      "content": "服务总线命名空间",
+      "pos": [
+        1821,
+        1829
+      ]
+    },
+    {
+      "content": "服务总线命名空间是包含一组消息传递实体的容器。当你创建新的事件中心后，你还创建了 Service Bus 命名空间。",
+      "pos": [
+        1832,
+        1890
+      ]
+    },
+    {
+      "content": "事件中心",
+      "pos": [
+        1895,
+        1899
+      ]
+    },
+    {
+      "content": "事件中心输入的名称。",
+      "pos": [
+        1902,
+        1912
+      ]
+    },
+    {
+      "content": "事件中心策略名称",
+      "pos": [
+        1917,
+        1925
+      ]
+    },
+    {
+      "content": "可以在事件中心的“配置”选项卡上创建的共享访问策略。每个共享访问策略都会有名称、所设权限以及访问密钥。",
+      "pos": [
+        1928,
+        1979
+      ]
+    },
+    {
+      "content": "事件中心策略密钥",
+      "pos": [
+        1984,
+        1992
+      ]
+    },
+    {
+      "content": "用于验证对服务总线命名空间的访问权限的共享访问密钥。",
+      "pos": [
+        1995,
+        2021
+      ]
+    },
+    {
+      "content": "事件中心使用者组（可选）",
+      "pos": [
+        2026,
+        2038
+      ]
+    },
+    {
+      "content": "可以从事件中心引入数据的使用者组。如果未指定，流分析作业将使用默认使用者组从事件中心引入数据。建议为每个流分析作业使用不同的使用者组。",
+      "pos": [
+        2041,
+        2108
+      ]
+    },
+    {
+      "content": "事件序列化格式",
+      "pos": [
+        2113,
+        2120
+      ]
+    },
+    {
+      "content": "为确保查询按预计的方式运行，流分析需要了解你对传入数据流使用哪种序列化格式（JSON、CSV 或 Avro）。",
+      "pos": [
+        2123,
+        2178
+      ]
+    },
+    {
+      "content": "编码",
+      "pos": [
+        2183,
+        2185
+      ]
+    },
+    {
+      "content": "目前只支持 UTF-8 这种编码格式。",
+      "pos": [
+        2188,
+        2207
+      ]
+    },
+    {
+      "content": "当你的数据来自事件中心源时，你可以在流分析查询中访问几个元数据字段。下表列出了这些字段及其说明。",
+      "pos": [
+        2211,
+        2259
+      ]
+    },
+    {
+      "content": "属性",
+      "pos": [
+        2263,
+        2265
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        2268,
+        2270
+      ]
+    },
+    {
+      "content": "EventProcessedUtcTime",
+      "pos": [
+        2291,
+        2312
+      ]
+    },
+    {
+      "content": "流分析处理事件的日期和时间。",
+      "pos": [
+        2315,
+        2329
+      ]
+    },
+    {
+      "content": "EventEnqueuedUtcTime",
+      "pos": [
+        2334,
+        2354
+      ]
+    },
+    {
+      "content": "事件中心收到事件的日期和时间。",
+      "pos": [
+        2357,
+        2372
+      ]
+    },
+    {
+      "content": "PartitionId",
+      "pos": [
+        2377,
+        2388
+      ]
+    },
+    {
+      "content": "输入适配器的从零开始的分区 ID。",
+      "pos": [
+        2391,
+        2408
+      ]
+    },
+    {
+      "content": "例如，你可以编写类似以下的查询：",
+      "pos": [
+        2412,
+        2428
+      ]
+    },
+    {
+      "content": "创建 Blob 存储数据流输入",
+      "pos": [
+        2530,
+        2545
+      ]
+    },
+    {
+      "pos": [
+        2547,
+        2741
+      ],
+      "content": "对于需要将大量非结构化数据存储在云中的情况，Blob 存储提供了一种经济高效且可伸缩的解决方案。通常情况下，可以将 <bpt id=\"p1\">[</bpt>Blob 存储<ept id=\"p1\">](/services/storage/)</ept>中的数据视为“静态”数据，但这些数据可以作为数据流由流分析进行处理。流分析使用 Blob 存储输入的一种常见情况是进行日志处理，即首先从某个系统捕获遥测数据，然后根据需要对这些数据进行分析和处理以提取有意义的数据。"
+    },
+    {
+      "pos": [
+        2743,
+        2924
+      ],
+      "content": "需要注意的是，流分析中 Blob 存储事件的默认时间戳是上次修改 blob 的时间戳，即 <bpt id=\"p1\">*</bpt>isBlobLastModifiedUtcTime<ept id=\"p1\">*</ept>。若要在事件负载中使用时间戳以流方式处理数据，必须使用 <bpt id=\"p2\">[</bpt>TIMESTAMP BY<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/dn834998.aspx)</ept> 关键字。"
+    },
+    {
+      "content": "下表在属性说明中介绍了 Blob 存储输入选项卡中的每个属性：",
+      "pos": [
+        2926,
+        2957
+      ]
+    },
+    {
+      "content": "属性名称",
+      "pos": [
+        2984,
+        2988
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        2998,
+        3000
+      ]
+    },
+    {
+      "content": "输入别名",
+      "pos": [
+        3021,
+        3025
+      ]
+    },
+    {
+      "content": "一个友好名称会用于作业查询，以便引用此输入。",
+      "pos": [
+        3035,
+        3057
+      ]
+    },
+    {
+      "content": "存储帐户",
+      "pos": [
+        3078,
+        3082
+      ]
+    },
+    {
+      "content": "存储 blob 文件的存储帐户的名称。",
+      "pos": [
+        3092,
+        3111
+      ]
+    },
+    {
+      "content": "存储帐户密钥",
+      "pos": [
+        3132,
+        3138
+      ]
+    },
+    {
+      "content": "与存储帐户关联的密钥。",
+      "pos": [
+        3148,
+        3159
+      ]
+    },
+    {
+      "content": "存储容器",
+      "pos": [
+        3180,
+        3184
+      ]
+    },
+    {
+      "content": "容器对存储在 Azure Blob 服务中的 blob 进行逻辑分组。将 blob 上载到 Blob 服务时，必须为该 blob 指定一个容器。",
+      "pos": [
+        3195,
+        3267
+      ]
+    },
+    {
+      "content": "路径前缀模式 [可选]",
+      "pos": [
+        3288,
+        3299
+      ]
+    },
+    {
+      "content": "用于对指定容器中的 blob 进行定位的文件路径。在路径中，你可以选择指定一个或多个使用以下 3 个变量的实例：",
+      "pos": [
+        3309,
+        3365
+      ]
+    },
+    {
+      "content": "{date}、{time}、",
+      "pos": [
+        3369,
+        3383
+      ]
+    },
+    {
+      "content": "{partition}",
+      "pos": [
+        3387,
+        3398
+      ]
+    },
+    {
+      "content": "示例 1：cluster1/logs/{date}/{time}/{partition}",
+      "pos": [
+        3402,
+        3446
+      ]
+    },
+    {
+      "content": "示例 2：cluster1/logs/{date}",
+      "pos": [
+        3450,
+        3475
+      ]
+    },
+    {
+      "content": "请注意，“*”不是路径前缀允许使用的值。仅允许使用有效的 <ph id=\"ph1\">&lt;a HREF=\"https://msdn.microsoft.com/zh-cn/library/azure/dd135715.aspx\"&gt;</ph>Azure blob 字符<ph id=\"ph2\">&lt;/a&gt;</ph>。",
+      "pos": [
+        3478,
+        3596
+      ]
+    },
+    {
+      "content": "日期格式 [可选]",
+      "pos": [
+        3617,
+        3626
+      ]
+    },
+    {
+      "content": "如果在前缀路径中使用日期令牌，你可以选择组织文件所采用的日期格式。示例：YYYY/MM/DD",
+      "pos": [
+        3636,
+        3682
+      ]
+    },
+    {
+      "content": "时间格式 [可选]",
+      "pos": [
+        3703,
+        3712
+      ]
+    },
+    {
+      "content": "如果在前缀路径中使用时间令牌，你可以选择组织文件所采用的时间格式。目前唯一支持的值是 HH。",
+      "pos": [
+        3722,
+        3768
+      ]
+    },
+    {
+      "content": "事件序列化格式",
+      "pos": [
+        3789,
+        3796
+      ]
+    },
+    {
+      "content": "为确保查询按预计的方式运行，流分析需要了解你对传入数据流使用哪种序列化格式（JSON、CSV 或 Avro）。",
+      "pos": [
+        3806,
+        3861
+      ]
+    },
+    {
+      "content": "编码",
+      "pos": [
+        3882,
+        3884
+      ]
+    },
+    {
+      "content": "对于 CSV 和 JSON，目前只支持 UTF-8 这种编码格式。",
+      "pos": [
+        3894,
+        3927
+      ]
+    },
+    {
+      "content": "分隔符",
+      "pos": [
+        3948,
+        3951
+      ]
+    },
+    {
+      "content": "流分析支持大量的常见分隔符以对 CSV 格式的数据进行序列化。支持的值为逗号、分号、空格、制表符和竖线。",
+      "pos": [
+        3961,
+        4013
+      ]
+    },
+    {
+      "content": "当你的数据来自 Blob 存储源时，你可以在流分析查询中访问几个元数据字段。下表列出了这些字段及其说明。",
+      "pos": [
+        4044,
+        4096
+      ]
+    },
+    {
+      "content": "属性",
+      "pos": [
+        4100,
+        4102
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        4105,
+        4107
+      ]
+    },
+    {
+      "content": "BlobName",
+      "pos": [
+        4128,
+        4136
+      ]
+    },
+    {
+      "content": "提供事件的输入 blob 的名称。",
+      "pos": [
+        4139,
+        4156
+      ]
+    },
+    {
+      "content": "EventProcessedUtcTime",
+      "pos": [
+        4161,
+        4182
+      ]
+    },
+    {
+      "content": "流分析处理事件的日期和时间。",
+      "pos": [
+        4185,
+        4199
+      ]
+    },
+    {
+      "content": "BlobLastModifiedUtcTime",
+      "pos": [
+        4204,
+        4227
+      ]
+    },
+    {
+      "content": "上次修改 blob 的日期和时间。",
+      "pos": [
+        4230,
+        4247
+      ]
+    },
+    {
+      "content": "PartitionId",
+      "pos": [
+        4252,
+        4263
+      ]
+    },
+    {
+      "content": "输入适配器的从零开始的分区 ID。",
+      "pos": [
+        4266,
+        4283
+      ]
+    },
+    {
+      "content": "例如，你可以编写类似以下的查询：",
+      "pos": [
+        4287,
+        4303
+      ]
+    },
+    {
+      "content": "获取帮助",
+      "pos": [
+        4407,
+        4411
+      ]
+    },
+    {
+      "pos": [
+        4412,
+        4521
+      ],
+      "content": "如需进一步的帮助，请尝试我们的 <bpt id=\"p1\">[</bpt>Azure 流分析论坛<ept id=\"p1\">](https://social.msdn.microsoft.com/Forums/zh-CN/home?forum=AzureStreamAnalytics)</ept>"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        4526,
+        4530
+      ]
+    },
+    {
+      "content": "你已经了解了 Azure 中针对流分析作业的数据连接选项。若要了解流分析的更多内容，请参阅：",
+      "pos": [
+        4531,
+        4577
+      ]
+    },
+    {
+      "content": "Azure 流分析入门",
+      "pos": [
+        4582,
+        4593
+      ]
+    },
+    {
+      "content": "缩放 Azure 流分析作业",
+      "pos": [
+        4652,
+        4666
+      ]
+    },
+    {
+      "content": "Azure 流分析查询语言参考",
+      "pos": [
+        4724,
+        4739
+      ]
+    },
+    {
+      "content": "Azure 流分析管理 REST API 参考",
+      "pos": [
+        4806,
+        4829
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"数据连接：事件流中的数据流输入 | Azure\"\n    description=\"了解如何设置连接到流分析的名为“输入”的数据连接。输入包括来自事件的数据流，也包括引用数据。\"\n    keywords=\"数据流、数据连接、事件流\"\n    services=\"stream-analytics\"\n    documentationCenter=\"\"\n    authors=\"jeffstokes72\"\n    manager=\"paulettm\"\n    editor=\"cgronlun\"/>\n\n<tags \n    ms.service=\"stream-analytics\" \n    ms.date=\"11/23/2015\"\n    wacn.date=\"01/29/2016\"/>\n# 数据连接：了解从事件到流分析的数据流输入\n\n连接到流分析的数据连接是数据源提供的事件所组成的数据流。这称为“输入”。 流分析与 Azure 数据流源（事件中心、IoT 中心和 Blob 存储）进行第一类集成，这些数据流源可能与你的分析作业来自同一个 Azure 订阅，也可能来自不同的 Azure 订阅。\n\n## 数据输入类型：数据流和引用数据\n将数据推送到数据源时，流分析作业会使用该数据并对其进行实时处理。输入分为两种不同类型：数据流输入和引用数据输入。\n\n### 数据流输入\n数据流是一段时间内不受限制的事件序列。流分析作业必须包含至少一种可供作业使用和转换的数据流输入。Blob 存储、事件中心和 IoT 中心均可作为数据流输入源。事件中心用于从多个设备和服务（例如传感器提供的社交媒体活动源、股票交易信息或数据）收集事件流。IoT 中心经过优化以从物联网 (IoT) 方案中连接的设备收集数据。Blob 存储可用作按流的形式引入大量数据的输入源。\n\n### 引用数据\n流分析支持称为引用数据的第二类输入。此类数据为辅助数据，处于静态或者缓慢变化状态，通常用于执行关联性操作和查找操作。目前只支持使用 Azure Blob 存储作为引用数据的输入源。引用数据源 blob 存在 50 MB 的大小限制。若要了解如何创建引用数据输入，请参阅[使用引用数据](stream-analytics-use-reference-data.md)\n\n## 通过事件中心创建数据流输入\n\n[Azure 事件中心](/services/event-hubs/)是具有高扩展性的发布-订阅事件引入器。事件中心每秒可收集数百万个事件，使你能够处理和分析互连设备与应用程序生成的海量数据。事件中心是最常见的流分析输入。事件中心和流分析一起为客户提供端到端的解决方案以进行实时分析。事件中心允许客户实时将事件输入到 Azure 中，流分析作业可实时处理这些事件。例如，客户可以将 Web 点击操作、传感器读数、联机日志事件发送到事件中心，然后创建流分析作业，将事件中心用作输入数据流，以便进行实时筛选、聚合和关联操作。\n\n需要注意的是，来自流分析中事件中心的事件默认时间戳是事件到达事件中心的时间戳，即 EventEnqueuedUtcTime。若要在事件负载中使用时间戳以流方式处理数据，必须使用 [TIMESTAMP BY](https://msdn.microsoft.com/zh-cn/library/azure/dn834998.aspx) 关键字。\n\n### 使用者组\n\n应对每个流分析事件中心输入进行配置，使之拥有自己的使用者组。如果作业包含自联接或多个输入，部分输入可能会由下游的多个读取器读取，这会影响单个使用者组中的读取器数目。为了避免超出针对事件中心设置的每个分区每个使用者组 5 个读取器的限制，最好是为每个流分析作业指定一个使用者组。请注意还有一项限制，即每个事件中心最多只能有 20 个使用者组。有关详细信息，请参阅[事件中心编程指南](/documentation/articles/event-hubs-programming-guide)。\n\n## 将事件中心配置为输入数据流\n\n下表在属性说明中介绍了事件中心输入选项卡中的每个属性：\n\n| 属性名称 | 说明 |\n|------|------|\n| 输入别名 | 一个友好名称会用于作业查询，以便引用此输入 |\n| 服务总线命名空间 | 服务总线命名空间是包含一组消息传递实体的容器。当你创建新的事件中心后，你还创建了 Service Bus 命名空间。 |\n| 事件中心 | 事件中心输入的名称。 |\n| 事件中心策略名称 | 可以在事件中心的“配置”选项卡上创建的共享访问策略。每个共享访问策略都会有名称、所设权限以及访问密钥。 |\n| 事件中心策略密钥 | 用于验证对服务总线命名空间的访问权限的共享访问密钥。 |\n| 事件中心使用者组（可选） | 可以从事件中心引入数据的使用者组。如果未指定，流分析作业将使用默认使用者组从事件中心引入数据。建议为每个流分析作业使用不同的使用者组。 |\n| 事件序列化格式 | 为确保查询按预计的方式运行，流分析需要了解你对传入数据流使用哪种序列化格式（JSON、CSV 或 Avro）。 |\n| 编码 | 目前只支持 UTF-8 这种编码格式。 |\n\n当你的数据来自事件中心源时，你可以在流分析查询中访问几个元数据字段。下表列出了这些字段及其说明。\n\n| 属性 | 说明 |\n|------|------|\n| EventProcessedUtcTime | 流分析处理事件的日期和时间。 |\n| EventEnqueuedUtcTime | 事件中心收到事件的日期和时间。 |\n| PartitionId | 输入适配器的从零开始的分区 ID。 |\n\n例如，你可以编写类似以下的查询：\n\n````\nSELECT\n    EventProcessedUtcTime,\n    EventEnqueuedUtcTime,\n    PartitionId\nFROM Input\n````\n## 创建 Blob 存储数据流输入\n\n对于需要将大量非结构化数据存储在云中的情况，Blob 存储提供了一种经济高效且可伸缩的解决方案。通常情况下，可以将 [Blob 存储](/services/storage/)中的数据视为“静态”数据，但这些数据可以作为数据流由流分析进行处理。流分析使用 Blob 存储输入的一种常见情况是进行日志处理，即首先从某个系统捕获遥测数据，然后根据需要对这些数据进行分析和处理以提取有意义的数据。\n\n需要注意的是，流分析中 Blob 存储事件的默认时间戳是上次修改 blob 的时间戳，即 *isBlobLastModifiedUtcTime*。若要在事件负载中使用时间戳以流方式处理数据，必须使用 [TIMESTAMP BY](https://msdn.microsoft.com/zh-cn/library/azure/dn834998.aspx) 关键字。\n\n下表在属性说明中介绍了 Blob 存储输入选项卡中的每个属性：\n\n<table>\n<tbody>\n<tr>\n<td>属性名称</td>\n<td>说明</td>\n</tr>\n<tr>\n<td>输入别名</td>\n<td>一个友好名称会用于作业查询，以便引用此输入。</td>\n</tr>\n<tr>\n<td>存储帐户</td>\n<td>存储 blob 文件的存储帐户的名称。</td>\n</tr>\n<tr>\n<td>存储帐户密钥</td>\n<td>与存储帐户关联的密钥。</td>\n</tr>\n<tr>\n<td>存储容器\n</td>\n<td>容器对存储在 Azure Blob 服务中的 blob 进行逻辑分组。将 blob 上载到 Blob 服务时，必须为该 blob 指定一个容器。</td>\n</tr>\n<tr>\n<td>路径前缀模式 [可选]</td>\n<td>用于对指定容器中的 blob 进行定位的文件路径。在路径中，你可以选择指定一个或多个使用以下 3 个变量的实例：<BR>{date}、{time}、<BR>{partition}<BR>示例 1：cluster1/logs/{date}/{time}/{partition}<BR>示例 2：cluster1/logs/{date}<P>请注意，“*”不是路径前缀允许使用的值。仅允许使用有效的 <a HREF=\"https://msdn.microsoft.com/zh-cn/library/azure/dd135715.aspx\">Azure blob 字符</a>。</td>\n</tr>\n<tr>\n<td>日期格式 [可选]</td>\n<td>如果在前缀路径中使用日期令牌，你可以选择组织文件所采用的日期格式。示例：YYYY/MM/DD</td>\n</tr>\n<tr>\n<td>时间格式 [可选]</td>\n<td>如果在前缀路径中使用时间令牌，你可以选择组织文件所采用的时间格式。目前唯一支持的值是 HH。</td>\n</tr>\n<tr>\n<td>事件序列化格式</td>\n<td>为确保查询按预计的方式运行，流分析需要了解你对传入数据流使用哪种序列化格式（JSON、CSV 或 Avro）。</td>\n</tr>\n<tr>\n<td>编码</td>\n<td>对于 CSV 和 JSON，目前只支持 UTF-8 这种编码格式。</td>\n</tr>\n<tr>\n<td>分隔符</td>\n<td>流分析支持大量的常见分隔符以对 CSV 格式的数据进行序列化。支持的值为逗号、分号、空格、制表符和竖线。</td>\n</tr>\n</tbody>\n</table>\n\n当你的数据来自 Blob 存储源时，你可以在流分析查询中访问几个元数据字段。下表列出了这些字段及其说明。\n\n| 属性 | 说明 |\n|------|------|\n| BlobName | 提供事件的输入 blob 的名称。 |\n| EventProcessedUtcTime | 流分析处理事件的日期和时间。 |\n| BlobLastModifiedUtcTime | 上次修改 blob 的日期和时间。 |\n| PartitionId | 输入适配器的从零开始的分区 ID。 |\n\n例如，你可以编写类似以下的查询：\n\n````\nSELECT\n    BlobName,\n    EventProcessedUtcTime,\n    BlobLastModifiedUtcTime\nFROM Input\n````\n\n\n## 获取帮助\n如需进一步的帮助，请尝试我们的 [Azure 流分析论坛](https://social.msdn.microsoft.com/Forums/zh-CN/home?forum=AzureStreamAnalytics)\n\n## 后续步骤\n你已经了解了 Azure 中针对流分析作业的数据连接选项。若要了解流分析的更多内容，请参阅：\n\n- [Azure 流分析入门](/documentation/articles/stream-analytics-get-started)\n- [缩放 Azure 流分析作业](/documentation/articles/stream-analytics-scale-jobs)\n- [Azure 流分析查询语言参考](https://msdn.microsoft.com/zh-cn/library/azure/dn834998.aspx)\n- [Azure 流分析管理 REST API 参考](https://msdn.microsoft.com/zh-cn/library/azure/dn835031.aspx)\n\n<!--Link references-->\n[stream.analytics.developer.guide]: ../stream-analytics-developer-guide.md\n[stream.analytics.scale.jobs]: stream-analytics-scale-jobs.md\n[stream.analytics.introduction]: stream-analytics-introduction.md\n[stream.analytics.get.started]: stream-analytics-get-started.md\n[stream.analytics.query.language.reference]: http://go.microsoft.com/fwlink/?LinkID=513299\n[stream.analytics.rest.api.reference]: http://go.microsoft.com/fwlink/?LinkId=517301\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

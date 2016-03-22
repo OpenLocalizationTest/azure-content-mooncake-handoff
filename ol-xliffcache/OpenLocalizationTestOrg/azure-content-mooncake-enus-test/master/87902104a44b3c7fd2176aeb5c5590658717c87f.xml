@@ -1,0 +1,404 @@
+{
+  "nodes": [
+    {
+      "content": "如何对 .NET 后端移动服务进行数据模型更改",
+      "pos": [
+        28,
+        51
+      ]
+    },
+    {
+      "content": "本主题介绍数据模型初始值设定项，以及如何在 .NET 后端移动服务进行数据模型更改。",
+      "pos": [
+        71,
+        113
+      ]
+    },
+    {
+      "content": "如何对 .NET 后端移动服务进行数据模型更改",
+      "pos": [
+        360,
+        383
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        485,
+        491
+      ]
+    },
+    {
+      "content": "本主题说明如何使用 Entity Framework 中的 Code First 迁移对现有的 Azure SQL 数据库进行数据模型更改，以避免丢失现有数据。此过程假设你已将 .NET 后端项目发布到 Azure，数据库中已有数据，并且远程和本地数据模型仍然保持同步。本主题还将介绍 Azure 移动服务实现的、在开发期间使用的默认 Code First 初始值设定项。这些初始值设定项可让你在无需维护现有数据的情况下，不使用 Code First 迁移就能轻松进行架构更改。",
+      "pos": [
+        494,
+        733
+      ]
+    },
+    {
+      "pos": [
+        736,
+        879
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>用作 SQL 数据库中表的前缀的架构名称在 web.config 文件内的 MS\\_MobileServiceName 应用设置中定义。当你从门户下载初学者项目后，此值已设置为移动服务名称。如果架构名称与移动服务匹配，则多个移动服务可以安全共享同一个数据库实例。"
+    },
+    {
+      "content": "请注意，.NET 后端项目不支持自动迁移。",
+      "pos": [
+        881,
+        902
+      ]
+    },
+    {
+      "content": "更新数据模型",
+      "pos": [
+        907,
+        913
+      ]
+    },
+    {
+      "pos": [
+        915,
+        1225
+      ],
+      "content": "当你在 .NET 后端移动服务中添加功能时，会添加新的控制器来公开 API 中的新终结点。可以将新的 API 创建为自定义控制器或表控制器。<bpt id=\"p1\">[</bpt><ph id=\"ph1\">TableController&lt;TEntity&gt;</ph><ept id=\"p1\">]</ept> 公开继承自 <bpt id=\"p2\">[</bpt><ept id=\"p2\">EntityData]</ept> 的数据类型。要使数据持久保存在数据库中，还必须在 <bpt id=\"p3\">[</bpt><ept id=\"p3\">DbContext]</ept> 中将此数据类型作为新的 <bpt id=\"p4\">[</bpt><ph id=\"ph2\">DbSet&lt;T&gt;</ph><ept id=\"p4\">]</ept> 添加到数据模型中。若要了解有关 Entity Framework 中 Code First 的详细信息，请参阅<bpt id=\"p5\">[</bpt>使用 Code First 创建模型<ept id=\"p5\">](https://msdn.microsoft.com/zh-cn/data/ee712907#codefirst)</ept>。"
+    },
+    {
+      "pos": [
+        1227,
+        1377
+      ],
+      "content": "使用 Visual Studio 可以轻松地创建用于向客户端应用公开新数据类型的新表控制器。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何使用控制器访问移动服务中的数据<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/windows/apps/xaml/dn614132.aspx)</ept>。"
+    },
+    {
+      "content": "数据模型初始值设定项",
+      "pos": [
+        1382,
+        1392
+      ]
+    },
+    {
+      "pos": [
+        1394,
+        1545
+      ],
+      "content": "移动服务在 .NET 后端移动服务项目中提供两个数据模型初始值设定项基类。当 Entity Framework 在 <bpt id=\"p1\">[</bpt><ept id=\"p1\">DbContext]</ept> 中检测到数据模型更改时，这两个初始值设定项将删除然后重新创建数据库中的表。不管移动服务在本地计算机上运行，还是在 Azure 中托管，都可以使用这些初始值设定项。"
+    },
+    {
+      "pos": [
+        1548,
+        1650
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>当你发布 .NET 后端移动服务时，在发生数据访问操作之前，初始值设定项将不会运行。这意味着，对于新发布的服务而言，只有在客户端请求数据访问操作（例如查询）之后，才会创建存储的表。"
+    },
+    {
+      "pos": [
+        1654,
+        1881
+      ],
+      "content": "你也可以使用内置的 API 帮助功能（从启动页上的“试用”链接访问）执行数据访问操作。有关使用 API 页面测试移动服务的详细信息，请参阅<bpt id=\"p1\">[</bpt>将移动服务添加到现有应用程序<ept id=\"p1\">](/documentation/articles/mobile-services-dotnet-backend-windows-universal-dotnet-get-started-data/#test-the-service-locally)</ept>中的“在本地测试移动服务项目”部分。"
+    },
+    {
+      "content": "这两个初始值设定项会从数据库中，删除移动服务所用架构中的所有表、视图、函数和过程。",
+      "pos": [
+        1883,
+        1924
+      ]
+    },
+    {
+      "content": "ClearDatabaseSchemaIfModelChanges",
+      "pos": [
+        1930,
+        1963
+      ]
+    },
+    {
+      "content": "仅当 Code First 检测到数据模型更改时，才删除架构对象。从 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 经典门户]</ept>下载的 .NET 后端项目中的默认初始值设定项继承自这个基类。",
+      "pos": [
+        1971,
+        2049
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>ClearDatabaseSchemaAlways<ept id=\"p1\">**</ept>：",
+      "pos": [
+        2054,
+        2084
+      ]
+    },
+    {
+      "content": "每次访问数据模型都会删除架构对象。使用此基类可以重置数据库，而无需进行数据模型更改。",
+      "pos": [
+        2089,
+        2131
+      ]
+    },
+    {
+      "content": "在本地计算机上运行时，可以使用其他 Code First 数据模型初始值设定项。但是，由于用户没有删除数据库的权限，因此尝试删除数据库的初始值设定项在 Azure 中会失败，这是件好事。",
+      "pos": [
+        2133,
+        2226
+      ]
+    },
+    {
+      "content": "在本地开发移动服务期间，你可以持续使用初始值设定项，而 .NET 后端教程也假设你使用的是初始值设定项。但是，如果你要做出数据模型更改并在数据库中维护现有数据，则必须使用 Code First 迁移。",
+      "pos": [
+        2228,
+        2328
+      ]
+    },
+    {
+      "pos": [
+        2331,
+        2431
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>针对实时 Azure 服务开发和测试移动服务项目时，始终应该使用专门用于测试的移动服务实例。切勿针对当前已投入生产或者正由客户端应用程序使用的移动服务开发或测试项目。"
+    },
+    {
+      "pos": [
+        2433,
+        2543
+      ],
+      "content": "在下载的快速入门项目中，Code First 初始值设定项在 WebApiConfig.cs 文件中定义。重写 <bpt id=\"p1\">**</bpt>Seed<ept id=\"p1\">**</ept> 方法可将开头几行数据添加到新表中。有关设定数据种子的示例，请参阅<bpt id=\"p2\">[</bpt><ept id=\"p2\">在迁移中设定数据种子]</ept>。"
+    },
+    {
+      "pos": [
+        2548,
+        2589
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"migrations\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>启用 Code First 迁移"
+    },
+    {
+      "content": "Code First 迁移使用快照方法来生成代码，执行这些代码会对数据库进行架构更改。借助迁移，你可对数据模型进行增量更改并在数据库中维护现有数据。",
+      "pos": [
+        2591,
+        2665
+      ]
+    },
+    {
+      "pos": [
+        2668,
+        2796
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果你已将 .NET 后端移动服务项目发布到 Azure，而你的 SQL 数据库表架构与项目的当前数据模型不匹配，则你必须使用初始值设定项并手动删除表，或者使架构和数据模型保持同步，然后尝试使用 Code First 迁移进行发布。"
+    },
+    {
+      "content": "以下步骤将启用迁移，并应用项目、本地数据库和 Azure 中的数据模型更改。",
+      "pos": [
+        2798,
+        2836
+      ]
+    },
+    {
+      "content": "在 Visual Studio 的解决方案资源管理器中，右键单击移动服务项目，然后单击“设为启动项目”。",
+      "pos": [
+        2841,
+        2893
+      ]
+    },
+    {
+      "content": "在“工具”菜单中，展开“NuGet Package Manager”，然后单击“Package Manager Console”。",
+      "pos": [
+        2899,
+        2964
+      ]
+    },
+    {
+      "content": "此时会显示 Package Manager Console，你可以使用它来管理 Code First 迁移。",
+      "pos": [
+        2970,
+        3024
+      ]
+    },
+    {
+      "content": "在 Package Manager Console 中运行以下命令：",
+      "pos": [
+        3029,
+        3063
+      ]
+    },
+    {
+      "content": "这将为你的项目启用 Code First 迁移。",
+      "pos": [
+        3100,
+        3124
+      ]
+    },
+    {
+      "content": "在控制台中运行以下命令：",
+      "pos": [
+        3129,
+        3141
+      ]
+    },
+    {
+      "pos": [
+        3182,
+        3222
+      ],
+      "content": "这将创建一个名为 <bpt id=\"p1\">*</bpt>Initial<ept id=\"p1\">*</ept> 的新迁移。迁移代码存储在迁移项目文件夹中。"
+    },
+    {
+      "pos": [
+        3227,
+        3287
+      ],
+      "content": "展开 App\\_Start 文件夹，打开 WebApiConfig.cs 项目文件并添加以下 <bpt id=\"p1\">**</bpt>using<ept id=\"p1\">**</ept> 语句："
+    },
+    {
+      "pos": [
+        3381,
+        3487
+      ],
+      "content": "在上述代码中，必须将 <bpt id=\"p1\">_</bpt>todolistService<ept id=\"p1\">_</ept> 字符串替换为项目的命名空间，对于下载的快速入门项目，该命名空间为 <ph id=\"ph1\">&lt;em&gt;</ph>mobile&amp;#95;service&amp;#95;name<ph id=\"ph2\">&lt;/em&gt;</ph>Service。"
+    },
+    {
+      "pos": [
+        3493,
+        3558
+      ],
+      "content": "在这同一个代码文件中，注释掉对 <bpt id=\"p1\">**</bpt>Database.SetInitializer<ept id=\"p1\">**</ept> 方法的调用，并在该调用的后面添加以下代码："
+    },
+    {
+      "content": "这样就会禁用用于删除然后重新创建数据库的默认 Code First 数据库初始值设定项，并将其替换为应用最新迁移的显式请求。此时，除非为数据创建了迁移，否则，在访问数据时，进行任何数据模型更改都会导致 InvalidOperationException。另外，你的服务必须使用 Code First 迁移将数据模型更改迁移到数据库。",
+      "pos": [
+        3652,
+        3818
+      ]
+    },
+    {
+      "content": "按 F5 在本地计算机上启动移动服务项目。",
+      "pos": [
+        3824,
+        3845
+      ]
+    },
+    {
+      "pos": [
+        3852,
+        3949
+      ],
+      "content": "此时，数据库已与数据模型同步。如果你提供了种子数据，可以通过依次单击“试用”、“GET 表/todoitem”、“试用此项”和“发送”来验证该数据。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">在迁移中设定数据种子]</ept>。"
+    },
+    {
+      "content": "现在，对数据模型进行更改（例如，向 TodoItem 类型添加一个新的 UserId 属性），重新生成项目，然后在 Package Manager 中运行以下命令：",
+      "pos": [
+        3956,
+        4038
+      ]
+    },
+    {
+      "content": "PM&gt; Add-Migration NewUserId",
+      "pos": [
+        4048,
+        4075
+      ]
+    },
+    {
+      "content": "再次按 F5 以在本地计算机上重新启动移动服务项目。",
+      "pos": [
+        4200,
+        4226
+      ]
+    },
+    {
+      "pos": [
+        4232,
+        4340
+      ],
+      "content": "迁移已应用到数据库，并且数据库已重新与数据模型同步。如果你提供了种子数据，可以通过依次单击“试用”、“GET 表/todoitem”、“试用此项”和“发送”来验证该数据。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">在迁移中设定数据种子]</ept>。"
+    },
+    {
+      "content": "将移动服务重新发布到 Azure，然后运行客户端应用程序以访问数据，并验证是否可以加载数据且不出错。",
+      "pos": [
+        4346,
+        4396
+      ]
+    },
+    {
+      "pos": [
+        4402,
+        4474
+      ],
+      "content": "（可选）在 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 经典门户]</ept>中选择你的移动服务，然后单击“配置”&gt;“SQL 数据库”。随后你将导航到移动服务数据库的 SQL 数据库页。"
+    },
+    {
+      "content": "随后你将导航到移动服务数据库的 SQL 数据库页。",
+      "pos": [
+        4492,
+        4517
+      ]
+    },
+    {
+      "content": "（可选）单击“管理”，登录到 SQL 数据库服务器，然后单击“设计”并验证是否已在 Azure 中进行架构更改。",
+      "pos": [
+        4523,
+        4579
+      ]
+    },
+    {
+      "content": "在没有初始值设定项的情况下使用 Code First 迁移",
+      "pos": [
+        4585,
+        4614
+      ]
+    },
+    {
+      "content": "在对 .NET 后端项目使用 Code First 迁移之前，应运行数据模型初始值设定项。如果不使用初始值设定项，在尝试应用迁移时可能会出现错误。如果你选择不使用预定义的数据模型初始值设定项之一，请确保在 Migrations\\\\Configuration.cs 文件中，将迁移配置为使用 EntityTableSqlGenerator 作为 SqlGenerator，如以下示例所示：",
+      "pos": [
+        4615,
+        4808
+      ]
+    },
+    {
+      "pos": [
+        4977,
+        5009
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"seeding\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>在迁移中设定数据种子"
+    },
+    {
+      "pos": [
+        5011,
+        5192
+      ],
+      "content": "你可以让迁移在执行迁移时向数据库添加种子数据。<bpt id=\"p1\">**</bpt>Configuration<ept id=\"p1\">**</ept> 类提供了 <bpt id=\"p2\">**</bpt>Seed<ept id=\"p2\">**</ept> 方法，重写该方法可以插入或更新数据。启用迁移后，Configuration.cs 代码文件将添加到迁移文件夹。以下示例演示了如何重写 <bpt id=\"p3\">[</bpt><ept id=\"p3\">Seed]</ept> 方法，以在 <bpt id=\"p4\">**</bpt>TodoItems<ept id=\"p4\">**</ept> 表中设定数据种子。应在迁移到最新版本后调用 <bpt id=\"p5\">[</bpt><ept id=\"p5\">Seed]</ept> 方法。"
+    },
+    {
+      "content": "设定新表的种子",
+      "pos": [
+        5197,
+        5204
+      ]
+    },
+    {
+      "pos": [
+        5206,
+        5240
+      ],
+      "content": "以下代码将使用新的数据行设定 <bpt id=\"p1\">**</bpt>TodoItems<ept id=\"p1\">**</ept> 表的种子："
+    },
+    {
+      "content": "设定表中新列的种子",
+      "pos": [
+        5627,
+        5636
+      ]
+    },
+    {
+      "content": "以下代码只设定 UserId 列的种子：",
+      "pos": [
+        5638,
+        5658
+      ]
+    },
+    {
+      "pos": [
+        5916,
+        5995
+      ],
+      "content": "此代码将调用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">AddOrUpdate]</ept> Helper 扩展方法，以向新的 UserId 列添加种子数据。使用 <bpt id=\"p2\">[</bpt><ept id=\"p2\">AddOrUpdate]</ept> 时不会创建重复行。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"如何对 .NET 后端移动服务进行数据模型更改\" \n    description=\"本主题介绍数据模型初始值设定项，以及如何在 .NET 后端移动服务进行数据模型更改。\" \n    services=\"mobile-services\" \n    documentationCenter=\"\" \n    authors=\"ggailey777\" \n    writer=\"glenga\" \n    manager=\"dwrede\" \n    editor=\"\"/>\n\n<tags \n    ms.service=\"mobile-services\" \n    ms.date=\"12/07/2015\"\n    wacn.date=\"01/29/2016\"/>\n\n# 如何对 .NET 后端移动服务进行数据模型更改\n\n[AZURE.INCLUDE [mobile-service-note-mobile-apps](../includes/mobile-services-note-mobile-apps.md)]\n\n&nbsp;\n\n\n本主题说明如何使用 Entity Framework 中的 Code First 迁移对现有的 Azure SQL 数据库进行数据模型更改，以避免丢失现有数据。此过程假设你已将 .NET 后端项目发布到 Azure，数据库中已有数据，并且远程和本地数据模型仍然保持同步。本主题还将介绍 Azure 移动服务实现的、在开发期间使用的默认 Code First 初始值设定项。这些初始值设定项可让你在无需维护现有数据的情况下，不使用 Code First 迁移就能轻松进行架构更改。\n\n>[AZURE.NOTE]用作 SQL 数据库中表的前缀的架构名称在 web.config 文件内的 MS\\_MobileServiceName 应用设置中定义。当你从门户下载初学者项目后，此值已设置为移动服务名称。如果架构名称与移动服务匹配，则多个移动服务可以安全共享同一个数据库实例。\n\n请注意，.NET 后端项目不支持自动迁移。\n\n## 更新数据模型\n\n当你在 .NET 后端移动服务中添加功能时，会添加新的控制器来公开 API 中的新终结点。可以将新的 API 创建为自定义控制器或表控制器。[TableController<TEntity>] 公开继承自 [EntityData] 的数据类型。要使数据持久保存在数据库中，还必须在 [DbContext] 中将此数据类型作为新的 [DbSet<T>] 添加到数据模型中。若要了解有关 Entity Framework 中 Code First 的详细信息，请参阅[使用 Code First 创建模型](https://msdn.microsoft.com/zh-cn/data/ee712907#codefirst)。\n\n使用 Visual Studio 可以轻松地创建用于向客户端应用公开新数据类型的新表控制器。有关详细信息，请参阅[如何使用控制器访问移动服务中的数据](https://msdn.microsoft.com/zh-cn/library/windows/apps/xaml/dn614132.aspx)。\n\n## 数据模型初始值设定项\n\n移动服务在 .NET 后端移动服务项目中提供两个数据模型初始值设定项基类。当 Entity Framework 在 [DbContext] 中检测到数据模型更改时，这两个初始值设定项将删除然后重新创建数据库中的表。不管移动服务在本地计算机上运行，还是在 Azure 中托管，都可以使用这些初始值设定项。\n\n>[AZURE.NOTE]当你发布 .NET 后端移动服务时，在发生数据访问操作之前，初始值设定项将不会运行。这意味着，对于新发布的服务而言，只有在客户端请求数据访问操作（例如查询）之后，才会创建存储的表。\n>\n>你也可以使用内置的 API 帮助功能（从启动页上的“试用”链接访问）执行数据访问操作。有关使用 API 页面测试移动服务的详细信息，请参阅[将移动服务添加到现有应用程序](/documentation/articles/mobile-services-dotnet-backend-windows-universal-dotnet-get-started-data/#test-the-service-locally)中的“在本地测试移动服务项目”部分。\n\n这两个初始值设定项会从数据库中，删除移动服务所用架构中的所有表、视图、函数和过程。\n\n+ **ClearDatabaseSchemaIfModelChanges** <br/>仅当 Code First 检测到数据模型更改时，才删除架构对象。从 [Azure 经典门户]下载的 .NET 后端项目中的默认初始值设定项继承自这个基类。\n \n+ **ClearDatabaseSchemaAlways**：<br/>每次访问数据模型都会删除架构对象。使用此基类可以重置数据库，而无需进行数据模型更改。\n\n在本地计算机上运行时，可以使用其他 Code First 数据模型初始值设定项。但是，由于用户没有删除数据库的权限，因此尝试删除数据库的初始值设定项在 Azure 中会失败，这是件好事。\n\n在本地开发移动服务期间，你可以持续使用初始值设定项，而 .NET 后端教程也假设你使用的是初始值设定项。但是，如果你要做出数据模型更改并在数据库中维护现有数据，则必须使用 Code First 迁移。\n\n>[AZURE.IMPORTANT]针对实时 Azure 服务开发和测试移动服务项目时，始终应该使用专门用于测试的移动服务实例。切勿针对当前已投入生产或者正由客户端应用程序使用的移动服务开发或测试项目。\n\n在下载的快速入门项目中，Code First 初始值设定项在 WebApiConfig.cs 文件中定义。重写 **Seed** 方法可将开头几行数据添加到新表中。有关设定数据种子的示例，请参阅[在迁移中设定数据种子]。\n\n## <a name=\"migrations\"></a>启用 Code First 迁移\n\nCode First 迁移使用快照方法来生成代码，执行这些代码会对数据库进行架构更改。借助迁移，你可对数据模型进行增量更改并在数据库中维护现有数据。\n\n>[AZURE.NOTE]如果你已将 .NET 后端移动服务项目发布到 Azure，而你的 SQL 数据库表架构与项目的当前数据模型不匹配，则你必须使用初始值设定项并手动删除表，或者使架构和数据模型保持同步，然后尝试使用 Code First 迁移进行发布。\n\n以下步骤将启用迁移，并应用项目、本地数据库和 Azure 中的数据模型更改。\n\n1. 在 Visual Studio 的解决方案资源管理器中，右键单击移动服务项目，然后单击“设为启动项目”。\n \n2. 在“工具”菜单中，展开“NuGet Package Manager”，然后单击“Package Manager Console”。\n\n    此时会显示 Package Manager Console，你可以使用它来管理 Code First 迁移。\n\n3. 在 Package Manager Console 中运行以下命令：\n\n        PM> Enable-Migrations\n\n    这将为你的项目启用 Code First 迁移。\n\n4. 在控制台中运行以下命令：\n\n        PM> Add-Migration Initial\n\n    这将创建一个名为 *Initial* 的新迁移。迁移代码存储在迁移项目文件夹中。\n\n5. 展开 App\\_Start 文件夹，打开 WebApiConfig.cs 项目文件并添加以下 **using** 语句：\n\n        using System.Data.Entity.Migrations;\n        using todolistService.Migrations;\n\n    在上述代码中，必须将 _todolistService_ 字符串替换为项目的命名空间，对于下载的快速入门项目，该命名空间为 <em>mobile&#95;service&#95;name</em>Service。\n \n6. 在这同一个代码文件中，注释掉对 **Database.SetInitializer** 方法的调用，并在该调用的后面添加以下代码：\n\n        var migrator = new DbMigrator(new Configuration());\n        migrator.Update();\n\n    这样就会禁用用于删除然后重新创建数据库的默认 Code First 数据库初始值设定项，并将其替换为应用最新迁移的显式请求。此时，除非为数据创建了迁移，否则，在访问数据时，进行任何数据模型更改都会导致 InvalidOperationException。另外，你的服务必须使用 Code First 迁移将数据模型更改迁移到数据库。\n\n7.  按 F5 在本地计算机上启动移动服务项目。\n \n    此时，数据库已与数据模型同步。如果你提供了种子数据，可以通过依次单击“试用”、“GET 表/todoitem”、“试用此项”和“发送”来验证该数据。有关详细信息，请参阅[在迁移中设定数据种子]。\n\n8.   现在，对数据模型进行更改（例如，向 TodoItem 类型添加一个新的 UserId 属性），重新生成项目，然后在 Package Manager 中运行以下命令：\n\n        PM> Add-Migration NewUserId\n                                                               \n    这将创建一个名为 *NewUserId* 的新迁移。迁移文件夹中添加了一个用于实施此更改的新代码文件\n\n9.  再次按 F5 以在本地计算机上重新启动移动服务项目。\n\n    迁移已应用到数据库，并且数据库已重新与数据模型同步。如果你提供了种子数据，可以通过依次单击“试用”、“GET 表/todoitem”、“试用此项”和“发送”来验证该数据。有关详细信息，请参阅[在迁移中设定数据种子]。\n\n10. 将移动服务重新发布到 Azure，然后运行客户端应用程序以访问数据，并验证是否可以加载数据且不出错。\n\n13. （可选）在 [Azure 经典门户]中选择你的移动服务，然后单击“配置”>“SQL 数据库”。随后你将导航到移动服务数据库的 SQL 数据库页。\n\n    ![][0]\n\n    随后你将导航到移动服务数据库的 SQL 数据库页。\n\n12. （可选）单击“管理”，登录到 SQL 数据库服务器，然后单击“设计”并验证是否已在 Azure 中进行架构更改。\n\n\n## 在没有初始值设定项的情况下使用 Code First 迁移\n在对 .NET 后端项目使用 Code First 迁移之前，应运行数据模型初始值设定项。如果不使用初始值设定项，在尝试应用迁移时可能会出现错误。如果你选择不使用预定义的数据模型初始值设定项之一，请确保在 Migrations\\\\Configuration.cs 文件中，将迁移配置为使用 EntityTableSqlGenerator 作为 SqlGenerator，如以下示例所示：\n\n    public Configuration()\n    {\n        AutomaticMigrationsEnabled = false;\n        SetSqlGenerator(\"System.Data.SqlClient\", new EntityTableSqlGenerator());\n    }\n\n##<a name=\"seeding\"></a>在迁移中设定数据种子\n\n你可以让迁移在执行迁移时向数据库添加种子数据。**Configuration** 类提供了 **Seed** 方法，重写该方法可以插入或更新数据。启用迁移后，Configuration.cs 代码文件将添加到迁移文件夹。以下示例演示了如何重写 [Seed] 方法，以在 **TodoItems** 表中设定数据种子。应在迁移到最新版本后调用 [Seed] 方法。\n\n###设定新表的种子\n\n以下代码将使用新的数据行设定 **TodoItems** 表的种子：\n\n        List<TodoItem> todoItems = new List<TodoItem>\n        {\n            new TodoItem { Id = \"1\", Text = \"First item\", Complete = false },\n            new TodoItem { Id = \"2\", Text = \"Second item\", Complete = false },\n        };\n\n        foreach (TodoItem todoItem in todoItems)\n        {\n            context.Set<TodoItem>().Add(todoItem);\n        }\n        base.Seed(context);\n\n###设定表中新列的种子\n\n以下代码只设定 UserId 列的种子：\n            \n        context.TodoItems.AddOrUpdate(\n            t => t.UserId,\n                new TodoItem { UserId = 1 },\n                new TodoItem { UserId = 1 },\n                new TodoItem { UserId = 2 }\n            );\n        base.Seed(context);\n\n此代码将调用 [AddOrUpdate] Helper 扩展方法，以向新的 UserId 列添加种子数据。使用 [AddOrUpdate] 时不会创建重复行。\n\n<!-- Anchors -->\n[Migrations]: #migrations\n[在迁移中设定数据种子]: #seeding\n\n<!-- Images -->\n\n[0]: ./media/mobile-services-dotnet-backend-how-to-use-code-first-migrations/navagate-to-sql-database.png\n[1]: ./media/mobile-services-dotnet-backend-how-to-use-code-first-migrations/manage-sql-database.png\n[2]: ./media/mobile-services-dotnet-backend-how-to-use-code-first-migrations/sql-database-drop-tables.png\n\n<!-- URLs -->\n[DropCreateDatabaseIfModelChanges]: http://msdn.microsoft.com/zh-cn/library/gg679604(v=vs.113).aspx\n[Seed]: http://msdn.microsoft.com/zh-cn/library/hh829453(v=vs.113).aspx\n[Azure 经典门户]: https://manage.windowsazure.cn/\n[DbContext]: http://msdn.microsoft.com/zh-cn/library/system.data.entity.dbcontext(v=vs.113).aspx\n[AddOrUpdate]: http://msdn.microsoft.com/zh-cn/library/system.data.entity.migrations.idbsetextensions.addorupdate(v=vs.103).aspx\n[TableController<TEntity>]: https://msdn.microsoft.com/zh-cn/library/azure/dn643359.aspx\n[EntityData]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.windowsazure.mobile.service.entitydata.aspx\n[DbSet<T>]: https://msdn.microsoft.com/zh-cn/library/azure/gg696460.aspx\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

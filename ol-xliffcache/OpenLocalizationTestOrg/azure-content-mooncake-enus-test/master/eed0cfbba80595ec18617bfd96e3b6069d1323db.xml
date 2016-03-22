@@ -1,0 +1,397 @@
+{
+  "nodes": [
+    {
+      "content": "在移动服务中使用脱机数据 (Xamarin Android) | Microsoft Azure",
+      "pos": [
+        27,
+        75
+      ]
+    },
+    {
+      "content": "了解如何使用 Azure 移动服务向 Xamarin.android 应用程序中的缓存和同步离线数据",
+      "pos": [
+        94,
+        144
+      ]
+    },
+    {
+      "content": "在移动服务中使用脱机数据同步",
+      "pos": [
+        376,
+        390
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        492,
+        498
+      ]
+    },
+    {
+      "content": "本主题将指导你通过 Azure 移动服务的脱机同步功能在 todo 列表快速入门应用程序中。脱机同步可轻松地创建应用程序即使在最终用户不具有任何网络访问权限时才可用。",
+      "pos": [
+        600,
+        683
+      ]
+    },
+    {
+      "content": "脱机同步具有几种可能的用法：",
+      "pos": [
+        685,
+        699
+      ]
+    },
+    {
+      "content": "通过缓存在设备上的本地服务器数据来提高应用程序响应能力",
+      "pos": [
+        703,
+        730
+      ]
+    },
+    {
+      "content": "使应用程序可灵活地应对间歇性网络连接",
+      "pos": [
+        733,
+        751
+      ]
+    },
+    {
+      "content": "允许最终用户创建和修改数据，甚至在没有网络访问权限，并支持方案具有很少或没有连接时",
+      "pos": [
+        754,
+        795
+      ]
+    },
+    {
+      "content": "跨多个设备同步数据和同一个记录修改由两个设备时检测冲突",
+      "pos": [
+        798,
+        825
+      ]
+    },
+    {
+      "pos": [
+        828,
+        971
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>若要完成本教程，你需要一个 Azure 帐户。如果你没有帐户，可以注册 Azure 试用版并取得多达 10 个免费的移动服务，即使在试用期结束之后仍可继续使用这些服务。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 试用<ept id=\"p1\">](/pricing/1rmb-trial)</ept><ph id=\"ph2\">&lt;/a&gt;</ph>。"
+    },
+    {
+      "pos": [
+        976,
+        1006
+      ],
+      "content": "如果这是你第一次体验移动服务，你应首先完成<bpt id=\"p1\">[</bpt><ept id=\"p1\">移动服务入门]</ept>。"
+    },
+    {
+      "content": "本教程将指导你完成以下基本步骤：",
+      "pos": [
+        1008,
+        1024
+      ]
+    },
+    {
+      "content": "查看移动服务同步代码",
+      "pos": [
+        1030,
+        1040
+      ]
+    },
+    {
+      "content": "更新应用程序的同步行为",
+      "pos": [
+        1046,
+        1057
+      ]
+    },
+    {
+      "content": "更新应用程序以重新连接移动服务",
+      "pos": [
+        1063,
+        1078
+      ]
+    },
+    {
+      "content": "本教程需要的内容如下：",
+      "pos": [
+        1081,
+        1092
+      ]
+    },
+    {
+      "pos": [
+        1096,
+        1148
+      ],
+      "content": "带 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Xamarin 扩展]</ept><bpt id=\"p2\">**</bpt>或<ept id=\"p2\">**</ept> <bpt id=\"p3\">[</bpt><ept id=\"p3\">Xamarin Studio]</ept> 的 Visual Studio"
+    },
+    {
+      "pos": [
+        1152,
+        1164
+      ],
+      "content": "完成<bpt id=\"p1\">[</bpt><ept id=\"p1\">移动服务入门]</ept>教程"
+    },
+    {
+      "pos": [
+        1170,
+        1209
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"review-offline\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>查看移动服务同步代码"
+    },
+    {
+      "pos": [
+        1211,
+        1389
+      ],
+      "content": "Azure 移动服务脱机同步允许最终用户在无法访问网络时与本地数据库交互。若要在你的应用程序中使用这些功能，请将 <ph id=\"ph1\">`MobileServiceClient.SyncContext`</ph> 初始化到本地存储。然后，通过 <ph id=\"ph2\">`IMobileServiceSyncTable`</ph> 接口引用你的表。本部分将指导完成脱机同步 <ph id=\"ph3\">`ToDoActivity.cs`</ph> 中的相关代码。"
+    },
+    {
+      "pos": [
+        1394,
+        1476
+      ],
+      "content": "在 Visual Studio 或 Xamarin Studio 中，打开你在完成<bpt id=\"p1\">[</bpt><ept id=\"p1\">移动服务入门]</ept>教程后创建的项目。打开 <ph id=\"ph1\">`ToDoActivity.cs`</ph> 文件。"
+    },
+    {
+      "pos": [
+        1481,
+        1608
+      ],
+      "content": "请注意成员 <ph id=\"ph1\">`toDoTable`</ph> 的类型是 <ph id=\"ph2\">`IMobileServiceSyncTable`</ph>。脱机同步使用此同步表接口而不是 <ph id=\"ph3\">`IMobileServiceTable`</ph>。当使用同步表时，所有操作转到本地存储区，并仅同步与远程服务与显式的推和请求操作。"
+    },
+    {
+      "pos": [
+        1614,
+        1678
+      ],
+      "content": "若要获取对同步表的引用，请使用 <ph id=\"ph1\">`GetSyncTable()`</ph> 方法。若要删除脱机同步功能，应改用 <ph id=\"ph2\">`GetTable()`</ph>。"
+    },
+    {
+      "pos": [
+        1683,
+        1733
+      ],
+      "content": "表操作之前，必须初始化本地存储区。这可以在 <ph id=\"ph1\">`InitLocalStoreAsync`</ph> 方法中完成："
+    },
+    {
+      "pos": [
+        2348,
+        2449
+      ],
+      "content": "这将使用移动服务 SDK 中提供的类 <ph id=\"ph1\">`MobileServiceSQLiteStore`</ph> 创建本地存储。你还可以通过实现 <ph id=\"ph2\">`IMobileServiceLocalStore`</ph> 提供不同的本地存储实现。"
+    },
+    {
+      "pos": [
+        2455,
+        2545
+      ],
+      "content": "<ph id=\"ph1\">`DefineTable`</ph> 方法与所提供的类型中的字段相匹配的本地存储中创建一个表 <ph id=\"ph2\">`ToDoItem`</ph> 这种情况下。该类型无需包括所有的列，同时在远程数据库中就可以存储列的子集。"
+    },
+    {
+      "pos": [
+        2551,
+        2631
+      ],
+      "content": "此重载 <ph id=\"ph1\">`InitializeAsync`</ph> 使用默认冲突处理程序，只要有冲突，则将失败。若要提供自定义冲突处理程序，请参阅教程<bpt id=\"p1\">[</bpt><ept id=\"p1\">处理脱机支持的移动服务与冲突]</ept>。"
+    },
+    {
+      "pos": [
+        2636,
+        2660
+      ],
+      "content": "方法 <ph id=\"ph1\">`SyncAsync`</ph> 触发实际同步操作："
+    },
+    {
+      "pos": [
+        2897,
+        3040
+      ],
+      "content": "首先，将调用 <ph id=\"ph1\">`IMobileServiceSyncContext.PushAsync()`</ph>。此方法属于 <ph id=\"ph2\">`IMobileServicesSyncContext`</ph> 而不是同步表，因为它会将更改推送到所有表中。只有已在本地以某种方式修改（通过 CUD 操作来完成）的记录才会发送到服务器。"
+    },
+    {
+      "pos": [
+        3046,
+        3186
+      ],
+      "content": "接下来，该方法调用 <ph id=\"ph1\">`IMobileServiceSyncTable.PullAsync()`</ph> 向应用程序的服务器上表中提取数据。请注意是否有任何挂起的更改的同步上下文中，请求始终先发出推送操作。这是为了确保一致的本地存储区以及关系中的所有表。在这种情况下，我们必须显式调用推送。"
+    },
+    {
+      "pos": [
+        3192,
+        3414
+      ],
+      "content": "在此示例中，我们检索远程中的所有记录 <ph id=\"ph1\">`TodoItem`</ph> 表中，但它也可能是要作为筛选依据传递查询的记录。<ph id=\"ph2\">`PullAsync()`</ph> 的第一个参数是用于增量同步的查询 ID；增量同步使用 <ph id=\"ph3\">`UpdatedAt`</ph> 时间戳以仅获取自上次同步以来修改的那些记录。查询 ID 应对于你的应用程序中的每个逻辑查询都是唯一的描述性字符串。若选择不要增量同步，请传递 <ph id=\"ph4\">`null`</ph> 作为查询 ID。此命令会检索每个请求的操作，这是可能效率低下上的所有记录。"
+    },
+    {
+      "pos": [
+        3421,
+        3533
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>若要从设备本地存储区中删除已在移动设备数据库中删除的记录，应启用<bpt id=\"p1\">[</bpt><ept id=\"p1\">软删除]</ept>。否则，你的应用程序应定期调用 <ph id=\"ph2\">`IMobileServiceSyncTable.PurgeAsync()`</ph> 以清除本地存储。"
+    },
+    {
+      "pos": [
+        3539,
+        3629
+      ],
+      "content": "请注意，推送和请求操作可能会发生 <ph id=\"ph1\">`MobileServicePushFailedException`</ph>。下一篇教程<bpt id=\"p1\">[</bpt><ept id=\"p1\">使用移动服务脱机支持处理冲突]</ept>说明了如何处理这些同步相关的异常。"
+    },
+    {
+      "pos": [
+        3634,
+        3841
+      ],
+      "content": "在 <ph id=\"ph1\">`ToDoActivity`</ph> 类中，<ph id=\"ph2\">`SyncAsync()`</ph> 方法之后修改数据的操作，将调用 <ph id=\"ph3\">`AddItem()`</ph> 和 <ph id=\"ph4\">`CheckItem()`</ph>。它也称为从 <ph id=\"ph5\">`OnRefreshItemsSelected()`</ph>，以便用户获取最新数据，只要它们推送“刷新”按钮。该应用程序还执行同步启动，因为 <ph id=\"ph6\">`ToDoActivity.OnCreate()`</ph> 调用 <ph id=\"ph7\">`OnRefreshItemsSelected()`</ph>。"
+    },
+    {
+      "pos": [
+        3847,
+        3941
+      ],
+      "content": "因为 <ph id=\"ph1\">`SyncAsync()`</ph> 只要修改数据时，就将调用此应用程序假定用户处于联机状态，只要他们正在编辑的数据。在下一部分中，我们将更新应用程序，以便用户可以编辑甚至当它们处于脱机状态。"
+    },
+    {
+      "pos": [
+        3947,
+        3984
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"update-sync\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>更新应用程序的同步行为"
+    },
+    {
+      "content": "在本部分中，将修改应用程序，以便它不会同步应用程序启动或 insert 和 update 操作，而只推送刷新按钮。然后，将中断与移动服务以模拟脱机情况下的应用程序连接。在添加数据项时，它们将保存在本地存储区，但不是会立即同步到移动服务。",
+      "pos": [
+        3986,
+        4104
+      ]
+    },
+    {
+      "pos": [
+        4109,
+        4186
+      ],
+      "content": "在 <ph id=\"ph1\">`ToDoActivity`</ph> 类中，编辑方法 <ph id=\"ph2\">`AddItem()`</ph> 和 <ph id=\"ph3\">`CheckItem()`</ph>，并注释掉对 <ph id=\"ph4\">`SyncAsync()`</ph> 的调用。"
+    },
+    {
+      "pos": [
+        4191,
+        4278
+      ],
+      "content": "在 <ph id=\"ph1\">`ToDoActivity`</ph> 中，注释掉成员 <ph id=\"ph2\">`applicationURL`</ph> 和 <ph id=\"ph3\">`applicationKey`</ph> 的定义。添加以下行，通过引用无效的移动服务 URL："
+    },
+    {
+      "pos": [
+        4421,
+        4492
+      ],
+      "content": "在 <ph id=\"ph1\">`ToDoActivity.OnCreate()`</ph> 中，删除对 <ph id=\"ph2\">`OnRefreshItemsSelected()`</ph> 的调用并将其替换为："
+    },
+    {
+      "content": "构建并运行应用程序。添加一些新的 todo 项。新的 Todo 项目在推送到移动服务之前，只存在于本地存储中。客户端应用程序的行为就像它已连接到支持所有创建、读取、更新、删除 (CRUD) 操作的移动服务一样。",
+      "pos": [
+        4674,
+        4779
+      ]
+    },
+    {
+      "content": "关闭应用程序并重新启动它，以验证你创建的新项目是否已永久保存到本地存储中。",
+      "pos": [
+        4784,
+        4821
+      ]
+    },
+    {
+      "pos": [
+        4827,
+        4874
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"update-online-app\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>更新应用程序以重新连接移动服务"
+    },
+    {
+      "content": "在本节中，你会将应用程序重新连接到移动服务。这模拟的是通过移动服务从脱机状态转为联机状态的应用程序。推送“刷新”按钮时，数据将同步到你的移动服务。",
+      "pos": [
+        4876,
+        4949
+      ]
+    },
+    {
+      "pos": [
+        4954,
+        5009
+      ],
+      "content": "打开 <ph id=\"ph1\">`ToDoActivity.cs`</ph>。删除无效的移动服务 URL，并添加回正确的 URL 和应用程序密钥。"
+    },
+    {
+      "pos": [
+        5014,
+        5105
+      ],
+      "content": "构建并运行应用程序。请注意，数据看上去与脱机情况下相同，即使应用程序现已连接到移动服务。这是因为此应用程序始终使用指向本地存储的 <ph id=\"ph1\">`IMobileServiceSyncTable`</ph>。"
+    },
+    {
+      "pos": [
+        5110,
+        5182
+      ],
+      "content": "登录到 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 经典门户]</ept>，查看你的移动服务数据库。如果服务使用 JavaScript 后端，则你可以从移动服务的“数据”选项卡浏览数据。"
+    },
+    {
+      "content": "如果将 .NET 后端用于移动服务，请在 Visual Studio 中，转到“服务器资源管理器”-&gt;“Azure”-&gt;“SQL 数据库”。右键单击数据库并选择“在 SQL Server 对象资源管理器中打开”。",
+      "pos": [
+        5188,
+        5294
+      ]
+    },
+    {
+      "pos": [
+        5300,
+        5324
+      ],
+      "content": "请注意，数据<bpt id=\"p1\">*</bpt>尚未<ept id=\"p1\">*</ept>在数据库和本地存储之间同步。"
+    },
+    {
+      "pos": [
+        5329,
+        5437
+      ],
+      "content": "在应用程序中，按刷新按钮。这将调用 <ph id=\"ph1\">`OnRefreshItemsSelected()`</ph>，从而又会调用 <ph id=\"ph2\">`SyncAsync()`</ph>。这将执行推送和请求的操作，首先将本地存储项发送到移动服务中，然后从服务中检索新数据。"
+    },
+    {
+      "content": "请检查你的移动服务以确认更改都已同步的数据库。",
+      "pos": [
+        5442,
+        5465
+      ]
+    },
+    {
+      "content": "摘要",
+      "pos": [
+        5470,
+        5472
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        5591,
+        5595
+      ]
+    },
+    {
+      "content": "使用移动服务脱机支持处理冲突",
+      "pos": [
+        5600,
+        5614
+      ]
+    },
+    {
+      "content": "如何使用适用于 Azure 移动服务的 Xamarin 组件客户端",
+      "pos": [
+        5620,
+        5653
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"在移动服务中使用脱机数据 (Xamarin Android) | Microsoft Azure\"\n    description=\"了解如何使用 Azure 移动服务向 Xamarin.android 应用程序中的缓存和同步离线数据\"\n    documentationCenter=\"xamarin\"\n    authors=\"lindydonna\"\n    editor=\"wesmc\"\n    manager=\"dwrede\"\n    services=\"mobile-services\"/>\n\n<tags\n    ms.service=\"mobile-services\"\n    ms.date=\"02/11/2016\"\n    wacn.date=\"03/21/2016\"/>\n\n#  在移动服务中使用脱机数据同步\n\n[AZURE.INCLUDE [mobile-service-note-mobile-apps](../includes/mobile-services-note-mobile-apps.md)]\n\n&nbsp;\n[AZURE.INCLUDE [mobile-services-selector-offline](../includes/mobile-services-selector-offline.md)]\n\n本主题将指导你通过 Azure 移动服务的脱机同步功能在 todo 列表快速入门应用程序中。脱机同步可轻松地创建应用程序即使在最终用户不具有任何网络访问权限时才可用。\n\n脱机同步具有几种可能的用法：\n\n* 通过缓存在设备上的本地服务器数据来提高应用程序响应能力\n* 使应用程序可灵活地应对间歇性网络连接\n* 允许最终用户创建和修改数据，甚至在没有网络访问权限，并支持方案具有很少或没有连接时\n* 跨多个设备同步数据和同一个记录修改由两个设备时检测冲突\n\n>[AZURE.NOTE]若要完成本教程，你需要一个 Azure 帐户。如果你没有帐户，可以注册 Azure 试用版并取得多达 10 个免费的移动服务，即使在试用期结束之后仍可继续使用这些服务。有关详细信息，请参阅 [Azure 试用](/pricing/1rmb-trial)</a>。\n>\n> 如果这是你第一次体验移动服务，你应首先完成[移动服务入门]。\n\n本教程将指导你完成以下基本步骤：\n\n1. [查看移动服务同步代码]\n2. [更新应用程序的同步行为]\n3. [更新应用程序以重新连接移动服务]\n\n本教程需要的内容如下：\n\n* 带 [Xamarin 扩展]**或** [Xamarin Studio] 的 Visual Studio \n* 完成[移动服务入门]教程\n\n##  <a name=\"review-offline\"></a>查看移动服务同步代码\n\nAzure 移动服务脱机同步允许最终用户在无法访问网络时与本地数据库交互。若要在你的应用程序中使用这些功能，请将 `MobileServiceClient.SyncContext` 初始化到本地存储。然后，通过 `IMobileServiceSyncTable` 接口引用你的表。本部分将指导完成脱机同步 `ToDoActivity.cs` 中的相关代码。\n\n1. 在 Visual Studio 或 Xamarin Studio 中，打开你在完成[移动服务入门]教程后创建的项目。打开 `ToDoActivity.cs` 文件。\n\n2. 请注意成员 `toDoTable` 的类型是 `IMobileServiceSyncTable`。脱机同步使用此同步表接口而不是 `IMobileServiceTable`。当使用同步表时，所有操作转到本地存储区，并仅同步与远程服务与显式的推和请求操作。\n\n    若要获取对同步表的引用，请使用 `GetSyncTable()` 方法。若要删除脱机同步功能，应改用 `GetTable()`。\n\n3. 表操作之前，必须初始化本地存储区。这可以在 `InitLocalStoreAsync` 方法中完成：\n\n        private async Task InitLocalStoreAsync()\n        {\n            // new code to initialize the SQLite store\n            string path = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), localDbFilename);\n\n            if (!File.Exists(path))\n            {\n                File.Create(path).Dispose();\n            }\n\n            var store = new MobileServiceSQLiteStore(path);\n            store.DefineTable<ToDoItem>();\n\n            // Uses the default conflict handler, which fails on conflict\n            await client.SyncContext.InitializeAsync(store);\n        }\n\n    这将使用移动服务 SDK 中提供的类 `MobileServiceSQLiteStore` 创建本地存储。你还可以通过实现 `IMobileServiceLocalStore` 提供不同的本地存储实现。\n\n    `DefineTable` 方法与所提供的类型中的字段相匹配的本地存储中创建一个表 `ToDoItem` 这种情况下。该类型无需包括所有的列，同时在远程数据库中就可以存储列的子集。\n\n    此重载 `InitializeAsync` 使用默认冲突处理程序，只要有冲突，则将失败。若要提供自定义冲突处理程序，请参阅教程[处理脱机支持的移动服务与冲突]。\n\n4. 方法 `SyncAsync` 触发实际同步操作：\n\n        private async Task SyncAsync()\n        {\n            await client.SyncContext.PushAsync();\n            await toDoTable.PullAsync(\"allTodoItems\", toDoTable.CreateQuery()); // query ID is used for incremental sync\n        }\n\n    首先，将调用 `IMobileServiceSyncContext.PushAsync()`。此方法属于 `IMobileServicesSyncContext` 而不是同步表，因为它会将更改推送到所有表中。只有已在本地以某种方式修改（通过 CUD 操作来完成）的记录才会发送到服务器。\n\n    接下来，该方法调用 `IMobileServiceSyncTable.PullAsync()` 向应用程序的服务器上表中提取数据。请注意是否有任何挂起的更改的同步上下文中，请求始终先发出推送操作。这是为了确保一致的本地存储区以及关系中的所有表。在这种情况下，我们必须显式调用推送。\n\n    在此示例中，我们检索远程中的所有记录 `TodoItem` 表中，但它也可能是要作为筛选依据传递查询的记录。`PullAsync()` 的第一个参数是用于增量同步的查询 ID；增量同步使用 `UpdatedAt` 时间戳以仅获取自上次同步以来修改的那些记录。查询 ID 应对于你的应用程序中的每个逻辑查询都是唯一的描述性字符串。若选择不要增量同步，请传递 `null` 作为查询 ID。此命令会检索每个请求的操作，这是可能效率低下上的所有记录。\n\n    >[AZURE.NOTE]若要从设备本地存储区中删除已在移动设备数据库中删除的记录，应启用[软删除]。否则，你的应用程序应定期调用 `IMobileServiceSyncTable.PurgeAsync()` 以清除本地存储。\n\n    请注意，推送和请求操作可能会发生 `MobileServicePushFailedException`。下一篇教程[使用移动服务脱机支持处理冲突]说明了如何处理这些同步相关的异常。\n\n5. 在 `ToDoActivity` 类中，`SyncAsync()` 方法之后修改数据的操作，将调用 `AddItem()` 和 `CheckItem()`。它也称为从 `OnRefreshItemsSelected()`，以便用户获取最新数据，只要它们推送“刷新”按钮。该应用程序还执行同步启动，因为 `ToDoActivity.OnCreate()` 调用 `OnRefreshItemsSelected()`。\n\n    因为 `SyncAsync()` 只要修改数据时，就将调用此应用程序假定用户处于联机状态，只要他们正在编辑的数据。在下一部分中，我们将更新应用程序，以便用户可以编辑甚至当它们处于脱机状态。\n\n##  <a name=\"update-sync\"></a>更新应用程序的同步行为\n\n在本部分中，将修改应用程序，以便它不会同步应用程序启动或 insert 和 update 操作，而只推送刷新按钮。然后，将中断与移动服务以模拟脱机情况下的应用程序连接。在添加数据项时，它们将保存在本地存储区，但不是会立即同步到移动服务。\n\n1. 在 `ToDoActivity` 类中，编辑方法 `AddItem()` 和 `CheckItem()`，并注释掉对 `SyncAsync()` 的调用。\n\n2. 在 `ToDoActivity` 中，注释掉成员 `applicationURL` 和 `applicationKey` 的定义。添加以下行，通过引用无效的移动服务 URL：\n\n        const string applicationURL = @\"https://your-mobile-service.azure-mobile.xxx/\";\n        const string applicationKey = @\"AppKey\";\n\n3. 在 `ToDoActivity.OnCreate()` 中，删除对 `OnRefreshItemsSelected()` 的调用并将其替换为：\n\n        // Load the items from the Mobile Service\n        // OnRefreshItemsSelected (); // don't sync on app launch\n        await RefreshItemsFromTableAsync(); // load UI only\n\n4. 构建并运行应用程序。添加一些新的 todo 项。新的 Todo 项目在推送到移动服务之前，只存在于本地存储中。客户端应用程序的行为就像它已连接到支持所有创建、读取、更新、删除 (CRUD) 操作的移动服务一样。\n\n5. 关闭应用程序并重新启动它，以验证你创建的新项目是否已永久保存到本地存储中。\n\n##  <a name=\"update-online-app\"></a>更新应用程序以重新连接移动服务\n\n在本节中，你会将应用程序重新连接到移动服务。这模拟的是通过移动服务从脱机状态转为联机状态的应用程序。推送“刷新”按钮时，数据将同步到你的移动服务。\n\n1. 打开 `ToDoActivity.cs`。删除无效的移动服务 URL，并添加回正确的 URL 和应用程序密钥。\n\n2. 构建并运行应用程序。请注意，数据看上去与脱机情况下相同，即使应用程序现已连接到移动服务。这是因为此应用程序始终使用指向本地存储的 `IMobileServiceSyncTable`。\n\n3. 登录到 [Azure 经典门户]，查看你的移动服务数据库。如果服务使用 JavaScript 后端，则你可以从移动服务的“数据”选项卡浏览数据。\n\n    如果将 .NET 后端用于移动服务，请在 Visual Studio 中，转到“服务器资源管理器”->“Azure”->“SQL 数据库”。右键单击数据库并选择“在 SQL Server 对象资源管理器中打开”。\n\n    请注意，数据*尚未*在数据库和本地存储之间同步。\n\n4. 在应用程序中，按刷新按钮。这将调用 `OnRefreshItemsSelected()`，从而又会调用 `SyncAsync()`。这将执行推送和请求的操作，首先将本地存储项发送到移动服务中，然后从服务中检索新数据。\n\n5. 请检查你的移动服务以确认更改都已同步的数据库。\n\n## 摘要\n\n[AZURE.INCLUDE [mobile-services-offline-summary-csharp](../includes/mobile-services-offline-summary-csharp.md)]\n\n##  后续步骤\n\n* [使用移动服务脱机支持处理冲突]\n\n* [如何使用适用于 Azure 移动服务的 Xamarin 组件客户端]\n\n<!-- Anchors. -->\n[查看移动服务同步代码]: #review-offline\n[更新应用程序的同步行为]: #update-sync\n[更新应用程序以重新连接移动服务]: #update-online-app\n\n<!-- Images -->\n\n\n<!-- URLs. -->\n[使用移动服务脱机支持处理冲突]: /documentation/articles/mobile-services-windows-store-dotnet-handling-conflicts-offline-data\n[处理脱机支持的移动服务与冲突]: /documentation/articles/mobile-services-windows-store-dotnet-handling-conflicts-offline-data\n[移动服务入门]: /documentation/articles/partner-xamarin-mobile-services-android-get-started\n[如何使用适用于 Azure 移动服务的 Xamarin 组件客户端]: /documentation/articles/partner-xamarin-mobile-services-how-to-use-client-library\n[软删除]: /documentation/articles/mobile-services-using-soft-delete\n[Mobile Services SDK Nuget]: http://www.nuget.org/packages/WindowsAzure.MobileServices/1.3.0\n[SQLite store nuget]: http://www.nuget.org/packages/WindowsAzure.MobileServices.SQLiteStore/1.0.0\n[Xamarin Studio]: http://xamarin.com/download\n[Xamarin 扩展]: http://xamarin.com/visual-studio\n[NuGet Addin for Xamarin]: https://github.com/mrward/monodevelop-nuget-addin\n[Azure 经典门户]: https://manage.windowsazure.cn\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

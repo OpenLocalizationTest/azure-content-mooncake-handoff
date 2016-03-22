@@ -1,0 +1,845 @@
+{
+  "nodes": [
+    {
+      "content": "创建具有 .NET 后端的 Windows 应用商店排行榜应用 | Azure 移动服务",
+      "pos": [
+        27,
+        71
+      ]
+    },
+    {
+      "content": "了解如何使用 Azure 移动服务构建具有 .NET 后端的 Windows 应用商店排行榜应用。",
+      "pos": [
+        90,
+        139
+      ]
+    },
+    {
+      "content": "使用 Azure 移动服务 .NET 后端创建排行榜应用程序",
+      "pos": [
+        368,
+        398
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        499,
+        505
+      ]
+    },
+    {
+      "pos": [
+        507,
+        714
+      ],
+      "content": "本教程将说明如何使用具有 .NET 后端的 Azure 移动服务生成 Windows 应用商店应用程序。Azure 移动服务提供可缩放且安全的后端，具有内置身份验证、监视、推送通知和其他功能，以及用来生成移动应用程序的跨平台客户端库。移动服务的 .NET 后端基于 <bpt id=\"p1\">[</bpt>ASP.NET Web API<ept id=\"p1\">](http://asp.net/web-api)</ept>，可为 .NET 开发人员提供创建 REST API 的绝佳途径。"
+    },
+    {
+      "content": "概述",
+      "pos": [
+        719,
+        721
+      ]
+    },
+    {
+      "content": "Web API 是一个开源框架，可为 .NET 开发人员提供创建 REST API 的绝佳途径。你可以在 Azure 网站或使用 .NET 后端的 Azure 移动服务上托管 Web API 解决方案，甚至以自定义过程自我托管解决方案。移动服务是专门为移动应用程序设计的托管环境。当你在移动服务上托管 Web API 服务时，除了数据存储以外，还可以获得以下好处：",
+      "pos": [
+        723,
+        905
+      ]
+    },
+    {
+      "content": "使用社交服务提供商和 Azure Active Directory (AAD) 的内置身份验证。",
+      "pos": [
+        909,
+        957
+      ]
+    },
+    {
+      "content": "使用设备特定的通知服务将通知推送到应用程序。",
+      "pos": [
+        961,
+        983
+      ]
+    },
+    {
+      "content": "一整套可让你从任何应用程序轻松访问服务的客户端库。",
+      "pos": [
+        986,
+        1011
+      ]
+    },
+    {
+      "content": "内置的日志记录和诊断。",
+      "pos": [
+        1015,
+        1026
+      ]
+    },
+    {
+      "content": "在本教程中你将：",
+      "pos": [
+        1028,
+        1036
+      ]
+    },
+    {
+      "content": "使用 Azure 移动服务创建 REST API。",
+      "pos": [
+        1040,
+        1065
+      ]
+    },
+    {
+      "content": "将服务发布到 Azure。",
+      "pos": [
+        1068,
+        1081
+      ]
+    },
+    {
+      "content": "创建使用服务的 Windows 应用商店应用程序。",
+      "pos": [
+        1084,
+        1109
+      ]
+    },
+    {
+      "content": "使用 Entity Framework (EF) 创建外键关系和数据传输对象 (DTO)。",
+      "pos": [
+        1112,
+        1157
+      ]
+    },
+    {
+      "content": "使用 ASP.NET Web API 定义自定义 API。",
+      "pos": [
+        1160,
+        1189
+      ]
+    },
+    {
+      "pos": [
+        1191,
+        1273
+      ],
+      "content": "本教程使用 <bpt id=\"p1\">[</bpt>Visual Studio 2013 最新更新版<ept id=\"p1\">](http://go.microsoft.com/fwlink/p/?LinkID=390465)</ept>。"
+    },
+    {
+      "content": "关于示例应用程序",
+      "pos": [
+        1279,
+        1287
+      ]
+    },
+    {
+      "pos": [
+        1289,
+        1381
+      ],
+      "content": "<bpt id=\"p1\">*</bpt>排行榜<ept id=\"p1\">*</ept>显示游戏的玩家列表，以及每个玩家的分数和排名。排行榜可作为较大游戏的一部分，或作为单独的应用程序。排行榜是实际的应用程序，但简单易懂且可用于教程。下面是该应用程序的屏幕截图："
+    },
+    {
+      "content": "为了方便说明此应用程序，其中不含任何实际的游戏。你可以添加玩家，以及提交每个玩家的分数。当你提交分数时，移动服务会计算新排名。在后端上，移动服务会创建具有两个表的数据库：",
+      "pos": [
+        1391,
+        1476
+      ]
+    },
+    {
+      "content": "Player。包含玩家 ID 和姓名。",
+      "pos": [
+        1480,
+        1499
+      ]
+    },
+    {
+      "content": "PlayerRank。包含玩家的分数和排名。",
+      "pos": [
+        1502,
+        1524
+      ]
+    },
+    {
+      "content": "PlayerRank 具有 Player 的外键。每个玩家各有零个或一个 PlayerRank。",
+      "pos": [
+        1526,
+        1574
+      ]
+    },
+    {
+      "content": "在实际的排行榜应用程序中，PlayerRank 还可能会有游戏 ID，让玩家提交多个游戏的分数。",
+      "pos": [
+        1576,
+        1624
+      ]
+    },
+    {
+      "content": "客户端应用程序可对 Player 执行一组完整的 CRUD 操作。它可读取或删除现有的 PlayerRank 实体，但无法直接加以创建或更新。这是因为排名值是由服务所计算的。实际做法是，在客户端提交分数后，由服务更新所有玩家的排名。",
+      "pos": [
+        1634,
+        1750
+      ]
+    },
+    {
+      "pos": [
+        1752,
+        1833
+      ],
+      "content": "在<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](http://code.msdn.microsoft.com/Leaderboard-App-with-Azure-9acf63af)</ept>下载完成的项目。"
+    },
+    {
+      "content": "创建项目",
+      "pos": [
+        1839,
+        1843
+      ]
+    },
+    {
+      "content": "启动 Visual Studio，并创建新的 ASP.NET Web 应用程序项目。将项目命名为 Leaderboard。",
+      "pos": [
+        1845,
+        1906
+      ]
+    },
+    {
+      "content": "在 Visual Studio 2013 中，ASP.NET Web 应用程序项目包含 Azure 移动服务的模板。请选择此模板，然后单击“确定”。",
+      "pos": [
+        1916,
+        1990
+      ]
+    },
+    {
+      "content": "项目模板包含示例控制器和数据对象。",
+      "pos": [
+        2001,
+        2018
+      ]
+    },
+    {
+      "content": "教程中并不需要这些项目，因此你可以将其从项目中删除。此外，请在 WebApiConfig.cs 和 LeaderboardContext.cs 中删除对 TodoItem 的引用。",
+      "pos": [
+        2029,
+        2119
+      ]
+    },
+    {
+      "content": "添加数据模型",
+      "pos": [
+        2124,
+        2130
+      ]
+    },
+    {
+      "pos": [
+        2132,
+        2254
+      ],
+      "content": "你将使用 <bpt id=\"p1\">[</bpt>EF Code First<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/data/ee712907#codefirst)</ept> 来定义数据库表。在 DataObjects 文件夹下，添加名为 <ph id=\"ph1\">`Player`</ph> 的类。"
+    },
+    {
+      "pos": [
+        2467,
+        2491
+      ],
+      "content": "添加名为 <ph id=\"ph1\">`PlayerRank`</ph> 的另一个类。"
+    },
+    {
+      "pos": [
+        2895,
+        3102
+      ],
+      "content": "请注意，这两个类都继承自 <bpt id=\"p1\">**</bpt>EntityData<ept id=\"p1\">**</ept> 类。派生自 <bpt id=\"p2\">**</bpt>EntityData<ept id=\"p2\">**</ept> 可方便应用程序使用数据，并将跨平台客户端库用于 Azure 移动服务。<bpt id=\"p3\">**</bpt>EntityData<ept id=\"p3\">**</ept> 还可方便应用程序<bpt id=\"p4\">[</bpt>处理数据库写入冲突<ept id=\"p4\">](/documentation/articles/mobile-services-windows-store-dotnet-handle-database-conflicts)</ept>。"
+    },
+    {
+      "pos": [
+        3104,
+        3239
+      ],
+      "content": "<ph id=\"ph1\">`PlayerRank`</ph> 类具有指向相关 <ph id=\"ph2\">`Player`</ph> 实体的<bpt id=\"p1\">[</bpt>导航属性<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/data/jj713564.aspx)</ept>。<bpt id=\"p2\">**</bpt>[ForeignKey]<ept id=\"p2\">**</ept> 属性让 EF 知道 <ph id=\"ph3\">`Player`</ph> 属性表示外键。"
+    },
+    {
+      "content": "添加 Web API 控制器",
+      "pos": [
+        3244,
+        3258
+      ]
+    },
+    {
+      "pos": [
+        3260,
+        3364
+      ],
+      "content": "接下来，你要为 <ph id=\"ph1\">`Player`</ph> 和 <ph id=\"ph2\">`PlayerRank`</ph> 添加 Web API 控制器。要添加的并不是普通 Web API 控制器，而是专门针对 Azure 移动服务设计的名为<bpt id=\"p1\">*</bpt>表控制器<ept id=\"p1\">*</ept>的特殊控制器。"
+    },
+    {
+      "content": "右键单击 Controllers 文件夹，选择“添加”，然后选择“新建基架项”。",
+      "pos": [
+        3366,
+        3406
+      ]
+    },
+    {
+      "pos": [
+        3416,
+        3489
+      ],
+      "content": "在“添加基架”对话框中，展开左侧的“通用”，然后选择“Azure 移动服务”。接下来，选择“Azure 移动服务表控制器”。单击<bpt id=\"p1\">**</bpt>“添加”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "在“添加控制器”对话框中：",
+      "pos": [
+        3500,
+        3513
+      ]
+    },
+    {
+      "content": "在“模型类”下，选择“Player”。",
+      "pos": [
+        3519,
+        3538
+      ]
+    },
+    {
+      "content": "在“数据上下文类”下，选择“MobileServiceContext”。",
+      "pos": [
+        3544,
+        3580
+      ]
+    },
+    {
+      "content": "将控制器命名为“PlayerController”。",
+      "pos": [
+        3585,
+        3611
+      ]
+    },
+    {
+      "pos": [
+        3616,
+        3627
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“添加”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "此步骤将名为 PlayerController.cs 的文件添加到项目中。",
+      "pos": [
+        3630,
+        3667
+      ]
+    },
+    {
+      "pos": [
+        3677,
+        3751
+      ],
+      "content": "该控制器派生自 <bpt id=\"p1\">**</bpt>TableController<ph id=\"ph1\">&lt;T&gt;</ph><ept id=\"p1\">**</ept>。此类继承 <bpt id=\"p2\">**</bpt>ApiController<ept id=\"p2\">**</ept>，但它是专用于 Azure 移动服务的类。"
+    },
+    {
+      "pos": [
+        3756,
+        3990
+      ],
+      "content": "路由：<bpt id=\"p1\">**</bpt>TableController<ept id=\"p1\">**</ept> 的默认路径为 <ph id=\"ph1\">`/tables/{table_name}/{id}`</ph>，其中，<bpt id=\"p2\">*</bpt>table\\_name<ept id=\"p2\">*</ept> 与实体名称匹配。因此，Player 控制器的路由为 <bpt id=\"p3\">*</bpt>/tables/player/{id}<ept id=\"p3\">*</ept>。这种路由约定使得 <bpt id=\"p4\">**</bpt>TableController<ept id=\"p4\">**</ept> 与移动服务 <bpt id=\"p5\">[</bpt>REST API<ept id=\"p5\">](http://msdn.microsoft.com/zh-cn/library/azure/jj710104.aspx)</ept> 相一致。"
+    },
+    {
+      "pos": [
+        3993,
+        4132
+      ],
+      "content": "数据访问：对于数据库操作，<bpt id=\"p1\">**</bpt>TableController<ept id=\"p1\">**</ept> 类使用 <bpt id=\"p2\">**</bpt>IDomainManager<ept id=\"p2\">**</ept> 接口，该接口定义数据访问的抽象。基架使用 <bpt id=\"p3\">**</bpt>EntityDomainManager<ept id=\"p3\">**</ept>，这是包装 EF 上下文的 <bpt id=\"p4\">**</bpt>IDomainManager<ept id=\"p4\">**</ept> 的具体实现。"
+    },
+    {
+      "content": "现在，请为 PlayerRank 实体添加第二个控制器。请遵循相同的步骤，但选择 PlayerRank 作为模型类。请使用相同的数据上下文类，而不要创建新类。将控制器命名为“PlayerRankController”。",
+      "pos": [
+        4135,
+        4244
+      ]
+    },
+    {
+      "content": "使用 DTO 返回相关实体",
+      "pos": [
+        4249,
+        4262
+      ]
+    },
+    {
+      "pos": [
+        4264,
+        4300
+      ],
+      "content": "回想一下，<ph id=\"ph1\">`PlayerRank`</ph> 具有相关的 <ph id=\"ph2\">`Player`</ph> 实体："
+    },
+    {
+      "pos": [
+        4512,
+        4584
+      ],
+      "content": "移动服务客户端库不支持导航属性，并且这些属性将不序列化。例如，下面是 GET <ph id=\"ph1\">`/tables/PlayerRank`</ph> 的原始 HTTP 响应："
+    },
+    {
+      "pos": [
+        4921,
+        4982
+      ],
+      "content": "请注意，<ph id=\"ph1\">`Player`</ph> 并未包含在对象图形中。若要包含玩家，可以通过定义<bpt id=\"p1\">*</bpt>数据传输对象 (DTO)<ept id=\"p1\">*</ept> 将对象图形平面化。"
+    },
+    {
+      "pos": [
+        4984,
+        5103
+      ],
+      "content": "DTO 是定义如何通过网络发送数据的对象。如果你希望有线格式看起来与数据库模型不同，即可使用 DTO。若要为 <ph id=\"ph1\">`PlayerRank`</ph> 创建 DTO，请在 DataObjects 文件夹中添加名为 <ph id=\"ph2\">`PlayerRankDto`</ph> 的新类。"
+    },
+    {
+      "pos": [
+        5390,
+        5534
+      ],
+      "content": "在 <ph id=\"ph1\">`PlayerRankController`</ph> 类中，我们将使用 LINQ <bpt id=\"p1\">**</bpt>Select<ept id=\"p1\">**</ept> 方法，将 <ph id=\"ph2\">`PlayerRank`</ph> 实例转换为 <ph id=\"ph3\">`PlayerRankDto`</ph> 实例。按以下方式更新 <ph id=\"ph4\">`GetAllPlayerRank`</ph> 和 <ph id=\"ph5\">`GetPlayerRank`</ph> 控制器方法："
+    },
+    {
+      "pos": [
+        6254,
+        6350
+      ],
+      "content": "做出这些更改后，两个 GET 方法将 <ph id=\"ph1\">`PlayerRankDto`</ph> 对象返回到客户端。<ph id=\"ph2\">`PlayerRankDto.PlayerName`</ph> 属性设置为玩家姓名。以下是做出此更改后的示例响应："
+    },
+    {
+      "content": "请注意 JSON 负载现在包含玩家姓名。",
+      "pos": [
+        6751,
+        6771
+      ]
+    },
+    {
+      "pos": [
+        6773,
+        7047
+      ],
+      "content": "除了使用 LINQ Select 语句以外，另一种做法是使用 AutoMapper。这种做法需要使用其他设置代码，但可启用从域实体到 DTO 的自动映射。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>使用 AutoMapper 在 .NET 后端中的数据库类型与客户端类型之间映射<ept id=\"p1\">](http://blogs.msdn.com/b/azuremobile/archive/2014/05/19/mapping-between-database-types-and-client-type-in-the-net-backend-using-automapper.aspx)</ept>。"
+    },
+    {
+      "content": "定义自定义 API 来提交分数",
+      "pos": [
+        7052,
+        7067
+      ]
+    },
+    {
+      "pos": [
+        7069,
+        7163
+      ],
+      "content": "<ph id=\"ph1\">`PlayerRank`</ph> 实体包含 <ph id=\"ph2\">`Rank`</ph> 属性。此值由服务器计算，而我们不希望客户端设置它。客户端应使用自定义 API 提交玩家的分数。当服务器获取新分数时，将更新所有的玩家排名。"
+    },
+    {
+      "pos": [
+        7165,
+        7208
+      ],
+      "content": "首先，将名为 <ph id=\"ph1\">`PlayerScore`</ph> 的类添加到 DataObjects 文件夹。"
+    },
+    {
+      "pos": [
+        7406,
+        7472
+      ],
+      "content": "在 <ph id=\"ph1\">`PlayerRankController`</ph> 类中，将 <ph id=\"ph2\">`MobileServiceContext`</ph> 变量从构造函数移到类变量："
+    },
+    {
+      "pos": [
+        7987,
+        8020
+      ],
+      "content": "从 <ph id=\"ph1\">`PlayerRankController`</ph> 中删除以下方法："
+    },
+    {
+      "pos": [
+        8085,
+        8120
+      ],
+      "content": "然后，将以下代码添加到 <ph id=\"ph1\">`PlayerRankController`</ph>："
+    },
+    {
+      "pos": [
+        9403,
+        9497
+      ],
+      "content": "<ph id=\"ph1\">`PostPlayerScore`</ph> 方法采用 <ph id=\"ph2\">`PlayerScore`</ph> 实例作为输入。（客户端将在 HTTP POST 请求中发送 <ph id=\"ph3\">`PlayerScore`</ph>。） 该方法将执行以下操作："
+    },
+    {
+      "pos": [
+        9503,
+        9534
+      ],
+      "content": "如果数据库中尚无玩家的 <ph id=\"ph1\">`PlayerRank`</ph>，则新增一个。"
+    },
+    {
+      "content": "更新玩家的分数。",
+      "pos": [
+        9539,
+        9547
+      ]
+    },
+    {
+      "content": "运行 SQL 查询，以分批更新所有玩家排名。",
+      "pos": [
+        9552,
+        9574
+      ]
+    },
+    {
+      "pos": [
+        9576,
+        9604
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>[Route]<ept id=\"p1\">**</ept> 属性为此方法定义一个自定义路由："
+    },
+    {
+      "content": "也可以将方法放入单独的控制器中。没有哪种方法特别好，具体取决于你想要如何组织代码。",
+      "pos": [
+        9632,
+        9673
+      ]
+    },
+    {
+      "content": "若要深入了解 <bpt id=\"p1\">**</bpt>[Route]<ept id=\"p1\">**</ept> 属性，请参阅 <bpt id=\"p2\">[</bpt>Web API 中的属性路由<ept id=\"p2\">](http://www.asp.net/web-api/overview/web-api-routing-and-actions/attribute-routing-in-web-api-2)</ept>。",
+      "pos": [
+        9674,
+        9813
+      ]
+    },
+    {
+      "content": "创建 Windows 应用商店应用程序",
+      "pos": [
+        9818,
+        9837
+      ]
+    },
+    {
+      "pos": [
+        9839,
+        9993
+      ],
+      "content": "在本部分中，我将介绍使用移动服务的 Windows 应用商店应用程序。但是，我不会将重点放在 XAML 或 UI 上，而是着重于应用程序逻辑。你可以在<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](http://code.msdn.microsoft.com/Leaderboard-App-with-Azure-9acf63af)</ept>下载完整项目。"
+    },
+    {
+      "content": "将新的 Windows 应用商店应用程序项目添加到解决方案。我使用了空白应用程序 (Windows) 模板。",
+      "pos": [
+        9995,
+        10049
+      ]
+    },
+    {
+      "content": "使用 NuGet Package Manager 添加移动服务客户端库。在 Visual Studio 中，从“工具”菜单中选择“NuGet Package Manager”。然后选择“Package Manager Console”。在“Package Manager Console”窗口中键入以下命令。",
+      "pos": [
+        10061,
+        10215
+      ]
+    },
+    {
+      "content": "-Project 开关指定要将包安装到哪个项目。",
+      "pos": [
+        10290,
+        10314
+      ]
+    },
+    {
+      "content": "添加模型类",
+      "pos": [
+        10319,
+        10324
+      ]
+    },
+    {
+      "content": "创建名为 Models 的文件夹并添加以下类：",
+      "pos": [
+        10326,
+        10349
+      ]
+    },
+    {
+      "content": "这些类直接对应于移动服务中的数据实体。",
+      "pos": [
+        10922,
+        10941
+      ]
+    },
+    {
+      "content": "创建视图模型",
+      "pos": [
+        10947,
+        10953
+      ]
+    },
+    {
+      "content": "模型-视图-视图模型 (MVVM) 是模型-视图-控制器 (MVC) 的变体。MVVM 模式有助于将应用程序逻辑与表示形式区分开来。",
+      "pos": [
+        10955,
+        11021
+      ]
+    },
+    {
+      "content": "模型表示域数据（玩家、玩家排名和玩家分数）。",
+      "pos": [
+        11025,
+        11047
+      ]
+    },
+    {
+      "content": "视图模型是视图的抽象表示形式。",
+      "pos": [
+        11050,
+        11065
+      ]
+    },
+    {
+      "content": "视图显示视图模型，并向视图模型发送用户输入。对于 Windows 应用商店应用程序，视图在 XAML 中定义。",
+      "pos": [
+        11069,
+        11124
+      ]
+    },
+    {
+      "pos": [
+        11135,
+        11167
+      ],
+      "content": "添加名为的 <ph id=\"ph1\">`LeaderboardViewModel`</ph> 的类。"
+    },
+    {
+      "pos": [
+        11658,
+        11708
+      ],
+      "content": "在视图模型上实现 <bpt id=\"p1\">**</bpt>INotifyPropertyChanged<ept id=\"p1\">**</ept>，使视图模型可以参与数据绑定。"
+    },
+    {
+      "content": "接下来，添加可查看属性。XAML 将与这些属性建立数据绑定。",
+      "pos": [
+        12328,
+        12358
+      ]
+    },
+    {
+      "pos": [
+        13670,
+        13734
+      ],
+      "content": "当服务的异步操作挂起时，<ph id=\"ph1\">`IsPending`</ph> 属性为 true。<ph id=\"ph2\">`ErrorMessage`</ph> 属性包含来自服务的任何错误消息。"
+    },
+    {
+      "content": "最后，添加调用服务层的方法。",
+      "pos": [
+        13736,
+        13750
+      ]
+    },
+    {
+      "content": "添加 MobileServiceClient 实例",
+      "pos": [
+        16742,
+        16767
+      ]
+    },
+    {
+      "pos": [
+        16769,
+        16829
+      ],
+      "content": "打开 <bpt id=\"p1\">*</bpt>App.xaml.cs<ept id=\"p1\">*</ept> 文件并将 <bpt id=\"p2\">**</bpt>MobileServiceClient<ept id=\"p2\">**</ept> 实例添加到 <ph id=\"ph1\">`App`</ph> 类。"
+    },
+    {
+      "pos": [
+        17293,
+        17504
+      ],
+      "content": "当你在本地调试时，移动服务将在 IIS Express 上运行。Visual Studio 将分配一个随机端口号，因此本地 URL 为 http://localhost:<bpt id=\"p1\">*</bpt>port<ept id=\"p1\">*</ept>，其中 <bpt id=\"p2\">*</bpt>port<ept id=\"p2\">*</ept> 为端口号。若要获取端口号，请按 F5 在 Visual Studio 中启动服务，以进行调试。Visual Studio 将启动浏览器，并导航到服务 URL。你也可以在项目属性中的 <bpt id=\"p3\">**</bpt>Web<ept id=\"p3\">**</ept> 下查找本地 URL。"
+    },
+    {
+      "content": "创建主页面",
+      "pos": [
+        17509,
+        17514
+      ]
+    },
+    {
+      "pos": [
+        17516,
+        17563
+      ],
+      "content": "在主页面中，添加视图模型的实例。然后将视图模型设置为该页面的 <bpt id=\"p1\">**</bpt>DataContext<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "前面已经提到，我不会介绍应用程序的所有 XAML。MVVM 模式的优点之一是能够区分表示形式和应用程序逻辑，因此，如果你不喜欢示例应用程序，可以轻松更改 UI。",
+      "pos": [
+        17897,
+        17977
+      ]
+    },
+    {
+      "pos": [
+        17979,
+        18001
+      ],
+      "content": "玩家列表显示在 <bpt id=\"p1\">**</bpt>ListBox<ept id=\"p1\">**</ept> 中："
+    },
+    {
+      "pos": [
+        18133,
+        18154
+      ],
+      "content": "排名显示在 <bpt id=\"p1\">**</bpt>ListView<ept id=\"p1\">**</ept> 中："
+    },
+    {
+      "content": "所有数据绑定都通过视图模型发生。",
+      "pos": [
+        18950,
+        18966
+      ]
+    },
+    {
+      "content": "发布移动服务",
+      "pos": [
+        18971,
+        18977
+      ]
+    },
+    {
+      "content": "在此步骤中，你要将移动服务发布到 Azure，并修改应用程序以使用实时服务。",
+      "pos": [
+        18979,
+        19017
+      ]
+    },
+    {
+      "content": "在“解决方案资源管理器”中，右键单击 Leaderboard 项目并选择“发布”。",
+      "pos": [
+        19019,
+        19060
+      ]
+    },
+    {
+      "content": "在“发布”对话框中，单击“Azure 移动服务”。",
+      "pos": [
+        19072,
+        19097
+      ]
+    },
+    {
+      "content": "如果你尚未登录你的 Azure 帐户，请单击“登录”。",
+      "pos": [
+        19109,
+        19136
+      ]
+    },
+    {
+      "content": "选择现有的移动服务，或单击“新建”以创建一个新的服务。然后单击“确定”以发布。",
+      "pos": [
+        19148,
+        19187
+      ]
+    },
+    {
+      "content": "发布过程会自动创建数据库。你不需要配置连接字符串。",
+      "pos": [
+        19199,
+        19224
+      ]
+    },
+    {
+      "content": "现在，你可以将排行榜应用程序连接到实时服务了。你需要以下两项：",
+      "pos": [
+        19226,
+        19257
+      ]
+    },
+    {
+      "content": "服务的 URL",
+      "pos": [
+        19261,
+        19268
+      ]
+    },
+    {
+      "content": "应用程序密钥",
+      "pos": [
+        19271,
+        19277
+      ]
+    },
+    {
+      "content": "你可以从 Azure 经典门户获取这两项信息。在门户中单击“移动服务”，然后单击该移动服务。仪表板选项卡上列出了服务 URL。若要获取应用程序密钥，请单击“管理密钥”。",
+      "pos": [
+        19279,
+        19363
+      ]
+    },
+    {
+      "content": "在“管理访问密钥”对话框中，复制应用程序密钥值。",
+      "pos": [
+        19375,
+        19399
+      ]
+    },
+    {
+      "pos": [
+        19412,
+        19460
+      ],
+      "content": "将服务 URL 和应用程序密钥传递给 <bpt id=\"p1\">**</bpt>MobileServiceClient<ept id=\"p1\">**</ept> 构造函数。"
+    },
+    {
+      "content": "现在，当你运行该应用程序时，它将与实际的服务通信。",
+      "pos": [
+        19818,
+        19843
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        19848,
+        19852
+      ]
+    },
+    {
+      "content": "详细了解 Azure 移动服务",
+      "pos": [
+        19857,
+        19872
+      ]
+    },
+    {
+      "content": "详细了解 Web API",
+      "pos": [
+        19877,
+        19889
+      ]
+    },
+    {
+      "content": "处理数据库写入冲突",
+      "pos": [
+        19894,
+        19903
+      ]
+    },
+    {
+      "pos": [
+        19907,
+        19935
+      ],
+      "content": "<bpt id=\"p1\">[</bpt><ept id=\"p1\">添加推送通知]</ept>（例如，当某人添加新玩家或更新分数时）。"
+    },
+    {
+      "content": "身份验证入门",
+      "pos": [
+        19939,
+        19945
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"创建具有 .NET 后端的 Windows 应用商店排行榜应用 | Azure 移动服务\"\n    description=\"了解如何使用 Azure 移动服务构建具有 .NET 后端的 Windows 应用商店排行榜应用。\"\n    documentationCenter=\"windows\"\n    authors=\"rmcmurray\"\n    manager=\"wpickett\"\n    editor=\"\"\n    services=\"mobile-services\"/>\n\n<tags \n    ms.service=\"mobile-services\" \n    ms.date=\"01/09/2016\"\n    wacn.date=\"02/26/2016\"/>\n\n# 使用 Azure 移动服务 .NET 后端创建排行榜应用程序\n[AZURE.INCLUDE [mobile-service-note-mobile-apps](../includes/mobile-services-note-mobile-apps.md)]\n\n&nbsp;\n\n本教程将说明如何使用具有 .NET 后端的 Azure 移动服务生成 Windows 应用商店应用程序。Azure 移动服务提供可缩放且安全的后端，具有内置身份验证、监视、推送通知和其他功能，以及用来生成移动应用程序的跨平台客户端库。移动服务的 .NET 后端基于 [ASP.NET Web API](http://asp.net/web-api)，可为 .NET 开发人员提供创建 REST API 的绝佳途径。\n\n## 概述\n\nWeb API 是一个开源框架，可为 .NET 开发人员提供创建 REST API 的绝佳途径。你可以在 Azure 网站或使用 .NET 后端的 Azure 移动服务上托管 Web API 解决方案，甚至以自定义过程自我托管解决方案。移动服务是专门为移动应用程序设计的托管环境。当你在移动服务上托管 Web API 服务时，除了数据存储以外，还可以获得以下好处：\n\n- 使用社交服务提供商和 Azure Active Directory (AAD) 的内置身份验证。 \n- 使用设备特定的通知服务将通知推送到应用程序。\n- 一整套可让你从任何应用程序轻松访问服务的客户端库。 \n- 内置的日志记录和诊断。\n\n在本教程中你将：\n\n- 使用 Azure 移动服务创建 REST API。\n- 将服务发布到 Azure。\n- 创建使用服务的 Windows 应用商店应用程序。\n- 使用 Entity Framework (EF) 创建外键关系和数据传输对象 (DTO)。\n- 使用 ASP.NET Web API 定义自定义 API。\n\n本教程使用 [Visual Studio 2013 最新更新版](http://go.microsoft.com/fwlink/p/?LinkID=390465)。\n\n\n## 关于示例应用程序\n\n*排行榜*显示游戏的玩家列表，以及每个玩家的分数和排名。排行榜可作为较大游戏的一部分，或作为单独的应用程序。排行榜是实际的应用程序，但简单易懂且可用于教程。下面是该应用程序的屏幕截图：\n\n![][1]\n\n为了方便说明此应用程序，其中不含任何实际的游戏。你可以添加玩家，以及提交每个玩家的分数。当你提交分数时，移动服务会计算新排名。在后端上，移动服务会创建具有两个表的数据库：\n\n- Player。包含玩家 ID 和姓名。\n- PlayerRank。包含玩家的分数和排名。\n\nPlayerRank 具有 Player 的外键。每个玩家各有零个或一个 PlayerRank。\n\n在实际的排行榜应用程序中，PlayerRank 还可能会有游戏 ID，让玩家提交多个游戏的分数。\n\n![][2]\n\n客户端应用程序可对 Player 执行一组完整的 CRUD 操作。它可读取或删除现有的 PlayerRank 实体，但无法直接加以创建或更新。这是因为排名值是由服务所计算的。实际做法是，在客户端提交分数后，由服务更新所有玩家的排名。\n\n在[此处](http://code.msdn.microsoft.com/Leaderboard-App-with-Azure-9acf63af)下载完成的项目。\n\n\n## 创建项目\n\n启动 Visual Studio，并创建新的 ASP.NET Web 应用程序项目。将项目命名为 Leaderboard。\n\n![][3]\n\n在 Visual Studio 2013 中，ASP.NET Web 应用程序项目包含 Azure 移动服务的模板。请选择此模板，然后单击“确定”。\n\n![][4]\n \n项目模板包含示例控制器和数据对象。\n\n![][5]\n \n教程中并不需要这些项目，因此你可以将其从项目中删除。此外，请在 WebApiConfig.cs 和 LeaderboardContext.cs 中删除对 TodoItem 的引用。\n\n## 添加数据模型\n\n你将使用 [EF Code First](http://msdn.microsoft.com/zh-cn/data/ee712907#codefirst) 来定义数据库表。在 DataObjects 文件夹下，添加名为 `Player` 的类。\n\n    using Microsoft.WindowsAzure.Mobile.Service;\n    \n    namespace Leaderboard.DataObjects\n    {\n        public class Player : EntityData\n        {\n            public string Name { get; set; }\n        }\n    }\n\n添加名为 `PlayerRank` 的另一个类。\n\n    using Microsoft.WindowsAzure.Mobile.Service;\n    using System.ComponentModel.DataAnnotations.Schema;\n    \n    namespace Leaderboard.DataObjects\n    {\n        public class PlayerRank : EntityData\n        {\n            public int Score { get; set; }\n            public int Rank { get; set; }\n    \n            [ForeignKey(\"Id\")]\n            public virtual Player Player { get; set; }\n        }\n    }\n\n请注意，这两个类都继承自 **EntityData** 类。派生自 **EntityData** 可方便应用程序使用数据，并将跨平台客户端库用于 Azure 移动服务。**EntityData** 还可方便应用程序[处理数据库写入冲突](/documentation/articles/mobile-services-windows-store-dotnet-handle-database-conflicts)。\n\n`PlayerRank` 类具有指向相关 `Player` 实体的[导航属性](http://msdn.microsoft.com/zh-cn/data/jj713564.aspx)。**[ForeignKey]** 属性让 EF 知道 `Player` 属性表示外键。\n\n## 添加 Web API 控制器\n\n接下来，你要为 `Player` 和 `PlayerRank` 添加 Web API 控制器。要添加的并不是普通 Web API 控制器，而是专门针对 Azure 移动服务设计的名为*表控制器*的特殊控制器。\n\n右键单击 Controllers 文件夹，选择“添加”，然后选择“新建基架项”。\n\n![][6]\n\n在“添加基架”对话框中，展开左侧的“通用”，然后选择“Azure 移动服务”。接下来，选择“Azure 移动服务表控制器”。单击**“添加”**。\n\n![][7]\n \n在“添加控制器”对话框中：\n\n1.  在“模型类”下，选择“Player”。 \n2.  在“数据上下文类”下，选择“MobileServiceContext”。\n3.  将控制器命名为“PlayerController”。\n4.  单击**“添加”**。\n\n\n此步骤将名为 PlayerController.cs 的文件添加到项目中。\n\n![][8]\n\n该控制器派生自 **TableController<T>**。此类继承 **ApiController**，但它是专用于 Azure 移动服务的类。\n \n- 路由：**TableController** 的默认路径为 `/tables/{table_name}/{id}`，其中，*table\\_name* 与实体名称匹配。因此，Player 控制器的路由为 */tables/player/{id}*。这种路由约定使得 **TableController** 与移动服务 [REST API](http://msdn.microsoft.com/zh-cn/library/azure/jj710104.aspx) 相一致。\n- 数据访问：对于数据库操作，**TableController** 类使用 **IDomainManager** 接口，该接口定义数据访问的抽象。基架使用 **EntityDomainManager**，这是包装 EF 上下文的 **IDomainManager** 的具体实现。 \n\n现在，请为 PlayerRank 实体添加第二个控制器。请遵循相同的步骤，但选择 PlayerRank 作为模型类。请使用相同的数据上下文类，而不要创建新类。将控制器命名为“PlayerRankController”。\n\n## 使用 DTO 返回相关实体\n\n回想一下，`PlayerRank` 具有相关的 `Player` 实体：\n\n    public class PlayerRank : EntityData\n    {\n        public int Score { get; set; }\n        public int Rank { get; set; }\n\n        [ForeignKey(\"Id\")]\n        public virtual Player Player { get; set; }\n    }\n\n移动服务客户端库不支持导航属性，并且这些属性将不序列化。例如，下面是 GET `/tables/PlayerRank` 的原始 HTTP 响应：\n\n    HTTP/1.1 200 OK\n    Cache-Control: no-cache\n    Pragma: no-cache\n    Content-Length: 97\n    Content-Type: application/json; charset=utf-8\n    Expires: 0\n    Server: Microsoft-IIS/8.0\n    Date: Mon, 21 Apr 2014 17:58:43 GMT\n    \n    [{\"id\":\"1\",\"rank\":1,\"score\":150},{\"id\":\"2\",\"rank\":3,\"score\":100},{\"id\":\"3\",\"rank\":1,\"score\":150}]\n\n请注意，`Player` 并未包含在对象图形中。若要包含玩家，可以通过定义*数据传输对象 (DTO)* 将对象图形平面化。\n\nDTO 是定义如何通过网络发送数据的对象。如果你希望有线格式看起来与数据库模型不同，即可使用 DTO。若要为 `PlayerRank` 创建 DTO，请在 DataObjects 文件夹中添加名为 `PlayerRankDto` 的新类。\n\n    namespace Leaderboard.DataObjects\n    {\n        public class PlayerRankDto\n        {\n            public string Id { get; set; }\n            public string PlayerName { get; set; }\n            public int Score { get; set; }\n            public int Rank { get; set; }\n        }\n    }\n\n在 `PlayerRankController` 类中，我们将使用 LINQ **Select** 方法，将 `PlayerRank` 实例转换为 `PlayerRankDto` 实例。按以下方式更新 `GetAllPlayerRank` 和 `GetPlayerRank` 控制器方法：\n\n    // GET tables/PlayerRank\n    public IQueryable<PlayerRankDto> GetAllPlayerRank()\n    {\n        return Query().Select(x => new PlayerRankDto()\n        {\n            Id = x.Id,\n            PlayerName = x.Player.Name,\n            Score = x.Score,\n            Rank = x.Rank\n        });\n    }\n    \n    // GET tables/PlayerRank/48D68C86-6EA6-4C25-AA33-223FC9A27959\n    public SingleResult<PlayerRankDto> GetPlayerRank(string id)\n    {\n        var result = Lookup(id).Queryable.Select(x => new PlayerRankDto()\n        {\n            Id = x.Id,\n            PlayerName = x.Player.Name,\n            Score = x.Score,\n            Rank = x.Rank\n        });\n    \n        return SingleResult<PlayerRankDto>.Create(result);\n    }\n\n做出这些更改后，两个 GET 方法将 `PlayerRankDto` 对象返回到客户端。`PlayerRankDto.PlayerName` 属性设置为玩家姓名。以下是做出此更改后的示例响应：\n\n    HTTP/1.1 200 OK\n    Cache-Control: no-cache\n    Pragma: no-cache\n    Content-Length: 160\n    Content-Type: application/json; charset=utf-8\n    Expires: 0\n    Server: Microsoft-IIS/8.0\n    Date: Mon, 21 Apr 2014 19:57:08 GMT\n    \n    [{\"id\":\"1\",\"playerName\":\"Alice\",\"score\":150,\"rank\":1},{\"id\":\"2\",\"playerName\":\"Bob\",\"score\":100,\"rank\":3},{\"id\":\"3\",\"playerName\":\"Charles\",\"score\":150,\"rank\":1}]\n\n请注意 JSON 负载现在包含玩家姓名。\n\n除了使用 LINQ Select 语句以外，另一种做法是使用 AutoMapper。这种做法需要使用其他设置代码，但可启用从域实体到 DTO 的自动映射。有关详细信息，请参阅[使用 AutoMapper 在 .NET 后端中的数据库类型与客户端类型之间映射](http://blogs.msdn.com/b/azuremobile/archive/2014/05/19/mapping-between-database-types-and-client-type-in-the-net-backend-using-automapper.aspx)。\n\n## 定义自定义 API 来提交分数\n\n`PlayerRank` 实体包含 `Rank` 属性。此值由服务器计算，而我们不希望客户端设置它。客户端应使用自定义 API 提交玩家的分数。当服务器获取新分数时，将更新所有的玩家排名。\n\n首先，将名为 `PlayerScore` 的类添加到 DataObjects 文件夹。\n\n    namespace Leaderboard.DataObjects\n    {\n        public class PlayerScore\n        {\n            public string PlayerId { get; set; }\n            public int Score { get; set; }\n        }\n    }\n\n在 `PlayerRankController` 类中，将 `MobileServiceContext` 变量从构造函数移到类变量：\n\n    public class PlayerRankController : TableController<PlayerRank>\n    {\n        // Add this:\n        MobileServiceContext context = new MobileServiceContext();\n\n        protected override void Initialize(HttpControllerContext controllerContext)\n        {\n            base.Initialize(controllerContext);\n\n            // Delete this:\n            // MobileServiceContext context = new MobileServiceContext();\n            DomainManager = new EntityDomainManager<PlayerRank>(context, Request, Services);\n        }\n\n\n从 `PlayerRankController` 中删除以下方法：\n\n- `PatchPlayerRank` \n- `PostPlayerRank` \n- `DeletePlayerRank`\n\n然后，将以下代码添加到 `PlayerRankController`：\n\n    [Route(\"api/score\")]\n    public async Task<IHttpActionResult> PostPlayerScore(PlayerScore score)\n    {\n        // Does this player exist?\n        var count = context.Players.Where(x => x.Id == score.PlayerId).Count();\n        if (count < 1)\n        {\n            return BadRequest();\n        }\n\n        // Try to find the PlayerRank entity for this player. If not found, create a new one.\n        PlayerRank rank = await context.PlayerRanks.FindAsync(score.PlayerId);\n        if (rank == null)\n        {\n            rank = new PlayerRank { Id = score.PlayerId };\n            rank.Score = score.Score;\n            context.PlayerRanks.Add(rank);\n        }\n        else\n        {\n            rank.Score = score.Score;\n        }\n\n        await context.SaveChangesAsync();\n\n        // Update rankings\n        // See http://stackoverflow.com/a/575799\n        const string updateCommand =\n            \"UPDATE r SET Rank = ((SELECT COUNT(*)+1 from {0}.PlayerRanks \" +\n            \"where Score > (select score from {0}.PlayerRanks where Id = r.Id)))\" +\n            \"FROM {0}.PlayerRanks as r\";\n\n        string command = String.Format(updateCommand, ServiceSettingsDictionary.GetSchemaName());\n        await context.Database.ExecuteSqlCommandAsync(command);\n\n        return Ok();\n    }\n\n`PostPlayerScore` 方法采用 `PlayerScore` 实例作为输入。（客户端将在 HTTP POST 请求中发送 `PlayerScore`。） 该方法将执行以下操作：\n\n1.  如果数据库中尚无玩家的 `PlayerRank`，则新增一个。\n2.  更新玩家的分数。\n3.  运行 SQL 查询，以分批更新所有玩家排名。\n\n**[Route]** 属性为此方法定义一个自定义路由：\n\n    [Route(\"api/score\")]\n\n也可以将方法放入单独的控制器中。没有哪种方法特别好，具体取决于你想要如何组织代码。\n若要深入了解 **[Route]** 属性，请参阅 [Web API 中的属性路由](http://www.asp.net/web-api/overview/web-api-routing-and-actions/attribute-routing-in-web-api-2)。\n\n## 创建 Windows 应用商店应用程序\n\n在本部分中，我将介绍使用移动服务的 Windows 应用商店应用程序。但是，我不会将重点放在 XAML 或 UI 上，而是着重于应用程序逻辑。你可以在[此处](http://code.msdn.microsoft.com/Leaderboard-App-with-Azure-9acf63af)下载完整项目。\n\n将新的 Windows 应用商店应用程序项目添加到解决方案。我使用了空白应用程序 (Windows) 模板。\n\n![][10]\n \n使用 NuGet Package Manager 添加移动服务客户端库。在 Visual Studio 中，从“工具”菜单中选择“NuGet Package Manager”。然后选择“Package Manager Console”。在“Package Manager Console”窗口中键入以下命令。\n\n    Install-Package WindowsAzure.MobileServices -Project LeaderboardApp\n\n-Project 开关指定要将包安装到哪个项目。\n\n## 添加模型类\n\n创建名为 Models 的文件夹并添加以下类：\n\n    namespace LeaderboardApp.Models\n    {\n        public class Player\n        {\n            public string Id { get; set; }\n            public string Name { get; set; }\n        }\n    \n        public class PlayerRank\n        {\n            public string Id { get; set; }\n            public string PlayerName { get; set; }\n            public int Score { get; set; }\n            public int Rank { get; set; }\n        }\n    \n        public class PlayerScore\n        {\n            public string PlayerId { get; set; }\n            public int Score { get; set; }\n        }\n    }\n\n这些类直接对应于移动服务中的数据实体。\n \n## 创建视图模型\n\n模型-视图-视图模型 (MVVM) 是模型-视图-控制器 (MVC) 的变体。MVVM 模式有助于将应用程序逻辑与表示形式区分开来。\n\n- 模型表示域数据（玩家、玩家排名和玩家分数）。\n- 视图模型是视图的抽象表示形式。 \n- 视图显示视图模型，并向视图模型发送用户输入。对于 Windows 应用商店应用程序，视图在 XAML 中定义。\n\n![][11]\n\n添加名为的 `LeaderboardViewModel` 的类。\n\n    using LeaderboardApp.Models;\n    using Microsoft.WindowsAzure.MobileServices;\n    using System.ComponentModel;\n    using System.Net.Http;\n    using System.Threading.Tasks;\n    \n    namespace LeaderboardApp.ViewModel\n    {\n        class LeaderboardViewModel : INotifyPropertyChanged\n        {\n            MobileServiceClient _client;\n    \n            public LeaderboardViewModel(MobileServiceClient client)\n            {\n                _client = client;\n            }\n        }\n    }\n\n在视图模型上实现 **INotifyPropertyChanged**，使视图模型可以参与数据绑定。\n\n    class LeaderboardViewModel : INotifyPropertyChanged\n    {\n        MobileServiceClient _client;\n\n        public LeaderboardViewModel(MobileServiceClient client)\n        {\n            _client = client;\n        }\n\n        // New code:\n        // INotifyPropertyChanged implementation\n        public event PropertyChangedEventHandler PropertyChanged;\n\n        public void NotifyPropertyChanged(string propertyName)\n        {\n            if (PropertyChanged != null)\n            {\n                PropertyChanged(this,\n                    new PropertyChangedEventArgs(propertyName));\n            }\n        }    \n    }\n\n接下来，添加可查看属性。XAML 将与这些属性建立数据绑定。\n\n    class LeaderboardViewModel : INotifyPropertyChanged\n    {\n        // ...\n\n        // New code:\n        // View model properties\n        private MobileServiceCollection<Player, Player> _Players;\n        public MobileServiceCollection<Player, Player> Players\n        {\n            get { return _Players; }\n            set\n            {\n                _Players = value;\n                NotifyPropertyChanged(\"Players\");\n            }\n        }\n\n        private MobileServiceCollection<PlayerRank, PlayerRank> _Ranks;\n        public MobileServiceCollection<PlayerRank, PlayerRank> Ranks\n        {\n            get { return _Ranks; }\n            set\n            {\n                _Ranks = value;\n                NotifyPropertyChanged(\"Ranks\");\n            }\n        }\n\n        private bool _IsPending;\n        public bool IsPending\n        {\n            get { return _IsPending; }\n            set\n            {\n                _IsPending = value;\n                NotifyPropertyChanged(\"IsPending\");\n            }\n        }\n\n        private string _ErrorMessage = null;\n        public string ErrorMessage\n        {\n            get { return _ErrorMessage; }\n            set\n            {\n                _ErrorMessage = value;\n                NotifyPropertyChanged(\"ErrorMessage\");\n            }\n        }\n    }\n\n当服务的异步操作挂起时，`IsPending` 属性为 true。`ErrorMessage` 属性包含来自服务的任何错误消息。\n\n最后，添加调用服务层的方法。\n\n    class LeaderboardViewModel : INotifyPropertyChanged\n    {\n        // ...\n\n        // New code:\n        // Service operations\n        public async Task GetAllPlayersAsync()\n        {\n            IsPending = true;\n            ErrorMessage = null;\n\n            try\n            {\n                IMobileServiceTable<Player> table = _client.GetTable<Player>();\n                Players = await table.OrderBy(x => x.Name).ToCollectionAsync();\n            }\n            catch (MobileServiceInvalidOperationException ex)\n            {\n                ErrorMessage = ex.Message;\n            }\n            catch (HttpRequestException ex2)\n            {\n                ErrorMessage = ex2.Message;\n            }\n            finally\n            {\n                IsPending = false;\n            }\n        }\n\n        public async Task AddPlayerAsync(Player player)\n        {\n            IsPending = true;\n            ErrorMessage = null;\n\n            try\n            {\n                IMobileServiceTable<Player> table = _client.GetTable<Player>();\n                await table.InsertAsync(player);\n                Players.Add(player);\n            }\n            catch (MobileServiceInvalidOperationException ex)\n            {\n                ErrorMessage = ex.Message;\n            }\n            catch (HttpRequestException ex2)\n            {\n                ErrorMessage = ex2.Message;\n            }\n            finally\n            {\n                IsPending = false;\n            }\n        }\n\n        public async Task SubmitScoreAsync(Player player, int score)\n        {\n            IsPending = true;\n            ErrorMessage = null;\n\n            var playerScore = new PlayerScore()\n            {\n                PlayerId = player.Id,\n                Score = score\n            }; \n            \n            try\n            {\n                await _client.InvokeApiAsync<PlayerScore, object>(\"score\", playerScore);\n                await GetAllRanksAsync();\n            }\n            catch (MobileServiceInvalidOperationException ex)\n            {\n                ErrorMessage = ex.Message;\n            }\n            catch (HttpRequestException ex2)\n            {\n                ErrorMessage = ex2.Message;\n            }\n            finally\n            {\n                IsPending = false;\n            }\n        }\n\n        public async Task GetAllRanksAsync()\n        {\n            IsPending = true;\n            ErrorMessage = null;\n\n            try\n            {\n                IMobileServiceTable<PlayerRank> table = _client.GetTable<PlayerRank>();\n                Ranks = await table.OrderBy(x => x.Rank).ToCollectionAsync();\n            }\n            catch (MobileServiceInvalidOperationException ex)\n            {\n                ErrorMessage = ex.Message;\n            }\n            catch (HttpRequestException ex2)\n            {\n                ErrorMessage = ex2.Message;\n            }\n            finally\n            {\n                IsPending = false;\n            }\n         }    \n    }\n\n## 添加 MobileServiceClient 实例\n\n打开 *App.xaml.cs* 文件并将 **MobileServiceClient** 实例添加到 `App` 类。\n\n    // New code:\n    using Microsoft.WindowsAzure.MobileServices;\n    \n    namespace LeaderboardApp\n    {\n        sealed partial class App : Application\n        {\n            // New code.\n            // TODO: Replace 'port' with the actual port number.\n            const string serviceUrl = \"http://localhost:port/\";\n            public static MobileServiceClient MobileService = new MobileServiceClient(serviceUrl);\n    \n    \n            // ...\n        }\n    }\n\n当你在本地调试时，移动服务将在 IIS Express 上运行。Visual Studio 将分配一个随机端口号，因此本地 URL 为 http://localhost:*port*，其中 *port* 为端口号。若要获取端口号，请按 F5 在 Visual Studio 中启动服务，以进行调试。Visual Studio 将启动浏览器，并导航到服务 URL。你也可以在项目属性中的 **Web** 下查找本地 URL。\n\n## 创建主页面\n\n在主页面中，添加视图模型的实例。然后将视图模型设置为该页面的 **DataContext**。\n\n    public sealed partial class MainPage : Page\n    {\n        // New code:\n        LeaderboardViewModel viewModel = new LeaderboardViewModel(App.MobileService);\n\n        public MainPage()\n        {\n            this.InitializeComponent();\n            // New code:\n            this.DataContext = viewModel;\n        }\n\n       // ...\n\n\n前面已经提到，我不会介绍应用程序的所有 XAML。MVVM 模式的优点之一是能够区分表示形式和应用程序逻辑，因此，如果你不喜欢示例应用程序，可以轻松更改 UI。\n\n玩家列表显示在 **ListBox** 中：\n\n    <ListBox Width=\"200\" Height=\"400\" x:Name=\"PlayerListBox\" \n        ItemsSource=\"{Binding Players}\" DisplayMemberPath=\"Name\"/>\n\n排名显示在 **ListView** 中：\n\n    <ListView x:Name=\"RankingsListView\" ItemsSource=\"{Binding Ranks}\" SelectionMode=\"None\">\n        <!-- Header and styles not shown -->\n        <ListView.ItemTemplate>\n            <DataTemplate>\n                <Grid>\n                    <Grid.ColumnDefinitions>\n                        <ColumnDefinition Width=\"*\"/>\n                        <ColumnDefinition Width=\"2*\"/>\n                        <ColumnDefinition Width=\"*\"/>\n                    </Grid.ColumnDefinitions>\n                    <TextBlock Text=\"{Binding Path=Rank}\"/>\n                    <TextBlock Text=\"{Binding Path=PlayerName}\" Grid.Column=\"1\"/>\n                    <TextBlock Text=\"{Binding Path=Score}\" Grid.Column=\"2\"/>\n                </Grid>\n            </DataTemplate>\n        </ListView.ItemTemplate>\n    </ListView>\n\n所有数据绑定都通过视图模型发生。\n\n## 发布移动服务\n\n在此步骤中，你要将移动服务发布到 Azure，并修改应用程序以使用实时服务。\n\n在“解决方案资源管理器”中，右键单击 Leaderboard 项目并选择“发布”。\n \n![][12]\n\n在“发布”对话框中，单击“Azure 移动服务”。\n\n![][13]\n \n如果你尚未登录你的 Azure 帐户，请单击“登录”。\n\n![][14]\n\n\n选择现有的移动服务，或单击“新建”以创建一个新的服务。然后单击“确定”以发布。\n\n![][15]\n \n发布过程会自动创建数据库。你不需要配置连接字符串。\n\n现在，你可以将排行榜应用程序连接到实时服务了。你需要以下两项：\n\n- 服务的 URL\n- 应用程序密钥\n\n你可以从 Azure 经典门户获取这两项信息。在门户中单击“移动服务”，然后单击该移动服务。仪表板选项卡上列出了服务 URL。若要获取应用程序密钥，请单击“管理密钥”。\n\n![][16]\n \n在“管理访问密钥”对话框中，复制应用程序密钥值。\n\n![][17]\n\n \n将服务 URL 和应用程序密钥传递给 **MobileServiceClient** 构造函数。\n\n    sealed partial class App : Application\n    {\n        // TODO: Replace these strings with the real URL and key.\n        const string serviceUrl = \"https://yourapp.azure-mobile.net/\";\n        const string appKey = \"YOUR ACCESSS KEY\";\n\n        public static MobileServiceClient MobileService = new MobileServiceClient(serviceUrl, appKey);\n\n       // ...\n\n现在，当你运行该应用程序时，它将与实际的服务通信。\n\n## 后续步骤\n\n* [详细了解 Azure 移动服务]\n* [详细了解 Web API]\n* [处理数据库写入冲突]\n* [添加推送通知]（例如，当某人添加新玩家或更新分数时）。\n* [身份验证入门]\n\n<!-- Anchors. -->\n[Overview]: #overview\n[About the sample app]: #about-the-sample-app\n[Create the project]: #create-the-project\n[Add data models]: #add-data-models\n[Add Web API controllers]: #add-web-api-controllers\n[Use a DTO to return related entities]: #use-a-dto-to-return-related-entities\n[Define a custom API to submit scores]: #define-a-custom-api-to-submit-scores\n[Create the Windows Store app]: #create-the-windows-store-app\n[Add model classes]: #add-model-classes\n[Create a view model]: #create-a-view-model\n[Add a MobileServiceClient instance]: #add-a-mobileserviceclient-instance\n[Create the main page]: #create-the-main-page\n[Publish your mobile service]: #publish-your-mobile-service\n[Next Steps]: #next-steps\n\n<!-- Images. -->\n\n[1]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/01leaderboard.png\n[2]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/02leaderboard.png\n[3]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/03leaderboard.png\n[4]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/04leaderboard.png\n[5]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/05leaderboard.png\n[6]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/06leaderboard.png\n[7]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/07leaderboard.png\n[8]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/08leaderboard.png\n[9]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/09leaderboard.png\n[10]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/10leaderboard.png\n[11]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/11leaderboard.png\n[12]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/12leaderboard.png\n[13]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/13leaderboard.png\n[14]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/14leaderboard.png\n[15]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/15leaderboard.png\n[16]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/16leaderboard.png\n[17]: ./media/mobile-services-dotnet-backend-windows-store-dotnet-leaderboard/17leaderboard.png\n\n<!-- URLs. -->\n\n[详细了解 Azure 移动服务]: /documentation/services/mobile-services/\n[详细了解 Web API]: http://asp.net/web-api\n[处理数据库写入冲突]: /documentation/articles/mobile-services-windows-store-dotnet-handle-database-conflicts\n[添加推送通知]: /documentation/articles/notification-hubs-windows-store-dotnet-get-started\n[身份验证入门]: /documentation/articles/mobile-services-windows-store-dotnet-get-started-users\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

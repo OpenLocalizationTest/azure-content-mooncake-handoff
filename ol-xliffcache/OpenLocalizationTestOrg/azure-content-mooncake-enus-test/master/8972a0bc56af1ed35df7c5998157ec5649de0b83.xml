@@ -1,0 +1,845 @@
+{
+  "nodes": [
+    {
+      "content": "站点恢复的工作原理 | Azure",
+      "pos": [
+        27,
+        44
+      ]
+    },
+    {
+      "content": "本文提供站点恢复体系结构的概述",
+      "pos": [
+        63,
+        78
+      ]
+    },
+    {
+      "content": "Azure Site Recovery 的工作原理",
+      "pos": [
+        296,
+        321
+      ]
+    },
+    {
+      "content": "关于本文",
+      "pos": [
+        326,
+        330
+      ]
+    },
+    {
+      "pos": [
+        332,
+        464
+      ],
+      "content": "本文介绍站点恢复的基础架构以及它运行时使用的组件。阅读本文后，你可以在 <bpt id=\"p1\">[</bpt>Azure 恢复服务论坛<ept id=\"p1\">](https://social.msdn.microsoft.com/Forums/zh-cn/home?forum=hypervrecovmgr)</ept>上发布任何问题。"
+    },
+    {
+      "content": "概述",
+      "pos": [
+        470,
+        472
+      ]
+    },
+    {
+      "content": "组织需要制定业务连续性和灾难恢复 (BCDR) 策略来确定应用、工作负荷和数据如何在计划内和计划外停机期间保持可用，并尽快恢复正常运行。BCDR 策略重点在于维护可确保业务数据的安全且可恢复，以及在发生灾难时工作负荷持续可用的解决方案。",
+      "pos": [
+        474,
+        592
+      ]
+    },
+    {
+      "content": "站点恢复是一项 Azure 服务，可以通过协调从本地物理服务器和虚拟机到云 (Azure) 或辅助数据中心的的复制，来为 BCDR 策略提供辅助。当主要位置发生故障时，你可以故障转移到辅助站点，使应用和工作负荷保持可用。当主要位置恢复正常时，你可以故障转移回到主要位置。",
+      "pos": [
+        594,
+        729
+      ]
+    },
+    {
+      "content": "站点恢复可用于许多方案，并可保护许多工作负荷。",
+      "pos": [
+        731,
+        754
+      ]
+    },
+    {
+      "pos": [
+        758,
+        886
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>保护 VMware 虚拟机<ept id=\"p1\">**</ept>：可以通过将本地 VMware 虚拟机复制到 Azure 或辅助数据中心来为其提供保护。- <bpt id=\"p2\">**</bpt>保护 Hyper-V VM<ept id=\"p2\">**</ept>：可以通过将本地 Hyper-V 虚拟机复制到云 (Azure) 或辅助数据中心来为其提供保护。"
+    },
+    {
+      "pos": [
+        891,
+        956
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>保护物理服务器<ept id=\"p1\">**</ept>：可以通过将运行 Windows 或 Linux 的物理机复制到 Azure 或辅助数据中心来为其提供保护。"
+    },
+    {
+      "pos": [
+        959,
+        1035
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>迁移 VM<ept id=\"p1\">**</ept>：可以使用站点恢复在区域之间迁移 Azure IaaS VM，或者将 AWS Windows 实例迁移到 Azure IaaS VM。"
+    },
+    {
+      "pos": [
+        1037,
+        1211
+      ],
+      "content": "你可以在<bpt id=\"p1\">[</bpt>什么是 Azure Site Recovery？<ept id=\"p1\">](/documentation/articles/site-recovery-overview)</ept>和 <bpt id=\"p2\">[</bpt>Azure Site Recovery 可以保护哪些工作负荷？<ept id=\"p2\">](/documentation/articles/site-recovery-workload)</ept>中获取受支持部署的完整摘要"
+    },
+    {
+      "content": "在本地物理服务器或 VMware 虚拟机与 Azure 之间复制",
+      "pos": [
+        1216,
+        1248
+      ]
+    },
+    {
+      "content": "如果你想要通过将 VMware VM 或 Windows/Linux 物理机复制到 Azure 来保护它们，以下是你需要做好的准备。",
+      "pos": [
+        1250,
+        1316
+      ]
+    },
+    {
+      "content": "位置",
+      "pos": [
+        1320,
+        1322
+      ]
+    },
+    {
+      "content": "需要什么",
+      "pos": [
+        1329,
+        1333
+      ]
+    },
+    {
+      "content": "本地",
+      "pos": [
+        1349,
+        1351
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>进程服务器<ept id=\"p1\">**</ept>：此服务器在将受保护 VMware 虚拟机或 Windows/Linux 物理机中的数据发送到 Azure 之前优化这些数据。它还处理用于保护计算机的移动服务组件的推送安装，并执行 VMware 虚拟机的自动发现。",
+      "pos": [
+        1354,
+        1470
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>VMware vCenter 服务器<ept id=\"p1\">**</ept>：如果你要保护 VMware VM，则需要使用 VMwave vCenter 服务器管理 vSphere 虚拟机监控程序",
+      "pos": [
+        1480,
+        1562
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>ESX 服务器<ept id=\"p1\">**</ept>：如果你要保护 VMware VM，则需要一台运行具有最新更新的 ESX/ESXi 版本 5.1 或 5.5 的服务器。",
+      "pos": [
+        1572,
+        1643
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>计算机<ept id=\"p1\">**</ept>：如果你要保护 VMware，应该安装并运行具有 VMware 工具的 VMware VM。如果你要保护物理机，它们应该运行支持的 Windows 或 Linux 操作系统。请参阅<bpt id=\"p2\">[</bpt>支持的系统<ept id=\"p2\">](/documentation/articles/site-recovery-vmware-to-azure#before-you-start)</ept>。",
+      "pos": [
+        1654,
+        1831
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>移动服务<ept id=\"p1\">**</ept>：在要保护的计算机上安装以捕获更改并将其发送到进程服务器。",
+      "pos": [
+        1841,
+        1878
+      ]
+    },
+    {
+      "content": "第三方组件：此部署依赖于一些<bpt id=\"p1\">[</bpt>第三方组件<ept id=\"p1\">](http://download.microsoft.com/download/C/D/7/CD79E327-BF5A-4026-8FF4-9EB990F9CEE2/Third-Party_Notices.txt)</ept>。",
+      "pos": [
+        1888,
+        2017
+      ]
+    },
+    {
+      "content": "Azure",
+      "pos": [
+        2018,
+        2023
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>配置服务器<ept id=\"p1\">**</ept>：标准 A3 Azure VM，用于协调受保护的计算机、处理服务器和主目标服务器之间的通信。它设置故障转移发生时的复制和协调恢复。",
+      "pos": [
+        2026,
+        2100
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>主目标服务器<ept id=\"p1\">**</ept>：Azure VM 使用在 Azure 存储帐户的 Blob 存储中创建的附加 VHD 来保存从受保护计算机复制的数据。故障转移主目标服务器在本地运行，使你可以将 Azure VM 故障转移到 VMware VM。",
+      "pos": [
+        2110,
+        2227
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>站点恢复保管库<ept id=\"p1\">**</ept>：至少一个 Azure Site Recovery 保管库（其中设置了站点恢复服务的订阅）",
+      "pos": [
+        2237,
+        2293
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>虚拟网络<ept id=\"p1\">**</ept>：配置服务器与主目标服务器所在的 Azure 网络，与站点恢复服务位于相同的订阅和区域中。",
+      "pos": [
+        2303,
+        2356
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>Azure 存储空间<ept id=\"p1\">**</ept>：用于存储复制的数据的 Azure 存储帐户。应该采用标准异地冗余配置，或者位于与站点恢复订阅相同的区域中的高级帐户。",
+      "pos": [
+        2366,
+        2439
+      ]
+    },
+    {
+      "content": "在此方案中，通信可以通过 VPN 连接发送到 Azure 网络上的内部端口（使用 Azure ExpressRoute 或站点到站点 VPN），或通过安全 Internet 连接发送到配置 VM 和主目标服务器 VM 的 Azure 云服务上的映射公共终结点。",
+      "pos": [
+        2442,
+        2572
+      ]
+    },
+    {
+      "content": "受保护计算机上的移动服务将复制数据发送到进程服务器，并将复制元数据发送到配置服务器。进程服务器与配置服务器通信以接收管理和控制信息。它将复制信息发送到主目标服务器，优化复制的数据并将其发送到主目标服务器。",
+      "pos": [
+        2574,
+        2676
+      ]
+    },
+    {
+      "content": "将 Hyper-V VM 复制到 Azure（使用 VMM）",
+      "pos": [
+        2681,
+        2711
+      ]
+    },
+    {
+      "content": "如果 VM 位于在 System Center VMM 云中管理的 Hyper-V 主机上，以下是将它们复制到 Azure 所要做好的准备。",
+      "pos": [
+        2713,
+        2783
+      ]
+    },
+    {
+      "content": "位置",
+      "pos": [
+        2787,
+        2789
+      ]
+    },
+    {
+      "content": "需要什么",
+      "pos": [
+        2796,
+        2800
+      ]
+    },
+    {
+      "content": "本地",
+      "pos": [
+        2815,
+        2817
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>VMM 服务器<ept id=\"p1\">**</ept>：至少一个 VMM 服务器，其中至少设置了一个 VMM 私有云。将在 VMM 服务器上安装 Azure Site Recovery 提供程序",
+      "pos": [
+        2820,
+        2901
+      ]
+    },
+    {
+      "content": "&lt;br/<bpt id=\"p1\">**</bpt>Hyper-V 服务器<ept id=\"p1\">**</ept>：VMM 云中至少有一个 Hyper-V 主机服务器。Microsoft 恢复服务代理将安装在每个 Hyper-V 服务器上。",
+      "pos": [
+        2906,
+        2988
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>虚拟机<ept id=\"p1\">**</ept>：Hyper-V 服务器上至少运行一个虚拟机。不会在该虚拟机上安装任何软件。",
+      "pos": [
+        2998,
+        3043
+      ]
+    },
+    {
+      "content": "Azure",
+      "pos": [
+        3044,
+        3049
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>站点恢复保管库<ept id=\"p1\">**</ept>：至少一个 Azure Site Recovery 保管库（其中设置了站点恢复服务的订阅）",
+      "pos": [
+        3052,
+        3108
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>存储帐户<ept id=\"p1\">**</ept>：一个 Azure 存储帐户，与站点恢复服务位于同一个订阅下。复制的计算机将存储在 Azure 存储空间中。",
+      "pos": [
+        3118,
+        3180
+      ]
+    },
+    {
+      "content": "在此方案中，在 VMM 服务器上运行的提供程序通过 Internet 协调使用站点恢复服务的复制。通过 HTTPS 443 在本地 Hyper-V 服务器上运行的恢复服务代理与 Azure 存储空间之间复制数据。来自提供程序和代理的通信都是安全且经过加密的。Azure 存储空间中的复制数据也已加密。",
+      "pos": [
+        3183,
+        3333
+      ]
+    },
+    {
+      "content": "本地 VMM 到 Azure",
+      "pos": [
+        3337,
+        3351
+      ]
+    },
+    {
+      "content": "将 Hyper-V VM 复制到 Azure（不使用 VMM）",
+      "pos": [
+        3424,
+        3455
+      ]
+    },
+    {
+      "content": "如果你的 VM 不受 System Center VMM 服务器的管理，以下是将它们复制到 Azure 所要做好的准备",
+      "pos": [
+        3457,
+        3516
+      ]
+    },
+    {
+      "content": "位置",
+      "pos": [
+        3520,
+        3522
+      ]
+    },
+    {
+      "content": "需要什么",
+      "pos": [
+        3529,
+        3533
+      ]
+    },
+    {
+      "content": "本地",
+      "pos": [
+        3548,
+        3550
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>Hyper-V 服务器<ept id=\"p1\">**</ept>：至少一个 Hyper-V 主机服务器。Azure Site Recovery 提供程序和 Microsoft 恢复服务代理将安装在每个 Hyper-V 服务器上。",
+      "pos": [
+        3553,
+        3650
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>虚拟机<ept id=\"p1\">**</ept>：Hyper-V 服务器上至少运行一个虚拟机。不会在该虚拟机上安装任何软件。",
+      "pos": [
+        3660,
+        3705
+      ]
+    },
+    {
+      "content": "Azure",
+      "pos": [
+        3706,
+        3711
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>站点恢复保管库<ept id=\"p1\">**</ept>：至少一个 Azure Site Recovery 保管库（其中设置了站点恢复服务的订阅）",
+      "pos": [
+        3714,
+        3770
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>存储帐户<ept id=\"p1\">**</ept>：一个 Azure 存储帐户，与站点恢复服务位于同一个订阅下。复制的计算机将存储在 Azure 存储空间中。",
+      "pos": [
+        3780,
+        3842
+      ]
+    },
+    {
+      "content": "在此方案中，在 Hyper-V 服务器上运行的提供程序通过 Internet 协调使用站点恢复服务的复制。通过 HTTPS 443 在本地 Hyper-V 服务器上运行的恢复服务代理与 Azure 存储空间之间复制数据。来自提供程序和代理的通信都是安全且经过加密的。Azure 存储空间中的复制数据也已加密。",
+      "pos": [
+        3844,
+        3998
+      ]
+    },
+    {
+      "content": "本地 VMM 到 Azure",
+      "pos": [
+        4002,
+        4016
+      ]
+    },
+    {
+      "content": "将 Hyper-V VM 复制到辅助数据中心",
+      "pos": [
+        4091,
+        4113
+      ]
+    },
+    {
+      "content": "如果你想要通过将 Hyper-V VM 复制到辅助数据中心来为其提供保护，以下是需要做好的准备。请注意，仅当 Hyper-V 主机服务器在 System Center VMM 云中管理时，才可以这样做。",
+      "pos": [
+        4115,
+        4216
+      ]
+    },
+    {
+      "content": "位置",
+      "pos": [
+        4220,
+        4222
+      ]
+    },
+    {
+      "content": "需要什么",
+      "pos": [
+        4229,
+        4233
+      ]
+    },
+    {
+      "content": "本地",
+      "pos": [
+        4249,
+        4251
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>VMM 服务器<ept id=\"p1\">**</ept>：主站点和辅助站点中各有一个 VMM 服务器。Azure Site Recovery 提供程序将安装在每个 VMM 服务器上。",
+      "pos": [
+        4254,
+        4328
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>Hyper-V 服务器<ept id=\"p1\">**</ept>：主站点和辅助站点的 VMM 云中至少有一个 Hyper-V 主机服务器。不会在 Hyper-V 服务器上安装任何软件",
+      "pos": [
+        4338,
+        4412
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>虚拟机<ept id=\"p1\">**</ept>：Hyper-V 服务器上至少运行一个虚拟机。不会在该虚拟机上安装任何软件。",
+      "pos": [
+        4422,
+        4467
+      ]
+    },
+    {
+      "content": "Azure",
+      "pos": [
+        4468,
+        4473
+      ]
+    },
+    {
+      "pos": [
+        4476,
+        4533
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>站点恢复保管库<ept id=\"p1\">**</ept>：至少一个 Azure Site Recovery 保管库（其中设置了站点恢复服务的订阅）。"
+    },
+    {
+      "content": "在此方案中，VMM 服务器上的提供程序通过 Internet 协调使用站点恢复服务的复制。使用 Kerberos 或证书身份验证通过 Internet 在主要和辅助 Hyper-V 主机服务器之间复制数据。来自提供程序的通信以及 Hyper-V 主机服务器之间的通信都是安全且经过加密的。",
+      "pos": [
+        4536,
+        4680
+      ]
+    },
+    {
+      "content": "本地到本地",
+      "pos": [
+        4684,
+        4689
+      ]
+    },
+    {
+      "content": "使用 SAN 复制将 Hyper-V VM 复制到辅助数据中心",
+      "pos": [
+        4752,
+        4783
+      ]
+    },
+    {
+      "content": "如果 VM 位于在 System Center VMM 云中管理的 Hyper-V 主机上并且你使用 SAN 存储，以下是在两个数据中心之间复制时所要做好的准备。",
+      "pos": [
+        4785,
+        4866
+      ]
+    },
+    {
+      "content": "位置",
+      "pos": [
+        4870,
+        4872
+      ]
+    },
+    {
+      "content": "需要什么",
+      "pos": [
+        4879,
+        4883
+      ]
+    },
+    {
+      "content": "主数据中心",
+      "pos": [
+        4899,
+        4904
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>SAN 阵列<ept id=\"p1\">**</ept>：主 VMM 服务器管理的<bpt id=\"p2\">[</bpt>受支持 SAN 阵列<ept id=\"p2\">](http://social.technet.microsoft.com/wiki/contents/articles/28317.deploying-azure-site-recovery-with-vmm-and-san-supported-storage-arrays.aspx)</ept>。SAN 与辅助站点中的另一个 SAN 阵列共享网络基础结构",
+      "pos": [
+        4907,
+        5115
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>VMM 服务器<ept id=\"p1\">**</ept>：至少一个 VMM 服务器，其中已设置一个或多个 VMM 云和复制组。将在每个 VMM 服务器上安装 Azure Site Recovery 提供程序。",
+      "pos": [
+        5125,
+        5212
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>Hyper-V 服务器<ept id=\"p1\">**</ept>：复制组中至少有一个包含虚拟机的 Hyper-V 主机服务器。不会在 Hyper-V 主机服务器上安装任何软件。",
+      "pos": [
+        5222,
+        5293
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>虚拟机<ept id=\"p1\">**</ept>：Hyper-V 主机服务器上至少运行一个虚拟机。不会在该虚拟机上安装任何软件。",
+      "pos": [
+        5304,
+        5351
+      ]
+    },
+    {
+      "content": "辅助数据中心",
+      "pos": [
+        5353,
+        5359
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>SAN 阵列<ept id=\"p1\">**</ept>：辅助 VMM 服务器管理的<bpt id=\"p2\">[</bpt>受支持 SAN 阵列<ept id=\"p2\">](http://social.technet.microsoft.com/wiki/contents/articles/28317.deploying-azure-site-recovery-with-vmm-and-san-supported-storage-arrays.aspx)</ept>。",
+      "pos": [
+        5362,
+        5542
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>VMM 服务器<ept id=\"p1\">**</ept>：至少一个 VMM 服务器，其中包含一个或多个 VMM 云。",
+      "pos": [
+        5552,
+        5593
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>Hyper-V 服务器<ept id=\"p1\">**</ept>：至少一个 Hyper-V 主机服务器。",
+      "pos": [
+        5604,
+        5639
+      ]
+    },
+    {
+      "content": "Azure",
+      "pos": [
+        5641,
+        5646
+      ]
+    },
+    {
+      "pos": [
+        5649,
+        5705
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>站点恢复保管库<ept id=\"p1\">**</ept>：至少一个 Azure Site Recovery 保管库（其中设置了站点恢复服务的订阅）"
+    },
+    {
+      "content": "在此方案中，VMM 服务器上的提供程序通过 Internet 协调使用站点恢复服务的复制。使用同步的 SAN 复制在主要和辅助存储阵列之间复制数据。",
+      "pos": [
+        5707,
+        5781
+      ]
+    },
+    {
+      "content": "本地到本地",
+      "pos": [
+        5785,
+        5790
+      ]
+    },
+    {
+      "content": "Hyper-V 保护生命周期",
+      "pos": [
+        5859,
+        5873
+      ]
+    },
+    {
+      "content": "此工作流显示保护、复制和故障转移 Hyper-V 虚拟机的过程。",
+      "pos": [
+        5875,
+        5907
+      ]
+    },
+    {
+      "pos": [
+        5912,
+        6238
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>启用保护<ept id=\"p1\">**</ept>：设置站点恢复保管库、配置 VMM 云或 Hyper-V 网站的复制设置，并启用 VM 的保护。名为“启用保护”的作业将会启动，并可以在“作业”选项卡中监视。该作业将检查计算机是否符合先决条件，然后调用 <bpt id=\"p2\">[</bpt>CreateReplicationRelationship<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/hh850036.aspx)</ept> 方法，以使用配置的设置来设置到 Azure 的复制。“启用保护”作业还调用 <bpt id=\"p3\">[</bpt>StartReplication<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/hh850303.aspx)</ept> 方法来初始化完整 VM 复制。"
+    },
+    {
+      "pos": [
+        6242,
+        6501
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>初始复制<ept id=\"p1\">**</ept>：生成虚拟机快照，并逐个复制虚拟硬盘，直到它们已全部复制到 Azure 或辅助数据中心。完成时间取决于数据大小和网络带宽以及所选的初始复制方法。如果在初始复制期间发生磁盘更改，Hyper-V 副本复制跟踪器将跟踪这些更改，并将其记录在 Hyper-V 复制日志 (.hrl) 中，该文件位于与磁盘相同的文件夹中。每个磁盘都有一个关联的 .hrl 文件，该文件将发送到辅助存储。请注意，当初始复制正在进行时，快照和日志将占用磁盘资源。初始复制完成后，将删除 VM 快照，并同步和合并日志中的差异磁盘更改。"
+    },
+    {
+      "pos": [
+        6505,
+        6621
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>完成保护<ept id=\"p1\">**</ept>：初始复制完成后，“完成保护”作业将配置网络和其他复制后设置，然后虚拟机将受到保护。如果要复制到 Azure，你可能需要调整虚拟机的设置，使其随时可进行故障转移。此时，你可以运行测试故障转移以检查一切是否按预期工作。"
+    },
+    {
+      "pos": [
+        6625,
+        6656
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>复制<ept id=\"p1\">**</ept>：在初始复制之后，根据复制设置和方法进行差异同步。"
+    },
+    {
+      "pos": [
+        6664,
+        6852
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>复制失败<ept id=\"p1\">**</ept>：如果差异复制失败且完整复制因为带宽或时间限制而需要大量开销，将会发生重新同步。例如，如果 .hrl 文件达到磁盘大小的 50%，系统会将虚拟机标记为重新同步。重新同步通过计算源虚拟机磁盘和目标虚拟机的校验和并只发送差异来最大程度地减小发送的数据量。重新同步完成后，应会恢复差异复制。默认情况下，重新同步安排为在非工作时间自动运行，但你可以手动重新同步虚拟机。"
+    },
+    {
+      "pos": [
+        6859,
+        6996
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>复制错误<ept id=\"p1\">**</ept>：如果发生复制错误，将会进行内置重试。如果是无法恢复的错误，例如身份验证或授权错误，或者副本计算机处于无效状态，则不会重试。如果是可恢复的错误，例如网络错误，或磁盘空间/内存不足，则会发生重试。重试的间隔将会递增（依次为 1、2、4、8、10、30 分钟）。"
+    },
+    {
+      "pos": [
+        7000,
+        7180
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>计划/非计划的故障转移<ept id=\"p1\">**</ept>：必要时，你可以运行计划/非计划的故障转移。如果运行计划的故障转移，源 VM 将关闭以确保不会丢失数据。副本 VM 在创建后处于待提交状态。你需要提交它们以完成故障转移，除非使用 SAN 复制，在此情况下提交是自动的。主站点已启动并运行之后，可以发生故障转移。如果已复制到 Azure，则反向复制是自动的。否则你应该开始反向复制。"
+    },
+    {
+      "content": "工作流",
+      "pos": [
+        7186,
+        7189
+      ]
+    },
+    {
+      "content": "将 VMware 虚拟机和物理服务器复制到 Azure",
+      "pos": [
+        7260,
+        7287
+      ]
+    },
+    {
+      "content": "可以通过 VPN 站点到站点连接或 Internet 将 VMware 虚拟机和物理服务器 (Windows/Linux) 复制到 Azure。",
+      "pos": [
+        7289,
+        7361
+      ]
+    },
+    {
+      "content": "通过 VPN 站点到站点连接（或 ExpressRoute）复制到 Azure",
+      "pos": [
+        7367,
+        7406
+      ]
+    },
+    {
+      "content": "通过 Internet 从 VMware 或物理计算机到 Azure",
+      "pos": [
+        7410,
+        7444
+      ]
+    },
+    {
+      "content": "通过 Internet 复制",
+      "pos": [
+        7519,
+        7533
+      ]
+    },
+    {
+      "content": "通过 Internet 从 VMware 或物理计算机到 Azure",
+      "pos": [
+        7537,
+        7571
+      ]
+    },
+    {
+      "content": "在主要和辅助数据中心的本地物理服务器或 VMware 虚拟机之间复制",
+      "pos": [
+        7649,
+        7683
+      ]
+    },
+    {
+      "content": "如果你想要通过在两个本地数据中心之间复制 VMware VM 或 Windows/Linux 物理机来保护它们，以下是你需要做好的准备。",
+      "pos": [
+        7685,
+        7753
+      ]
+    },
+    {
+      "content": "位置",
+      "pos": [
+        7757,
+        7759
+      ]
+    },
+    {
+      "content": "需要什么",
+      "pos": [
+        7766,
+        7770
+      ]
+    },
+    {
+      "content": "本地主服务器",
+      "pos": [
+        7786,
+        7792
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>进程服务器<ept id=\"p1\">**</ept>：设置主站点中的进程服务器组件，以处理缓存、压缩和数据优化。它还可以将安装的统一代理推送到你要保护的计算机。",
+      "pos": [
+        7795,
+        7858
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>VMware 保护<ept id=\"p1\">**</ept>：如果你要保护 VMware VM，则需要一个 VMware EXS/ESXi 虚拟监控程序，或者用于管理多个虚拟机监控程序的 VMware vCenter 服务器",
+      "pos": [
+        7868,
+        7963
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>物理服务器保护<ept id=\"p1\">**</ept>：如果你要保护物理机，它们应该运行 Windows 或 Linux。",
+      "pos": [
+        7973,
+        8018
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>统一代理<ept id=\"p1\">**</ept>：安装在要保护的计算机上和用作主目标服务器的计算机上。它充当所有 InMage 组件之间的通信提供程序。",
+      "pos": [
+        8028,
+        8088
+      ]
+    },
+    {
+      "content": "本地辅助服务器",
+      "pos": [
+        8089,
+        8096
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>配置服务器<ept id=\"p1\">**</ept>：配置服务器是安装的第一个组件，需将它安装在辅助站点上，以便使用管理网站或 vContinuum 控制台来管理、配置和监视部署。配置服务器还包含远程部署统一代理的推送机制。一个部署中只有一个配置服务器，该服务器必须安装在运行 Windows Server 2012 R2 的计算机上。",
+      "pos": [
+        8099,
+        8250
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>vContinuum 服务器<ept id=\"p1\">**</ept>：安装在与配置服务器相同的位置（辅助站点）。它提供一个控制台用于管理和监视受保护的环境。在默认安装中，vContinuum 服务器是第一个主目标服务器，并且已安装统一代理。",
+      "pos": [
+        8260,
+        8364
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>主目标服务器<ept id=\"p1\">**</ept>：主目标服务器保存复制的数据。它从进程服务器接收数据，在辅助站点中创建副本地器，并保存数据保留点。需要的主目标服务器数目取决于要保护的计算机数目。如果你想要故障转移到主站点，则也需要一个主目标服务器。",
+      "pos": [
+        8374,
+        8484
+      ]
+    },
+    {
+      "content": "Azure",
+      "pos": [
+        8486,
+        8491
+      ]
+    },
+    {
+      "pos": [
+        8494,
+        8607
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>站点恢复保管库<ept id=\"p1\">**</ept>：至少一个 Azure Site Recovery 保管库（其中设置了站点恢复服务的订阅）。下载 InMage Scout 以在创建保管库之后设置部署。你还要安装所有 InMage 组件服务器的最新更新。"
+    },
+    {
+      "content": "在此方案中，差异复制更改将从受保护计算机上运行的统一代理发送到进程服务器。进程服务器将优化这些数据，并将其传输到辅助站点上的主目标服务器。配置服务器将管理复制进程。",
+      "pos": [
+        8610,
+        8692
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        8700,
+        8704
+      ]
+    },
+    {
+      "pos": [
+        8706,
+        8770
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>为部署做好准备<ept id=\"p1\">](/documentation/articles/site-recovery-best-practices)</ept>。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"站点恢复的工作原理 | Azure\"\n    description=\"本文提供站点恢复体系结构的概述\"\n    services=\"site-recovery\"\n    documentationCenter=\"\"\n    authors=\"rayne-wiselman\"\n    manager=\"jwhit\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"site-recovery\"\n    ms.date=\"12/07/2015\"\n    wacn.date=\"01/29/2016\"/>\n\n# Azure Site Recovery 的工作原理\n\n## 关于本文\n\n本文介绍站点恢复的基础架构以及它运行时使用的组件。阅读本文后，你可以在 [Azure 恢复服务论坛](https://social.msdn.microsoft.com/Forums/zh-cn/home?forum=hypervrecovmgr)上发布任何问题。\n\n\n## 概述\n\n组织需要制定业务连续性和灾难恢复 (BCDR) 策略来确定应用、工作负荷和数据如何在计划内和计划外停机期间保持可用，并尽快恢复正常运行。BCDR 策略重点在于维护可确保业务数据的安全且可恢复，以及在发生灾难时工作负荷持续可用的解决方案。\n\n站点恢复是一项 Azure 服务，可以通过协调从本地物理服务器和虚拟机到云 (Azure) 或辅助数据中心的的复制，来为 BCDR 策略提供辅助。当主要位置发生故障时，你可以故障转移到辅助站点，使应用和工作负荷保持可用。当主要位置恢复正常时，你可以故障转移回到主要位置。\n\n站点恢复可用于许多方案，并可保护许多工作负荷。\n\n- **保护 VMware 虚拟机**：可以通过将本地 VMware 虚拟机复制到 Azure 或辅助数据中心来为其提供保护。- **保护 Hyper-V VM**：可以通过将本地 Hyper-V 虚拟机复制到云 (Azure) 或辅助数据中心来为其提供保护。  \n- **保护物理服务器**：可以通过将运行 Windows 或 Linux 的物理机复制到 Azure 或辅助数据中心来为其提供保护。\n- **迁移 VM**：可以使用站点恢复在区域之间迁移 Azure IaaS VM，或者将 AWS Windows 实例迁移到 Azure IaaS VM。\n\n你可以在[什么是 Azure Site Recovery？](/documentation/articles/site-recovery-overview)和 [Azure Site Recovery 可以保护哪些工作负荷？](/documentation/articles/site-recovery-workload)中获取受支持部署的完整摘要\n\n## 在本地物理服务器或 VMware 虚拟机与 Azure 之间复制\n\n如果你想要通过将 VMware VM 或 Windows/Linux 物理机复制到 Azure 来保护它们，以下是你需要做好的准备。\n\n**位置** | **需要什么** \n--- | --- \n 本地 | **进程服务器**：此服务器在将受保护 VMware 虚拟机或 Windows/Linux 物理机中的数据发送到 Azure 之前优化这些数据。它还处理用于保护计算机的移动服务组件的推送安装，并执行 VMware 虚拟机的自动发现。<br/><br/>**VMware vCenter 服务器**：如果你要保护 VMware VM，则需要使用 VMwave vCenter 服务器管理 vSphere 虚拟机监控程序<br/><br/>**ESX 服务器**：如果你要保护 VMware VM，则需要一台运行具有最新更新的 ESX/ESXi 版本 5.1 或 5.5 的服务器。<br/><br/> **计算机**：如果你要保护 VMware，应该安装并运行具有 VMware 工具的 VMware VM。如果你要保护物理机，它们应该运行支持的 Windows 或 Linux 操作系统。请参阅[支持的系统](/documentation/articles/site-recovery-vmware-to-azure#before-you-start)。<br/><br/>**移动服务**：在要保护的计算机上安装以捕获更改并将其发送到进程服务器。<br/><br/>第三方组件：此部署依赖于一些[第三方组件](http://download.microsoft.com/download/C/D/7/CD79E327-BF5A-4026-8FF4-9EB990F9CEE2/Third-Party_Notices.txt)。\nAzure | **配置服务器**：标准 A3 Azure VM，用于协调受保护的计算机、处理服务器和主目标服务器之间的通信。它设置故障转移发生时的复制和协调恢复。<br/><br/>**主目标服务器**：Azure VM 使用在 Azure 存储帐户的 Blob 存储中创建的附加 VHD 来保存从受保护计算机复制的数据。故障转移主目标服务器在本地运行，使你可以将 Azure VM 故障转移到 VMware VM。<br/><br/>**站点恢复保管库**：至少一个 Azure Site Recovery 保管库（其中设置了站点恢复服务的订阅）<br/><br/>**虚拟网络**：配置服务器与主目标服务器所在的 Azure 网络，与站点恢复服务位于相同的订阅和区域中。<br/><br/>**Azure 存储空间**：用于存储复制的数据的 Azure 存储帐户。应该采用标准异地冗余配置，或者位于与站点恢复订阅相同的区域中的高级帐户。\n\n\n在此方案中，通信可以通过 VPN 连接发送到 Azure 网络上的内部端口（使用 Azure ExpressRoute 或站点到站点 VPN），或通过安全 Internet 连接发送到配置 VM 和主目标服务器 VM 的 Azure 云服务上的映射公共终结点。\n\n受保护计算机上的移动服务将复制数据发送到进程服务器，并将复制元数据发送到配置服务器。进程服务器与配置服务器通信以接收管理和控制信息。它将复制信息发送到主目标服务器，优化复制的数据并将其发送到主目标服务器。\n\n## 将 Hyper-V VM 复制到 Azure（使用 VMM）\n\n如果 VM 位于在 System Center VMM 云中管理的 Hyper-V 主机上，以下是将它们复制到 Azure 所要做好的准备。\n\n**位置** | **需要什么** \n--- | --- \n本地 | **VMM 服务器**：至少一个 VMM 服务器，其中至少设置了一个 VMM 私有云。将在 VMM 服务器上安装 Azure Site Recovery 提供程序<br/><br/**Hyper-V 服务器**：VMM 云中至少有一个 Hyper-V 主机服务器。Microsoft 恢复服务代理将安装在每个 Hyper-V 服务器上。<br/><br/>**虚拟机**：Hyper-V 服务器上至少运行一个虚拟机。不会在该虚拟机上安装任何软件。\nAzure | **站点恢复保管库**：至少一个 Azure Site Recovery 保管库（其中设置了站点恢复服务的订阅）<br/><br/>**存储帐户**：一个 Azure 存储帐户，与站点恢复服务位于同一个订阅下。复制的计算机将存储在 Azure 存储空间中。 \n\n在此方案中，在 VMM 服务器上运行的提供程序通过 Internet 协调使用站点恢复服务的复制。通过 HTTPS 443 在本地 Hyper-V 服务器上运行的恢复服务代理与 Azure 存储空间之间复制数据。来自提供程序和代理的通信都是安全且经过加密的。Azure 存储空间中的复制数据也已加密。\n\n![本地 VMM 到 Azure](./media/site-recovery-components/arch-onprem-onprem-azure-vmm.png)\n\n## 将 Hyper-V VM 复制到 Azure（不使用 VMM）\n\n如果你的 VM 不受 System Center VMM 服务器的管理，以下是将它们复制到 Azure 所要做好的准备\n\n**位置** | **需要什么**\n--- | --- \n 本地 | **Hyper-V 服务器**：至少一个 Hyper-V 主机服务器。Azure Site Recovery 提供程序和 Microsoft 恢复服务代理将安装在每个 Hyper-V 服务器上。<br/><br/>**虚拟机**：Hyper-V 服务器上至少运行一个虚拟机。不会在该虚拟机上安装任何软件。\nAzure | **站点恢复保管库**：至少一个 Azure Site Recovery 保管库（其中设置了站点恢复服务的订阅）<br/><br/>**存储帐户**：一个 Azure 存储帐户，与站点恢复服务位于同一个订阅下。复制的计算机将存储在 Azure 存储空间中。\n\n在此方案中，在 Hyper-V 服务器上运行的提供程序通过 Internet 协调使用站点恢复服务的复制。通过 HTTPS 443 在本地 Hyper-V 服务器上运行的恢复服务代理与 Azure 存储空间之间复制数据。来自提供程序和代理的通信都是安全且经过加密的。Azure 存储空间中的复制数据也已加密。\n\n![本地 VMM 到 Azure](./media/site-recovery-components/arch-onprem-azure-hypervsite.png)\n\n\n\n## 将 Hyper-V VM 复制到辅助数据中心\n\n如果你想要通过将 Hyper-V VM 复制到辅助数据中心来为其提供保护，以下是需要做好的准备。请注意，仅当 Hyper-V 主机服务器在 System Center VMM 云中管理时，才可以这样做。\n\n**位置** | **需要什么** \n--- | --- \n 本地 | **VMM 服务器**：主站点和辅助站点中各有一个 VMM 服务器。Azure Site Recovery 提供程序将安装在每个 VMM 服务器上。<br/><br/>**Hyper-V 服务器**：主站点和辅助站点的 VMM 云中至少有一个 Hyper-V 主机服务器。不会在 Hyper-V 服务器上安装任何软件<br/><br/>**虚拟机**：Hyper-V 服务器上至少运行一个虚拟机。不会在该虚拟机上安装任何软件。\nAzure | **站点恢复保管库**：至少一个 Azure Site Recovery 保管库（其中设置了站点恢复服务的订阅）。 \n\n在此方案中，VMM 服务器上的提供程序通过 Internet 协调使用站点恢复服务的复制。使用 Kerberos 或证书身份验证通过 Internet 在主要和辅助 Hyper-V 主机服务器之间复制数据。来自提供程序的通信以及 Hyper-V 主机服务器之间的通信都是安全且经过加密的。\n\n![本地到本地](./media/site-recovery-components/arch-onprem-onprem.png)\n\n## 使用 SAN 复制将 Hyper-V VM 复制到辅助数据中心\n\n如果 VM 位于在 System Center VMM 云中管理的 Hyper-V 主机上并且你使用 SAN 存储，以下是在两个数据中心之间复制时所要做好的准备。\n\n**位置** | **需要什么** \n--- | --- \n 主数据中心 | **SAN 阵列**：主 VMM 服务器管理的[受支持 SAN 阵列](http://social.technet.microsoft.com/wiki/contents/articles/28317.deploying-azure-site-recovery-with-vmm-and-san-supported-storage-arrays.aspx)。SAN 与辅助站点中的另一个 SAN 阵列共享网络基础结构<br/><br/>**VMM 服务器**：至少一个 VMM 服务器，其中已设置一个或多个 VMM 云和复制组。将在每个 VMM 服务器上安装 Azure Site Recovery 提供程序。<br/><br/>**Hyper-V 服务器**：复制组中至少有一个包含虚拟机的 Hyper-V 主机服务器。不会在 Hyper-V 主机服务器上安装任何软件。<br/><br/> **虚拟机**：Hyper-V 主机服务器上至少运行一个虚拟机。不会在该虚拟机上安装任何软件。 \n辅助数据中心 | **SAN 阵列**：辅助 VMM 服务器管理的[受支持 SAN 阵列](http://social.technet.microsoft.com/wiki/contents/articles/28317.deploying-azure-site-recovery-with-vmm-and-san-supported-storage-arrays.aspx)。<br/><br/>**VMM 服务器**：至少一个 VMM 服务器，其中包含一个或多个 VMM 云。<br/><br/> **Hyper-V 服务器**：至少一个 Hyper-V 主机服务器。 \nAzure | **站点恢复保管库**：至少一个 Azure Site Recovery 保管库（其中设置了站点恢复服务的订阅）\n\n在此方案中，VMM 服务器上的提供程序通过 Internet 协调使用站点恢复服务的复制。使用同步的 SAN 复制在主要和辅助存储阵列之间复制数据。\n\n![本地到本地](./media/site-recovery-components/arch-onprem-onprem-san.png)\n\n\n\n## Hyper-V 保护生命周期\n\n此工作流显示保护、复制和故障转移 Hyper-V 虚拟机的过程。\n\n1. **启用保护**：设置站点恢复保管库、配置 VMM 云或 Hyper-V 网站的复制设置，并启用 VM 的保护。名为“启用保护”的作业将会启动，并可以在“作业”选项卡中监视。该作业将检查计算机是否符合先决条件，然后调用 [CreateReplicationRelationship](https://msdn.microsoft.com/zh-cn/library/hh850036.aspx) 方法，以使用配置的设置来设置到 Azure 的复制。“启用保护”作业还调用 [StartReplication](https://msdn.microsoft.com/zh-cn/library/hh850303.aspx) 方法来初始化完整 VM 复制。\n2. **初始复制**：生成虚拟机快照，并逐个复制虚拟硬盘，直到它们已全部复制到 Azure 或辅助数据中心。完成时间取决于数据大小和网络带宽以及所选的初始复制方法。如果在初始复制期间发生磁盘更改，Hyper-V 副本复制跟踪器将跟踪这些更改，并将其记录在 Hyper-V 复制日志 (.hrl) 中，该文件位于与磁盘相同的文件夹中。每个磁盘都有一个关联的 .hrl 文件，该文件将发送到辅助存储。请注意，当初始复制正在进行时，快照和日志将占用磁盘资源。初始复制完成后，将删除 VM 快照，并同步和合并日志中的差异磁盘更改。\n3. **完成保护**：初始复制完成后，“完成保护”作业将配置网络和其他复制后设置，然后虚拟机将受到保护。如果要复制到 Azure，你可能需要调整虚拟机的设置，使其随时可进行故障转移。此时，你可以运行测试故障转移以检查一切是否按预期工作。\n4. **复制**：在初始复制之后，根据复制设置和方法进行差异同步。 \n    - **复制失败**：如果差异复制失败且完整复制因为带宽或时间限制而需要大量开销，将会发生重新同步。例如，如果 .hrl 文件达到磁盘大小的 50%，系统会将虚拟机标记为重新同步。重新同步通过计算源虚拟机磁盘和目标虚拟机的校验和并只发送差异来最大程度地减小发送的数据量。重新同步完成后，应会恢复差异复制。默认情况下，重新同步安排为在非工作时间自动运行，但你可以手动重新同步虚拟机。\n    - **复制错误**：如果发生复制错误，将会进行内置重试。如果是无法恢复的错误，例如身份验证或授权错误，或者副本计算机处于无效状态，则不会重试。如果是可恢复的错误，例如网络错误，或磁盘空间/内存不足，则会发生重试。重试的间隔将会递增（依次为 1、2、4、8、10、30 分钟）。\n4. **计划/非计划的故障转移**：必要时，你可以运行计划/非计划的故障转移。如果运行计划的故障转移，源 VM 将关闭以确保不会丢失数据。副本 VM 在创建后处于待提交状态。你需要提交它们以完成故障转移，除非使用 SAN 复制，在此情况下提交是自动的。主站点已启动并运行之后，可以发生故障转移。如果已复制到 Azure，则反向复制是自动的。否则你应该开始反向复制。\n \n\n![工作流](./media/site-recovery-components/arch-hyperv-azure-workflow.png)\n\n## 将 VMware 虚拟机和物理服务器复制到 Azure\n\n可以通过 VPN 站点到站点连接或 Internet 将 VMware 虚拟机和物理服务器 (Windows/Linux) 复制到 Azure。\n\n### 通过 VPN 站点到站点连接（或 ExpressRoute）复制到 Azure\n\n![通过 Internet 从 VMware 或物理计算机到 Azure](./media/site-recovery-components/arch-onprem-azure-vmware-vpn.png)\n\n#### 通过 Internet 复制\n\n![通过 Internet 从 VMware 或物理计算机到 Azure](./media/site-recovery-components/arch-onprem-azure-vmware-internet.png)\n\n## 在主要和辅助数据中心的本地物理服务器或 VMware 虚拟机之间复制\n\n如果你想要通过在两个本地数据中心之间复制 VMware VM 或 Windows/Linux 物理机来保护它们，以下是你需要做好的准备。\n\n**位置** | **需要什么** \n--- | --- \n 本地主服务器 | **进程服务器**：设置主站点中的进程服务器组件，以处理缓存、压缩和数据优化。它还可以将安装的统一代理推送到你要保护的计算机。<br/><br/>**VMware 保护**：如果你要保护 VMware VM，则需要一个 VMware EXS/ESXi 虚拟监控程序，或者用于管理多个虚拟机监控程序的 VMware vCenter 服务器<br/><br/>**物理服务器保护**：如果你要保护物理机，它们应该运行 Windows 或 Linux。<br/><br/>**统一代理**：安装在要保护的计算机上和用作主目标服务器的计算机上。它充当所有 InMage 组件之间的通信提供程序。\n本地辅助服务器 | **配置服务器**：配置服务器是安装的第一个组件，需将它安装在辅助站点上，以便使用管理网站或 vContinuum 控制台来管理、配置和监视部署。配置服务器还包含远程部署统一代理的推送机制。一个部署中只有一个配置服务器，该服务器必须安装在运行 Windows Server 2012 R2 的计算机上。<br/><br/>**vContinuum 服务器**：安装在与配置服务器相同的位置（辅助站点）。它提供一个控制台用于管理和监视受保护的环境。在默认安装中，vContinuum 服务器是第一个主目标服务器，并且已安装统一代理。<br/><br/>**主目标服务器**：主目标服务器保存复制的数据。它从进程服务器接收数据，在辅助站点中创建副本地器，并保存数据保留点。需要的主目标服务器数目取决于要保护的计算机数目。如果你想要故障转移到主站点，则也需要一个主目标服务器。 \nAzure | **站点恢复保管库**：至少一个 Azure Site Recovery 保管库（其中设置了站点恢复服务的订阅）。下载 InMage Scout 以在创建保管库之后设置部署。你还要安装所有 InMage 组件服务器的最新更新。\n\n\n在此方案中，差异复制更改将从受保护计算机上运行的统一代理发送到进程服务器。进程服务器将优化这些数据，并将其传输到辅助站点上的主目标服务器。配置服务器将管理复制进程。\n\n\n\n\n## 后续步骤\n\n[为部署做好准备](/documentation/articles/site-recovery-best-practices)。\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

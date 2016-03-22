@@ -1,0 +1,369 @@
+{
+  "nodes": [
+    {
+      "content": "创建 WebAPI 项目",
+      "pos": [
+        3,
+        15
+      ]
+    },
+    {
+      "content": "新的 ASP.NET WebAPI 后端将会在后续部分中创建，该后端有三个主要用途：",
+      "pos": [
+        17,
+        59
+      ]
+    },
+    {
+      "pos": [
+        64,
+        118
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>对客户端进行身份验证<ept id=\"p1\">**</ept>：稍后将会添加消息处理程序，以便对客户端请求进行身份验证，并将用户与请求相关联。"
+    },
+    {
+      "pos": [
+        122,
+        249
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>客户端通知注册<ept id=\"p1\">**</ept>：稍后，你将要添加一个控制器来处理新的注册，使客户端设备能够接收通知。经过身份验证的用户名将作为<bpt id=\"p2\">[</bpt>标记<ept id=\"p2\">](https://msdn.microsoft.com/library/azure/dn530749.aspx)</ept>自动添加到注册。"
+    },
+    {
+      "pos": [
+        253,
+        305
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>将通知发送到客户端<ept id=\"p1\">**</ept>：稍后，你还要添加一个控制器，以便用户对与标记关联的设备和客户端触发安全推送。"
+    },
+    {
+      "content": "以下步骤说明了如何创建新的 ASP.NET WebAPI 后端：",
+      "pos": [
+        308,
+        340
+      ]
+    },
+    {
+      "pos": [
+        345,
+        538
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph><bpt id=\"p1\">**</bpt>重要提示<ept id=\"p1\">**</ept>：在开始本教程之前，请确保已安装最新版本的 NuGet 程序包管理器。若要进行检查，请启动 Visual Studio。从“工具”菜单，单击“扩展和更新”。搜索“适用于 Visual Studio 2013 的 NuGet 程序包管理器”，并且确保具有版本 2.8.50313.46 或更高版本。否则，请卸载并重新安装 NuGet 程序包管理器。"
+    },
+    {
+      "pos": [
+        555,
+        633
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>请确保已安装 Visual Studio <bpt id=\"p1\">[</bpt>Azure SDK<ept id=\"p1\">](/zh-cn/downloads/)</ept> 以便进行 Web 应用部署。"
+    },
+    {
+      "content": "启动 Visual Studio 或 Visual Studio Express。单击“服务器资源管理器”并登录到你的 Azure 帐户。Visual Studio 需要你登录才能在你的帐户中创建 Web 应用资源。",
+      "pos": [
+        638,
+        746
+      ]
+    },
+    {
+      "pos": [
+        750,
+        868
+      ],
+      "content": "在 Visual Studio 中，依次单击“文件”、“新建”和“项目”，依次展开“模板”和“Visual C#”，然后依次单击“Web”和“ASP.NET Web 应用程序”，键入名称 <bpt id=\"p1\">**</bpt>AppBackend<ept id=\"p1\">**</ept>，然后单击“确定”。"
+    },
+    {
+      "content": "在“新建 ASP.NET 项目”对话框中，单击“Web API”，然后单击“确定”。",
+      "pos": [
+        891,
+        933
+      ]
+    },
+    {
+      "pos": [
+        951,
+        1092
+      ],
+      "content": "在“配置 Azure Web 应用”对话框中，选择订阅和你已创建的 <bpt id=\"p1\">**</bpt>App Service 计划<ept id=\"p1\">**</ept>。你也可以选择“创建新的 App Service 计划”，并通过对话框创建一个计划。在本教程中，你不需要使用数据库。选择 App Service 计划后，单击“确定”以创建项目。"
+    },
+    {
+      "content": "在 WebAPI 后端上对客户端进行身份验证",
+      "pos": [
+        1112,
+        1134
+      ]
+    },
+    {
+      "pos": [
+        1136,
+        1320
+      ],
+      "content": "在本部分，你将为新的后端创建名为 <bpt id=\"p1\">**</bpt>AuthenticationTestHandler<ept id=\"p1\">**</ept> 的新消息处理程序类。此类衍生自 <bpt id=\"p2\">[</bpt>DelegatingHandler<ept id=\"p2\">](https://msdn.microsoft.com/library/system.net.http.delegatinghandler.aspx)</ept> 并已添加为消息处理程序，以便处理传入后端的所有请求。"
+    },
+    {
+      "pos": [
+        1327,
+        1479
+      ],
+      "content": "在“解决方案资源管理器”中，右键单击“AppBackend”项目，单击“添加”，然后单击“类”。将新类命名为 <bpt id=\"p1\">**</bpt>AuthenticationTestHandler.cs<ept id=\"p1\">**</ept>，然后单击“添加”以生成该类。通过此类可简单地使用<bpt id=\"p2\">*</bpt>基本身份验证<ept id=\"p2\">*</ept> 对用户进行身份验证。请注意，您的应用可以使用所有身份验证方案。"
+    },
+    {
+      "pos": [
+        1484,
+        1533
+      ],
+      "content": "在 AuthenticationTestHandler.cs 中，添加以下 <ph id=\"ph1\">`using`</ph> 语句："
+    },
+    {
+      "pos": [
+        1695,
+        1769
+      ],
+      "content": "在 AuthenticationTestHandler.cs 中，将 <ph id=\"ph1\">`AuthenticationTestHandler`</ph> 类定义替换为以下代码。"
+    },
+    {
+      "content": "当以下三个条件都成立时，此处理程序将授权给请求：",
+      "pos": [
+        1775,
+        1799
+      ]
+    },
+    {
+      "pos": [
+        1806,
+        1830
+      ],
+      "content": "请求包含 <bpt id=\"p1\">*</bpt>Authorization<ept id=\"p1\">*</ept> 标头。"
+    },
+    {
+      "pos": [
+        1837,
+        1851
+      ],
+      "content": "请求使用<bpt id=\"p1\">*</bpt>基本<ept id=\"p1\">*</ept> 身份验证。"
+    },
+    {
+      "content": "用户名字符串和密码字符串是相同的字符串。",
+      "pos": [
+        1858,
+        1878
+      ]
+    },
+    {
+      "content": "否则，将会拒绝该请求。这不是真正的身份验证和授权方法。它只是本教程中一个非常简单的示例。",
+      "pos": [
+        1884,
+        1928
+      ]
+    },
+    {
+      "pos": [
+        1934,
+        2213
+      ],
+      "content": "如果请求消息已经过 <ph id=\"ph1\">`AuthenticationTestHandler`</ph> 的身份验证和授权，则基本身份验证用户将附加到 <bpt id=\"p1\">[</bpt>HttpContext<ept id=\"p1\">](https://msdn.microsoft.com/library/system.web.httpcontext.current.aspx)</ept> 上的当前请求。然后，另一个控制器 (RegisterController) 会使用 HttpContext 中的用户信息，将<bpt id=\"p2\">[</bpt>标记<ept id=\"p2\">](https://msdn.microsoft.com/library/azure/dn530749.aspx)</ept>添加到通知注册请求。"
+    },
+    {
+      "pos": [
+        4391,
+        4498
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph><bpt id=\"p1\">**</bpt>安全说明<ept id=\"p1\">**</ept>：<ph id=\"ph2\">`AuthenticationTestHandler`</ph> 类不提供真正的身份验证。它仅用于模拟基本身份验证并且是不安全的。您必须在生产应用程序和服务中实现安全的身份验证机制。"
+    },
+    {
+      "pos": [
+        4503,
+        4572
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>App\\_Start/WebApiConfig.cs<ept id=\"p1\">**</ept> 类中 <ph id=\"ph1\">`Register`</ph> 方法的末尾添加以下代码，以注册消息处理程序："
+    },
+    {
+      "content": "保存所做更改。",
+      "pos": [
+        4647,
+        4654
+      ]
+    },
+    {
+      "content": "使用 WebAPI 后端注册通知",
+      "pos": [
+        4659,
+        4675
+      ]
+    },
+    {
+      "pos": [
+        4677,
+        4843
+      ],
+      "content": "在本部分，我们要将新的控制器添加到 WebAPI 后端来处理请求，以使用通知中心的客户端库为用户和设备注册通知。控制器将为已由 <ph id=\"ph1\">`AuthenticationTestHandler`</ph> 验证并已附加到 HttpContext 的用户添加用户标记。该标记采用以下字符串格式：<ph id=\"ph2\">`\"username:&lt;actual username&gt;\"`</ph>。"
+    },
+    {
+      "content": "在“解决方案资源管理器”中，右键单击“AppBackend”项目，然后单击“管理 NuGet 程序包”。",
+      "pos": [
+        4852,
+        4904
+      ]
+    },
+    {
+      "pos": [
+        4909,
+        4969
+      ],
+      "content": "在左侧，单击“联机”，然后在“搜索”框中搜索 <bpt id=\"p1\">**</bpt>Microsoft.Azure.NotificationHubs<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "在结果列表中，单击“Azure 通知中心”，然后单击“安装”。完成安装后，关闭“NuGet 程序包管理器”窗口。",
+      "pos": [
+        4974,
+        5030
+      ]
+    },
+    {
+      "pos": [
+        5036,
+        5185
+      ],
+      "content": "这将使用 <ph id=\"ph1\">&lt;a href=\"http://www.nuget.org/packages/Microsoft.Azure.NotificationHubs/\"&gt;</ph>Microsoft.Azure.Notification Hubs NuGet 程序包<ph id=\"ph2\">&lt;/a&gt;</ph>添加对 Azure 通知中心 SDK 的引用。"
+    },
+    {
+      "pos": [
+        5190,
+        5350
+      ],
+      "content": "现在，我们要创建新的类文件，用于表示所要发送的不同安全通知。在完整的实现中，这些通知存储在某个数据库中。为简单起见，本教程将这些通知存储在内存中。在“解决方案资源管理器”中，右键单击“Models”文件夹，单击“添加”，然后单击“类”。将新类命名为 <bpt id=\"p1\">**</bpt>Notifications.cs<ept id=\"p1\">**</ept>，然后单击“添加”以生成该类。"
+    },
+    {
+      "pos": [
+        5368,
+        5410
+      ],
+      "content": "在 Notifications.cs 中，在文件顶部添加以下 <ph id=\"ph1\">`using`</ph> 语句："
+    },
+    {
+      "pos": [
+        5464,
+        5581
+      ],
+      "content": "将 <ph id=\"ph1\">`Notifications`</ph> 类定义替换为以下内容并确保将两个占位符替换为通知中心的连接字符串（具有完全访问权限）和中心名称（可在 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">](http://manage.windowsazure.cn)</ept>中找到）："
+    },
+    {
+      "pos": [
+        6056,
+        6244
+      ],
+      "content": "接下来，我们将创建一个名为 <bpt id=\"p1\">**</bpt>RegisterController<ept id=\"p1\">**</ept> 的新控制器。在“解决方案资源管理器”中，右键单击“Controllers”文件夹，然后依次单击“添加”和“控制器”。单击“Web API 2 Controller -- Empty”项目，然后单击“添加”。将新类命名为 <bpt id=\"p2\">**</bpt>RegisterController<ept id=\"p2\">**</ept>，然后再次单击“添加”以生成该控制器。"
+    },
+    {
+      "pos": [
+        6275,
+        6317
+      ],
+      "content": "在 RegisterController.cs 中，添加以下 <ph id=\"ph1\">`using`</ph> 语句："
+    },
+    {
+      "pos": [
+        6526,
+        6699
+      ],
+      "content": "在 <ph id=\"ph1\">`RegisterController`</ph> 类定义中添加以下代码：请注意，在此代码中，我们将为已附加到 HttpContext 的用户添加用户标记。添加的消息筛选器 <ph id=\"ph2\">`AuthenticationTestHandler`</ph> 将对该用户进行身份验证并将其附加到 HttpContext。还可以通过添加可选复选框来验证用户是否有权注册以获取请求标记。"
+    },
+    {
+      "content": "保存所做更改。",
+      "pos": [
+        10475,
+        10482
+      ]
+    },
+    {
+      "content": "从 WebAPI 后端发送通知",
+      "pos": [
+        10487,
+        10502
+      ]
+    },
+    {
+      "content": "在本部分，你将添加新的控制器，以便客户端设备使用 ASP.NET WebAPI 后端中的 Azure 通知中心服务管理库根据用户名标记发送通知。",
+      "pos": [
+        10504,
+        10576
+      ]
+    },
+    {
+      "pos": [
+        10582,
+        10670
+      ],
+      "content": "创建另一个名为 <bpt id=\"p1\">**</bpt>NotificationsController<ept id=\"p1\">**</ept> 的新控制器。以你在上一节中创建 <bpt id=\"p2\">**</bpt>RegisterController<ept id=\"p2\">**</ept> 的相同方式来创建新控制器。"
+    },
+    {
+      "pos": [
+        10675,
+        10722
+      ],
+      "content": "在 NotificationsController.cs 中，添加以下 <ph id=\"ph1\">`using`</ph> 语句："
+    },
+    {
+      "pos": [
+        10825,
+        10864
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>NotificationsController<ept id=\"p1\">**</ept> 类中添加以下方法。"
+    },
+    {
+      "pos": [
+        10870,
+        11002
+      ],
+      "content": "此代码将会根据平台通知服务 (PNS) <ph id=\"ph1\">`pns`</ph> 参数发送相应类型的通知。<ph id=\"ph2\">`to_tag`</ph> 的值用于设置消息中的 <bpt id=\"p1\">*</bpt>username<ept id=\"p1\">*</ept> 标记。此标记必须与活动的通知中心注册的用户名标记相匹配。将从 POST 请求正文提取通知消息，并根据目标 PNS 将其格式化。"
+    },
+    {
+      "pos": [
+        11008,
+        11355
+      ],
+      "content": "根据受支持设备用来接收通知的平台通知服务 (PNS)，支持使用不同的格式接收不同的通知。例如，在 Windows 设备上，可以使用其他 PNS 不能直接支持的 <bpt id=\"p1\">[</bpt>toast 通知和 WNS<ept id=\"p1\">](https://msdn.microsoft.com/library/windows/apps/br230849.aspx)</ept>。因此，后端需要将通知格式化为你打算使用的设备 PNS 所支持的通知。然后，对 <bpt id=\"p2\">[</bpt>NotificationHubClient 类<ept id=\"p2\">](https://msdn.microsoft.com/library/azure/microsoft.azure.notificationhubs.notificationhubclient_methods.aspx)</ept>使用相应的 send API"
+    },
+    {
+      "pos": [
+        13331,
+        13392
+      ],
+      "content": "按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 运行应用程序并确保到目前为止操作的准确性。该应用应启动 Web 浏览器，然后显示 ASP.NET 主页。"
+    },
+    {
+      "content": "发布新的 WebAPI 后端",
+      "pos": [
+        13396,
+        13410
+      ]
+    },
+    {
+      "pos": [
+        13415,
+        13486
+      ],
+      "content": "现在，我们将此应用部署到 Azure Web 应用，以便可以从任意设备访问它。右键单击 <bpt id=\"p1\">**</bpt>AppBackend<ept id=\"p1\">**</ept> 项目，然后选择“发布”。"
+    },
+    {
+      "content": "选择“Azure Web Apps”作为发布目标。",
+      "pos": [
+        13491,
+        13516
+      ]
+    },
+    {
+      "content": "使用你的 Azure 帐户登录，然后选择一个现有的或新的 Web 应用。",
+      "pos": [
+        13535,
+        13571
+      ]
+    },
+    {
+      "pos": [
+        13590,
+        13649
+      ],
+      "content": "记下“连接”选项卡中的“目标 URL”属性。在本教程后面的部分中，我们将此 URL 称为<bpt id=\"p1\">*</bpt>后端终结点<ept id=\"p1\">*</ept>。单击“发布”。"
+    }
+  ],
+  "content": "## 创建 WebAPI 项目\n\n新的 ASP.NET WebAPI 后端将会在后续部分中创建，该后端有三个主要用途：\n\n1. **对客户端进行身份验证**：稍后将会添加消息处理程序，以便对客户端请求进行身份验证，并将用户与请求相关联。\n2. **客户端通知注册**：稍后，你将要添加一个控制器来处理新的注册，使客户端设备能够接收通知。经过身份验证的用户名将作为[标记](https://msdn.microsoft.com/library/azure/dn530749.aspx)自动添加到注册。\n3. **将通知发送到客户端**：稍后，你还要添加一个控制器，以便用户对与标记关联的设备和客户端触发安全推送。 \n\n以下步骤说明了如何创建新的 ASP.NET WebAPI 后端：\n\n\n> [AZURE.NOTE]**重要提示**：在开始本教程之前，请确保已安装最新版本的 NuGet 程序包管理器。若要进行检查，请启动 Visual Studio。从“工具”菜单，单击“扩展和更新”。搜索“适用于 Visual Studio 2013 的 NuGet 程序包管理器”，并且确保具有版本 2.8.50313.46 或更高版本。否则，请卸载并重新安装 NuGet 程序包管理器。\n> \n> ![][B4]\n\n> [AZURE.NOTE]请确保已安装 Visual Studio [Azure SDK](/zh-cn/downloads/) 以便进行 Web 应用部署。\n\n1. 启动 Visual Studio 或 Visual Studio Express。单击“服务器资源管理器”并登录到你的 Azure 帐户。Visual Studio 需要你登录才能在你的帐户中创建 Web 应用资源。\n2. 在 Visual Studio 中，依次单击“文件”、“新建”和“项目”，依次展开“模板”和“Visual C#”，然后依次单击“Web”和“ASP.NET Web 应用程序”，键入名称 **AppBackend**，然后单击“确定”。 \n    \n    ![][B1]\n\n3. 在“新建 ASP.NET 项目”对话框中，单击“Web API”，然后单击“确定”。\n\n    ![][B2]\n\n4. 在“配置 Azure Web 应用”对话框中，选择订阅和你已创建的 **App Service 计划**。你也可以选择“创建新的 App Service 计划”，并通过对话框创建一个计划。在本教程中，你不需要使用数据库。选择 App Service 计划后，单击“确定”以创建项目。\n\n    ![][B5]\n\n\n\n## 在 WebAPI 后端上对客户端进行身份验证\n\n在本部分，你将为新的后端创建名为 **AuthenticationTestHandler** 的新消息处理程序类。此类衍生自 [DelegatingHandler](https://msdn.microsoft.com/library/system.net.http.delegatinghandler.aspx) 并已添加为消息处理程序，以便处理传入后端的所有请求。\n\n\n\n1. 在“解决方案资源管理器”中，右键单击“AppBackend”项目，单击“添加”，然后单击“类”。将新类命名为 **AuthenticationTestHandler.cs**，然后单击“添加”以生成该类。通过此类可简单地使用*基本身份验证* 对用户进行身份验证。请注意，您的应用可以使用所有身份验证方案。\n\n2. 在 AuthenticationTestHandler.cs 中，添加以下 `using` 语句：\n\n        using System.Net.Http;\n        using System.Threading;\n        using System.Security.Principal;\n        using System.Net;\n        using System.Web;\n\n3. 在 AuthenticationTestHandler.cs 中，将 `AuthenticationTestHandler` 类定义替换为以下代码。\n\n    当以下三个条件都成立时，此处理程序将授权给请求：\n    * 请求包含 *Authorization* 标头。\n    * 请求使用*基本* 身份验证。\n    * 用户名字符串和密码字符串是相同的字符串。\n\n    否则，将会拒绝该请求。这不是真正的身份验证和授权方法。它只是本教程中一个非常简单的示例。\n\n    如果请求消息已经过 `AuthenticationTestHandler` 的身份验证和授权，则基本身份验证用户将附加到 [HttpContext](https://msdn.microsoft.com/library/system.web.httpcontext.current.aspx) 上的当前请求。然后，另一个控制器 (RegisterController) 会使用 HttpContext 中的用户信息，将[标记](https://msdn.microsoft.com/library/azure/dn530749.aspx)添加到通知注册请求。\n\n        public class AuthenticationTestHandler : DelegatingHandler\n        {\n            protected override Task<HttpResponseMessage> SendAsync(\n            HttpRequestMessage request, CancellationToken cancellationToken)\n            {\n                var authorizationHeader = request.Headers.GetValues(\"Authorization\").First();\n    \n                if (authorizationHeader != null && authorizationHeader\n                    .StartsWith(\"Basic \", StringComparison.InvariantCultureIgnoreCase))\n                {\n                    string authorizationUserAndPwdBase64 =\n                        authorizationHeader.Substring(\"Basic \".Length);\n                    string authorizationUserAndPwd = Encoding.Default\n                        .GetString(Convert.FromBase64String(authorizationUserAndPwdBase64));\n                    string user = authorizationUserAndPwd.Split(':')[0];\n                    string password = authorizationUserAndPwd.Split(':')[1];\n    \n                    if (verifyUserAndPwd(user, password))\n                    {\n                        // Attach the new principal object to the current HttpContext object\n                        HttpContext.Current.User =\n                            new GenericPrincipal(new GenericIdentity(user), new string[0]);\n                        System.Threading.Thread.CurrentPrincipal =\n                            System.Web.HttpContext.Current.User;\n                    }\n                    else return Unauthorized();\n                }\n                else return Unauthorized();\n    \n                return base.SendAsync(request, cancellationToken);\n            }\n    \n            private bool verifyUserAndPwd(string user, string password)\n            {\n                // This is not a real authentication scheme.\n                return user == password;\n            }\n    \n            private Task<HttpResponseMessage> Unauthorized()\n            {\n                var response = new HttpResponseMessage(HttpStatusCode.Forbidden);\n                var tsc = new TaskCompletionSource<HttpResponseMessage>();\n                tsc.SetResult(response);\n                return tsc.Task;\n            }\n        }\n\n    > [AZURE.NOTE]**安全说明**：`AuthenticationTestHandler` 类不提供真正的身份验证。它仅用于模拟基本身份验证并且是不安全的。您必须在生产应用程序和服务中实现安全的身份验证机制。\n\n4. 在 **App\\_Start/WebApiConfig.cs** 类中 `Register` 方法的末尾添加以下代码，以注册消息处理程序：\n\n        config.MessageHandlers.Add(new AuthenticationTestHandler());\n\n5. 保存所做更改。\n\n## 使用 WebAPI 后端注册通知\n\n在本部分，我们要将新的控制器添加到 WebAPI 后端来处理请求，以使用通知中心的客户端库为用户和设备注册通知。控制器将为已由 `AuthenticationTestHandler` 验证并已附加到 HttpContext 的用户添加用户标记。该标记采用以下字符串格式：`\"username:<actual username>\"`。\n\n\n \n\n1. 在“解决方案资源管理器”中，右键单击“AppBackend”项目，然后单击“管理 NuGet 程序包”。\n\n2. 在左侧，单击“联机”，然后在“搜索”框中搜索 **Microsoft.Azure.NotificationHubs**。\n\n3. 在结果列表中，单击“Azure 通知中心”，然后单击“安装”。完成安装后，关闭“NuGet 程序包管理器”窗口。\n\n    这将使用 <a href=\"http://www.nuget.org/packages/Microsoft.Azure.NotificationHubs/\">Microsoft.Azure.Notification Hubs NuGet 程序包</a>添加对 Azure 通知中心 SDK 的引用。\n\n4. 现在，我们要创建新的类文件，用于表示所要发送的不同安全通知。在完整的实现中，这些通知存储在某个数据库中。为简单起见，本教程将这些通知存储在内存中。在“解决方案资源管理器”中，右键单击“Models”文件夹，单击“添加”，然后单击“类”。将新类命名为 **Notifications.cs**，然后单击“添加”以生成该类。\n\n    ![][B6]\n\n5. 在 Notifications.cs 中，在文件顶部添加以下 `using` 语句：\n\n        using Microsoft.Azure.NotificationHubs;\n\n6. 将 `Notifications` 类定义替换为以下内容并确保将两个占位符替换为通知中心的连接字符串（具有完全访问权限）和中心名称（可在 [Azure 管理门户](http://manage.windowsazure.cn)中找到）：\n\n        public class Notifications\n        {\n            public static Notifications Instance = new Notifications();\n        \n            public NotificationHubClient Hub { get; set; }\n\n            private Notifications() {\n                Hub = NotificationHubClient.CreateClientFromConnectionString(\"<your hub's DefaultFullSharedAccessSignature>\", \n                                                                             \"<hub name>\");\n            }\n        }\n\n\n\n7. 接下来，我们将创建一个名为 **RegisterController** 的新控制器。在“解决方案资源管理器”中，右键单击“Controllers”文件夹，然后依次单击“添加”和“控制器”。单击“Web API 2 Controller -- Empty”项目，然后单击“添加”。将新类命名为 **RegisterController**，然后再次单击“添加”以生成该控制器。\n\n    ![][B7]\n\n    ![][B8]\n\n8. 在 RegisterController.cs 中，添加以下 `using` 语句：\n\n        using Microsoft.Azure.NotificationHubs;\n        using Microsoft.Azure.NotificationHubs.Messaging;\n        using AppBackend.Models;\n        using System.Threading.Tasks;\n        using System.Web;\n\n9. 在 `RegisterController` 类定义中添加以下代码：请注意，在此代码中，我们将为已附加到 HttpContext 的用户添加用户标记。添加的消息筛选器 `AuthenticationTestHandler` 将对该用户进行身份验证并将其附加到 HttpContext。还可以通过添加可选复选框来验证用户是否有权注册以获取请求标记。\n\n        private NotificationHubClient hub;\n\n        public RegisterController()\n        {\n            hub = Notifications.Instance.Hub;\n        }\n\n        public class DeviceRegistration\n        {\n            public string Platform { get; set; }\n            public string Handle { get; set; }\n            public string[] Tags { get; set; }\n        }\n\n        // POST api/register\n        // This creates a registration id\n        public async Task<string> Post(string handle = null)\n        {\n            string newRegistrationId = null;\n            \n            // make sure there are no existing registrations for this push handle (used for iOS and Android)\n            if (handle != null)\n            {\n                var registrations = await hub.GetRegistrationsByChannelAsync(handle, 100);\n\n                foreach (RegistrationDescription registration in registrations)\n                {\n                    if (newRegistrationId == null)\n                    {\n                        newRegistrationId = registration.RegistrationId;\n                    }\n                    else\n                    {\n                        await hub.DeleteRegistrationAsync(registration);\n                    }\n                }\n            }\n\n            if (newRegistrationId == null) \n                newRegistrationId = await hub.CreateRegistrationIdAsync();\n\n            return newRegistrationId;\n        }\n\n        // PUT api/register/5\n        // This creates or updates a registration (with provided channelURI) at the specified id\n        public async Task<HttpResponseMessage> Put(string id, DeviceRegistration deviceUpdate)\n        {\n            RegistrationDescription registration = null;\n            switch (deviceUpdate.Platform)\n            {\n                case \"mpns\":\n                    registration = new MpnsRegistrationDescription(deviceUpdate.Handle);\n                    break;\n                case \"wns\":\n                    registration = new WindowsRegistrationDescription(deviceUpdate.Handle);\n                    break;\n                case \"apns\":\n                    registration = new AppleRegistrationDescription(deviceUpdate.Handle);\n                    break;\n                case \"gcm\":\n                    registration = new GcmRegistrationDescription(deviceUpdate.Handle);\n                    break;\n                default:\n                    throw new HttpResponseException(HttpStatusCode.BadRequest);\n            }\n\n            registration.RegistrationId = id;\n            var username = HttpContext.Current.User.Identity.Name;\n\n            // add check if user is allowed to add these tags\n            registration.Tags = new HashSet<string>(deviceUpdate.Tags);\n            registration.Tags.Add(\"username:\" + username);\n\n            try\n            {\n                await hub.CreateOrUpdateRegistrationAsync(registration);\n            }\n            catch (MessagingException e)\n            {\n                ReturnGoneIfHubResponseIsGone(e);\n            }\n\n            return Request.CreateResponse(HttpStatusCode.OK);\n        }\n\n        // DELETE api/register/5\n        public async Task<HttpResponseMessage> Delete(string id)\n        {\n            await hub.DeleteRegistrationAsync(id);\n            return Request.CreateResponse(HttpStatusCode.OK);\n        }\n\n        private static void ReturnGoneIfHubResponseIsGone(MessagingException e)\n        {\n            var webex = e.InnerException as WebException;\n            if (webex.Status == WebExceptionStatus.ProtocolError)\n            {\n                var response = (HttpWebResponse)webex.Response;\n                if (response.StatusCode == HttpStatusCode.Gone)\n                    throw new HttpRequestException(HttpStatusCode.Gone.ToString());\n            }\n        }\n\n10. 保存所做更改。\n\n## 从 WebAPI 后端发送通知\n\n在本部分，你将添加新的控制器，以便客户端设备使用 ASP.NET WebAPI 后端中的 Azure 通知中心服务管理库根据用户名标记发送通知。\n\n\n1. 创建另一个名为 **NotificationsController** 的新控制器。以你在上一节中创建 **RegisterController** 的相同方式来创建新控制器。\n\n2. 在 NotificationsController.cs 中，添加以下 `using` 语句：\n\n        using AppBackend.Models;\n        using System.Threading.Tasks;\n        using System.Web;\n\n3. 在 **NotificationsController** 类中添加以下方法。\n\n    此代码将会根据平台通知服务 (PNS) `pns` 参数发送相应类型的通知。`to_tag` 的值用于设置消息中的 *username* 标记。此标记必须与活动的通知中心注册的用户名标记相匹配。将从 POST 请求正文提取通知消息，并根据目标 PNS 将其格式化。\n\n    根据受支持设备用来接收通知的平台通知服务 (PNS)，支持使用不同的格式接收不同的通知。例如，在 Windows 设备上，可以使用其他 PNS 不能直接支持的 [toast 通知和 WNS](https://msdn.microsoft.com/library/windows/apps/br230849.aspx)。因此，后端需要将通知格式化为你打算使用的设备 PNS 所支持的通知。然后，对 [NotificationHubClient 类](https://msdn.microsoft.com/library/azure/microsoft.azure.notificationhubs.notificationhubclient_methods.aspx)使用相应的 send API\n\n        public async Task<HttpResponseMessage> Post(string pns, [FromBody]string message, string to_tag)\n        {\n            var user = HttpContext.Current.User.Identity.Name;\n            string[] userTag = new string[2];\n            userTag[0] = \"username:\" + to_tag;\n            userTag[1] = \"from:\" + user;\n\n            Microsoft.Azure.NotificationHubs.NotificationOutcome outcome = null;\n            HttpStatusCode ret = HttpStatusCode.InternalServerError;\n\n            switch (pns.ToLower())\n            {\n                case \"wns\":\n                    // Windows 8.1 / Windows Phone 8.1\n                    var toast = @\"<toast><visual><binding template=\"\"ToastText01\"\"><text id=\"\"1\"\">\" + \n                                \"From \" + user + \": \" + message + \"</text></binding></visual></toast>\";\n                    outcome = await Notifications.Instance.Hub.SendWindowsNativeNotificationAsync(toast, userTag);\n                    break;\n                case \"apns\":\n                    // iOS\n                    var alert = \"{\"aps\":{\"alert\":\"\" + \"From \" + user + \": \" + message + \"\"}}\";\n                    outcome = await Notifications.Instance.Hub.SendAppleNativeNotificationAsync(alert, userTag);\n                    break;\n                case \"gcm\":\n                    // Android\n                    var notif = \"{ \"data\" : {\"message\":\"\" + \"From \" + user + \": \" + message + \"\"}}\";\n                    outcome = await Notifications.Instance.Hub.SendGcmNativeNotificationAsync(notif, userTag);\n                    break;\n            }\n\n            if (outcome != null)\n            {\n                if (!((outcome.State == Microsoft.Azure.NotificationHubs.NotificationOutcomeState.Abandoned) ||\n                    (outcome.State == Microsoft.Azure.NotificationHubs.NotificationOutcomeState.Unknown)))\n                {\n                    ret = HttpStatusCode.OK;\n                }\n            }\n\n            return Request.CreateResponse(ret);\n        }\n\n\n4. 按 **F5** 运行应用程序并确保到目前为止操作的准确性。该应用应启动 Web 浏览器，然后显示 ASP.NET 主页。\n\n##发布新的 WebAPI 后端\n\n1. 现在，我们将此应用部署到 Azure Web 应用，以便可以从任意设备访问它。右键单击 **AppBackend** 项目，然后选择“发布”。\n\n2. 选择“Azure Web Apps”作为发布目标。\n\n    ![][B15]\n\n3. 使用你的 Azure 帐户登录，然后选择一个现有的或新的 Web 应用。\n\n    ![][B16]\n\n4. 记下“连接”选项卡中的“目标 URL”属性。在本教程后面的部分中，我们将此 URL 称为*后端终结点*。单击“发布”。\n\n    ![][B18]\n\n\n[B1]: ./media/notification-hubs-aspnet-backend-notifyusers/notification-hubs-secure-push1.png\n[B2]: ./media/notification-hubs-aspnet-backend-notifyusers/notification-hubs-secure-push2.png\n[B3]: ./media/notification-hubs-aspnet-backend-notifyusers/notification-hubs-secure-push3.png\n[B4]: ./media/notification-hubs-aspnet-backend-notifyusers/notification-hubs-secure-push4.png\n[B5]: ./media/notification-hubs-aspnet-backend-notifyusers/notification-hubs-secure-push5.png\n[B6]: ./media/notification-hubs-aspnet-backend-notifyusers/notification-hubs-secure-push6.png\n[B7]: ./media/notification-hubs-aspnet-backend-notifyusers/notification-hubs-secure-push7.png\n[B8]: ./media/notification-hubs-aspnet-backend-notifyusers/notification-hubs-secure-push8.png\n[B14]: ./media/notification-hubs-aspnet-backend-notifyusers/notification-hubs-secure-push14.png\n[B15]: ./media/notification-hubs-aspnet-backend-notifyusers/notification-hubs-notify-users15.PNG\n[B16]: ./media/notification-hubs-aspnet-backend-notifyusers/notification-hubs-notify-users16.PNG\n[B18]: ./media/notification-hubs-aspnet-backend-notifyusers/notification-hubs-notify-users18.PNG\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

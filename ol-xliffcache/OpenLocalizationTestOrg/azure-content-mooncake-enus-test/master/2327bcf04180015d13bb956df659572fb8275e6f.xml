@@ -1,0 +1,867 @@
+{
+  "nodes": [
+    {
+      "content": "弹性数据库拆分/合并工具教程 | Azure",
+      "pos": [
+        27,
+        49
+      ]
+    },
+    {
+      "content": "使用弹性数据库工具进行拆分与合并",
+      "pos": [
+        68,
+        84
+      ]
+    },
+    {
+      "content": "弹性数据库拆分/合并工具教程",
+      "pos": [
+        297,
+        311
+      ]
+    },
+    {
+      "content": "下载拆分/合并包",
+      "pos": [
+        316,
+        324
+      ]
+    },
+    {
+      "pos": [
+        328,
+        409
+      ],
+      "content": "从 <bpt id=\"p1\">[</bpt>NuGet<ept id=\"p1\">](http://docs.nuget.org/docs/start-here/installing-nuget)</ept> 下载最新的 NuGet 版本。"
+    },
+    {
+      "content": "打开命令提示符，然后导航到您下载 nuget.exe 的目录。",
+      "pos": [
+        413,
+        444
+      ]
+    },
+    {
+      "pos": [
+        448,
+        548
+      ],
+      "content": "使用以下命令将最新的拆分/合并包下载到当前目录中：<ph id=\"ph1\">`nuget install Microsoft.Azure.SqlDatabase.ElasticScale.Service.SplitMerge`</ph>"
+    },
+    {
+      "pos": [
+        552,
+        813
+      ],
+      "content": "上面的步骤可将拆分/合并文件下载到当前目录。文件放置在名为 <bpt id=\"p1\">**</bpt>Microsoft.Azure.SqlDatabase.ElasticScale.Service.SplitMerge.x.x.xxx.x<ept id=\"p1\">**</ept> 的目录中，其中 <bpt id=\"p2\">*</bpt>x.x.xxx.x<ept id=\"p2\">*</ept> 表示版本号。拆分/合并服务文件可在 <bpt id=\"p3\">**</bpt>content\\\\splitmerge\\\\service<ept id=\"p3\">**</ept> 子目录中找到；拆分/合并 PowerShell 脚本（和所需的客户端 .dll）可在 <bpt id=\"p4\">**</bpt>content\\\\splitmerge\\\\powershell<ept id=\"p4\">**</ept> 子目录中找到。"
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        818,
+        822
+      ]
+    },
+    {
+      "pos": [
+        827,
+        955
+      ],
+      "content": "创建将用作拆分/合并状态数据库的 Azure SQL DB。转到 <bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>。创建新的 <bpt id=\"p2\">**</bpt>SQL 数据库<ept id=\"p2\">**</ept>。填写数据库名称并创建新的用户和密码。确保记录该名称和密码以供日后使用。"
+    },
+    {
+      "content": "确保你的 Azure SQL DB 服务器允许 Azure 服务与其连接。在门户上的“防火墙设置”中，确保“允许访问 Azure 服务”设置设为“打开”。单击“保存”图标。",
+      "pos": [
+        960,
+        1046
+      ]
+    },
+    {
+      "content": "允许的服务",
+      "pos": [
+        1054,
+        1059
+      ]
+    },
+    {
+      "content": "创建将用于诊断输出的 Azure 存储帐户。转到 Azure 门户。在左侧栏中，依次单击“新建”、“数据 + 存储”、“存储”。",
+      "pos": [
+        1068,
+        1132
+      ]
+    },
+    {
+      "content": "创建将包含拆分/合并服务的 Azure 云服务。转到 Azure 门户。在左侧栏中，依次单击“新建”、“计算”、“云服务”、“创建”。",
+      "pos": [
+        1137,
+        1204
+      ]
+    },
+    {
+      "content": "配置您的拆分/合并服务",
+      "pos": [
+        1210,
+        1221
+      ]
+    },
+    {
+      "content": "拆分/合并服务配置",
+      "pos": [
+        1227,
+        1236
+      ]
+    },
+    {
+      "content": "在你下载拆分/合并组件的文件夹中，创建“SplitMergeService.cspkg”随附的“ServiceConfiguration.Template.cscfg”文件的副本，并将其命名为“ServiceConfiguration.cscfg”。",
+      "pos": [
+        1241,
+        1366
+      ]
+    },
+    {
+      "content": "在您喜欢的文本编辑器中打开 ServiceConfiguration.cscfg。我们建议使用 Visual Studio，因为它将验证输入（例如，证书指纹的格式）。",
+      "pos": [
+        1371,
+        1454
+      ]
+    },
+    {
+      "content": "创建新的数据库或选择现有的数据库，以将其用作拆分/合并操作的状态数据库并检索该数据库的连接字符串。",
+      "pos": [
+        1459,
+        1508
+      ]
+    },
+    {
+      "pos": [
+        1514,
+        1678
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>重要说明：<ept id=\"p1\">**</ept>目前，状态数据库必须使用拉丁语排序规则 (SQL\\_Latin1\\_General\\_CP1\\_CI\\_AS)。有关详细信息，请参阅 <bpt id=\"p2\">[</bpt>Windows 排序规则名称 (Transact-SQL)<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/ms188046.aspx)</ept>。"
+    },
+    {
+      "content": "在 Azure SQL DB 中，连接字符串通常采用以下形式：",
+      "pos": [
+        1684,
+        1715
+      ]
+    },
+    {
+      "pos": [
+        1881,
+        1977
+      ],
+      "content": "同时在 ElasticScaleMetadata 设置的 <bpt id=\"p1\">**</bpt>SplitMergeWeb<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>SplitMergeWorker<ept id=\"p2\">**</ept> 角色部分中，在 cscfg 文件内输入此连接字符串。"
+    },
+    {
+      "pos": [
+        1985,
+        2104
+      ],
+      "content": "对于 <bpt id=\"p1\">**</bpt>SplitMergeWorker<ept id=\"p1\">**</ept> 角色，在 <bpt id=\"p2\">**</bpt>WorkerRoleSynchronizationStorageAccountConnectionString<ept id=\"p2\">**</ept> 设置中输入有效的连接字符串用于连接到 Azure 存储空间。"
+    },
+    {
+      "content": "配置安全性",
+      "pos": [
+        2118,
+        2123
+      ]
+    },
+    {
+      "pos": [
+        2124,
+        2241
+      ],
+      "content": "有关配置服务安全性的详细说明，请参阅<bpt id=\"p1\">[</bpt>拆分/合并安全配置<ept id=\"p1\">](/documentation/articles/sql-database-elastic-scale-split-merge-security-configuration)</ept>。"
+    },
+    {
+      "content": "为了针对本教程创建一个简单的测试部署，我们将执行少量的配置步骤来使服务正常运行。仅一个计算机/帐户可以执行这些步骤，以便与服务进行通信。",
+      "pos": [
+        2243,
+        2311
+      ]
+    },
+    {
+      "content": "创建自签名证书",
+      "pos": [
+        2317,
+        2324
+      ]
+    },
+    {
+      "pos": [
+        2326,
+        2430
+      ],
+      "content": "创建新的目录并使用 <bpt id=\"p1\">[</bpt>Visual Studio 的开发人员命令提示符<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/ms229859.aspx)</ept>窗口从该目录执行以下命令："
+    },
+    {
+      "content": "将要求您提供密码以保护私钥。输入强密码并进行确认。之后，系统将提示您再次输入该密码。在完成后单击“是”，以将证书导入到“受信任的根证书颁发机构”存储中。",
+      "pos": [
+        2640,
+        2716
+      ]
+    },
+    {
+      "content": "创建 PFX 文件",
+      "pos": [
+        2722,
+        2731
+      ]
+    },
+    {
+      "content": "从执行 makecert 的相同窗口中执行以下命令；使用您用于创建证书的相同密码：",
+      "pos": [
+        2733,
+        2774
+      ]
+    },
+    {
+      "content": "将客户端证书导入到个人存储中",
+      "pos": [
+        2856,
+        2870
+      ]
+    },
+    {
+      "content": "在 Windows 资源管理器中，双击“MyCert.pfx”。",
+      "pos": [
+        2874,
+        2906
+      ]
+    },
+    {
+      "content": "在“证书导入向导”中，选择“当前用户”，然后单击“下一步”。",
+      "pos": [
+        2910,
+        2940
+      ]
+    },
+    {
+      "content": "确认文件路径，然后单击“下一步”。",
+      "pos": [
+        2944,
+        2961
+      ]
+    },
+    {
+      "content": "键入密码、保持选中“包括所有扩展属性”，然后单击“下一步”。",
+      "pos": [
+        2965,
+        2995
+      ]
+    },
+    {
+      "content": "保持选中“自动选择证书存储[…]”，然后单击“下一步”。",
+      "pos": [
+        2999,
+        3027
+      ]
+    },
+    {
+      "content": "依次单击“完成”和“确定”。",
+      "pos": [
+        3031,
+        3045
+      ]
+    },
+    {
+      "content": "将 PFX 文件上载到云服务",
+      "pos": [
+        3051,
+        3065
+      ]
+    },
+    {
+      "pos": [
+        3067,
+        3113
+      ],
+      "content": "转到 <bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>。"
+    },
+    {
+      "content": "选择“云服务”。",
+      "pos": [
+        3118,
+        3126
+      ]
+    },
+    {
+      "content": "选择您之前为拆分/合并服务创建的云服务。",
+      "pos": [
+        3130,
+        3150
+      ]
+    },
+    {
+      "content": "单击顶部菜单上的“证书”。",
+      "pos": [
+        3154,
+        3167
+      ]
+    },
+    {
+      "content": "单击底部栏中的“上载”。",
+      "pos": [
+        3171,
+        3183
+      ]
+    },
+    {
+      "content": "选择 PFX 文件并输入上面所述的相同密码。",
+      "pos": [
+        3187,
+        3209
+      ]
+    },
+    {
+      "content": "完成操作后，从列表中的新条目复制证书指纹。",
+      "pos": [
+        3213,
+        3234
+      ]
+    },
+    {
+      "content": "更新服务配置文件",
+      "pos": [
+        3240,
+        3248
+      ]
+    },
+    {
+      "content": "将之前复制的证书指纹粘贴到这些设置的指纹/值属性中。对于辅助角色：",
+      "pos": [
+        3250,
+        3283
+      ]
+    },
+    {
+      "content": "对于 Web 角色：",
+      "pos": [
+        3451,
+        3461
+      ]
+    },
+    {
+      "pos": [
+        3919,
+        4071
+      ],
+      "content": "请注意，对于生产部署，应针对用于加密的 CA 使用单独的证书（服务器证书和客户端证书）。有关此内容的详细说明，请参阅<bpt id=\"p1\">[</bpt>安全配置<ept id=\"p1\">](/documentation/articles/sql-database-elastic-scale-split-merge-security-configuration)</ept>。"
+    },
+    {
+      "content": "部署你的拆分/合并服务",
+      "pos": [
+        4077,
+        4088
+      ]
+    },
+    {
+      "pos": [
+        4093,
+        4139
+      ],
+      "content": "转到 <bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>。"
+    },
+    {
+      "content": "单击左侧的“云服务”选项卡，然后选择你之前创建的云服务。",
+      "pos": [
+        4143,
+        4171
+      ]
+    },
+    {
+      "content": "单击“仪表板”。",
+      "pos": [
+        4175,
+        4183
+      ]
+    },
+    {
+      "content": "选择过渡环境，然后单击“上载新的过渡部署”。",
+      "pos": [
+        4187,
+        4209
+      ]
+    },
+    {
+      "content": "过渡",
+      "pos": [
+        4217,
+        4219
+      ]
+    },
+    {
+      "pos": [
+        4228,
+        4317
+      ],
+      "content": "在对话框中，输入一个部署标签。对于“程序包”和“配置”，单击“从本地”，然后选择 <bpt id=\"p1\">**</bpt>SplitMergeService.cspkg<ept id=\"p1\">**</ept> 文件和你之前配置的 .cscfg 文件。"
+    },
+    {
+      "content": "确保选中标记为“即使一个或多个角色包含单个实例也部署”的复选框。",
+      "pos": [
+        4321,
+        4353
+      ]
+    },
+    {
+      "content": "点击右下角的勾选按钮以开始部署。它预计需要几分钟的时间才能完成。",
+      "pos": [
+        4357,
+        4389
+      ]
+    },
+    {
+      "content": "上载",
+      "pos": [
+        4397,
+        4399
+      ]
+    },
+    {
+      "content": "部署故障排除",
+      "pos": [
+        4409,
+        4415
+      ]
+    },
+    {
+      "content": "如果您的 Web 角色无法联机，可能是安全配置出现了问题。检查 SSL 是否按照上面的描述进行了配置。",
+      "pos": [
+        4417,
+        4468
+      ]
+    },
+    {
+      "content": "如果您的辅助角色无法联机，但是您的 Web 角色已成功，很可能是在连接到您之前创建的状态数据库时出现了问题。",
+      "pos": [
+        4470,
+        4524
+      ]
+    },
+    {
+      "content": "确保您的 .cscfg 中的连接字符串正确。",
+      "pos": [
+        4528,
+        4550
+      ]
+    },
+    {
+      "content": "检查服务器和数据库是否存在，以及用户 ID 和密码是否正确。",
+      "pos": [
+        4553,
+        4583
+      ]
+    },
+    {
+      "content": "对于 Azure SQL DB，连接字符串应采用以下形式：",
+      "pos": [
+        4586,
+        4615
+      ]
+    },
+    {
+      "pos": [
+        4778,
+        4804
+      ],
+      "content": "确保服务器名称不以 <bpt id=\"p1\">**</bpt>https://<ept id=\"p1\">**</ept> 开头。"
+    },
+    {
+      "content": "确保你的 Azure SQL DB 服务器允许 Azure 服务与其连接。若要执行此操作，请打开 https://manage.windowsazure.cn，依次单击左侧的“SQL 数据库s”和顶部的“服务器”，然后选择你的服务器。在顶部单击“配置”并确保将“Azure 服务”设置为“是”。（请参阅此文章顶部的“先决条件”部分）。",
+      "pos": [
+        4807,
+        4974
+      ]
+    },
+    {
+      "content": "测试你的拆分/合并服务部署",
+      "pos": [
+        4979,
+        4992
+      ]
+    },
+    {
+      "content": "使用 Web 浏览器建立连接",
+      "pos": [
+        4998,
+        5012
+      ]
+    },
+    {
+      "pos": [
+        5014,
+        5163
+      ],
+      "content": "确定您的拆分/合并服务的 Web 终结点。通过转到云服务的“仪表板”并在右侧的“站点 URL”下查找，你可以在 Azure 经典门户中找到此内容。由于默认的安全设置将禁用 HTTP 终结点，因此请将 <bpt id=\"p1\">**</bpt>http://<ept id=\"p1\">**</ept> 替换为 <bpt id=\"p2\">**</bpt>https://<ept id=\"p2\">**</ept>。将此 URL 的页面加载到您的浏览器中。"
+    },
+    {
+      "content": "使用 PowerShell 脚本进行测试",
+      "pos": [
+        5169,
+        5189
+      ]
+    },
+    {
+      "content": "可以通过运行包含的示例 PowerShell 脚本测试部署和您的环境。",
+      "pos": [
+        5191,
+        5226
+      ]
+    },
+    {
+      "content": "包含的脚本文件为：",
+      "pos": [
+        5228,
+        5237
+      ]
+    },
+    {
+      "pos": [
+        5242,
+        5312
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>SetupSampleSplitMergeEnvironment.ps1<ept id=\"p1\">**</ept> - 为拆分/合并设置测试数据层（有关详细说明，请参见下表）"
+    },
+    {
+      "pos": [
+        5316,
+        5377
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>ExecuteSampleSplitMerge.ps1<ept id=\"p1\">**</ept> - 在测试数据层上执行测试操作（有关详细说明，请参见下表）"
+    },
+    {
+      "pos": [
+        5381,
+        5423
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>GetMappings.ps1<ept id=\"p1\">**</ept> – 可输出分片映射的当前状态的顶级示例脚本。"
+    },
+    {
+      "pos": [
+        5427,
+        5485
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>ShardManagement.psm1<ept id=\"p1\">**</ept> – 可包装 ShardManagement API 的帮助程序脚本"
+    },
+    {
+      "pos": [
+        5489,
+        5541
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>SqlDatabaseHelpers.psm1<ept id=\"p1\">**</ept> – 用于创建和管理 SQL 数据库的帮助程序脚本"
+    },
+    {
+      "content": "PowerShell 文件",
+      "pos": [
+        5585,
+        5598
+      ]
+    },
+    {
+      "content": "步骤",
+      "pos": [
+        5612,
+        5614
+      ]
+    },
+    {
+      "content": "SetupSampleSplitMergeEnvironment.ps1",
+      "pos": [
+        5655,
+        5691
+      ]
+    },
+    {
+      "content": "1.创建分片映射管理器数据库",
+      "pos": [
+        5705,
+        5719
+      ]
+    },
+    {
+      "content": "2.创建 2 个分片数据库。",
+      "pos": [
+        5748,
+        5762
+      ]
+    },
+    {
+      "content": "3.为这些数据库创建一个分片映射（删除这些数据库上的任何现有的分片映射）。",
+      "pos": [
+        5786,
+        5823
+      ]
+    },
+    {
+      "content": "4.在这两个分片中创建一个小的示例表，然后使用一个分片填充该表。",
+      "pos": [
+        5852,
+        5884
+      ]
+    },
+    {
+      "content": "5.声明分片表的 SchemaInfo。",
+      "pos": [
+        5913,
+        5933
+      ]
+    },
+    {
+      "content": "PowerShell 文件",
+      "pos": [
+        6000,
+        6013
+      ]
+    },
+    {
+      "content": "步骤",
+      "pos": [
+        6027,
+        6029
+      ]
+    },
+    {
+      "content": "ExecuteSampleSplitMerge.ps1",
+      "pos": [
+        6068,
+        6095
+      ]
+    },
+    {
+      "content": "1.将拆分请求发送到拆分/合并服务 Web 前端，以将数据从第一个分片到第二个分片拆分为两半。",
+      "pos": [
+        6110,
+        6157
+      ]
+    },
+    {
+      "content": "2.轮询拆分请求状态的 Web 前端并等待该请求完成。",
+      "pos": [
+        6186,
+        6213
+      ]
+    },
+    {
+      "content": "3.将合并请求发送到拆分/合并服务 Web 前端，以将数据从第二个分片移回到第一个分片。",
+      "pos": [
+        6242,
+        6286
+      ]
+    },
+    {
+      "content": "4.轮询合并请求状态的 Web 前端并等待该请求完成。",
+      "pos": [
+        6315,
+        6342
+      ]
+    },
+    {
+      "content": "使用 PowerShell 验证你的部署",
+      "pos": [
+        6368,
+        6388
+      ]
+    },
+    {
+      "content": "打开新的 PowerShell 窗口并导航到您下载拆分/合并包的目录，然后导航到“powershell”目录中。",
+      "pos": [
+        6396,
+        6452
+      ]
+    },
+    {
+      "content": "创建将在其中创建分片映射管理器和分片的 Azure SQL 数据库服务器（或选择现有服务器）。",
+      "pos": [
+        6459,
+        6506
+      ]
+    },
+    {
+      "content": "执行 SetupSampleSplitMergeEnvironment.ps1 脚本以创建示例环境。",
+      "pos": [
+        6791,
+        6841
+      ]
+    },
+    {
+      "content": "执行 Getmappings.ps1 脚本以查看示例环境中当前存在的映射。",
+      "pos": [
+        7140,
+        7177
+      ]
+    },
+    {
+      "pos": [
+        7187,
+        7360
+      ],
+      "content": ".\\GetMappings.ps1 `\n      -UserName 'mysqluser' `\n      -Password 'MySqlPassw0rd' `\n      -ShardMapManagerServerName 'abcdefghij.database.chinacloudapi.cn'",
+      "leadings": [
+        "",
+        "      ",
+        "      ",
+        "      "
+      ],
+      "nodes": [
+        {
+          "content": ".\\GetMappings.ps1 <ph id=\"ph1\">`\n      -UserName 'mysqluser' `</ph>",
+          "pos": [
+            0,
+            49
+          ]
+        },
+        {
+          "content": "-Password 'MySqlPassw0rd' `",
+          "pos": [
+            56,
+            83
+          ]
+        },
+        {
+          "content": "-ShardMapManagerServerName 'abcdefghij.database.chinacloudapi.cn'",
+          "pos": [
+            90,
+            155
+          ]
+        }
+      ]
+    },
+    {
+      "content": "执行 ExecuteSampleSplitMerge.ps1 脚本以执行拆分操作（将第一个分片上一半的数据移至第二个分片），然后执行合并操作（将数据移回第一个分片）。如果您已配置 SSL 并且已将 http 终结点保留为禁用，请确保改为使用 https:// 终结点。",
+      "pos": [
+        7368,
+        7502
+      ]
+    },
+    {
+      "content": "试用其他数据类型！ 所有这些脚本均采取可选的 -ShardKeyType 参数，该参数允许您指定密钥类型。默认值为 Int32，但您也可以指定 Int64、Guid 或 Binary。",
+      "pos": [
+        11320,
+        11412
+      ]
+    },
+    {
+      "content": "创建你自己的请求",
+      "pos": [
+        11417,
+        11425
+      ]
+    },
+    {
+      "content": "可以通过 Web UI 或通过导入并使用 SplitMerge.psm1 PowerShell 模块（该模块将通过 Web 角色提交你的请求）使用该服务。",
+      "pos": [
+        11427,
+        11504
+      ]
+    },
+    {
+      "content": "拆分/合并服务可以将数据同时移入分片表和引用表。分片表具有一个分片密钥列并在不同的分片上具有不同的行数据。引用表未进行分片，因此它在每个分片上都包含相同的行数据。引用表适用于不经常更改的数据，并且可用于接联查询中的分片表。",
+      "pos": [
+        11506,
+        11617
+      ]
+    },
+    {
+      "pos": [
+        11619,
+        11760
+      ],
+      "content": "为了执行拆分/合并操作，您必须声明要移动的分片表和引用表。将使用 <bpt id=\"p1\">**</bpt>SchemaInfo<ept id=\"p1\">**</ept> API 完成此操作。此 API 位于 <bpt id=\"p2\">**</bpt>Microsoft.Azure.SqlDatabase.ElasticScale.ShardManagement.Schema<ept id=\"p2\">**</ept> 命名空间中。"
+    },
+    {
+      "pos": [
+        11768,
+        11853
+      ],
+      "content": "对于每个分片表，请创建一个 <bpt id=\"p1\">**</bpt>ShardedTableInfo<ept id=\"p1\">**</ept> 对象，该对象在包含分片密钥的表中描述了此表的父架构名称（可选，默认为“dbo”）、表名称以及列名称。"
+    },
+    {
+      "pos": [
+        11860,
+        11930
+      ],
+      "content": "对于每个引用表，请创建一个 <bpt id=\"p1\">**</bpt>ShardedTableInfo<ept id=\"p1\">**</ept> 对象，该对象描述了此表的父架构名称（可选，默认为“dbo”）和表名称。"
+    },
+    {
+      "pos": [
+        11937,
+        11978
+      ],
+      "content": "将上面的 TableInfo 对象添加到新的 <bpt id=\"p1\">**</bpt>SchemaInfo<ept id=\"p1\">**</ept> 对象。"
+    },
+    {
+      "pos": [
+        11985,
+        12048
+      ],
+      "content": "获取对 <bpt id=\"p1\">**</bpt>ShardMapManager<ept id=\"p1\">**</ept> 对象的引用，然后调用 <bpt id=\"p2\">**</bpt>GetSchemaInfoCollection<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "pos": [
+        12055,
+        12112
+      ],
+      "content": "将 <bpt id=\"p1\">**</bpt>SchemaInfo<ept id=\"p1\">**</ept> 添加到 <bpt id=\"p2\">**</bpt>SchemaInfoCollection<ept id=\"p2\">**</ept>，从而提供分片映射名称。"
+    },
+    {
+      "content": "可在 SetupSampleSplitMergeEnvironment.ps1 脚本中看到此操作的示例。",
+      "pos": [
+        12114,
+        12166
+      ]
+    },
+    {
+      "content": "请注意，拆分/合并服务不会为您创建目标数据库（或在数据库中为任何表创建架构）。在将请求发送到服务之前，必须预先创建它们。",
+      "pos": [
+        12168,
+        12228
+      ]
+    },
+    {
+      "content": "故障排除",
+      "pos": [
+        12234,
+        12238
+      ]
+    },
+    {
+      "content": "在运行示例 powershell 脚本时，您可能会看到下面的消息：",
+      "pos": [
+        12239,
+        12272
+      ]
+    },
+    {
+      "content": "此错误表示您的 SSL 证书未正确配置。请按照“与 Web 浏览器连接”部分中的说明进行操作。",
+      "pos": [
+        12408,
+        12455
+      ]
+    },
+    {
+      "content": "如果无法提交请求，你可能会看到:",
+      "pos": [
+        12457,
+        12473
+      ]
+    },
+    {
+      "content": "[异常] System.Data.SqlClient.SqlException (0x80131904): 找不到存储过程 'dbo.InsertRequest'。",
+      "pos": [
+        12476,
+        12558
+      ]
+    },
+    {
+      "pos": [
+        12560,
+        12675
+      ],
+      "content": "在这种情况下，请检查你的配置文件，尤其是 <bpt id=\"p1\">**</bpt>WorkerRoleSynchronizationStorageAccountConnectionString<ept id=\"p1\">**</ept> 的设置。此错误通常表示辅助角色无法成功初始化首次使用的元数据数据库。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"弹性数据库拆分/合并工具教程 | Azure\"\n    description=\"使用弹性数据库工具进行拆分与合并\"\n    services=\"sql-database\"\n    documentationCenter=\"\"\n    authors=\"sidneyh\"\n    manager=\"jeffreyg\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"sql-database\"\n    ms.date=\"12/01/2015\"\n    wacn.date=\"01/29/2016\" />\n\n# 弹性数据库拆分/合并工具教程\n\n## 下载拆分/合并包\n1. 从 [NuGet](http://docs.nuget.org/docs/start-here/installing-nuget) 下载最新的 NuGet 版本。\n2. 打开命令提示符，然后导航到您下载 nuget.exe 的目录。\n3. 使用以下命令将最新的拆分/合并包下载到当前目录中：`nuget install Microsoft.Azure.SqlDatabase.ElasticScale.Service.SplitMerge`  \n\n上面的步骤可将拆分/合并文件下载到当前目录。文件放置在名为 **Microsoft.Azure.SqlDatabase.ElasticScale.Service.SplitMerge.x.x.xxx.x** 的目录中，其中 *x.x.xxx.x* 表示版本号。拆分/合并服务文件可在 **content\\\\splitmerge\\\\service** 子目录中找到；拆分/合并 PowerShell 脚本（和所需的客户端 .dll）可在 **content\\\\splitmerge\\\\powershell** 子目录中找到。\n\n## 先决条件\n\n1. 创建将用作拆分/合并状态数据库的 Azure SQL DB。转到 [Azure 门户](https://manage.windowsazure.cn)。创建新的 **SQL 数据库**。填写数据库名称并创建新的用户和密码。确保记录该名称和密码以供日后使用。\n\n2. 确保你的 Azure SQL DB 服务器允许 Azure 服务与其连接。在门户上的“防火墙设置”中，确保“允许访问 Azure 服务”设置设为“打开”。单击“保存”图标。\n\n    ![允许的服务][1]\n\n3. 创建将用于诊断输出的 Azure 存储帐户。转到 Azure 门户。在左侧栏中，依次单击“新建”、“数据 + 存储”、“存储”。\n\n4. 创建将包含拆分/合并服务的 Azure 云服务。转到 Azure 门户。在左侧栏中，依次单击“新建”、“计算”、“云服务”、“创建”。\n\n\n## 配置您的拆分/合并服务\n\n### 拆分/合并服务配置\n\n1. 在你下载拆分/合并组件的文件夹中，创建“SplitMergeService.cspkg”随附的“ServiceConfiguration.Template.cscfg”文件的副本，并将其命名为“ServiceConfiguration.cscfg”。\n\n2. 在您喜欢的文本编辑器中打开 ServiceConfiguration.cscfg。我们建议使用 Visual Studio，因为它将验证输入（例如，证书指纹的格式）。\n\n3. 创建新的数据库或选择现有的数据库，以将其用作拆分/合并操作的状态数据库并检索该数据库的连接字符串。\n\n    **重要说明：**目前，状态数据库必须使用拉丁语排序规则 (SQL\\_Latin1\\_General\\_CP1\\_CI\\_AS)。有关详细信息，请参阅 [Windows 排序规则名称 (Transact-SQL)](https://msdn.microsoft.com/zh-cn/library/ms188046.aspx)。\n\n    在 Azure SQL DB 中，连接字符串通常采用以下形式：\n\n        \"Server=myservername.database.chinacloudapi.cn; Database=mydatabasename;User ID=myuserID; Password=mypassword; Encrypt=True; Connection Timeout=30\" .\n4.    同时在 ElasticScaleMetadata 设置的 **SplitMergeWeb** 和 **SplitMergeWorker** 角色部分中，在 cscfg 文件内输入此连接字符串。\n\n5.    对于 **SplitMergeWorker** 角色，在 **WorkerRoleSynchronizationStorageAccountConnectionString** 设置中输入有效的连接字符串用于连接到 Azure 存储空间。\n        \n### 配置安全性\n有关配置服务安全性的详细说明，请参阅[拆分/合并安全配置](/documentation/articles/sql-database-elastic-scale-split-merge-security-configuration)。\n\n为了针对本教程创建一个简单的测试部署，我们将执行少量的配置步骤来使服务正常运行。仅一个计算机/帐户可以执行这些步骤，以便与服务进行通信。\n\n### 创建自签名证书\n\n创建新的目录并使用 [Visual Studio 的开发人员命令提示符](http://msdn.microsoft.com/zh-cn/library/ms229859.aspx)窗口从该目录执行以下命令：\n\n    makecert ^\n    -n \"CN=*.chinacloudapp.cn\" ^\n    -r -cy end -sky exchange -eku \"1.3.6.1.5.5.7.3.1,1.3.6.1.5.5.7.3.2\" ^\n    -a sha1 -len 2048 ^\n    -sr currentuser -ss root ^\n    -sv MyCert.pvk MyCert.cer\n\n将要求您提供密码以保护私钥。输入强密码并进行确认。之后，系统将提示您再次输入该密码。在完成后单击“是”，以将证书导入到“受信任的根证书颁发机构”存储中。\n\n### 创建 PFX 文件\n\n从执行 makecert 的相同窗口中执行以下命令；使用您用于创建证书的相同密码：\n\n    pvk2pfx -pvk MyCert.pvk -spc MyCert.cer -pfx MyCert.pfx -pi <password>\n\n### 将客户端证书导入到个人存储中\n1. 在 Windows 资源管理器中，双击“MyCert.pfx”。\n2. 在“证书导入向导”中，选择“当前用户”，然后单击“下一步”。\n3. 确认文件路径，然后单击“下一步”。\n4. 键入密码、保持选中“包括所有扩展属性”，然后单击“下一步”。\n5. 保持选中“自动选择证书存储[…]”，然后单击“下一步”。\n6. 依次单击“完成”和“确定”。\n\n### 将 PFX 文件上载到云服务\n\n转到 [Azure 门户](https://manage.windowsazure.cn)。\n\n1. 选择“云服务”。\n2. 选择您之前为拆分/合并服务创建的云服务。\n3. 单击顶部菜单上的“证书”。\n4. 单击底部栏中的“上载”。\n5. 选择 PFX 文件并输入上面所述的相同密码。\n6. 完成操作后，从列表中的新条目复制证书指纹。\n\n### 更新服务配置文件\n\n将之前复制的证书指纹粘贴到这些设置的指纹/值属性中。对于辅助角色：\n\n    <Setting name=\"DataEncryptionPrimaryCertificateThumbprint\" value=\"\" />\n    <Certificate name=\"DataEncryptionPrimary\" thumbprint=\"\" thumbprintAlgorithm=\"sha1\" />\n\n对于 Web 角色：\n\n    <Setting name=\"AdditionalTrustedRootCertificationAuthorities\" value=\"\" />\n    <Setting name=\"AllowedClientCertificateThumbprints\" value=\"\" />\n    <Setting name=\"DataEncryptionPrimaryCertificateThumbprint\" value=\"\" />\n    <Certificate name=\"SSL\" thumbprint=\"\" thumbprintAlgorithm=\"sha1\" />\n    <Certificate name=\"CA\" thumbprint=\"\" thumbprintAlgorithm=\"sha1\" />\n    <Certificate name=\"DataEncryptionPrimary\" thumbprint=\"\" thumbprintAlgorithm=\"sha1\" />\n\n\n请注意，对于生产部署，应针对用于加密的 CA 使用单独的证书（服务器证书和客户端证书）。有关此内容的详细说明，请参阅[安全配置](/documentation/articles/sql-database-elastic-scale-split-merge-security-configuration)。\n\n### 部署你的拆分/合并服务\n\n1. 转到 [Azure 门户](https://manage.windowsazure.cn)。\n2. 单击左侧的“云服务”选项卡，然后选择你之前创建的云服务。\n3. 单击“仪表板”。\n4. 选择过渡环境，然后单击“上载新的过渡部署”。\n\n    ![过渡][3]\n\n5. 在对话框中，输入一个部署标签。对于“程序包”和“配置”，单击“从本地”，然后选择 **SplitMergeService.cspkg** 文件和你之前配置的 .cscfg 文件。\n6. 确保选中标记为“即使一个或多个角色包含单个实例也部署”的复选框。\n7. 点击右下角的勾选按钮以开始部署。它预计需要几分钟的时间才能完成。\n\n    ![上载][4]\n\n\n## 部署故障排除\n\n如果您的 Web 角色无法联机，可能是安全配置出现了问题。检查 SSL 是否按照上面的描述进行了配置。\n\n如果您的辅助角色无法联机，但是您的 Web 角色已成功，很可能是在连接到您之前创建的状态数据库时出现了问题。\n\n* 确保您的 .cscfg 中的连接字符串正确。\n* 检查服务器和数据库是否存在，以及用户 ID 和密码是否正确。\n* 对于 Azure SQL DB，连接字符串应采用以下形式：\n\n        \"Server=myservername.database.chinacloudapi.cn; Database=mydatabasename;User ID=myuserID; Password=mypassword; Encrypt=True; Connection Timeout=30\" .\n\n* 确保服务器名称不以 **https://** 开头。\n* 确保你的 Azure SQL DB 服务器允许 Azure 服务与其连接。若要执行此操作，请打开 https://manage.windowsazure.cn，依次单击左侧的“SQL 数据库s”和顶部的“服务器”，然后选择你的服务器。在顶部单击“配置”并确保将“Azure 服务”设置为“是”。（请参阅此文章顶部的“先决条件”部分）。\n\n## 测试你的拆分/合并服务部署\n\n### 使用 Web 浏览器建立连接\n\n确定您的拆分/合并服务的 Web 终结点。通过转到云服务的“仪表板”并在右侧的“站点 URL”下查找，你可以在 Azure 经典门户中找到此内容。由于默认的安全设置将禁用 HTTP 终结点，因此请将 **http://** 替换为 **https://**。将此 URL 的页面加载到您的浏览器中。\n\n### 使用 PowerShell 脚本进行测试\n\n可以通过运行包含的示例 PowerShell 脚本测试部署和您的环境。\n\n包含的脚本文件为：\n\n1. **SetupSampleSplitMergeEnvironment.ps1** - 为拆分/合并设置测试数据层（有关详细说明，请参见下表）\n2. **ExecuteSampleSplitMerge.ps1** - 在测试数据层上执行测试操作（有关详细说明，请参见下表）\n3. **GetMappings.ps1** – 可输出分片映射的当前状态的顶级示例脚本。\n4. **ShardManagement.psm1** – 可包装 ShardManagement API 的帮助程序脚本\n5. **SqlDatabaseHelpers.psm1** – 用于创建和管理 SQL 数据库的帮助程序脚本\n\n<table style=\"width:100%\">\n  <tr>\n    <th>PowerShell 文件</th>\n    <th>步骤</th>\n  </tr>\n  <tr>\n    <th rowspan=\"5\">SetupSampleSplitMergeEnvironment.ps1</th>\n    <td>1.创建分片映射管理器数据库</td>\n  </tr>\n  <tr>\n    <td>2.创建 2 个分片数据库。\n  </tr>\n  <tr>\n    <td>3.为这些数据库创建一个分片映射（删除这些数据库上的任何现有的分片映射）。</td>\n  </tr>\n  <tr>\n    <td>4.在这两个分片中创建一个小的示例表，然后使用一个分片填充该表。</td>\n  </tr>\n  <tr>\n    <td>5.声明分片表的 SchemaInfo。</td>\n  </tr>\n\n</table>\n\n<table style=\"width:100%\">\n  <tr>\n    <th>PowerShell 文件</th>\n    <th>步骤</th>\n  </tr>\n<tr>\n    <th rowspan=\"4\">ExecuteSampleSplitMerge.ps1 </th>\n    <td>1.将拆分请求发送到拆分/合并服务 Web 前端，以将数据从第一个分片到第二个分片拆分为两半。</td>\n  </tr>\n  <tr>\n    <td>2.轮询拆分请求状态的 Web 前端并等待该请求完成。</td>\n  </tr>\n  <tr>\n    <td>3.将合并请求发送到拆分/合并服务 Web 前端，以将数据从第二个分片移回到第一个分片。</td>\n  </tr>\n  <tr>\n    <td>4.轮询合并请求状态的 Web 前端并等待该请求完成。</td>\n  </tr>\n</table>\n\n##使用 PowerShell 验证你的部署\n\n1.    打开新的 PowerShell 窗口并导航到您下载拆分/合并包的目录，然后导航到“powershell”目录中。\n2.    创建将在其中创建分片映射管理器和分片的 Azure SQL 数据库服务器（或选择现有服务器）。\n\n    注意：默认情况下，SetupSampleSplitMergeEnvironment.ps1 脚本将在相同的服务器上创建所有这些数据库以简化脚本。这并不表示拆分/合并服务本身存在限制。\n\n    拆分/合并服务将需要具有数据库读/写访问权限的 SQL 身份验证登录，才能移动数据并更新分片映射。由于拆分/合并服务在云中运行，因此它当前不支持集成的身份验证。\n\n    确保 Azure SQL 服务器已配置为允许从运行这些脚本的计算机的 IP 地址进行访问。您可以在“Azure SQL 服务器”/“配置”/“允许的 IP 地址”下找到此设置。\n\n3.    执行 SetupSampleSplitMergeEnvironment.ps1 脚本以创建示例环境。\n\n    运行此脚本将擦除分片映射管理器数据库和分片上任何现有的分片映射管理数据结构。如果您想要重新初始化分片映射或分片，重新运行脚本可能会很有用。\n\n    示例命令行：\n\n        .\\SetupSampleSplitMergeEnvironment.ps1 `\n            -UserName 'mysqluser' `\n            -Password 'MySqlPassw0rd' `\n            -ShardMapManagerServerName 'abcdefghij.database.chinacloudapi.cn'\n\n4.    执行 Getmappings.ps1 脚本以查看示例环境中当前存在的映射。\n\n        .\\GetMappings.ps1 `\n            -UserName 'mysqluser' `\n            -Password 'MySqlPassw0rd' `\n            -ShardMapManagerServerName 'abcdefghij.database.chinacloudapi.cn'\n\n5.    执行 ExecuteSampleSplitMerge.ps1 脚本以执行拆分操作（将第一个分片上一半的数据移至第二个分片），然后执行合并操作（将数据移回第一个分片）。如果您已配置 SSL 并且已将 http 终结点保留为禁用，请确保改为使用 https:// 终结点。\n\n    示例命令行：\n\n        .\\ExecuteSampleSplitMerge.ps1 `\n            -UserName 'mysqluser' `\n            -Password 'MySqlPassw0rd' `\n            -ShardMapManagerServerName 'abcdefghij.database.chinacloudapi.cn' `\n            -SplitMergeServiceEndpoint 'https://mysplitmergeservice.chinacloudapp.cn' `\n            -CertificateThumbprint '0123456789abcdef0123456789abcdef01234567'\n\n    如果您收到以下错误，很有可能是您的 Web 终结点证书出现了问题。尝试使用您最喜欢的 Web 浏览器连接到 Web 终结点并检查是否存在证书错误。\n\n        Invoke-WebRequest : The underlying connection was closed: Could not establish trust relationship for the SSL/TLSsecure channel.\n\n    如果成功，则输出应如下所示：\n\n        > .\\ExecuteSampleSplitMerge.ps1 -UserName 'mysqluser' -Password 'MySqlPassw0rd' -ShardMapManagerServerName 'abcdefghij.database.chinacloudapi.cn' -SplitMergeServiceEndpoint 'http://mysplitmergeservice.chinacloudapp.cn' –CertificateThumbprint 0123456789abcdef0123456789abcdef01234567\n        Sending split request\n        Began split operation with id dc68dfa0-e22b-4823-886a-9bdc903c80f3\n        Polling split-merge request status. Press Ctrl-C to end\n        Progress: 0% | Status: Queued | Details: [Informational] Queued request\n        Progress: 5% | Status: Starting | Details: [Informational] Starting split-merge state machine for request.\n        Progress: 5% | Status: Starting | Details: [Informational] Performing data consistency checks on target     shards.\n        Progress: 20% | Status: CopyingReferenceTables | Details: [Informational] Moving reference tables from     source to target shard.\n        Progress: 20% | Status: CopyingReferenceTables | Details: [Informational] Waiting for reference tables copy     completion.\n        Progress: 20% | Status: CopyingReferenceTables | Details: [Informational] Moving reference tables from     source to target shard.\n        Progress: 44% | Status: CopyingShardedTables | Details: [Informational] Moving key range [100:110) of     Sharded tables\n        Progress: 44% | Status: CopyingShardedTables | Details: [Informational] Successfully copied key range     [100:110) for table [dbo].[MyShardedTable]\n        ...\n        ...\n        Progress: 90% | Status: Completing | Details: [Informational] Successfully deleted shardlets in table     [dbo].[MyShardedTable].\n        Progress: 90% | Status: Completing | Details: [Informational] Deleting any temp tables that were created     while processing the request.\n        Progress: 100% | Status: Succeeded | Details: [Informational] Successfully processed request.\n        Sending merge request\n        Began merge operation with id 6ffc308f-d006-466b-b24e-857242ec5f66\n        Polling request status. Press Ctrl-C to end\n        Progress: 0% | Status: Queued | Details: [Informational] Queued request\n        Progress: 5% | Status: Starting | Details: [Informational] Starting split-merge state machine for request.\n        Progress: 5% | Status: Starting | Details: [Informational] Performing data consistency checks on target     shards.\n        Progress: 20% | Status: CopyingReferenceTables | Details: [Informational] Moving reference tables from     source to target shard.\n        Progress: 44% | Status: CopyingShardedTables | Details: [Informational] Moving key range [100:110) of     Sharded tables\n        Progress: 44% | Status: CopyingShardedTables | Details: [Informational] Successfully copied key range     [100:110) for table [dbo].[MyShardedTable]\n        ...\n        ...\n        Progress: 90% | Status: Completing | Details: [Informational] Successfully deleted shardlets in table     [dbo].[MyShardedTable].\n        Progress: 90% | Status: Completing | Details: [Informational] Deleting any temp tables that were created     while processing the request.\n        Progress: 100% | Status: Succeeded | Details: [Informational] Successfully processed request.\n\n6.    试用其他数据类型！ 所有这些脚本均采取可选的 -ShardKeyType 参数，该参数允许您指定密钥类型。默认值为 Int32，但您也可以指定 Int64、Guid 或 Binary。\n\n## 创建你自己的请求\n\n可以通过 Web UI 或通过导入并使用 SplitMerge.psm1 PowerShell 模块（该模块将通过 Web 角色提交你的请求）使用该服务。\n\n拆分/合并服务可以将数据同时移入分片表和引用表。分片表具有一个分片密钥列并在不同的分片上具有不同的行数据。引用表未进行分片，因此它在每个分片上都包含相同的行数据。引用表适用于不经常更改的数据，并且可用于接联查询中的分片表。\n\n为了执行拆分/合并操作，您必须声明要移动的分片表和引用表。将使用 **SchemaInfo** API 完成此操作。此 API 位于 **Microsoft.Azure.SqlDatabase.ElasticScale.ShardManagement.Schema** 命名空间中。\n\n1.    对于每个分片表，请创建一个 **ShardedTableInfo** 对象，该对象在包含分片密钥的表中描述了此表的父架构名称（可选，默认为“dbo”）、表名称以及列名称。\n2.    对于每个引用表，请创建一个 **ShardedTableInfo** 对象，该对象描述了此表的父架构名称（可选，默认为“dbo”）和表名称。\n3.    将上面的 TableInfo 对象添加到新的 **SchemaInfo** 对象。\n4.    获取对 **ShardMapManager** 对象的引用，然后调用 **GetSchemaInfoCollection**。\n5.    将 **SchemaInfo** 添加到 **SchemaInfoCollection**，从而提供分片映射名称。\n\n可在 SetupSampleSplitMergeEnvironment.ps1 脚本中看到此操作的示例。\n\n请注意，拆分/合并服务不会为您创建目标数据库（或在数据库中为任何表创建架构）。在将请求发送到服务之前，必须预先创建它们。\n\n\n## 故障排除\n在运行示例 powershell 脚本时，您可能会看到下面的消息：\n\n    Invoke-WebRequest : The underlying connection was closed: Could not establish trust relationship for the SSL/TLS secure channel.\n\n此错误表示您的 SSL 证书未正确配置。请按照“与 Web 浏览器连接”部分中的说明进行操作。\n\n如果无法提交请求，你可能会看到:\n\n [异常] System.Data.SqlClient.SqlException (0x80131904): 找不到存储过程 'dbo.InsertRequest'。\n\n在这种情况下，请检查你的配置文件，尤其是 **WorkerRoleSynchronizationStorageAccountConnectionString** 的设置。此错误通常表示辅助角色无法成功初始化首次使用的元数据数据库。\n\n[AZURE.INCLUDE [elastic-scale-include](../includes/elastic-scale-include.md)]\n\n<!--Image references-->\n[1]: ./media/sql-database-elastic-scale-configure-deploy-split-and-merge/allowed-services.png\n[2]: ./media/sql-database-elastic-scale-configure-deploy-split-and-merge/manage.png\n[3]: ./media/sql-database-elastic-scale-configure-deploy-split-and-merge/staging.png\n[4]: ./media/sql-database-elastic-scale-configure-deploy-split-and-merge/upload.png\n[5]: ./media/sql-database-elastic-scale-configure-deploy-split-and-merge/storage.png\n \n\n<!---HONumber=Mooncake_0118_2016-->\n"
+}

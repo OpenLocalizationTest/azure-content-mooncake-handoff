@@ -1,0 +1,1524 @@
+{
+  "nodes": [
+    {
+      "content": "通过 Azure Site Recovery 使用 SAN 将 Hyper-V VM（位于 VMM 云中）复制到辅助站点 | Azure",
+      "pos": [
+        28,
+        96
+      ]
+    },
+    {
+      "content": "Azure Site Recovery 可以使用 SAN 复制在本地 VMM 站点之间协调 Hyper-V 虚拟机的复制、故障转移和恢复。",
+      "pos": [
+        115,
+        184
+      ]
+    },
+    {
+      "content": "通过 Azure Site Recovery 使用 SAN 将 Hyper-V VM（位于 VMM 云中）复制到辅助站点",
+      "pos": [
+        415,
+        475
+      ]
+    },
+    {
+      "pos": [
+        477,
+        662
+      ],
+      "content": "Azure Site Recovery 有助于业务连续性和灾难恢复 (BCDR) 策略，因为它可以安排复制、故障转移和恢复虚拟机和物理服务器。虚拟机可复制到 Azure 中，也可复制到本地数据中心中。如需快速概览，请阅读<bpt id=\"p1\">[</bpt>什么是 Azure Site Recovery？<ept id=\"p1\">](/documentation/articles/site-recovery-overview)</ept>。"
+    },
+    {
+      "content": "概述",
+      "pos": [
+        667,
+        669
+      ]
+    },
+    {
+      "content": "本文介绍了如何部署 Site Recovery，以便针对 System Center Virtual Machine Manager (VMM) 私有云中的 Hyper-V 虚拟机安排和自动实施保护。在本方案中，使用了 Site Recovery 和 SAN 复制将虚拟机从主 VMM 站点复制到辅助 VMM 站点。",
+      "pos": [
+        671,
+        829
+      ]
+    },
+    {
+      "content": "本文包括概述和部署先决条件。它将引导你在 VMM 和 Site Recovery 保管库中配置和启用复制。你可以发现和分类 VMM 中的 SAN 存储，设置 LUN，以及向 Hyper-V 群集分配存储。本文最后指导你测试故障转移，以确保一切都按预期进行。",
+      "pos": [
+        831,
+        959
+      ]
+    },
+    {
+      "pos": [
+        961,
+        1062
+      ],
+      "content": "请在 <bpt id=\"p1\">[</bpt>Azure 恢复服务论坛<ept id=\"p1\">](https://social.msdn.microsoft.com/Forums/zh-cn/home?forum=hypervrecovmgr)</ept>上发布你的任何问题。"
+    },
+    {
+      "content": "此方案的业务优势包括：",
+      "pos": [
+        1064,
+        1075
+      ]
+    },
+    {
+      "content": "提供可由站点恢复自动实现的企业可缩放复制解决方案。",
+      "pos": [
+        1079,
+        1104
+      ]
+    },
+    {
+      "pos": [
+        1107,
+        1213
+      ],
+      "content": "利用企业存储合作伙伴通过光纤通道和 iSCSI 存储提供的 SAN 复制功能。请查看我们的 <bpt id=\"p1\">[</bpt>SAN 存储合作伙伴<ept id=\"p1\">](http://go.microsoft.com/fwlink/?LinkId=518669)</ept>。"
+    },
+    {
+      "content": "利用现有的 SAN 基础结构来保护 Hyper-V 群集中部署的任务关键型应用程序。",
+      "pos": [
+        1216,
+        1258
+      ]
+    },
+    {
+      "content": "为来宾群集提供支持。",
+      "pos": [
+        1262,
+        1272
+      ]
+    },
+    {
+      "content": "确保使用 RTO 和 RPO 较低的同步复制以及灵活性较高的异步复制（取决于存储阵列功能），在不同的应用层实现复制一致性。",
+      "pos": [
+        1275,
+        1336
+      ]
+    },
+    {
+      "content": "与 VMM 的集成可以在 VMM 控制台中提供 SAN 管理，VMM 中的 SMI-S 可发现现有的存储。",
+      "pos": [
+        1341,
+        1394
+      ]
+    },
+    {
+      "content": "体系结构",
+      "pos": [
+        1403,
+        1407
+      ]
+    },
+    {
+      "content": "此方案会通过使用 SAN 复制将 Hyper-V 虚拟机从一个本地 VMM 站点备份到另一个站点，保护你的工作负载。",
+      "pos": [
+        1409,
+        1467
+      ]
+    },
+    {
+      "content": "SAN 体系结构",
+      "pos": [
+        1471,
+        1479
+      ]
+    },
+    {
+      "content": "此方案中的组件包括：",
+      "pos": [
+        1530,
+        1540
+      ]
+    },
+    {
+      "pos": [
+        1544,
+        1594
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>本地虚拟机<ept id=\"p1\">**</ept> - 在 VMM 私有云中管理的本地 Hyper-V 服务器包含你要保护的虚拟机。"
+    },
+    {
+      "pos": [
+        1597,
+        1648
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>本地 VMM 服务器<ept id=\"p1\">**</ept> - 在想要保护的主站点以及辅助站点上需要运行一个或多个 VMM 服务器。"
+    },
+    {
+      "pos": [
+        1651,
+        1684
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>SAN 存储<ept id=\"p1\">**</ept> - 主站点和辅助站点中各有一个 SAN 阵列"
+    },
+    {
+      "pos": [
+        1688,
+        1736
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Azure 站点恢复保管库<ept id=\"p1\">**</ept> - 保管库协调和安排本地站点之间的数据副本、故障转移和恢复。"
+    },
+    {
+      "pos": [
+        1739,
+        1779
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Azure 站点恢复提供程序<ept id=\"p1\">**</ept> - 在每个 VMM 服务器上安装提供程序。"
+    },
+    {
+      "content": "开始之前",
+      "pos": [
+        1784,
+        1788
+      ]
+    },
+    {
+      "content": "确保已满足以下先决条件：",
+      "pos": [
+        1790,
+        1802
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        1806,
+        1810
+      ]
+    },
+    {
+      "content": "详细信息",
+      "pos": [
+        1817,
+        1821
+      ]
+    },
+    {
+      "content": "Azure",
+      "pos": [
+        1837,
+        1842
+      ]
+    },
+    {
+      "pos": [
+        1846,
+        1962
+      ],
+      "content": "需要一个 <bpt id=\"p1\">[</bpt>Azure<ept id=\"p1\">](/)</ept> 帐户。你可以从 <bpt id=\"p2\">[</bpt>1rmb 试用版<ept id=\"p2\">](/pricing/1-trial/)</ept>开始。<bpt id=\"p3\">[</bpt>详细了解<ept id=\"p3\">](/home/features/site-recovery#price)</ept> Site Recovery 定价。"
+    },
+    {
+      "content": "VMM",
+      "pos": [
+        1966,
+        1969
+      ]
+    },
+    {
+      "content": "你至少需要一台部署为单独的物理或虚拟服务器（或虚拟群集）的 VMM 服务器。",
+      "pos": [
+        1974,
+        2012
+      ]
+    },
+    {
+      "content": "VMM 服务器应运行安装了最新累积更新的 System Center 2012 R2。",
+      "pos": [
+        2022,
+        2065
+      ]
+    },
+    {
+      "content": "至少需要将一个云配置在所要保护的主 VMM 服务器上，一个云配置在需要用于保护和恢复的辅助 VMM 服务器上",
+      "pos": [
+        2075,
+        2129
+      ]
+    },
+    {
+      "content": "要保护的源云必须包含一个或多个 VMM 主机组。",
+      "pos": [
+        2139,
+        2163
+      ]
+    },
+    {
+      "content": "所有 VMM 云都必须设置 Hyper-V 容量配置文件。",
+      "pos": [
+        2173,
+        2202
+      ]
+    },
+    {
+      "content": "若要详细了解如何设置 VMM 云，请参阅<bpt id=\"p1\">[</bpt>配置 VMM 云结构<ept id=\"p1\">](/documentation/articles/site-recovery-best-practices)</ept>和<bpt id=\"p2\">[</bpt>演练：使用 System Center 2012 SP1 VMM 创建私有云<ept id=\"p2\">](http://blogs.technet.com/b/keithmayer/archive/2013/04/18/walkthrough-creating-private-clouds-with-system-center-2012-sp1-virtual-machine-manager-build-your-private-cloud-in-a-month.aspx)</ept>。",
+      "pos": [
+        2212,
+        2527
+      ]
+    },
+    {
+      "content": "Hyper-V",
+      "pos": [
+        2530,
+        2537
+      ]
+    },
+    {
+      "content": "你将需要一个或多个位于主站点和辅助站点中的 Hyper-V 群集，以及一个或多个位于源 Hyper-V 群集中的 VM。主位置和辅助位置中的 VMM 主机组应在每个组中有一个或多个 Hyper-V 群集。",
+      "pos": [
+        2542,
+        2644
+      ]
+    },
+    {
+      "content": "主机和目标 Hyper-V 服务器必须至少运行包含 Hyper-V 角色的 Windows Server 2012，并安装了最新更新。",
+      "pos": [
+        2654,
+        2721
+      ]
+    },
+    {
+      "content": "任何包含你所要保护的 VM 的 Hyper-V 服务器都必须位于 VMM 云中。",
+      "pos": [
+        2731,
+        2771
+      ]
+    },
+    {
+      "content": "如果你要在群集中运行 Hyper-V，请注意，如果你的群集是静态的基于 IP 地址的群集，则不会自动创建群集代理。你需要手动配置群集代理。<bpt id=\"p1\">[</bpt>了解详细信息<ept id=\"p1\">](http://social.technet.microsoft.com/wiki/contents/articles/18792.configure-replica-broker-role-cluster-to-cluster-replication.aspx)</ept>。",
+      "pos": [
+        2781,
+        2991
+      ]
+    },
+    {
+      "content": "SAN 存储",
+      "pos": [
+        2994,
+        3000
+      ]
+    },
+    {
+      "content": "使用可以通过 iSCSI 或光纤通道存储复制来宾群集虚拟机的 SAN 复制，或使用共享虚拟硬盘 (vhdx)。",
+      "pos": [
+        3005,
+        3060
+      ]
+    },
+    {
+      "content": "你需要设置两个 SAN 阵列，一个位于主站点，另一个位于辅助站点。",
+      "pos": [
+        3070,
+        3103
+      ]
+    },
+    {
+      "content": "应在阵列之间设置网络基础结构。应该配置对等互连和复制。应该根据存储阵列要求设置复制许可证。",
+      "pos": [
+        3113,
+        3158
+      ]
+    },
+    {
+      "content": "应该在 Hyper-V 主机服务器与存储阵列之间设置网络，使主机能够使用 ISCSI 或光纤通道与存储 LUN 通信。",
+      "pos": [
+        3168,
+        3227
+      ]
+    },
+    {
+      "content": "查看<bpt id=\"p1\">[</bpt>支持的存储阵列<ept id=\"p1\">](http://social.technet.microsoft.com/wiki/contents/articles/28317.deploying-azure-site-recovery-with-vmm-and-san-supported-storage-arrays.aspx)</ept>列表。",
+      "pos": [
+        3238,
+        3395
+      ]
+    },
+    {
+      "content": "应安装存储阵列制造商提供的 SMI-S 提供程序，并且 SAN 阵列应由提供程序管理。按提供程序文档要求设置提供程序。",
+      "pos": [
+        3405,
+        3464
+      ]
+    },
+    {
+      "content": "确保阵列的 SMI-S 提供程序位于某个服务器上，使得 VMM 服务器能够通过 IP 地址或 FQDN 进行经网络的访问。",
+      "pos": [
+        3474,
+        3535
+      ]
+    },
+    {
+      "content": "每个 SAN 阵列应该有一个或多个可以用于此部署的存储池。主站点的 VMM 服务器需管理主阵列，辅助 VMM 服务器将管理辅助阵列。",
+      "pos": [
+        3545,
+        3611
+      ]
+    },
+    {
+      "content": "主站点的 VMM 服务器应管理主阵列，辅助 VMM 服务器应管理辅助阵列。",
+      "pos": [
+        3621,
+        3658
+      ]
+    },
+    {
+      "content": "网络映射",
+      "pos": [
+        3661,
+        3665
+      ]
+    },
+    {
+      "content": "你可以配置网络映射，以确保在故障转移后以最佳方式将复制的虚拟机放置在辅助 Hyper-V 主机服务器上，并确保它们连接到适当的 VM 网络。如果不配置网络映射，则在故障转移后，副本 VM 将不会连接到任何网络。",
+      "pos": [
+        3670,
+        3775
+      ]
+    },
+    {
+      "content": "若要在部署期间设置网络映射，请确保源 Hyper-V 主机服务器上的虚拟机连接到 VMM VM 网络。该网络应链接到与云关联的逻辑网络。&lt;br/",
+      "pos": [
+        3785,
+        3857
+      ]
+    },
+    {
+      "content": "辅助 VMM 服务器上用于恢复的目标云应当配置了相应的 VM 网络，并且该网络应当链接到与目标云关联的相应逻辑网络。",
+      "pos": [
+        3862,
+        3920
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">[</bpt>详细了解<ept id=\"p1\">](/documentation/articles/site-recovery-network-mapping)</ept>网络映射。",
+      "pos": [
+        3930,
+        3996
+      ]
+    },
+    {
+      "content": "步骤 1：准备 VMM 基础结构",
+      "pos": [
+        4002,
+        4018
+      ]
+    },
+    {
+      "content": "若要准备 VMM 基础结构，你需要：",
+      "pos": [
+        4020,
+        4038
+      ]
+    },
+    {
+      "content": "确保已设置 VMM 云",
+      "pos": [
+        4043,
+        4054
+      ]
+    },
+    {
+      "content": "集成并分类 VMM 中的 SAN 存储",
+      "pos": [
+        4058,
+        4077
+      ]
+    },
+    {
+      "content": "创建 LUN 并分配存储",
+      "pos": [
+        4081,
+        4093
+      ]
+    },
+    {
+      "content": "创建复制组",
+      "pos": [
+        4097,
+        4102
+      ]
+    },
+    {
+      "content": "设置 VM 网络",
+      "pos": [
+        4106,
+        4114
+      ]
+    },
+    {
+      "content": "确保已设置 VMM 云",
+      "pos": [
+        4120,
+        4131
+      ]
+    },
+    {
+      "content": "站点恢复将协调 VMM 云中 Hyper-V 主机服务器上的虚拟机的保护。在开始部署站点恢复之前，需要确保已正确设置这些云。下面几篇不错的文章：",
+      "pos": [
+        4133,
+        4205
+      ]
+    },
+    {
+      "content": "配置 VMM 云结构",
+      "pos": [
+        4210,
+        4220
+      ]
+    },
+    {
+      "pos": [
+        4278,
+        4491
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>创建私有云<ept id=\"p1\">](http://blogs.technet.com/b/keithmayer/archive/2013/04/18/walkthrough-creating-private-clouds-with-system-center-2012-sp1-virtual-machine-manager-build-your-private-cloud-in-a-month.aspx)</ept>（Keith Mayer 博客文章）。"
+    },
+    {
+      "content": "集成并分类 VMM 中的 SAN 存储",
+      "pos": [
+        4497,
+        4516
+      ]
+    },
+    {
+      "content": "在 VMM 控制台中添加并分类 SAN：",
+      "pos": [
+        4518,
+        4538
+      ]
+    },
+    {
+      "content": "在“结构”工作区中，单击“存储”。单击“主页”&gt;“添加资源”&gt;“存储设备”以启动“添加存储设备向导”。",
+      "pos": [
+        4543,
+        4594
+      ]
+    },
+    {
+      "content": "在“选择存储提供程序类型”页上，选择“SMI-S 提供程序发现和管理的 SAN 与 NAS 设备”。",
+      "pos": [
+        4598,
+        4648
+      ]
+    },
+    {
+      "content": "提供程序类型",
+      "pos": [
+        4656,
+        4662
+      ]
+    },
+    {
+      "content": "在“指定存储 SMI-S 提供程序的协议和地址”页上，选择“SMI-S CIMXML”并指定用于连接提供程序的设置。",
+      "pos": [
+        4717,
+        4775
+      ]
+    },
+    {
+      "content": "在“提供程序 IP 地址或 FQDN”和“TCP/IP 端口”中，指定用于连接提供程序的设置。只能对 SMI-S CIMXML 使用 SSL 连接。",
+      "pos": [
+        4779,
+        4853
+      ]
+    },
+    {
+      "content": "提供程序连接",
+      "pos": [
+        4861,
+        4867
+      ]
+    },
+    {
+      "content": "在“运行方式帐户”中，指定可以访问该提供程序的 VMM 运行方式帐户，或创建新的帐户。",
+      "pos": [
+        4925,
+        4968
+      ]
+    },
+    {
+      "content": "在“收集信息”页上，VMM 会自动尝试发现并导入存储设备信息。若要重试发现，请单击“扫描提供程序”。如果发现过程成功，发现的存储阵列、存储池、制造商、型号和容量将列在页中。",
+      "pos": [
+        4972,
+        5058
+      ]
+    },
+    {
+      "content": "发现存储",
+      "pos": [
+        5066,
+        5070
+      ]
+    },
+    {
+      "content": "在“选择要接受管理的存储池并分配分类”中，选择 VMM 将要管理的存储池，并为其分配一个分类。将从存储池导入 LUN 信息。根据需要保护的应用程序、其容量要求以及你需要同时复制的内容创建 LUN。",
+      "pos": [
+        5120,
+        5218
+      ]
+    },
+    {
+      "content": "为存储分类",
+      "pos": [
+        5226,
+        5231
+      ]
+    },
+    {
+      "content": "创建 LUN 并分配存储",
+      "pos": [
+        5282,
+        5294
+      ]
+    },
+    {
+      "content": "将 SAN 存储集成到 VMM 后，需要创建（设置）逻辑单元 (LUN)。",
+      "pos": [
+        5299,
+        5336
+      ]
+    },
+    {
+      "content": "如何选择用于在 VMM 中创建逻辑单元的方法",
+      "pos": [
+        5341,
+        5363
+      ]
+    },
+    {
+      "content": "如何在 VMM 中设置存储逻辑单元",
+      "pos": [
+        5427,
+        5444
+      ]
+    },
+    {
+      "content": "然后，向 Hyper-V 主机群集分配存储容量，使 VMM 能够将虚拟机数据部署到设置的存储中：",
+      "pos": [
+        5509,
+        5557
+      ]
+    },
+    {
+      "pos": [
+        5565,
+        5753
+      ],
+      "content": "在向群集分配存储之前，需要向群集所在的 VMM 主机组分配存储。请参阅<bpt id=\"p1\">[</bpt>如何向主机组分配存储逻辑单元<ept id=\"p1\">](https://technet.microsoft.com/zh-cn/library/gg610686.aspx)</ept>和<bpt id=\"p2\">[</bpt>如何向主机组分配存储池<ept id=\"p2\">](https://technet.microsoft.com/zh-cn/library/gg610635.aspx)</ept>。<ph id=\"ph1\">&lt;/a&gt;</ph>"
+    },
+    {
+      "pos": [
+        5760,
+        5872
+      ],
+      "content": "然后，根据<bpt id=\"p1\">[</bpt>如何在 VMM 中的 Hyper-V 主机群集上配置存储<ept id=\"p1\">](https://technet.microsoft.com/zh-cn/library/gg610692.aspx)</ept>中所述，向群集分配存储容量。<ph id=\"ph1\">&lt;/a&gt;</ph>"
+    },
+    {
+      "content": "创建复制组",
+      "pos": [
+        5878,
+        5883
+      ]
+    },
+    {
+      "content": "创建一个复制组，其中包含需要一起复制的所有 LUN。",
+      "pos": [
+        5885,
+        5911
+      ]
+    },
+    {
+      "content": "在 VMM 控制台中，打开存储阵列属性的“复制组”选项卡，然后单击“新建”。",
+      "pos": [
+        5916,
+        5954
+      ]
+    },
+    {
+      "content": "然后创建复制组。",
+      "pos": [
+        5958,
+        5966
+      ]
+    },
+    {
+      "content": "SAN 复制组",
+      "pos": [
+        5974,
+        5981
+      ]
+    },
+    {
+      "content": "设置网络",
+      "pos": [
+        6033,
+        6037
+      ]
+    },
+    {
+      "content": "如果你要配置网络映射，请执行以下操作：",
+      "pos": [
+        6039,
+        6058
+      ]
+    },
+    {
+      "pos": [
+        6063,
+        6132
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>阅读<ept id=\"p1\">](/documentation/articles/site-recovery-network-mapping)</ept>有关网络映射的信息。"
+    },
+    {
+      "content": "在 VMM 中准备 VM 网络：",
+      "pos": [
+        6136,
+        6152
+      ]
+    },
+    {
+      "pos": [
+        6160,
+        6228
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>设置逻辑网络<ept id=\"p1\">](https://technet.microsoft.com/zh-cn/library/jj721568.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        6235,
+        6305
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>设置 VM 网络<ept id=\"p1\">](https://technet.microsoft.com/zh-cn/library/jj721575.aspx)</ept>。"
+    },
+    {
+      "content": "步骤 2：创建保管库",
+      "pos": [
+        6310,
+        6320
+      ]
+    },
+    {
+      "pos": [
+        6326,
+        6382
+      ],
+      "content": "从你要注册的 VMM 服务器登录到<bpt id=\"p1\">[</bpt>管理门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>。"
+    },
+    {
+      "content": "展开“数据服务”&gt;“恢复服务”，并单击“Site Recovery 保管库”。",
+      "pos": [
+        6387,
+        6426
+      ]
+    },
+    {
+      "content": "单击“新建”&gt;“快速创建”。",
+      "pos": [
+        6431,
+        6445
+      ]
+    },
+    {
+      "content": "在“名称”中，输入一个友好名称以标识此保管库。",
+      "pos": [
+        6450,
+        6473
+      ]
+    },
+    {
+      "pos": [
+        6478,
+        6586
+      ],
+      "content": "在“区域”中，为保管库选择地理区域。若要查看受支持的区域，请参阅 <bpt id=\"p1\">[</bpt>Azure Site Recovery 价格详细信息<ept id=\"p1\">](/home/features/site-recovery/#price)</ept>中的“地域可用性”。"
+    },
+    {
+      "content": "单击“创建保管库”。",
+      "pos": [
+        6591,
+        6601
+      ]
+    },
+    {
+      "content": "新保管库",
+      "pos": [
+        6609,
+        6613
+      ]
+    },
+    {
+      "content": "检查状态栏以确认保管库已成功创建。保管库将以“活动”状态列在主要的“恢复服务”页上。",
+      "pos": [
+        6664,
+        6706
+      ]
+    },
+    {
+      "content": "注册 VMM 服务器",
+      "pos": [
+        6713,
+        6723
+      ]
+    },
+    {
+      "content": "从“恢复服务”页打开“快速启动”页。也可随时使用该图标打开“快速启动”。",
+      "pos": [
+        6728,
+        6764
+      ]
+    },
+    {
+      "content": "“快速启动”图标",
+      "pos": [
+        6772,
+        6780
+      ]
+    },
+    {
+      "content": "在下拉列表中，选择“使用阵列复制在 Hyper-V 本地站点之间进行”。",
+      "pos": [
+        6838,
+        6874
+      ]
+    },
+    {
+      "content": "注册密钥",
+      "pos": [
+        6882,
+        6886
+      ]
+    },
+    {
+      "content": "在“准备 VMM 服务器”中，下载最新版的 Azure Site Recovery 提供程序安装文件。",
+      "pos": [
+        6939,
+        6990
+      ]
+    },
+    {
+      "content": "在源 VMM 服务器上运行此文件。如果 VMM 部署到群集中并且你是首次安装该提供程序，请将其安装在一个活动节点上并完成安装以在保管库中注册 VMM 服务器。然后在其他节点上安装该提供程序。请注意，如果你是在升级提供程序，则需要在所有节点上进行升级，因为所有节点都应当运行相同的提供程序版本。",
+      "pos": [
+        6994,
+        7140
+      ]
+    },
+    {
+      "content": "安装程序将执行简单的“先决条件检查”，并请求授权停止 VMM 服务以开始安装提供程序。VMM 服务将在安装程序完成时自动重新启动。如果你是在 VMM 群集上进行安装，则会提示你停止群集角色。",
+      "pos": [
+        7144,
+        7239
+      ]
+    },
+    {
+      "content": "在“Microsoft 更新”中，你可以选择获取更新。当启用了此设置时，将根据你的 Microsoft 更新策略自动安装提供程序更新。",
+      "pos": [
+        7243,
+        7310
+      ]
+    },
+    {
+      "content": "Microsoft 更新",
+      "pos": [
+        7318,
+        7330
+      ]
+    },
+    {
+      "pos": [
+        7381,
+        7503
+      ],
+      "content": "安装位置设置为 <bpt id=\"p1\">**</bpt><ph id=\"ph1\">&lt;SystemDrive&gt;</ph>\\\\Program Files\\\\Microsoft System Center 2012 R2\\\\Virtual Machine Manager\\\\bin<ept id=\"p1\">**</ept>。单击“安装”按钮，开始安装提供程序。"
+    },
+    {
+      "content": "InstallLocation",
+      "pos": [
+        7511,
+        7526
+      ]
+    },
+    {
+      "content": "安装提供程序之后，请单击“注册”按钮，以在保管库中注册服务器。",
+      "pos": [
+        7584,
+        7615
+      ]
+    },
+    {
+      "content": "InstallComplete",
+      "pos": [
+        7623,
+        7638
+      ]
+    },
+    {
+      "content": "在“Internet 连接”中，指定在 VMM 服务器上运行的提供程序如何连接到 Internet。选择“使用默认系统代理设置”以使用服务器上配置的默认 Internet 连接设置。",
+      "pos": [
+        7696,
+        7787
+      ]
+    },
+    {
+      "content": "Internet 设置",
+      "pos": [
+        7795,
+        7806
+      ]
+    },
+    {
+      "content": "如果希望使用自定义代理，则应当在安装该提供程序之前设置它。当配置自定义代理设置时，会运行测试来检查代理连接。",
+      "pos": [
+        7864,
+        7918
+      ]
+    },
+    {
+      "content": "如果你确实使用自定义代理，或者你的默认代理要求进行身份验证，则需要输入代理详细信息，包括代理地址和端口。",
+      "pos": [
+        7925,
+        7977
+      ]
+    },
+    {
+      "content": "以下 URL 应可从 VMM 服务器和 Hyper-v 主机访问",
+      "pos": [
+        7984,
+        8016
+      ]
+    },
+    {
+      "content": "*.hypervrecoverymanager.windowsazure.cn",
+      "pos": [
+        8027,
+        8066
+      ]
+    },
+    {
+      "content": "*.accesscontrol.chinacloudapi.cn",
+      "pos": [
+        8077,
+        8109
+      ]
+    },
+    {
+      "content": "*.backup.windowsazure.cn",
+      "pos": [
+        8120,
+        8144
+      ]
+    },
+    {
+      "content": "*.blob.core.chinacloudapi.cn",
+      "pos": [
+        8155,
+        8183
+      ]
+    },
+    {
+      "content": "*.store.core.chinacloudapi.cn",
+      "pos": [
+        8194,
+        8223
+      ]
+    },
+    {
+      "pos": [
+        8230,
+        8380
+      ],
+      "content": "允许 <bpt id=\"p1\">[</bpt>Azure 数据中心 IP 范围<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/dn175718.aspx)</ept>中所述的 IP 地址，以及 HTTPS (443) 协议。必须将你打算使用的 Azure 区域以及中国东部的 IP 范围加入允许列表。"
+    },
+    {
+      "content": "如果你使用自定义代理，则将使用指定的代理凭据自动创建一个 VMM 运行身份帐户 (DRAProxyAccount)。对代理服务器进行配置以便该帐户可以成功通过身份验证。可以在 VMM 控制台中修改 VMM 运行身份帐户设置。若要执行此操作，请打开“设置”工作区，展开“安全性”，单击“运行身份帐户”，然后修改 DRAProxyAccount 的密码。你将需要重新启动 VMM 服务以使此设置生效。",
+      "pos": [
+        8388,
+        8586
+      ]
+    },
+    {
+      "content": "在“注册密钥”中，选择你从 Azure Site Recovery 下载并复制到 VMM 服务器的密钥。",
+      "pos": [
+        8592,
+        8644
+      ]
+    },
+    {
+      "content": "在“保管库名称”中，验证将要在其中注册服务器的保管库的名称。",
+      "pos": [
+        8649,
+        8679
+      ]
+    },
+    {
+      "content": "服务器注册",
+      "pos": [
+        8688,
+        8693
+      ]
+    },
+    {
+      "content": "加密设置仅适用于 VMM 到 Azure 方案，如果你是仅从 VMM 到 VMM 的用户，则可以忽略此屏幕。",
+      "pos": [
+        8747,
+        8801
+      ]
+    },
+    {
+      "content": "服务器注册",
+      "pos": [
+        8809,
+        8814
+      ]
+    },
+    {
+      "content": "在“服务器名称”中，指定一个友好名称以在保管库中标识该 VMM 服务器。在群集配置中，请指定 VMM 群集角色名称。",
+      "pos": [
+        8864,
+        8922
+      ]
+    },
+    {
+      "content": "在“初始云元数据同步”中，指定将出现在保管库中的服务器的友好名称，并选择是否要将 VMM 服务器上所有云的元数据与保管库进行同步。此操作在每个服务器上只需执行一次。如果你不希望同步所有云，可以将此设置保留为未选中状态并在 VMM 控制台中的云属性中分别同步各个云。",
+      "pos": [
+        8927,
+        9059
+      ]
+    },
+    {
+      "content": "服务器注册",
+      "pos": [
+        9067,
+        9072
+      ]
+    },
+    {
+      "content": "单击“下一步”以完成此过程。注册后，Azure Site Recovery 将检索 VMM 服务器中的元数据。服务器显示在保管库中“服务器”页上的“VMM 服务器”选项卡中。",
+      "pos": [
+        9128,
+        9215
+      ]
+    },
+    {
+      "content": "命令行安装",
+      "pos": [
+        9221,
+        9226
+      ]
+    },
+    {
+      "content": "也可使用以下命令行来安装 Azure Site Recovery 提供程序。此命令可用来将提供程序安装在 Server CORE for Windows Server 2012 R2 上。",
+      "pos": [
+        9228,
+        9322
+      ]
+    },
+    {
+      "content": "将提供程序安装文件和注册密钥下载到某个文件夹（例如 C:\\\\ASR）中",
+      "pos": [
+        9327,
+        9362
+      ]
+    },
+    {
+      "content": "停止 System Center Virtual Machine Manager 服务",
+      "pos": [
+        9366,
+        9409
+      ]
+    },
+    {
+      "pos": [
+        9413,
+        9463
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>Administrator<ept id=\"p1\">**</ept> 权限从命令提示符处运行以下命令，以便提取提供程序安装程序："
+    },
+    {
+      "content": "运行以下命令以安装提供程序：",
+      "pos": [
+        9562,
+        9576
+      ]
+    },
+    {
+      "content": "运行以下命令以注册提供程序：",
+      "pos": [
+        9613,
+        9627
+      ]
+    },
+    {
+      "content": "其中的参数如下：",
+      "pos": [
+        9995,
+        10003
+      ]
+    },
+    {
+      "pos": [
+        10008,
+        10044
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>/Credentials<ept id=\"p1\">**</ept>：用于指定注册密钥文件所在位置的必需参数"
+    },
+    {
+      "pos": [
+        10050,
+        10118
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>/FriendlyName<ept id=\"p1\">**</ept>：在 Azure Site Recovery 门户中显示的 Hyper-V 主机服务器名称的必需参数。"
+    },
+    {
+      "pos": [
+        10122,
+        10226
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>/EncryptionEnabled<ept id=\"p1\">**</ept>：仅当你需要在 Azure 中以静止方式为虚拟机加密时，才需要在 VMM 到 Azure 方案中使用这个可选参数。请确保提供的文件名具有 <bpt id=\"p2\">**</bpt>.pfx<ept id=\"p2\">**</ept> 扩展名。"
+    },
+    {
+      "pos": [
+        10230,
+        10266
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>/proxyAddress<ept id=\"p1\">**</ept>：可选参数，用于指定代理服务器的地址。"
+    },
+    {
+      "pos": [
+        10270,
+        10303
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>/proxyport<ept id=\"p1\">**</ept>：可选参数，用于指定代理服务器的端口。"
+    },
+    {
+      "pos": [
+        10307,
+        10359
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>/proxyUsername<ept id=\"p1\">**</ept>：可选参数，用于指定代理服务器用户名（如果代理服务器要求身份验证）。"
+    },
+    {
+      "pos": [
+        10363,
+        10425
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>/proxyPassword<ept id=\"p1\">**</ept>：可选参数，用于指定密码，以便通过代理服务器进行身份验证（如果代理服务器要求身份验证）。"
+    },
+    {
+      "content": "步骤 3：映射存储阵列和池",
+      "pos": [
+        10431,
+        10444
+      ]
+    },
+    {
+      "content": "映射阵列，以指定哪个辅助存储池要从主池接收复制数据。之所以要在配置云保护之前映射存储，是因为当你为复制组启用保护时要使用映射信息。",
+      "pos": [
+        10446,
+        10511
+      ]
+    },
+    {
+      "content": "在开始操作之前，请检查云是否已显示在保管库中。若要检测云，你可以在安装提供程序时选择同步所有云，也可以在 VMM 控制台中云属性的“常规”选项卡上选择同步特定的云。然后按如下所述映射存储阵列：",
+      "pos": [
+        10513,
+        10609
+      ]
+    },
+    {
+      "content": "单击“资源”&gt;“服务器存储”&gt;“映射源和目标阵列”。",
+      "pos": [
+        10614,
+        10640
+      ]
+    },
+    {
+      "content": "服务器注册",
+      "pos": [
+        10642,
+        10647
+      ]
+    },
+    {
+      "content": "选择主站点上的存储阵列，并将其映射到辅助站点上的存储阵列。",
+      "pos": [
+        10699,
+        10728
+      ]
+    },
+    {
+      "content": "映射阵列中的源和目标存储池。为此，请在“存储池”中选择要映射的源和目标存储池。",
+      "pos": [
+        10733,
+        10772
+      ]
+    },
+    {
+      "content": "服务器注册",
+      "pos": [
+        10780,
+        10785
+      ]
+    },
+    {
+      "content": "步骤 4：配置云保护设置",
+      "pos": [
+        10843,
+        10855
+      ]
+    },
+    {
+      "pos": [
+        10857,
+        10952
+      ],
+      "content": "在注册 VMM 服务器后，你可以配置云保护设置。你在安装提供程序时启用了“将云数据与保管库同步”选项，所以 VMM 服务器上的所有云都将出现在保管库中的“受保护的项”选项卡中。<ph id=\"ph1\">&lt;b&gt;</ph><ph id=\"ph2\">&lt;/b&gt;</ph>"
+    },
+    {
+      "content": "已发布的云",
+      "pos": [
+        10956,
+        10961
+      ]
+    },
+    {
+      "content": "在“快速启动”页上，单击“为 VMM 云设置保护”。",
+      "pos": [
+        11014,
+        11040
+      ]
+    },
+    {
+      "content": "在“受保护的项”选项卡上，选择要配置的云并转到“配置”选项卡。请注意：",
+      "pos": [
+        11044,
+        11079
+      ]
+    },
+    {
+      "pos": [
+        11083,
+        11112
+      ],
+      "content": "在“目标”中，选择“VMM”。<ph id=\"ph1\">&lt;b&gt;</ph><ph id=\"ph2\">&lt;/b&gt;</ph><ph id=\"ph3\">&lt;b&gt;</ph><ph id=\"ph4\">&lt;/b&gt;</ph>"
+    },
+    {
+      "pos": [
+        11116,
+        11157
+      ],
+      "content": "在“目标位置”中，选择管理着你要用于恢复的云的现场 VMM 服务器。<ph id=\"ph1\">&lt;b&gt;</ph><ph id=\"ph2\">&lt;/b&gt;</ph>"
+    },
+    {
+      "pos": [
+        11161,
+        11200
+      ],
+      "content": "在“目标云”中，选择要用于源云中虚拟机故障转移的目标云。<ph id=\"ph1\">&lt;b&gt;</ph><ph id=\"ph2\">&lt;/b&gt;</ph>请注意："
+    },
+    {
+      "content": "我们建议你选择可满足你要保护的虚拟机的恢复要求的目标云。",
+      "pos": [
+        11207,
+        11235
+      ]
+    },
+    {
+      "content": "一个云只能属于一个云对 — 作为主云或目标云。",
+      "pos": [
+        11242,
+        11265
+      ]
+    },
+    {
+      "content": "Azure 站点恢复将验证云是否有权访问支持 SAN 复制的存储，并且是否为存储阵列建立了对等互连。将显示参与的阵列对等方。",
+      "pos": [
+        11269,
+        11331
+      ]
+    },
+    {
+      "content": "如果验证成功，请在“复制类型”中选择“SAN”。",
+      "pos": [
+        11335,
+        11359
+      ]
+    },
+    {
+      "content": "在保存设置后，将创建一个作业，可以在“作业”选项卡上监视该作业。<ph id=\"ph1\">&lt;b&gt;&lt;/b&gt;</ph>可以在“配置”选项卡上修改云设置。<ph id=\"ph2\">&lt;b&gt;&lt;/b&gt;</ph>如果希望修改目标位置或目标云，必须删除云配置，然后重新配置该云。",
+      "pos": [
+        11364,
+        11459
+      ]
+    },
+    {
+      "content": "步骤 5：启用网络映射",
+      "pos": [
+        11468,
+        11479
+      ]
+    },
+    {
+      "content": "在“快速启动”页上，单击“映射网络”。",
+      "pos": [
+        11484,
+        11503
+      ]
+    },
+    {
+      "content": "选择你要映射其中的网络的源 VMM 服务器，然后选择要将网络映射到的目标 VMM 服务器。此时将显示源网络及其关联的目标网络的列表。对于当前未映射的网络将显示空值。单击源和目标网络名称旁的信息图标以查看每个网络的子网。",
+      "pos": [
+        11507,
+        11616
+      ]
+    },
+    {
+      "content": "在“源的网络”中选择一个网络，然后单击“映射”。服务将检测目标服务器上的 VM 网络并显示它们。",
+      "pos": [
+        11620,
+        11668
+      ]
+    },
+    {
+      "content": "SAN 体系结构",
+      "pos": [
+        11676,
+        11684
+      ]
+    },
+    {
+      "content": "在显示的对话框中，从目标 VMM 服务器选择其中一个 VM 网络。",
+      "pos": [
+        11738,
+        11771
+      ]
+    },
+    {
+      "content": "SAN 体系结构",
+      "pos": [
+        11779,
+        11787
+      ]
+    },
+    {
+      "content": "当选择某个目标网络时，会显示使用源网络的受保护云。此时也会显示与用于保护的云关联的可用目标网络。建议你选择可供你用于保护的所有云使用的一个目标网络。",
+      "pos": [
+        11841,
+        11915
+      ]
+    },
+    {
+      "content": "单击复选标记以完成映射过程。作业开始跟踪映射进度。你可以在“作业”选项卡上查看该作业。",
+      "pos": [
+        11920,
+        11963
+      ]
+    },
+    {
+      "content": "步骤 6：为复制组启用复制",
+      "pos": [
+        11969,
+        11982
+      ]
+    },
+    {
+      "content": "在为虚拟机启用保护之前，需要为存储复制组启用复制。",
+      "pos": [
+        11989,
+        12014
+      ]
+    },
+    {
+      "content": "在 Azure Site Recovery 门户中，在主云的属性页上打开“虚拟机”选项卡。单击“添加复制组”。",
+      "pos": [
+        12019,
+        12074
+      ]
+    },
+    {
+      "content": "选择与云关联的一个或多个 VMM 复制组，验证源和目标阵列，然后指定复制频率。",
+      "pos": [
+        12078,
+        12117
+      ]
+    },
+    {
+      "content": "完成此操作后，Azure Site Recovery 以及 VMM 和 SMI-S 提供程序将设置目标站点存储 LUN，并启用存储复制。如果复制组已复制，Azure Site Recovery 将重用现有的复制关系并更新 Azure Site Recovery 中的信息。",
+      "pos": [
+        12119,
+        12255
+      ]
+    },
+    {
+      "content": "步骤 7：为虚拟机启用保护",
+      "pos": [
+        12260,
+        12273
+      ]
+    },
+    {
+      "content": "存储组开始复制后，请在 VMM 控制台中使用以下方法之一为虚拟机启用保护：",
+      "pos": [
+        12275,
+        12312
+      ]
+    },
+    {
+      "pos": [
+        12316,
+        12494
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>新的虚拟机<ept id=\"p1\">**</ept> - 在创建新的虚拟机时，可以在 VMM 控制台中启用 Azure Site Recovery 保护，并将虚拟机与复制组相关联。如果选择此选项，VMM 将使用智能定位以最佳方式将虚拟机存储放置在复制组的 LUN 上。Azure Site Recovery 将协调辅助站点上的阴影虚拟机的创建并分配容量，以便在故障转移后可以启动副本虚拟机。"
+    },
+    {
+      "pos": [
+        12497,
+        12687
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>现有虚拟机<ept id=\"p1\">**</ept> - 如果已在 VMM 中部署虚拟机，你可以启用 Azure Site Recovery 保护，并执行到复制组的存储迁移。完成此操作后，VMM 和 Azure Site Recovery 将检测新虚拟机，并开始在 Azure Site Recovery 中对它进行管理，以提供保护。将在辅助站点上创建阴影虚拟机并为其分配容量，以便在故障转移后可以启动副本虚拟机。"
+    },
+    {
+      "content": "启用保护",
+      "pos": [
+        12695,
+        12699
+      ]
+    },
+    {
+      "content": "为虚拟机启用保护后，它们将显示在 Azure Site Recovery 控制台中。你可以查看虚拟机属性，跟踪状态，以及故障转移包含多个虚拟机的复制组。请注意，在 SAN 复制中，与复制组关联的所有虚拟机必须一起故障转移。这是因为，故障转移会先在存储层发生。必须正确组合复制组，并只将关联的虚拟机放置在一起。",
+      "pos": [
+        12752,
+        12906
+      ]
+    },
+    {
+      "content": "你可以在“作业”选项卡中跟踪“启用保护”操作的进度，包括初始复制。在“完成保护”作业运行之后，虚拟机就可以进行故障转移了。",
+      "pos": [
+        12908,
+        12969
+      ]
+    },
+    {
+      "content": "虚拟机保护作业",
+      "pos": [
+        12973,
+        12980
+      ]
+    },
+    {
+      "content": "步骤 8：测试部署",
+      "pos": [
+        13031,
+        13040
+      ]
+    },
+    {
+      "content": "测试你的部署，以确保虚拟机和数据可按预期方式故障转移。为此，你将要通过选择复制组创建恢复计划。然后，对该计划运行测试故障转移。",
+      "pos": [
+        13042,
+        13105
+      ]
+    },
+    {
+      "content": "在“恢复计划”选项卡上，单击“创建恢复计划”。",
+      "pos": [
+        13110,
+        13133
+      ]
+    },
+    {
+      "content": "为恢复计划指定一个名称，并指定源和目标 VMM 服务器。源服务器必须具有启用了故障转移和恢复的虚拟机。选择“SAN”，以仅查看为 SAN 复制配置的云。",
+      "pos": [
+        13137,
+        13213
+      ]
+    },
+    {
+      "content": "创建恢复计划",
+      "pos": [
+        13223,
+        13229
+      ]
+    },
+    {
+      "content": "在“选择虚拟机”中，选择复制组。将选择与复制组关联的所有虚拟机，并将其添加到恢复计划。这些虚拟机将添加到恢复计划的默认组—“组 1”中。如果需要，你可以添加更多的组。请注意，在复制后，各个虚拟机将根据恢复计划组的顺序启动。",
+      "pos": [
+        13277,
+        13388
+      ]
+    },
+    {
+      "content": "添加虚拟机",
+      "pos": [
+        13396,
+        13401
+      ]
+    },
+    {
+      "content": "在创建恢复计划后，它将出现在“恢复计划”选项卡上的列表中。",
+      "pos": [
+        13451,
+        13480
+      ]
+    },
+    {
+      "content": "在“恢复计划”选项卡上，选择该计划并单击“测试故障转移”。",
+      "pos": [
+        13484,
+        13513
+      ]
+    },
+    {
+      "pos": [
+        13517,
+        13709
+      ],
+      "content": "在“确认测试故障转移”页面上，选择“无”。请注意，当启用了此选项时，故障转移后的副本虚拟机不会连接到任何网络。这将测试虚拟机是否按预期进行故障转移，但是不会测试你的复制网络环境。有关如何使用不同网络选项的详细信息，请查看<bpt id=\"p1\">[</bpt>如何运行测试性故障转移<ept id=\"p1\">](/documentation/articles/site-recovery-failover#run-a-test-failover)</ept>。"
+    },
+    {
+      "content": "将在副本虚拟机所在的同一主机上创建测试虚拟机。它不会被添加到副本虚拟机所在的云中。",
+      "pos": [
+        13777,
+        13818
+      ]
+    },
+    {
+      "content": "在复制之后，副本虚拟机将具有与主虚拟机的 IP 地址不同的 IP 地址。如果你是通过 DHCP 颁发地址，则 DNS 将自动更新。如果你未使用 DHCP 并且希望确保地址相同，则需要运行两个脚本。",
+      "pos": [
+        13822,
+        13920
+      ]
+    },
+    {
+      "content": "运行此示例脚本来检索 IP 地址。",
+      "pos": [
+        13925,
+        13942
+      ]
+    },
+    {
+      "content": "运行此示例脚本来更新 DNS 并指定你通过前一个示例脚本检索到的 IP 地址。",
+      "pos": [
+        14124,
+        14163
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        14512,
+        14516
+      ]
+    },
+    {
+      "pos": [
+        14518,
+        14602
+      ],
+      "content": "运行测试性故障转移以确保环境功能正常以后，请<bpt id=\"p1\">[</bpt>了解<ept id=\"p1\">](/documentation/articles/site-recovery-failover)</ept>不同类型的故障转移。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"通过 Azure Site Recovery 使用 SAN 将 Hyper-V VM（位于 VMM 云中）复制到辅助站点 | Azure\"\n    description=\"Azure Site Recovery 可以使用 SAN 复制在本地 VMM 站点之间协调 Hyper-V 虚拟机的复制、故障转移和恢复。\" \n    services=\"site-recovery\" \n    documentationCenter=\"\" \n    authors=\"rayne-wiselman\" \n    manager=\"jwhit\" \n    editor=\"tysonn\"/>\n\n<tags \n    ms.service=\"site-recovery\" \n    ms.date=\"01/12/2016\"\n    wacn.date=\"02/25/2016\"/>\n\n# 通过 Azure Site Recovery 使用 SAN 将 Hyper-V VM（位于 VMM 云中）复制到辅助站点\n\nAzure Site Recovery 有助于业务连续性和灾难恢复 (BCDR) 策略，因为它可以安排复制、故障转移和恢复虚拟机和物理服务器。虚拟机可复制到 Azure 中，也可复制到本地数据中心中。如需快速概览，请阅读[什么是 Azure Site Recovery？](/documentation/articles/site-recovery-overview)。\n\n## 概述\n\n本文介绍了如何部署 Site Recovery，以便针对 System Center Virtual Machine Manager (VMM) 私有云中的 Hyper-V 虚拟机安排和自动实施保护。在本方案中，使用了 Site Recovery 和 SAN 复制将虚拟机从主 VMM 站点复制到辅助 VMM 站点。\n\n本文包括概述和部署先决条件。它将引导你在 VMM 和 Site Recovery 保管库中配置和启用复制。你可以发现和分类 VMM 中的 SAN 存储，设置 LUN，以及向 Hyper-V 群集分配存储。本文最后指导你测试故障转移，以确保一切都按预期进行。\n\n请在 [Azure 恢复服务论坛](https://social.msdn.microsoft.com/Forums/zh-cn/home?forum=hypervrecovmgr)上发布你的任何问题。\n\n此方案的业务优势包括：\n\n- 提供可由站点恢复自动实现的企业可缩放复制解决方案。\n- 利用企业存储合作伙伴通过光纤通道和 iSCSI 存储提供的 SAN 复制功能。请查看我们的 [SAN 存储合作伙伴](http://go.microsoft.com/fwlink/?LinkId=518669)。\n- 利用现有的 SAN 基础结构来保护 Hyper-V 群集中部署的任务关键型应用程序。 \n- 为来宾群集提供支持。\n- 确保使用 RTO 和 RPO 较低的同步复制以及灵活性较高的异步复制（取决于存储阵列功能），在不同的应用层实现复制一致性。  \n- 与 VMM 的集成可以在 VMM 控制台中提供 SAN 管理，VMM 中的 SMI-S 可发现现有的存储。  \n\n\n\n## 体系结构\n\n此方案会通过使用 SAN 复制将 Hyper-V 虚拟机从一个本地 VMM 站点备份到另一个站点，保护你的工作负载。\n\n![SAN 体系结构](./media/site-recovery-vmm-san/architecture.png)\n\n此方案中的组件包括：\n\n- **本地虚拟机** - 在 VMM 私有云中管理的本地 Hyper-V 服务器包含你要保护的虚拟机。\n- **本地 VMM 服务器** - 在想要保护的主站点以及辅助站点上需要运行一个或多个 VMM 服务器。\n- **SAN 存储** - 主站点和辅助站点中各有一个 SAN 阵列\n-  **Azure 站点恢复保管库** - 保管库协调和安排本地站点之间的数据副本、故障转移和恢复。\n- **Azure 站点恢复提供程序** - 在每个 VMM 服务器上安装提供程序。\n\n## 开始之前\n\n确保已满足以下先决条件：\n\n**先决条件** | **详细信息** \n--- | ---\n**Azure**| 需要一个 [Azure](/) 帐户。你可以从 [1rmb 试用版](/pricing/1-trial/)开始。[详细了解](/home/features/site-recovery#price) Site Recovery 定价。 \n**VMM** | 你至少需要一台部署为单独的物理或虚拟服务器（或虚拟群集）的 VMM 服务器。<br/><br/>VMM 服务器应运行安装了最新累积更新的 System Center 2012 R2。<br/><br/>至少需要将一个云配置在所要保护的主 VMM 服务器上，一个云配置在需要用于保护和恢复的辅助 VMM 服务器上<br/><br/>要保护的源云必须包含一个或多个 VMM 主机组。<br/><br/>所有 VMM 云都必须设置 Hyper-V 容量配置文件。<br/><br/>若要详细了解如何设置 VMM 云，请参阅[配置 VMM 云结构](/documentation/articles/site-recovery-best-practices)和[演练：使用 System Center 2012 SP1 VMM 创建私有云](http://blogs.technet.com/b/keithmayer/archive/2013/04/18/walkthrough-creating-private-clouds-with-system-center-2012-sp1-virtual-machine-manager-build-your-private-cloud-in-a-month.aspx)。\n**Hyper-V** | 你将需要一个或多个位于主站点和辅助站点中的 Hyper-V 群集，以及一个或多个位于源 Hyper-V 群集中的 VM。主位置和辅助位置中的 VMM 主机组应在每个组中有一个或多个 Hyper-V 群集。<br/><br/>主机和目标 Hyper-V 服务器必须至少运行包含 Hyper-V 角色的 Windows Server 2012，并安装了最新更新。<br/><br/>任何包含你所要保护的 VM 的 Hyper-V 服务器都必须位于 VMM 云中。<br/><br/>如果你要在群集中运行 Hyper-V，请注意，如果你的群集是静态的基于 IP 地址的群集，则不会自动创建群集代理。你需要手动配置群集代理。[了解详细信息](http://social.technet.microsoft.com/wiki/contents/articles/18792.configure-replica-broker-role-cluster-to-cluster-replication.aspx)。\n**SAN 存储** | 使用可以通过 iSCSI 或光纤通道存储复制来宾群集虚拟机的 SAN 复制，或使用共享虚拟硬盘 (vhdx)。<br/><br/>你需要设置两个 SAN 阵列，一个位于主站点，另一个位于辅助站点。<br/><br/>应在阵列之间设置网络基础结构。应该配置对等互连和复制。应该根据存储阵列要求设置复制许可证。<br/><br/>应该在 Hyper-V 主机服务器与存储阵列之间设置网络，使主机能够使用 ISCSI 或光纤通道与存储 LUN 通信。<br/><br/> 查看[支持的存储阵列](http://social.technet.microsoft.com/wiki/contents/articles/28317.deploying-azure-site-recovery-with-vmm-and-san-supported-storage-arrays.aspx)列表。<br/><br/>应安装存储阵列制造商提供的 SMI-S 提供程序，并且 SAN 阵列应由提供程序管理。按提供程序文档要求设置提供程序。<br/><br/>确保阵列的 SMI-S 提供程序位于某个服务器上，使得 VMM 服务器能够通过 IP 地址或 FQDN 进行经网络的访问。<br/><br/>每个 SAN 阵列应该有一个或多个可以用于此部署的存储池。主站点的 VMM 服务器需管理主阵列，辅助 VMM 服务器将管理辅助阵列。<br/><br/>主站点的 VMM 服务器应管理主阵列，辅助 VMM 服务器应管理辅助阵列。\n**网络映射** | 你可以配置网络映射，以确保在故障转移后以最佳方式将复制的虚拟机放置在辅助 Hyper-V 主机服务器上，并确保它们连接到适当的 VM 网络。如果不配置网络映射，则在故障转移后，副本 VM 将不会连接到任何网络。<br/><br/>若要在部署期间设置网络映射，请确保源 Hyper-V 主机服务器上的虚拟机连接到 VMM VM 网络。该网络应链接到与云关联的逻辑网络。<br/<br/>辅助 VMM 服务器上用于恢复的目标云应当配置了相应的 VM 网络，并且该网络应当链接到与目标云关联的相应逻辑网络。<br/><br/>[详细了解](/documentation/articles/site-recovery-network-mapping)网络映射。\n\n\n## 步骤 1：准备 VMM 基础结构\n\n若要准备 VMM 基础结构，你需要：\n\n1. 确保已设置 VMM 云\n2. 集成并分类 VMM 中的 SAN 存储\n3. 创建 LUN 并分配存储\n4. 创建复制组\n5. 设置 VM 网络\n\n### 确保已设置 VMM 云\n\n站点恢复将协调 VMM 云中 Hyper-V 主机服务器上的虚拟机的保护。在开始部署站点恢复之前，需要确保已正确设置这些云。下面几篇不错的文章：\n\n- [配置 VMM 云结构](/documentation/articles/site-recovery-best-practices)\n- [创建私有云](http://blogs.technet.com/b/keithmayer/archive/2013/04/18/walkthrough-creating-private-clouds-with-system-center-2012-sp1-virtual-machine-manager-build-your-private-cloud-in-a-month.aspx)（Keith Mayer 博客文章）。\n\n### 集成并分类 VMM 中的 SAN 存储\n\n在 VMM 控制台中添加并分类 SAN：\n\n1. 在“结构”工作区中，单击“存储”。单击“主页”>“添加资源”>“存储设备”以启动“添加存储设备向导”。\n2. 在“选择存储提供程序类型”页上，选择“SMI-S 提供程序发现和管理的 SAN 与 NAS 设备”。\n\n    ![提供程序类型](./media/site-recovery-vmm-san/provider-type.png)\n\n3. 在“指定存储 SMI-S 提供程序的协议和地址”页上，选择“SMI-S CIMXML”并指定用于连接提供程序的设置。\n4. 在“提供程序 IP 地址或 FQDN”和“TCP/IP 端口”中，指定用于连接提供程序的设置。只能对 SMI-S CIMXML 使用 SSL 连接。\n\n    ![提供程序连接](./media/site-recovery-vmm-san/connect-settings.png)\n\n5. 在“运行方式帐户”中，指定可以访问该提供程序的 VMM 运行方式帐户，或创建新的帐户。\n6. 在“收集信息”页上，VMM 会自动尝试发现并导入存储设备信息。若要重试发现，请单击“扫描提供程序”。如果发现过程成功，发现的存储阵列、存储池、制造商、型号和容量将列在页中。\n\n    ![发现存储](./media/site-recovery-vmm-san/discover.png)\n\n7. 在“选择要接受管理的存储池并分配分类”中，选择 VMM 将要管理的存储池，并为其分配一个分类。将从存储池导入 LUN 信息。根据需要保护的应用程序、其容量要求以及你需要同时复制的内容创建 LUN。\n\n    ![为存储分类](./media/site-recovery-vmm-san/classify.png)\n\n### 创建 LUN 并分配存储\n\n1. 将 SAN 存储集成到 VMM 后，需要创建（设置）逻辑单元 (LUN)。\n\n- [如何选择用于在 VMM 中创建逻辑单元的方法](https://technet.microsoft.com/zh-cn/library/gg610624.aspx)\n- [如何在 VMM 中设置存储逻辑单元](https://technet.microsoft.com/zh-cn/library/gg696973.aspx)\n\n2. 然后，向 Hyper-V 主机群集分配存储容量，使 VMM 能够将虚拟机数据部署到设置的存储中：\n\n    - 在向群集分配存储之前，需要向群集所在的 VMM 主机组分配存储。请参阅[如何向主机组分配存储逻辑单元](https://technet.microsoft.com/zh-cn/library/gg610686.aspx)和[如何向主机组分配存储池](https://technet.microsoft.com/zh-cn/library/gg610635.aspx)。</a>\n    - 然后，根据[如何在 VMM 中的 Hyper-V 主机群集上配置存储](https://technet.microsoft.com/zh-cn/library/gg610692.aspx)中所述，向群集分配存储容量。</a>\n\n### 创建复制组\n\n创建一个复制组，其中包含需要一起复制的所有 LUN。\n\n1. 在 VMM 控制台中，打开存储阵列属性的“复制组”选项卡，然后单击“新建”。\n2. 然后创建复制组。\n\n    ![SAN 复制组](./media/site-recovery-vmm-san/rep-group.png)\n\n### 设置网络\n\n如果你要配置网络映射，请执行以下操作：\n\n1. [阅读](/documentation/articles/site-recovery-network-mapping)有关网络映射的信息。\n2. 在 VMM 中准备 VM 网络：\n\n    - [设置逻辑网络](https://technet.microsoft.com/zh-cn/library/jj721568.aspx)。\n    - [设置 VM 网络](https://technet.microsoft.com/zh-cn/library/jj721575.aspx)。\n\n## 步骤 2：创建保管库\n\n\n1. 从你要注册的 VMM 服务器登录到[管理门户](https://manage.windowsazure.cn)。\n\n2. 展开“数据服务”>“恢复服务”，并单击“Site Recovery 保管库”。\n\n3. 单击“新建”>“快速创建”。\n\n4. 在“名称”中，输入一个友好名称以标识此保管库。\n\n5. 在“区域”中，为保管库选择地理区域。若要查看受支持的区域，请参阅 [Azure Site Recovery 价格详细信息](/home/features/site-recovery/#price)中的“地域可用性”。\n\n6. 单击“创建保管库”。\n\n    ![新保管库](./media/site-recovery-vmm-san/create-vault.png)\n\n检查状态栏以确认保管库已成功创建。保管库将以“活动”状态列在主要的“恢复服务”页上。\n\n\n### 注册 VMM 服务器\n\n1. 从“恢复服务”页打开“快速启动”页。也可随时使用该图标打开“快速启动”。\n\n    ![“快速启动”图标](./media/site-recovery-vmm-san/quick-start-icon.png)\n\n2. 在下拉列表中，选择“使用阵列复制在 Hyper-V 本地站点之间进行”。\n\n    ![注册密钥](./media/site-recovery-vmm-san/select-san.png)\n\n\n3. 在“准备 VMM 服务器”中，下载最新版的 Azure Site Recovery 提供程序安装文件。\n4. 在源 VMM 服务器上运行此文件。如果 VMM 部署到群集中并且你是首次安装该提供程序，请将其安装在一个活动节点上并完成安装以在保管库中注册 VMM 服务器。然后在其他节点上安装该提供程序。请注意，如果你是在升级提供程序，则需要在所有节点上进行升级，因为所有节点都应当运行相同的提供程序版本。\n5. 安装程序将执行简单的“先决条件检查”，并请求授权停止 VMM 服务以开始安装提供程序。VMM 服务将在安装程序完成时自动重新启动。如果你是在 VMM 群集上进行安装，则会提示你停止群集角色。\n6. 在“Microsoft 更新”中，你可以选择获取更新。当启用了此设置时，将根据你的 Microsoft 更新策略自动安装提供程序更新。\n\n    ![Microsoft 更新](./media/site-recovery-vmm-san/ms-update.png)\n\n7. 安装位置设置为 **<SystemDrive>\\\\Program Files\\\\Microsoft System Center 2012 R2\\\\Virtual Machine Manager\\\\bin**。单击“安装”按钮，开始安装提供程序。\n\n    ![InstallLocation](./media/site-recovery-vmm-san/install-location.png)\n\n8. 安装提供程序之后，请单击“注册”按钮，以在保管库中注册服务器。\n\n    ![InstallComplete](./media/site-recovery-vmm-san/install-complete.png)\n\n9. 在“Internet 连接”中，指定在 VMM 服务器上运行的提供程序如何连接到 Internet。选择“使用默认系统代理设置”以使用服务器上配置的默认 Internet 连接设置。\n\n    ![Internet 设置](./media/site-recovery-vmm-san/proxy-details.png)\n\n    - 如果希望使用自定义代理，则应当在安装该提供程序之前设置它。当配置自定义代理设置时，会运行测试来检查代理连接。\n    - 如果你确实使用自定义代理，或者你的默认代理要求进行身份验证，则需要输入代理详细信息，包括代理地址和端口。\n    - 以下 URL 应可从 VMM 服务器和 Hyper-v 主机访问\n        - *.hypervrecoverymanager.windowsazure.cn\n        - *.accesscontrol.chinacloudapi.cn\n        - *.backup.windowsazure.cn\n        - *.blob.core.chinacloudapi.cn\n        - *.store.core.chinacloudapi.cn\n    - 允许 [Azure 数据中心 IP 范围](https://msdn.microsoft.com/zh-cn/library/azure/dn175718.aspx)中所述的 IP 地址，以及 HTTPS (443) 协议。必须将你打算使用的 Azure 区域以及中国东部的 IP 范围加入允许列表。 \n    - 如果你使用自定义代理，则将使用指定的代理凭据自动创建一个 VMM 运行身份帐户 (DRAProxyAccount)。对代理服务器进行配置以便该帐户可以成功通过身份验证。可以在 VMM 控制台中修改 VMM 运行身份帐户设置。若要执行此操作，请打开“设置”工作区，展开“安全性”，单击“运行身份帐户”，然后修改 DRAProxyAccount 的密码。你将需要重新启动 VMM 服务以使此设置生效。\n\n10. 在“注册密钥”中，选择你从 Azure Site Recovery 下载并复制到 VMM 服务器的密钥。\n11. 在“保管库名称”中，验证将要在其中注册服务器的保管库的名称。 \n\n    ![服务器注册](./media/site-recovery-vmm-san/vault-creds.png)\n\n12. 加密设置仅适用于 VMM 到 Azure 方案，如果你是仅从 VMM 到 VMM 的用户，则可以忽略此屏幕。\n\n    ![服务器注册](./media/site-recovery-vmm-san/encrypt.png)\n\n13. 在“服务器名称”中，指定一个友好名称以在保管库中标识该 VMM 服务器。在群集配置中，请指定 VMM 群集角色名称。\n14. 在“初始云元数据同步”中，指定将出现在保管库中的服务器的友好名称，并选择是否要将 VMM 服务器上所有云的元数据与保管库进行同步。此操作在每个服务器上只需执行一次。如果你不希望同步所有云，可以将此设置保留为未选中状态并在 VMM 控制台中的云属性中分别同步各个云。\n\n    ![服务器注册](./media/site-recovery-vmm-san/friendly-name.png)\n\n15. 单击“下一步”以完成此过程。注册后，Azure Site Recovery 将检索 VMM 服务器中的元数据。服务器显示在保管库中“服务器”页上的“VMM 服务器”选项卡中。\n\n### 命令行安装\n\n也可使用以下命令行来安装 Azure Site Recovery 提供程序。此命令可用来将提供程序安装在 Server CORE for Windows Server 2012 R2 上。\n\n1. 将提供程序安装文件和注册密钥下载到某个文件夹（例如 C:\\\\ASR）中\n2. 停止 System Center Virtual Machine Manager 服务\n3. 使用 **Administrator** 权限从命令提示符处运行以下命令，以便提取提供程序安装程序：\n\n        C:\\Windows\\System32> CD C:\\ASR\n        C:\\ASR> AzureSiteRecoveryProvider.exe /x:. /q\n\n4. 运行以下命令以安装提供程序：\n\n        C:\\ASR> setupdr.exe /i\n\n5. 运行以下命令以注册提供程序：\n\n        CD C:\\Program Files\\Microsoft System Center 2012 R2\\Virtual Machine Manager\\bin\n        C:\\Program Files\\Microsoft System Center 2012 R2\\Virtual Machine Manager\\bin> DRConfigurator.exe /r  /Friendlyname <friendly name of the server> /Credentials <path of the credentials file> /EncryptionEnabled <full file name to save the encryption certificate>         \n\n其中的参数如下：\n\n - **/Credentials**：用于指定注册密钥文件所在位置的必需参数  \n - **/FriendlyName**：在 Azure Site Recovery 门户中显示的 Hyper-V 主机服务器名称的必需参数。\n - **/EncryptionEnabled**：仅当你需要在 Azure 中以静止方式为虚拟机加密时，才需要在 VMM 到 Azure 方案中使用这个可选参数。请确保提供的文件名具有 **.pfx** 扩展名。\n - **/proxyAddress**：可选参数，用于指定代理服务器的地址。\n - **/proxyport**：可选参数，用于指定代理服务器的端口。\n - **/proxyUsername**：可选参数，用于指定代理服务器用户名（如果代理服务器要求身份验证）。\n - **/proxyPassword**：可选参数，用于指定密码，以便通过代理服务器进行身份验证（如果代理服务器要求身份验证）。\n\n\n## 步骤 3：映射存储阵列和池\n\n映射阵列，以指定哪个辅助存储池要从主池接收复制数据。之所以要在配置云保护之前映射存储，是因为当你为复制组启用保护时要使用映射信息。\n\n在开始操作之前，请检查云是否已显示在保管库中。若要检测云，你可以在安装提供程序时选择同步所有云，也可以在 VMM 控制台中云属性的“常规”选项卡上选择同步特定的云。然后按如下所述映射存储阵列：\n\n1. 单击“资源”>“服务器存储”>“映射源和目标阵列”。![服务器注册](./media/site-recovery-vmm-san/storage-map.png)\n2. 选择主站点上的存储阵列，并将其映射到辅助站点上的存储阵列。\n3.  映射阵列中的源和目标存储池。为此，请在“存储池”中选择要映射的源和目标存储池。\n\n    ![服务器注册](./media/site-recovery-vmm-san/storage-map-pool.png)\n\n## 步骤 4：配置云保护设置\n\n在注册 VMM 服务器后，你可以配置云保护设置。你在安装提供程序时启用了“将云数据与保管库同步”选项，所以 VMM 服务器上的所有云都将出现在保管库中的“受保护的项”选项卡中。<b></b>\n\n![已发布的云](./media/site-recovery-vmm-san/clouds-list.png)\n\n1. 在“快速启动”页上，单击“为 VMM 云设置保护”。\n2. 在“受保护的项”选项卡上，选择要配置的云并转到“配置”选项卡。请注意：\n3. 在“目标”中，选择“VMM”。<b></b><b></b>\n4. 在“目标位置”中，选择管理着你要用于恢复的云的现场 VMM 服务器。<b></b>\n5. 在“目标云”中，选择要用于源云中虚拟机故障转移的目标云。<b></b>请注意：\n    - 我们建议你选择可满足你要保护的虚拟机的恢复要求的目标云。\n    - 一个云只能属于一个云对 — 作为主云或目标云。\n6. Azure 站点恢复将验证云是否有权访问支持 SAN 复制的存储，并且是否为存储阵列建立了对等互连。将显示参与的阵列对等方。\n7. 如果验证成功，请在“复制类型”中选择“SAN”。\n\n<p>在保存设置后，将创建一个作业，可以在“作业”选项卡上监视该作业。<b></b>可以在“配置”选项卡上修改云设置。<b></b>如果希望修改目标位置或目标云，必须删除云配置，然后重新配置该云。</p>\n\n## 步骤 5：启用网络映射\n\n1. 在“快速启动”页上，单击“映射网络”。\n2. 选择你要映射其中的网络的源 VMM 服务器，然后选择要将网络映射到的目标 VMM 服务器。此时将显示源网络及其关联的目标网络的列表。对于当前未映射的网络将显示空值。单击源和目标网络名称旁的信息图标以查看每个网络的子网。\n3. 在“源的网络”中选择一个网络，然后单击“映射”。服务将检测目标服务器上的 VM 网络并显示它们。\n\n    ![SAN 体系结构](./media/site-recovery-vmm-san/network-map1.png)\n\n4. 在显示的对话框中，从目标 VMM 服务器选择其中一个 VM 网络。\n\n    ![SAN 体系结构](./media/site-recovery-vmm-san/network-map2.png)\n\n5. 当选择某个目标网络时，会显示使用源网络的受保护云。此时也会显示与用于保护的云关联的可用目标网络。建议你选择可供你用于保护的所有云使用的一个目标网络。\n6.  单击复选标记以完成映射过程。作业开始跟踪映射进度。你可以在“作业”选项卡上查看该作业。\n\n\n## 步骤 6：为复制组启用复制</h3>\n\n在为虚拟机启用保护之前，需要为存储复制组启用复制。\n\n1. 在 Azure Site Recovery 门户中，在主云的属性页上打开“虚拟机”选项卡。单击“添加复制组”。\n2. 选择与云关联的一个或多个 VMM 复制组，验证源和目标阵列，然后指定复制频率。\n\n完成此操作后，Azure Site Recovery 以及 VMM 和 SMI-S 提供程序将设置目标站点存储 LUN，并启用存储复制。如果复制组已复制，Azure Site Recovery 将重用现有的复制关系并更新 Azure Site Recovery 中的信息。\n\n## 步骤 7：为虚拟机启用保护\n\n存储组开始复制后，请在 VMM 控制台中使用以下方法之一为虚拟机启用保护：\n\n- **新的虚拟机** - 在创建新的虚拟机时，可以在 VMM 控制台中启用 Azure Site Recovery 保护，并将虚拟机与复制组相关联。如果选择此选项，VMM 将使用智能定位以最佳方式将虚拟机存储放置在复制组的 LUN 上。Azure Site Recovery 将协调辅助站点上的阴影虚拟机的创建并分配容量，以便在故障转移后可以启动副本虚拟机。\n- **现有虚拟机** - 如果已在 VMM 中部署虚拟机，你可以启用 Azure Site Recovery 保护，并执行到复制组的存储迁移。完成此操作后，VMM 和 Azure Site Recovery 将检测新虚拟机，并开始在 Azure Site Recovery 中对它进行管理，以提供保护。将在辅助站点上创建阴影虚拟机并为其分配容量，以便在故障转移后可以启动副本虚拟机。\n\n    ![启用保护](./media/site-recovery-vmm-san/enable-protect.png)\n\n为虚拟机启用保护后，它们将显示在 Azure Site Recovery 控制台中。你可以查看虚拟机属性，跟踪状态，以及故障转移包含多个虚拟机的复制组。请注意，在 SAN 复制中，与复制组关联的所有虚拟机必须一起故障转移。这是因为，故障转移会先在存储层发生。必须正确组合复制组，并只将关联的虚拟机放置在一起。\n\n你可以在“作业”选项卡中跟踪“启用保护”操作的进度，包括初始复制。在“完成保护”作业运行之后，虚拟机就可以进行故障转移了。\n\n![虚拟机保护作业](./media/site-recovery-vmm-san/job-props.png)\n\n## 步骤 8：测试部署\n\n测试你的部署，以确保虚拟机和数据可按预期方式故障转移。为此，你将要通过选择复制组创建恢复计划。然后，对该计划运行测试故障转移。\n\n1. 在“恢复计划”选项卡上，单击“创建恢复计划”。\n2. 为恢复计划指定一个名称，并指定源和目标 VMM 服务器。源服务器必须具有启用了故障转移和恢复的虚拟机。选择“SAN”，以仅查看为 SAN 复制配置的云。\n3.\n    ![创建恢复计划](./media/site-recovery-vmm-san/r-plan.png)\n\n4. 在“选择虚拟机”中，选择复制组。将选择与复制组关联的所有虚拟机，并将其添加到恢复计划。这些虚拟机将添加到恢复计划的默认组—“组 1”中。如果需要，你可以添加更多的组。请注意，在复制后，各个虚拟机将根据恢复计划组的顺序启动。\n\n    ![添加虚拟机](./media/site-recovery-vmm-san/r-plan-vm.png)\n5. 在创建恢复计划后，它将出现在“恢复计划”选项卡上的列表中。\n6. 在“恢复计划”选项卡上，选择该计划并单击“测试故障转移”。\n7. 在“确认测试故障转移”页面上，选择“无”。请注意，当启用了此选项时，故障转移后的副本虚拟机不会连接到任何网络。这将测试虚拟机是否按预期进行故障转移，但是不会测试你的复制网络环境。有关如何使用不同网络选项的详细信息，请查看[如何运行测试性故障转移](/documentation/articles/site-recovery-failover#run-a-test-failover)。\n\n\n    ![选择测试网络](./media/site-recovery-vmm-san/test-fail1.png)\n\n\n8. 将在副本虚拟机所在的同一主机上创建测试虚拟机。它不会被添加到副本虚拟机所在的云中。\n9. 在复制之后，副本虚拟机将具有与主虚拟机的 IP 地址不同的 IP 地址。如果你是通过 DHCP 颁发地址，则 DNS 将自动更新。如果你未使用 DHCP 并且希望确保地址相同，则需要运行两个脚本。\n10. 运行此示例脚本来检索 IP 地址。\n\n        $vm = Get-SCVirtualMachine -Name <VM_NAME>\n        $na = $vm[0].VirtualNetworkAdapters>\n        $ip = Get-SCIPAddress -GrantToObjectID $na[0].id\n        $ip.address  \n\n11. 运行此示例脚本来更新 DNS 并指定你通过前一个示例脚本检索到的 IP 地址。\n\n        [string]$Zone,\n        [string]$name,\n        [string]$IP\n        )\n        $Record = Get-DnsServerResourceRecord -ZoneName $zone -Name $name\n        $newrecord = $record.clone()\n        $newrecord.RecordData[0].IPv4Address  =  $IP\n        Set-DnsServerResourceRecord -zonename $zone -OldInputObject $record -NewInputObject $Newrecord\n\n## 后续步骤\n\n运行测试性故障转移以确保环境功能正常以后，请[了解](/documentation/articles/site-recovery-failover)不同类型的故障转移。\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

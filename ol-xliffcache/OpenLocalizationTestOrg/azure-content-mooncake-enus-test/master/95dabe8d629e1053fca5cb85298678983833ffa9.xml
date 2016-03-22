@@ -1,0 +1,383 @@
+{
+  "nodes": [
+    {
+      "content": "用于部署 HPC Pack 群集的 PowerShell 脚本 | Azure",
+      "pos": [
+        26,
+        65
+      ]
+    },
+    {
+      "content": "运行 Windows PowerShell 脚本，以在 Azure 基础结构服务中部署完整的 HPC Pack 群集",
+      "pos": [
+        83,
+        141
+      ]
+    },
+    {
+      "content": "使用 HPC Pack IaaS 部署脚本在 Azure VM 中创建高性能计算 (HPC) 群集",
+      "pos": [
+        395,
+        444
+      ]
+    },
+    {
+      "pos": [
+        446,
+        532
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]"
+    },
+    {
+      "content": "在客户端计算机上运行 HPC Pack IaaS 部署 PowerShell 脚本，以在 Azure 基础结构服务 (IaaS) 中部署完整的 HPC Pack 群集。此脚本提供多种部署选项，并且可添加运行受支持 Linux 分发包或 Windows Server 操作系统的群集计算节点。",
+      "pos": [
+        536,
+        681
+      ]
+    },
+    {
+      "content": "根据你的环境和选择，该脚本可以创建所有群集基础结构，包括 Azure 虚拟网络、存储帐户、云服务、域控制器、远程或本地 SQL 数据库、头节点、代理节点、计算节点和 Azure 云服务（“迸发”或 PaaS）节点。此外，该脚本还可以使用预先存在的 Azure 基础结构，然后创建 HPC 群集头节点、代理节点、计算节点和 Azure 迸发节点。",
+      "pos": [
+        683,
+        855
+      ]
+    },
+    {
+      "pos": [
+        858,
+        1039
+      ],
+      "content": "有关规划 HPC Pack 群集的背景信息，请参阅 HPC Pack TechNet 库中的<bpt id=\"p1\">[</bpt>产品评估和规划<ept id=\"p1\">](https://technet.microsoft.com/zh-cn/library/jj899596.aspx)</ept>及<bpt id=\"p2\">[</bpt>入门<ept id=\"p2\">](https://technet.microsoft.com/zh-cn/library/jj899590.aspx)</ept>内容。"
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        1044,
+        1048
+      ]
+    },
+    {
+      "pos": [
+        1052,
+        1214
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Azure 订阅<ept id=\"p1\">**</ept> - 你可以使用 Azure 全球或 Azure 中国服务中的订阅。你的订阅限制只会影响你可以部署的群集节点数量和类型。有关信息，请参阅 <bpt id=\"p2\">[</bpt>Azure 订阅和服务限制、配额与约束<ept id=\"p2\">](/documentation/articles/azure-subscription-service-limits)</ept>。"
+    },
+    {
+      "pos": [
+        1219,
+        1379
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>安装并配置了 Azure PowerShell 0.8.7 或更高版本的 Windows 客户端计算机<ept id=\"p1\">**</ept> - 请参阅<bpt id=\"p2\">[</bpt>安装和配置 Azure PowerShell<ept id=\"p2\">](/documentation/articles/powershell-install-configure)</ept>。该脚本将在 Azure 服务管理中运行。"
+    },
+    {
+      "pos": [
+        1384,
+        1563
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>HPC Pack IaaS 部署脚本<ept id=\"p1\">**</ept> - 从 <bpt id=\"p2\">[</bpt>Microsoft 下载中心<ept id=\"p2\">](https://www.microsoft.com/download/details.aspx?id=44949)</ept>下载并解压缩最新版本的脚本。通过运行 <ph id=\"ph1\">`New-HPCIaaSCluster.ps1 -Version`</ph> 检查脚本的版本。本文基于版本 4.4.0 的脚本。"
+    },
+    {
+      "pos": [
+        1567,
+        1625
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>脚本配置文件<ept id=\"p1\">**</ept> - 需要创建脚本用来配置 HPC 群集的 XML 文件。有关信息和示例，请参阅本文后面的部分。"
+    },
+    {
+      "content": "语法",
+      "pos": [
+        1631,
+        1633
+      ]
+    },
+    {
+      "pos": [
+        1863,
+        1889
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>你必须以管理员身份运行脚本。"
+    },
+    {
+      "content": "Parameters",
+      "pos": [
+        1895,
+        1905
+      ]
+    },
+    {
+      "pos": [
+        1909,
+        2018
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>ConfigFile<ept id=\"p1\">**</ept> - 指定描述 HPC 群集的配置文件的路径。有关详细信息，请参阅本主题中的<bpt id=\"p2\">[</bpt>配置文件<ept id=\"p2\">](#Configuration-file)</ept>，或参阅包含该脚本的文件夹中的 Manual.rtf 文件。"
+    },
+    {
+      "pos": [
+        2022,
+        2134
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>AdminUserName<ept id=\"p1\">**</ept> - 指定用户名。如果域林是由脚本创建的，则此用户名将成为所有 VM 的本地管理员用户名以及域管理员名称。如果域林已存在，则此参数会将域用户指定为安装 HPC Pack 的本地管理员用户名。"
+    },
+    {
+      "pos": [
+        2138,
+        2189
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>AdminPassword<ept id=\"p1\">**</ept> - 指定管理员的密码。如果未在命令行中指定，脚本将提示你输入密码。"
+    },
+    {
+      "pos": [
+        2193,
+        2332
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>HPCImageName<ept id=\"p1\">**</ept>（可选）- 指定用于部署 HPC 群集的 HPC Pack VM 映像名称。它必须是 Microsoft 通过 Azure 库提供的 HPC Pack 映像。如果未指定（在大多数情况下建议不要指定），脚本将选择最新发布的 HPC Pack 映像。"
+    },
+    {
+      "pos": [
+        2339,
+        2377
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 指定无效的 HPC Pack 映像会导致部署失败。"
+    },
+    {
+      "pos": [
+        2381,
+        2446
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>LogFile<ept id=\"p1\">**</ept>（可选）- 指定部署日志文件路径。如果未指定，脚本将在运行脚本的计算机的 temp 目录中创建一个日志文件。"
+    },
+    {
+      "pos": [
+        2450,
+        2474
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Force<ept id=\"p1\">**</ept>（可选）- 抑制所有确认提示。"
+    },
+    {
+      "pos": [
+        2478,
+        2563
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>NoCleanOnFailure<ept id=\"p1\">**</ept>（可选）- 指定将不删除未成功部署的 Azure VM。在重新运行脚本以继续部署之前，你必须手动删除这些 VM，否则部署可能失败。"
+    },
+    {
+      "pos": [
+        2567,
+        2831
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>PSSessionSkipCACheck<ept id=\"p1\">**</ept>（可选）- 对于每个包含此脚本所部署的 VM 的云服务，Azure 将自动生成自签名证书，云服务中的所有 VM 使用此证书作为默认的 Windows 远程管理 (WinRM) 证书。若要在这些 Azure VM 中部署 HPC 功能，脚本默认情况下将在客户端计算机的“本地计算机\\\\受信任的根证书颁发机构”存储中临时安装这些证书，以抑制执行脚本期间发生的“不受信任的 CA”安全错误，并在完成脚本后删除这些证书。如果指定此参数，将不会在客户端计算机中安装证书，并且会抑制安全警告。"
+    },
+    {
+      "pos": [
+        2838,
+        2872
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph> 对于生产部署，不建议指定此参数。"
+    },
+    {
+      "content": "示例",
+      "pos": [
+        2878,
+        2880
+      ]
+    },
+    {
+      "pos": [
+        2882,
+        2948
+      ],
+      "content": "以下示例将使用配置文件 <bpt id=\"p1\">*</bpt>MyConfigFile.xml<ept id=\"p1\">*</ept> 创建一个新的 HPC Pack 群集，并指定用于安装该群集的管理凭据。"
+    },
+    {
+      "content": "其他注意事项",
+      "pos": [
+        3063,
+        3069
+      ]
+    },
+    {
+      "content": "该脚本使用 Azure 库中的 HPC Pack VM 映像创建群集头节点。最新映像基于装有 HPC Pack 2012 R2 Update 3 的 Windows Server 2012 R2 Datacenter。",
+      "pos": [
+        3073,
+        3182
+      ]
+    },
+    {
+      "content": "（可选）该脚本可以启用通过 HPC Pack Web 门户或 HPC Pack REST API 提交作业。",
+      "pos": [
+        3186,
+        3240
+      ]
+    },
+    {
+      "content": "如果你想要安装其他软件或配置其他设置，该脚本可以选择在头节点上运行自定义的配置前和配置后脚本。",
+      "pos": [
+        3244,
+        3291
+      ]
+    },
+    {
+      "pos": [
+        3296,
+        3334
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"Configuration-file\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 配置文件"
+    },
+    {
+      "pos": [
+        3336,
+        3537
+      ],
+      "content": "部署脚本的配置文件是一个 XML 文件。架构文件 HPCIaaSClusterConfig.xsd 位于 HPC Pack IaaS 部署脚本文件夹中。<bpt id=\"p1\">**</bpt>IaaSClusterConfig<ept id=\"p1\">**</ept> 是配置文件的根元素，其中包含部署脚本文件夹中 Manual.rtf 文件详细描述的子元素。有关不同方案的示例文件，请参阅本文中的<bpt id=\"p2\">[</bpt>示例配置文件<ept id=\"p2\">](#Example-configuration-files)</ept>。"
+    },
+    {
+      "pos": [
+        3541,
+        3590
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"Example-configuration-files\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 示例配置文件"
+    },
+    {
+      "content": "示例 1",
+      "pos": [
+        3596,
+        3600
+      ]
+    },
+    {
+      "pos": [
+        3602,
+        4028
+      ],
+      "content": "以下配置文件将在现有域林中部署一个 HPC Pack 群集。该群集包含 1 个具有本地数据库的头节点和 12 个应用了 BGInfo VM 扩展的计算节点。对于域林中的所有 VM，禁用了 Windows 更新的自动安装。所有云服务直接在“中国东部”位置创建。计算节点在 3 个云服务和 3 个存储帐户中创建（即，<bpt id=\"p1\">_</bpt>MyHPCCNService01<ept id=\"p1\">_</ept> 和 <bpt id=\"p2\">_</bpt>mycnstorage01<ept id=\"p2\">_</ept> 中的 <bpt id=\"p3\">_</bpt>MyHPCCN-0001<ept id=\"p3\">_</ept> 到 <bpt id=\"p4\">_</bpt>MyHPCCN-0005<ept id=\"p4\">_</ept>；<bpt id=\"p5\">_</bpt>MyHPCCNService02<ept id=\"p5\">_</ept> 和 <bpt id=\"p6\">_</bpt>mycnstorage02<ept id=\"p6\">_</ept> 中的 <bpt id=\"p7\">_</bpt>MyHPCCN-0006<ept id=\"p7\">_</ept> 到 <bpt id=\"p8\">_</bpt>MyHPCCN0010<ept id=\"p8\">_</ept>；<bpt id=\"p9\">_</bpt>MyHPCCNService03<ept id=\"p9\">_</ept> 和 <bpt id=\"p10\">_</bpt>mycnstorage03<ept id=\"p10\">_</ept> 中的 <bpt id=\"p11\">_</bpt>MyHPCCN-0011<ept id=\"p11\">_</ept> 到 <bpt id=\"p12\">_</bpt>MyHPCCN-0012<ept id=\"p12\">_</ept>）。计算节点是基于从计算节点捕获的现有专用映像创建的。已启用自动增长和收缩服务，该服务采用默认的增长和收缩间隔。"
+    },
+    {
+      "content": "示例 2",
+      "pos": [
+        5942,
+        5946
+      ]
+    },
+    {
+      "pos": [
+        5948,
+        6224
+      ],
+      "content": "以下配置文件将在现有域林中部署一个 HPC Pack 群集。该群集包含 1 个头节点、1 台具有 500GB 数据磁盘的数据库服务器、2 个运行 Windows Server 2012 R2 操作系统的代理节点，和 5 个运行 Windows Server 2012 R2 操作系统的计算节点。云服务 MyHPCCNService 是在地缘组 <bpt id=\"p1\">*</bpt>MyIBAffinityGroup<ept id=\"p1\">*</ept> 中创建的，其他所有云服务是在地缘组 <bpt id=\"p2\">*</bpt>MyAffinityGroup<ept id=\"p2\">*</ept> 中创建的。已在头节点上启用了 HPC 作业计划程序 REST API 和 HPC Web 门户。"
+    },
+    {
+      "content": "示例 3",
+      "pos": [
+        7825,
+        7829
+      ]
+    },
+    {
+      "pos": [
+        7831,
+        8285
+      ],
+      "content": "以下配置文件将创建新的域林并部署 HPC Pack 群集，其中包含 1 个具有本地数据库的头节点和 20 个 Linux 计算节点。所有云服务直接在“中国东部”位置创建。Linux 计算节点在 4 个云服务和 4 个存储帐户中创建（即，<bpt id=\"p1\">_</bpt>MyLnxCNService01<ept id=\"p1\">_</ept> 和 <bpt id=\"p2\">_</bpt>mylnxstorage01<ept id=\"p2\">_</ept> 中的 <bpt id=\"p3\">_</bpt>MyLnxCN-0001<ept id=\"p3\">_</ept> 到 <bpt id=\"p4\">_</bpt>MyLnxCN-0005<ept id=\"p4\">_</ept>；<bpt id=\"p5\">_</bpt>MyLnxCNService02<ept id=\"p5\">_</ept> 和 <bpt id=\"p6\">_</bpt>mylnxstorage02<ept id=\"p6\">_</ept> 中的 <bpt id=\"p7\">_</bpt>MyLnxCN-0006<ept id=\"p7\">_</ept> 到 <bpt id=\"p8\">_</bpt>MyLnxCN-0010<ept id=\"p8\">_</ept>；<bpt id=\"p9\">_</bpt>MyLnxCNService03<ept id=\"p9\">_</ept> 和 <bpt id=\"p10\">_</bpt>mylnxstorage03<ept id=\"p10\">_</ept> 中的 <bpt id=\"p11\">_</bpt>MyLnxCN-0011<ept id=\"p11\">_</ept> 到 <bpt id=\"p12\">_</bpt>MyLnxCN-0015<ept id=\"p12\">_</ept>；<bpt id=\"p13\">_</bpt>MyLnxCNService04<ept id=\"p13\">_</ept> 和 <bpt id=\"p14\">_</bpt>mylnxstorage04<ept id=\"p14\">_</ept> 中的 <bpt id=\"p15\">_</bpt>MyLnxCN-0016<ept id=\"p15\">_</ept> 到 <bpt id=\"p16\">_</bpt>MyLnxCN-0020<ept id=\"p16\">_</ept>）。计算节点是基于 OpenLogic CentOS 7.0 版 Linux 映像创建的。"
+    },
+    {
+      "content": "示例 4",
+      "pos": [
+        9823,
+        9827
+      ]
+    },
+    {
+      "content": "以下配置文件将部署一个 HPC Pack 群集，其中包含一个具有本地数据库的头节点，以及 5 个运行 Windows Server 2008 R2 操作系统的计算节点。所有云服务直接在“中国东部”位置创建。头节点充当域林的域控制器。",
+      "pos": [
+        9829,
+        9945
+      ]
+    },
+    {
+      "content": "示例 5",
+      "pos": [
+        10975,
+        10979
+      ]
+    },
+    {
+      "pos": [
+        10981,
+        11123
+      ],
+      "content": "以下配置文件将在现有域林中部署一个 HPC Pack 群集。该群集包含 1 个具有本地数据库的头节点，此外将创建两个 Azure 节点模板，并为 Azure 节点模板 <bpt id=\"p1\">_</bpt>AzureTemplate1<ept id=\"p1\">_</ept> 创建 3 个中等大小的 Azure 节点。配置头节点后，将在头节点上运行脚本文件。"
+    },
+    {
+      "content": "已知问题",
+      "pos": [
+        13339,
+        13343
+      ]
+    },
+    {
+      "pos": [
+        13348,
+        13480
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>“虚拟网络不存在”错误<ept id=\"p1\">**</ept> - 如果你运行 HPC Pack IaaS 部署脚本以在 Azure 中的一个订阅下同时部署多个群集，则一个或多个部署可能会失败并显示错误“虚拟网络 <bpt id=\"p2\">*</bpt>VNet\\_Name<ept id=\"p2\">*</ept> 不存在”。如果发生此错误，请对失败的部署重新运行该脚本。"
+    },
+    {
+      "pos": [
+        13484,
+        13666
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>从 Azure 虚拟网络访问 Internet 时出现问题<ept id=\"p1\">**</ept> - 如果你通过使用部署脚本创建 HPC Pack 群集和新的域控制器，或者你手动将 VM 提升为域控制器，则在将 Azure 虚拟网络中的 VM 连接到 Internet 时可能会遇到问题。如果已在域控制器上自动配置转发器 DNS 服务器，但此转发器 DNS 服务器未正确解析，则会出现这种情况。"
+    },
+    {
+      "content": "若要解决此问题，请登录到域控制器，删除转发器配置设置或配置一个有效的转发器 DNS 服务器。为此，请在服务器管理器中单击“工具”&gt;“DNS”以打开 DNS 管理器，然后双击“转发器”。",
+      "pos": [
+        13672,
+        13764
+      ]
+    },
+    {
+      "pos": [
+        13768,
+        13961
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>从大小为 A8 或 A9 的 VM 访问 RDMA 网络时出现问题<ept id=\"p1\">**</ept> - 如果你通过使用部署脚本添加大小为 A8 或 A9 的计算节点 VM 或代理节点 VM，则在将这些 VM 连接到 RDMA 应用程序网络时可能会遇到问题。发生这种情况的原因之一是，在将大小为 A8 或 A9 的 VM 添加到群集时未正确安装 HpcVmDrivers 扩展。例如，该扩展可能会停滞在安装状态。"
+    },
+    {
+      "content": "若要解决此问题，请先检查 VM 中扩展的状态。如果该扩展未正确安装，请尝试从 HPC 群集中删除节点，然后再重新添加节点。例如，你可以通过使用 Add-HpcIaaSNode.ps1 脚本添加计算节点 VM。",
+      "pos": [
+        13967,
+        14071
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        14077,
+        14081
+      ]
+    },
+    {
+      "pos": [
+        14085,
+        14177
+      ],
+      "content": "尝试在群集上运行测试工作负荷。例如，请参阅 HPC Pack <bpt id=\"p1\">[</bpt>入门指南<ept id=\"p1\">](https://technet.microsoft.com/zh-cn/library/jj884144)</ept>。"
+    },
+    {
+      "pos": [
+        14181,
+        14576
+      ],
+      "content": "有关使用脚本创建群集和运行 HPC 工作负荷的教程，请参阅<bpt id=\"p1\">[</bpt>开始使用 Azure 中的 HPC Pack 群集运行 Excel 和 SOA 工作负荷<ept id=\"p1\">](/documentation/articles/virtual-machines-excel-cluster-hpcpack)</ept>、<bpt id=\"p2\">[</bpt>在 Azure 中的 Linux 计算节点上使用 Microsoft HPC Pack 运行 NAMD<ept id=\"p2\">](/documentation/articles/virtual-machines-linux-cluster-hpcpack-namd)</ept> 或<bpt id=\"p3\">[</bpt>在 Azure 中的 Linux 计算节点上使用 Microsoft HPC Pack 运行 OpenFOAM<ept id=\"p3\">](/documentation/articles/virtual-machines-linux-cluster-hpcpack-openfoam)</ept>。"
+    },
+    {
+      "pos": [
+        14580,
+        14724
+      ],
+      "content": "尝试使用 HPC Pack 的工具来启动、停止、添加和删除所创建群集中的计算节点。请参阅<bpt id=\"p1\">[</bpt>在 Azure 中管理 HPC Pack 群集的计算节点<ept id=\"p1\">](/documentation/articles/virtual-machines-hpcpack-cluster-node-manage)</ept>"
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"用于部署 HPC Pack 群集的 PowerShell 脚本 | Azure\"\n   description=\"运行 Windows PowerShell 脚本，以在 Azure 基础结构服务中部署完整的 HPC Pack 群集\"\n   services=\"virtual-machines\"\n   documentationCenter=\"\"\n   authors=\"dlepow\"\n   manager=\"timlt\"\n   editor=\"\"\n   tags=\"azure-service-management,hpc-pack\"/>\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"01/08/2016\"\n    wacn.date=\"02/26/2016\"/>\n\n# 使用 HPC Pack IaaS 部署脚本在 Azure VM 中创建高性能计算 (HPC) 群集\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]\n\n\n\n在客户端计算机上运行 HPC Pack IaaS 部署 PowerShell 脚本，以在 Azure 基础结构服务 (IaaS) 中部署完整的 HPC Pack 群集。此脚本提供多种部署选项，并且可添加运行受支持 Linux 分发包或 Windows Server 操作系统的群集计算节点。\n\n根据你的环境和选择，该脚本可以创建所有群集基础结构，包括 Azure 虚拟网络、存储帐户、云服务、域控制器、远程或本地 SQL 数据库、头节点、代理节点、计算节点和 Azure 云服务（“迸发”或 PaaS）节点。此外，该脚本还可以使用预先存在的 Azure 基础结构，然后创建 HPC 群集头节点、代理节点、计算节点和 Azure 迸发节点。\n\n\n有关规划 HPC Pack 群集的背景信息，请参阅 HPC Pack TechNet 库中的[产品评估和规划](https://technet.microsoft.com/zh-cn/library/jj899596.aspx)及[入门](https://technet.microsoft.com/zh-cn/library/jj899590.aspx)内容。\n\n## 先决条件\n\n* **Azure 订阅** - 你可以使用 Azure 全球或 Azure 中国服务中的订阅。你的订阅限制只会影响你可以部署的群集节点数量和类型。有关信息，请参阅 [Azure 订阅和服务限制、配额与约束](/documentation/articles/azure-subscription-service-limits)。\n\n\n* **安装并配置了 Azure PowerShell 0.8.7 或更高版本的 Windows 客户端计算机** - 请参阅[安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure)。该脚本将在 Azure 服务管理中运行。\n\n\n* **HPC Pack IaaS 部署脚本** - 从 [Microsoft 下载中心](https://www.microsoft.com/download/details.aspx?id=44949)下载并解压缩最新版本的脚本。通过运行 `New-HPCIaaSCluster.ps1 -Version` 检查脚本的版本。本文基于版本 4.4.0 的脚本。\n\n* **脚本配置文件** - 需要创建脚本用来配置 HPC 群集的 XML 文件。有关信息和示例，请参阅本文后面的部分。\n\n\n## 语法\n\n    New-HPCIaaSCluster.ps1 [-ConfigFile] <String> [-AdminUserName]<String> [[-AdminPassword] <String>] [[-HPCImageName] <String>] [[-LogFile] <String>] [-Force] [-NoCleanOnFailure] [-PSSessionSkipCACheck] [<CommonParameters>]\n\n>[AZURE.NOTE]你必须以管理员身份运行脚本。\n\n### Parameters\n\n* **ConfigFile** - 指定描述 HPC 群集的配置文件的路径。有关详细信息，请参阅本主题中的[配置文件](#Configuration-file)，或参阅包含该脚本的文件夹中的 Manual.rtf 文件。\n\n* **AdminUserName** - 指定用户名。如果域林是由脚本创建的，则此用户名将成为所有 VM 的本地管理员用户名以及域管理员名称。如果域林已存在，则此参数会将域用户指定为安装 HPC Pack 的本地管理员用户名。\n\n* **AdminPassword** - 指定管理员的密码。如果未在命令行中指定，脚本将提示你输入密码。\n\n* **HPCImageName**（可选）- 指定用于部署 HPC 群集的 HPC Pack VM 映像名称。它必须是 Microsoft 通过 Azure 库提供的 HPC Pack 映像。如果未指定（在大多数情况下建议不要指定），脚本将选择最新发布的 HPC Pack 映像。\n\n    >[AZURE.NOTE] 指定无效的 HPC Pack 映像会导致部署失败。\n\n* **LogFile**（可选）- 指定部署日志文件路径。如果未指定，脚本将在运行脚本的计算机的 temp 目录中创建一个日志文件。\n\n* **Force**（可选）- 抑制所有确认提示。\n\n* **NoCleanOnFailure**（可选）- 指定将不删除未成功部署的 Azure VM。在重新运行脚本以继续部署之前，你必须手动删除这些 VM，否则部署可能失败。\n\n* **PSSessionSkipCACheck**（可选）- 对于每个包含此脚本所部署的 VM 的云服务，Azure 将自动生成自签名证书，云服务中的所有 VM 使用此证书作为默认的 Windows 远程管理 (WinRM) 证书。若要在这些 Azure VM 中部署 HPC 功能，脚本默认情况下将在客户端计算机的“本地计算机\\\\受信任的根证书颁发机构”存储中临时安装这些证书，以抑制执行脚本期间发生的“不受信任的 CA”安全错误，并在完成脚本后删除这些证书。如果指定此参数，将不会在客户端计算机中安装证书，并且会抑制安全警告。\n\n    >[AZURE.IMPORTANT] 对于生产部署，不建议指定此参数。\n\n### 示例\n\n以下示例将使用配置文件 *MyConfigFile.xml* 创建一个新的 HPC Pack 群集，并指定用于安装该群集的管理凭据。\n\n    New-HPCIaaSCluster.ps1 -ConfigFile MyConfigFile.xml -AdminUserName <username> -AdminPassword <password>\n\n### 其他注意事项\n\n* 该脚本使用 Azure 库中的 HPC Pack VM 映像创建群集头节点。最新映像基于装有 HPC Pack 2012 R2 Update 3 的 Windows Server 2012 R2 Datacenter。\n\n* （可选）该脚本可以启用通过 HPC Pack Web 门户或 HPC Pack REST API 提交作业。\n\n* 如果你想要安装其他软件或配置其他设置，该脚本可以选择在头节点上运行自定义的配置前和配置后脚本。\n\n\n##<a name=\"Configuration-file\"></a> 配置文件\n\n部署脚本的配置文件是一个 XML 文件。架构文件 HPCIaaSClusterConfig.xsd 位于 HPC Pack IaaS 部署脚本文件夹中。**IaaSClusterConfig** 是配置文件的根元素，其中包含部署脚本文件夹中 Manual.rtf 文件详细描述的子元素。有关不同方案的示例文件，请参阅本文中的[示例配置文件](#Example-configuration-files)。\n\n##<a name=\"Example-configuration-files\"></a> 示例配置文件\n\n### 示例 1\n\n以下配置文件将在现有域林中部署一个 HPC Pack 群集。该群集包含 1 个具有本地数据库的头节点和 12 个应用了 BGInfo VM 扩展的计算节点。对于域林中的所有 VM，禁用了 Windows 更新的自动安装。所有云服务直接在“中国东部”位置创建。计算节点在 3 个云服务和 3 个存储帐户中创建（即，_MyHPCCNService01_ 和 _mycnstorage01_ 中的 _MyHPCCN-0001_ 到 _MyHPCCN-0005_；_MyHPCCNService02_ 和 _mycnstorage02_ 中的 _MyHPCCN-0006_ 到 _MyHPCCN0010_；_MyHPCCNService03_ 和 _mycnstorage03_ 中的 _MyHPCCN-0011_ 到 _MyHPCCN-0012_）。计算节点是基于从计算节点捕获的现有专用映像创建的。已启用自动增长和收缩服务，该服务采用默认的增长和收缩间隔。\n\n    <?xml version=\"1.0\" encoding=\"utf-8\" ?>\n    <IaaSClusterConfig>\n      <Subscription>\n        <SubscriptionName>Subscription-1</SubscriptionName>\n        <StorageAccount>mystorageaccount</StorageAccount>\n      </Subscription>\n      <Location>China East</Location>  \n      <VNet>\n        <VNetName>MyVNet</VNetName>\n        <SubnetName>Subnet-1</SubnetName>\n      </VNet>\n      <Domain>\n        <DCOption>NewDC</DCOption>\n        <DomainFQDN>hpc.local</DomainFQDN>\n        <DomainController>\n          <VMName>MyDCServer</VMName>\n          <ServiceName>MyHPCService</ServiceName>\n          <VMSize>Large</VMSize>\n          </DomainController>\n         <NoWindowsAutoUpdate />\n      </Domain>\n      <Database>\n        <DBOption>LocalDB</DBOption>\n      </Database>\n      <HeadNode>\n        <VMName>MyHeadNode</VMName>\n        <ServiceName>MyHPCService</ServiceName>\n        <VMSize>ExtraLarge</VMSize>\n      </HeadNode>\n      <Certificates>\n        <Certificate>\n          <Id>1</Id>\n          <PfxFile>d:\\mytestcert1.pfx</PfxFile>\n          <Password>MyPsw!!2</Password>\n        </Certificate>\n      </Certificates>\n      <ComputeNodes>\n        <VMNamePattern>MyHPCCN-%0001%</VMNamePattern>\n    <ServiceNamePattern>MyHPCCNService%01%</ServiceNamePattern>\n    <MaxNodeCountPerService>5</MaxNodeCountPerService>\n    <StorageAccountNamePattern>mycnstorage%01%</StorageAccountNamePattern>\n        <VMSize>Medium</VMSize>\n        <NodeCount>12</NodeCount>\n        <ImageName HPCPackInstalled=\"true\">MyHPCComputeNodeImage</ImageName>\n        <VMExtensions>\n           <VMExtension>\n              <ExtensionName>BGInfo</ExtensionName>\n              <Publisher>Microsoft.Compute</Publisher>\n              <Version>1.*</Version>\n           </VMExtension>\n        </VMExtensions>\n      </ComputeNodes>\n      <AutoGrowShrink>\n        <CertificateId>1</CertificateId>\n      </AutoGrowShrink>\n    </IaaSClusterConfig>\n\n### 示例 2\n\n以下配置文件将在现有域林中部署一个 HPC Pack 群集。该群集包含 1 个头节点、1 台具有 500GB 数据磁盘的数据库服务器、2 个运行 Windows Server 2012 R2 操作系统的代理节点，和 5 个运行 Windows Server 2012 R2 操作系统的计算节点。云服务 MyHPCCNService 是在地缘组 *MyIBAffinityGroup* 中创建的，其他所有云服务是在地缘组 *MyAffinityGroup* 中创建的。已在头节点上启用了 HPC 作业计划程序 REST API 和 HPC Web 门户。\n\n    <?xml version=\"1.0\" encoding=\"utf-8\" ?>\n    <IaaSClusterConfig>\n      <Subscription>\n        <SubscriptionName>Subscription-1</SubscriptionName>\n        <StorageAccount>mystorageaccount</StorageAccount>\n      </Subscription>\n      <AffinityGroup>MyAffinityGroup</AffinityGroup>\n      <Location>China East</Location>  \n      <VNet>\n        <VNetName>MyVNet</VNetName>\n        <SubnetName>Subnet-1</SubnetName>\n      </VNet>    \n      <Domain>\n        <DCOption>ExistingDC</DCOption>\n        <DomainFQDN>hpc.local</DomainFQDN>\n      </Domain>\n      <Database>\n        <DBOption>NewRemoteDB</DBOption>\n        <DBVersion>SQLServer2014_Enterprise</DBVersion>\n        <DBServer>\n          <VMName>MyDBServer</VMName>\n          <ServiceName>MyHPCService</ServiceName>\n          <VMSize>ExtraLarge</VMSize>\n          <DataDiskSizeInGB>500</DataDiskSizeInGB>\n        </DBServer>\n      </Database>\n      <HeadNode>\n        <VMName>MyHeadNode</VMName>\n        <ServiceName>MyHPCService</ServiceName>\n        <VMSize>ExtraLarge</VMSize>\n        <EnableRESTAPI />\n        <EnableWebPortal />\n      </HeadNode>\n      <ComputeNodes>\n        <VMNamePattern>MyHPCCN-%0000%</VMNamePattern>\n        <ServiceName>MyHPCCNService</ServiceName>\n        <VMSize>A8</VMSize>\n    <NodeCount>5</NodeCount>\n    <AffinityGroup>MyIBAffinityGroup</AffinityGroup>\n      </ComputeNodes>\n      <BrokerNodes>\n        <VMNamePattern>MyHPCBN-%0000%</VMNamePattern>\n        <ServiceName>MyHPCBNService</ServiceName>\n        <VMSize>Medium</VMSize>\n        <NodeCount>2</NodeCount>\n      </BrokerNodes>\n    </IaaSClusterConfig>\n\n### 示例 3\n\n以下配置文件将创建新的域林并部署 HPC Pack 群集，其中包含 1 个具有本地数据库的头节点和 20 个 Linux 计算节点。所有云服务直接在“中国东部”位置创建。Linux 计算节点在 4 个云服务和 4 个存储帐户中创建（即，_MyLnxCNService01_ 和 _mylnxstorage01_ 中的 _MyLnxCN-0001_ 到 _MyLnxCN-0005_；_MyLnxCNService02_ 和 _mylnxstorage02_ 中的 _MyLnxCN-0006_ 到 _MyLnxCN-0010_；_MyLnxCNService03_ 和 _mylnxstorage03_ 中的 _MyLnxCN-0011_ 到 _MyLnxCN-0015_；_MyLnxCNService04_ 和 _mylnxstorage04_ 中的 _MyLnxCN-0016_ 到 _MyLnxCN-0020_）。计算节点是基于 OpenLogic CentOS 7.0 版 Linux 映像创建的。\n\n    <?xml version=\"1.0\" encoding=\"utf-8\" ?>\n    <IaaSClusterConfig>\n      <Subscription>\n        <SubscriptionName>Subscription-1</SubscriptionName>\n        <StorageAccount>mystorageaccount</StorageAccount>\n      </Subscription>\n      <Location>China East</Location>  \n      <VNet>\n        <VNetName>MyVNet</VNetName>\n        <SubnetName>Subnet-1</SubnetName>\n      </VNet>\n      <Domain>\n        <DCOption>NewDC</DCOption>\n        <DomainFQDN>hpc.local</DomainFQDN>\n        <DomainController>\n          <VMName>MyDCServer</VMName>\n          <ServiceName>MyHPCService</ServiceName>\n          <VMSize>Large</VMSize>\n        </DomainController>\n      </Domain>\n      <Database>\n        <DBOption>LocalDB</DBOption>\n      </Database>\n      <HeadNode>\n        <VMName>MyHeadNode</VMName>\n        <ServiceName>MyHPCService</ServiceName>\n        <VMSize>ExtraLarge</VMSize>\n      </HeadNode>\n      <LinuxComputeNodes>\n        <VMNamePattern>MyLnxCN-%0001%</VMNamePattern>\n        <ServiceNamePattern>MyLnxCNService%01%</ServiceNamePattern>\n        <MaxNodeCountPerService>5</MaxNodeCountPerService>\n        <StorageAccountNamePattern>mylnxstorage%01%</StorageAccountNamePattern>\n        <VMSize>Medium</VMSize>\n        <NodeCount>20</NodeCount>\n        <ImageName>5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-70-20150325 </ImageName>\n        <SSHKeyPairForRoot>\n          <PfxFile>d:\\mytestcert1.pfx</PfxFile>\n          <Password>MyPsw!!2</Password>\n        </SSHKeyPairForRoot>\n      </LinuxComputeNodes>\n    </IaaSClusterConfig>\n\n### 示例 4\n\n以下配置文件将部署一个 HPC Pack 群集，其中包含一个具有本地数据库的头节点，以及 5 个运行 Windows Server 2008 R2 操作系统的计算节点。所有云服务直接在“中国东部”位置创建。头节点充当域林的域控制器。\n\n    <?xml version=\"1.0\" encoding=\"utf-8\" ?>\n    <IaaSClusterConfig>\n      <Subscription>\n        <SubscriptionId>08701940-C02E-452F-B0B1-39D50119F267</SubscriptionId>\n        <StorageAccount>mystorageaccount</StorageAccount>\n      </Subscription>\n      <Location>China East</Location>  \n      <VNet>\n        <VNetName>MyVNet</VNetName>\n        <SubnetName>Subnet-1</SubnetName>\n      </VNet>\n      <Domain>\n        <DCOption>HeadNodeAsDC</DCOption>\n        <DomainFQDN>hpc.local</DomainFQDN>\n      </Domain>\n      <Database>\n        <DBOption>LocalDB</DBOption>\n      </Database>\n      <HeadNode>\n        <VMName>MyHeadNode</VMName>\n        <ServiceName>MyHPCService</ServiceName>\n        <VMSize>ExtraLarge</VMSize>\n      </HeadNode>\n      <ComputeNodes>\n        <VMNamePattern>MyHPCCN-%1000%</VMNamePattern>\n        <ServiceName>MyHPCCNService</ServiceName>\n        <VMSize>Medium</VMSize>\n        <NodeCount>5</NodeCount>\n        <OSVersion>WindowsServer2008R2</OSVersion>\n      </ComputeNodes>\n    </IaaSClusterConfig>\n\n### 示例 5\n\n以下配置文件将在现有域林中部署一个 HPC Pack 群集。该群集包含 1 个具有本地数据库的头节点，此外将创建两个 Azure 节点模板，并为 Azure 节点模板 _AzureTemplate1_ 创建 3 个中等大小的 Azure 节点。配置头节点后，将在头节点上运行脚本文件。\n\n    <?xml version=\"1.0\" encoding=\"utf-8\" ?>\n    <IaaSClusterConfig>\n      <Subscription>\n        <SubscriptionName>Subscription-1</SubscriptionName>\n        <StorageAccount>mystorageaccount</StorageAccount>\n      </Subscription>\n      <AffinityGroup>MyAffinityGroup</AffinityGroup>\n      <Location>China East</Location>  \n      <VNet>\n        <VNetName>MyVNet</VNetName>\n        <SubnetName>Subnet-1</SubnetName>\n      </VNet>\n      <Domain>\n        <DCOption>ExistingDC</DCOption>\n        <DomainFQDN>hpc.local</DomainFQDN>\n      </Domain>\n      <Database>\n        <DBOption>LocalDB</DBOption>\n      </Database>\n      <HeadNode>\n        <VMName>MyHeadNode</VMName>\n        <ServiceName>MyHPCService</ServiceName>\n    <VMSize>ExtraLarge</VMSize>\n        <PostConfigScript>c:\\MyHNPostActions.ps1</PostConfigScript>\n      </HeadNode>\n      <Certificates>\n        <Certificate>\n          <Id>1</Id>\n          <PfxFile>d:\\mytestcert1.pfx</PfxFile>\n          <Password>MyPsw!!2</Password>\n        </Certificate>\n        <Certificate>\n          <Id>2</Id>\n          <PfxFile>d:\\mytestcert2.pfx</PfxFile>\n        </Certificate>    \n      </Certificates>\n      <AzureBurst>\n        <AzureNodeTemplate>\n          <TemplateName>AzureTemplate1</TemplateName>\n          <SubscriptionId>bb9252ba-831f-4c9d-ae14-9a38e6da8ee4</SubscriptionId>\n          <CertificateId>1</CertificateId>\n          <ServiceName>mytestsvc1</ServiceName>\n          <StorageAccount>myteststorage1</StorageAccount>\n          <NodeCount>3</NodeCount>\n          <RoleSize>Medium</RoleSize>\n        </AzureNodeTemplate>\n        <AzureNodeTemplate>\n          <TemplateName>AzureTemplate2</TemplateName>\n          <SubscriptionId>ad4b9f9f-05f2-4c74-a83f-f2eb73000e0b</SubscriptionId>\n          <CertificateId>1</CertificateId>\n          <ServiceName>mytestsvc2</ServiceName>\n          <StorageAccount>myteststorage2</StorageAccount>\n          <Proxy>\n            <UsesStaticProxyCount>false</UsesStaticProxyCount>     \n            <ProxyRatio>100</ProxyRatio>\n            <ProxyRatioBase>400</ProxyRatioBase>\n          </Proxy>\n          <OSVersion>WindowsServer2012</OSVersion>\n        </AzureNodeTemplate>\n      </AzureBurst>\n    </IaaSClusterConfig>\n\n## 已知问题\n\n\n* **“虚拟网络不存在”错误** - 如果你运行 HPC Pack IaaS 部署脚本以在 Azure 中的一个订阅下同时部署多个群集，则一个或多个部署可能会失败并显示错误“虚拟网络 *VNet\\_Name* 不存在”。如果发生此错误，请对失败的部署重新运行该脚本。\n\n* **从 Azure 虚拟网络访问 Internet 时出现问题** - 如果你通过使用部署脚本创建 HPC Pack 群集和新的域控制器，或者你手动将 VM 提升为域控制器，则在将 Azure 虚拟网络中的 VM 连接到 Internet 时可能会遇到问题。如果已在域控制器上自动配置转发器 DNS 服务器，但此转发器 DNS 服务器未正确解析，则会出现这种情况。\n\n    若要解决此问题，请登录到域控制器，删除转发器配置设置或配置一个有效的转发器 DNS 服务器。为此，请在服务器管理器中单击“工具”>“DNS”以打开 DNS 管理器，然后双击“转发器”。\n\n* **从大小为 A8 或 A9 的 VM 访问 RDMA 网络时出现问题** - 如果你通过使用部署脚本添加大小为 A8 或 A9 的计算节点 VM 或代理节点 VM，则在将这些 VM 连接到 RDMA 应用程序网络时可能会遇到问题。发生这种情况的原因之一是，在将大小为 A8 或 A9 的 VM 添加到群集时未正确安装 HpcVmDrivers 扩展。例如，该扩展可能会停滞在安装状态。\n\n    若要解决此问题，请先检查 VM 中扩展的状态。如果该扩展未正确安装，请尝试从 HPC 群集中删除节点，然后再重新添加节点。例如，你可以通过使用 Add-HpcIaaSNode.ps1 脚本添加计算节点 VM。\n\n\n## 后续步骤\n\n* 尝试在群集上运行测试工作负荷。例如，请参阅 HPC Pack [入门指南](https://technet.microsoft.com/zh-cn/library/jj884144)。\n\n* 有关使用脚本创建群集和运行 HPC 工作负荷的教程，请参阅[开始使用 Azure 中的 HPC Pack 群集运行 Excel 和 SOA 工作负荷](/documentation/articles/virtual-machines-excel-cluster-hpcpack)、[在 Azure 中的 Linux 计算节点上使用 Microsoft HPC Pack 运行 NAMD](/documentation/articles/virtual-machines-linux-cluster-hpcpack-namd) 或[在 Azure 中的 Linux 计算节点上使用 Microsoft HPC Pack 运行 OpenFOAM](/documentation/articles/virtual-machines-linux-cluster-hpcpack-openfoam)。\n\n* 尝试使用 HPC Pack 的工具来启动、停止、添加和删除所创建群集中的计算节点。请参阅[在 Azure 中管理 HPC Pack 群集的计算节点](/documentation/articles/virtual-machines-hpcpack-cluster-node-manage)\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

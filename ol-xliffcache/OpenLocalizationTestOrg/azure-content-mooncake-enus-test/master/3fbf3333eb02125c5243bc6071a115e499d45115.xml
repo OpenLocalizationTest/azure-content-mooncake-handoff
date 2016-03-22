@@ -1,0 +1,334 @@
+{
+  "nodes": [
+    {
+      "content": "在运行 Linux 的虚拟机上配置软件 RAID | Azure",
+      "pos": [
+        28,
+        60
+      ]
+    },
+    {
+      "content": "了解如何使用 mdadm 在 Azure 中的 Linux 上配置 RAID。",
+      "pos": [
+        80,
+        119
+      ]
+    },
+    {
+      "content": "在 Linux 上配置软件 RAID",
+      "pos": [
+        425,
+        443
+      ]
+    },
+    {
+      "content": "在 Azure 中的 Linux 虚拟机上使用软件 RAID 将多个附加的数据磁盘呈现为一个单一的 RAID 设备，是一种常见的情形。通常，使用这种方法可以改进性能，而且与只使用单独一块磁盘相比，吞吐量也会有所改进。",
+      "pos": [
+        444,
+        552
+      ]
+    },
+    {
+      "pos": [
+        554,
+        637
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-both-include.md)</ept>]"
+    },
+    {
+      "content": "附加数据磁盘",
+      "pos": [
+        644,
+        650
+      ]
+    },
+    {
+      "pos": [
+        651,
+        825
+      ],
+      "content": "配置 RAID 设备通常需要两个或更多的空数据磁盘。本文将不详细介绍如何为 Linux 虚拟机附加数据磁盘。请参阅 Azure 文章<bpt id=\"p1\">[</bpt>附加磁盘<ept id=\"p1\">](/documentation/articles/storage-windows-attach-disk/#attachempty)</ept>，以详细了解如何在 Azure 上为 Linux 虚拟机附加空数据磁盘。"
+    },
+    {
+      "pos": [
+        828,
+        980
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>“特小型”VM 大小不支持将一个以上数据磁盘附加到虚拟机。请参阅 <bpt id=\"p1\">[</bpt>Azure 的虚拟机和云服务大小<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/azure/dn197896.aspx)</ept>，以了解有关 VM 大小和支持的数据磁盘数量的详细信息。"
+    },
+    {
+      "content": "安装 mdadm 实用程序",
+      "pos": [
+        986,
+        999
+      ]
+    },
+    {
+      "content": "Ubuntu",
+      "pos": [
+        1005,
+        1011
+      ]
+    },
+    {
+      "content": "CentOS 和 Oracle Linux",
+      "pos": [
+        1087,
+        1108
+      ]
+    },
+    {
+      "content": "SLES 和 openSUSE",
+      "pos": [
+        1150,
+        1165
+      ]
+    },
+    {
+      "content": "创建磁盘分区",
+      "pos": [
+        1205,
+        1211
+      ]
+    },
+    {
+      "content": "在此示例中，我们将在 /dev/sdc 上创建一个单一的磁盘分区。该新磁盘分区将被命名为 /dev/sdc1。",
+      "pos": [
+        1212,
+        1267
+      ]
+    },
+    {
+      "content": "启动 fdisk，以开始创建分区",
+      "pos": [
+        1271,
+        1287
+      ]
+    },
+    {
+      "content": "在提示符处按 N 键，以创建新分区：",
+      "pos": [
+        1834,
+        1852
+      ]
+    },
+    {
+      "content": "接下来，按 P 键，以创建主分区：",
+      "pos": [
+        1889,
+        1906
+      ]
+    },
+    {
+      "content": "按 1 键，以选择分区号 1：",
+      "pos": [
+        2009,
+        2024
+      ]
+    },
+    {
+      "pos": [
+        2063,
+        2115
+      ],
+      "content": "选择新分区的起始点，或者直接按 <ph id=\"ph1\">`&lt;enter&gt;`</ph> 键以接受默认值，将该分区置于驱动器可用空间的开始处："
+    },
+    {
+      "pos": [
+        2194,
+        2262
+      ],
+      "content": "选择分区大小，例如，键入“+10G”以创建一个 10 GB 的分区。或者，直接按 <ph id=\"ph1\">`&lt;enter&gt;`</ph> 键创建一个跨整个驱动器的单一分区："
+    },
+    {
+      "content": "接下来，将该分区的 ID 和类型从默认的 ID“83”(Linux) 更改为 ID“fd”(Linux raid auto)：",
+      "pos": [
+        2375,
+        2438
+      ]
+    },
+    {
+      "content": "最后，将分区表写入驱动器并退出 fdisk：",
+      "pos": [
+        2548,
+        2570
+      ]
+    },
+    {
+      "content": "创建 RAID 阵列",
+      "pos": [
+        2655,
+        2665
+      ]
+    },
+    {
+      "content": "以下示例将给位于三个不同数据磁盘（sdc1、sdd1、sde1）上的三个分区设置带区（RAID 级别 0）：",
+      "pos": [
+        2670,
+        2724
+      ]
+    },
+    {
+      "pos": [
+        2837,
+        2952
+      ],
+      "content": "在此示例中，运行此命令之后，将会创建一个名为 <bpt id=\"p1\">**</bpt>/dev/md127<ept id=\"p1\">**</ept> 的新 RAID 设备。另请注意，如果这些数据磁盘以前属于另一失效的 RAID 阵列，则可能有必要将 <ph id=\"ph1\">`--force`</ph> 参数添加到 <ph id=\"ph2\">`mdadm`</ph> 命令。"
+    },
+    {
+      "content": "在新 RAID 设备上创建文件系统",
+      "pos": [
+        2958,
+        2975
+      ]
+    },
+    {
+      "content": "CentOS、Oracle Linux、SLES 12、openSUSE 和 Ubuntu",
+      "pos": [
+        2983,
+        3028
+      ]
+    },
+    {
+      "content": "SLES 11",
+      "pos": [
+        3078,
+        3085
+      ]
+    },
+    {
+      "pos": [
+        3132,
+        3182
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>SLES 11 和 openSUSE<ept id=\"p1\">**</ept> - 启用 boot.md 并创建 mdadm.conf"
+    },
+    {
+      "pos": [
+        3294,
+        3357
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在 SUSE 系统中完成这些更改之后，可能需要重新引导。在 SLES 12 中，此步骤<bpt id=\"p1\">*</bpt>不<ept id=\"p1\">*</ept>是必需的。"
+    },
+    {
+      "content": "将新文件系统添加到 /etc/fstab",
+      "pos": [
+        3363,
+        3383
+      ]
+    },
+    {
+      "pos": [
+        3385,
+        3486
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>警告：<ept id=\"p1\">**</ept>错误地编辑 /etc/fstab 文件可能会导致系统无法引导。如果没有把握，请参考分发的文档来获取有关如何正确编辑该文件的信息。另外，建议在编辑之前创建 /etc/fstab 文件的备份。"
+    },
+    {
+      "content": "为新文件系统创建需要的装入点，例如：",
+      "pos": [
+        3491,
+        3509
+      ]
+    },
+    {
+      "pos": [
+        3542,
+        3616
+      ],
+      "content": "在编辑 /etc/fstab 时，<bpt id=\"p1\">**</bpt>UUID<ept id=\"p1\">**</ept> 应该用于引用文件系统而不是设备名称。使用 <ph id=\"ph1\">`blkid`</ph> 实用程序来确定新文件系统的 UUID："
+    },
+    {
+      "content": "在文本编辑器中打开 /etc/fstab 并为新文件系统添加新条目，例如：",
+      "pos": [
+        3745,
+        3782
+      ]
+    },
+    {
+      "pos": [
+        3868,
+        3898
+      ],
+      "content": "或者，在 <bpt id=\"p1\">**</bpt>SLES 11 和 openSUSE<ept id=\"p1\">**</ept> 上："
+    },
+    {
+      "content": "然后，保存并关闭 /etc/fstab。",
+      "pos": [
+        3997,
+        4017
+      ]
+    },
+    {
+      "content": "测试该 /etc/fstab 条目是否正确：",
+      "pos": [
+        4022,
+        4044
+      ]
+    },
+    {
+      "content": "如果此命令导致错误消息，请检查 /etc/fstab 文件中的语法。",
+      "pos": [
+        4075,
+        4109
+      ]
+    },
+    {
+      "pos": [
+        4115,
+        4143
+      ],
+      "content": "接下来，运行 <ph id=\"ph1\">`mount`</ph> 命令以确保文件系统已装入："
+    },
+    {
+      "content": "（可选）故障安全引导参数",
+      "pos": [
+        4234,
+        4246
+      ]
+    },
+    {
+      "content": "fstab 配置",
+      "pos": [
+        4254,
+        4262
+      ]
+    },
+    {
+      "pos": [
+        4270,
+        4418
+      ],
+      "content": "许多分发版包括 <ph id=\"ph1\">`nobootwait`</ph> 或 <ph id=\"ph2\">`nofail`</ph> 装入参数，这些参数可以添加到 /etc/fstab 文件中。这些参数允许装入某特定文件系统时失败，并且允许 Linux 系统继续引导，即使它无法正确装入 RAID 文件系统也无妨。请参阅你的分发的文档，以了解有关这些参数的详细信息。"
+    },
+    {
+      "content": "示例 (Ubuntu)：",
+      "pos": [
+        4424,
+        4436
+      ]
+    },
+    {
+      "content": "Linux 引导参数",
+      "pos": [
+        4535,
+        4545
+      ]
+    },
+    {
+      "pos": [
+        4553,
+        4671
+      ],
+      "content": "除了以上参数，还可以使用内核参数“<ph id=\"ph1\">`bootdegraded=true`</ph>”来启用系统引导功能，即使发现 RAID 已损坏或降级（例如，由于无意中从虚拟机中移除了数据驱动器而发现这种情况）也无妨。默认情况下，这样也可能会导致系统无法引导。"
+    },
+    {
+      "pos": [
+        4677,
+        4851
+      ],
+      "content": "请参阅你的分发的文档，了解如何正确编辑内核参数。例如，在许多分发（CentOS、Oracle Linux、SLES 11）中，可以手动将这些参数添加到“<ph id=\"ph1\">`/boot/grub/menu.lst`</ph>”文件。在 Ubuntu 上，此参数可添加到“/etc/default/grub”上的 <ph id=\"ph2\">`GRUB_CMDLINE_LINUX_DEFAULT`</ph> 变量中。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"在运行 Linux 的虚拟机上配置软件 RAID | Azure\" \n    description=\"了解如何使用 mdadm 在 Azure 中的 Linux 上配置 RAID。\" \n    services=\"virtual-machines\" \n    documentationCenter=\"\" \n    authors=\"szarkos\" \n    writer=\"szark\" \n    manager=\"timlt\" \n    editor=\"\"\n    tag=\"azure-service-management,azure-resource-manager\" />\n\n<tags \n    ms.service=\"virtual-machines\" \n    ms.date=\"12/17/2015\" \n    wacn.date=\"01/29/2016\"/>\n\n\n\n# 在 Linux 上配置软件 RAID\n在 Azure 中的 Linux 虚拟机上使用软件 RAID 将多个附加的数据磁盘呈现为一个单一的 RAID 设备，是一种常见的情形。通常，使用这种方法可以改进性能，而且与只使用单独一块磁盘相比，吞吐量也会有所改进。\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-both-include.md)]\n \n\n## 附加数据磁盘\n配置 RAID 设备通常需要两个或更多的空数据磁盘。本文将不详细介绍如何为 Linux 虚拟机附加数据磁盘。请参阅 Azure 文章[附加磁盘](/documentation/articles/storage-windows-attach-disk/#attachempty)，以详细了解如何在 Azure 上为 Linux 虚拟机附加空数据磁盘。\n\n>[AZURE.NOTE]“特小型”VM 大小不支持将一个以上数据磁盘附加到虚拟机。请参阅 [Azure 的虚拟机和云服务大小](http://msdn.microsoft.com/zh-cn/library/azure/dn197896.aspx)，以了解有关 VM 大小和支持的数据磁盘数量的详细信息。\n\n\n## 安装 mdadm 实用程序\n\n- **Ubuntu**\n\n        # sudo apt-get update\n        # sudo apt-get install mdadm\n\n- **CentOS 和 Oracle Linux**\n\n        # sudo yum install mdadm\n\n- **SLES 和 openSUSE**\n\n        # zypper install mdadm\n\n\n## 创建磁盘分区\n在此示例中，我们将在 /dev/sdc 上创建一个单一的磁盘分区。该新磁盘分区将被命名为 /dev/sdc1。\n\n- 启动 fdisk，以开始创建分区\n\n        # sudo fdisk /dev/sdc\n        Device contains neither a valid DOS partition table, nor Sun, SGI or OSF disklabel\n        Building a new DOS disklabel with disk identifier 0xa34cb70c.\n        Changes will remain in memory only, until you decide to write them.\n        After that, of course, the previous content won't be recoverable.\n\n        WARNING: DOS-compatible mode is deprecated. It's strongly recommended to\n                 switch off the mode (command 'c') and change display units to\n                 sectors (command 'u').\n\n- 在提示符处按 N 键，以创建新分区：\n\n        Command (m for help): n\n\n- 接下来，按 P 键，以创建主分区：\n\n        Command action\n            e   extended\n            p   primary partition (1-4)\n        p\n\n- 按 1 键，以选择分区号 1：\n\n        Partition number (1-4): 1\n\n- 选择新分区的起始点，或者直接按 `<enter>` 键以接受默认值，将该分区置于驱动器可用空间的开始处：\n\n        First cylinder (1-1305, default 1):\n        Using default value 1\n\n- 选择分区大小，例如，键入“+10G”以创建一个 10 GB 的分区。或者，直接按 `<enter>` 键创建一个跨整个驱动器的单一分区：\n\n        Last cylinder, +cylinders or +size{K,M,G} (1-1305, default 1305): \n        Using default value 1305\n\n- 接下来，将该分区的 ID 和类型从默认的 ID“83”(Linux) 更改为 ID“fd”(Linux raid auto)：\n\n        Command (m for help): t\n        Selected partition 1\n        Hex code (type L to list codes): fd\n\n- 最后，将分区表写入驱动器并退出 fdisk：\n\n        Command (m for help): w\n        The partition table has been altered!\n\n\n## 创建 RAID 阵列\n\n1. 以下示例将给位于三个不同数据磁盘（sdc1、sdd1、sde1）上的三个分区设置带区（RAID 级别 0）：\n\n        # sudo mdadm --create /dev/md127 --level 0 --raid-devices 3 \\\n          /dev/sdc1 /dev/sdd1 /dev/sde1\n\n在此示例中，运行此命令之后，将会创建一个名为 **/dev/md127** 的新 RAID 设备。另请注意，如果这些数据磁盘以前属于另一失效的 RAID 阵列，则可能有必要将 `--force` 参数添加到 `mdadm` 命令。\n\n\n2. 在新 RAID 设备上创建文件系统\n\n    **CentOS、Oracle Linux、SLES 12、openSUSE 和 Ubuntu**\n\n        # sudo mkfs -t ext4 /dev/md127\n\n    **SLES 11**\n\n        # sudo mkfs -t ext3 /dev/md127\n\n3. **SLES 11 和 openSUSE** - 启用 boot.md 并创建 mdadm.conf\n\n        # sudo -i chkconfig --add boot.md\n        # sudo echo 'DEVICE /dev/sd*[0-9]' >> /etc/mdadm.conf\n\n    >[AZURE.NOTE]在 SUSE 系统中完成这些更改之后，可能需要重新引导。在 SLES 12 中，此步骤*不*是必需的。\n\n\n## 将新文件系统添加到 /etc/fstab\n\n**警告：**错误地编辑 /etc/fstab 文件可能会导致系统无法引导。如果没有把握，请参考分发的文档来获取有关如何正确编辑该文件的信息。另外，建议在编辑之前创建 /etc/fstab 文件的备份。\n\n1. 为新文件系统创建需要的装入点，例如：\n\n        # sudo mkdir /data\n\n2. 在编辑 /etc/fstab 时，**UUID** 应该用于引用文件系统而不是设备名称。使用 `blkid` 实用程序来确定新文件系统的 UUID：\n\n        # sudo /sbin/blkid\n        ...........\n        /dev/md127: UUID=\"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee\" TYPE=\"ext4\"\n\n3. 在文本编辑器中打开 /etc/fstab 并为新文件系统添加新条目，例如：\n\n        UUID=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee  /data  ext4  defaults  0  2\n\n    或者，在 **SLES 11 和 openSUSE** 上：\n\n        /dev/disk/by-uuid/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee  /data  ext3  defaults  0  2\n\n    然后，保存并关闭 /etc/fstab。\n\n4. 测试该 /etc/fstab 条目是否正确：\n\n        # sudo mount -a\n\n    如果此命令导致错误消息，请检查 /etc/fstab 文件中的语法。\n\n    接下来，运行 `mount` 命令以确保文件系统已装入：\n\n        # mount\n        .................\n        /dev/md127 on /data type ext4 (rw)\n\n5. （可选）故障安全引导参数\n\n    **fstab 配置**\n\n    许多分发版包括 `nobootwait` 或 `nofail` 装入参数，这些参数可以添加到 /etc/fstab 文件中。这些参数允许装入某特定文件系统时失败，并且允许 Linux 系统继续引导，即使它无法正确装入 RAID 文件系统也无妨。请参阅你的分发的文档，以了解有关这些参数的详细信息。\n\n    示例 (Ubuntu)：\n\n        UUID=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee  /data  ext4  defaults,nobootwait  0  2\n\n    **Linux 引导参数**\n\n    除了以上参数，还可以使用内核参数“`bootdegraded=true`”来启用系统引导功能，即使发现 RAID 已损坏或降级（例如，由于无意中从虚拟机中移除了数据驱动器而发现这种情况）也无妨。默认情况下，这样也可能会导致系统无法引导。\n\n    请参阅你的分发的文档，了解如何正确编辑内核参数。例如，在许多分发（CentOS、Oracle Linux、SLES 11）中，可以手动将这些参数添加到“`/boot/grub/menu.lst`”文件。在 Ubuntu 上，此参数可添加到“/etc/default/grub”上的 `GRUB_CMDLINE_LINUX_DEFAULT` 变量中。\n\n \n\n<!---HONumber=Mooncake_0118_2016-->"
+}

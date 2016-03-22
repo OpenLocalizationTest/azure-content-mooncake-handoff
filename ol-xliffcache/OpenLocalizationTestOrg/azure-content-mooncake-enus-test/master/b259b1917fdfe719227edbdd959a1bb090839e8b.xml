@@ -1,0 +1,334 @@
+{
+  "nodes": [
+    {
+      "content": "适用于跨数据库查询的弹性数据库查询（垂直分区）| Azure",
+      "pos": [
+        27,
+        57
+      ]
+    },
+    {
+      "content": "如何在垂直分区上设置跨数据库查询",
+      "pos": [
+        76,
+        92
+      ]
+    },
+    {
+      "content": "适用于跨数据库查询的弹性数据库查询（垂直分区）",
+      "pos": [
+        298,
+        321
+      ]
+    },
+    {
+      "pos": [
+        323,
+        468
+      ],
+      "content": "本文档说明如何为跨数据库查询方案（垂直分区）设置弹性查询，以及如何执行查询。有关垂直分区方案的定义，请参阅 <bpt id=\"p1\">[</bpt>Azure SQL 数据库弹性数据库查询概述（预览版）<ept id=\"p1\">](/documentation/articles/sql-database-elastic-query-overview)</ept>。"
+    },
+    {
+      "content": "跨不同数据库中的表进行查询",
+      "pos": [
+        472,
+        485
+      ]
+    },
+    {
+      "content": "创建数据库对象",
+      "pos": [
+        494,
+        501
+      ]
+    },
+    {
+      "content": "对于垂直分区方案，弹性查询将扩展当前 T-SQL DDL 以引用存储在远程数据库中的表。本部分概述了用于配置弹性查询以透明地访问远程表的 DDL 语句。这些 DDL 语句允许在本地数据库中创建元数据表示形式的远程表。",
+      "pos": [
+        503,
+        611
+      ]
+    },
+    {
+      "pos": [
+        613,
+        666
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意<ept id=\"p1\">**</ept>：与水平分区不同，这些 DDL 语句并不依赖于通过弹性数据库客户端库定义包含分片映射的数据层。"
+    },
+    {
+      "content": "定义弹性数据库查询的数据库对象依赖于以下 T-SQL 语句，下面将针对垂直分区方案对这些语句进行进一步说明：",
+      "pos": [
+        668,
+        722
+      ]
+    },
+    {
+      "content": "CREATE MASTER KEY",
+      "pos": [
+        727,
+        744
+      ]
+    },
+    {
+      "content": "CREATE DATABASE SCOPED CREDENTIAL",
+      "pos": [
+        807,
+        840
+      ]
+    },
+    {
+      "content": "CREATE/DROP EXTERNAL DATA SOURCE",
+      "pos": [
+        902,
+        934
+      ]
+    },
+    {
+      "content": "CREATE/DROP EXTERNAL TABLE",
+      "pos": [
+        996,
+        1022
+      ]
+    },
+    {
+      "content": "1\\.1 数据库范围的主密钥和凭据",
+      "pos": [
+        1085,
+        1102
+      ]
+    },
+    {
+      "content": "凭据表示弹性查询将用于连接到 Azure SQL 数据库中的远程数据库的用户 ID 和密码。若要创建所需的主密钥和凭据，请使用以下语法：",
+      "pos": [
+        1105,
+        1173
+      ]
+    },
+    {
+      "content": "若要删除凭据：",
+      "pos": [
+        1362,
+        1369
+      ]
+    },
+    {
+      "pos": [
+        1459,
+        1503
+      ],
+      "content": "请确保 <bpt id=\"p1\">*</bpt>&lt; username&gt;<ept id=\"p1\">*</ept> 中不包括任何 <bpt id=\"p2\">*</bpt>“@servername”<ept id=\"p2\">*</ept> 后缀。"
+    },
+    {
+      "content": "1\\.2 外部数据源",
+      "pos": [
+        1509,
+        1519
+      ]
+    },
+    {
+      "content": "通过定义外部数据源为弹性查询提供有关远程数据库的信息。用于创建和删除外部数据源的语法定义如下：",
+      "pos": [
+        1521,
+        1568
+      ]
+    },
+    {
+      "content": "请注意将此数据源定义为 RDBMS 的 TYPE 参数。",
+      "pos": [
+        1880,
+        1908
+      ]
+    },
+    {
+      "content": "可以使用以下语句删除外部数据源：",
+      "pos": [
+        1910,
+        1926
+      ]
+    },
+    {
+      "content": "CREATE/DROP EXTERNAL DATA SOURCE 的权限",
+      "pos": [
+        1986,
+        2022
+      ]
+    },
+    {
+      "content": "用户必须拥有 ALTER ANY EXTERNAL DATA SOURCE 权限。此权限包含在 ALTER DATABASE 权限中。",
+      "pos": [
+        2025,
+        2092
+      ]
+    },
+    {
+      "content": "示例",
+      "pos": [
+        2096,
+        2098
+      ]
+    },
+    {
+      "content": "以下示例说明了如何使用 CREATE 语句创建外部数据源。",
+      "pos": [
+        2102,
+        2131
+      ]
+    },
+    {
+      "content": "若要从以下目录视图中检索当前外部数据源的列表，请执行以下命令：",
+      "pos": [
+        2359,
+        2390
+      ]
+    },
+    {
+      "content": "1\\.3 外部表",
+      "pos": [
+        2443,
+        2451
+      ]
+    },
+    {
+      "content": "弹性查询将扩展现有的外部表语法以定义使用 RDBMS 类型的外部数据源的外部表。垂直分区的外部表定义涉及以下几个方面：",
+      "pos": [
+        2454,
+        2513
+      ]
+    },
+    {
+      "pos": [
+        2517,
+        2583
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>架构<ept id=\"p1\">**</ept>：外部表 DDL 定义了你的查询可以使用的架构。外部表定义中提供的架构需要与存储实际数据的远程数据库中的表的架构相匹配。"
+    },
+    {
+      "pos": [
+        2588,
+        2651
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>远程数据库引用<ept id=\"p1\">**</ept>：外部表 DDL 引用外部数据源。外部数据源指定存储实际表数据的远程数据库的逻辑服务器名称和数据库名称。"
+    },
+    {
+      "content": "使用上一节中所述的外部数据源时，用于创建外部表的语法如下：",
+      "pos": [
+        2653,
+        2682
+      ]
+    },
+    {
+      "content": "DATA\\_SOURCE 子句定义用于外部表的外部数据源（即，在垂直分区情况下的远程数据库）。",
+      "pos": [
+        3075,
+        3122
+      ]
+    },
+    {
+      "content": "使用 SCHEMA\\_NAME 和 OBJECT\\_NAME 子句可分别将外部表定义映射到远程数据库上不同架构中的表，或映射到具有不同名称的表。如果你要在远程数据库上为目录视图或 DMV 定义外部表，或者在远程表名已在本地使用的任何其他情况下，这两个子句很有用。",
+      "pos": [
+        3124,
+        3255
+      ]
+    },
+    {
+      "content": "以下 DDL 语句从本地目录中删除现有的外部表定义。它不会影响远程数据库。",
+      "pos": [
+        3257,
+        3294
+      ]
+    },
+    {
+      "pos": [
+        3390,
+        3486
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>CREATE/DROP EXTERNAL TABLE 的权限：<ept id=\"p1\">**</ept>外部表 DDL 需要 ALTER ANY EXTERNAL DATA SOURCE 权限，在引用基础数据源时也需要该权限。"
+    },
+    {
+      "pos": [
+        3488,
+        3614
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>安全注意事项：<ept id=\"p1\">**</ept>有权访问外部表的用户在使用外部数据源定义中提供的凭据时自动获得对基础远程表的访问权。你应小心管理对外部表的访问权以避免通过外部数据源的凭据意外地提升权限。可以使用常规 SQL 权限来授予或撤消对外部表的访问权，就像它是常规表一样。"
+    },
+    {
+      "pos": [
+        3618,
+        3639
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>示例<ept id=\"p1\">**</ept>：以下示例说明如何创建外部表："
+    },
+    {
+      "content": "以下示例演示如何从当前数据库中检索外部表的列表：",
+      "pos": [
+        4044,
+        4068
+      ]
+    },
+    {
+      "content": "查询",
+      "pos": [
+        4114,
+        4116
+      ]
+    },
+    {
+      "content": "2\\.1 完全保真的 T-SQL 查询",
+      "pos": [
+        4122,
+        4141
+      ]
+    },
+    {
+      "content": "定义外部数据源和外部表后，可以对外部表使用完整的 T-SQL。",
+      "pos": [
+        4144,
+        4175
+      ]
+    },
+    {
+      "pos": [
+        4177,
+        4239
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>垂直分区的示例<ept id=\"p1\">**</ept>：以下查询执行订单和订单行的两个本地表和客户的远程表之间的三向联接。这是弹性查询的引用数据用例的示例："
+    },
+    {
+      "content": "工具的连接",
+      "pos": [
+        4614,
+        4619
+      ]
+    },
+    {
+      "content": "可以使用常规 SQL Server 连接字符串将 BI 和数据集成工具连接到 SQL 数据库服务器上已启用弹性查询并已定义外部表的数据库。请确保支持将 SQL Server 用作工具的数据源。然后可以引用弹性查询数据库及其外部表，就如同使用工具连接的任何其他 SQL Server 数据库一样。",
+      "pos": [
+        4621,
+        4768
+      ]
+    },
+    {
+      "content": "最佳实践",
+      "pos": [
+        4773,
+        4777
+      ]
+    },
+    {
+      "content": "确保已通过在 SQL 数据库防火墙配置中启用对 Azure 服务的访问授予弹性查询终结点数据库访问远程数据库的权限。另请确保外部数据源定义中提供的凭据可以成功登录到远程数据库并有权访问远程表。",
+      "pos": [
+        4783,
+        4879
+      ]
+    },
+    {
+      "content": "弹性查询最适合大部分计算可以在远程数据库上完成的查询。使用可以在远程数据库或联接上求值的选择性筛选器谓词（可以完全在远程数据库上执行），通常可以获得最佳查询性能。其他查询模式可能需要从远程数据库加载大量数据并且可能会执行效果不佳。",
+      "pos": [
+        4885,
+        5000
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"适用于跨数据库查询的弹性数据库查询（垂直分区）| Azure\"\n    description=\"如何在垂直分区上设置跨数据库查询\"    \n    services=\"sql-database\"\n    documentationCenter=\"\"  \n    manager=\"jeffreyg\"\n    authors=\"torsteng\"/>\n\n<tags\n    ms.service=\"sql-database\"\n    ms.date=\"01/06/2016\"\n    wacn.date=\"02/26/2016\" />\n\n# 适用于跨数据库查询的弹性数据库查询（垂直分区）\n\n本文档说明如何为跨数据库查询方案（垂直分区）设置弹性查询，以及如何执行查询。有关垂直分区方案的定义，请参阅 [Azure SQL 数据库弹性数据库查询概述（预览版）](/documentation/articles/sql-database-elastic-query-overview)。\n\n![跨不同数据库中的表进行查询][1]\n\n## 创建数据库对象\n\n对于垂直分区方案，弹性查询将扩展当前 T-SQL DDL 以引用存储在远程数据库中的表。本部分概述了用于配置弹性查询以透明地访问远程表的 DDL 语句。这些 DDL 语句允许在本地数据库中创建元数据表示形式的远程表。\n\n**注意**：与水平分区不同，这些 DDL 语句并不依赖于通过弹性数据库客户端库定义包含分片映射的数据层。\n\n定义弹性数据库查询的数据库对象依赖于以下 T-SQL 语句，下面将针对垂直分区方案对这些语句进行进一步说明：\n\n* [CREATE MASTER KEY](https://msdn.microsoft.com/zh-cn/library/ms174382.aspx) \n\n* [CREATE DATABASE SCOPED CREDENTIAL](https://msdn.microsoft.com/zh-cn/library/mt270260.aspx)\n\n* [CREATE/DROP EXTERNAL DATA SOURCE](https://msdn.microsoft.com/zh-cn/library/dn935022.aspx)\n\n* [CREATE/DROP EXTERNAL TABLE](https://msdn.microsoft.com/zh-cn/library/dn935021.aspx)\n\n### 1\\.1 数据库范围的主密钥和凭据 \n\n凭据表示弹性查询将用于连接到 Azure SQL 数据库中的远程数据库的用户 ID 和密码。若要创建所需的主密钥和凭据，请使用以下语法：\n\n    CREATE MASTER KEY ENCRYPTION BY PASSWORD = ’password’;\n    CREATE DATABASE SCOPED CREDENTIAL <credential_name>  WITH IDENTITY = ‘<username>’,  \n    SECRET = ‘<password>’\n    [;]\n    \n若要删除凭据：\n    \n    DROP DATABASE SCOPED CREDENTIAL <credential_name>;  \n    DROP MASTER KEY;   \n\n \n请确保 *< username>* 中不包括任何 *“@servername”* 后缀。\n\n### 1\\.2 外部数据源\n\n通过定义外部数据源为弹性查询提供有关远程数据库的信息。用于创建和删除外部数据源的语法定义如下：\n\n    <External_Data_Source> ::=\n    CREATE EXTERNAL DATA SOURCE <data_source_name> WITH \n               (TYPE = RDBMS,\n                LOCATION = ’<fully_qualified_server_name>’,\n                DATABASE_NAME = ‘<remote_database_name>’,  \n                CREDENTIAL = <credential_name> \n                ) [;] \n\n请注意将此数据源定义为 RDBMS 的 TYPE 参数。\n\n可以使用以下语句删除外部数据源：\n\n    DROP EXTERNAL DATA SOURCE <data_source_name>[;]\n\n#### CREATE/DROP EXTERNAL DATA SOURCE 的权限 \n\n用户必须拥有 ALTER ANY EXTERNAL DATA SOURCE 权限。此权限包含在 ALTER DATABASE 权限中。\n\n**示例**\n\n以下示例说明了如何使用 CREATE 语句创建外部数据源。\n\n    CREATE EXTERNAL DATA SOURCE RemoteReferenceData \n    WITH \n    ( \n        TYPE=RDBMS, \n        LOCATION='myserver.database.chinacloudapi.cn', \n        DATABASE_NAME='ReferenceData', \n        CREDENTIAL= SqlUser \n    ); \n \n若要从以下目录视图中检索当前外部数据源的列表，请执行以下命令：\n\n    select * from sys.external_data_sources; \n\n### 1\\.3 外部表 \n\n弹性查询将扩展现有的外部表语法以定义使用 RDBMS 类型的外部数据源的外部表。垂直分区的外部表定义涉及以下几个方面：\n\n* **架构**：外部表 DDL 定义了你的查询可以使用的架构。外部表定义中提供的架构需要与存储实际数据的远程数据库中的表的架构相匹配。 \n\n* **远程数据库引用**：外部表 DDL 引用外部数据源。外部数据源指定存储实际表数据的远程数据库的逻辑服务器名称和数据库名称。\n\n使用上一节中所述的外部数据源时，用于创建外部表的语法如下：\n\n    CREATE EXTERNAL TABLE [ database_name . [ schema_name ] . | schema_name . ] table_name  \n    ( { <column_definition> } [ ,...n ])     \n    { WITH ( <rdbms_external_table_options> ) } \n    )[;] \n    \n    <rdbms_external_table_options> ::= \n      DATA_SOURCE = <External_Data_Source>, \n      [ SCHEMA_NAME = N'nonescaped_schema_name',] \n      [ OBJECT_NAME = N'nonescaped_object_name',] \n\nDATA\\_SOURCE 子句定义用于外部表的外部数据源（即，在垂直分区情况下的远程数据库）。\n\n使用 SCHEMA\\_NAME 和 OBJECT\\_NAME 子句可分别将外部表定义映射到远程数据库上不同架构中的表，或映射到具有不同名称的表。如果你要在远程数据库上为目录视图或 DMV 定义外部表，或者在远程表名已在本地使用的任何其他情况下，这两个子句很有用。\n\n以下 DDL 语句从本地目录中删除现有的外部表定义。它不会影响远程数据库。\n\n    DROP EXTERNAL TABLE [ database_name . [ schema_name ] . | schema_name. ] table_name[;]  \n\n**CREATE/DROP EXTERNAL TABLE 的权限：**外部表 DDL 需要 ALTER ANY EXTERNAL DATA SOURCE 权限，在引用基础数据源时也需要该权限。\n\n**安全注意事项：**有权访问外部表的用户在使用外部数据源定义中提供的凭据时自动获得对基础远程表的访问权。你应小心管理对外部表的访问权以避免通过外部数据源的凭据意外地提升权限。可以使用常规 SQL 权限来授予或撤消对外部表的访问权，就像它是常规表一样。\n\n\n **示例**：以下示例说明如何创建外部表：\n\n    CREATE EXTERNAL TABLE [dbo].[customer]( \n        [c_id] int NOT NULL, \n        [c_firstname] nvarchar(256) NULL, \n        [c_lastname] nvarchar(256) NOT NULL, \n        [street] nvarchar(256) NOT NULL, \n        [city] nvarchar(256) NOT NULL, \n        [state] nvarchar(20) NULL, \n        [country] nvarchar(50) NOT NULL, \n    ) \n    WITH \n    ( \n           DATA_SOURCE = RemoteReferenceData \n    ); \n\n以下示例演示如何从当前数据库中检索外部表的列表：\n\n    select * from sys.external_tables; \n\n## 查询\n\n### 2\\.1 完全保真的 T-SQL 查询 \n\n定义外部数据源和外部表后，可以对外部表使用完整的 T-SQL。\n\n**垂直分区的示例**：以下查询执行订单和订单行的两个本地表和客户的远程表之间的三向联接。这是弹性查询的引用数据用例的示例：\n\n    SELECT      \n     c_id as customer,\n     c_lastname as customer_name,\n     count(*) as cnt_orderline, \n     max(ol_quantity) as max_quantity,\n     avg(ol_amount) as avg_amount,\n     min(ol_delivery_d) as min_deliv_date\n    FROM customer \n    JOIN orders \n    ON c_id = o_c_id\n    JOIN  order_line \n    ON o_id = ol_o_id and o_c_id = ol_c_id\n    WHERE c_id = 100\n\n  \n## 工具的连接\n\n可以使用常规 SQL Server 连接字符串将 BI 和数据集成工具连接到 SQL 数据库服务器上已启用弹性查询并已定义外部表的数据库。请确保支持将 SQL Server 用作工具的数据源。然后可以引用弹性查询数据库及其外部表，就如同使用工具连接的任何其他 SQL Server 数据库一样。\n\n## 最佳实践 \n \n* 确保已通过在 SQL 数据库防火墙配置中启用对 Azure 服务的访问授予弹性查询终结点数据库访问远程数据库的权限。另请确保外部数据源定义中提供的凭据可以成功登录到远程数据库并有权访问远程表。  \n\n* 弹性查询最适合大部分计算可以在远程数据库上完成的查询。使用可以在远程数据库或联接上求值的选择性筛选器谓词（可以完全在远程数据库上执行），通常可以获得最佳查询性能。其他查询模式可能需要从远程数据库加载大量数据并且可能会执行效果不佳。\n\n\n[AZURE.INCLUDE [elastic-scale-include](../includes/elastic-scale-include.md)]\n\n\n<!--Image references-->\n[1]: ./media/sql-database-elastic-query-vertical-partitioning/verticalpartitioning.png\n\n\n<!--anchors-->\n\n<!---HONumber=Mooncake_0215_2016-->\n"
+}

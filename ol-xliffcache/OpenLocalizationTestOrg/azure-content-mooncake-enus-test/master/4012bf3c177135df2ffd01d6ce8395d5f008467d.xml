@@ -1,0 +1,250 @@
+{
+  "nodes": [
+    {
+      "content": "捕获 Linux VM 的映像| Azure",
+      "pos": [
+        27,
+        49
+      ]
+    },
+    {
+      "content": "了解如何使用经典部署模型捕获基于 Linux 的 Azure 虚拟机 (VM) 的映像。",
+      "pos": [
+        68,
+        112
+      ]
+    },
+    {
+      "content": "如何捕获经典 Linux 虚拟机以用作映像",
+      "pos": [
+        374,
+        395
+      ]
+    },
+    {
+      "pos": [
+        397,
+        483
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]"
+    },
+    {
+      "content": "本文将演示如何捕获运行 Linux 的经典 Azure 虚拟机，以用作映像来创建其他虚拟机。此映像包括操作系统磁盘和附加到虚拟机的数据磁盘。它不包括网络配置，因此你在使用此映像创建其他虚拟机时需要进行网络配置。",
+      "pos": [
+        486,
+        591
+      ]
+    },
+    {
+      "pos": [
+        593,
+        662
+      ],
+      "content": "Azure 将映像存储在“映像”下。这也是你上载和存储任何映像的地方。有关映像的详细信息，请参阅<bpt id=\"p1\">[</bpt>关于 Azure 中的虚拟机映像<ept id=\"p1\">][]</ept>。"
+    },
+    {
+      "content": "开始之前",
+      "pos": [
+        667,
+        671
+      ]
+    },
+    {
+      "content": "这些步骤假定你已使用经典部署模式创建了 Azure 虚拟机并配置了操作系统，包括附加任何数据磁盘。如果你尚未执行此操作，请参阅以下说明：",
+      "pos": [
+        673,
+        741
+      ]
+    },
+    {
+      "content": "如何创建运行 Linux 的虚拟机",
+      "pos": [
+        746,
+        763
+      ]
+    },
+    {
+      "content": "捕获虚拟机",
+      "pos": [
+        772,
+        777
+      ]
+    },
+    {
+      "pos": [
+        782,
+        834
+      ],
+      "content": "使用所选 SSH 客户端连接到虚拟机。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何登录到运行 Linux 的虚拟机<ept id=\"p1\">][]</ept>。"
+    },
+    {
+      "pos": [
+        839,
+        893
+      ],
+      "content": "在 SSH 窗口中，键入以下命令。请注意，<ph id=\"ph1\">`waagent`</ph> 的输出结果可能会因此实用程序的版本而略有差异："
+    },
+    {
+      "content": "此命令将尝试清除系统并使其适用于重新预配。此操作执行以下任务：",
+      "pos": [
+        932,
+        963
+      ]
+    },
+    {
+      "content": "删除 SSH 主机密钥（如果在配置文件中 Provisioning.RegenerateSshHostKeyPair 为“y”）",
+      "pos": [
+        971,
+        1035
+      ]
+    },
+    {
+      "content": "清除 /etc/resolv.conf 中的 nameserver 配置",
+      "pos": [
+        1042,
+        1078
+      ]
+    },
+    {
+      "pos": [
+        1085,
+        1162
+      ],
+      "content": "从 /etc/shadow 中删除 <ph id=\"ph1\">`root`</ph> 用户的密码（如果在配置文件中 Provisioning.DeleteRootPassword 为“y”）"
+    },
+    {
+      "content": "删除缓存的 DHCP 客户端租赁",
+      "pos": [
+        1169,
+        1185
+      ]
+    },
+    {
+      "content": "将主机名重置为 localhost.localdomain",
+      "pos": [
+        1192,
+        1221
+      ]
+    },
+    {
+      "pos": [
+        1228,
+        1272
+      ],
+      "content": "删除上次预配的用户帐户（从 /var/lib/waagent 获得）<bpt id=\"p1\">**</bpt>和关联数据<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        1279,
+        1380
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>取消预配会删除文件和数据，目的是使映像“一般化”。仅在需要捕获以用作新映像模板的虚拟机上运行此命令。无法确保映像中的所有敏感信息均已清除，或者说无法确保该映像适合再分发给第三方。"
+    },
+    {
+      "pos": [
+        1386,
+        1422
+      ],
+      "content": "键入 <bpt id=\"p1\">**</bpt>y<ept id=\"p1\">**</ept> 继续。添加 <ph id=\"ph1\">`-force`</ph> 参数即可免除此确认步骤。"
+    },
+    {
+      "pos": [
+        1427,
+        1450
+      ],
+      "content": "键入 <bpt id=\"p1\">**</bpt>Exit<ept id=\"p1\">**</ept> 关闭 SSH 客户端。"
+    },
+    {
+      "pos": [
+        1458,
+        1566
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>后续步骤假定你已在客户端计算机上<bpt id=\"p1\">[</bpt>安装 Azure CLI<ept id=\"p1\">](/documentation/articles/xplat-cli-install)</ept>。以下所有步骤也可以在<bpt id=\"p2\">[</bpt>管理门户<ept id=\"p2\">][]</ept>中执行。"
+    },
+    {
+      "pos": [
+        1571,
+        1688
+      ],
+      "content": "从客户端计算机中打开 Azure CLI 并登录到你的 Azure 订阅。有关详细信息，请阅读<bpt id=\"p1\">[</bpt>从 Azure CLI 连接到 Azure 订阅<ept id=\"p1\">](/documentation/articles/xplat-cli-connect)</ept>。"
+    },
+    {
+      "content": "请确保你是在服务管理模式下：",
+      "pos": [
+        1693,
+        1707
+      ]
+    },
+    {
+      "content": "使用以下命令关闭已在上述步骤中预配的虚拟机：",
+      "pos": [
+        1741,
+        1763
+      ]
+    },
+    {
+      "pos": [
+        1823,
+        1871
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>你可以使用 <ph id=\"ph2\">`azure vm list`</ph> 找出在订阅中创建的所有虚拟机"
+    },
+    {
+      "content": "在虚拟机停止后，使用以下命令捕获映像：",
+      "pos": [
+        1876,
+        1895
+      ]
+    },
+    {
+      "pos": [
+        1973,
+        2035
+      ],
+      "content": "键入你需要的映像名称以替换 <bpt id=\"p1\">_</bpt>new-image-name<ept id=\"p1\">_</ept>。此命令创建通用 OS 映像。<ph id=\"ph1\">`-t`</ph> 子命令将删除原始虚拟机。"
+    },
+    {
+      "content": "新映像现在会出现在映像列表中，可以用于配置任何新的虚拟机。你可以使用以下命令来查看它：",
+      "pos": [
+        2041,
+        2084
+      ]
+    },
+    {
+      "pos": [
+        2117,
+        2143
+      ],
+      "content": "在“管理门户”中，它会显示在“映像”列表中。<bpt id=\"p1\">[</bpt><ept id=\"p1\">][]</ept>"
+    },
+    {
+      "content": "成功捕获映像",
+      "pos": [
+        2151,
+        2157
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        2239,
+        2243
+      ]
+    },
+    {
+      "pos": [
+        2244,
+        2519
+      ],
+      "content": "该映像已就绪，可用于创建虚拟机了。你可以使用 Azure CLI 命令 <ph id=\"ph1\">`azure vm create`</ph> 并提供刚创建的映像名称。有关该命令的详细信息，请参阅<bpt id=\"p1\">[</bpt>将适用于 Mac、Linux 和 Windows 的 Azure CLI 与 Azure 服务管理配合使用<ept id=\"p1\">](/documentation/articles/virtual-machines-command-line-tools)</ept>。此外，你也可以使用<bpt id=\"p2\">[</bpt>管理门户<ept id=\"p2\">][]</ept>来创建自定义虚拟机，只需使用“从库中”方法并选择刚刚创建的映像即可。如需更多详细信息，请参阅<bpt id=\"p3\">[</bpt>如何创建自定义虚拟机<ept id=\"p3\">][]</ept>。"
+    },
+    {
+      "pos": [
+        2521,
+        2615
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>另请参阅：<ept id=\"p1\">**</ept><bpt id=\"p2\">[</bpt>Azure Linux 代理用户指南<ept id=\"p2\">](/documentation/articles/virtual-machines-linux-agent-user-guide)</ept>"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"捕获 Linux VM 的映像| Azure\"\n    description=\"了解如何使用经典部署模型捕获基于 Linux 的 Azure 虚拟机 (VM) 的映像。\"\n    services=\"virtual-machines\"\n    documentationCenter=\"\"\n    authors=\"dsk-2015\"\n    manager=\"timlt\"\n    editor=\"tysonn\"\n    tags=\"azure-service-management\"/>\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"10/14/2015\"\n    wacn.date=\"12/17/2015\"/>\n\n\n\n# 如何捕获经典 Linux 虚拟机以用作映像\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]\n\n\n本文将演示如何捕获运行 Linux 的经典 Azure 虚拟机，以用作映像来创建其他虚拟机。此映像包括操作系统磁盘和附加到虚拟机的数据磁盘。它不包括网络配置，因此你在使用此映像创建其他虚拟机时需要进行网络配置。\n\nAzure 将映像存储在“映像”下。这也是你上载和存储任何映像的地方。有关映像的详细信息，请参阅[关于 Azure 中的虚拟机映像][]。\n\n## 开始之前\n\n这些步骤假定你已使用经典部署模式创建了 Azure 虚拟机并配置了操作系统，包括附加任何数据磁盘。如果你尚未执行此操作，请参阅以下说明：\n\n- [如何创建运行 Linux 的虚拟机][]\n\n\n## 捕获虚拟机\n\n1. 使用所选 SSH 客户端连接到虚拟机。有关详细信息，请参阅[如何登录到运行 Linux 的虚拟机][]。\n\n2. 在 SSH 窗口中，键入以下命令。请注意，`waagent` 的输出结果可能会因此实用程序的版本而略有差异：\n\n    `sudo waagent -deprovision`\n\n    此命令将尝试清除系统并使其适用于重新预配。此操作执行以下任务：\n\n    - 删除 SSH 主机密钥（如果在配置文件中 Provisioning.RegenerateSshHostKeyPair 为“y”）\n    - 清除 /etc/resolv.conf 中的 nameserver 配置\n    - 从 /etc/shadow 中删除 `root` 用户的密码（如果在配置文件中 Provisioning.DeleteRootPassword 为“y”）\n    - 删除缓存的 DHCP 客户端租赁\n    - 将主机名重置为 localhost.localdomain\n    - 删除上次预配的用户帐户（从 /var/lib/waagent 获得）**和关联数据**。\n\n    >[AZURE.NOTE]取消预配会删除文件和数据，目的是使映像“一般化”。仅在需要捕获以用作新映像模板的虚拟机上运行此命令。无法确保映像中的所有敏感信息均已清除，或者说无法确保该映像适合再分发给第三方。\n\n\n3. 键入 **y** 继续。添加 `-force` 参数即可免除此确认步骤。\n\n4. 键入 **Exit** 关闭 SSH 客户端。\n\n\n    >[AZURE.NOTE]后续步骤假定你已在客户端计算机上[安装 Azure CLI](/documentation/articles/xplat-cli-install)。以下所有步骤也可以在[管理门户][]中执行。\n\n5. 从客户端计算机中打开 Azure CLI 并登录到你的 Azure 订阅。有关详细信息，请阅读[从 Azure CLI 连接到 Azure 订阅](/documentation/articles/xplat-cli-connect)。\n\n6. 请确保你是在服务管理模式下：\n\n    `azure config mode asm`\n\n7. 使用以下命令关闭已在上述步骤中预配的虚拟机：\n\n    `azure vm shutdown <your-virtual-machine-name>`\n\n    >[AZURE.NOTE]你可以使用 `azure vm list` 找出在订阅中创建的所有虚拟机\n\n8. 在虚拟机停止后，使用以下命令捕获映像：\n\n    `azure vm capture -t <your-virtual-machine-name> <new-image-name>`\n\n    键入你需要的映像名称以替换 _new-image-name_。此命令创建通用 OS 映像。`-t` 子命令将删除原始虚拟机。\n\n9.  新映像现在会出现在映像列表中，可以用于配置任何新的虚拟机。你可以使用以下命令来查看它：\n\n    `azure vm image list`\n\n    在“管理门户”中，它会显示在“映像”列表中。[][]\n\n    ![成功捕获映像](./media/virtual-machines-linux-capture-image/VMCapturedImageAvailable.png)\n\n\n## 后续步骤\n该映像已就绪，可用于创建虚拟机了。你可以使用 Azure CLI 命令 `azure vm create` 并提供刚创建的映像名称。有关该命令的详细信息，请参阅[将适用于 Mac、Linux 和 Windows 的 Azure CLI 与 Azure 服务管理配合使用](/documentation/articles/virtual-machines-command-line-tools)。此外，你也可以使用[管理门户][]来创建自定义虚拟机，只需使用“从库中”方法并选择刚刚创建的映像即可。如需更多详细信息，请参阅[如何创建自定义虚拟机][]。\n\n**另请参阅：**[Azure Linux 代理用户指南](/documentation/articles/virtual-machines-linux-agent-user-guide)\n\n[]: http://manage.windowsazure.cn\n[管理门户]: http://manage.windowsazure.cn\n[如何登录到运行 Linux 的虚拟机]: /documentation/articles/virtual-machines-linux-how-to-log-on\n[关于 Azure 中的虚拟机映像]: http://msdn.microsoft.com/zh-cn/library/azure/dn790290.aspx\n[如何创建自定义虚拟机]: /documentation/articles/virtual-machines-create-custom\n[How to Attach a Data Disk to a Virtual Machine]: /documentation/articles/storage-windows-attach-disk\n[如何创建运行 Linux 的虚拟机]: /documentation/articles/virtual-machines-linux-tutorial-portal-rm\n\n<!---HONumber=Mooncake_1207_2015-->"
+}

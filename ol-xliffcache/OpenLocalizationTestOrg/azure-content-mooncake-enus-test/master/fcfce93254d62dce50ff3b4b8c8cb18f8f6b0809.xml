@@ -1,0 +1,541 @@
+{
+  "nodes": [
+    {
+      "content": "如何创建和部署云服务 | Azure",
+      "pos": [
+        27,
+        45
+      ]
+    },
+    {
+      "content": "了解如何在 Azure 中使用“快速创建”方法创建和部署云服务。",
+      "pos": [
+        64,
+        96
+      ]
+    },
+    {
+      "content": "如何创建和部署云服务",
+      "pos": [
+        311,
+        321
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        325,
+        341
+      ]
+    },
+    {
+      "content": "Azure portal",
+      "pos": [
+        345,
+        357
+      ]
+    },
+    {
+      "content": "Azure classic portal",
+      "pos": [
+        430,
+        450
+      ]
+    },
+    {
+      "content": "Azure 经典门户为你提供两种创建和部署云服务的方法：“快速创建”和“自定义创建”。",
+      "pos": [
+        514,
+        557
+      ]
+    },
+    {
+      "content": "本主题介绍如何使用“快速创建”方法创建新的云服务，然后使用“上载”在 Azure 中上载和部署云服务包。使用此方法时，Azure 经典门户在你进行操作时将提供方便的链接供你完成所有要求。如果你在创建云服务后已准备好对其进行部署，则可以使用“自定义创建”同时执行这两项操作。",
+      "pos": [
+        559,
+        695
+      ]
+    },
+    {
+      "pos": [
+        699,
+        894
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 如果你计划从 Visual Studio Team Services (VSTS) 发布云服务，请使用“快速创建”，然后从“快速启动”或仪表板设置 VSTS 发布。有关详细信息，请参阅[使用 Visual Studio Team Services 向 Azure 持续传送项目][TFSTutorialForCloudService]，或查看“快速启动”页的帮助。"
+    },
+    {
+      "content": "概念",
+      "pos": [
+        899,
+        901
+      ]
+    },
+    {
+      "content": "要将应用程序部署为 Azure 中的云服务，需要以下三个组件：",
+      "pos": [
+        902,
+        933
+      ]
+    },
+    {
+      "pos": [
+        937,
+        982
+      ],
+      "content": "**服务定义**：  \n云服务定义文件 (.csdef) 定义服务模型，包括角色数量。",
+      "leadings": [
+        "",
+        "  "
+      ],
+      "nodes": [
+        {
+          "content": "<bpt id=\"p1\">**</bpt>服务定义<ept id=\"p1\">**</ept>：",
+          "pos": [
+            0,
+            9
+          ]
+        },
+        {
+          "content": "云服务定义文件 (.csdef) 定义服务模型，包括角色数量。",
+          "pos": [
+            12,
+            43
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        986,
+        1043
+      ],
+      "content": "**服务配置**：  \n云服务配置文件 (.cscfg) 为云服务和各个角色提供配置设置，包括角色实例的数量。",
+      "leadings": [
+        "",
+        "  "
+      ],
+      "nodes": [
+        {
+          "content": "<bpt id=\"p1\">**</bpt>服务配置<ept id=\"p1\">**</ept>：",
+          "pos": [
+            0,
+            9
+          ]
+        },
+        {
+          "content": "云服务配置文件 (.cscfg) 为云服务和各个角色提供配置设置，包括角色实例的数量。",
+          "pos": [
+            12,
+            55
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        1047,
+        1093
+      ],
+      "content": "**服务包**：  \n服务包 (.cspkg) 包含应用程序代码和配置以及服务定义文件。",
+      "leadings": [
+        "",
+        "  "
+      ],
+      "nodes": [
+        {
+          "content": "<bpt id=\"p1\">**</bpt>服务包<ept id=\"p1\">**</ept>：",
+          "pos": [
+            0,
+            8
+          ]
+        },
+        {
+          "content": "服务包 (.cspkg) 包含应用程序代码和配置以及服务定义文件。",
+          "pos": [
+            11,
+            44
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        1097,
+        1185
+      ],
+      "content": "你可以通过<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](/documentation/articles/cloud-services-model-and-package)</ept>了解有关这些内容以及如何创建包的详细信息。"
+    },
+    {
+      "content": "准备应用程序",
+      "pos": [
+        1190,
+        1196
+      ]
+    },
+    {
+      "pos": [
+        1197,
+        1341
+      ],
+      "content": "在可以部署云服务之前，必须根据你的应用程序代码创建云服务包 (.cspkg)，并创建云服务配置文件 (.cscfg)。Azure SDK 提供了用于准备这些必需的部署文件的工具。你可以从 <bpt id=\"p1\">[</bpt>Azure 下载<ept id=\"p1\">](/downloads)</ept>页安装 SDK，并使用你选择用于开发应用程序代码的语言。"
+    },
+    {
+      "content": "在你导出服务包之前，三种云服务功能需要特殊的配置：",
+      "pos": [
+        1343,
+        1368
+      ]
+    },
+    {
+      "pos": [
+        1372,
+        1547
+      ],
+      "content": "如果你要部署使用安全套接字层 (SSL) 进行数据加密的云服务，请<bpt id=\"p1\">[</bpt>为应用程序配置 SSL<ept id=\"p1\">](/documentation/articles/cloud-services-configure-ssl-certificate/#step-2-modify-the-service-definition-and-configuration-files)</ept>。"
+    },
+    {
+      "pos": [
+        1551,
+        1651
+      ],
+      "content": "如果要配置与角色实例的远程桌面连接，请<bpt id=\"p1\">[</bpt>为这些角色配置远程桌面<ept id=\"p1\">](/documentation/articles/cloud-services-role-enable-remote-desktop)</ept>。"
+    },
+    {
+      "pos": [
+        1655,
+        1879
+      ],
+      "content": "如果要为云服务配置详细监视，请为云服务启用 Azure 诊断。<bpt id=\"p1\">*</bpt>“最少监视”<ept id=\"p1\">*</ept>（默认监视级别）使用从角色实例（虚拟机）的主机操作系统中收集到的性能计数器。“详细监视”根据角色实例中的性能数据收集其他度量信息，以便对处理应用程序期间出现的问题进行进一步分析。若要了解如何启用 Azure 诊断，请参阅<bpt id=\"p2\">[</bpt>在 Azure 中启用诊断<ept id=\"p2\">](/documentation/articles/cloud-services-dotnet-diagnostics)</ept>。"
+    },
+    {
+      "pos": [
+        1881,
+        1992
+      ],
+      "content": "要使用 Web 角色或辅助角色创建云服务，你必须<bpt id=\"p1\">[</bpt>创建服务包<ept id=\"p1\">](/documentation/articles/cloud-services-model-and-package/#servicepackagecspkg)</ept>。"
+    },
+    {
+      "content": "开始之前",
+      "pos": [
+        1997,
+        2001
+      ]
+    },
+    {
+      "pos": [
+        2005,
+        2106
+      ],
+      "content": "如果你尚未安装 Azure SDK，请单击“安装 Azure SDK”以打开<bpt id=\"p1\">[</bpt> Azure 下载页<ept id=\"p1\">](/downloads)</ept>，然后下载你选择用于开发代码的相应语言的 SDK。（你也可以稍后执行此操作。）"
+    },
+    {
+      "pos": [
+        2110,
+        2275
+      ],
+      "content": "如果任何角色实例需要证书，请创建这些证书。云服务需要带有私钥的 .pfx 文件。你可以在创建和部署云服务时<bpt id=\"p1\">[</bpt>将这些证书上载到 Azure<ept id=\"p1\">](/documentation/articles/cloud-services-configure-ssl-certificate/#step-3-upload-a-certificate)</ept>。"
+    },
+    {
+      "content": "如果你计划将云服务部署到关联组，请创建关联组。可以使用关联组将你的云服务和其他 Azure 服务部署到某个区域中的同一位置。你可以在 Azure 经典门户的“网络”区域中的“地缘组”页上创建地缘组。",
+      "pos": [
+        2279,
+        2378
+      ]
+    },
+    {
+      "content": "如何：使用“快速创建”创建云服务",
+      "pos": [
+        2384,
+        2400
+      ]
+    },
+    {
+      "pos": [
+        2405,
+        2477
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">](http://manage.windowsazure.cn)</ept>中，单击“新建”&gt;“计算”&gt;“云服务”&gt;“快速创建”。"
+    },
+    {
+      "content": "云服务\\_快速创建",
+      "pos": [
+        2485,
+        2494
+      ]
+    },
+    {
+      "pos": [
+        2575,
+        2665
+      ],
+      "content": "在“URL”中，输入要在公用 URL 中使用的子域名称，以便在生产部署中访问你的云服务。生产部署的 URL 格式为：http://<bpt id=\"p1\">*</bpt>myURL<ept id=\"p1\">*</ept>.chinacloudapp.cn。"
+    },
+    {
+      "content": "在“区域或地缘组”中，选择要在其中部署云服务的地理区域或地缘组。如果要将云服务和其他 Azure 服务部署到某个区域中的同一位置，请选择一个地缘组。",
+      "pos": [
+        2670,
+        2744
+      ]
+    },
+    {
+      "content": "单击“创建云服务”。",
+      "pos": [
+        2749,
+        2759
+      ]
+    },
+    {
+      "content": "云服务\\_区域",
+      "pos": [
+        2767,
+        2774
+      ]
+    },
+    {
+      "content": "可以在窗口底部的消息区域中监视过程的状态。",
+      "pos": [
+        2855,
+        2876
+      ]
+    },
+    {
+      "content": "“云服务”区域随即打开，并显示新的云服务。当状态更改为“已创建”时，云服务创建即成功完成。",
+      "pos": [
+        2882,
+        2927
+      ]
+    },
+    {
+      "content": "云服务\\_云服务页",
+      "pos": [
+        2935,
+        2944
+      ]
+    },
+    {
+      "content": "如何：为云服务上载证书",
+      "pos": [
+        3032,
+        3043
+      ]
+    },
+    {
+      "pos": [
+        3048,
+        3120
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">](http://manage.windowsazure.cn)</ept>中单击“云服务”，单击云服务的名称，然后单击“证书”。"
+    },
+    {
+      "content": "云服务\\_快速创建",
+      "pos": [
+        3128,
+        3137
+      ]
+    },
+    {
+      "content": "单击“上载证书”或“上载”。",
+      "pos": [
+        3222,
+        3236
+      ]
+    },
+    {
+      "content": "在“文件”中，使用“浏览”选择证书（.pfx 文件）。",
+      "pos": [
+        3241,
+        3268
+      ]
+    },
+    {
+      "content": "在“密码”中，输入证书的私钥。",
+      "pos": [
+        3273,
+        3288
+      ]
+    },
+    {
+      "content": "单击“确定”（复选标记）。",
+      "pos": [
+        3293,
+        3306
+      ]
+    },
+    {
+      "content": "云服务\\_添加证书",
+      "pos": [
+        3314,
+        3323
+      ]
+    },
+    {
+      "content": "可以在消息区域中查看上载进度，如下所示。上载完成时，证书即添加到表中。在消息区域中，单击“确定”关闭消息。",
+      "pos": [
+        3409,
+        3462
+      ]
+    },
+    {
+      "content": "云服务\\_证书进度",
+      "pos": [
+        3470,
+        3479
+      ]
+    },
+    {
+      "content": "如何：部署云服务",
+      "pos": [
+        3568,
+        3576
+      ]
+    },
+    {
+      "pos": [
+        3581,
+        3654
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">](http://manage.windowsazure.cn)</ept>中单击“云服务”，单击云服务的名称，然后单击“仪表板”。"
+    },
+    {
+      "content": "单击“上载新的生产部署”或“上载”。",
+      "pos": [
+        3659,
+        3677
+      ]
+    },
+    {
+      "content": "在“部署标签”中，输入新部署的名称 - 例如 MyCloudServicev4。",
+      "pos": [
+        3682,
+        3722
+      ]
+    },
+    {
+      "content": "在“包”中，使用“浏览”选择要使用的服务包文件 (.cspkg)。",
+      "pos": [
+        3727,
+        3760
+      ]
+    },
+    {
+      "content": "在“配置”中，使用“浏览”选择要使用的服务配置文件 (.cscfg)。",
+      "pos": [
+        3765,
+        3800
+      ]
+    },
+    {
+      "content": "如果云服务将包括只具有一个实例的任何角色，请选中“即使一个或多个角色包含单个实例也进行部署”复选框以使部署继续进行。",
+      "pos": [
+        3805,
+        3863
+      ]
+    },
+    {
+      "pos": [
+        3869,
+        3998
+      ],
+      "content": "如果每个角色至少具有两个实例，那么 Azure 在维护和服务更新期间只能保证他人可访问云服务的概率是 99.95%。如果需要，你可以在部署云服务后，在“缩放”页上添加其他角色实例。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>服务级别协议<ept id=\"p1\">](/support/legal/sla)</ept>。"
+    },
+    {
+      "content": "单击“确定”（复选标记）以开始云服务部署。",
+      "pos": [
+        4003,
+        4024
+      ]
+    },
+    {
+      "content": "云服务\\_上载包",
+      "pos": [
+        4032,
+        4040
+      ]
+    },
+    {
+      "content": "可以在消息区域中监视部署状态。单击“确定”隐藏消息。",
+      "pos": [
+        4125,
+        4151
+      ]
+    },
+    {
+      "content": "云服务\\_上载过程",
+      "pos": [
+        4159,
+        4168
+      ]
+    },
+    {
+      "content": "验证确认你的部署已成功完成",
+      "pos": [
+        4252,
+        4265
+      ]
+    },
+    {
+      "content": "单击“仪表板”。",
+      "pos": [
+        4270,
+        4278
+      ]
+    },
+    {
+      "pos": [
+        4284,
+        4303
+      ],
+      "content": "该状态应该显示该服务<bpt id=\"p1\">**</bpt>正在运行<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "在“速览”下，单击 Web 应用 URL 以在 Web 浏览器中打开你的云服务。",
+      "pos": [
+        4308,
+        4348
+      ]
+    },
+    {
+      "content": "云服务\\_速览",
+      "pos": [
+        4356,
+        4363
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        4447,
+        4451
+      ]
+    },
+    {
+      "pos": [
+        4455,
+        4523
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>云服务的常规配置<ept id=\"p1\">](/documentation/articles/cloud-services-how-to-configure)</ept>。"
+    },
+    {
+      "pos": [
+        4526,
+        4596
+      ],
+      "content": "配置 <bpt id=\"p1\">[</bpt>自定义域名<ept id=\"p1\">](/documentation/articles/cloud-services-custom-domain-name)</ept>。"
+    },
+    {
+      "pos": [
+        4599,
+        4661
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>管理云服务<ept id=\"p1\">](/documentation/articles/cloud-services-how-to-manage)</ept>。"
+    },
+    {
+      "pos": [
+        4664,
+        4742
+      ],
+      "content": "配置 <bpt id=\"p1\">[</bpt>SSL 证书<ept id=\"p1\">](/documentation/articles/cloud-services-configure-ssl-certificate)</ept>。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"如何创建和部署云服务 | Azure\"\n    description=\"了解如何在 Azure 中使用“快速创建”方法创建和部署云服务。\"\n    services=\"cloud-services\"\n    documentationCenter=\"\"\n    authors=\"Thraka\"\n    manager=\"timlt\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"cloud-services\"\n    ms.date=\"01/15/2016\"\n    wacn.date=\"02/26/2016\"/>\n\n\n\n\n# 如何创建和部署云服务\n\n> [AZURE.SELECTOR]\n- [Azure portal](/documentation/articles/cloud-services-how-to-create-deploy-portal)\n- [Azure classic portal](/documentation/articles/cloud-services-how-to-create-deploy)\n\nAzure 经典门户为你提供两种创建和部署云服务的方法：“快速创建”和“自定义创建”。\n\n本主题介绍如何使用“快速创建”方法创建新的云服务，然后使用“上载”在 Azure 中上载和部署云服务包。使用此方法时，Azure 经典门户在你进行操作时将提供方便的链接供你完成所有要求。如果你在创建云服务后已准备好对其进行部署，则可以使用“自定义创建”同时执行这两项操作。\n\n> [AZURE.NOTE] 如果你计划从 Visual Studio Team Services (VSTS) 发布云服务，请使用“快速创建”，然后从“快速启动”或仪表板设置 VSTS 发布。有关详细信息，请参阅[使用 Visual Studio Team Services 向 Azure 持续传送项目][TFSTutorialForCloudService]，或查看“快速启动”页的帮助。\n\n## 概念\n要将应用程序部署为 Azure 中的云服务，需要以下三个组件：\n\n- **服务定义**：  \n  云服务定义文件 (.csdef) 定义服务模型，包括角色数量。\n\n- **服务配置**：  \n  云服务配置文件 (.cscfg) 为云服务和各个角色提供配置设置，包括角色实例的数量。\n\n- **服务包**：  \n  服务包 (.cspkg) 包含应用程序代码和配置以及服务定义文件。\n  \n你可以通过[此处](/documentation/articles/cloud-services-model-and-package)了解有关这些内容以及如何创建包的详细信息。\n\n## 准备应用程序\n在可以部署云服务之前，必须根据你的应用程序代码创建云服务包 (.cspkg)，并创建云服务配置文件 (.cscfg)。Azure SDK 提供了用于准备这些必需的部署文件的工具。你可以从 [Azure 下载](/downloads)页安装 SDK，并使用你选择用于开发应用程序代码的语言。\n\n在你导出服务包之前，三种云服务功能需要特殊的配置：\n\n- 如果你要部署使用安全套接字层 (SSL) 进行数据加密的云服务，请[为应用程序配置 SSL](/documentation/articles/cloud-services-configure-ssl-certificate/#step-2-modify-the-service-definition-and-configuration-files)。\n\n- 如果要配置与角色实例的远程桌面连接，请[为这些角色配置远程桌面](/documentation/articles/cloud-services-role-enable-remote-desktop)。\n\n- 如果要为云服务配置详细监视，请为云服务启用 Azure 诊断。*“最少监视”*（默认监视级别）使用从角色实例（虚拟机）的主机操作系统中收集到的性能计数器。“详细监视”根据角色实例中的性能数据收集其他度量信息，以便对处理应用程序期间出现的问题进行进一步分析。若要了解如何启用 Azure 诊断，请参阅[在 Azure 中启用诊断](/documentation/articles/cloud-services-dotnet-diagnostics)。\n\n要使用 Web 角色或辅助角色创建云服务，你必须[创建服务包](/documentation/articles/cloud-services-model-and-package/#servicepackagecspkg)。\n\n## 开始之前\n\n- 如果你尚未安装 Azure SDK，请单击“安装 Azure SDK”以打开[ Azure 下载页](/downloads)，然后下载你选择用于开发代码的相应语言的 SDK。（你也可以稍后执行此操作。）\n\n- 如果任何角色实例需要证书，请创建这些证书。云服务需要带有私钥的 .pfx 文件。你可以在创建和部署云服务时[将这些证书上载到 Azure](/documentation/articles/cloud-services-configure-ssl-certificate/#step-3-upload-a-certificate)。\n\n- 如果你计划将云服务部署到关联组，请创建关联组。可以使用关联组将你的云服务和其他 Azure 服务部署到某个区域中的同一位置。你可以在 Azure 经典门户的“网络”区域中的“地缘组”页上创建地缘组。\n\n\n## 如何：使用“快速创建”创建云服务\n\n1. 在 [Azure 经典门户](http://manage.windowsazure.cn)中，单击“新建”>“计算”>“云服务”>“快速创建”。\n\n    ![云服务\\_快速创建](./media/cloud-services-how-to-create-deploy/CloudServices_QuickCreate.png)\n\n2. 在“URL”中，输入要在公用 URL 中使用的子域名称，以便在生产部署中访问你的云服务。生产部署的 URL 格式为：http://*myURL*.chinacloudapp.cn。\n\n3. 在“区域或地缘组”中，选择要在其中部署云服务的地理区域或地缘组。如果要将云服务和其他 Azure 服务部署到某个区域中的同一位置，请选择一个地缘组。\n\n4. 单击“创建云服务”。\n\n    ![云服务\\_区域](./media/cloud-services-how-to-create-deploy/CloudServices_Regionlist.png)\n\n    可以在窗口底部的消息区域中监视过程的状态。\n\n    “云服务”区域随即打开，并显示新的云服务。当状态更改为“已创建”时，云服务创建即成功完成。\n\n    ![云服务\\_云服务页](./media/cloud-services-how-to-create-deploy/CloudServices_CloudServicesPage.png)\n\n\n## 如何：为云服务上载证书\n\n1. 在 [Azure 经典门户](http://manage.windowsazure.cn)中单击“云服务”，单击云服务的名称，然后单击“证书”。\n\n    ![云服务\\_快速创建](./media/cloud-services-how-to-create-deploy/CloudServices_EmptyDashboard.png)\n\n\n2. 单击“上载证书”或“上载”。\n\n3. 在“文件”中，使用“浏览”选择证书（.pfx 文件）。\n\n4. 在“密码”中，输入证书的私钥。\n\n5. 单击“确定”（复选标记）。\n\n    ![云服务\\_添加证书](./media/cloud-services-how-to-create-deploy/CloudServices_AddaCertificate.png)\n\n    可以在消息区域中查看上载进度，如下所示。上载完成时，证书即添加到表中。在消息区域中，单击“确定”关闭消息。\n\n    ![云服务\\_证书进度](./media/cloud-services-how-to-create-deploy/CloudServices_CertificateProgress.png)\n\n## 如何：部署云服务\n\n1. 在 [Azure 经典门户](http://manage.windowsazure.cn)中单击“云服务”，单击云服务的名称，然后单击“仪表板”。\n\n2. 单击“上载新的生产部署”或“上载”。\n\n3. 在“部署标签”中，输入新部署的名称 - 例如 MyCloudServicev4。\n\n3. 在“包”中，使用“浏览”选择要使用的服务包文件 (.cspkg)。\n\n4. 在“配置”中，使用“浏览”选择要使用的服务配置文件 (.cscfg)。\n\n5. 如果云服务将包括只具有一个实例的任何角色，请选中“即使一个或多个角色包含单个实例也进行部署”复选框以使部署继续进行。\n\n    如果每个角色至少具有两个实例，那么 Azure 在维护和服务更新期间只能保证他人可访问云服务的概率是 99.95%。如果需要，你可以在部署云服务后，在“缩放”页上添加其他角色实例。有关详细信息，请参阅[服务级别协议](/support/legal/sla)。\n\n6. 单击“确定”（复选标记）以开始云服务部署。\n\n    ![云服务\\_上载包](./media/cloud-services-how-to-create-deploy/CloudServices_UploadaPackage.png)\n\n    可以在消息区域中监视部署状态。单击“确定”隐藏消息。\n\n    ![云服务\\_上载过程](./media/cloud-services-how-to-create-deploy/CloudServices_UploadProgress.png)\n\n## 验证确认你的部署已成功完成\n\n1. 单击“仪表板”。\n\n    该状态应该显示该服务**正在运行**。\n\n2. 在“速览”下，单击 Web 应用 URL 以在 Web 浏览器中打开你的云服务。\n\n    ![云服务\\_速览](./media/cloud-services-how-to-create-deploy/CloudServices_QuickGlance.png)\n\n\n \n## 后续步骤\n\n* [云服务的常规配置](/documentation/articles/cloud-services-how-to-configure)。\n* 配置 [自定义域名](/documentation/articles/cloud-services-custom-domain-name)。\n* [管理云服务](/documentation/articles/cloud-services-how-to-manage)。\n* 配置 [SSL 证书](/documentation/articles/cloud-services-configure-ssl-certificate)。\n\n<!---HONumber=Mooncake_0215_2016-->\n"
+}

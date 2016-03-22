@@ -1,0 +1,698 @@
+{
+  "nodes": [
+    {
+      "content": "使用 REST API 将文件上载到媒体服务帐户",
+      "pos": [
+        28,
+        52
+      ]
+    },
+    {
+      "content": "了解如何通过创建和上载资产将媒体内容加入媒体服务。",
+      "pos": [
+        72,
+        97
+      ]
+    },
+    {
+      "content": "使用 REST API 将文件上载到媒体服务帐户",
+      "pos": [
+        316,
+        340
+      ]
+    },
+    {
+      "pos": [
+        453,
+        623
+      ],
+      "content": "在媒体服务中，可以将数字文件上载到资产中。<bpt id=\"p1\">[</bpt>资产<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/hh974277.aspx)</ept>实体可以包含视频、音频、图像、缩略图集合、图文轨迹和隐藏式字幕文件（以及有关这些文件的元数据。） 将文件上载到资产后，相关内容即安全地存储在云中供后续处理和流式处理。"
+    },
+    {
+      "pos": [
+        627,
+        965
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>生成流式处理内容的 URL（例如 http://{AMSAccount}.origin.mediaservices.chinacloudapi.cn/{GUID}/{IAssetFile.Name}/streamingParameters.）时，媒体服务会使用 IAssetFile.Name 属性的值。出于这个原因，不允许使用百分号编码。<bpt id=\"p1\">**</bpt>Name<ept id=\"p1\">**</ept> 属性的值不能含有任何以下保留的<bpt id=\"p2\">[</bpt>百分号编码字符<ept id=\"p2\">](http://en.wikipedia.org/wiki/Percent-encoding#Percent-encoding_reserved_characters)</ept>：!*'();:@&amp;=+$,/?%#\"。此外，文件扩展名中只能含有一个“.”。"
+    },
+    {
+      "content": "上载资产的基本工作流分为下列各节：",
+      "pos": [
+        967,
+        984
+      ]
+    },
+    {
+      "content": "创建资产",
+      "pos": [
+        988,
+        992
+      ]
+    },
+    {
+      "content": "对资产加密（可选）",
+      "pos": [
+        995,
+        1004
+      ]
+    },
+    {
+      "content": "将文件上载到 blob 存储",
+      "pos": [
+        1007,
+        1021
+      ]
+    },
+    {
+      "pos": [
+        1023,
+        1127
+      ],
+      "content": "AMS 还可用于批量上载资产。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>此<ept id=\"p1\">](/documentation/articles/media-services-rest-upload-files#upload_in_bulk)</ept>部分。"
+    },
+    {
+      "content": "上载资产",
+      "pos": [
+        1131,
+        1135
+      ]
+    },
+    {
+      "content": "创建资产",
+      "pos": [
+        1140,
+        1144
+      ]
+    },
+    {
+      "pos": [
+        1147,
+        1185
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>使用媒体服务 REST API 时，需注意以下事项："
+    },
+    {
+      "pos": [
+        1189,
+        1312
+      ],
+      "content": "访问媒体服务中的实体时，必须在 HTTP 请求中设置特定标头字段和值。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>媒体服务 REST API 开发的设置<ept id=\"p1\">](/documentation/articles/media-services-rest-how-to-use)</ept>。"
+    },
+    {
+      "pos": [
+        1315,
+        1497
+      ],
+      "content": "在成功连接到 https://media.chinacloudapi.cn 之后，你将接收到指定另一个媒体服务 URI 的 301 重定向。必须按<bpt id=\"p1\">[</bpt>使用 REST API 连接到媒体服务<ept id=\"p1\">](/documentation/articles/media-services-rest-connect_programmatically)</ept>中所述对新的 URI 执行后续调用。"
+    },
+    {
+      "content": "资产是媒体服务中多种类型的对象或多组对象（包括视频、音频、图像、缩略图集合、文本轨道和隐藏的解释性字幕文件）的容器。在 REST API 中，创建资产需要向媒体服务发送 POST 请求，并将任何有关资产的属性信息放入请求正文中。",
+      "pos": [
+        1500,
+        1614
+      ]
+    },
+    {
+      "pos": [
+        1616,
+        1703
+      ],
+      "content": "在创建资产时可以指定的属性之一是 <bpt id=\"p1\">**</bpt>Options<ept id=\"p1\">**</ept>。<bpt id=\"p2\">**</bpt>Options<ept id=\"p2\">**</ept> 是一个枚举值，描述可用于创建资产的加密选项。有效值为以下列表中的某个值，而不是这些值的组合。"
+    },
+    {
+      "pos": [
+        1707,
+        1796
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>无<ept id=\"p1\">**</ept> = <bpt id=\"p2\">**</bpt>0<ept id=\"p2\">**</ept>：将不使用加密。这是默认值。请注意，使用此选项时，你的内容在传送过程中或静态存储过程中都不会受到保护。如果计划使用渐进式下载交付 MP4，则使用此选项。"
+    },
+    {
+      "pos": [
+        1801,
+        1868
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>StorageEncrypted<ept id=\"p1\">**</ept> = <bpt id=\"p2\">**</bpt>1<ept id=\"p2\">**</ept>：如果要使用 AES-256 位加密法对文件加密以方便上载和存储，请指定此值。"
+    },
+    {
+      "pos": [
+        1874,
+        1998
+      ],
+      "content": "如果你的资产已经过存储加密，则必须配置资产传送策略。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>配置资产传送策略<ept id=\"p1\">](/documentation/articles/media-services-rest-configure-asset-delivery-policy)</ept>。"
+    },
+    {
+      "pos": [
+        2002,
+        2078
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>CommonEncryptionProtected<ept id=\"p1\">**</ept> = <bpt id=\"p2\">**</bpt>2<ept id=\"p2\">**</ept>：如果要上载使用常见加密法（例如 PlayReady）保护的文件，请指定此值。"
+    },
+    {
+      "pos": [
+        2082,
+        2186
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>EnvelopeEncryptionProtected<ept id=\"p1\">**</ept> = <bpt id=\"p2\">**</bpt>4<ept id=\"p2\">**</ept>：如果要上载使用 AES 文件加密的 HLS，请指定此值。请注意，Transform Manager 必须已对文件进行编码和加密。"
+    },
+    {
+      "pos": [
+        2189,
+        2417
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果资产要使用加密，则你必须按以下主题中所述创建 <bpt id=\"p1\">**</bpt>ContentKey<ept id=\"p1\">**</ept> 并将其链接到你的资产：<bpt id=\"p2\">[</bpt>如何创建 ContentKey<ept id=\"p2\">](/documentation/articles/media-services-rest-create-contentkey)</ept>。请注意，将文件上载到资产后，需要使用加密<bpt id=\"p3\">**</bpt>资产<ept id=\"p3\">**</ept>期间获取的值更新 <bpt id=\"p4\">**</bpt>AssetFile<ept id=\"p4\">**</ept> 实体上的加密属性。使用 <bpt id=\"p5\">**</bpt>MERGE<ept id=\"p5\">**</ept> HTTP 请求完成此操作。"
+    },
+    {
+      "content": "以下示例说明了如何创建资产。",
+      "pos": [
+        2420,
+        2434
+      ]
+    },
+    {
+      "content": "HTTP 请求",
+      "pos": [
+        2438,
+        2445
+      ]
+    },
+    {
+      "content": "HTTP 响应",
+      "pos": [
+        3327,
+        3334
+      ]
+    },
+    {
+      "content": "如果成功，将返回以下响应：",
+      "pos": [
+        3338,
+        3351
+      ]
+    },
+    {
+      "content": "创建 AssetFile",
+      "pos": [
+        4587,
+        4599
+      ]
+    },
+    {
+      "pos": [
+        4601,
+        4781
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>AssetFile<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/azure/hh974275.aspx)</ept> 实体表示 blob 容器中存储的视频或音频文件。一个资产文件始终与一个资产关联，而一个资产则可能包含一个或多个资产文件。如果资产文件对象未与 BLOB 容器中的数字文件关联，则媒体服务 Encoder 任务将失败。"
+    },
+    {
+      "pos": [
+        4783,
+        4858
+      ],
+      "content": "请注意，<bpt id=\"p1\">**</bpt>AssetFile<ept id=\"p1\">**</ept> 实例和实际媒体文件是两个不同的对象。AssetFile 实例包含有关媒体文件的元数据，而媒体文件包含实际媒体内容。"
+    },
+    {
+      "pos": [
+        4860,
+        4937
+      ],
+      "content": "将数字媒体文件上载到 blob 容器后，需要使用 <bpt id=\"p1\">**</bpt>MERGE<ept id=\"p1\">**</ept> HTTP 请求来更新 AssetFile 中有关媒体文件的信息（如本主题稍后所述）。"
+    },
+    {
+      "content": "HTTP 请求",
+      "pos": [
+        4941,
+        4948
+      ]
+    },
+    {
+      "content": "HTTP 响应",
+      "pos": [
+        6028,
+        6035
+      ]
+    },
+    {
+      "content": "创建具有写入权限的 AccessPolicy。",
+      "pos": [
+        7351,
+        7374
+      ]
+    },
+    {
+      "pos": [
+        7377,
+        7618
+      ],
+      "content": "将任何文件上载到 BLOB 存储之前，请设置用于对资产执行写入操作的访问策略权限。为此，请向 AccessPolicy 实体集发送一个 HTTP POST 请求。请在执行创建操作时定义 DurationInMinutes 值，否则会在响应中收到 500 内部服务器错误消息。有关 AccessPolicies 的详细信息，请参阅 <bpt id=\"p1\">[</bpt>AccessPolicy<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/azure/hh974297.aspx)</ept>。"
+    },
+    {
+      "content": "以下示例说明了如何创建 AccessPolicy：",
+      "pos": [
+        7620,
+        7645
+      ]
+    },
+    {
+      "content": "HTTP 请求",
+      "pos": [
+        7657,
+        7664
+      ]
+    },
+    {
+      "content": "HTTP 请求",
+      "pos": [
+        8595,
+        8602
+      ]
+    },
+    {
+      "content": "获取上载 URL",
+      "pos": [
+        9668,
+        9676
+      ]
+    },
+    {
+      "pos": [
+        9678,
+        9943
+      ],
+      "content": "若要检索实际上载 URL，请创建一个 SAS 定位符。定位符为希望访问资产中文件的客户端定义连接终结点的开始时间和类型。可以为给定 AccessPolicy 和资产对创建多个定位符实体，以处理不同的客户端请求和需求。这其中的任一定位符都可使用 AccessPolicy 的 StartTime 值和 DurationInMinutes 值来确定可以使用某 URL 的时间长度。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>定位符<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/azure/hh974308.aspx)</ept>。"
+    },
+    {
+      "content": "SAS URL 采用以下格式：",
+      "pos": [
+        9946,
+        9961
+      ]
+    },
+    {
+      "content": "请注意以下事项：",
+      "pos": [
+        10062,
+        10070
+      ]
+    },
+    {
+      "content": "一项给定的资产一次最多只能与五个唯一的定位符相关联。有关详细信息，请参阅定位符。",
+      "pos": [
+        10074,
+        10114
+      ]
+    },
+    {
+      "content": "如果需要立即上载文件，应将 StartTime 值设置为当前时间前五分钟。这是因为你的客户端计算机与媒体服务之间可能存在时钟偏差。此外，StartTime 值必须采用以下 DateTime 格式：YYYY-MM-DDTHH:mm:ssZ（例如，“2014-05-23T17:53:50Z”）。",
+      "pos": [
+        10117,
+        10263
+      ]
+    },
+    {
+      "content": "定位符从创建到可用可能会有 30-40 秒的延迟。SAS URL 和源定位符都会出现这个问题。",
+      "pos": [
+        10270,
+        10317
+      ]
+    },
+    {
+      "pos": [
+        10319,
+        10421
+      ],
+      "content": "以下示例说明了如何创建 SAS URL 定位符，由请求正文中的 Type 属性定义（“1”表示 SAS 定位符，“2”表示按需来源定位符）。返回的 <bpt id=\"p1\">**</bpt>Path<ept id=\"p1\">**</ept> 属性包含上载文件时必须使用的 URL。"
+    },
+    {
+      "content": "HTTP 请求",
+      "pos": [
+        10429,
+        10436
+      ]
+    },
+    {
+      "content": "HTTP 响应",
+      "pos": [
+        11500,
+        11507
+      ]
+    },
+    {
+      "content": "如果成功，将返回以下响应：",
+      "pos": [
+        11511,
+        11524
+      ]
+    },
+    {
+      "content": "将文件上载到 Blob 存储容器",
+      "pos": [
+        13241,
+        13257
+      ]
+    },
+    {
+      "content": "设置 AccessPolicy 和定位符后，即可使用 Azure 存储 REST API 将具体的文件上载到 Azure BLOB 存储容器。也可以按页或块 BLOB 来上载。",
+      "pos": [
+        13263,
+        13351
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>必须将要上载的文件的文件名添加到在上一节收到的定位符 <bpt id=\"p1\">**</bpt>Path<ept id=\"p1\">**</ept> 值中。例如，https://storagetestaccount001.blob.core.chinacloudapi.cn/asset-e7b02da4-5a69-40e7-a8db-e8f4f697aac0/BigBuckBunny.mp4?",
+      "pos": [
+        13354,
+        13525
+      ]
+    },
+    {
+      "content": ".",
+      "pos": [
+        13526,
+        13527
+      ]
+    },
+    {
+      "content": ".",
+      "pos": [
+        13528,
+        13529
+      ]
+    },
+    {
+      "content": ".",
+      "pos": [
+        13530,
+        13531
+      ]
+    },
+    {
+      "pos": [
+        13533,
+        13642
+      ],
+      "content": "有关使用 Azure 存储 blob 的详细信息，请参阅 <bpt id=\"p1\">[</bpt>Blob 服务 REST API<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/azure/dd135733.aspx)</ept>。"
+    },
+    {
+      "content": "更新 AssetFile",
+      "pos": [
+        13649,
+        13661
+      ]
+    },
+    {
+      "content": "上载文件后，请更新 FileAsset 大小（和其他）信息。例如：",
+      "pos": [
+        13664,
+        13697
+      ]
+    },
+    {
+      "content": "HTTP 响应",
+      "pos": [
+        14852,
+        14859
+      ]
+    },
+    {
+      "content": "如果成功，将返回以下响应：HTTP/1.1 204 无内容",
+      "pos": [
+        14863,
+        14892
+      ]
+    },
+    {
+      "content": "删除定位符和 AccessPolicy",
+      "pos": [
+        14898,
+        14917
+      ]
+    },
+    {
+      "content": "HTTP 请求",
+      "pos": [
+        14922,
+        14929
+      ]
+    },
+    {
+      "content": "HTTP 响应",
+      "pos": [
+        15798,
+        15805
+      ]
+    },
+    {
+      "content": "如果成功，将返回以下响应：",
+      "pos": [
+        15809,
+        15822
+      ]
+    },
+    {
+      "content": "HTTP 请求",
+      "pos": [
+        15864,
+        15871
+      ]
+    },
+    {
+      "content": "HTTP 响应",
+      "pos": [
+        16740,
+        16747
+      ]
+    },
+    {
+      "content": "如果成功，将返回以下响应：",
+      "pos": [
+        16751,
+        16764
+      ]
+    },
+    {
+      "pos": [
+        16806,
+        16839
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"upload_in_bulk\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>批量上载资产"
+    },
+    {
+      "content": "创建 IngestManifest",
+      "pos": [
+        16844,
+        16861
+      ]
+    },
+    {
+      "content": "IngestManifest 是一个容器，用于放置一组资产、资产文件以及可用于确定该组资产或文件的批量引入进度的统计信息。",
+      "pos": [
+        16863,
+        16924
+      ]
+    },
+    {
+      "content": "HTTP 请求",
+      "pos": [
+        16929,
+        16936
+      ]
+    },
+    {
+      "content": "创建资产",
+      "pos": [
+        17828,
+        17832
+      ]
+    },
+    {
+      "content": "在创建 IngestManifestAsset 之前，你需要创建将使用批量引入完成的资产。资产是媒体服务中多种类型的对象或多组对象（包括视频、音频、图像、缩略图集合、文本轨道和隐藏的解释性字幕文件）的容器。在 REST API 中，创建资产需要向 Azure 媒体服务发送 HTTP POST 请求，并在请求正文中放置资产属性信息。在本示例中，资产是使用请求正文中包含的 StorageEncrption(1) 选项创建的。",
+      "pos": [
+        17834,
+        18046
+      ]
+    },
+    {
+      "content": "HTTP 响应",
+      "pos": [
+        18050,
+        18057
+      ]
+    },
+    {
+      "content": "创建 IngestManifestAsset",
+      "pos": [
+        18960,
+        18982
+      ]
+    },
+    {
+      "content": "IngestManifestAsset 表示 IngestManifest 内与批量引入一起使用的资产。IngestManifestAsset 主要用于将资产链接到清单。Azure 媒体服务会在内部根据关联到 IngestManifestAsset 的 IngestManifestFile 集合来监视文件上载。上载这些文件后，即完成资产操作。可以使用 HTTP POST 请求创建新的 IngestManifestAsset。在请求正文中包括 IngestManifest ID 和资产 ID，以便 IngestManifestAsset 将其链接到一起进行批量引入。",
+      "pos": [
+        18984,
+        19269
+      ]
+    },
+    {
+      "content": "HTTP 响应",
+      "pos": [
+        19273,
+        19280
+      ]
+    },
+    {
+      "content": "（可选）创建用于加密的 ContentKey",
+      "pos": [
+        20290,
+        20312
+      ]
+    },
+    {
+      "content": "如果你的资产将使用加密，则在为资产创建 IngestManifestFile 之前，必须创建用于加密的 ContentKey。在本示例中，请求正文包括以下属性。",
+      "pos": [
+        20314,
+        20394
+      ]
+    },
+    {
+      "content": "请求正文属性 | 说明",
+      "pos": [
+        20397,
+        20408
+      ]
+    },
+    {
+      "content": "ID | 我们使用以下格式自行生成的 ContentKey ID：“nb:kid:UUID:",
+      "pos": [
+        20410,
+        20456
+      ]
+    },
+    {
+      "content": "”。",
+      "pos": [
+        20466,
+        20468
+      ]
+    },
+    {
+      "content": "ContentKeyType | 这是此内容密钥的内容密钥类型（为整数）。我们为存储加密传递了值 1。",
+      "pos": [
+        20469,
+        20520
+      ]
+    },
+    {
+      "content": "EncryptedContentKey | 我们创建一个新的内容密钥值，这是一个 256 位（32 字节）的值。此密钥使用存储加密 X.509 证书进行加密，该证书是我们通过执行 GetProtectionKeyId 和 GetProtectionKey 方法的 HTTP GET 请求从 Azure 媒体服务中检索到的。",
+      "pos": [
+        20521,
+        20682
+      ]
+    },
+    {
+      "content": "ProtectionKeyId | 这是存储加密 X.509 证书的保护密钥 ID，用于加密内容密钥。",
+      "pos": [
+        20683,
+        20734
+      ]
+    },
+    {
+      "content": "ProtectionKeyType | 这是用于加密内容密钥的保护密钥的加密类型。对于我们的示例，此值为 StorageEncryption(1)。",
+      "pos": [
+        20735,
+        20809
+      ]
+    },
+    {
+      "content": "校验和 | 内容密钥的 MD5 计算的校验和。它通过使用内容密钥加密内容 ID 计算得出。此示例代码演示了如何计算校验和。",
+      "pos": [
+        20810,
+        20871
+      ]
+    },
+    {
+      "content": "HTTP 响应",
+      "pos": [
+        20876,
+        20883
+      ]
+    },
+    {
+      "content": "将 ContentKey 链接到资产",
+      "pos": [
+        22314,
+        22332
+      ]
+    },
+    {
+      "content": "ContentKey 通过发送 HTTP POST 请求关联到一个或多个资产。以下请求是一个示例，说明了如何按 ID 将示例 ContentKey 链接到示例资产。",
+      "pos": [
+        22334,
+        22416
+      ]
+    },
+    {
+      "content": "HTTP 响应",
+      "pos": [
+        22420,
+        22427
+      ]
+    },
+    {
+      "content": "为每个资产创建 IngestManifestFile",
+      "pos": [
+        23467,
+        23493
+      ]
+    },
+    {
+      "content": "IngestManifestFile 代表将作为批量引入资产的一部分上载的实际视频或音频 blob 对象。除非资产使用加密选项，否则不需要与加密相关的属性。本部分使用的示例演示了如何创建 IngestManifestFile，以便将 StorageEncryption 用于之前创建的资产。",
+      "pos": [
+        23495,
+        23640
+      ]
+    },
+    {
+      "content": "HTTP 响应",
+      "pos": [
+        23645,
+        23652
+      ]
+    },
+    {
+      "content": "将文件上载到 Blob 存储",
+      "pos": [
+        24885,
+        24899
+      ]
+    },
+    {
+      "pos": [
+        24901,
+        25110
+      ],
+      "content": "可以使用任何能够将资产文件上载到 Blob 存储容器 URI（由 IngestManifest 的 BlobStorageUriForUpload 属性提供）的高速客户端应用程序。一个明显的高速上载服务就是<bpt id=\"p1\">[</bpt>适用于 Azure 应用程序的点播 Aspera<ept id=\"p1\">](https://datamarket.azure.com/application/2cdbc511-cb12-4715-9871-c7e7fbbb82a6)</ept>。"
+    },
+    {
+      "content": "监视批量引入进度",
+      "pos": [
+        25115,
+        25123
+      ]
+    },
+    {
+      "pos": [
+        25125,
+        25351
+      ],
+      "content": "可以通过轮询 IngestManifest 的 Statistics 属性来监视 IngestManifest 的批量引入操作的进度。该属性为复杂类型，即 <bpt id=\"p1\">[</bpt>IngestManifestStatistics<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/jj853027.aspx)</ept>。若要轮询 Statistics 属性，请提交一个传递 IngestManifest ID 的 HTTP GET 请求。"
+    },
+    {
+      "content": "HTTP 响应",
+      "pos": [
+        25357,
+        25364
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"使用 REST API 将文件上载到媒体服务帐户\" \n    description=\"了解如何通过创建和上载资产将媒体内容加入媒体服务。\" \n    services=\"media-services\" \n    documentationCenter=\"\" \n    authors=\"Juliako\" \n    manager=\"dwrede\" \n    editor=\"\"/>\n\n<tags\n    ms.service=\"media-services\"\n    ms.date=\"10/18/2015\"\n    wacn.date=\"11/27/2015\"/>\n\n\n#使用 REST API 将文件上载到媒体服务帐户\n\n[AZURE.INCLUDE [media-services-selector-upload-files](../includes/media-services-selector-upload-files.md)]\n \n\n在媒体服务中，可以将数字文件上载到资产中。[资产](https://msdn.microsoft.com/zh-cn/library/azure/hh974277.aspx)实体可以包含视频、音频、图像、缩略图集合、图文轨迹和隐藏式字幕文件（以及有关这些文件的元数据。） 将文件上载到资产后，相关内容即安全地存储在云中供后续处理和流式处理。\n\n\n>[AZURE.NOTE]生成流式处理内容的 URL（例如 http://{AMSAccount}.origin.mediaservices.chinacloudapi.cn/{GUID}/{IAssetFile.Name}/streamingParameters.）时，媒体服务会使用 IAssetFile.Name 属性的值。出于这个原因，不允许使用百分号编码。**Name** 属性的值不能含有任何以下保留的[百分号编码字符](http://en.wikipedia.org/wiki/Percent-encoding#Percent-encoding_reserved_characters)：!*'();:@&=+$,/?%#\"。此外，文件扩展名中只能含有一个“.”。\n\n上载资产的基本工作流分为下列各节：\n\n- 创建资产\n- 对资产加密（可选）\n- 将文件上载到 blob 存储\n\nAMS 还可用于批量上载资产。有关详细信息，请参阅[此](/documentation/articles/media-services-rest-upload-files#upload_in_bulk)部分。\n\n##上载资产\n\n###创建资产\n\n>[AZURE.NOTE]使用媒体服务 REST API 时，需注意以下事项：\n>\n>访问媒体服务中的实体时，必须在 HTTP 请求中设置特定标头字段和值。有关详细信息，请参阅[媒体服务 REST API 开发的设置](/documentation/articles/media-services-rest-how-to-use)。\n\n>在成功连接到 https://media.chinacloudapi.cn 之后，你将接收到指定另一个媒体服务 URI 的 301 重定向。必须按[使用 REST API 连接到媒体服务](/documentation/articles/media-services-rest-connect_programmatically)中所述对新的 URI 执行后续调用。\n \n资产是媒体服务中多种类型的对象或多组对象（包括视频、音频、图像、缩略图集合、文本轨道和隐藏的解释性字幕文件）的容器。在 REST API 中，创建资产需要向媒体服务发送 POST 请求，并将任何有关资产的属性信息放入请求正文中。\n\n在创建资产时可以指定的属性之一是 **Options**。**Options** 是一个枚举值，描述可用于创建资产的加密选项。有效值为以下列表中的某个值，而不是这些值的组合。\n\n- **无** = **0**：将不使用加密。这是默认值。请注意，使用此选项时，你的内容在传送过程中或静态存储过程中都不会受到保护。如果计划使用渐进式下载交付 MP4，则使用此选项。 \n\n- **StorageEncrypted** = **1**：如果要使用 AES-256 位加密法对文件加密以方便上载和存储，请指定此值。\n\n    如果你的资产已经过存储加密，则必须配置资产传送策略。有关详细信息，请参阅[配置资产传送策略](/documentation/articles/media-services-rest-configure-asset-delivery-policy)。\n\n- **CommonEncryptionProtected** = **2**：如果要上载使用常见加密法（例如 PlayReady）保护的文件，请指定此值。\n\n- **EnvelopeEncryptionProtected** = **4**：如果要上载使用 AES 文件加密的 HLS，请指定此值。请注意，Transform Manager 必须已对文件进行编码和加密。\n\n>[AZURE.NOTE]如果资产要使用加密，则你必须按以下主题中所述创建 **ContentKey** 并将其链接到你的资产：[如何创建 ContentKey](/documentation/articles/media-services-rest-create-contentkey)。请注意，将文件上载到资产后，需要使用加密**资产**期间获取的值更新 **AssetFile** 实体上的加密属性。使用 **MERGE** HTTP 请求完成此操作。\n\n\n以下示例说明了如何创建资产。\n\n**HTTP 请求**\n\n    POST https://media.chinacloudapi.cn/api/Assets HTTP/1.1\n    Content-Type: application/json\n    DataServiceVersion: 1.0;NetFx\n    MaxDataServiceVersion: 3.0;NetFx\n    Accept: application/json\n    Accept-Charset: UTF-8\n    Authorization: Bearer http%3a%2f%2fschemas.xmlsoap.org%2fws%2f2005%2f05%2fidentity%2fclaims%2fnameidentifier=amstestaccount001&urn%3aSubscriptionId=z7f09258-6753-2233-b1ae-193798e2c9d8&http%3a%2f%2fschemas.microsoft.com%2faccesscontrolservice%2f2010%2f07%2fclaims%2fidentityprovider=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&Audience=urn%3aWindowsAzureMediaServices&ExpiresOn=1421640053&Issuer=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&HMACSHA256=vlG%2fPYdFDMS1zKc36qcFVWnaNh07UCkhYj3B71%2fk1YA%3d\n    x-ms-version: 2.11\n    Host: media.chinacloudapi.cn\n    \n    {\"Name\":\"BigBuckBunny.mp4\"}\n    \n\n**HTTP 响应**\n\n如果成功，将返回以下响应：\n    \n    HTP/1.1 201 Created\n    Cache-Control: no-cache\n    Content-Length: 452\n    Content-Type: application/json;odata=minimalmetadata;streaming=true;charset=utf-8\n    Location: https://wamsbayclus001rest-hs.chinacloudapp.cn/api/Assets('nb%3Acid%3AUUID%3A9bc8ff20-24fb-4fdb-9d7c-b04c7ee573a1')\n    Server: Microsoft-IIS/8.5\n    x-ms-client-request-id: c59de965-bc89-4295-9a57-75d897e5221e\n    request-id: e98be122-ae09-473a-8072-0ccd234a0657\n    x-ms-request-id: e98be122-ae09-473a-8072-0ccd234a0657\n    X-Content-Type-Options: nosniff\n    DataServiceVersion: 3.0;\n    Strict-Transport-Security: max-age=31536000; includeSubDomains\n    Date: Sun, 18 Jan 2015 22:06:40 GMT\n    {  \n       \"odata.metadata\":\"https://wamsbayclus001rest-hs.chinacloudapp.cn/api/$metadata#Assets/@Element\",\n       \"Id\":\"nb:cid:UUID:9bc8ff20-24fb-4fdb-9d7c-b04c7ee573a1\",\n       \"State\":0,\n       \"Created\":\"2015-01-18T22:06:40.6010903Z\",\n       \"LastModified\":\"2015-01-18T22:06:40.6010903Z\",\n       \"AlternateId\":null,\n       \"Name\":\"BigBuckBunny.mp4\",\n       \"Options\":0,\n       \"Uri\":\"https://storagetestaccount001.blob.core.chinacloudapi.cn/asset-9bc8ff20-24fb-4fdb-9d7c-b04c7ee573a1\",\n       \"StorageAccountName\":\"storagetestaccount001\"\n    }\n    \n###创建 AssetFile\n\n[AssetFile](http://msdn.microsoft.com/zh-cn/library/azure/hh974275.aspx) 实体表示 blob 容器中存储的视频或音频文件。一个资产文件始终与一个资产关联，而一个资产则可能包含一个或多个资产文件。如果资产文件对象未与 BLOB 容器中的数字文件关联，则媒体服务 Encoder 任务将失败。\n\n请注意，**AssetFile** 实例和实际媒体文件是两个不同的对象。AssetFile 实例包含有关媒体文件的元数据，而媒体文件包含实际媒体内容。\n\n将数字媒体文件上载到 blob 容器后，需要使用 **MERGE** HTTP 请求来更新 AssetFile 中有关媒体文件的信息（如本主题稍后所述）。\n\n**HTTP 请求**\n\n    POST https://media.chinacloudapi.cn/api/Files HTTP/1.1\n    Content-Type: application/json\n    DataServiceVersion: 1.0;NetFx\n    MaxDataServiceVersion: 3.0;NetFx\n    Accept: application/json\n    Accept-Charset: UTF-8\n    Authorization: Bearer http%3a%2f%2fschemas.xmlsoap.org%2fws%2f2005%2f05%2fidentity%2fclaims%2fnameidentifier=amstestaccount001&urn%3aSubscriptionId=z7f09258-6753-4ca2-2233-193798e2c9d8&http%3a%2f%2fschemas.microsoft.com%2faccesscontrolservice%2f2010%2f07%2fclaims%2fidentityprovider=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&Audience=urn%3aWindowsAzureMediaServices&ExpiresOn=1421640053&Issuer=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&HMACSHA256=vlG%2fPYdFDMS1zKc36qcFVWnaNh07UCkhYj3B71%2fk1YA%3d\n    x-ms-version: 2.11\n    Host: media.chinacloudapi.cn\n    Content-Length: 164\n    \n    {  \n       \"IsEncrypted\":\"false\",\n       \"IsPrimary\":\"false\",\n       \"MimeType\":\"video/mp4\",\n       \"Name\":\"BigBuckBunny.mp4\",\n       \"ParentAssetId\":\"nb:cid:UUID:9bc8ff20-24fb-4fdb-9d7c-b04c7ee573a1\"\n    }\n\n\n**HTTP 响应**\n\n    HTTP/1.1 201 Created\n    Cache-Control: no-cache\n    Content-Length: 535\n    Content-Type: application/json;odata=minimalmetadata;streaming=true;charset=utf-8\n    Location: https://wamsbayclus001rest-hs.chinacloudapp.cn/api/Files('nb%3Acid%3AUUID%3Af13a0137-0a62-9d4c-b3b9-ca944b5142c5')\n    Server: Microsoft-IIS/8.5\n    request-id: 98a30e2d-f379-4495-988e-0b79edc9b80e\n    x-ms-request-id: 98a30e2d-f379-4495-988e-0b79edc9b80e\n    X-Content-Type-Options: nosniff\n    DataServiceVersion: 3.0;\n    X-Powered-By: ASP.NET\n    Strict-Transport-Security: max-age=31536000; includeSubDomains\n    Date: Mon, 19 Jan 2015 00:34:07 GMT\n    \n    {  \n       \"odata.metadata\":\"https://wamsbayclus001rest-hs.chinacloudapp.cn/api/$metadata#Files/@Element\",\n       \"Id\":\"nb:cid:UUID:f13a0137-0a62-9d4c-b3b9-ca944b5142c5\",\n       \"Name\":\"BigBuckBunny.mp4\",\n       \"ContentFileSize\":\"0\",\n       \"ParentAssetId\":\"nb:cid:UUID:9bc8ff20-24fb-4fdb-9d7c-b04c7ee573a1\",\n       \"EncryptionVersion\":null,\n       \"EncryptionScheme\":null,\n       \"IsEncrypted\":false,\n       \"EncryptionKeyId\":null,\n       \"InitializationVector\":null,\n       \"IsPrimary\":false,\n       \"LastModified\":\"2015-01-19T00:34:08.1934137Z\",\n       \"Created\":\"2015-01-19T00:34:08.1934137Z\",\n       \"MimeType\":\"video/mp4\",\n       \"ContentChecksum\":null\n    }\n\n\n### 创建具有写入权限的 AccessPolicy。 \n\n将任何文件上载到 BLOB 存储之前，请设置用于对资产执行写入操作的访问策略权限。为此，请向 AccessPolicy 实体集发送一个 HTTP POST 请求。请在执行创建操作时定义 DurationInMinutes 值，否则会在响应中收到 500 内部服务器错误消息。有关 AccessPolicies 的详细信息，请参阅 [AccessPolicy](http://msdn.microsoft.com/zh-cn/library/azure/hh974297.aspx)。\n\n以下示例说明了如何创建 AccessPolicy：\n        \n**HTTP 请求**\n\n    POST https://media.chinacloudapi.cn/api/AccessPolicies HTTP/1.1\n    Content-Type: application/json\n    DataServiceVersion: 1.0;NetFx\n    MaxDataServiceVersion: 3.0;NetFx\n    Accept: application/json\n    Accept-Charset: UTF-8\n    Authorization: Bearer http%3a%2f%2fschemas.xmlsoap.org%2fws%2f2005%2f05%2fidentity%2fclaims%2fnameidentifier=amstestaccount001&urn%3aSubscriptionId=z7f09258-6753-2233-b1ae-193798e2c9d8&http%3a%2f%2fschemas.microsoft.com%2faccesscontrolservice%2f2010%2f07%2fclaims%2fidentityprovider=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&Audience=urn%3aWindowsAzureMediaServices&ExpiresOn=1421640053&Issuer=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&HMACSHA256=vlG%2fPYdFDMS1zKc36qcFVWnaNh07UCkhYj3B71%2fk1YA%3d\n    x-ms-version: 2.11\n    Host: media.chinacloudapi.cn\n    \n    {\"Name\":\"NewUploadPolicy\", \"DurationInMinutes\":\"440\", \"Permissions\":\"2\"} \n\n**HTTP 请求**\n\n    If successful, the following response is returned:\n    \n    HTTP/1.1 201 Created\n    Cache-Control: no-cache\n    Content-Length: 312\n    Content-Type: application/json;odata=minimalmetadata;streaming=true;charset=utf-8\n    Location: https://wamsbayclus001rest-hs.chinacloudapp.cn/api/AccessPolicies('nb%3Apid%3AUUID%3Abe0ac48d-af7d-4877-9d60-1805d68bffae')\n    Server: Microsoft-IIS/8.5\n    request-id: 74c74545-7e0a-4cd6-a440-c1c48074a970\n    x-ms-request-id: 74c74545-7e0a-4cd6-a440-c1c48074a970\n    X-Content-Type-Options: nosniff\n    DataServiceVersion: 3.0;\n    Strict-Transport-Security: max-age=31536000; includeSubDomains\n    Date: Sun, 18 Jan 2015 22:18:06 GMT\n\n    {  \n       \"odata.metadata\":\"https://wamsbayclus001rest-hs.chinacloudapp.cn/api/$metadata#AccessPolicies/@Element\",\n       \"Id\":\"nb:pid:UUID:be0ac48d-af7d-4877-9d60-1805d68bffae\",\n       \"Created\":\"2015-01-18T22:18:06.6370575Z\",\n       \"LastModified\":\"2015-01-18T22:18:06.6370575Z\",\n       \"Name\":\"NewUploadPolicy\",\n       \"DurationInMinutes\":440.0,\n       \"Permissions\":2\n    }\n\n###获取上载 URL\n\n若要检索实际上载 URL，请创建一个 SAS 定位符。定位符为希望访问资产中文件的客户端定义连接终结点的开始时间和类型。可以为给定 AccessPolicy 和资产对创建多个定位符实体，以处理不同的客户端请求和需求。这其中的任一定位符都可使用 AccessPolicy 的 StartTime 值和 DurationInMinutes 值来确定可以使用某 URL 的时间长度。有关详细信息，请参阅[定位符](http://msdn.microsoft.com/zh-cn/library/azure/hh974308.aspx)。\n\n\nSAS URL 采用以下格式：\n\n    {https://myaccount.blob.core.chinacloudapi.cn}/{asset name}/{video file name}?{SAS signature}\n\n请注意以下事项：\n\n- 一项给定的资产一次最多只能与五个唯一的定位符相关联。有关详细信息，请参阅定位符。\n- 如果需要立即上载文件，应将 StartTime 值设置为当前时间前五分钟。这是因为你的客户端计算机与媒体服务之间可能存在时钟偏差。此外，StartTime 值必须采用以下 DateTime 格式：YYYY-MM-DDTHH:mm:ssZ（例如，“2014-05-23T17:53:50Z”）。    \n- 定位符从创建到可用可能会有 30-40 秒的延迟。SAS URL 和源定位符都会出现这个问题。\n\n以下示例说明了如何创建 SAS URL 定位符，由请求正文中的 Type 属性定义（“1”表示 SAS 定位符，“2”表示按需来源定位符）。返回的 **Path** 属性包含上载文件时必须使用的 URL。\n    \n**HTTP 请求**\n    \n    POST https://media.chinacloudapi.cn/api/Locators HTTP/1.1\n    Content-Type: application/json\n    DataServiceVersion: 1.0;NetFx\n    MaxDataServiceVersion: 3.0;NetFx\n    Accept: application/json\n    Accept-Charset: UTF-8\n    Authorization: Bearer http%3a%2f%2fschemas.xmlsoap.org%2fws%2f2005%2f05%2fidentity%2fclaims%2fnameidentifier=amstestaccount001&urn%3aSubscriptionId=z7f09258-6753-4ca2-2233-193798e2c9d8&http%3a%2f%2fschemas.microsoft.com%2faccesscontrolservice%2f2010%2f07%2fclaims%2fidentityprovider=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&Audience=urn%3aWindowsAzureMediaServices&ExpiresOn=1421640053&Issuer=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&HMACSHA256=vlG%2fPYdFDMS1zKc36qcFVWnaNh07UCkhYj3B71%2fk1YA%3d\n    x-ms-version: 2.11\n    Host: media.chinacloudapi.cn\n    {  \n       \"AccessPolicyId\":\"nb:pid:UUID:be0ac48d-af7d-4877-9d60-1805d68bffae\",\n       \"AssetId\":\"nb:cid:UUID:9bc8ff20-24fb-4fdb-9d7c-b04c7ee573a1\",\n       \"StartTime\":\"2015-02-18T16:45:53\",\n       \"Type\":1\n    }\n\n\n**HTTP 响应**\n\n如果成功，将返回以下响应：\n        \n    HTTP/1.1 201 Created\n    Cache-Control: no-cache\n    Content-Length: 949\n    Content-Type: application/json;odata=minimalmetadata;streaming=true;charset=utf-8\n    Location: https://wamsbayclus001rest-hs.chinacloudapp.cn/api/Locators('nb%3Alid%3AUUID%3Aaf57bdd8-6751-4e84-b403-f3c140444b54')\n    Server: Microsoft-IIS/8.5\n    request-id: 2adeb1f8-89c5-4cc8-aa4f-08cdfef33ae0\n    x-ms-request-id: 2adeb1f8-89c5-4cc8-aa4f-08cdfef33ae0\n    X-Content-Type-Options: nosniff\n    DataServiceVersion: 3.0;\n    X-Powered-By: ASP.NET\n    Strict-Transport-Security: max-age=31536000; includeSubDomains\n    Date: Mon, 19 Jan 2015 03:01:29 GMT\n    \n    {  \n       \"odata.metadata\":\"https://wamsbayclus001rest-hs.chinacloudapp.cn/api/$metadata#Locators/@Element\",\n       \"Id\":\"nb:lid:UUID:af57bdd8-6751-4e84-b403-f3c140444b54\",\n       \"ExpirationDateTime\":\"2015-02-19T00:05:53\",\n       \"Type\":1,\n       \"Path\":\"https://storagetestaccount001.blob.core.chinacloudapi.cn/asset-f438649c-313c-46e2-8d68-7d2550288247?sv=2012-02-12&sr=c&si=af57bdd8-6751-4e84-b403-f3c140444b54&sig=fE4btwEfZtVQFeC0Wh3Kwks2OFPQfzl5qTMW5YytiuY%3D&st=2015-02-18T16%3A45%3A53Z&se=2015-02-19T00%3A05%3A53Z\",\n       \"BaseUri\":\"https://storagetestaccount001.blob.core.chinacloudapi.cn/asset-f438649c-313c-46e2-8d68-7d2550288247\",\n       \"ContentAccessComponent\":\"?sv=2012-02-12&sr=c&si=af57bdd8-6751-4e84-b403-f3c140444b54&sig=fE4btwEfZtVQFeC0Wh3Kwks2OFPQfzl5qTMW5YytiuY%3D&st=2015-02-18T16%3A45%3A53Z&se=2015-02-19T00%3A05%3A53Z\",\n       \"AccessPolicyId\":\"nb:pid:UUID:be0ac48d-af7d-4877-9d60-1805d68bffae\",\n       \"AssetId\":\"nb:cid:UUID:9bc8ff20-24fb-4fdb-9d7c-b04c7ee573a1\",\n       \"StartTime\":\"2015-02-18T16:45:53\",\n       \"Name\":null\n    }\n\n### 将文件上载到 Blob 存储容器\n    \n设置 AccessPolicy 和定位符后，即可使用 Azure 存储 REST API 将具体的文件上载到 Azure BLOB 存储容器。也可以按页或块 BLOB 来上载。\n\n>[AZURE.NOTE]必须将要上载的文件的文件名添加到在上一节收到的定位符 **Path** 值中。例如，https://storagetestaccount001.blob.core.chinacloudapi.cn/asset-e7b02da4-5a69-40e7-a8db-e8f4f697aac0/BigBuckBunny.mp4? . . .\n\n有关使用 Azure 存储 blob 的详细信息，请参阅 [Blob 服务 REST API](http://msdn.microsoft.com/zh-cn/library/azure/dd135733.aspx)。\n\n\n### 更新 AssetFile \n\n上载文件后，请更新 FileAsset 大小（和其他）信息。例如：\n    \n    MERGE https://media.chinacloudapi.cn/api/Files('nb%3Acid%3AUUID%3Af13a0137-0a62-9d4c-b3b9-ca944b5142c5') HTTP/1.1\n    Content-Type: application/json\n    DataServiceVersion: 1.0;NetFx\n    MaxDataServiceVersion: 3.0;NetFx\n    Accept: application/json\n    Accept-Charset: UTF-8\n    Authorization: Bearer http%3a%2f%2fschemas.xmlsoap.org%2fws%2f2005%2f05%2fidentity%2fclaims%2fnameidentifier=amstestaccount001&urn%3aSubscriptionId=z7f09258-6753-4ca2-2233-193798e2c9d8&http%3a%2f%2fschemas.microsoft.com%2faccesscontrolservice%2f2010%2f07%2fclaims%2fidentityprovider=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&Audience=urn%3aWindowsAzureMediaServices&ExpiresOn=1421662918&Issuer=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&HMACSHA256=utmoXXbm9Q7j4tW1yJuMVA3egRiQy5FPygwadkmPeaY%3d\n    x-ms-version: 2.11\n    Host: media.chinacloudapi.cn\n    \n    {  \n       \"ContentFileSize\":\"1186540\",\n       \"Id\":\"nb:cid:UUID:f13a0137-0a62-9d4c-b3b9-ca944b5142c5\",\n       \"MimeType\":\"video/mp4\",\n       \"Name\":\"BigBuckBunny.mp4\",\n       \"ParentAssetId\":\"nb:cid:UUID:9bc8ff20-24fb-4fdb-9d7c-b04c7ee573a1\"\n    }\n\n\n**HTTP 响应**\n\n如果成功，将返回以下响应：HTTP/1.1 204 无内容\n\n### 删除定位符和 AccessPolicy \n\n**HTTP 请求**\n\n\n    DELETE https://media.chinacloudapi.cn/api/Locators('nb%3Alid%3AUUID%3Aaf57bdd8-6751-4e84-b403-f3c140444b54') HTTP/1.1\n    DataServiceVersion: 1.0;NetFx\n    MaxDataServiceVersion: 3.0;NetFx\n    Accept: application/json\n    Accept-Charset: UTF-8\n    Authorization: Bearer http%3a%2f%2fschemas.xmlsoap.org%2fws%2f2005%2f05%2fidentity%2fclaims%2fnameidentifier=amstestaccount001&urn%3aSubscriptionId=z7f09258-6753-2233-b1ae-193798e2c9d8&http%3a%2f%2fschemas.microsoft.com%2faccesscontrolservice%2f2010%2f07%2fclaims%2fidentityprovider=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&Audience=urn%3aWindowsAzureMediaServices&ExpiresOn=1421662918&Issuer=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&HMACSHA256=utmoXXbm9Q7j4tW1yJuMVA3egRiQy5FPygwadkmPeaY%3d\n    x-ms-version: 2.11\n    Host: media.chinacloudapi.cn\n\n    \n**HTTP 响应**\n\n如果成功，将返回以下响应：\n\n    HTTP/1.1 204 No Content \n    ...\n\n**HTTP 请求**\n\n    DELETE https://media.chinacloudapi.cn/api/AccessPolicies('nb%3Apid%3AUUID%3Abe0ac48d-af7d-4877-9d60-1805d68bffae') HTTP/1.1\n    DataServiceVersion: 1.0;NetFx\n    MaxDataServiceVersion: 3.0;NetFx\n    Accept: application/json\n    Accept-Charset: UTF-8\n    Authorization: Bearer http%3a%2f%2fschemas.xmlsoap.org%2fws%2f2005%2f05%2fidentity%2fclaims%2fnameidentifier=amstestaccount001&urn%3aSubscriptionId=z7f09258-6753-2233-b1ae-193798e2c9d8&http%3a%2f%2fschemas.microsoft.com%2faccesscontrolservice%2f2010%2f07%2fclaims%2fidentityprovider=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&Audience=urn%3aWindowsAzureMediaServices&ExpiresOn=1421662918&Issuer=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&HMACSHA256=utmoXXbm9Q7j4tW1yJuMVA3egRiQy5FPygwadkmPeaY%3d\n    x-ms-version: 2.11\n    Host: media.chinacloudapi.cn\n\n**HTTP 响应**\n\n如果成功，将返回以下响应：\n\n    HTTP/1.1 204 No Content \n    ...\n\n##<a id=\"upload_in_bulk\"></a>批量上载资产\n\n###创建 IngestManifest\n\nIngestManifest 是一个容器，用于放置一组资产、资产文件以及可用于确定该组资产或文件的批量引入进度的统计信息。\n\n\n**HTTP 请求**\n\n    POST https:// media.chinacloudapi.cn/API/IngestManifests HTTP/1.1\n    Content-Type: application/json;odata=verbose\n    Accept: application/json;odata=verbose\n    DataServiceVersion: 3.0\n    MaxDataServiceVersion: 3.0\n    x-ms-version: 2.11\n    Authorization: Bearer http%3a%2f%2fschemas.xmlsoap.org%2fws%2f2005%2f05%2fidentity%2fclaims%2fnameidentifier=070500D0-F35C-4A5A-9249-485BBF4EC70B&http%3a%2f%2fschemas.microsoft.com%2faccesscontrolservice%2f2010%2f07%2fclaims%2fidentityprovider=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&Audience=urn%3aWindowsAzureMediaServices&ExpiresOn=1334275521&Issuer=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&HMACSHA256=GxdBb%2fmEyN7iHdNxbawawHRftLhPFFqxX1JZckuv3hY%3d\n    Host: media.chinacloudapi.cn\n    Content-Length: 36\n    Expect: 100-continue\n    \n    { \"Name\" : \"ExampleManifestREST\" }\n\n###创建资产\n\n在创建 IngestManifestAsset 之前，你需要创建将使用批量引入完成的资产。资产是媒体服务中多种类型的对象或多组对象（包括视频、音频、图像、缩略图集合、文本轨道和隐藏的解释性字幕文件）的容器。在 REST API 中，创建资产需要向 Azure 媒体服务发送 HTTP POST 请求，并在请求正文中放置资产属性信息。在本示例中，资产是使用请求正文中包含的 StorageEncrption(1) 选项创建的。\n\n**HTTP 响应**\n\n    POST https://media.chinacloudapi.cn/API/Assets HTTP/1.1\n    Content-Type: application/json;odata=verbose\n    Accept: application/json;odata=verbose\n    DataServiceVersion: 3.0\n    MaxDataServiceVersion: 3.0\n    x-ms-version: 2.11\n    Authorization: Bearer http%3a%2f%2fschemas.xmlsoap.org%2fws%2f2005%2f05%2fidentity%2fclaims%2fnameidentifier=070500D0-F35C-4A5A-9249-485BBF4EC70B&http%3a%2f%2fschemas.microsoft.com%2faccesscontrolservice%2f2010%2f07%2fclaims%2fidentityprovider=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&Audience=urn%3aWindowsAzureMediaServices&ExpiresOn=1334275521&Issuer=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&HMACSHA256=GxdBb%2fmEyN7iHdNxbawawHRftLhPFFqxX1JZckuv3hY%3d\n    Host: media.chinacloudapi.cn\n    Content-Length: 55\n    Expect: 100-continue\n    \n    { \"Name\" : \"ExampleManifestREST_Asset\", \"Options\" : 1 }\n\n###创建 IngestManifestAsset\n\nIngestManifestAsset 表示 IngestManifest 内与批量引入一起使用的资产。IngestManifestAsset 主要用于将资产链接到清单。Azure 媒体服务会在内部根据关联到 IngestManifestAsset 的 IngestManifestFile 集合来监视文件上载。上载这些文件后，即完成资产操作。可以使用 HTTP POST 请求创建新的 IngestManifestAsset。在请求正文中包括 IngestManifest ID 和资产 ID，以便 IngestManifestAsset 将其链接到一起进行批量引入。\n\n**HTTP 响应**\n\n    POST https://media.chinacloudapi.cn/API/IngestManifestAssets HTTP/1.1\n    Content-Type: application/json;odata=verbose\n    Accept: application/json;odata=verbose\n    DataServiceVersion: 3.0\n    MaxDataServiceVersion: 3.0\n    x-ms-version: 2.11\n    Authorization: Bearer http%3a%2f%2fschemas.xmlsoap.org%2fws%2f2005%2f05%2fidentity%2fclaims%2fnameidentifier=070500D0-F35C-4A5A-9249-485BBF4EC70B&http%3a%2f%2fschemas.microsoft.com%2faccesscontrolservice%2f2010%2f07%2fclaims%2fidentityprovider=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&Audience=urn%3aWindowsAzureMediaServices&ExpiresOn=1334275521&Issuer=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&HMACSHA256=GxdBb%2fmEyN7iHdNxbawawHRftLhPFFqxX1JZckuv3hY%3d\n    Host: media.chinacloudapi.cn\n    Content-Length: 152\n    Expect: 100-continue\n    { \"ParentIngestManifestId\" : \"nb:mid:UUID:5c77f186-414f-8b48-8231-17f9264e2048\", \"Asset\" : { \"Id\" : \"nb:cid:UUID:b757929a-5a57-430b-b33e-c05c6cbef02e\"}}\n\n###（可选）创建用于加密的 ContentKey\n\n如果你的资产将使用加密，则在为资产创建 IngestManifestFile 之前，必须创建用于加密的 ContentKey。在本示例中，请求正文包括以下属性。\n \n请求正文属性 | 说明 \nID | 我们使用以下格式自行生成的 ContentKey ID：“nb:kid:UUID:<NEW GUID>”。\nContentKeyType | 这是此内容密钥的内容密钥类型（为整数）。我们为存储加密传递了值 1。\nEncryptedContentKey | 我们创建一个新的内容密钥值，这是一个 256 位（32 字节）的值。此密钥使用存储加密 X.509 证书进行加密，该证书是我们通过执行 GetProtectionKeyId 和 GetProtectionKey 方法的 HTTP GET 请求从 Azure 媒体服务中检索到的。\nProtectionKeyId | 这是存储加密 X.509 证书的保护密钥 ID，用于加密内容密钥。\nProtectionKeyType | 这是用于加密内容密钥的保护密钥的加密类型。对于我们的示例，此值为 StorageEncryption(1)。\n校验和 | 内容密钥的 MD5 计算的校验和。它通过使用内容密钥加密内容 ID 计算得出。此示例代码演示了如何计算校验和。\n\n\n**HTTP 响应**\n    \n    POST https://media.chinacloudapi.cn/api/ContentKeys HTTP/1.1\n    Content-Type: application/json;odata=verbose\n    Accept: application/json;odata=verbose\n    DataServiceVersion: 3.0\n    MaxDataServiceVersion: 3.0\n    x-ms-version: 2.11\n    Authorization: Bearer http%3a%2f%2fschemas.xmlsoap.org%2fws%2f2005%2f05%2fidentity%2fclaims%2fnameidentifier=070500D0-F35C-4A5A-9249-485BBF4EC70B&http%3a%2f%2fschemas.microsoft.com%2faccesscontrolservice%2f2010%2f07%2fclaims%2fidentityprovider=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&Audience=urn%3aWindowsAzureMediaServices&ExpiresOn=1334275521&Issuer=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&HMACSHA256=GxdBb%2fmEyN7iHdNxbawawHRftLhPFFqxX1JZckuv3hY%3d\n    Host: media.chinacloudapi.cn\n    Content-Length: 572\n    Expect: 100-continue\n    \n    {\"Id\" : \"nb:kid:UUID:316d14d4-b603-4d90-b8db-0fede8aa48f8\", \"ContentKeyType\" : 1, \"EncryptedContentKey\" : \"Y4NPej7heOFa2vsd8ZEOcjjpu/qOq3RJ6GRfxa8CCwtAM83d6J2mKOeQFUmMyVXUSsBCCOdufmieTKi+hOUtNAbyNM4lY4AXI537b9GaY8oSeje0NGU8+QCOuf7jGdRac5B9uIk7WwD76RAJnqyep6U/OdvQV4RLvvZ9w7nO4bY8RHaUaLxC2u4aIRRaZtLu5rm8GKBPy87OzQVXNgnLM01I8s3Z4wJ3i7jXqkknDy4VkIyLBSQvIvUzxYHeNdMVWDmS+jPN9ScVmolUwGzH1A23td8UWFHOjTjXHLjNm5Yq+7MIOoaxeMlKPYXRFKofRY8Qh5o5tqvycSAJ9KUqfg==\", \"ProtectionKeyId\" : \"7D9BB04D9D0A4A24800CADBFEF232689E048F69C\", \"ProtectionKeyType\" : 1, \"Checksum\" : \"TfXtjCIlq1Y=\" }\n\n### 将 ContentKey 链接到资产\n\nContentKey 通过发送 HTTP POST 请求关联到一个或多个资产。以下请求是一个示例，说明了如何按 ID 将示例 ContentKey 链接到示例资产。\n\n**HTTP 响应**\n    \n    POST https://media.chinacloudapi.cn/API/Assets('nb:cid:UUID:b3023475-09b4-4647-9d6d-6fc242822e68')/$links/ContentKeys HTTP/1.1\n    Content-Type: application/json;odata=verbose\n    Accept: application/json;odata=verbose\n    DataServiceVersion: 3.0\n    MaxDataServiceVersion: 3.0\n    x-ms-version: 2.11\n    Authorization: Bearer http%3a%2f%2fschemas.xmlsoap.org%2fws%2f2005%2f05%2fidentity%2fclaims%2fnameidentifier=070500D0-F35C-4A5A-9249-485BBF4EC70B&http%3a%2f%2fschemas.microsoft.com%2faccesscontrolservice%2f2010%2f07%2fclaims%2fidentityprovider=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&Audience=urn%3aWindowsAzureMediaServices&ExpiresOn=1334275521&Issuer=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&HMACSHA256=GxdBb%2fmEyN7iHdNxbawawHRftLhPFFqxX1JZckuv3hY%3d\n    Host: media.chinacloudapi.cn\n    Content-Length: 113\n    Expect: 100-continue\n    \n    { \"uri\": \"https://media.chinacloudapi.cn/api/ContentKeys('nb%3Akid%3AUUID%3A32e6efaf-5fba-4538-b115-9d1cefe43510')\"}\n\n###为每个资产创建 IngestManifestFile\n\nIngestManifestFile 代表将作为批量引入资产的一部分上载的实际视频或音频 blob 对象。除非资产使用加密选项，否则不需要与加密相关的属性。本部分使用的示例演示了如何创建 IngestManifestFile，以便将 StorageEncryption 用于之前创建的资产。\n\n\n**HTTP 响应**\n\n    POST https://media.chinacloudapi.cn/API/IngestManifestFiles HTTP/1.1\n    Content-Type: application/json;odata=verbose\n    Accept: application/json;odata=verbose\n    DataServiceVersion: 3.0\n    MaxDataServiceVersion: 3.0\n    x-ms-version: 2.11\n    Authorization: Bearer http%3a%2f%2fschemas.xmlsoap.org%2fws%2f2005%2f05%2fidentity%2fclaims%2fnameidentifier=070500D0-F35C-4A5A-9249-485BBF4EC70B&http%3a%2f%2fschemas.microsoft.com%2faccesscontrolservice%2f2010%2f07%2fclaims%2fidentityprovider=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&Audience=urn%3aWindowsAzureMediaServices&ExpiresOn=1334275521&Issuer=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&HMACSHA256=GxdBb%2fmEyN7iHdNxbawawHRftLhPFFqxX1JZckuv3hY%3d\n    Host: media.chinacloudapi.cn\n    Content-Length: 367\n    Expect: 100-continue\n    \n    { \"Name\" : \"REST_Example_File.wmv\", \"ParentIngestManifestId\" : \"nb:mid:UUID:5c77f186-414f-8b48-8231-17f9264e2048\", \"ParentIngestManifestAssetId\" : \"nb:maid:UUID:beed8531-9a03-9043-b1d8-6a6d1044cdda\", \"IsEncrypted\" : \"true\", \"EncryptionScheme\" : \"StorageEncryption\", \"EncryptionVersion\" : \"1.0\", \"EncryptionKeyId\" : \"nb:kid:UUID:32e6efaf-5fba-4538-b115-9d1cefe43510\" }\n    \n###将文件上载到 Blob 存储\n\n可以使用任何能够将资产文件上载到 Blob 存储容器 URI（由 IngestManifest 的 BlobStorageUriForUpload 属性提供）的高速客户端应用程序。一个明显的高速上载服务就是[适用于 Azure 应用程序的点播 Aspera](https://datamarket.azure.com/application/2cdbc511-cb12-4715-9871-c7e7fbbb82a6)。\n\n###监视批量引入进度\n\n可以通过轮询 IngestManifest 的 Statistics 属性来监视 IngestManifest 的批量引入操作的进度。该属性为复杂类型，即 [IngestManifestStatistics](https://msdn.microsoft.com/zh-cn/library/azure/jj853027.aspx)。若要轮询 Statistics 属性，请提交一个传递 IngestManifest ID 的 HTTP GET 请求。\n \n\n**HTTP 响应**\n\n    GET https://media.chinacloudapi.cn/API/IngestManifests('nb:mid:UUID:5c77f186-414f-8b48-8231-17f9264e2048') HTTP/1.1\n    Content-Type: application/json;odata=verbose\n    Accept: application/json;odata=verbose\n    DataServiceVersion: 3.0\n    MaxDataServiceVersion: 3.0\n    x-ms-version: 2.11\n    Authorization: Bearer http%3a%2f%2fschemas.xmlsoap.org%2fws%2f2005%2f05%2fidentity%2fclaims%2fnameidentifier=070500D0-F35C-4A5A-9249-485BBF4EC70B&http%3a%2f%2fschemas.microsoft.com%2faccesscontrolservice%2f2010%2f07%2fclaims%2fidentityprovider=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&Audience=urn%3aWindowsAzureMediaServices&ExpiresOn=1334275521&Issuer=https%3a%2f%2fwamsprodglobal001acs.accesscontrol.chinacloudapi.cn%2f&HMACSHA256=GxdBb%2fmEyN7iHdNxbawawHRftLhPFFqxX1JZckuv3hY%3d\n    Host: media.chinacloudapi.cn\n\n\n\n \n[How to Get a Media Processor]: /documentation/articles/media-services-get-media-processor\n \n\n<!---HONumber=82-->"
+}

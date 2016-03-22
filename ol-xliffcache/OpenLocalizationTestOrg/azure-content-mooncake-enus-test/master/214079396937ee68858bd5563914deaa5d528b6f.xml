@@ -1,0 +1,1450 @@
+{
+  "nodes": [
+    {
+      "content": "创建并上载 Red Hat Enterprise Linux VHD，以供在 Azure 中使用",
+      "pos": [
+        28,
+        76
+      ]
+    },
+    {
+      "content": "了解如何创建和上载包含 Red Hat Linux 操作系统的 Azure 虚拟硬盘 (VHD)。",
+      "pos": [
+        96,
+        145
+      ]
+    },
+    {
+      "content": "为 Azure 准备基于 Red Hat 的虚拟机",
+      "pos": [
+        381,
+        406
+      ]
+    },
+    {
+      "pos": [
+        407,
+        724
+      ],
+      "content": "在本文中，你将了解如何准备 Red Hat Enterprise Linux (RHEL) 虚拟机，以供在 Azure 中使用。本文中涉及的 RHEL 的版本是 6.7、7.1 和 7.2，本文中涉及的进行准备的虚拟机监控程序是 Hyper-V、KVM 和 VMWare。有关参与 Red Hat 云访问计划的资格要求的详细信息，请参阅 <bpt id=\"p1\">[</bpt>Red Hat 的云访问网站<ept id=\"p1\">](http://www.redhat.com/en/technologies/cloud-computing/cloud-access)</ept>和<bpt id=\"p2\">[</bpt>在 Azure 上运行 RHEL<ept id=\"p2\">](https://access.redhat.com/articles/1989673)</ept>。"
+    },
+    {
+      "content": "通过 Hyper-V 管理器准备映像",
+      "pos": [
+        731,
+        749
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        754,
+        758
+      ]
+    },
+    {
+      "content": "本部分假定你已经将从 Red Hat 网站获取的 ISO 文件中的 RHEL 映像安装到虚拟硬盘 (VHD)。有关如何使用 Hyper-V 管理器来安装操作系统映像的更多详细信息，请参阅<bpt id=\"p1\">[</bpt>安装 Hyper-V 角色和配置虚拟机<ept id=\"p1\">](http://technet.microsoft.com/zh-cn/library/hh846766.aspx)</ept>。",
+      "pos": [
+        759,
+        932
+      ]
+    },
+    {
+      "content": "RHEL 安装说明",
+      "pos": [
+        936,
+        945
+      ]
+    },
+    {
+      "content": "Azure 不支持更新的 VHDX 格式。可使用 Hyper-V 管理器或 convert-vhd powershell cmdlet 将磁盘转换为 VHD 格式。",
+      "pos": [
+        951,
+        1033
+      ]
+    },
+    {
+      "content": "在安装 Linux 系统时，建议使用标准分区而不是 LVM（通常是许多安装的默认值）。这将避免 LVM 与克隆 VM 发生名称冲突，特别是在 OS 磁盘需要连接到另一台 VM 以进行故障排除的情况下。如果首选，LVM 或 RAID 可以在数据磁盘上使用。",
+      "pos": [
+        1037,
+        1164
+      ]
+    },
+    {
+      "content": "不要在操作系统磁盘上配置交换分区。可以配置 Linux 代理，以在临时资源磁盘上创建交换文件。可以在下面的步骤中找到有关此内容的详细信息。",
+      "pos": [
+        1168,
+        1237
+      ]
+    },
+    {
+      "content": "所有 VHD 的大小必须是 1 MB 的倍数。",
+      "pos": [
+        1241,
+        1264
+      ]
+    },
+    {
+      "content": "请注意，在使用 qemu-img 将磁盘映像转换成 VHD 格式时，2.2.1 及更高版本的 qemu-img 中存在一个已知的 Bug，导致 VHD 格式不正常。我们会在即将发布的 qemu-img 版本中解决此问题。现在建议使用 qemu-img 版本 2.2.0 或较低版本。",
+      "pos": [
+        1268,
+        1409
+      ]
+    },
+    {
+      "content": "RHEL 6.7",
+      "pos": [
+        1415,
+        1423
+      ]
+    },
+    {
+      "content": "在 Hyper-V 管理器中，选择虚拟机。",
+      "pos": [
+        1429,
+        1450
+      ]
+    },
+    {
+      "pos": [
+        1456,
+        1480
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“连接”<ept id=\"p1\">**</ept>以打开该虚拟机的控制台窗口。"
+    },
+    {
+      "content": "通过运行以下命令卸载 NetworkManager：",
+      "pos": [
+        1486,
+        1512
+      ]
+    },
+    {
+      "pos": [
+        1565,
+        1606
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>如果尚未安装此包，则该命令将失败，并显示一条错误消息。这是正常情况。"
+    },
+    {
+      "pos": [
+        1612,
+        1665
+      ],
+      "content": "在包含以下文本的 <ph id=\"ph1\">`/etc/sysconfig/`</ph> 目录中创建一个名为 <bpt id=\"p1\">**</bpt>network<ept id=\"p1\">**</ept> 的文件："
+    },
+    {
+      "pos": [
+        1734,
+        1806
+      ],
+      "content": "在包含以下文本的 <ph id=\"ph1\">`/etc/sysconfig/network-scripts/`</ph> 目录中创建一个名为 <bpt id=\"p1\">**</bpt>ifcfg-eth0<ept id=\"p1\">**</ept> 的文件："
+    },
+    {
+      "content": "移动（或删除）udev 规则，以避免产生以太网接口的静态规则。在 Azure 或 Hyper-V 中克隆虚拟机时，这些规则会引发问题：",
+      "pos": [
+        1956,
+        2023
+      ]
+    },
+    {
+      "content": "通过运行以下命令，确保网络服务将在引导时启动：",
+      "pos": [
+        2254,
+        2277
+      ]
+    },
+    {
+      "content": "注册你的 Red Hat 订阅，以通过运行以下命令来启用来自 RHEL 存储库中的包的安装：",
+      "pos": [
+        2320,
+        2366
+      ]
+    },
+    {
+      "pos": [
+        2462,
+        2546
+      ],
+      "content": "WALinuxAgent 包 <ph id=\"ph1\">`WALinuxAgent-&lt;version&gt;`</ph> 已推送到 Fedora EPEL 6 存储库中。通过运行以下命令启用 epel 存储库："
+    },
+    {
+      "pos": [
+        2695,
+        2783
+      ],
+      "content": "在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开 <ph id=\"ph1\">`/boot/grub/menu.lst`</ph>，并确保默认内核包含以下参数："
+    },
+    {
+      "content": "这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。由于 RHEL 6 所使用的内核版本中存在 bug，因此这将禁用 NUMA。",
+      "pos": [
+        2880,
+        2964
+      ]
+    },
+    {
+      "content": "除此之外，建议删除以下参数：",
+      "pos": [
+        2970,
+        2984
+      ]
+    },
+    {
+      "content": "图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。",
+      "pos": [
+        3027,
+        3069
+      ]
+    },
+    {
+      "content": "根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。",
+      "pos": [
+        3075,
+        3151
+      ]
+    },
+    {
+      "content": "请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。修改 /etc/ssh/sshd\\_config 以包含以下行：",
+      "pos": [
+        3157,
+        3226
+      ]
+    },
+    {
+      "content": "通过运行以下命令来安装 Azure Linux 代理：",
+      "pos": [
+        3265,
+        3292
+      ]
+    },
+    {
+      "pos": [
+        3375,
+        3464
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>如果没有如步骤 2 中所述删除 NetworkManager 包和 NetworkManager-gnome 包，则安装 WALinuxAgent 包时会将其删除。"
+    },
+    {
+      "content": "请勿在 OS 磁盘上创建交换空间。",
+      "pos": [
+        3470,
+        3487
+      ]
+    },
+    {
+      "content": "Azure Linux 代理可使用在 Azure 上预配后附加到 VM 的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是临时磁盘，并且当取消设置 VM 时可能会被清空。在安装 Azure Linux 代理（请参见前一步骤）后，相应地在 /etc/waagent.conf 中修改以下参数：",
+      "pos": [
+        3488,
+        3635
+      ]
+    },
+    {
+      "content": "通过运行以下命令取消注册订阅（如有必要）：",
+      "pos": [
+        3878,
+        3899
+      ]
+    },
+    {
+      "content": "运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：",
+      "pos": [
+        3953,
+        3993
+      ]
+    },
+    {
+      "pos": [
+        4088,
+        4144
+      ],
+      "content": "在 Hyper-V 管理器中单击<bpt id=\"p1\">**</bpt>“操作”-&gt;“关闭”<ept id=\"p1\">**</ept>。Linux VHD 现已准备好上载到 Azure。"
+    },
+    {
+      "content": "RHEL 7.1/7.2",
+      "pos": [
+        4149,
+        4161
+      ]
+    },
+    {
+      "content": "在 Hyper-V 管理器中，选择虚拟机。",
+      "pos": [
+        4167,
+        4188
+      ]
+    },
+    {
+      "content": "单击“连接”以打开虚拟机的控制台窗口。",
+      "pos": [
+        4194,
+        4213
+      ]
+    },
+    {
+      "pos": [
+        4219,
+        4272
+      ],
+      "content": "在包含以下文本的 <ph id=\"ph1\">`/etc/sysconfig/`</ph> 目录中创建一个名为 <bpt id=\"p1\">**</bpt>network<ept id=\"p1\">**</ept> 的文件："
+    },
+    {
+      "pos": [
+        4341,
+        4413
+      ],
+      "content": "在包含以下文本的 <ph id=\"ph1\">`/etc/sysconfig/network-scripts/`</ph> 目录中创建一个名为 <bpt id=\"p1\">**</bpt>ifcfg-eth0<ept id=\"p1\">**</ept> 的文件："
+    },
+    {
+      "content": "通过运行以下命令，确保网络服务将在引导时启动：",
+      "pos": [
+        4563,
+        4586
+      ]
+    },
+    {
+      "content": "注册你的 Red Hat 订阅，以通过运行以下命令来启用来自 RHEL 存储库中的包的安装：",
+      "pos": [
+        4629,
+        4675
+      ]
+    },
+    {
+      "pos": [
+        4771,
+        4878
+      ],
+      "content": "在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开 <ph id=\"ph1\">`/etc/default/grub`</ph> 并编辑 <bpt id=\"p1\">**</bpt>GRUB\\_CMDLINE\\_LINUX<ept id=\"p1\">**</ept> 参数，例如："
+    },
+    {
+      "content": "这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。除此之外，建议删除以下参数：",
+      "pos": [
+        4978,
+        5038
+      ]
+    },
+    {
+      "pos": [
+        5080,
+        5203
+      ],
+      "content": "图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。\n根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。",
+          "pos": [
+            0,
+            42
+          ]
+        },
+        {
+          "content": "根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。",
+          "pos": [
+            43,
+            119
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        5209,
+        5262
+      ],
+      "content": "按照上面所示完成编辑 <ph id=\"ph1\">`/etc/default/grub`</ph> 后，运行以下命令以重新生成 grub 配置："
+    },
+    {
+      "pos": [
+        5323,
+        5393
+      ],
+      "content": "请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。修改 <ph id=\"ph1\">`/etc/ssh/sshd_config`</ph> 以包含以下行："
+    },
+    {
+      "pos": [
+        5432,
+        5516
+      ],
+      "content": "WALinuxAgent 包 <ph id=\"ph1\">`WALinuxAgent-&lt;version&gt;`</ph> 已推送到 Fedora EPEL 6 存储库中。通过运行以下命令启用 epel 存储库："
+    },
+    {
+      "content": "通过运行以下命令来安装 Azure Linux 代理：",
+      "pos": [
+        5661,
+        5688
+      ]
+    },
+    {
+      "pos": [
+        5784,
+        5947
+      ],
+      "content": "不要在 OS 磁盘上创建交换空间。Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是临时磁盘，并且当取消设置 VM 时可能会被清空。安装 Azure Linux 代理（请参阅上一步）后，相应地在 <ph id=\"ph1\">`/etc/waagent.conf`</ph> 中修改以下参数："
+    },
+    {
+      "content": "如果你想要撤消注册订阅，运行以下命令：",
+      "pos": [
+        6190,
+        6209
+      ]
+    },
+    {
+      "content": "运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：",
+      "pos": [
+        6263,
+        6303
+      ]
+    },
+    {
+      "pos": [
+        6406,
+        6462
+      ],
+      "content": "在 Hyper-V 管理器中单击<bpt id=\"p1\">**</bpt>“操作”-&gt;“关闭”<ept id=\"p1\">**</ept>。Linux VHD 现已准备好上载到 Azure。"
+    },
+    {
+      "content": "通过 KVM 准备映像",
+      "pos": [
+        6467,
+        6478
+      ]
+    },
+    {
+      "content": "RHEL 6.7",
+      "pos": [
+        6483,
+        6491
+      ]
+    },
+    {
+      "content": "从 Red Hat 网站上下载 RHEL 6.7 的 KVM 映像。",
+      "pos": [
+        6497,
+        6531
+      ]
+    },
+    {
+      "content": "设置根密码",
+      "pos": [
+        6537,
+        6542
+      ]
+    },
+    {
+      "content": "生成加密密码，然后复制命令的输出：",
+      "pos": [
+        6548,
+        6565
+      ]
+    },
+    {
+      "content": "使用 guestfish 设置根密码：",
+      "pos": [
+        6608,
+        6627
+      ]
+    },
+    {
+      "content": "将根用户的第二个字段从“!!”更改为加密密码。",
+      "pos": [
+        6810,
+        6833
+      ]
+    },
+    {
+      "pos": [
+        6839,
+        6926
+      ],
+      "content": "在 KVM 中通过 qcow2 映像创建虚拟机，将磁盘类型设置为 <bpt id=\"p1\">**</bpt>qcow2<ept id=\"p1\">**</ept>，将虚拟网络接口设备型号设置为 <bpt id=\"p2\">**</bpt>virtio<ept id=\"p2\">**</ept>。然后启动虚拟机，并以根用户身份登录。"
+    },
+    {
+      "pos": [
+        6932,
+        6985
+      ],
+      "content": "在包含以下文本的 <ph id=\"ph1\">`/etc/sysconfig/`</ph> 目录中创建一个名为 <bpt id=\"p1\">**</bpt>network<ept id=\"p1\">**</ept> 的文件："
+    },
+    {
+      "pos": [
+        7054,
+        7126
+      ],
+      "content": "在包含以下文本的 <ph id=\"ph1\">`/etc/sysconfig/network-scripts/`</ph> 目录中创建一个名为 <bpt id=\"p1\">**</bpt>ifcfg-eth0<ept id=\"p1\">**</ept> 的文件："
+    },
+    {
+      "content": "移动（或删除）udev 规则，以避免产生以太网接口的静态规则。在 Azure 或 Hyper-V 中克隆虚拟机时，这些规则会引发问题：",
+      "pos": [
+        7276,
+        7343
+      ]
+    },
+    {
+      "content": "通过运行以下命令，确保网络服务将在引导时启动：",
+      "pos": [
+        7547,
+        7570
+      ]
+    },
+    {
+      "content": "注册你的 Red Hat 订阅，以通过运行以下命令来启用来自 RHEL 存储库中的包的安装：",
+      "pos": [
+        7608,
+        7654
+      ]
+    },
+    {
+      "pos": [
+        7744,
+        7832
+      ],
+      "content": "在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开 <ph id=\"ph1\">`/boot/grub/menu.lst`</ph>，并确保默认内核包含以下参数："
+    },
+    {
+      "content": "这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。由于 RHEL 6 所使用的内核版本中存在 bug，因此这将禁用 NUMA。",
+      "pos": [
+        7902,
+        7986
+      ]
+    },
+    {
+      "content": "除此之外，建议删除以下参数：",
+      "pos": [
+        7992,
+        8006
+      ]
+    },
+    {
+      "pos": [
+        8049,
+        8172
+      ],
+      "content": "图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。\n根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。",
+          "pos": [
+            0,
+            42
+          ]
+        },
+        {
+          "content": "根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。",
+          "pos": [
+            43,
+            119
+          ]
+        }
+      ]
+    },
+    {
+      "content": "卸载 cloud-init：",
+      "pos": [
+        8178,
+        8192
+      ]
+    },
+    {
+      "content": "确保已安装 SSH 服务器且已将其配置为在引导时启动。",
+      "pos": [
+        8231,
+        8258
+      ]
+    },
+    {
+      "content": "修改 /etc/ssh/sshd\\_config 以包含以下行：",
+      "pos": [
+        8294,
+        8326
+      ]
+    },
+    {
+      "content": "重新启动 sshd：",
+      "pos": [
+        8400,
+        8410
+      ]
+    },
+    {
+      "pos": [
+        8448,
+        8532
+      ],
+      "content": "WALinuxAgent 包 <ph id=\"ph1\">`WALinuxAgent-&lt;version&gt;`</ph> 已推送到 Fedora EPEL 6 存储库中。通过运行以下命令启用 epel 存储库："
+    },
+    {
+      "content": "通过运行以下命令来安装 Azure Linux 代理：",
+      "pos": [
+        8681,
+        8708
+      ]
+    },
+    {
+      "pos": [
+        8781,
+        8929
+      ],
+      "content": "Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是临时磁盘，并且当取消设置 VM 时可能会被清空。安装 Azure Linux 代理（请参阅上一步）后，相应地在 <bpt id=\"p1\">**</bpt>/etc/waagent.conf<ept id=\"p1\">**</ept> 中修改以下参数："
+    },
+    {
+      "content": "通过运行以下命令取消注册订阅（如有必要）：",
+      "pos": [
+        9172,
+        9193
+      ]
+    },
+    {
+      "content": "运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：",
+      "pos": [
+        9250,
+        9290
+      ]
+    },
+    {
+      "content": "关闭 KVM 中的 VM。",
+      "pos": [
+        9380,
+        9393
+      ]
+    },
+    {
+      "pos": [
+        9399,
+        9439
+      ],
+      "content": "将 qcow2 映像转换为 vhd 格式：\n首先将此映像转换为原始格式：",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "将 qcow2 映像转换为 vhd 格式：",
+          "pos": [
+            0,
+            21
+          ]
+        },
+        {
+          "content": "首先将此映像转换为原始格式：",
+          "pos": [
+            22,
+            36
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        9526,
+        9803
+      ],
+      "content": "确保原始映像的大小为 1MB，如果不符合，则将数值大小四舍五入，使其等于 1MB：\n     # MB=$((1024*1024))\n     # size=$(qemu-img info -f raw --output json \"rhel-6.7.raw\" | \\\n              gawk 'match($0, /\"virtual-size\": ([0-9]+),/, val) {print val[1]}')\n     # rounded\\_size=$((($size/$MB + 1)*$MB))",
+      "leadings": [
+        "",
+        "    ",
+        "    ",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "确保原始映像的大小为 1MB，如果不符合，则将数值大小四舍五入，使其等于 1MB：",
+          "pos": [
+            0,
+            41
+          ]
+        },
+        {
+          "content": "MB=$((1024<bpt id=\"p1\">*</bpt>1024))\n     # size=$(qemu-img info -f raw --output json \"rhel-6.7.raw\" | \\\n              gawk 'match($0, /\"virtual-size\": ([0-9]+),/, val) {print val[1]}')\n     # rounded\\_size=$((($size/$MB + 1)<ept id=\"p1\">*</ept>$MB))",
+          "pos": [
+            49,
+            261
+          ]
+        }
+      ]
+    },
+    {
+      "content": "将原始磁盘转换为固定大小的 vhd：",
+      "pos": [
+        9864,
+        9882
+      ]
+    },
+    {
+      "content": "RHEL 7.1/7.2",
+      "pos": [
+        9976,
+        9988
+      ]
+    },
+    {
+      "content": "请从 Red Hat 网站下载 RHEL 7.1（或 7.2）的 KVM 映像，我们在这里将使用 RHEL 7.1 作为示例。",
+      "pos": [
+        9994,
+        10057
+      ]
+    },
+    {
+      "content": "设置根密码",
+      "pos": [
+        10063,
+        10068
+      ]
+    },
+    {
+      "content": "生成加密密码，然后复制命令的输出",
+      "pos": [
+        10074,
+        10090
+      ]
+    },
+    {
+      "content": "使用 guestfish 设置根密码",
+      "pos": [
+        10134,
+        10152
+      ]
+    },
+    {
+      "content": "将根用户的第二个字段从“!!”更改为加密密码",
+      "pos": [
+        10329,
+        10351
+      ]
+    },
+    {
+      "pos": [
+        10357,
+        10444
+      ],
+      "content": "在 KVM 中通过 qcow2 映像创建虚拟机，将磁盘类型设置为 <bpt id=\"p1\">**</bpt>qcow2<ept id=\"p1\">**</ept>，将虚拟网络接口设备型号设置为 <bpt id=\"p2\">**</bpt>virtio<ept id=\"p2\">**</ept>。然后启动虚拟机，并以根用户身份登录。"
+    },
+    {
+      "pos": [
+        10450,
+        10503
+      ],
+      "content": "在包含以下文本的 <ph id=\"ph1\">`/etc/sysconfig/`</ph> 目录中创建一个名为 <bpt id=\"p1\">**</bpt>network<ept id=\"p1\">**</ept> 的文件："
+    },
+    {
+      "pos": [
+        10572,
+        10644
+      ],
+      "content": "在包含以下文本的 <ph id=\"ph1\">`/etc/sysconfig/network-scripts/`</ph> 目录中创建一个名为 <bpt id=\"p1\">**</bpt>ifcfg-eth0<ept id=\"p1\">**</ept> 的文件："
+    },
+    {
+      "content": "通过运行以下命令，确保网络服务将在引导时启动：",
+      "pos": [
+        10794,
+        10817
+      ]
+    },
+    {
+      "content": "注册你的 Red Hat 订阅，以通过运行以下命令来启用来自 RHEL 存储库中的包的安装：",
+      "pos": [
+        10855,
+        10901
+      ]
+    },
+    {
+      "pos": [
+        10991,
+        11098
+      ],
+      "content": "在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开 <ph id=\"ph1\">`/etc/default/grub`</ph> 并编辑 <bpt id=\"p1\">**</bpt>GRUB\\_CMDLINE\\_LINUX<ept id=\"p1\">**</ept> 参数，例如："
+    },
+    {
+      "content": "这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。除此之外，建议删除以下参数：",
+      "pos": [
+        11198,
+        11258
+      ]
+    },
+    {
+      "pos": [
+        11301,
+        11424
+      ],
+      "content": "图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。\n根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。",
+          "pos": [
+            0,
+            42
+          ]
+        },
+        {
+          "content": "根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。",
+          "pos": [
+            43,
+            119
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        11430,
+        11483
+      ],
+      "content": "按照上面所示完成编辑 <ph id=\"ph1\">`/etc/default/grub`</ph> 后，运行以下命令以重新生成 grub 配置："
+    },
+    {
+      "content": "卸载 cloud-init：",
+      "pos": [
+        11539,
+        11553
+      ]
+    },
+    {
+      "content": "确保已安装 SSH 服务器且已将其配置为在引导时启动。",
+      "pos": [
+        11592,
+        11619
+      ]
+    },
+    {
+      "content": "修改 /etc/ssh/sshd\\_config 以包含以下行：",
+      "pos": [
+        11658,
+        11690
+      ]
+    },
+    {
+      "content": "重新启动 sshd：",
+      "pos": [
+        11764,
+        11774
+      ]
+    },
+    {
+      "pos": [
+        11814,
+        11898
+      ],
+      "content": "WALinuxAgent 包 <ph id=\"ph1\">`WALinuxAgent-&lt;version&gt;`</ph> 已推送到 Fedora EPEL 6 存储库中。通过运行以下命令启用 epel 存储库："
+    },
+    {
+      "content": "通过运行以下命令来安装 Azure Linux 代理：",
+      "pos": [
+        12043,
+        12070
+      ]
+    },
+    {
+      "content": "启用 waagent 服务：",
+      "pos": [
+        12112,
+        12126
+      ]
+    },
+    {
+      "pos": [
+        12176,
+        12339
+      ],
+      "content": "不要在 OS 磁盘上创建交换空间。Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是临时磁盘，并且当取消设置 VM 时可能会被清空。安装 Azure Linux 代理（请参阅上一步）后，相应地在 <ph id=\"ph1\">`/etc/waagent.conf`</ph> 中修改以下参数："
+    },
+    {
+      "content": "通过运行以下命令取消注册订阅（如有必要）：",
+      "pos": [
+        12582,
+        12603
+      ]
+    },
+    {
+      "content": "运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：",
+      "pos": [
+        12652,
+        12692
+      ]
+    },
+    {
+      "content": "关闭 KVM 中的虚拟机。",
+      "pos": [
+        12787,
+        12800
+      ]
+    },
+    {
+      "content": "将 qcow2 映像转换为 vhd 格式：",
+      "pos": [
+        12806,
+        12827
+      ]
+    },
+    {
+      "content": "首先将此映像转换为原始格式：",
+      "pos": [
+        12833,
+        12847
+      ]
+    },
+    {
+      "content": "确保原始映像的大小为 1MB，如果不符合，则将数值大小四舍五入，使其等于 1MB：",
+      "pos": [
+        12926,
+        12967
+      ]
+    },
+    {
+      "content": "将原始磁盘转换为固定大小的 vhd：",
+      "pos": [
+        13264,
+        13282
+      ]
+    },
+    {
+      "content": "通过 VMWare 准备映像",
+      "pos": [
+        13375,
+        13389
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        13393,
+        13397
+      ]
+    },
+    {
+      "content": "本部分假定你已经在 VMWare 中安装了 RHEL 虚拟机。有关如何在 VMWare 中安装操作系统的详细信息，请参阅 <bpt id=\"p1\">[</bpt>VMWare 来宾操作系统安装指南<ept id=\"p1\">](http://partnerweb.vmware.com/GOSIG/home.html)</ept>。",
+      "pos": [
+        13398,
+        13525
+      ]
+    },
+    {
+      "content": "在安装 Linux 系统时，建议使用标准分区而不是 LVM（通常是许多安装的默认值）。这将避免 LVM 与克隆 VM 发生名称冲突，特别是在 OS 磁盘需要连接到另一台 VM 以进行故障排除的情况下。如果首选，LVM 或 RAID 可以在数据磁盘上使用。",
+      "pos": [
+        13530,
+        13657
+      ]
+    },
+    {
+      "content": "不要在操作系统磁盘上配置交换分区。可以配置 Linux 代理，以在临时资源磁盘上创建交换文件。可以在下面的步骤中找到有关此内容的详细信息。",
+      "pos": [
+        13661,
+        13730
+      ]
+    },
+    {
+      "content": "当你创建虚拟硬盘时，选择“将虚拟磁盘存储为单个文件”。",
+      "pos": [
+        13734,
+        13761
+      ]
+    },
+    {
+      "content": "RHEL 6.7",
+      "pos": [
+        13766,
+        13774
+      ]
+    },
+    {
+      "content": "通过运行以下命令卸载 NetworkManager：",
+      "pos": [
+        13779,
+        13805
+      ]
+    },
+    {
+      "pos": [
+        13859,
+        13900
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>如果尚未安装此包，则该命令将失败，并显示一条错误消息。这是正常情况。"
+    },
+    {
+      "pos": [
+        13906,
+        13957
+      ],
+      "content": "在包含以下文本的 /etc/sysconfig/ 目录中创建一个名为 <bpt id=\"p1\">**</bpt>network<ept id=\"p1\">**</ept> 的文件："
+    },
+    {
+      "pos": [
+        14026,
+        14096
+      ],
+      "content": "在包含以下文本的 /etc/sysconfig/network-scripts/ 目录中创建一个名为 <bpt id=\"p1\">**</bpt>ifcfg-eth0<ept id=\"p1\">**</ept> 的文件："
+    },
+    {
+      "content": "移动（或删除）udev 规则，以避免产生以太网接口的静态规则。在 Azure 或 Hyper-V 中克隆虚拟机时，这些规则会引发问题：",
+      "pos": [
+        14246,
+        14313
+      ]
+    },
+    {
+      "content": "通过运行以下命令，确保网络服务将在引导时启动：",
+      "pos": [
+        14532,
+        14555
+      ]
+    },
+    {
+      "content": "注册你的 Red Hat 订阅，以通过运行以下命令来启用来自 RHEL 存储库中的包的安装：",
+      "pos": [
+        14598,
+        14644
+      ]
+    },
+    {
+      "pos": [
+        14740,
+        14824
+      ],
+      "content": "WALinuxAgent 包 <ph id=\"ph1\">`WALinuxAgent-&lt;version&gt;`</ph> 已推送到 Fedora EPEL 6 存储库中。通过运行以下命令启用 epel 存储库："
+    },
+    {
+      "content": "在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开“/boot/grub/menu.lst”，并确保默认内核包含以下参数：",
+      "pos": [
+        14973,
+        15060
+      ]
+    },
+    {
+      "content": "这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。由于 RHEL 6 所使用的内核版本中存在 bug，因此这将禁用 NUMA。除此之外，建议删除以下参数：",
+      "pos": [
+        15157,
+        15255
+      ]
+    },
+    {
+      "pos": [
+        15298,
+        15421
+      ],
+      "content": "图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。\n根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。",
+          "pos": [
+            0,
+            42
+          ]
+        },
+        {
+          "content": "根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。",
+          "pos": [
+            43,
+            119
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        15427,
+        15497
+      ],
+      "content": "请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。修改 <ph id=\"ph1\">`/etc/ssh/sshd_config`</ph> 以包含以下行："
+    },
+    {
+      "content": "通过运行以下命令来安装 Azure Linux 代理：",
+      "pos": [
+        15536,
+        15563
+      ]
+    },
+    {
+      "content": "请勿在 OS 磁盘上创建交换空间：",
+      "pos": [
+        15646,
+        15663
+      ]
+    },
+    {
+      "pos": [
+        15673,
+        15819
+      ],
+      "content": "Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是临时磁盘，并且当取消设置 VM 时可能会被清空。安装 Azure Linux 代理（请参阅上一步）后，相应地在 <ph id=\"ph1\">`/etc/waagent.conf`</ph> 中修改以下参数："
+    },
+    {
+      "content": "通过运行以下命令取消注册订阅（如有必要）：",
+      "pos": [
+        16062,
+        16083
+      ]
+    },
+    {
+      "content": "运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：",
+      "pos": [
+        16137,
+        16177
+      ]
+    },
+    {
+      "content": "关闭 VM，并将 VMDK 文件转换为 VHD 文件。",
+      "pos": [
+        16273,
+        16300
+      ]
+    },
+    {
+      "content": "首先将此映像转换为原始格式：",
+      "pos": [
+        16306,
+        16320
+      ]
+    },
+    {
+      "content": "确保原始映像的大小为 1MB，如果不符合，则将数值大小四舍五入，使其等于 1MB：",
+      "pos": [
+        16396,
+        16437
+      ]
+    },
+    {
+      "content": "将原始磁盘转换为固定大小的 vhd：",
+      "pos": [
+        16727,
+        16745
+      ]
+    },
+    {
+      "content": "RHEL 7.1/7.2",
+      "pos": [
+        16837,
+        16849
+      ]
+    },
+    {
+      "pos": [
+        16855,
+        16906
+      ],
+      "content": "在包含以下文本的 /etc/sysconfig/ 目录中创建一个名为 <bpt id=\"p1\">**</bpt>network<ept id=\"p1\">**</ept> 的文件："
+    },
+    {
+      "pos": [
+        16975,
+        17045
+      ],
+      "content": "在包含以下文本的 /etc/sysconfig/network-scripts/ 目录中创建一个名为 <bpt id=\"p1\">**</bpt>ifcfg-eth0<ept id=\"p1\">**</ept> 的文件："
+    },
+    {
+      "content": "通过运行以下命令，确保网络服务将在引导时启动：",
+      "pos": [
+        17195,
+        17218
+      ]
+    },
+    {
+      "content": "注册你的 Red Hat 订阅，以通过运行以下命令来启用来自 RHEL 存储库中的包的安装：",
+      "pos": [
+        17261,
+        17307
+      ]
+    },
+    {
+      "pos": [
+        17403,
+        17510
+      ],
+      "content": "在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开 <ph id=\"ph1\">`/etc/default/grub`</ph> 并编辑 <bpt id=\"p1\">**</bpt>GRUB\\_CMDLINE\\_LINUX<ept id=\"p1\">**</ept> 参数，例如："
+    },
+    {
+      "content": "这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。除此之外，建议删除以下参数：",
+      "pos": [
+        17610,
+        17670
+      ]
+    },
+    {
+      "pos": [
+        17713,
+        17836
+      ],
+      "content": "图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。\n根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。",
+          "pos": [
+            0,
+            42
+          ]
+        },
+        {
+          "content": "根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。",
+          "pos": [
+            43,
+            119
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        17842,
+        17895
+      ],
+      "content": "按照上面所示完成编辑 <ph id=\"ph1\">`/etc/default/grub`</ph> 后，运行以下命令以重新生成 grub 配置："
+    },
+    {
+      "content": "将 Hyper-V 模块添加到 initramfs 中：",
+      "pos": [
+        17957,
+        17985
+      ]
+    },
+    {
+      "pos": [
+        17991,
+        18018
+      ],
+      "content": "编辑 <ph id=\"ph1\">`/etc/dracut.conf`</ph>，添加内容："
+    },
+    {
+      "content": "重新生成 initramfs：",
+      "pos": [
+        18078,
+        18093
+      ]
+    },
+    {
+      "pos": [
+        18123,
+        18193
+      ],
+      "content": "请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。修改 <ph id=\"ph1\">`/etc/ssh/sshd_config`</ph> 以包含以下行："
+    },
+    {
+      "pos": [
+        18232,
+        18316
+      ],
+      "content": "WALinuxAgent 包 <ph id=\"ph1\">`WALinuxAgent-&lt;version&gt;`</ph> 已推送到 Fedora EPEL 6 存储库中。通过运行以下命令启用 epel 存储库："
+    },
+    {
+      "content": "通过运行以下命令来安装 Azure Linux 代理：",
+      "pos": [
+        18462,
+        18489
+      ]
+    },
+    {
+      "pos": [
+        18584,
+        18747
+      ],
+      "content": "不要在 OS 磁盘上创建交换空间。Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是临时磁盘，并且当取消设置 VM 时可能会被清空。安装 Azure Linux 代理（请参阅上一步）后，相应地在 <ph id=\"ph1\">`/etc/waagent.conf`</ph> 中修改以下参数："
+    },
+    {
+      "content": "如果你想要撤消注册订阅，运行以下命令：",
+      "pos": [
+        18990,
+        19009
+      ]
+    },
+    {
+      "content": "运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：",
+      "pos": [
+        19063,
+        19103
+      ]
+    },
+    {
+      "content": "关闭 VM，并将 VMDK 文件转换为 VHD 格式。",
+      "pos": [
+        19198,
+        19225
+      ]
+    },
+    {
+      "content": "首先将此映像转换为原始格式：",
+      "pos": [
+        19231,
+        19245
+      ]
+    },
+    {
+      "content": "确保原始映像的大小为 1MB，如果不符合，则将数值大小四舍五入，使其等于 1MB：",
+      "pos": [
+        19321,
+        19362
+      ]
+    },
+    {
+      "content": "将原始磁盘转换为固定大小的 vhd：",
+      "pos": [
+        19653,
+        19671
+      ]
+    },
+    {
+      "content": "使用启动文件通过 ISO 进行自动准备",
+      "pos": [
+        19763,
+        19782
+      ]
+    },
+    {
+      "content": "RHEL 7.1/7.2",
+      "pos": [
+        19786,
+        19798
+      ]
+    },
+    {
+      "pos": [
+        19804,
+        19981
+      ],
+      "content": "创建包含以下内容的启动文件，并保存该文件。有关启动安装的详细信息，请参阅<bpt id=\"p1\">[</bpt>启动安装指南<ept id=\"p1\">](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/Installation_Guide/chap-kickstart-installations.html)</ept>。"
+    },
+    {
+      "content": "将启动文件置于可从安装系统访问的位置。",
+      "pos": [
+        22705,
+        22724
+      ]
+    },
+    {
+      "content": "在 Hyper-V 管理器中，创建新的 VM。在“连接虚拟硬盘”页上，选择“稍后附加虚拟硬盘”，并完成新建虚拟机向导。",
+      "pos": [
+        22731,
+        22790
+      ]
+    },
+    {
+      "content": "打开 VM 设置：",
+      "pos": [
+        22796,
+        22805
+      ]
+    },
+    {
+      "content": "a.将新的虚拟硬盘附加到 VM，请务必选择“VHD 格式”和“固定大小”。",
+      "pos": [
+        22811,
+        22848
+      ]
+    },
+    {
+      "content": "b.将安装 ISO 附加到 DVD 驱动器。",
+      "pos": [
+        22858,
+        22880
+      ]
+    },
+    {
+      "content": "c.将 BIOS 设置为从 CD 启动。",
+      "pos": [
+        22886,
+        22906
+      ]
+    },
+    {
+      "pos": [
+        22912,
+        22947
+      ],
+      "content": "启动 VM，当安装指南出现时，请按 <bpt id=\"p1\">**</bpt>Tab<ept id=\"p1\">**</ept> 键来配置启动选项。"
+    },
+    {
+      "pos": [
+        22953,
+        23027
+      ],
+      "content": "在启动选项的末尾输入 <ph id=\"ph1\">`inst.ks=&lt;the location of the Kickstart file&gt;`</ph>，然后按 <bpt id=\"p1\">**</bpt>Enter<ept id=\"p1\">**</ept> 键。"
+    },
+    {
+      "content": "等待安装完成，完成后，VM 会自动关闭。Linux VHD 现已准备好上载到 Azure。",
+      "pos": [
+        23033,
+        23078
+      ]
+    },
+    {
+      "content": "已知问题",
+      "pos": [
+        23082,
+        23086
+      ]
+    },
+    {
+      "content": "当你在 Hyper-V 和 Azure 中使用 RHEL 7.1 时，会遇到多个已知问题。",
+      "pos": [
+        23087,
+        23132
+      ]
+    },
+    {
+      "content": "问题：磁盘 I/O 冻结",
+      "pos": [
+        23137,
+        23149
+      ]
+    },
+    {
+      "content": "在 Hyper-V 和 Azure 中使用 RHEL 7.1 时，频繁的存储磁盘 I/O 活动期间可能会出现此问题。",
+      "pos": [
+        23152,
+        23210
+      ]
+    },
+    {
+      "content": "重现率：",
+      "pos": [
+        23212,
+        23216
+      ]
+    },
+    {
+      "content": "此问题是间歇出现的，但在 Hyper-V 和 Azure 中进行频繁的磁盘 I/O 操作过程中出现更加频繁。",
+      "pos": [
+        23218,
+        23272
+      ]
+    },
+    {
+      "pos": [
+        23279,
+        23330
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>此已知问题已被 Red Hat 解决。若要安装关联的修补程序，请运行以下命令："
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        23359,
+        23363
+      ]
+    },
+    {
+      "pos": [
+        23364,
+        23552
+      ],
+      "content": "现在，你已准备就绪，可以使用 Red Hat Enterprise Linux .vhd 在 Azure 中创建新的 Azure 虚拟机了。有关已通过认证可运行 Red Hat Enterprise Linux 的虚拟机监控程序的更多详细信息，请访问 <bpt id=\"p1\">[</bpt>Red Hat 网站<ept id=\"p1\">](https://access.redhat.com/certified-hypervisors)</ept>。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"创建并上载 Red Hat Enterprise Linux VHD，以供在 Azure 中使用\" \n    description=\"了解如何创建和上载包含 Red Hat Linux 操作系统的 Azure 虚拟硬盘 (VHD)。\" \n    services=\"virtual-machines\" \n    documentationCenter=\"\" \n    authors=\"SuperScottz\" \n    manager=\"timlt\" \n    editor=\"tysonn\"/>\n\n<tags \n    ms.service=\"virtual-machines\" \n    ms.date=\"11/23/2015\" \n    wacn.date=\"01/29/2016\"/>\n\n\n# 为 Azure 准备基于 Red Hat 的虚拟机\n在本文中，你将了解如何准备 Red Hat Enterprise Linux (RHEL) 虚拟机，以供在 Azure 中使用。本文中涉及的 RHEL 的版本是 6.7、7.1 和 7.2，本文中涉及的进行准备的虚拟机监控程序是 Hyper-V、KVM 和 VMWare。有关参与 Red Hat 云访问计划的资格要求的详细信息，请参阅 [Red Hat 的云访问网站](http://www.redhat.com/en/technologies/cloud-computing/cloud-access)和[在 Azure 上运行 RHEL](https://access.redhat.com/articles/1989673)。\n\n\n\n\n##通过 Hyper-V 管理器准备映像 \n###先决条件\n本部分假定你已经将从 Red Hat 网站获取的 ISO 文件中的 RHEL 映像安装到虚拟硬盘 (VHD)。有关如何使用 Hyper-V 管理器来安装操作系统映像的更多详细信息，请参阅[安装 Hyper-V 角色和配置虚拟机](http://technet.microsoft.com/zh-cn/library/hh846766.aspx)。\n\n**RHEL 安装说明**\n\n- Azure 不支持更新的 VHDX 格式。可使用 Hyper-V 管理器或 convert-vhd powershell cmdlet 将磁盘转换为 VHD 格式。\n\n- 在安装 Linux 系统时，建议使用标准分区而不是 LVM（通常是许多安装的默认值）。这将避免 LVM 与克隆 VM 发生名称冲突，特别是在 OS 磁盘需要连接到另一台 VM 以进行故障排除的情况下。如果首选，LVM 或 RAID 可以在数据磁盘上使用。\n\n- 不要在操作系统磁盘上配置交换分区。可以配置 Linux 代理，以在临时资源磁盘上创建交换文件。可以在下面的步骤中找到有关此内容的详细信息。\n\n- 所有 VHD 的大小必须是 1 MB 的倍数。\n\n- 请注意，在使用 qemu-img 将磁盘映像转换成 VHD 格式时，2.2.1 及更高版本的 qemu-img 中存在一个已知的 Bug，导致 VHD 格式不正常。我们会在即将发布的 qemu-img 版本中解决此问题。现在建议使用 qemu-img 版本 2.2.0 或较低版本。\n\n\n###RHEL 6.7\n\n1.  在 Hyper-V 管理器中，选择虚拟机。\n\n2.  单击**“连接”**以打开该虚拟机的控制台窗口。\n\n3.  通过运行以下命令卸载 NetworkManager：\n\n        # sudo rpm -e --nodeps NetworkManager\n\n    **注意：**如果尚未安装此包，则该命令将失败，并显示一条错误消息。这是正常情况。\n\n4.  在包含以下文本的 `/etc/sysconfig/` 目录中创建一个名为 **network** 的文件：\n\n        NETWORKING=yes\n        HOSTNAME=localhost.localdomain\n\n5.  在包含以下文本的 `/etc/sysconfig/network-scripts/` 目录中创建一个名为 **ifcfg-eth0** 的文件：\n\n        DEVICE=eth0\n        ONBOOT=yes\n        BOOTPROTO=dhcp\n        TYPE=Ethernet\n        USERCTL=no\n        PEERDNS=yes\n        IPV6INIT=no\n\n6.  移动（或删除）udev 规则，以避免产生以太网接口的静态规则。在 Azure 或 Hyper-V 中克隆虚拟机时，这些规则会引发问题：\n            \n        # sudo mkdir -m 0700 /var/lib/waagent\n        # sudo mv /lib/udev/rules.d/75-persistent-net-generator.rules /var/lib/waagent/\n        # sudo mv /etc/udev/rules.d/70-persistent-net.rules /var/lib/waagent/\n\n7.  通过运行以下命令，确保网络服务将在引导时启动：\n\n        # sudo chkconfig network on\n\n8.  注册你的 Red Hat 订阅，以通过运行以下命令来启用来自 RHEL 存储库中的包的安装：\n\n        # sudo subscription-manager register --auto-attach --username=XXX --password=XXX\n\n9.  WALinuxAgent 包 `WALinuxAgent-<version>` 已推送到 Fedora EPEL 6 存储库中。通过运行以下命令启用 epel 存储库：\n\n        # wget http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm\n        # rpm -ivh epel-release-6-8.noarch.rpm\n\n10. 在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开 `/boot/grub/menu.lst`，并确保默认内核包含以下参数：\n\n        console=ttyS0 \n        earlyprintk=ttyS0 \n        rootdelay=300 \n        numa=off\n\n    这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。由于 RHEL 6 所使用的内核版本中存在 bug，因此这将禁用 NUMA。\n\n    除此之外，建议删除以下参数：\n\n        rhgb quiet crashkernel=auto\n\n    图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。\n\n    根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。\n\n11. 请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。修改 /etc/ssh/sshd\\_config 以包含以下行：\n\n        ClientAliveInterval 180\n\n12. 通过运行以下命令来安装 Azure Linux 代理：\n\n        # sudo yum install WALinuxAgent\n        # sudo chkconfig waagent on\n\n    **注意：**如果没有如步骤 2 中所述删除 NetworkManager 包和 NetworkManager-gnome 包，则安装 WALinuxAgent 包时会将其删除。\n\n13. 请勿在 OS 磁盘上创建交换空间。\nAzure Linux 代理可使用在 Azure 上预配后附加到 VM 的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是临时磁盘，并且当取消设置 VM 时可能会被清空。在安装 Azure Linux 代理（请参见前一步骤）后，相应地在 /etc/waagent.conf 中修改以下参数：\n\n        ResourceDisk.Format=y\n        ResourceDisk.Filesystem=ext4\n        ResourceDisk.MountPoint=/mnt/resource\n        ResourceDisk.EnableSwap=y\n        ResourceDisk.SwapSizeMB=2048    ## NOTE: set this to whatever you need it to be.\n\n14. 通过运行以下命令取消注册订阅（如有必要）：\n\n        # sudo subscription-manager unregister\n\n15. 运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：\n\n        # sudo waagent -force -deprovision\n        # export HISTSIZE=0\n        # logout\n\n16. 在 Hyper-V 管理器中单击**“操作”->“关闭”**。Linux VHD 现已准备好上载到 Azure。\n\n###RHEL 7.1/7.2\n\n1.  在 Hyper-V 管理器中，选择虚拟机。\n\n2.  单击“连接”以打开虚拟机的控制台窗口。\n\n3.  在包含以下文本的 `/etc/sysconfig/` 目录中创建一个名为 **network** 的文件：\n\n        NETWORKING=yes\n        HOSTNAME=localhost.localdomain\n\n4.  在包含以下文本的 `/etc/sysconfig/network-scripts/` 目录中创建一个名为 **ifcfg-eth0** 的文件：\n\n        DEVICE=eth0\n        ONBOOT=yes\n        BOOTPROTO=dhcp\n        TYPE=Ethernet\n        USERCTL=no\n        PEERDNS=yes\n        IPV6INIT=no\n\n5.  通过运行以下命令，确保网络服务将在引导时启动：\n\n        # sudo chkconfig network on\n\n6.  注册你的 Red Hat 订阅，以通过运行以下命令来启用来自 RHEL 存储库中的包的安装：\n\n        # sudo subscription-manager register --auto-attach --username=XXX --password=XXX\n\n7.  在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开 `/etc/default/grub` 并编辑 **GRUB\\_CMDLINE\\_LINUX** 参数，例如：\n\n        GRUB_CMDLINE_LINUX=\"rootdelay=300 \n        console=ttyS0 \n        earlyprintk=ttyS0\"\n\n    这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。除此之外，建议删除以下参数：\n\n        rhgb quiet crashkernel=auto\n    图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。\n    根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。\n\n8.  按照上面所示完成编辑 `/etc/default/grub` 后，运行以下命令以重新生成 grub 配置：\n\n        # sudo grub2-mkconfig -o /boot/grub2/grub.cfg\n\n9.  请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。修改 `/etc/ssh/sshd_config` 以包含以下行：\n\n        ClientAliveInterval 180\n\n10. WALinuxAgent 包 `WALinuxAgent-<version>` 已推送到 Fedora EPEL 6 存储库中。通过运行以下命令启用 epel 存储库：\n\n        # wget http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm\n        # rpm -ivh epel-release-7-5.noarch.rpm\n\n11. 通过运行以下命令来安装 Azure Linux 代理：\n\n        # sudo yum install WALinuxAgent\n        # sudo systemctl enable waagent.service \n\n12. 不要在 OS 磁盘上创建交换空间。Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是临时磁盘，并且当取消设置 VM 时可能会被清空。安装 Azure Linux 代理（请参阅上一步）后，相应地在 `/etc/waagent.conf` 中修改以下参数：\n\n        ResourceDisk.Format=y\n        ResourceDisk.Filesystem=ext4\n        ResourceDisk.MountPoint=/mnt/resource\n        ResourceDisk.EnableSwap=y\n        ResourceDisk.SwapSizeMB=2048    ## NOTE: set this to whatever you need it to be.\n\n13. 如果你想要撤消注册订阅，运行以下命令：\n\n        # sudo subscription-manager unregister\n\n14. 运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：\n        \n        # sudo waagent -force -deprovision\n        # export HISTSIZE=0\n        # logout\n\n15. 在 Hyper-V 管理器中单击**“操作”->“关闭”**。Linux VHD 现已准备好上载到 Azure。\n\n\n##通过 KVM 准备映像 \n###RHEL 6.7\n\n1.  从 Red Hat 网站上下载 RHEL 6.7 的 KVM 映像。\n\n2.  设置根密码\n\n    生成加密密码，然后复制命令的输出：\n\n        # openssl passwd -1 changeme\n    使用 guestfish 设置根密码：\n       \n        # guestfish --rw -a <image-name>\n        ><fs> run\n        ><fs> list-filesystems\n        ><fs> mount /dev/sda1 /\n        ><fs> vi /etc/shadow\n        ><fs> exit\n    将根用户的第二个字段从“!!”更改为加密密码。\n\n3.  在 KVM 中通过 qcow2 映像创建虚拟机，将磁盘类型设置为 **qcow2**，将虚拟网络接口设备型号设置为 **virtio**。然后启动虚拟机，并以根用户身份登录。\n\n4.  在包含以下文本的 `/etc/sysconfig/` 目录中创建一个名为 **network** 的文件：\n\n        NETWORKING=yes\n        HOSTNAME=localhost.localdomain\n\n5.  在包含以下文本的 `/etc/sysconfig/network-scripts/` 目录中创建一个名为 **ifcfg-eth0** 的文件：\n\n        DEVICE=eth0\n        ONBOOT=yes\n        BOOTPROTO=dhcp\n        TYPE=Ethernet\n        USERCTL=no\n        PEERDNS=yes\n        IPV6INIT=no\n\n6.  移动（或删除）udev 规则，以避免产生以太网接口的静态规则。在 Azure 或 Hyper-V 中克隆虚拟机时，这些规则会引发问题：\n\n        # mkdir -m 0700 /var/lib/waagent\n        # mv /lib/udev/rules.d/75-persistent-net-generator.rules /var/lib/waagent/\n        # mv /etc/udev/rules.d/70-persistent-net.rules /var/lib/waagent/\n\n7.  通过运行以下命令，确保网络服务将在引导时启动：\n\n        # chkconfig network on\n\n8.  注册你的 Red Hat 订阅，以通过运行以下命令来启用来自 RHEL 存储库中的包的安装：\n\n        # subscription-manager register –auto-attach --username=XXX --password=XXX\n\n9.  在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开 `/boot/grub/menu.lst`，并确保默认内核包含以下参数：\n\n        console=ttyS0 earlyprintk=ttyS0 rootdelay=300 numa=off\n\n    这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。由于 RHEL 6 所使用的内核版本中存在 bug，因此这将禁用 NUMA。\n\n    除此之外，建议删除以下参数：\n\n        rhgb quiet crashkernel=auto\n\n    图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。\n    根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。\n\n10. 卸载 cloud-init：\n\n        # yum remove cloud-init\n\n11. 确保已安装 SSH 服务器且已将其配置为在引导时启动。\n \n        # chkconfig sshd on\n\n    修改 /etc/ssh/sshd\\_config 以包含以下行：\n\n        PasswordAuthentication yes\n        ClientAliveInterval 180\n\n    重新启动 sshd：\n\n        # service sshd restart\n\n12. WALinuxAgent 包 `WALinuxAgent-<version>` 已推送到 Fedora EPEL 6 存储库中。通过运行以下命令启用 epel 存储库：\n\n        # wget http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm\n        # rpm -ivh epel-release-6-8.noarch.rpm\n\n13. 通过运行以下命令来安装 Azure Linux 代理：\n\n        # yum install WALinuxAgent\n        # chkconfig waagent on\n\n14. Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是临时磁盘，并且当取消设置 VM 时可能会被清空。安装 Azure Linux 代理（请参阅上一步）后，相应地在 **/etc/waagent.conf** 中修改以下参数：\n\n        ResourceDisk.Format=y\n        ResourceDisk.Filesystem=ext4\n        ResourceDisk.MountPoint=/mnt/resource\n        ResourceDisk.EnableSwap=y\n        ResourceDisk.SwapSizeMB=2048    ## NOTE: set this to whatever you need it to be.\n\n15. 通过运行以下命令取消注册订阅（如有必要）：\n        \n        # subscription-manager unregister\n\n16. 运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：\n\n        # waagent -force -deprovision\n        # export HISTSIZE=0\n        # logout\n\n17. 关闭 KVM 中的 VM。\n\n18. 将 qcow2 映像转换为 vhd 格式：\n    首先将此映像转换为原始格式：\n         \n         # qemu-img convert -f qcow2 –O raw rhel-6.7.qcow2 rhel-6.7.raw\n    确保原始映像的大小为 1MB，如果不符合，则将数值大小四舍五入，使其等于 1MB：\n         # MB=$((1024*1024))\n         # size=$(qemu-img info -f raw --output json \"rhel-6.7.raw\" | \\\n                  gawk 'match($0, /\"virtual-size\": ([0-9]+),/, val) {print val[1]}')\n         # rounded\\_size=$((($size/$MB + 1)*$MB))\n\n         # qemu-img resize rhel-6.7.raw $rounded_size\n\n    将原始磁盘转换为固定大小的 vhd：\n\n         # qemu-img convert -f raw -o subformat=fixed -O vpc rhel-6.7.raw rhel-6.7.vhd\n\n\n###RHEL 7.1/7.2\n\n1.  请从 Red Hat 网站下载 RHEL 7.1（或 7.2）的 KVM 映像，我们在这里将使用 RHEL 7.1 作为示例。\n\n2.  设置根密码\n\n    生成加密密码，然后复制命令的输出\n\n        # openssl passwd -1 changeme\n\n    使用 guestfish 设置根密码\n\n        # guestfish --rw -a <image-name>\n        ><fs> run\n        ><fs> list-filesystems\n        ><fs> mount /dev/sda1 /\n        ><fs> vi /etc/shadow\n        ><fs> exit\n\n    将根用户的第二个字段从“!!”更改为加密密码\n\n3.  在 KVM 中通过 qcow2 映像创建虚拟机，将磁盘类型设置为 **qcow2**，将虚拟网络接口设备型号设置为 **virtio**。然后启动虚拟机，并以根用户身份登录。\n\n4.  在包含以下文本的 `/etc/sysconfig/` 目录中创建一个名为 **network** 的文件：\n\n        NETWORKING=yes\n        HOSTNAME=localhost.localdomain\n\n5.  在包含以下文本的 `/etc/sysconfig/network-scripts/` 目录中创建一个名为 **ifcfg-eth0** 的文件：\n\n        DEVICE=eth0\n        ONBOOT=yes\n        BOOTPROTO=dhcp\n        TYPE=Ethernet\n        USERCTL=no\n        PEERDNS=yes\n        IPV6INIT=no\n\n6.  通过运行以下命令，确保网络服务将在引导时启动：\n\n        # chkconfig network on\n\n7.  注册你的 Red Hat 订阅，以通过运行以下命令来启用来自 RHEL 存储库中的包的安装：\n\n        # subscription-manager register –auto-attach --username=XXX --password=XXX\n\n8.  在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开 `/etc/default/grub` 并编辑 **GRUB\\_CMDLINE\\_LINUX** 参数，例如：\n\n        GRUB_CMDLINE_LINUX=\"rootdelay=300 \n        console=ttyS0 \n        earlyprintk=ttyS0\"\n\n    这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。除此之外，建议删除以下参数：\n\n        rhgb quiet crashkernel=auto\n\n    图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。\n    根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。\n\n9.  按照上面所示完成编辑 `/etc/default/grub` 后，运行以下命令以重新生成 grub 配置：\n\n        # grub2-mkconfig -o /boot/grub2/grub.cfg\n\n10. 卸载 cloud-init：\n\n        # yum remove cloud-init\n\n11. 确保已安装 SSH 服务器且已将其配置为在引导时启动。\n\n        # systemctl enable sshd\n\n    修改 /etc/ssh/sshd\\_config 以包含以下行：\n\n        PasswordAuthentication yes\n        ClientAliveInterval 180\n\n    重新启动 sshd：\n\n        systemctl restart sshd  \n\n12. WALinuxAgent 包 `WALinuxAgent-<version>` 已推送到 Fedora EPEL 6 存储库中。通过运行以下命令启用 epel 存储库：\n\n        # wget http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm\n        # rpm -ivh epel-release-7-5.noarch.rpm\n\n13. 通过运行以下命令来安装 Azure Linux 代理：\n\n        # yum install WALinuxAgent\n\n    启用 waagent 服务：\n\n        # systemctl enable waagent.service\n\n14. 不要在 OS 磁盘上创建交换空间。Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是临时磁盘，并且当取消设置 VM 时可能会被清空。安装 Azure Linux 代理（请参阅上一步）后，相应地在 `/etc/waagent.conf` 中修改以下参数：\n\n        ResourceDisk.Format=y\n        ResourceDisk.Filesystem=ext4\n        ResourceDisk.MountPoint=/mnt/resource\n        ResourceDisk.EnableSwap=y\n        ResourceDisk.SwapSizeMB=2048    ## NOTE: set this to whatever you need it to be.\n\n15. 通过运行以下命令取消注册订阅（如有必要）：\n\n        # subscription-manager unregister\n\n16. 运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：\n\n        # sudo waagent -force -deprovision\n        # export HISTSIZE=0\n        # logout\n\n17. 关闭 KVM 中的虚拟机。\n\n18. 将 qcow2 映像转换为 vhd 格式：\n\n    首先将此映像转换为原始格式：\n\n         # qemu-img convert -f qcow2 –O raw rhel-7.1.qcow2 rhel-7.1.raw\n\n    确保原始映像的大小为 1MB，如果不符合，则将数值大小四舍五入，使其等于 1MB：\n\n         # MB=$((1024*1024))\n         # size=$(qemu-img info -f raw --output json \"rhel-7.1.raw\" | \\\n                  gawk 'match($0, /\"virtual-size\": ([0-9]+),/, val) {print val[1]}')\n         # rounded_size=$((($size/$MB + 1)*$MB))\n\n         # qemu-img resize rhel-7.1.raw $rounded_size\n\n    将原始磁盘转换为固定大小的 vhd：\n\n         # qemu-img convert -f raw -o subformat=fixed -O vpc rhel-7.1.raw rhel-7.1.vhd\n\n\n##通过 VMWare 准备映像\n###先决条件\n本部分假定你已经在 VMWare 中安装了 RHEL 虚拟机。有关如何在 VMWare 中安装操作系统的详细信息，请参阅 [VMWare 来宾操作系统安装指南](http://partnerweb.vmware.com/GOSIG/home.html)。\n \n- 在安装 Linux 系统时，建议使用标准分区而不是 LVM（通常是许多安装的默认值）。这将避免 LVM 与克隆 VM 发生名称冲突，特别是在 OS 磁盘需要连接到另一台 VM 以进行故障排除的情况下。如果首选，LVM 或 RAID 可以在数据磁盘上使用。\n\n- 不要在操作系统磁盘上配置交换分区。可以配置 Linux 代理，以在临时资源磁盘上创建交换文件。可以在下面的步骤中找到有关此内容的详细信息。\n\n- 当你创建虚拟硬盘时，选择“将虚拟磁盘存储为单个文件”。\n\n###RHEL 6.7\n1.  通过运行以下命令卸载 NetworkManager：\n\n         # sudo rpm -e --nodeps NetworkManager\n\n    **注意：**如果尚未安装此包，则该命令将失败，并显示一条错误消息。这是正常情况。\n\n2.  在包含以下文本的 /etc/sysconfig/ 目录中创建一个名为 **network** 的文件：\n\n        NETWORKING=yes\n        HOSTNAME=localhost.localdomain\n\n3.  在包含以下文本的 /etc/sysconfig/network-scripts/ 目录中创建一个名为 **ifcfg-eth0** 的文件：\n\n        DEVICE=eth0\n        ONBOOT=yes\n        BOOTPROTO=dhcp\n        TYPE=Ethernet\n        USERCTL=no\n        PEERDNS=yes\n        IPV6INIT=no\n\n4.  移动（或删除）udev 规则，以避免产生以太网接口的静态规则。在 Azure 或 Hyper-V 中克隆虚拟机时，这些规则会引发问题：\n\n        # sudo mkdir -m 0700 /var/lib/waagent\n        # sudo mv /lib/udev/rules.d/75-persistent-net-generator.rules /var/lib/waagent/\n        # sudo mv /etc/udev/rules.d/70-persistent-net.rules /var/lib/waagent/\n\n5.  通过运行以下命令，确保网络服务将在引导时启动：\n\n        # sudo chkconfig network on\n\n6.  注册你的 Red Hat 订阅，以通过运行以下命令来启用来自 RHEL 存储库中的包的安装：\n\n        # sudo subscription-manager register --auto-attach --username=XXX --password=XXX\n\n7.  WALinuxAgent 包 `WALinuxAgent-<version>` 已推送到 Fedora EPEL 6 存储库中。通过运行以下命令启用 epel 存储库：\n\n        # wget http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm\n        # rpm -ivh epel-release-6-8.noarch.rpm\n\n8.  在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开“/boot/grub/menu.lst”，并确保默认内核包含以下参数：\n\n        console=ttyS0 \n        earlyprintk=ttyS0 \n        rootdelay=300 \n        numa=off\n\n    这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。由于 RHEL 6 所使用的内核版本中存在 bug，因此这将禁用 NUMA。除此之外，建议删除以下参数：\n\n        rhgb quiet crashkernel=auto\n\n    图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。\n    根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。\n\n9.  请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。修改 `/etc/ssh/sshd_config` 以包含以下行：\n\n        ClientAliveInterval 180\n\n10. 通过运行以下命令来安装 Azure Linux 代理：\n\n        # sudo yum install WALinuxAgent\n        # sudo chkconfig waagent on\n\n11. 请勿在 OS 磁盘上创建交换空间：\n    \n    Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是临时磁盘，并且当取消设置 VM 时可能会被清空。安装 Azure Linux 代理（请参阅上一步）后，相应地在 `/etc/waagent.conf` 中修改以下参数：\n\n        ResourceDisk.Format=y\n        ResourceDisk.Filesystem=ext4\n        ResourceDisk.MountPoint=/mnt/resource\n        ResourceDisk.EnableSwap=y\n        ResourceDisk.SwapSizeMB=2048    ## NOTE: set this to whatever you need it to be.\n\n12. 通过运行以下命令取消注册订阅（如有必要）：\n\n        # sudo subscription-manager unregister\n\n13. 运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：\n\n        # sudo waagent -force -deprovision \n        # export HISTSIZE=0\n        # logout\n\n14. 关闭 VM，并将 VMDK 文件转换为 VHD 文件。\n\n    首先将此映像转换为原始格式：\n\n        # qemu-img convert -f vmdk –O raw rhel-6.7.vmdk rhel-6.7.raw\n\n    确保原始映像的大小为 1MB，如果不符合，则将数值大小四舍五入，使其等于 1MB：\n\n        # MB=$((1024*1024))\n        # size=$(qemu-img info -f raw --output json \"rhel-6.7.raw\" | \\\n                gawk 'match($0, /\"virtual-size\": ([0-9]+),/, val) {print val[1]}')\n        # rounded_size=$((($size/$MB + 1)*$MB))\n        # qemu-img resize rhel-6.7.raw $rounded_size\n\n    将原始磁盘转换为固定大小的 vhd：\n\n        # qemu-img convert -f raw -o subformat=fixed -O vpc rhel-6.7.raw rhel-6.7.vhd\n\n###RHEL 7.1/7.2\n\n1.  在包含以下文本的 /etc/sysconfig/ 目录中创建一个名为 **network** 的文件：\n\n        NETWORKING=yes\n        HOSTNAME=localhost.localdomain\n\n2.  在包含以下文本的 /etc/sysconfig/network-scripts/ 目录中创建一个名为 **ifcfg-eth0** 的文件：\n\n        DEVICE=eth0\n        ONBOOT=yes\n        BOOTPROTO=dhcp\n        TYPE=Ethernet\n        USERCTL=no\n        PEERDNS=yes\n        IPV6INIT=no\n\n3.  通过运行以下命令，确保网络服务将在引导时启动：\n\n        # sudo chkconfig network on\n\n4.  注册你的 Red Hat 订阅，以通过运行以下命令来启用来自 RHEL 存储库中的包的安装：\n\n        # sudo subscription-manager register --auto-attach --username=XXX --password=XXX\n\n5.  在 grub 配置中修改内核引导行，以使其包含 Azure 的其他内核参数。为此，请在文本编辑器中打开 `/etc/default/grub` 并编辑 **GRUB\\_CMDLINE\\_LINUX** 参数，例如：\n\n        GRUB_CMDLINE_LINUX=\"rootdelay=300 \n        console=ttyS0 \n        earlyprintk=ttyS0\"\n\n    这还将确保所有控制台消息都发送到第一个串行端口，从而可以协助 Azure 支持人员调试问题。除此之外，建议删除以下参数：\n\n        rhgb quiet crashkernel=auto\n\n    图形引导和无人参与引导不适用于云环境，在该环境中我们想要将所有日志都发送到串行端口。\n    根据需要可以配置 crashkernel 选项，但请注意，此参数会使 VM 中的可用内存量减少 128MB 或更多，这在较小的 VM 上可能会出现问题。\n\n6.  按照上面所示完成编辑 `/etc/default/grub` 后，运行以下命令以重新生成 grub 配置：\n\n         # sudo grub2-mkconfig -o /boot/grub2/grub.cfg\n\n7.  将 Hyper-V 模块添加到 initramfs 中：\n\n    编辑 `/etc/dracut.conf`，添加内容：\n\n        add_drivers+=”hv_vmbus hv_netvsc hv_storvsc”\n\n    重新生成 initramfs：\n\n        # dracut –f -v\n\n8.  请确保已安装 SSH 服务器且已将其配置为在引导时启动。这通常是默认设置。修改 `/etc/ssh/sshd_config` 以包含以下行：\n\n        ClientAliveInterval 180\n\n9.  WALinuxAgent 包 `WALinuxAgent-<version>` 已推送到 Fedora EPEL 6 存储库中。通过运行以下命令启用 epel 存储库：\n\n\n        # wget http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm\n        # rpm -ivh epel-release-7-5.noarch.rpm\n\n10. 通过运行以下命令来安装 Azure Linux 代理：\n\n        # sudo yum install WALinuxAgent\n        # sudo systemctl enable waagent.service\n\n11. 不要在 OS 磁盘上创建交换空间。Azure Linux 代理可使用在 Azure 上设置后附加到虚拟机的本地资源磁盘自动配置交换空间。请注意，本地资源磁盘是临时磁盘，并且当取消设置 VM 时可能会被清空。安装 Azure Linux 代理（请参阅上一步）后，相应地在 `/etc/waagent.conf` 中修改以下参数：\n\n        ResourceDisk.Format=y\n        ResourceDisk.Filesystem=ext4\n        ResourceDisk.MountPoint=/mnt/resource\n        ResourceDisk.EnableSwap=y\n        ResourceDisk.SwapSizeMB=2048    ## NOTE: set this to whatever you need it to be.\n\n12. 如果你想要撤消注册订阅，运行以下命令：\n\n        # sudo subscription-manager unregister\n\n13. 运行以下命令可取消对虚拟机的设置并且对其进行准备以便在 Azure 上进行设置：\n\n        # sudo waagent -force -deprovision\n        # export HISTSIZE=0\n        # logout\n\n14. 关闭 VM，并将 VMDK 文件转换为 VHD 格式。\n\n    首先将此映像转换为原始格式：\n\n        # qemu-img convert -f vmdk –O raw rhel-7.1.vmdk rhel-7.1.raw\n\n    确保原始映像的大小为 1MB，如果不符合，则将数值大小四舍五入，使其等于 1MB：\n\n        # MB=$((1024*1024))\n        # size=$(qemu-img info -f raw --output json \"rhel-7.1.raw\" | \\\n                 gawk 'match($0, /\"virtual-size\": ([0-9]+),/, val) {print val[1]}')\n        # rounded_size=$((($size/$MB + 1)*$MB))\n        # qemu-img resize rhel-7.1.raw $rounded_size\n\n    将原始磁盘转换为固定大小的 vhd：\n\n        # qemu-img convert -f raw -o subformat=fixed -O vpc rhel-7.1.raw rhel-7.1.vhd\n\n\n##使用启动文件通过 ISO 进行自动准备\n###RHEL 7.1/7.2\n\n1.  创建包含以下内容的启动文件，并保存该文件。有关启动安装的详细信息，请参阅[启动安装指南](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/Installation_Guide/chap-kickstart-installations.html)。\n\n\n        # Kickstart for provisioning a RHEL 7 Azure VM\n\n        # System authorization information\n        auth --enableshadow --passalgo=sha512\n\n        # Use graphical install\n        text\n\n        # Do not run the Setup Agent on first boot\n        firstboot --disable\n\n        # Keyboard layouts\n        keyboard --vckeymap=us --xlayouts='us'\n\n        # System language\n        lang en_US.UTF-8\n\n        # Network information\n        network  --bootproto=dhcp\n\n        # Root password\n        rootpw --plaintext \"to_be_disabled\"\n\n        # System services\n        services --enabled=\"sshd,waagent,NetworkManager\"\n\n        # System timezone\n        timezone Etc/UTC --isUtc --ntpservers 0.rhel.pool.ntp.org,1.rhel.pool.ntp.org,2.rhel.pool.ntp.org,3.rhel.pool.ntp.org\n\n        # Partition clearing information\n        clearpart --all --initlabel\n\n        # Clear the MBR\n        zerombr\n\n        # Disk partitioning information\n        part /boot --fstype=\"xfs\" --size=500\n        part / --fstyp=\"xfs\" --size=1 --grow --asprimary\n\n        # System bootloader configuration\n        bootloader --location=mbr\n\n        # Firewall configuration\n        firewall --disabled\n\n        # Enable SELinux\n        selinux --enforcing\n\n        # Don't configure X\n        skipx\n\n        # Power down the machine after install\n        poweroff\n\n        # Primary Fedora repo\n        repo --name=\"epel7\" --baseurl=\"http://dl.fedoraproject.org/pub/epel/7/x86_64/\"\n\n        %packages\n        @base\n        @console-internet\n        chrony\n        sudo\n        python-pyasn1\n        parted\n        ntfsprogs\n        WALinuxAgent\n        -dracut-config-rescue\n\n        %end\n\n        %post --log=/var/log/anaconda/post-install.log\n\n        #!/bin/bash\n\n        # Disable the root account\n        usermod root -p '!!'\n\n        # Configure swap in WALinuxAgent\n        sed -i 's/^(ResourceDisk\\.EnableSwap)=[Nn]$/\\1=y/g' /etc/waagent.conf\n        sed -i 's/^(ResourceDisk\\.SwapSizeMB)=[0-9]*$/\\1=2048/g' /etc/waagent.conf\n\n        # Set the cmdline\n        sed -i 's/^(GRUB_CMDLINE_LINUX)=\".*\"$/\\1=\"console=tty1 console=ttyS0 earlyprintk=ttyS0 rootdelay=300\"/g' /etc/default/grub\n\n        # Enable SSH keepalive\n        sed -i 's/^#(ClientAliveInterval).*$/\\1 180/g' /etc/ssh/sshd_config\n\n        # Build the grub cfg\n        grub2-mkconfig -o /boot/grub2/grub.cfg\n\n        # Configure network\n        cat << EOF > /etc/sysconfig/network-scripts/ifcfg-eth0\n        DEVICE=eth0\n        ONBOOT=yes\n        BOOTPROTO=dhcp\n        TYPE=Ethernet\n        USERCTL=no\n        PEERDNS=yes\n        IPV6INIT=no\n        NM_CONTROLLED=yes\n        EOF\n\n        # Deprovision and prepare for Azure\n        waagent -force -deprovision\n\n        %end\n\n \n\n2.  将启动文件置于可从安装系统访问的位置。\n \n3.  在 Hyper-V 管理器中，创建新的 VM。在“连接虚拟硬盘”页上，选择“稍后附加虚拟硬盘”，并完成新建虚拟机向导。\n\n4.  打开 VM 设置：\n\n    a.将新的虚拟硬盘附加到 VM，请务必选择“VHD 格式”和“固定大小”。\n    \n    b.将安装 ISO 附加到 DVD 驱动器。\n\n    c.将 BIOS 设置为从 CD 启动。\n\n5.  启动 VM，当安装指南出现时，请按 **Tab** 键来配置启动选项。\n\n6.  在启动选项的末尾输入 `inst.ks=<the location of the Kickstart file>`，然后按 **Enter** 键。\n\n7.  等待安装完成，完成后，VM 会自动关闭。Linux VHD 现已准备好上载到 Azure。\n\n##已知问题\n当你在 Hyper-V 和 Azure 中使用 RHEL 7.1 时，会遇到多个已知问题。\n\n###问题：磁盘 I/O 冻结 \n\n在 Hyper-V 和 Azure 中使用 RHEL 7.1 时，频繁的存储磁盘 I/O 活动期间可能会出现此问题。\n\n重现率：\n\n此问题是间歇出现的，但在 Hyper-V 和 Azure 中进行频繁的磁盘 I/O 操作过程中出现更加频繁。\n\n    \n[AZURE.NOTE]此已知问题已被 Red Hat 解决。若要安装关联的修补程序，请运行以下命令：\n\n    # sudo yum update\n\n\n## 后续步骤\n现在，你已准备就绪，可以使用 Red Hat Enterprise Linux .vhd 在 Azure 中创建新的 Azure 虚拟机了。有关已通过认证可运行 Red Hat Enterprise Linux 的虚拟机监控程序的更多详细信息，请访问 [Red Hat 网站](https://access.redhat.com/certified-hypervisors)。\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

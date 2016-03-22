@@ -1,0 +1,1003 @@
+{
+  "nodes": [
+    {
+      "content": "在 HDInsight 中使用 Hadoop Sqoop | Azure",
+      "pos": [
+        27,
+        63
+      ]
+    },
+    {
+      "content": "学习如何从工作站使用 Azure PowerShell 在 Hadoop 群集和 Azure SQL 数据库之间运行 Sqoop 导入和导出。",
+      "pos": [
+        82,
+        153
+      ]
+    },
+    {
+      "content": "将 Sqoop 与 HDInsight 中的 Hadoop 配合使用 (Windows)",
+      "pos": [
+        389,
+        433
+      ]
+    },
+    {
+      "content": "了解如何使用 HDInsight 中的 Sqoop 在 HDInsight 群集和 Azure SQL 数据库或 SQL Server 数据库之间进行导入和导出。",
+      "pos": [
+        514,
+        595
+      ]
+    },
+    {
+      "content": "虽然自然而然地选用 Hadoop 处理如日志和文件等非结构化和半结构化的数据，但可能还需要处理存储在关系数据库中的结构化数据。",
+      "pos": [
+        597,
+        660
+      ]
+    },
+    {
+      "pos": [
+        662,
+        899
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Sqoop<ept id=\"p1\">][sqoop-user-guide-1.4.4]</ept> 是一种为在 Hadoop 群集和关系数据库之间传输数据而设计的工具。可以使用此工具将数据从关系数据库管理系统 (RDBMS)（如 SQL Server、MySQL 或 Oracle）中导入到 Hadoop 分布式文件系统 (HDFS)，在 Hadoop 中使用 MapReduce 或 Hive 转换数据，然后回过来将数据导出到 RDBMS。在本教程中，你要为你的关系数据库使用 SQL Server 数据库。"
+    },
+    {
+      "content": "有关 HDInsight 群集上支持的 Sqoop 版本，",
+      "pos": [
+        901,
+        930
+      ]
+    },
+    {
+      "content": "请参阅 <bpt id=\"p1\">[</bpt>HDInsight 提供的群集版本有哪些新功能？<ept id=\"p1\">][hdinsight-versions]</ept>。",
+      "pos": [
+        931,
+        982
+      ]
+    },
+    {
+      "pos": [
+        987,
+        1019
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"prerequisites\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>先决条件"
+    },
+    {
+      "content": "在开始阅读本教程前，你必须具有：",
+      "pos": [
+        1021,
+        1037
+      ]
+    },
+    {
+      "pos": [
+        1041,
+        1278
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>配备 Azure PowerShell 的工作站<ept id=\"p1\">**</ept>。请参阅<bpt id=\"p2\">[</bpt>安装和使用 Azure PowerShell<ept id=\"p2\">](/documentation/articles/powershell-install-configure)</ept>。若要执行 Azure PowerShell 脚本，必须以管理员身份运行 Azure PowerShell 并将执行策略设为 <bpt id=\"p3\">*</bpt>RemoteSigned<ept id=\"p3\">*</ept>。请参阅<bpt id=\"p4\">[</bpt>运行 Windows PowerShell 脚本<ept id=\"p4\">][powershell-script]</ept>。"
+    },
+    {
+      "content": "如果选择使用现有的 Azure SQL 数据库或 Microsoft SQL Server",
+      "pos": [
+        1280,
+        1325
+      ]
+    },
+    {
+      "pos": [
+        1329,
+        1464
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Azure SQL 数据库<ept id=\"p1\">**</ept>：你必须为 Azure SQL 数据库服务器配置防火墙规则以允许从你的工作站进行访问。有关创建 Azure SQL 数据库和配置防火墙的说明，请参阅 <bpt id=\"p2\">[</bpt>Azure SQL 数据库入门<ept id=\"p2\">][sqldatabase-get-started]</ept>。"
+    },
+    {
+      "pos": [
+        1473,
+        1649
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>默认情况下，可以从 Azure HDInsight 这样的 Azure 服务连接 Azure SQL 数据库。如果禁用了此防火墙设置，则必须从 Azure 管理门户启用它。有关创建 Azure SQL 数据库和配置防火墙规则的说明，请参阅<bpt id=\"p1\">[</bpt>创建和配置 SQL 数据库<ept id=\"p1\">][sqldatabase-create-configue]</ept>。"
+    },
+    {
+      "pos": [
+        1653,
+        1755
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>SQL Server<ept id=\"p1\">**</ept>：如果你的 HDInsight 群集与 SQL Server 位于 Azure 中的同一虚拟网络，你可以使用本文中的步骤对 SQL Server 数据库执行数据导入和导出操作。"
+    },
+    {
+      "pos": [
+        1763,
+        1817
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>HDInsight 仅支持基于位置的虚拟网络，并且当前不适用于基于地缘组的虚拟网络。"
+    },
+    {
+      "pos": [
+        1825,
+        1885
+      ],
+      "content": "若要创建和配置虚拟网络，请参阅<bpt id=\"p1\">[</bpt>虚拟网络配置任务<ept id=\"p1\">](/home/features/virtual-machines/)</ept>。"
+    },
+    {
+      "pos": [
+        1897,
+        1943
+      ],
+      "content": "在数据中心使用 SQL Server 时，必须将虚拟网络配置为<bpt id=\"p1\">*</bpt>站点到站点<ept id=\"p1\">*</ept>或<bpt id=\"p2\">*</bpt>点到站点<ept id=\"p2\">*</ept>。"
+    },
+    {
+      "pos": [
+        1959,
+        2039
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>对于<bpt id=\"p1\">**</bpt>点到站点<ept id=\"p1\">**</ept>虚拟网络，SQL Server 必须运行 Azure 虚拟网络配置的“仪表板”中提供的 VPN 客户端配置应用程序。"
+    },
+    {
+      "content": "当你在 Azure 虚拟机上使用 SQL Server 时，如果托管 SQL Server 的虚拟机是 HDInsight 所在虚拟网络的成员，则可以使用任何虚拟网络配置。",
+      "pos": [
+        2051,
+        2137
+      ]
+    },
+    {
+      "pos": [
+        2145,
+        2263
+      ],
+      "content": "若要在虚拟网络上预配 HDInsight 群集，请参阅<bpt id=\"p1\">[</bpt>使用自定义选项在 HDInsight 中预配 Hadoop 群集<ept id=\"p1\">](/documentation/articles/hdinsight-provision-clusters-v1)</ept>"
+    },
+    {
+      "pos": [
+        2271,
+        2334
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>SQL Server 还必须允许身份验证。必须使用 SQL Server 登录名来完成此文章中的步骤。"
+    },
+    {
+      "content": "了解方案",
+      "pos": [
+        2342,
+        2346
+      ]
+    },
+    {
+      "content": "HDInsight 群集带有某些示例数据。你将会使用以下两个示例：",
+      "pos": [
+        2348,
+        2381
+      ]
+    },
+    {
+      "pos": [
+        2385,
+        2443
+      ],
+      "content": "位于 <bpt id=\"p1\">*</bpt>/example/data/sample.log<ept id=\"p1\">*</ept> 的 log4j 日志文件。以下日志会从该文件中提取出来："
+    },
+    {
+      "pos": [
+        2698,
+        2800
+      ],
+      "content": "一个名为 <bpt id=\"p1\">*</bpt>hivesampletable<ept id=\"p1\">*</ept> 的 Hive 表，它引用位于 <bpt id=\"p2\">*</bpt>/hive/warehouse/hivesampletable<ept id=\"p2\">*</ept> 中的数据文件。该表包含一些移动设备数据。Hive 表架构为："
+    },
+    {
+      "pos": [
+        2806,
+        3382
+      ],
+      "content": "<table border=\"1\">\n  <tr><th>字段</th><th>数据类型</th></tr>\n  <tr><td>clientid</td><td>字符串</td></tr>\n  <tr><td>querytime</td><td>字符串</td></tr>\n  <tr><td>market</td><td>字符串</td></tr>\n  <tr><td>deviceplatform</td><td>字符串</td></tr>\n  <tr><td>devicemake</td><td>字符串</td></tr>\n  <tr><td>devicemodel</td><td>字符串</td></tr>\n  <tr><td>state</td><td>字符串</td></tr>\n  <tr><td>country</td><td>字符串</td></tr>\n  <tr><td>querydwelltime</td><td>double</td></tr>\n  <tr><td>sessionid</td><td>bigint</td></tr>\n  <tr><td>sessionpagevieworder</td><td>bigint</td></tr>\n  </table>",
+      "leadings": [
+        "",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  "
+      ],
+      "nodes": [
+        {
+          "content": "字段",
+          "pos": [
+            29,
+            31
+          ]
+        },
+        {
+          "content": "数据类型",
+          "pos": [
+            40,
+            44
+          ]
+        },
+        {
+          "content": "clientid",
+          "pos": [
+            65,
+            73
+          ]
+        },
+        {
+          "content": "字符串",
+          "pos": [
+            82,
+            85
+          ]
+        },
+        {
+          "content": "querytime",
+          "pos": [
+            106,
+            115
+          ]
+        },
+        {
+          "content": "字符串",
+          "pos": [
+            124,
+            127
+          ]
+        },
+        {
+          "content": "market",
+          "pos": [
+            148,
+            154
+          ]
+        },
+        {
+          "content": "字符串",
+          "pos": [
+            163,
+            166
+          ]
+        },
+        {
+          "content": "deviceplatform",
+          "pos": [
+            187,
+            201
+          ]
+        },
+        {
+          "content": "字符串",
+          "pos": [
+            210,
+            213
+          ]
+        },
+        {
+          "content": "devicemake",
+          "pos": [
+            234,
+            244
+          ]
+        },
+        {
+          "content": "字符串",
+          "pos": [
+            253,
+            256
+          ]
+        },
+        {
+          "content": "devicemodel",
+          "pos": [
+            277,
+            288
+          ]
+        },
+        {
+          "content": "字符串",
+          "pos": [
+            297,
+            300
+          ]
+        },
+        {
+          "content": "state",
+          "pos": [
+            321,
+            326
+          ]
+        },
+        {
+          "content": "字符串",
+          "pos": [
+            335,
+            338
+          ]
+        },
+        {
+          "content": "country",
+          "pos": [
+            359,
+            366
+          ]
+        },
+        {
+          "content": "字符串",
+          "pos": [
+            375,
+            378
+          ]
+        },
+        {
+          "content": "querydwelltime",
+          "pos": [
+            399,
+            413
+          ]
+        },
+        {
+          "content": "double",
+          "pos": [
+            422,
+            428
+          ]
+        },
+        {
+          "content": "sessionid",
+          "pos": [
+            449,
+            458
+          ]
+        },
+        {
+          "content": "bigint",
+          "pos": [
+            467,
+            473
+          ]
+        },
+        {
+          "content": "sessionpagevieworder",
+          "pos": [
+            494,
+            514
+          ]
+        },
+        {
+          "content": "bigint",
+          "pos": [
+            523,
+            529
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        3384,
+        3486
+      ],
+      "content": "你需要首先将 <bpt id=\"p1\">*</bpt>sample.log<ept id=\"p1\">*</ept> 和 <bpt id=\"p2\">*</bpt>hivesampletable<ept id=\"p2\">*</ept> 导出到 Azure SQL 数据库或 SQL Server，然后使用以下路径将包含移动设备数据的表导回 HDInsight："
+    },
+    {
+      "content": "了解 HDInsight 存储",
+      "pos": [
+        3529,
+        3544
+      ]
+    },
+    {
+      "pos": [
+        3546,
+        3641
+      ],
+      "content": "HDInsight 将 Azure Blob 存储用于数据存储。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>将 Azure Blob 存储与 HDInsight 配合使用<ept id=\"p1\">][hdinsight-storage]</ept>。"
+    },
+    {
+      "content": "设置 HDInsight 群集时，请将 Azure 存储帐户和该帐户上的特定 Blob 存储容器指定为默认文件系统，像在 HDFS 中一样。除了此存储帐户外，在设置过程中，你还可以从同一 Azure 订阅或不同 Azure 订阅添加其他存储帐户。",
+      "pos": [
+        3643,
+        3766
+      ]
+    },
+    {
+      "content": "有关添加其他存储帐户的说明，请参阅<bpt id=\"p1\">[</bpt>设置 HDInsight 群集<ept id=\"p1\">][hdinsight-provision]</ept>。为了简化本教程中使用的 Windows PowerShell 脚本，所有文件都存储在默认文件系统容器（位于 <bpt id=\"p2\">*</bpt>/tutorials/usesqoop<ept id=\"p2\">*</ept>）中。默认情况下，此容器与 HDInsight 群集同名。",
+      "pos": [
+        3768,
+        3928
+      ]
+    },
+    {
+      "content": "语法为：",
+      "pos": [
+        3929,
+        3933
+      ]
+    },
+    {
+      "pos": [
+        4034,
+        4152
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>HDInsight 群集 3.0 版只支持 *<bpt id=\"p1\">*</bpt>wasb://<ept id=\"p1\">*</ept> 语法。较早的 *<bpt id=\"p2\">*</bpt>asv://<ept id=\"p2\">*</ept> 语法在 HDInsight 2.1 和 1.6 群集中受支持，但在 HDInsight 3.0 群集中不受支持。"
+    },
+    {
+      "pos": [
+        4156,
+        4250
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>*<bpt id=\"p1\">*</bpt>wasb://<ept id=\"p1\">*</ept> 路径是虚拟路径。有关详细信息，请参阅<bpt id=\"p2\">[</bpt>将 Azure Blob 存储与 HDInsight 配合使用<ept id=\"p2\">][hdinsight-storage]</ept>。"
+    },
+    {
+      "content": "存储在默认文件系统 Blob 中的文件可以使用以下任一 URI 从 HDInsight 进行访问（以下示例使用 sample.log）：",
+      "pos": [
+        4252,
+        4320
+      ]
+    },
+    {
+      "content": "如果要从存储帐户直接访问该文件，则请注意，该文件的 Blob 名称是：",
+      "pos": [
+        4479,
+        4514
+      ]
+    },
+    {
+      "content": "准备教程",
+      "pos": [
+        4548,
+        4552
+      ]
+    },
+    {
+      "content": "你将在 Azure SQL 数据库或 SQL Server 中创建两个表。在本教程中，这些在以后将由 Sqoop 用来进行导出。你还需要先处理 sample.log 文件，然后 Sqoop 才能处理它们。",
+      "pos": [
+        4554,
+        4656
+      ]
+    },
+    {
+      "content": "创建 SQL 表",
+      "pos": [
+        4661,
+        4669
+      ]
+    },
+    {
+      "content": "对于 Azure SQL 数据库",
+      "pos": [
+        4673,
+        4689
+      ]
+    },
+    {
+      "pos": [
+        4696,
+        4864
+      ],
+      "content": "打开 Windows PowerShell ISE（在 Windows 8 中的“开始”屏幕上键入 <bpt id=\"p1\">**</bpt>PowerShell\\_ISE<ept id=\"p1\">**</ept>，然后单击“Windows PowerShell ISE”。请参阅<bpt id=\"p2\">[</bpt>在 Windows 8 和 Windows 上启动 Windows PowerShell<ept id=\"p2\">][powershell-start]</ept>）。"
+    },
+    {
+      "content": "将以下脚本复制到脚本窗格，然后设置前四个变量：",
+      "pos": [
+        4869,
+        4892
+      ]
+    },
+    {
+      "pos": [
+        5367,
+        5412
+      ],
+      "content": "有关这些变量的详细说明，请参阅本教程中的<bpt id=\"p1\">[</bpt>先决条件<ept id=\"p1\">](#prerequisites)</ept>部分。"
+    },
+    {
+      "content": "将以下脚本追加到脚本窗格中。这些是定义两个表及其群集索引的 SQL 语句。Azure SQL 数据库要求群集的索引。",
+      "pos": [
+        5417,
+        5475
+      ]
+    },
+    {
+      "content": "将以下脚本追加到脚本窗格中以便运行 SQL 命令：",
+      "pos": [
+        6537,
+        6562
+      ]
+    },
+    {
+      "pos": [
+        7542,
+        7567
+      ],
+      "content": "单击“运行脚本”或按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 以运行该脚本。"
+    },
+    {
+      "pos": [
+        7571,
+        7614
+      ],
+      "content": "使用<bpt id=\"p1\">[</bpt>管理门户<ept id=\"p1\">][azure-management-portal]</ept>来检查表和群集索引。"
+    },
+    {
+      "content": "对于 SQL Server",
+      "pos": [
+        7618,
+        7631
+      ]
+    },
+    {
+      "pos": [
+        7638,
+        7690
+      ],
+      "content": "打开 <bpt id=\"p1\">**</bpt>SQL Server Management Studio<ept id=\"p1\">**</ept> 并连接到 SQL Server。"
+    },
+    {
+      "pos": [
+        7695,
+        7718
+      ],
+      "content": "创建名为 <bpt id=\"p1\">**</bpt>sqoopdb<ept id=\"p1\">**</ept> 的新数据库。"
+    },
+    {
+      "pos": [
+        7723,
+        7790
+      ],
+      "content": "选择 <bpt id=\"p1\">**</bpt>sqoopdb<ept id=\"p1\">**</ept> 数据库，然后从 SQL Server Management Studio 顶部的功能区选择“新建查询”。"
+    },
+    {
+      "content": "在查询窗口中输入以下信息：",
+      "pos": [
+        7795,
+        7808
+      ]
+    },
+    {
+      "pos": [
+        8507,
+        8553
+      ],
+      "content": "单击 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept>，或选择 <bpt id=\"p2\">**</bpt>！ Execute<ept id=\"p2\">**</ept> 以运行查询。在查询下会显示以下消息："
+    },
+    {
+      "content": "关闭 SQL Server Management Studio。",
+      "pos": [
+        8602,
+        8634
+      ]
+    },
+    {
+      "content": "生成数据",
+      "pos": [
+        8639,
+        8643
+      ]
+    },
+    {
+      "pos": [
+        8645,
+        8793
+      ],
+      "content": "在本教程中，你要将一个 log4j log 文件（带分隔符的文件）和一个 Hive 表导出到 Azure SQL 数据库。带分隔符的文件名为 <bpt id=\"p1\">*</bpt>/example/data/sample.log<ept id=\"p1\">*</ept>。在本教程前面，你看到了几个 log4j 日志的示例。在日志文件中，有一些空行和一些类似下面这样的行："
+    },
+    {
+      "content": "对于其他使用此数据的示例来说，这是没有问题的，但我们必须删除这些异常，然后才能将内容导入到 Azure SQL 数据库或 SQL Server 中。如果有空字符串，或者有其元素数量比 Azure SQL 数据库表中所定义字段数量要少的行，Sqoop 导出将会失败。log4jlogs 表有 7 个字符串类型的字段。",
+      "pos": [
+        8974,
+        9131
+      ]
+    },
+    {
+      "content": "处理 sample.log 文件",
+      "pos": [
+        9135,
+        9151
+      ]
+    },
+    {
+      "content": "打开 Windows PowerShell ISE。",
+      "pos": [
+        9158,
+        9184
+      ]
+    },
+    {
+      "content": "在底部窗格中，运行以下命令以连接到 Azure 订阅：",
+      "pos": [
+        9188,
+        9215
+      ]
+    },
+    {
+      "content": "系统将提示你输入 Azure 帐户凭据。这种添加订阅连接的方法会超时，12 个小时之后，你将需要再次登录。",
+      "pos": [
+        9276,
+        9329
+      ]
+    },
+    {
+      "pos": [
+        9337,
+        9439
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果你有多个 Azure 订阅，而默认订阅不是你想使用的，请使用 <ph id=\"ph2\">&lt;strong&gt;</ph>Select-AzureSubscription<ph id=\"ph3\">&lt;/strong&gt;</ph> cmdlet 来选择当前订阅。"
+    },
+    {
+      "content": "将以下脚本复制到脚本窗格，然后设置前两个变量。",
+      "pos": [
+        9444,
+        9467
+      ]
+    },
+    {
+      "pos": [
+        9693,
+        9738
+      ],
+      "content": "有关这些变量的详细说明，请参阅本教程中的<bpt id=\"p1\">[</bpt>先决条件<ept id=\"p1\">](#prerequisites)</ept>部分。"
+    },
+    {
+      "content": "将以下脚本追加到脚本窗格中：",
+      "pos": [
+        9743,
+        9757
+      ]
+    },
+    {
+      "pos": [
+        12068,
+        12093
+      ],
+      "content": "单击“运行脚本”或按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 以运行该脚本。"
+    },
+    {
+      "pos": [
+        12097,
+        12233
+      ],
+      "content": "若要检查修改后的数据文件，可以使用管理门户、Azure 存储资源管理器工具或 Azure PowerShell。<bpt id=\"p1\">[</bpt>HDInsight 入门<ept id=\"p1\">][hdinsight-get-started]</ept>中有一个关于使用 Azure PowerShell 下载文件并显示文件内容的代码示例。"
+    },
+    {
+      "content": "使用 PowerShell 来运行 Sqoop 导出",
+      "pos": [
+        12238,
+        12264
+      ]
+    },
+    {
+      "content": "在本节中，你将使用 Azure PowerShell 来运行 Sqoop 导出命令，以将一个 Hive 表和一个数据文件都导出到 Azure SQL 数据库或 SQL Server。下一节会提供一个 HDInsight .NET 示例。",
+      "pos": [
+        12266,
+        12384
+      ]
+    },
+    {
+      "pos": [
+        12388,
+        12463
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>除了连接字符串信息，此节中的步骤还应适用于 Azure SQL 数据库或 SQL Server。这些步骤已使用以下配置测试过："
+    },
+    {
+      "pos": [
+        12470,
+        12532
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Azure 虚拟网络点到站点配置<ept id=\"p1\">**</ept>：虚拟网络已将 HDInsight 群集连接到专用数据中心的 SQL Server。"
+    },
+    {
+      "pos": [
+        12537,
+        12672
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Azure HDInsight 3.1<ept id=\"p1\">**</ept>：有关在虚拟网络上创建群集的信息，请参阅<bpt id=\"p2\">[</bpt>在 HDInsight 中使用自定义选项预配 Hadoop 群集<ept id=\"p2\">](/documentation/articles/hdinsight-provision-clusters-v1)</ept>。"
+    },
+    {
+      "pos": [
+        12677,
+        12735
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>SQL Server 2014<ept id=\"p1\">**</ept>：已配置为允许身份验证和运行 VPN 客户端配置包，可以安全地连接到虚拟网络。"
+    },
+    {
+      "content": "导出 log4j 日志文件",
+      "pos": [
+        12739,
+        12752
+      ]
+    },
+    {
+      "content": "打开 Windows PowerShell ISE。",
+      "pos": [
+        12759,
+        12785
+      ]
+    },
+    {
+      "content": "在底部窗格中，运行以下命令以连接到 Azure 订阅：",
+      "pos": [
+        12789,
+        12816
+      ]
+    },
+    {
+      "content": "系统将提示你输入 Azure 帐户凭据。",
+      "pos": [
+        12877,
+        12897
+      ]
+    },
+    {
+      "content": "将以下脚本复制到脚本窗格，然后设置前七个变量：",
+      "pos": [
+        12902,
+        12925
+      ]
+    },
+    {
+      "pos": [
+        13995,
+        14040
+      ],
+      "content": "有关这些变量的详细说明，请参阅本教程中的<bpt id=\"p1\">[</bpt>先决条件<ept id=\"p1\">](#prerequisites)</ept>部分。"
+    },
+    {
+      "content": "请注意，$exportDir\\_log4j 没有指定 sample.log 文件的文件名。Sqoop 将从该文件夹下的所有文件中导出数据。",
+      "pos": [
+        14046,
+        14115
+      ]
+    },
+    {
+      "content": "将以下脚本追加到脚本窗格中：",
+      "pos": [
+        14120,
+        14134
+      ]
+    },
+    {
+      "pos": [
+        14862,
+        14994
+      ],
+      "content": "请注意，字段分隔符为 <bpt id=\"p1\">**</bpt>\\\\0x20<ept id=\"p1\">**</ept>，它是空格。该分隔符在 Azure PowerShell 脚本的 sample.log 文件中定义。若要了解有关 <bpt id=\"p2\">**</bpt>-m 1<ept id=\"p2\">**</ept> 的信息，请参阅 <bpt id=\"p3\">[</bpt>Sqoop 用户指南<ept id=\"p3\">][sqoop-user-guide-1.4.4]</ept>。"
+    },
+    {
+      "pos": [
+        14999,
+        15024
+      ],
+      "content": "单击“运行脚本”或按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 以运行该脚本。"
+    },
+    {
+      "pos": [
+        15028,
+        15069
+      ],
+      "content": "使用<bpt id=\"p1\">[</bpt>管理门户<ept id=\"p1\">][azure-management-portal]</ept>检查导出的数据。"
+    },
+    {
+      "content": "导出 hivesampletable Hive 表",
+      "pos": [
+        15073,
+        15098
+      ]
+    },
+    {
+      "content": "打开 Windows PowerShell ISE。",
+      "pos": [
+        15105,
+        15131
+      ]
+    },
+    {
+      "content": "在底部窗格中，运行以下命令以连接到 Azure 订阅：",
+      "pos": [
+        15135,
+        15162
+      ]
+    },
+    {
+      "content": "系统将提示你输入 Azure 帐户凭据。",
+      "pos": [
+        15223,
+        15243
+      ]
+    },
+    {
+      "content": "将以下脚本复制到脚本窗格，然后设置前七个变量：",
+      "pos": [
+        15248,
+        15271
+      ]
+    },
+    {
+      "pos": [
+        16347,
+        16392
+      ],
+      "content": "有关这些变量的详细说明，请参阅本教程中的<bpt id=\"p1\">[</bpt>先决条件<ept id=\"p1\">](#prerequisites)</ept>部分。"
+    },
+    {
+      "content": "将以下脚本追加到脚本窗格中：",
+      "pos": [
+        16397,
+        16411
+      ]
+    },
+    {
+      "pos": [
+        17104,
+        17129
+      ],
+      "content": "单击“运行脚本”或按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 以运行该脚本。"
+    },
+    {
+      "pos": [
+        17133,
+        17174
+      ],
+      "content": "使用<bpt id=\"p1\">[</bpt>管理门户<ept id=\"p1\">][azure-management-portal]</ept>检查导出的数据。"
+    },
+    {
+      "content": "使用 HDInsight .NET SDK 来运行 Sqoop 导出",
+      "pos": [
+        17178,
+        17212
+      ]
+    },
+    {
+      "content": "在本部分中，你将创建一个 C# 控制台应用程序，以便将 hivesampletable 导出到在本教程前面创建的 SQL 数据库表。",
+      "pos": [
+        17214,
+        17280
+      ]
+    },
+    {
+      "content": "提交 Sqoop 作业",
+      "pos": [
+        17284,
+        17295
+      ]
+    },
+    {
+      "content": "在 Visual Studio 包管理器控制台中，运行以下 Nuget 命令将包导入。",
+      "pos": [
+        17302,
+        17345
+      ]
+    },
+    {
+      "content": "在 Program.cs 文件中使用以下 using 语句：",
+      "pos": [
+        17420,
+        17450
+      ]
+    },
+    {
+      "pos": [
+        17623,
+        17719
+      ],
+      "content": "将以下代码添加到 Main() 函数中。有关使用 HDInsight .NET SDK 的常规信息，请参阅<bpt id=\"p1\">[</bpt>以编程方式提交 Hadoop 作业<ept id=\"p1\">][hdinsight-submit-jobs]</ept>。"
+    },
+    {
+      "pos": [
+        20388,
+        20402
+      ],
+      "content": "按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 运行程序。"
+    },
+    {
+      "content": "使用 Azure PowerShell 来运行 Sqoop 导入",
+      "pos": [
+        20407,
+        20439
+      ]
+    },
+    {
+      "content": "在本节中，你要将 log4j 日志（已导出到 Azure SQL 数据库）导回到 HDInsight 中。",
+      "pos": [
+        20441,
+        20494
+      ]
+    },
+    {
+      "content": "打开 Windows PowerShell ISE。",
+      "pos": [
+        20499,
+        20525
+      ]
+    },
+    {
+      "content": "在底部窗格中，运行以下命令以连接到 Azure 订阅：",
+      "pos": [
+        20529,
+        20556
+      ]
+    },
+    {
+      "content": "系统将提示你输入 Azure 帐户凭据。",
+      "pos": [
+        20617,
+        20637
+      ]
+    },
+    {
+      "content": "将以下脚本复制到脚本窗格，然后设置前七个变量：",
+      "pos": [
+        20642,
+        20665
+      ]
+    },
+    {
+      "pos": [
+        21780,
+        21825
+      ],
+      "content": "有关这些变量的详细说明，请参阅本教程中的<bpt id=\"p1\">[</bpt>先决条件<ept id=\"p1\">](#prerequisites)</ept>部分。"
+    },
+    {
+      "content": "将以下脚本追加到脚本窗格中：",
+      "pos": [
+        21830,
+        21844
+      ]
+    },
+    {
+      "pos": [
+        22571,
+        22596
+      ],
+      "content": "单击“运行脚本”或按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 以运行该脚本。"
+    },
+    {
+      "pos": [
+        22600,
+        22736
+      ],
+      "content": "若要检查修改后的数据文件，可以使用管理门户、Azure 存储资源管理器工具或 Azure PowerShell。<bpt id=\"p1\">[</bpt>HDInsight 入门<ept id=\"p1\">][hdinsight-get-started]</ept>中有一个关于使用 Azure PowerShell 下载文件并显示文件内容的代码示例。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        22740,
+        22744
+      ]
+    },
+    {
+      "content": "现在你已经学习了如何使用 Sqoop。若要了解更多信息，请参阅以下文章：",
+      "pos": [
+        22746,
+        22782
+      ]
+    },
+    {
+      "pos": [
+        22786,
+        22858
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>将 Oozie 与 HDInsight 配合使用<ept id=\"p1\">][hdinsight-use-oozie]</ept>：在 Oozie 工作流中使用 Sqoop 操作。"
+    },
+    {
+      "pos": [
+        22861,
+        22965
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>使用 HDInsight 分析航班延误数据<ept id=\"p1\">][hdinsight-analyze-flight-data]</ept>：使用 Hive 分析航班延误数据，然后使用 Sqoop 将数据导出到 Azure SQL 数据库。"
+    },
+    {
+      "pos": [
+        22968,
+        23048
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>将数据上载到 HDInsight<ept id=\"p1\">][hdinsight-upload-data]</ept>：了解将数据上载到 HDInsight/Azure Blob 存储的其他方法。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"在 HDInsight 中使用 Hadoop Sqoop | Azure\"\n    description=\"学习如何从工作站使用 Azure PowerShell 在 Hadoop 群集和 Azure SQL 数据库之间运行 Sqoop 导入和导出。\"\n    editor=\"cgronlun\"\n    manager=\"paulettm\"\n    services=\"hdinsight\"\n    documentationCenter=\"\"\n    tags=\"azure-portal\"\n    authors=\"mumian\"/>\n\n<tags\n    ms.service=\"hdinsight\"\n    ms.date=\"12/01/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n#将 Sqoop 与 HDInsight 中的 Hadoop 配合使用 (Windows)\n\n[AZURE.INCLUDE [sqoop-selector](../includes/hdinsight-selector-use-sqoop.md)]\n\n了解如何使用 HDInsight 中的 Sqoop 在 HDInsight 群集和 Azure SQL 数据库或 SQL Server 数据库之间进行导入和导出。\n\n虽然自然而然地选用 Hadoop 处理如日志和文件等非结构化和半结构化的数据，但可能还需要处理存储在关系数据库中的结构化数据。\n\n[Sqoop][sqoop-user-guide-1.4.4] 是一种为在 Hadoop 群集和关系数据库之间传输数据而设计的工具。可以使用此工具将数据从关系数据库管理系统 (RDBMS)（如 SQL Server、MySQL 或 Oracle）中导入到 Hadoop 分布式文件系统 (HDFS)，在 Hadoop 中使用 MapReduce 或 Hive 转换数据，然后回过来将数据导出到 RDBMS。在本教程中，你要为你的关系数据库使用 SQL Server 数据库。\n\n有关 HDInsight 群集上支持的 Sqoop 版本，\n请参阅 [HDInsight 提供的群集版本有哪些新功能？][hdinsight-versions]。\n\n###<a name=\"prerequisites\"></a>先决条件\n\n在开始阅读本教程前，你必须具有：\n\n- **配备 Azure PowerShell 的工作站**。请参阅[安装和使用 Azure PowerShell](/documentation/articles/powershell-install-configure)。若要执行 Azure PowerShell 脚本，必须以管理员身份运行 Azure PowerShell 并将执行策略设为 *RemoteSigned*。请参阅[运行 Windows PowerShell 脚本][powershell-script]。\n\n如果选择使用现有的 Azure SQL 数据库或 Microsoft SQL Server\n\n- **Azure SQL 数据库**：你必须为 Azure SQL 数据库服务器配置防火墙规则以允许从你的工作站进行访问。有关创建 Azure SQL 数据库和配置防火墙的说明，请参阅 [Azure SQL 数据库入门][sqldatabase-get-started]。 \n\n    > [AZURE.NOTE]默认情况下，可以从 Azure HDInsight 这样的 Azure 服务连接 Azure SQL 数据库。如果禁用了此防火墙设置，则必须从 Azure 管理门户启用它。有关创建 Azure SQL 数据库和配置防火墙规则的说明，请参阅[创建和配置 SQL 数据库][sqldatabase-create-configue]。\n\n- **SQL Server**：如果你的 HDInsight 群集与 SQL Server 位于 Azure 中的同一虚拟网络，你可以使用本文中的步骤对 SQL Server 数据库执行数据导入和导出操作。\n\n    > [AZURE.NOTE]HDInsight 仅支持基于位置的虚拟网络，并且当前不适用于基于地缘组的虚拟网络。\n\n    * 若要创建和配置虚拟网络，请参阅[虚拟网络配置任务](/home/features/virtual-machines/)。\n\n        * 在数据中心使用 SQL Server 时，必须将虚拟网络配置为*站点到站点*或*点到站点*。\n\n            > [AZURE.NOTE]对于**点到站点**虚拟网络，SQL Server 必须运行 Azure 虚拟网络配置的“仪表板”中提供的 VPN 客户端配置应用程序。\n\n        * 当你在 Azure 虚拟机上使用 SQL Server 时，如果托管 SQL Server 的虚拟机是 HDInsight 所在虚拟网络的成员，则可以使用任何虚拟网络配置。\n\n    * 若要在虚拟网络上预配 HDInsight 群集，请参阅[使用自定义选项在 HDInsight 中预配 Hadoop 群集](/documentation/articles/hdinsight-provision-clusters-v1)\n\n    > [AZURE.NOTE]SQL Server 还必须允许身份验证。必须使用 SQL Server 登录名来完成此文章中的步骤。\n    \n##了解方案\n\nHDInsight 群集带有某些示例数据。你将会使用以下两个示例：\n\n- 位于 */example/data/sample.log* 的 log4j 日志文件。以下日志会从该文件中提取出来：\n\n        2012-02-03 18:35:34 SampleClass6 [INFO] everything normal for id 577725851\n        2012-02-03 18:35:34 SampleClass4 [FATAL] system problem at id 1991281254\n        2012-02-03 18:35:34 SampleClass3 [DEBUG] detail for id 1304807656\n        ...\n\n- 一个名为 *hivesampletable* 的 Hive 表，它引用位于 */hive/warehouse/hivesampletable* 中的数据文件。该表包含一些移动设备数据。Hive 表架构为：\n\n    <table border=\"1\">\n    <tr><th>字段</th><th>数据类型</th></tr>\n    <tr><td>clientid</td><td>字符串</td></tr>\n    <tr><td>querytime</td><td>字符串</td></tr>\n    <tr><td>market</td><td>字符串</td></tr>\n    <tr><td>deviceplatform</td><td>字符串</td></tr>\n    <tr><td>devicemake</td><td>字符串</td></tr>\n    <tr><td>devicemodel</td><td>字符串</td></tr>\n    <tr><td>state</td><td>字符串</td></tr>\n    <tr><td>country</td><td>字符串</td></tr>\n    <tr><td>querydwelltime</td><td>double</td></tr>\n    <tr><td>sessionid</td><td>bigint</td></tr>\n    <tr><td>sessionpagevieworder</td><td>bigint</td></tr>\n    </table>\n\n你需要首先将 *sample.log* 和 *hivesampletable* 导出到 Azure SQL 数据库或 SQL Server，然后使用以下路径将包含移动设备数据的表导回 HDInsight：\n\n    /tutorials/usesqoop/importeddata\n\n###了解 HDInsight 存储\n\nHDInsight 将 Azure Blob 存储用于数据存储。有关详细信息，请参阅[将 Azure Blob 存储与 HDInsight 配合使用][hdinsight-storage]。\n\n设置 HDInsight 群集时，请将 Azure 存储帐户和该帐户上的特定 Blob 存储容器指定为默认文件系统，像在 HDFS 中一样。除了此存储帐户外，在设置过程中，你还可以从同一 Azure 订阅或不同 Azure 订阅添加其他存储帐户。\n\n有关添加其他存储帐户的说明，请参阅[设置 HDInsight 群集][hdinsight-provision]。为了简化本教程中使用的 Windows PowerShell 脚本，所有文件都存储在默认文件系统容器（位于 */tutorials/usesqoop*）中。默认情况下，此容器与 HDInsight 群集同名。\n语法为：\n\n    wasb[s]://<ContainerName>@<StorageAccountName>.blob.core.chinacloudapi.cn/<path>/<filename>\n\n> [AZURE.NOTE]HDInsight 群集 3.0 版只支持 **wasb://* 语法。较早的 **asv://* 语法在 HDInsight 2.1 和 1.6 群集中受支持，但在 HDInsight 3.0 群集中不受支持。\n\n> [AZURE.NOTE]**wasb://* 路径是虚拟路径。有关详细信息，请参阅[将 Azure Blob 存储与 HDInsight 配合使用][hdinsight-storage]。\n\n存储在默认文件系统 Blob 中的文件可以使用以下任一 URI 从 HDInsight 进行访问（以下示例使用 sample.log）：\n\n    wasb://mycontainer@mystorageaccount.blob.core.chinacloudapi.cn/example/data/sample.log\n    wasb:///example/data/sample.log\n    /example/data/sample.log\n\n如果要从存储帐户直接访问该文件，则请注意，该文件的 Blob 名称是：\n\n    example/data/sample.log\n\n\n##准备教程\n\n你将在 Azure SQL 数据库或 SQL Server 中创建两个表。在本教程中，这些在以后将由 Sqoop 用来进行导出。你还需要先处理 sample.log 文件，然后 Sqoop 才能处理它们。\n\n###创建 SQL 表\n\n**对于 Azure SQL 数据库**\n\n1. 打开 Windows PowerShell ISE（在 Windows 8 中的“开始”屏幕上键入 **PowerShell\\_ISE**，然后单击“Windows PowerShell ISE”。请参阅[在 Windows 8 和 Windows 上启动 Windows PowerShell][powershell-start]）。\n\n2. 将以下脚本复制到脚本窗格，然后设置前四个变量：\n\n        #SQL database variables\n        $sqlDatabaseServer = \"<SQLDatabaseServerName>\"\n        $sqlDatabaseLogin = \"<SQLDatabaseUsername>\"\n        $sqlDatabasePassword = \"<SQLDatabasePassword>\"\n        $sqlDatabaseName = \"<SQLDatabaseName>\"\n\n        $sqlDatabaseConnectionString = \"Data Source=$sqlDatabaseServer.database.chinacloudapi.cn;Initial Catalog=$sqlDatabaseName;User ID=$sqlDatabaseLogin;Password=$sqlDatabasePassword;Encrypt=true;Trusted_Connection=false;\"\n\n    有关这些变量的详细说明，请参阅本教程中的[先决条件](#prerequisites)部分。\n\n3. 将以下脚本追加到脚本窗格中。这些是定义两个表及其群集索引的 SQL 语句。Azure SQL 数据库要求群集的索引。\n\n        # SQL query strings for creating tables and clustered indexes\n        $cmdCreateLog4jTable = \"CREATE TABLE [dbo].[log4jlogs](\n            [t1] [nvarchar](50),\n            [t2] [nvarchar](50),\n            [t3] [nvarchar](50),\n            [t4] [nvarchar](50),\n            [t5] [nvarchar](50),\n            [t6] [nvarchar](50),\n            [t7] [nvarchar](50))\"\n\n        $cmdCreateLog4jClusteredIndex = \"CREATE CLUSTERED INDEX log4jlogs_clustered_index on log4jlogs(t1)\"\n\n        $cmdCreateMobileTable = \" CREATE TABLE [dbo].[mobiledata](\n        [clientid] [nvarchar](50),\n        [querytime] [nvarchar](50),\n        [market] [nvarchar](50),\n        [deviceplatform] [nvarchar](50),\n        [devicemake] [nvarchar](50),\n        [devicemodel] [nvarchar](50),\n        [state] [nvarchar](50),\n        [country] [nvarchar](50),\n        [querydwelltime] [float],\n        [sessionid] [bigint],\n        [sessionpagevieworder][bigint])\"\n\n        $cmdCreateMobileDataClusteredIndex = \"CREATE CLUSTERED INDEX mobiledata_clustered_index on mobiledata(clientid)\"\n\n4. 将以下脚本追加到脚本窗格中以便运行 SQL 命令：\n\n        Write-Host \"Connect to the SQL Database ...\" -ForegroundColor Green\n        $conn = New-Object System.Data.SqlClient.SqlConnection\n        $conn.ConnectionString = $sqlDatabaseConnectionString\n        $conn.Open()\n\n        Write-Host \"Create log4j table and clustered index ...\" -ForegroundColor Green\n        $cmd = New-Object System.Data.SqlClient.SqlCommand\n        $cmd.Connection = $conn\n        $cmd.CommandText = $cmdCreateLog4jTable\n        $ret = $cmd.ExecuteNonQuery()\n        $cmd.CommandText = $cmdCreateLog4jClusteredIndex\n        $cmd.ExecuteNonQuery()\n\n        Write-Host \"Create log4j table and clustered index ...\" -ForegroundColor Green\n        $cmd.CommandText = $cmdCreateMobileTable\n        $cmd.ExecuteNonQuery()\n        $cmd.CommandText = $cmdCreateMobileDataClusteredIndex\n        $cmd.ExecuteNonQuery()\n\n        Write-Host \"Close connection ...\" -ForegroundColor Green\n        $conn.close()\n\n        Write-Host \"Done\" -ForegroundColor Green\n\n5. 单击“运行脚本”或按 **F5** 以运行该脚本。\n6. 使用[管理门户][azure-management-portal]来检查表和群集索引。\n\n**对于 SQL Server**\n\n1. 打开 **SQL Server Management Studio** 并连接到 SQL Server。\n\n2. 创建名为 **sqoopdb** 的新数据库。\n\n3. 选择 **sqoopdb** 数据库，然后从 SQL Server Management Studio 顶部的功能区选择“新建查询”。\n\n4. 在查询窗口中输入以下信息：\n\n        CREATE TABLE [dbo].[log4jlogs](\n         [t1] [nvarchar](50),\n         [t2] [nvarchar](50),\n         [t3] [nvarchar](50),\n         [t4] [nvarchar](50),\n         [t5] [nvarchar](50),\n         [t6] [nvarchar](50),\n         [t7] [nvarchar](50))\n\n        CREATE TABLE [dbo].[mobiledata](\n         [clientid] [nvarchar](50),\n         [querytime] [nvarchar](50),\n         [market] [nvarchar](50),\n         [deviceplatform] [nvarchar](50),\n         [devicemake] [nvarchar](50),\n         [devicemodel] [nvarchar](50),\n         [state] [nvarchar](50),\n         [country] [nvarchar](50),\n         [querydwelltime] [float],\n         [sessionid] [bigint],\n         [sessionpagevieworder][bigint])\n\n5. 单击 **F5**，或选择 **！ Execute** 以运行查询。在查询下会显示以下消息：\n\n        Command(s) completed successfully.\n\n6. 关闭 SQL Server Management Studio。\n\n###生成数据\n\n在本教程中，你要将一个 log4j log 文件（带分隔符的文件）和一个 Hive 表导出到 Azure SQL 数据库。带分隔符的文件名为 */example/data/sample.log*。在本教程前面，你看到了几个 log4j 日志的示例。在日志文件中，有一些空行和一些类似下面这样的行：\n\n    java.lang.Exception: 2012-02-03 20:11:35 SampleClass2 [FATAL] unrecoverable system problem at id 609774657\n        at com.osa.mocklogger.MockLogger$2.run(MockLogger.java:83)\n\n对于其他使用此数据的示例来说，这是没有问题的，但我们必须删除这些异常，然后才能将内容导入到 Azure SQL 数据库或 SQL Server 中。如果有空字符串，或者有其元素数量比 Azure SQL 数据库表中所定义字段数量要少的行，Sqoop 导出将会失败。log4jlogs 表有 7 个字符串类型的字段。\n\n**处理 sample.log 文件**\n\n1. 打开 Windows PowerShell ISE。\n2. 在底部窗格中，运行以下命令以连接到 Azure 订阅：\n\n        Add-AzureAccount -Environment AzureChinaCloud\n\n    系统将提示你输入 Azure 帐户凭据。这种添加订阅连接的方法会超时，12 个小时之后，你将需要再次登录。\n\n    > [AZURE.NOTE]如果你有多个 Azure 订阅，而默认订阅不是你想使用的，请使用 <strong>Select-AzureSubscription</strong> cmdlet 来选择当前订阅。\n\n3. 将以下脚本复制到脚本窗格，然后设置前两个变量。\n\n        $storageAccountName = \"<AzureStorageAccountName>\"\n        $containerName = \"<BlobContainerName>\"\n\n        $sourceBlobName = \"example/data/sample.log\"\n        $destBlobName = \"tutorials/usesqoop/data/sample.log\"\n\n    有关这些变量的详细说明，请参阅本教程中的[先决条件](#prerequisites)部分。\n\n4. 将以下脚本追加到脚本窗格中：\n\n        # Define the connection string\n        $storageAccountKey = get-azurestoragekey $storageAccountName | %{$_.Primary}\n        $storageConnectionString = \"DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageAccountKey\"\n\n        # Create block blob objects referencing the source and destination blob.\n        $storageAccount = [Microsoft.WindowsAzure.Storage.CloudStorageAccount]::Parse($storageConnectionString)\n        $storageClient = $storageAccount.CreateCloudBlobClient();\n        $storageContainer = $storageClient.GetContainerReference($containerName)\n        $sourceBlob = $storageContainer.GetBlockBlobReference($sourceBlobName)\n        $destBlob = $storageContainer.GetBlockBlobReference($destBlobName)\n\n        # Define a MemoryStream and a StreamReader for reading from the source file\n        $stream = New-Object System.IO.MemoryStream\n        $stream = $sourceBlob.OpenRead()\n        $sReader = New-Object System.IO.StreamReader($stream)\n\n        # Define a MemoryStream and a StreamWriter for writing into the destination file\n        $memStream = New-Object System.IO.MemoryStream\n        $writeStream = New-Object System.IO.StreamWriter $memStream\n\n        # process the source blob\n        $exString = \"java.lang.Exception:\"\n        while(-Not $sReader.EndOfStream){\n            $line = $sReader.ReadLine()\n            $split = $line.Split(\" \")\n\n            # remove the \"java.lang.Exception\" from the first element of the array\n            # for example: java.lang.Exception: 2012-02-03 19:11:02 SampleClass8 [WARN] problem finding id 153454612\n            if ($split[0] -eq $exString){\n                #create a new ArrayList to remove $split[0]\n                $newArray = [System.Collections.ArrayList] $split\n                $newArray.Remove($exString)\n\n                # update $split and $line\n                $split = $newArray\n                $line = $newArray -join(\" \")\n            }\n\n            # remove the lines that has less than 7 elements\n            if ($split.count -ge 7){\n                write-host $line\n                $writeStream.WriteLine($line)\n            }\n        }\n\n        # Write to the destination blob\n        $writeStream.Flush()\n        $memStream.Seek(0, \"Begin\")\n        $destBlob.UploadFromStream($memStream)\n\n5. 单击“运行脚本”或按 **F5** 以运行该脚本。\n6. 若要检查修改后的数据文件，可以使用管理门户、Azure 存储资源管理器工具或 Azure PowerShell。[HDInsight 入门][hdinsight-get-started]中有一个关于使用 Azure PowerShell 下载文件并显示文件内容的代码示例。\n\n\n##使用 PowerShell 来运行 Sqoop 导出\n\n在本节中，你将使用 Azure PowerShell 来运行 Sqoop 导出命令，以将一个 Hive 表和一个数据文件都导出到 Azure SQL 数据库或 SQL Server。下一节会提供一个 HDInsight .NET 示例。\n\n> [AZURE.NOTE]除了连接字符串信息，此节中的步骤还应适用于 Azure SQL 数据库或 SQL Server。这些步骤已使用以下配置测试过：\n>\n> * **Azure 虚拟网络点到站点配置**：虚拟网络已将 HDInsight 群集连接到专用数据中心的 SQL Server。\n> * **Azure HDInsight 3.1**：有关在虚拟网络上创建群集的信息，请参阅[在 HDInsight 中使用自定义选项预配 Hadoop 群集](/documentation/articles/hdinsight-provision-clusters-v1)。\n> * **SQL Server 2014**：已配置为允许身份验证和运行 VPN 客户端配置包，可以安全地连接到虚拟网络。\n\n**导出 log4j 日志文件**\n\n1. 打开 Windows PowerShell ISE。\n2. 在底部窗格中，运行以下命令以连接到 Azure 订阅：\n\n        Add-AzureAccount -Environment AzureChinaCloud\n\n    系统将提示你输入 Azure 帐户凭据。\n\n3. 将以下脚本复制到脚本窗格，然后设置前七个变量：\n\n        # Define the cluster variables\n        $clusterName = \"<HDInsightClusterName>\"\n        $storageAccountName = \"<AzureStorageAccount>\"\n        $containerName = \"<BlobStorageContainerName>\"\n\n        # Define the SQL database variables\n        $sqlDatabaseServerName = \"<SQLDatabaseServerName>\"\n        $sqlDatabaseLogin = \"<SQLDatabaseUsername>\"\n        $sqlDatabasePassword = \"<SQLDatabasePassword>\"\n        $databaseName = \"<SQLDatabaseName>\"\n\n        $tableName_log4j = \"log4jlogs\"\n\n        # Connection string for Azure SQL Database.\n        # Comment if using SQL Server\n        $connectionString = \"jdbc:sqlserver://$sqlDatabaseServerName.database.chinacloudapi.cn;user=$sqlDatabaseLogin@$sqlDatabaseServerName;password=$sqlDatabasePassword;database=$databaseName\"\n        # Connection string for SQL Server.\n        # Uncomment if using SQL Server.\n        #$connectionString = \"jdbc:sqlserver://$sqlDatabaseServerName;user=$sqlDatabaseLogin;password=$sqlDatabasePassword;database=$databaseName\"\n\n        $exportDir_log4j = \"/tutorials/usesqoop/data\"\n\n    有关这些变量的详细说明，请参阅本教程中的[先决条件](#prerequisites)部分。\n\n    请注意，$exportDir\\_log4j 没有指定 sample.log 文件的文件名。Sqoop 将从该文件夹下的所有文件中导出数据。\n\n4. 将以下脚本追加到脚本窗格中：\n\n        # Submit a Sqoop job\n        $sqoopDef = New-AzureHDInsightSqoopJobDefinition -Command \"export --connect $connectionString --table $tableName_log4j --export-dir $exportDir_log4j --input-fields-terminated-by \\0x20 -m 1\"\n        $sqoopJob = Start-AzureHDInsightJob -Cluster $clusterName -JobDefinition $sqoopDef #-Debug -Verbose\n        Wait-AzureHDInsightJob -WaitTimeoutInSeconds 3600 -Job $sqoopJob\n\n        Write-Host \"Standard Error\" -BackgroundColor Green\n        Get-AzureHDInsightJobOutput -Cluster $clusterName -JobId $sqoopJob.JobId -StandardError\n        Write-Host \"Standard Output\" -BackgroundColor Green\n        Get-AzureHDInsightJobOutput -Cluster $clusterName -JobId $sqoopJob.JobId -StandardOutput\n\n    请注意，字段分隔符为 **\\\\0x20**，它是空格。该分隔符在 Azure PowerShell 脚本的 sample.log 文件中定义。若要了解有关 **-m 1** 的信息，请参阅 [Sqoop 用户指南][sqoop-user-guide-1.4.4]。\n\n5. 单击“运行脚本”或按 **F5** 以运行该脚本。\n6. 使用[管理门户][azure-management-portal]检查导出的数据。\n\n**导出 hivesampletable Hive 表**\n\n1. 打开 Windows PowerShell ISE。\n2. 在底部窗格中，运行以下命令以连接到 Azure 订阅：\n\n        Add-AzureAccount -Environment AzureChinaCloud\n\n    系统将提示你输入 Azure 帐户凭据。\n\n3. 将以下脚本复制到脚本窗格，然后设置前七个变量：\n\n        # Define the cluster variables\n        $clusterName = \"<HDInsightClusterName>\"\n        $storageAccountName = \"<AzureStorageAccount>\"\n        $containerName = \"<BlobStorageContainerName>\"\n\n        # Define the SQL database variables\n        $sqlDatabaseServerName = \"<SQLDatabaseServerName>\"\n        $sqlDatabaseLogin = \"<SQLDatabaseUsername>\"\n        $sqlDatabasePassword = \"SQLDatabasePassword>\"\n        $databaseName = \"SQLDatabaseName\"\n\n        $tableName_mobile = \"mobiledata\"\n\n        # Connection string for Azure SQL Database.\n        # Comment if using SQL Server\n        $connectionString = \"jdbc:sqlserver://$sqlDatabaseServerName.database.chinacloudapi.cn;user=$sqlDatabaseLogin@$sqlDatabaseServerName;password=$sqlDatabasePassword;database=$databaseName\"\n        # Connection string for SQL Server.\n        # Uncomment if using SQL Server\n        #$connectionString = \"jdbc:sqlserver://$sqlDatabaseServerName;user=$sqlDatabaseLogin;password=$sqlDatabasePassword;database=$databaseName\"\n\n        $exportDir_mobile = \"/hive/warehouse/hivesampletable\"\n\n    有关这些变量的详细说明，请参阅本教程中的[先决条件](#prerequisites)部分。\n\n4. 将以下脚本追加到脚本窗格中：\n\n        $sqoopDef = New-AzureHDInsightSqoopJobDefinition -Command \"export --connect $connectionString --table $tableName_mobile --export-dir $exportDir_mobile --fields-terminated-by \\t -m 1\"\n\n\n        $sqoopJob = Start-AzureHDInsightJob -Cluster $clusterName -JobDefinition $sqoopDef #-Debug -Verbose\n        Wait-AzureHDInsightJob -WaitTimeoutInSeconds 3600 -Job $sqoopJob\n\n        Write-Host \"Standard Error\" -BackgroundColor Green\n        Get-AzureHDInsightJobOutput -Cluster $clusterName -JobId $sqoopJob.JobId -StandardError\n        Write-Host \"Standard Output\" -BackgroundColor Green\n        Get-AzureHDInsightJobOutput -Cluster $clusterName -JobId $sqoopJob.JobId -StandardOutput\n\n5. 单击“运行脚本”或按 **F5** 以运行该脚本。\n6. 使用[管理门户][azure-management-portal]检查导出的数据。\n\n##使用 HDInsight .NET SDK 来运行 Sqoop 导出\n\n在本部分中，你将创建一个 C# 控制台应用程序，以便将 hivesampletable 导出到在本教程前面创建的 SQL 数据库表。\n\n**提交 Sqoop 作业**\n\n1. 在 Visual Studio 包管理器控制台中，运行以下 Nuget 命令将包导入。\n\n        Install-Package Microsoft.Azure.Management.HDInsight.Job -Pre\n2. 在 Program.cs 文件中使用以下 using 语句：\n\n        using System;\n        using Microsoft.Azure.Management.HDInsight.Job;\n        using Microsoft.Azure.Management.HDInsight.Job.Models;\n        using Hyak.Common;\n3. 将以下代码添加到 Main() 函数中。有关使用 HDInsight .NET SDK 的常规信息，请参阅[以编程方式提交 Hadoop 作业][hdinsight-submit-jobs]。\n\n        var ExistingClusterName = \"<HDInsightClusterName>\";\n        var ExistingClusterUri = ExistingClusterName + \".azurehdinsight.cn\";\n        var ExistingClusterUsername = \"<HDInsightClusterHttpUsername>\";\n        var ExistingClusterPassword = \"<HDInsightClusterHttpUserPassword>\";\n        \n        var sqlDatabaseServerName = \"<AzureSQLDatabaseServerName>\";\n        var sqlDatabaseLogin = \"<AzureSQLDatabaseLogin>\";\n        var sqlDatabaseLoginPassword = \"<AzureSQLDatabaseLoginPassword>\";\n        var sqlDatabaseDatabaseName = \"<AzureSQLDatabaseDatabaseName>\";\n        \n        var sqlDatabaseTableName = \"log4jlogs\";\n        var exportDir = \"/hive/warehouse/hivesampletable\";\n\n        var cmdExport = @\"export\";\n        // Connection string for using Azure SQL Database.\n        // Comment if using SQL Server\n        cmdExport = cmdExport + @\" --connect 'jdbc:sqlserver://\" + sqlDatabaseServerName + \".database.chinacloudapi.cn;user=\" + sqlDatabaseLogin + \"@\" + sqlDatabaseServerName + \";password=\" + sqlDatabaseLoginPassword + \";database=\" + sqlDatabaseDatabaseName +\"'\"; \n        // Connection string for using SQL Server.\n        // Uncomment if using SQL Server\n        //cmdExport = cmdExport + @\" --connect jdbc:sqlserver://\" + sqlDatabaseServerName + \";user=\" + sqlDatabaseLogin + \";password=\" + sqlDatabaseLoginPassword + \";database=\" + sqlDatabaseDatabaseName;\n        cmdExport = cmdExport + @\" --table \" + sqlDatabaseTableName;\n        cmdExport = cmdExport + @\" --export-dir \" + exportDir;\n        cmdExport = cmdExport + @\" --input-fields-terminated-by \\0x20 -m 1\";\n        \n        HDInsightJobManagementClient _hdiJobManagementClient;\n        var clusterCredentials = new BasicAuthenticationCloudCredentials { Username = ExistingClusterUsername, Password = ExistingClusterPassword };\n        _hdiJobManagementClient = new HDInsightJobManagementClient(ExistingClusterUri, clusterCredentials);\n\n        var parameters = new SqoopJobSubmissionParameters\n        {\n            UserName = ExistingClusterUsername,\n            Command = cmdExport\n        };\n        \n        System.Console.WriteLine(\"Submitting the Sqoop job to the cluster...\");\n        var response = _hdiJobManagementClient.JobManagement.SubmitSqoopJob(parameters);\n        System.Console.WriteLine(\"Validating that the response is as expected...\");\n        System.Console.WriteLine(\"Response status code is \" + response.StatusCode);\n        System.Console.WriteLine(\"Validating the response object...\");\n        System.Console.WriteLine(\"JobId is \" + response.JobSubmissionJsonResponse.Id);\n        Console.WriteLine(\"Press ENTER to continue ...\");\n        Console.ReadLine();\n4. 按 **F5** 运行程序。 \n\n##使用 Azure PowerShell 来运行 Sqoop 导入\n\n在本节中，你要将 log4j 日志（已导出到 Azure SQL 数据库）导回到 HDInsight 中。\n\n1. 打开 Windows PowerShell ISE。\n2. 在底部窗格中，运行以下命令以连接到 Azure 订阅：\n\n        Add-AzureAccount -Environment AzureChinaCloud\n\n    系统将提示你输入 Azure 帐户凭据。\n\n3. 将以下脚本复制到脚本窗格，然后设置前七个变量：\n\n        # Define the cluster variables\n        $clusterName = \"<HDInsightClusterName>\"\n        $storageAccountName = \"<AzureStorageAccount>\"\n        $containerName = \"<BlobStorageContainerName>\"\n\n        # Define the SQL database variables\n        $sqlDatabaseServerName = \"<SQLDatabaseServerName>\"\n        $sqlDatabaseLogin = \"<SQLDatabaseUsername>\"\n        $sqlDatabasePassword = \"SQLDatabasePassword>\"\n        $databaseName = \"SQLDatabaseName\"\n\n        $tableName_log4j = \"log4jlogs\"\n\n        # Connection string for Azure SQL Database\n        # Comment if using SQL Server\n        $connectionString = \"jdbc:sqlserver://$sqlDatabaseServerName.database.chinacloudapi.cn;user=$sqlDatabaseLogin@$sqlDatabaseServerName;password=$sqlDatabasePassword;database=$databaseName\"\n        # Connection string for SQL Server\n        # Uncomment if using SQL Server\n        #$connectionString = \"jdbc:sqlserver://$sqlDatabaseServerName;user=$sqlDatabaseLogin;password=$sqlDatabasePassword;database=$databaseName\"\n\n        $tableName_mobile = \"mobiledata\"\n        $targetDir_mobile = \"/tutorials/usesqoop/importeddata/\"\n\n    有关这些变量的详细说明，请参阅本教程中的[先决条件](#prerequisites)部分。\n\n4. 将以下脚本追加到脚本窗格中：\n\n        $sqoopDef = New-AzureRmHDInsightSqoopJobDefinition -Command \"import --connect $connectionString --table $tableName_mobile --target-dir $targetDir_mobile --fields-terminated-by \\t --lines-terminated-by \\n -m 1\"\n\n        $sqoopJob = Start-AzureRmHDInsightJob -Cluster $clusterName -JobDefinition $sqoopDef #-Debug -Verbose\n        Wait-AzureRmHDInsightJob -WaitTimeoutInSeconds 3600 -Job $sqoopJob\n\n        Write-Host \"Standard Error\" -BackgroundColor Green\n        Get-AzureRmHDInsightJobOutput -Cluster $clusterName -JobId $sqoopJob.JobId -StandardError\n        Write-Host \"Standard Output\" -BackgroundColor Green\n        Get-AzureHDRmInsightJobOutput -Cluster $clusterName -JobId $sqoopJob.JobId -StandardOutput\n\n5. 单击“运行脚本”或按 **F5** 以运行该脚本。\n6. 若要检查修改后的数据文件，可以使用管理门户、Azure 存储资源管理器工具或 Azure PowerShell。[HDInsight 入门][hdinsight-get-started]中有一个关于使用 Azure PowerShell 下载文件并显示文件内容的代码示例。\n\n##后续步骤\n\n现在你已经学习了如何使用 Sqoop。若要了解更多信息，请参阅以下文章：\n\n- [将 Oozie 与 HDInsight 配合使用][hdinsight-use-oozie]：在 Oozie 工作流中使用 Sqoop 操作。\n- [使用 HDInsight 分析航班延误数据][hdinsight-analyze-flight-data]：使用 Hive 分析航班延误数据，然后使用 Sqoop 将数据导出到 Azure SQL 数据库。\n- [将数据上载到 HDInsight][hdinsight-upload-data]：了解将数据上载到 HDInsight/Azure Blob 存储的其他方法。\n\n[azure-management-portal]: https://manage.windowsazure.cn/\n\n[hdinsight-versions]: /documentation/articles/hdinsight-component-versioning-v1\n[hdinsight-provision]: /documentation/articles/hdinsight-provision-clusters-v1\n[hdinsight-get-started]: /documentation/articles/hdinsight-hadoop-tutorial-get-started-windows-v1\n[hdinsight-storage]: /documentation/articles/hdinsight-hadoop-use-blob-storage\n[hdinsight-analyze-flight-data]: /documentation/articles/hdinsight-analyze-flight-delay-data\n[hdinsight-use-oozie]: /documentation/articles/hdinsight-use-oozie\n[hdinsight-upload-data]: /documentation/articles/hdinsight-upload-data\n[hdinsight-submit-jobs]: /documentation/articles/hdinsight-submit-hadoop-jobs-programmatically\n\n[sqldatabase-get-started]: /documentation/articles/sql-database-get-started\n[sqldatabase-create-configue]: /documentation/articles/sql-database-get-started\n\n[powershell-start]: http://technet.microsoft.com/zh-cn/library/hh847889.aspx\n[powershell-install]: /documentation/articles/powershell-install-configure\n[powershell-script]: https://technet.microsoft.com/zh-cn/library/dn425048.aspx\n\n[sqoop-user-guide-1.4.4]: https://sqoop.apache.org/docs/1.4.4/SqoopUserGuide.html\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

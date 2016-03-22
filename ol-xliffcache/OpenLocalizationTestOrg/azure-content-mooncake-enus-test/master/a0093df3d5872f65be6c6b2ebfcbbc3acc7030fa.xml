@@ -1,0 +1,425 @@
+{
+  "nodes": [
+    {
+      "content": "通过 Azure 资源管理器对服务主体进行身份验证",
+      "pos": [
+        26,
+        51
+      ]
+    },
+    {
+      "content": "介绍如何通过基于角色的访问控制向服务主体授予访问权限，并对服务主体进行身份验证。演示如何使用 PowerShell 和 Azure CLI 执行这些任务。",
+      "pos": [
+        69,
+        146
+      ]
+    },
+    {
+      "content": "通过 Azure 资源管理器对服务主体进行身份验证",
+      "pos": [
+        373,
+        398
+      ]
+    },
+    {
+      "content": "本主题说明如何允许服务主体（例如自动化的过程、应用程序或服务）访问订阅中的其他资源。借助 Azure 资源管理器，可以使用基于角色的访问控制向服务主体授予允许的操作，并对该服务主体进行身份验证。本主题说明如何使用 PowerShell 和 Azure CLI 将角色分配给服务主体，并对服务主体进行身份验证。",
+      "pos": [
+        400,
+        554
+      ]
+    },
+    {
+      "content": "它演示如何使用用户名和密码或证书进行身份验证。",
+      "pos": [
+        556,
+        579
+      ]
+    },
+    {
+      "pos": [
+        581,
+        956
+      ],
+      "content": "您可以使用适用于 Mac、Linux 和 Windows 的 Azure PowerShell 或 Azure CLI。如果你未安装 Azure PowerShell，请参阅<bpt id=\"p1\">[</bpt>如何安装和配置 Azure PowerShell<ept id=\"p1\">](/documentation/articles/powershell-install-configure)</ept>。如果你未安装 Azure CLI，请参阅<bpt id=\"p2\">[</bpt>安装和配置 Azure CLI<ept id=\"p2\">](/documentation/articles/xplat-cli-install)</ept>。有关使用门户执行这些步骤的信息，请参阅<bpt id=\"p3\">[</bpt>使用门户创建 Active Directory 应用程序和服务主体<ept id=\"p3\">](/documentation/articles/resource-group-create-service-principal-portal)</ept>"
+    },
+    {
+      "content": "概念",
+      "pos": [
+        961,
+        963
+      ]
+    },
+    {
+      "pos": [
+        967,
+        1097
+      ],
+      "content": "Azure Active Directory (AAD) - 云的标识与访问管理服务。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>什么是 Azure Active Directory<ept id=\"p1\">](/documentation/articles/active-directory-whatis)</ept>"
+    },
+    {
+      "content": "服务主体 - 目录中需要访问其他资源的应用程序实例。",
+      "pos": [
+        1101,
+        1127
+      ]
+    },
+    {
+      "pos": [
+        1131,
+        1262
+      ],
+      "content": "AD 应用程序 - 向 AAD 标识某个应用程序的目录记录。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure AD 中的身份验证基本知识<ept id=\"p1\">](/documentation/articles/active-directory-authentication-scenarios/)</ept>。"
+    },
+    {
+      "content": "使用密码对服务主体进行身份验证 - PowerShell",
+      "pos": [
+        1267,
+        1295
+      ]
+    },
+    {
+      "content": "在此部分中，您将执行以下用于创建 Azure Active Directory 应用程序的服务主体、将角色分配给服务主体，通过提供应用程序标识符和密码作为服务主体进行身份验证的步骤。",
+      "pos": [
+        1297,
+        1388
+      ]
+    },
+    {
+      "content": "登录到你的帐户。",
+      "pos": [
+        1496,
+        1504
+      ]
+    },
+    {
+      "pos": [
+        1547,
+        1654
+      ],
+      "content": "运行 <bpt id=\"p1\">**</bpt>New-AzureRmADApplication<ept id=\"p1\">**</ept> 命令创建新的 AAD 应用程序。提供应用程序的显示名称、描述应用程序的页面的 URI（该链接未验证）、标识应用程序的 URI，以及应用程序标识的密码。"
+    },
+    {
+      "pos": [
+        1892,
+        1951
+      ],
+      "content": "检查新的应用程序对象。需要使用 <bpt id=\"p1\">**</bpt>ApplicationId<ept id=\"p1\">**</ept> 属性创建服务主体、角色分配以及获取 JWT 令牌。"
+    },
+    {
+      "content": "创建应用程序的服务主体。",
+      "pos": [
+        3436,
+        3448
+      ]
+    },
+    {
+      "content": "现在你已在目录中创建服务主体，但未将任何权限或范围分配给服务。需要显式向服务主体授予权限，才能在某个范围执行操作。",
+      "pos": [
+        3551,
+        3608
+      ]
+    },
+    {
+      "content": "向服务主体授予对你的订阅的权限。在此示例中，你将要向服务主体授予读取订阅中所有资源的权限。对于 <bpt id=\"p1\">**</bpt>ServicePrincipalName<ept id=\"p1\">**</ept> 参数，请提供你在创建应用程序时使用的 <bpt id=\"p2\">**</bpt>ApplicationId<ept id=\"p2\">**</ept> 或 <bpt id=\"p3\">**</bpt>IdentifierUris<ept id=\"p3\">**</ept>。",
+      "pos": [
+        3613,
+        3744
+      ]
+    },
+    {
+      "pos": [
+        3962,
+        4016
+      ],
+      "content": "检索在其中创建了角色分配的订阅。稍后将使用此订阅来获取服务主体角色分配所在租户的 <bpt id=\"p1\">**</bpt>TenantId<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        4080,
+        4159
+      ],
+      "content": "如果角色分配不是在当前选择的订阅中创建的，你可以指定 <bpt id=\"p1\">**</bpt>SubscriptoinId<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>SubscriptionName<ept id=\"p2\">**</ept> 参数来检索其他订阅。"
+    },
+    {
+      "pos": [
+        4164,
+        4249
+      ],
+      "content": "若要通过 PowerShell 以服务主体的身份登录，请运行 <bpt id=\"p1\">**</bpt>Get-Credential<ept id=\"p1\">**</ept> 命令，以创建包含你的凭据的新 <bpt id=\"p2\">**</bpt>PSCredential<ept id=\"p2\">**</ept> 对象。"
+    },
+    {
+      "content": "系统会提示你输入凭据。",
+      "pos": [
+        4297,
+        4308
+      ]
+    },
+    {
+      "pos": [
+        4328,
+        4410
+      ],
+      "content": "对于用户名，请使用你在创建应用程序时所用的 <bpt id=\"p1\">**</bpt>ApplicationId<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>IdentifierUris<ept id=\"p2\">**</ept>。对于密码，请使用你在创建帐户时指定的密码。"
+    },
+    {
+      "pos": [
+        4417,
+        4470
+      ],
+      "content": "使用输入的凭据作为 <bpt id=\"p1\">**</bpt>Add-AzureRmAccount<ept id=\"p1\">**</ept> cmdlet 的输入，以将服务主体登录："
+    },
+    {
+      "content": "现在，你应该已经作为所创建 AAD 应用程序的服务主体进行身份验证。",
+      "pos": [
+        4775,
+        4809
+      ]
+    },
+    {
+      "content": "若要从应用程序进行身份验证，请包含以下 .NET 代码。检索令牌之后，便可以访问订阅中的资源。",
+      "pos": [
+        4814,
+        4861
+      ]
+    },
+    {
+      "content": "使用证书对服务主体进行身份验证 - PowerShell",
+      "pos": [
+        5523,
+        5551
+      ]
+    },
+    {
+      "content": "在此部分中，您将执行以下用于创建 Azure Active Directory 应用程序的服务主体、将角色分配给服务主体，通过提供证书作为服务主体进行身份验证的步骤。本主题假定您已获得所颁发的证书。",
+      "pos": [
+        5553,
+        5652
+      ]
+    },
+    {
+      "content": "它介绍了两种使用证书的方法 - 密钥凭据和密钥值。您可以使用任意一种方法。",
+      "pos": [
+        5654,
+        5691
+      ]
+    },
+    {
+      "content": "首先，当创建应用程序时，必须在 PowerShell 中设置以后将用到的某些值。",
+      "pos": [
+        5693,
+        5733
+      ]
+    },
+    {
+      "content": "登录到你的帐户。",
+      "pos": [
+        5738,
+        5746
+      ]
+    },
+    {
+      "content": "对于这两种方法，从您的证书创建一个 X509Certificate 对象并检索密钥值。使用指向您的证书的路径和该证书的密码。",
+      "pos": [
+        5789,
+        5851
+      ]
+    },
+    {
+      "pos": [
+        6100,
+        6144
+      ],
+      "content": "如果你使用密钥凭据，请创建密钥凭据对象并将其值设置为上一步中的 <ph id=\"ph1\">`$keyValue`</ph>。"
+    },
+    {
+      "content": "在目录中创建一个应用程序。第一个命令演示如何使用密钥值。",
+      "pos": [
+        6633,
+        6661
+      ]
+    },
+    {
+      "content": "或者，使用第二个示例分配密钥凭据。",
+      "pos": [
+        6925,
+        6942
+      ]
+    },
+    {
+      "pos": [
+        7175,
+        7234
+      ],
+      "content": "检查新的应用程序对象。需要使用 <bpt id=\"p1\">**</bpt>ApplicationId<ept id=\"p1\">**</ept> 属性创建服务主体、角色分配以及获取 JWT 令牌。"
+    },
+    {
+      "content": "创建应用程序的服务主体。",
+      "pos": [
+        8744,
+        8756
+      ]
+    },
+    {
+      "content": "现在你已在目录中创建服务主体，但未将任何权限或范围分配给服务。需要显式向服务主体授予权限，才能在某个范围执行操作。",
+      "pos": [
+        8858,
+        8915
+      ]
+    },
+    {
+      "content": "向服务主体授予对你的订阅的权限。在此示例中，你将要向服务主体授予读取订阅中所有资源的权限。对于 <bpt id=\"p1\">**</bpt>ServicePrincipalName<ept id=\"p1\">**</ept> 参数，请提供你在创建应用程序时使用的 <bpt id=\"p2\">**</bpt>ApplicationId<ept id=\"p2\">**</ept> 或 <bpt id=\"p3\">**</bpt>IdentifierUris<ept id=\"p3\">**</ept>。",
+      "pos": [
+        8920,
+        9051
+      ]
+    },
+    {
+      "content": "若要从应用程序进行身份验证，请包含以下 .NET 代码。检索客户端之后，您可以访问订阅中的资源。",
+      "pos": [
+        9261,
+        9309
+      ]
+    },
+    {
+      "content": "使用密码对服务主体进行身份验证 - Azure CLI",
+      "pos": [
+        10435,
+        10462
+      ]
+    },
+    {
+      "content": "首先，创建一个服务主体。为此，我们必须在目录中创建一个应用程序。本部分将指导你在目录中创建新的应用程序。",
+      "pos": [
+        10464,
+        10516
+      ]
+    },
+    {
+      "content": "切换到 Azure 资源管理器模式并登录到你的帐户。",
+      "pos": [
+        10521,
+        10547
+      ]
+    },
+    {
+      "pos": [
+        10603,
+        10705
+      ],
+      "content": "运行 <bpt id=\"p1\">**</bpt>azure ad app create<ept id=\"p1\">**</ept> 命令创建新的 AAD 应用程序。提供应用程序的显示名称、描述应用程序的页面的 URI（该链接未验证）、标识应用程序的 URI，以及应用程序标识的密码。"
+    },
+    {
+      "content": "将返回该 Azure AD 应用程序。需要使用 ApplicationId 属性创建服务主体、角色分配以及获取 JWT 令牌。",
+      "pos": [
+        10912,
+        10975
+      ]
+    },
+    {
+      "content": "创建应用程序的服务主体。提供上一步返回的应用程序 ID。",
+      "pos": [
+        11582,
+        11610
+      ]
+    },
+    {
+      "content": "随后将返回新的服务主体。授权时需要使用对象 ID。",
+      "pos": [
+        11689,
+        11714
+      ]
+    },
+    {
+      "content": "现在你已在目录中创建服务主体，但未将任何权限或范围分配给服务。需要显式向服务主体授予权限，才能在某个范围执行操作。",
+      "pos": [
+        12048,
+        12105
+      ]
+    },
+    {
+      "content": "向服务主体授予对你的订阅的权限。在此示例中，你将要向服务主体授予读取订阅中所有资源的权限。对于 <bpt id=\"p1\">**</bpt>ServicePrincipalName<ept id=\"p1\">**</ept> 参数，请提供你在创建应用程序时使用的 <bpt id=\"p2\">**</bpt>ApplicationId<ept id=\"p2\">**</ept> 或 <bpt id=\"p3\">**</bpt>IdentifierUris<ept id=\"p3\">**</ept>。",
+      "pos": [
+        12110,
+        12241
+      ]
+    },
+    {
+      "pos": [
+        12465,
+        12527
+      ],
+      "content": "若要确定服务主体角色分配所在租户的 <bpt id=\"p1\">**</bpt>TenantId<ept id=\"p1\">**</ept>，请列出帐户，然后查找输出中的 <bpt id=\"p2\">**</bpt>TenantId<ept id=\"p2\">**</ept> 属性。"
+    },
+    {
+      "pos": [
+        12567,
+        12644
+      ],
+      "content": "使用作为你的标识的服务主体登录。对于用户名，请使用你在创建应用程序时所用的 <bpt id=\"p1\">**</bpt>ApplicationId<ept id=\"p1\">**</ept>。对于密码，请使用你在创建帐户时指定的密码。"
+    },
+    {
+      "content": "现在，你应该已经作为所创建 AAD 应用程序的服务主体进行身份验证。",
+      "pos": [
+        12750,
+        12784
+      ]
+    },
+    {
+      "content": "使用证书对服务主体进行身份验证 - Azure CLI",
+      "pos": [
+        12789,
+        12816
+      ]
+    },
+    {
+      "pos": [
+        12818,
+        12933
+      ],
+      "content": "在本部分，你将执行以下步骤，为使用证书进行身份验证的 Azure Active Directory 应用程序创建服务主体。本主题假设你获得所颁发的证书并已安装 <bpt id=\"p1\">[</bpt>OpenSSL<ept id=\"p1\">](http://www.openssl.org/)</ept>。"
+    },
+    {
+      "pos": [
+        12938,
+        12959
+      ],
+      "content": "使用以下命令创建 <bpt id=\"p1\">**</bpt>.pem<ept id=\"p1\">**</ept> 文件："
+    },
+    {
+      "pos": [
+        13040,
+        13062
+      ],
+      "content": "打开 <bpt id=\"p1\">**</bpt>.pem<ept id=\"p1\">**</ept> 文件并复制证书数据。"
+    },
+    {
+      "pos": [
+        13067,
+        13133
+      ],
+      "content": "通过运行 <bpt id=\"p1\">**</bpt>azure ad app create<ept id=\"p1\">**</ept> 命令创建新的 AAD 应用程序，并提供你在上一步中复制为密钥值的证书数据。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        13308,
+        13312
+      ]
+    },
+    {
+      "pos": [
+        13318,
+        13415
+      ],
+      "content": "有关基于角色的访问控制的概述，请参阅 <bpt id=\"p1\">[</bpt>Azure 基于角色的访问控制<ept id=\"p1\">](/documentation/articles/role-based-access-control-configure)</ept>"
+    },
+    {
+      "pos": [
+        13420,
+        13542
+      ],
+      "content": "若要了解有关使用服务主体的门户的信息，请参阅<bpt id=\"p1\">[</bpt>使用 Azure 门户创建新的 Azure 服务主体<ept id=\"p1\">](/documentation/articles/resource-group-create-service-principal-portal)</ept>"
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"通过 Azure 资源管理器对服务主体进行身份验证\"\n   description=\"介绍如何通过基于角色的访问控制向服务主体授予访问权限，并对服务主体进行身份验证。演示如何使用 PowerShell 和 Azure CLI 执行这些任务。\"\n   services=\"azure-resource-manager\"\n   documentationCenter=\"na\"\n   authors=\"tfitzmac\"\n   manager=\"wpickett\"\n   editor=\"\"/>\n\n<tags\n   ms.service=\"azure-resource-manager\"\n   ms.date=\"11/18/2015\"\n   wacn.date=\"01/14/2016\"/>\n\n# 通过 Azure 资源管理器对服务主体进行身份验证\n\n本主题说明如何允许服务主体（例如自动化的过程、应用程序或服务）访问订阅中的其他资源。借助 Azure 资源管理器，可以使用基于角色的访问控制向服务主体授予允许的操作，并对该服务主体进行身份验证。本主题说明如何使用 PowerShell 和 Azure CLI 将角色分配给服务主体，并对服务主体进行身份验证。\n\n它演示如何使用用户名和密码或证书进行身份验证。\n\n您可以使用适用于 Mac、Linux 和 Windows 的 Azure PowerShell 或 Azure CLI。如果你未安装 Azure PowerShell，请参阅[如何安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure)。如果你未安装 Azure CLI，请参阅[安装和配置 Azure CLI](/documentation/articles/xplat-cli-install)。有关使用门户执行这些步骤的信息，请参阅[使用门户创建 Active Directory 应用程序和服务主体](/documentation/articles/resource-group-create-service-principal-portal)\n\n## 概念\n1. Azure Active Directory (AAD) - 云的标识与访问管理服务。有关详细信息，请参阅[什么是 Azure Active Directory](/documentation/articles/active-directory-whatis)\n2. 服务主体 - 目录中需要访问其他资源的应用程序实例。\n3. AD 应用程序 - 向 AAD 标识某个应用程序的目录记录。有关详细信息，请参阅 [Azure AD 中的身份验证基本知识](/documentation/articles/active-directory-authentication-scenarios/)。\n\n## 使用密码对服务主体进行身份验证 - PowerShell\n\n在此部分中，您将执行以下用于创建 Azure Active Directory 应用程序的服务主体、将角色分配给服务主体，通过提供应用程序标识符和密码作为服务主体进行身份验证的步骤。\n\n[AZURE.INCLUDE [powershell-preview-inline-include](../includes/powershell-preview-inline-include.md)]\n\n1. 登录到你的帐户。\n\n        PS C:\\> Login-AzureRmAccount\n\n1. 运行 **New-AzureRmADApplication** 命令创建新的 AAD 应用程序。提供应用程序的显示名称、描述应用程序的页面的 URI（该链接未验证）、标识应用程序的 URI，以及应用程序标识的密码。\n\n        PS C:\\> $azureAdApplication = New-AzureRmADApplication -DisplayName \"<Your Application Display Name>\" -HomePage \"<https://YourApplicationHomePage>\" -IdentifierUris \"<https://YouApplicationUri>\" -Password \"<Your_Password>\"\n\n     检查新的应用程序对象。需要使用 **ApplicationId** 属性创建服务主体、角色分配以及获取 JWT 令牌。\n\n        PS C:\\> $azureAdApplication\n\n        Type                    : Application\n        ApplicationId           : a41acfda-d588-47c9-8166-d659a335a865\n        ApplicationObjectId     : a26aaa48-bd52-4a7f-b29f-1bebf74c91e3\n        AvailableToOtherTenants : False\n        AppPermissions          : {{\n                            \"claimValue\": \"user_impersonation\",\n                            \"description\": \"Allow the application to access <Your Application Display Name> on behalf of the signed-in user.\",\n                            \"directAccessGrantTypes\": [],\n                            \"displayName\": \"Access <Your Application Display Name>\",\n                            \"impersonationAccessGrantTypes\": [\n                              {\n                                \"impersonated\": \"User\",\n                                \"impersonator\": \"Application\"\n                              }\n                            ],\n                            \"isDisabled\": false,\n                            \"origin\": \"Application\",\n                            \"permissionId\": \"b866ef28-9abb-4698-8c8f-eb4328533831\",\n                            \"resourceScopeType\": \"Personal\",\n                            \"userConsentDescription\": \"Allow the application to access <Your Application Display Name> on your behalf.\",\n                            \"userConsentDisplayName\": \"Access <Your Application Display Name>\",\n                            \"lang\": null\n                          }}\n\n\n2. 创建应用程序的服务主体。\n\n        PS C:\\> New-AzureRmADServicePrincipal -ApplicationId $azureAdApplication.ApplicationId\n\n     现在你已在目录中创建服务主体，但未将任何权限或范围分配给服务。需要显式向服务主体授予权限，才能在某个范围执行操作。\n\n3. 向服务主体授予对你的订阅的权限。在此示例中，你将要向服务主体授予读取订阅中所有资源的权限。对于 **ServicePrincipalName** 参数，请提供你在创建应用程序时使用的 **ApplicationId** 或 **IdentifierUris**。<!--有关基于角色的访问控制的详细信息，请参阅[管理和审核对资源的访问权限](/documentation/articles/resource-group-rbac)-->\n\n        PS C:\\> New-AzureRmRoleAssignment -RoleDefinitionName Reader -ServicePrincipalName $azureAdApplication.ApplicationId\n\n4. 检索在其中创建了角色分配的订阅。稍后将使用此订阅来获取服务主体角色分配所在租户的 **TenantId**。\n\n        PS C:\\> $subscription = Get-AzureRmSubscription\n\n     如果角色分配不是在当前选择的订阅中创建的，你可以指定 **SubscriptoinId** 或 **SubscriptionName** 参数来检索其他订阅。\n\n5. 若要通过 PowerShell 以服务主体的身份登录，请运行 **Get-Credential** 命令，以创建包含你的凭据的新 **PSCredential** 对象。\n\n        PS C:\\> $creds = Get-Credential\n\n     系统会提示你输入凭据。\n\n     ![][1]\n\n     对于用户名，请使用你在创建应用程序时所用的 **ApplicationId** 或 **IdentifierUris**。对于密码，请使用你在创建帐户时指定的密码。\n\n     使用输入的凭据作为 **Add-AzureRmAccount** cmdlet 的输入，以将服务主体登录：\n\n        PS C:\\> Login-AzureRmAccount -Credential $creds -ServicePrincipal -Tenant $subscription.TenantId\n        Environment           : AzureCloud\n        Account               : {guid}\n        Tenant                : {guid}\n        Subscription          : {guid}\n        CurrentStorageAccount :\n\n     现在，你应该已经作为所创建 AAD 应用程序的服务主体进行身份验证。\n\n6. 若要从应用程序进行身份验证，请包含以下 .NET 代码。检索令牌之后，便可以访问订阅中的资源。\n\n        public static string GetAccessToken()\n        {\n          var authenticationContext = new AuthenticationContext(\"https://login.chinacloudapi.cn/{tenantId or tenant name}\");  \n          var credential = new ClientCredential(clientId: \"{application id}\", clientSecret: \"{application password}\");\n          var result = authenticationContext.AcquireToken(resource: \"https://management.core.chinacloudapi.cn/\", clientCredential:credential);\n\n          if (result == null) {\n            throw new InvalidOperationException(\"Failed to obtain the JWT token\");\n          }\n\n          string token = result.AccessToken;\n\n          return token;\n        }\n\n\n\n## 使用证书对服务主体进行身份验证 - PowerShell\n\n在此部分中，您将执行以下用于创建 Azure Active Directory 应用程序的服务主体、将角色分配给服务主体，通过提供证书作为服务主体进行身份验证的步骤。本主题假定您已获得所颁发的证书。\n\n它介绍了两种使用证书的方法 - 密钥凭据和密钥值。您可以使用任意一种方法。\n\n首先，当创建应用程序时，必须在 PowerShell 中设置以后将用到的某些值。\n\n1. 登录到你的帐户。\n\n        PS C:\\> Login-AzureRmAccount\n\n1. 对于这两种方法，从您的证书创建一个 X509Certificate 对象并检索密钥值。使用指向您的证书的路径和该证书的密码。\n\n        $cert = New-Object -TypeName System.Security.Cryptography.X509Certificates.X509Certificate -ArgumentList @(\"C:\\certificates\\examplecert.pfx\", \"yourpassword\")\n        $keyValue = [System.Convert]::ToBase64String($cert.GetRawCertData())\n\n2. 如果你使用密钥凭据，请创建密钥凭据对象并将其值设置为上一步中的 `$keyValue`。\n\n        $currentDate = Get-Date\n        $endDate = $currentDate.AddYears(1)\n        $keyId = [guid]::NewGuid()\n        $keyCredential = New-Object  Microsoft.Azure.Commands.Resources.Models.ActiveDirectory.PSADKeyCredential\n        $keyCredential.StartDate = $currentDate\n        $keyCredential.EndDate= $endDate\n        $keyCredential.KeyId = $keyId\n        $keyCredential.Type = \"AsymmetricX509Cert\"\n        $keyCredential.Usage = \"Verify\"\n        $keyCredential.Value = $keyValue\n\n3. 在目录中创建一个应用程序。第一个命令演示如何使用密钥值。\n\n        $azureAdApplication = New-AzureRmADApplication -DisplayName \"<Your Application Display Name>\" -HomePage \"<https://YourApplicationHomePage>\" -IdentifierUris \"<https://YouApplicationUri>\" -KeyValue $keyValue -KeyType AsymmetricX509Cert       \n        \n    或者，使用第二个示例分配密钥凭据。\n\n         $azureAdApplication = New-AzureRmADApplication -DisplayName \"<Your Application Display Name>\" -HomePage \"<https://YourApplicationHomePage>\" -IdentifierUris \"<https://YouApplicationUri>\" -KeyCredentials $keyCredential\n\n    检查新的应用程序对象。需要使用 **ApplicationId** 属性创建服务主体、角色分配以及获取 JWT 令牌。\n\n        PS C:\\> $azureAdApplication\n\n        Type                    : Application\n        ApplicationId           : 76fa8d97-f07e-4b9a-b871-a57a7acd777a\n        ApplicationObjectId     : c36b7b57-a949-4401-b381-18a5210aff10\n        AvailableToOtherTenants : False\n        AppPermissions          : {{\n                            \"claimValue\": \"user_impersonation\",\n                            \"description\": \"Allow the application to access <Your Application Display Name> on behalf of the signed-in\n                          user.\",\n                            \"directAccessGrantTypes\": [],\n                            \"displayName\": \"Access <Your Application Display Name>\",\n                            \"impersonationAccessGrantTypes\": [\n                              {\n                                \"impersonated\": \"User\",\n                                \"impersonator\": \"Application\"\n                              }\n                            ],\n                            \"isDisabled\": false,\n                            \"origin\": \"Application\",\n                            \"permissionId\": \"9f13c6c6-35ba-43d6-b8b3-6a87aa641388\",\n                            \"resourceScopeType\": \"Personal\",\n                            \"userConsentDescription\": \"Allow the application to access <Your Application Display Name> on your behalf.\",\n                            \"userConsentDisplayName\": \"Access <Your Application Display Name>\",\n                            \"lang\": null\n                          }}\n\n4. 创建应用程序的服务主体。\n\n        PS C:\\> New-AzureRmADServicePrincipal -ApplicationId $azureAdApplication.ApplicationId\n\n    现在你已在目录中创建服务主体，但未将任何权限或范围分配给服务。需要显式向服务主体授予权限，才能在某个范围执行操作。\n\n5. 向服务主体授予对你的订阅的权限。在此示例中，你将要向服务主体授予读取订阅中所有资源的权限。对于 **ServicePrincipalName** 参数，请提供你在创建应用程序时使用的 **ApplicationId** 或 **IdentifierUris**。<!--有关基于角色的访问控制的详细信息，请参阅[管理和审核对资源的访问权限](azure-portal/resource-group-rbac.md)-->\n\n        PS C:\\> New-AzureRmRoleAssignment -RoleDefinitionName Reader -ServicePrincipalName $azureAdApplication.ApplicationId\n\n6. 若要从应用程序进行身份验证，请包含以下 .NET 代码。检索客户端之后，您可以访问订阅中的资源。\n\n        string clientId = \"<Application ID for your AAD app>\"; \n        var subscriptionId = \"<Your Azure SubscriptionId>\"; \n        string tenant = \"<Tenant id or tenant name>\"; \n\n        var authContext = new AuthenticationContext(string.Format(\"https://login.chinacloudapi.cn/{0}\", tenant)); \n\n        X509Certificate2 cert = null; \n        X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser); \n        string certName = \"examplecert\"; \n        try \n        { \n            store.Open(OpenFlags.ReadOnly); \n            var certCollection = store.Certificates; \n            var certs = certCollection.Find(X509FindType.FindBySubjectName, certName, false); \n            cert = certs[0]; \n        } \n        finally \n        { \n            store.Close(); \n        }        \n\n        var certCred = new ClientAssertionCertificate(clientId, cert); \n        var token = authContext.AcquireToken(\"https://management.core.chinacloudapi.cn/\", certCred); \n        var creds = new TokenCloudCredentials(subscriptionId, token.AccessToken); \n        var client = new ResourceManagementClient(creds); \n        \n\n## 使用密码对服务主体进行身份验证 - Azure CLI\n\n首先，创建一个服务主体。为此，我们必须在目录中创建一个应用程序。本部分将指导你在目录中创建新的应用程序。\n\n1. 切换到 Azure 资源管理器模式并登录到你的帐户。\n\n        azure config mode arm\n        azure login\n\n2. 运行 **azure ad app create** 命令创建新的 AAD 应用程序。提供应用程序的显示名称、描述应用程序的页面的 URI（该链接未验证）、标识应用程序的 URI，以及应用程序标识的密码。\n\n        azure ad app create --name \"<Your Application Display Name>\" --home-page \"<https://YourApplicationHomePage>\" --identifier-uris \"<https://YouApplicationUri>\" --password <Your_Password>\n        \n    将返回该 Azure AD 应用程序。需要使用 ApplicationId 属性创建服务主体、角色分配以及获取 JWT 令牌。\n\n        info:    Executing command ad app create\n        + Creating application exampleapp                                                \n        data:    Application Id:          b57dd71d-036c-4840-865e-23b71d8098ec\n        data:    Application Object Id:   d5c519e2-6149-447e-b323-88d2c4ea27de\n        data:    Application Permissions:  \n        data:                             claimValue:  user_impersonation\n        data:                             description:  Allow the application to access exampleapp on behalf of the signed-in user.\n        ...\n        info:    ad app create command OK\n\n3. 创建应用程序的服务主体。提供上一步返回的应用程序 ID。\n\n        azure ad sp create b57dd71d-036c-4840-865e-23b71d8098ec\n        \n    随后将返回新的服务主体。授权时需要使用对象 ID。\n    \n        info:    Executing command ad sp create\n        + Creating service principal for application b57dd71d-036c-4840-865e-23b71d8098ec\n        data:    Object Id:               47193a0a-63e4-46bd-9bee-6a9f6f9c03cb\n        data:    Display Name:            exampleapp\n        ...\n        info:    ad sp create command OK\n\n    现在你已在目录中创建服务主体，但未将任何权限或范围分配给服务。需要显式向服务主体授予权限，才能在某个范围执行操作。\n\n4. 向服务主体授予对你的订阅的权限。在此示例中，你将要向服务主体授予读取订阅中所有资源的权限。对于 **ServicePrincipalName** 参数，请提供你在创建应用程序时使用的 **ApplicationId** 或 **IdentifierUris**。<!--有关基于角色的访问控制的详细信息，请参阅[管理和审核对资源的访问权限](/documentation/articles/resource-group-rbac)-->\n\n        azure role assignment create --objectId 47193a0a-63e4-46bd-9bee-6a9f6f9c03cb -o Reader -c /subscriptions/{subscriptionId}/\n\n5. 若要确定服务主体角色分配所在租户的 **TenantId**，请列出帐户，然后查找输出中的 **TenantId** 属性。\n\n        azure account list --json\n\n6. 使用作为你的标识的服务主体登录。对于用户名，请使用你在创建应用程序时所用的 **ApplicationId**。对于密码，请使用你在创建帐户时指定的密码。\n\n        azure login -u \"<ApplicationId>\" -p \"<password>\" --service-principal --tenant \"<TenantId>\"\n\n    现在，你应该已经作为所创建 AAD 应用程序的服务主体进行身份验证。\n\n## 使用证书对服务主体进行身份验证 - Azure CLI\n\n在本部分，你将执行以下步骤，为使用证书进行身份验证的 Azure Active Directory 应用程序创建服务主体。本主题假设你获得所颁发的证书并已安装 [OpenSSL](http://www.openssl.org/)。\n\n1. 使用以下命令创建 **.pem** 文件：\n\n        openssl.exe pkcs12 -in examplecert.pfx -out examplecert.pem -nodes\n\n2. 打开 **.pem** 文件并复制证书数据。\n\n3. 通过运行 **azure ad app create** 命令创建新的 AAD 应用程序，并提供你在上一步中复制为密钥值的证书数据。\n\n        azure ad app create -n \"<your application name>\" --home-page \"<https://YourApplicationHomePage>\" -i \"<https://YouApplicationUri>\" --key-value <certificate data>\n\n## 后续步骤\n  \n- 有关基于角色的访问控制的概述，请参阅 [Azure 基于角色的访问控制](/documentation/articles/role-based-access-control-configure)  \n- 若要了解有关使用服务主体的门户的信息，请参阅[使用 Azure 门户创建新的 Azure 服务主体](/documentation/articles/resource-group-create-service-principal-portal) \n\n\n<!-- Images. -->\n[1]: ./media/resource-group-authenticate-service-principal/arm-get-credential.png\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

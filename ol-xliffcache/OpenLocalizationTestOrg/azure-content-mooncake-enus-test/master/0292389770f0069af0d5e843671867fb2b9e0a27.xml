@@ -1,0 +1,805 @@
+{
+  "nodes": [
+    {
+      "content": "配合 Java 使用 Storm on HDInsight 从事件中心处理事件 | Azure",
+      "pos": [
+        26,
+        73
+      ]
+    },
+    {
+      "content": "了解如何使用通过 Maven 创建的 Java Storm 拓扑处理事件中心数据。",
+      "pos": [
+        91,
+        132
+      ]
+    },
+    {
+      "content": "使用 Storm on HDInsight 从 Azure 事件中心处理事件 (Java)",
+      "pos": [
+        361,
+        406
+      ]
+    },
+    {
+      "content": "Azure 事件中心可让你处理 Web 应用、应用程序和设备中的大量数据。借助事件中心 Spout，你可以轻松使用 Apache Storm on HDInsight 实时分析这些数据。你还可以使用事件中心 Bolt 从 Storm 向事件中心写入数据。",
+      "pos": [
+        408,
+        535
+      ]
+    },
+    {
+      "content": "在本教程中，你将学习如何使用事件中心 Spout 和 Bolt 在基于 Java 的 Storm 拓扑中读取和写入数据。",
+      "pos": [
+        537,
+        597
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        602,
+        606
+      ]
+    },
+    {
+      "content": "一个 Apache Storm on HDInsight 群集。参考下列其中一篇入门文章来创建群集：",
+      "pos": [
+        610,
+        660
+      ]
+    },
+    {
+      "pos": [
+        668,
+        797
+      ],
+      "content": "一个<bpt id=\"p1\">[</bpt>基于 Windows 的群集<ept id=\"p1\">](/documentation/articles/hdinsight-apache-storm-tutorial-get-started)</ept>：若要从 Windows 客户端使用 PowerShell 来操作群集，请选择此选项"
+    },
+    {
+      "pos": [
+        805,
+        859
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>两种群集类型之间的唯一差别是，是要使用 SSH 将拓扑提交到群集还是 Web 窗体。"
+    },
+    {
+      "pos": [
+        863,
+        938
+      ],
+      "content": "一个 <bpt id=\"p1\">[</bpt>Azure 事件中心<ept id=\"p1\">](/documentation/articles/event-hubs-csharp-ephcs-getstarted)</ept>"
+    },
+    {
+      "pos": [
+        942,
+        1111
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Oracle Java Developer Kit (JDK) 版本 7<ept id=\"p1\">](https://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)</ept> 或同等版本，例如 <bpt id=\"p2\">[</bpt>OpenJDK<ept id=\"p2\">](http://openjdk.java.net/)</ept>"
+    },
+    {
+      "pos": [
+        1115,
+        1185
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Maven<ept id=\"p1\">](https://maven.apache.org/download.cgi)</ept>：Maven 是 Java 项目的项目生成系统。"
+    },
+    {
+      "content": "一个文本编辑器或 Java 集成开发环境 (IDE)",
+      "pos": [
+        1189,
+        1215
+      ]
+    },
+    {
+      "pos": [
+        1223,
+        1302
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>你的编辑器或 IDE 可能具有处理 Maven 的特定功能，但本文档中未提供说明。有关环境编辑功能的详细信息，请参阅所使用产品的文档。"
+    },
+    {
+      "pos": [
+        1306,
+        1424
+      ],
+      "content": "一个 SCP 客户端。对于 Windows 客户端，建议使用可从 <bpt id=\"p1\">[</bpt>PuTTY 下载页<ept id=\"p1\">](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html)</ept>获取的 PSCP。"
+    },
+    {
+      "content": "了解示例",
+      "pos": [
+        1428,
+        1432
+      ]
+    },
+    {
+      "pos": [
+        1434,
+        1535
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>hdinsight-java-storm-eventhub<ept id=\"p1\">](https://github.com/Blackmist/hdinsight-java-storm-eventhub)</ept> 示例包含两个拓扑："
+    },
+    {
+      "pos": [
+        1537,
+        1650
+      ],
+      "content": "<bpt id=\"p1\">__</bpt>com.microsoft.example.EventHubWriter<ept id=\"p1\">__</ept> 将随机数据写入 Azure 事件中心。数据由 Spout 生成，是随机设备 ID 和设备值。因此它可以模拟发出字符串 ID 和数字值的某些硬件。"
+    },
+    {
+      "pos": [
+        1652,
+        1797
+      ],
+      "content": "<bpt id=\"p1\">__</bpt>com.microsoft.example.EventHubReader<ept id=\"p1\">__</ept> 从事件中心读取数据（EventHubWriter 写入的数据），并将其存储到 HDFS（在本例中为 WASB，因为它是使用 Azure HDInsight 编写和测试的）上的 /devicedata 目录中。"
+    },
+    {
+      "content": "数据在写入事件中心之前已格式化为 JSON 文档，在被读取器读取时，将从 JSON 解析成 Tuple。JSON 格式如下：",
+      "pos": [
+        1799,
+        1861
+      ]
+    },
+    {
+      "content": "使用 JSON 文档将数据存储到事件中心的原因是让我们知道格式是什么，而不是依赖于事件中心 Spout 和 Bolt 的内部格式化机制。",
+      "pos": [
+        1931,
+        1999
+      ]
+    },
+    {
+      "content": "项目配置",
+      "pos": [
+        2004,
+        2008
+      ]
+    },
+    {
+      "pos": [
+        2010,
+        2051
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>POM.xml<ept id=\"p1\">**</ept> 文件包含此 Maven 项目的配置信息。需要关注的部分是："
+    },
+    {
+      "content": "EventHubs Storm Spout 依赖项",
+      "pos": [
+        2057,
+        2082
+      ]
+    },
+    {
+      "content": "这会添加 eventhubs-storm-spout 包的依赖项，包含用于从事件中心读取的 Spout 和写入事件中心的 Bolt。",
+      "pos": [
+        2253,
+        2319
+      ]
+    },
+    {
+      "pos": [
+        2323,
+        2375
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>此包不适用于 Maven，在稍后的步骤中将手动安装在本地 Maven 存储库中。"
+    },
+    {
+      "content": "HdfsBolt 和 WASB 组件",
+      "pos": [
+        2381,
+        2399
+      ]
+    },
+    {
+      "content": "HdfsBolt 一般用于将数据存储到 Hadoop 分布式文件系统 (HDFS)。但是，HDInsight 群集使用 Azure 存储空间 (WASB) 作为默认的数据存储区，因此我们必须加载多个组件，使 HdfsBolt 识别 WASB 文件系统。",
+      "pos": [
+        2401,
+        2527
+      ]
+    },
+    {
+      "pos": [
+        4580,
+        4632
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>用于启用 WASB 的包不适用于 Maven 存储库，将在稍后的步骤中手动安装。"
+    },
+    {
+      "content": "maven-compiler-plugin",
+      "pos": [
+        4638,
+        4659
+      ]
+    },
+    {
+      "content": "告诉 Maven，编译后的项目应与 HDInsight 群集所用的Java 7 版本兼容。",
+      "pos": [
+        4926,
+        4971
+      ]
+    },
+    {
+      "content": "maven-shade-plugin",
+      "pos": [
+        4977,
+        4995
+      ]
+    },
+    {
+      "content": "用于将解决方案打包成 uber jar，其中包含项目代码和所需的依赖项。它还用于：",
+      "pos": [
+        6074,
+        6115
+      ]
+    },
+    {
+      "content": "重命名依赖项的许可证文件：如果不这样做，基于 Windows 的 HDInsight 群集在运行时可能会出错。",
+      "pos": [
+        6119,
+        6174
+      ]
+    },
+    {
+      "content": "排除安全性/签名：如果不这样做，HDInsight 群集在运行时可能会出错。",
+      "pos": [
+        6178,
+        6216
+      ]
+    },
+    {
+      "content": "exec-maven-plugin",
+      "pos": [
+        6222,
+        6239
+      ]
+    },
+    {
+      "content": "可让你使用以下命令在开发环境上本地运行拓扑：",
+      "pos": [
+        6853,
+        6875
+      ]
+    },
+    {
+      "pos": [
+        6933,
+        7014
+      ],
+      "content": "例如，<ph id=\"ph1\">`mvn compile exec:java -Dstorm.topology=com.microsoft.example.EventHubWriter`</ph>。"
+    },
+    {
+      "content": "resources 节",
+      "pos": [
+        7020,
+        7031
+      ]
+    },
+    {
+      "content": "定义项目所需的资源：",
+      "pos": [
+        7318,
+        7328
+      ]
+    },
+    {
+      "pos": [
+        7332,
+        7378
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>EventHubs.properties<ept id=\"p1\">**</ept>：包含用于连接到 Azure 事件中心的信息"
+    },
+    {
+      "pos": [
+        7381,
+        7434
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>core-site.xml<ept id=\"p1\">**</ept>：包含 HDInsight 群集使用的 Azure 存储空间的相关信息。"
+    },
+    {
+      "content": "必须在这两节中填充事件中心与 HDInsight 群集的相关信息。",
+      "pos": [
+        7436,
+        7469
+      ]
+    },
+    {
+      "content": "配置环境变量",
+      "pos": [
+        7473,
+        7479
+      ]
+    },
+    {
+      "content": "可以在开发工作站上安装 Java 和 JDK 时设置以下环境变量。不过，你应该检查它们是否存在并且包含系统的正确值。",
+      "pos": [
+        7481,
+        7539
+      ]
+    },
+    {
+      "pos": [
+        7543,
+        7647
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>JAVA\\_HOME<ept id=\"p1\">**</ept> - 应该指向已安装 Java 运行时环境 (JRE) 的目录。例如，在 Windows 中，它的值类似于 <ph id=\"ph1\">`c:\\Program Files (x86)\\Java\\jre1.7`</ph>"
+    },
+    {
+      "pos": [
+        7651,
+        7671
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>PATH<ept id=\"p1\">**</ept> - 应该包含以下路径："
+    },
+    {
+      "pos": [
+        7679,
+        7701
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>JAVA\\_HOME<ept id=\"p1\">**</ept>（或等效的路径）"
+    },
+    {
+      "pos": [
+        7709,
+        7736
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>JAVA\\_HOME\\\\bin<ept id=\"p1\">**</ept>（或等效的路径）"
+    },
+    {
+      "content": "安装 Maven 的目录",
+      "pos": [
+        7744,
+        7756
+      ]
+    },
+    {
+      "content": "配置事件中心",
+      "pos": [
+        7761,
+        7767
+      ]
+    },
+    {
+      "content": "事件中心是此示例的数据源。按照下列步骤创建一个新的事件中心。",
+      "pos": [
+        7769,
+        7799
+      ]
+    },
+    {
+      "pos": [
+        7804,
+        7881
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>中，选择“新建”&gt;“服务总线”&gt;“事件中心”&gt;“自定义创建”。"
+    },
+    {
+      "pos": [
+        7886,
+        7959
+      ],
+      "content": "在“添加新事件中心”屏幕中，输入“事件中心名称”，选择要在其中创建中心的“区域”，然后创建新的命名空间或选择现有的命名空间。单击<bpt id=\"p1\">**</bpt>箭头<ept id=\"p1\">**</ept>继续。"
+    },
+    {
+      "content": "向导页 1",
+      "pos": [
+        7967,
+        7972
+      ]
+    },
+    {
+      "pos": [
+        8049,
+        8108
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>应该选择与 Storm on HDInsight 服务器相同的<bpt id=\"p1\">**</bpt>位置<ept id=\"p1\">**</ept>，以降低延迟和成本。"
+    },
+    {
+      "content": "在“配置事件中心”屏幕中，输入“分区计数”和“消息保留期”值。对于本示例，请使用分区计数 10，消息保留期 1。记下分区计数，因为稍后需要用到。",
+      "pos": [
+        8113,
+        8185
+      ]
+    },
+    {
+      "content": "向导页 2",
+      "pos": [
+        8193,
+        8198
+      ]
+    },
+    {
+      "content": "创建事件中心之后，请选择命名空间，选择“事件中心”，然后选择你前面创建的事件中心。",
+      "pos": [
+        8272,
+        8313
+      ]
+    },
+    {
+      "content": "选择“配置”，然后使用以下信息创建两个新的访问策略。",
+      "pos": [
+        8318,
+        8344
+      ]
+    },
+    {
+      "pos": [
+        8350,
+        8482
+      ],
+      "content": "<table>\n <tr><th>Name</th><th>权限</th></tr>\n <tr><td>写入器</td><td>发送</td></tr>\n <tr><td>读取器</td><td>侦听</td></tr>\n </table>",
+      "leadings": [
+        "",
+        "   ",
+        "   ",
+        "   ",
+        "   "
+      ],
+      "nodes": [
+        {
+          "content": "Name",
+          "pos": [
+            17,
+            21
+          ]
+        },
+        {
+          "content": "权限",
+          "pos": [
+            30,
+            32
+          ]
+        },
+        {
+          "content": "写入器",
+          "pos": [
+            52,
+            55
+          ]
+        },
+        {
+          "content": "发送",
+          "pos": [
+            64,
+            66
+          ]
+        },
+        {
+          "content": "读取器",
+          "pos": [
+            86,
+            89
+          ]
+        },
+        {
+          "content": "侦听",
+          "pos": [
+            98,
+            100
+          ]
+        }
+      ]
+    },
+    {
+      "content": "创建权限后，在页面底部选择“保存”图标。这将会创建共享访问策略，用于对此事件中心进行发送 (writer) 和侦听 (reader)。",
+      "pos": [
+        8488,
+        8555
+      ]
+    },
+    {
+      "content": "策略",
+      "pos": [
+        8563,
+        8565
+      ]
+    },
+    {
+      "pos": [
+        8641,
+        8714
+      ],
+      "content": "保存策略后，使用页面底部的“共享访问密钥生成器”检索 <bpt id=\"p1\">**</bpt>writer<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>reader<ept id=\"p2\">**</ept> 策略的密钥。保存这些密钥，因为稍后将要用到。"
+    },
+    {
+      "content": "下载并构建项目",
+      "pos": [
+        8719,
+        8726
+      ]
+    },
+    {
+      "pos": [
+        8731,
+        8894
+      ],
+      "content": "从 GitHub 下载项目：<bpt id=\"p1\">[</bpt>hdinsight-java-storm-eventhub<ept id=\"p1\">](https://github.com/Blackmist/hdinsight-java-storm-eventhub)</ept>。可以下载 zip 存档形式的包，或者使用 <bpt id=\"p2\">[</bpt>git<ept id=\"p2\">](https://git-scm.com/)</ept> 在本地克隆项目。"
+    },
+    {
+      "content": "使用以下命令以将项目中包含的包安装到本地 Maven 存储库。这些包将启用事件中心 Spout 和 Bolt，以及使用 HdfsBolt 写入 Azure 存储空间 (WASB) 的功能。",
+      "pos": [
+        8899,
+        8993
+      ]
+    },
+    {
+      "pos": [
+        10361,
+        10461
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果使用 Powershell，必须用引号括住 <ph id=\"ph2\">`-D`</ph> 参数。例如，<ph id=\"ph3\">`\"-Dfile=lib/hadoop/hadoop-main-3.0.0-SNAPSHOT.pom\"`</ph>。"
+    },
+    {
+      "content": "这些文件最初来自 https://github.com/hdinsight/hdinsight-storm-examples，因此可以在那里找到最新版本。",
+      "pos": [
+        10467,
+        10544
+      ]
+    },
+    {
+      "content": "使用以下命令构建和打包项目：",
+      "pos": [
+        10549,
+        10563
+      ]
+    },
+    {
+      "pos": [
+        10590,
+        10670
+      ],
+      "content": "这会下载所需的依赖项，构建然后打包项目。输出在 <bpt id=\"p1\">__</bpt>/target<ept id=\"p1\">__</ept> 目录中存储为 <bpt id=\"p2\">__</bpt>EventHubExample-1.0-SNAPSHOT.jar<ept id=\"p2\">__</ept>。"
+    },
+    {
+      "content": "部署拓扑",
+      "pos": [
+        10675,
+        10679
+      ]
+    },
+    {
+      "pos": [
+        10681,
+        10845
+      ],
+      "content": "此项目创建的 jar 包含两个拓扑；<bpt id=\"p1\">__</bpt>com.microsoft.example.EventHubWriter<ept id=\"p1\">__</ept> 和 <bpt id=\"p2\">__</bpt>com.microsoft.example.EventHubReader<ept id=\"p2\">__</ept>。应该先启动 EventHubWriter 拓扑，因为它会将事件写入事件中心，然后由 EventHubReader 读取事件。"
+    },
+    {
+      "content": "如果使用基于 Windows 的群集",
+      "pos": [
+        10850,
+        10868
+      ]
+    },
+    {
+      "content": "在浏览器中打开 https://CLUSTERNAME.azurehdinsight.cn。出现提示时，输入 HDInsight 群集的管理员凭据。随后你将进入 Storm 仪表板。",
+      "pos": [
+        10873,
+        10964
+      ]
+    },
+    {
+      "content": "使用“Jar 文件”下拉列表在构建环境中浏览并选择 EventHubExample-1.0-SNAPSHOT.jar 文件。",
+      "pos": [
+        10969,
+        11031
+      ]
+    },
+    {
+      "pos": [
+        11036,
+        11085
+      ],
+      "content": "对于“类名”，请输入 <ph id=\"ph1\">`com.mirosoft.example.EventHubWriter`</ph>。"
+    },
+    {
+      "pos": [
+        11090,
+        11150
+      ],
+      "content": "对于“其他参数”，请输入 <ph id=\"ph1\">`writer`</ph>。最后，单击“提交”上载 jar 并启动 EventHubWriter 拓扑。"
+    },
+    {
+      "content": "启动拓扑后，使用窗体来启动 EventHubReader：",
+      "pos": [
+        11155,
+        11184
+      ]
+    },
+    {
+      "pos": [
+        11192,
+        11243
+      ],
+      "content": "<bpt id=\"p1\">__</bpt>Jar 文件<ept id=\"p1\">__</ept>：选择前面上载的 EventHubExample-1.0-SNAPSHOT.jar"
+    },
+    {
+      "pos": [
+        11250,
+        11298
+      ],
+      "content": "<bpt id=\"p1\">__</bpt>类名<ept id=\"p1\">__</ept>：输入 <ph id=\"ph1\">`com.microsoft.example.EventHubReader`</ph>"
+    },
+    {
+      "pos": [
+        11305,
+        11325
+      ],
+      "content": "<bpt id=\"p1\">__</bpt>其他参数<ept id=\"p1\">__</ept>：输入 <ph id=\"ph1\">`reader`</ph>"
+    },
+    {
+      "content": "单击“提交”启动 EventHubReader 拓扑。",
+      "pos": [
+        11331,
+        11358
+      ]
+    },
+    {
+      "content": "等待几分钟让拓扑生成事件并将事件存储到 Azure 存储空间，然后选择“Storm 仪表板”页面顶部的“查询控制台”选项卡。",
+      "pos": [
+        11363,
+        11425
+      ]
+    },
+    {
+      "pos": [
+        11430,
+        11498
+      ],
+      "content": "在“查询控制台”上，选择“Hive 编辑器”并将默认的 <ph id=\"ph1\">`select * from hivesampletable`</ph> 替换为以下内容："
+    },
+    {
+      "content": "单击“选择”以运行查询。这会返回 10 行由 EventHubReader 写入 Azure 存储空间 (WASB) 的数据。完成查询后，你应会看到类似于下面的数据：",
+      "pos": [
+        11721,
+        11804
+      ]
+    },
+    {
+      "pos": [
+        12202,
+        12295
+      ],
+      "content": "选择页面顶部的“Storm 仪表板”，然后选择“Storm UI”。从“Storm UI”中选择<bpt id=\"p1\">__</bpt>读取器<ept id=\"p1\">__</ept>拓扑的链接，然后使用“终止”按钮停止拓扑。针对<bpt id=\"p2\">__</bpt>写入器<ept id=\"p2\">__</ept>拓扑重复该过程。"
+    },
+    {
+      "content": "检查点",
+      "pos": [
+        12303,
+        12306
+      ]
+    },
+    {
+      "content": "EventHubSpout 定期检查点其状态为 Zookeeper 节点，将保存当前的偏移量的消息从队列中读取。这样，要开始在以下情况下接收已保存的偏移量处的消息的组件：",
+      "pos": [
+        12308,
+        12393
+      ]
+    },
+    {
+      "content": "组件实例失败，并已重新启动。",
+      "pos": [
+        12397,
+        12411
+      ]
+    },
+    {
+      "content": "通过添加或删除节点扩大或收缩群集。",
+      "pos": [
+        12415,
+        12432
+      ]
+    },
+    {
+      "pos": [
+        12436,
+        12459
+      ],
+      "content": "拓扑已终止并已<bpt id=\"p1\">**</bpt>使用相同的名称<ept id=\"p1\">**</ept>重新启动。"
+    },
+    {
+      "content": "在基于 Windows 的 HDInsight 群集上",
+      "pos": [
+        12465,
+        12492
+      ]
+    },
+    {
+      "pos": [
+        12494,
+        12648
+      ],
+      "content": "你可以将持久性检查点导入和导出到 WASB（HDInsight 群集使用的 Azure 存储空间。） 用于执行此操作的脚本位于 Storm on HDInsight 上的 <bpt id=\"p1\">**</bpt>c:\\\\apps\\\\dist\\\\storm-0.9.3.2.2.1.0-2340\\\\zkdatatool-1.0\\\\bin<ept id=\"p1\">**</ept> 中。"
+    },
+    {
+      "pos": [
+        12651,
+        12700
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>路径中的版本号可能不同，因为群集上安装的 Storm 版本将来可能会更改。"
+    },
+    {
+      "content": "此目录中的脚本是：",
+      "pos": [
+        12702,
+        12711
+      ]
+    },
+    {
+      "pos": [
+        12715,
+        12776
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>stormmeta\\_import.cmd<ept id=\"p1\">**</ept>：将所有 Storm 元数据从群集默认存储容器导入 Zookeeper。"
+    },
+    {
+      "pos": [
+        12780,
+        12843
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>stormmeta\\_export.cmd<ept id=\"p1\">**</ept>：将所有 Storm 元数据从 Zookeeper 导出到群集默认存储容器。"
+    },
+    {
+      "pos": [
+        12847,
+        12901
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>stormmeta\\_delete.cmd<ept id=\"p1\">**</ept>：从 Zookeeper 中删除所有 Storm 元数据。"
+    },
+    {
+      "content": "当你需要删除群集，但在将新群集重新联机的情况下想要从中心的当前偏移量恢复处理时，可以使用导出和导入来保存检查点数据。",
+      "pos": [
+        12903,
+        12961
+      ]
+    },
+    {
+      "pos": [
+        12965,
+        13022
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>由于数据将保存到默认的存储容器，新群集<bpt id=\"p1\">**</bpt>必须<ept id=\"p1\">**</ept>使用前一群集所用的同一个存储帐户和容器。"
+    },
+    {
+      "content": "故障排除",
+      "pos": [
+        13026,
+        13030
+      ]
+    },
+    {
+      "pos": [
+        13032,
+        13138
+      ],
+      "content": "如果你未看到文件存储在 /devicedata 位置（使用 <ph id=\"ph1\">`hadoop fs -ls /devicedata`</ph> 命令或在查询控制台中使用 Hive 命令），请使用 Storm UI 来查找拓扑返回的任何错误。"
+    },
+    {
+      "content": "有关使用 Storm UI 的详细信息，请参阅以下主题：",
+      "pos": [
+        13140,
+        13168
+      ]
+    },
+    {
+      "pos": [
+        13172,
+        13331
+      ],
+      "content": "如果你在 HDInsight 群集上使用<bpt id=\"p1\">__</bpt>基于 Windows<ept id=\"p1\">__</ept> 的 Storm，请参阅<bpt id=\"p2\">[</bpt>部署和管理基于 Windows 的 HDInsight 上的 Apache Storm 拓扑<ept id=\"p2\">](/documentation/articles/hdinsight-storm-deploy-monitor-topology)</ept>"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        13335,
+        13339
+      ]
+    },
+    {
+      "content": "Storm on HDInsight 的示例拓扑",
+      "pos": [
+        13344,
+        13368
+      ]
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"配合 Java 使用 Storm on HDInsight 从事件中心处理事件 | Azure\"\n   description=\"了解如何使用通过 Maven 创建的 Java Storm 拓扑处理事件中心数据。\"\n   services=\"hdinsight,notification hubs\"\n   documentationCenter=\"\"\n   authors=\"Blackmist\"\n   manager=\"paulettm\"\n   editor=\"cgronlun\"/>\n\n<tags\n    ms.service=\"hdinsight\"\n    ms.date=\"01/12/2016\"\n    wacn.date=\"03/03/2016\"/>\n\n# 使用 Storm on HDInsight 从 Azure 事件中心处理事件 (Java)\n\nAzure 事件中心可让你处理 Web 应用、应用程序和设备中的大量数据。借助事件中心 Spout，你可以轻松使用 Apache Storm on HDInsight 实时分析这些数据。你还可以使用事件中心 Bolt 从 Storm 向事件中心写入数据。\n\n在本教程中，你将学习如何使用事件中心 Spout 和 Bolt 在基于 Java 的 Storm 拓扑中读取和写入数据。\n\n## 先决条件\n\n* 一个 Apache Storm on HDInsight 群集。参考下列其中一篇入门文章来创建群集：\n\n    - 一个[基于 Windows 的群集](/documentation/articles/hdinsight-apache-storm-tutorial-get-started)：若要从 Windows 客户端使用 PowerShell 来操作群集，请选择此选项\n\n    > [AZURE.NOTE]两种群集类型之间的唯一差别是，是要使用 SSH 将拓扑提交到群集还是 Web 窗体。\n\n* 一个 [Azure 事件中心](/documentation/articles/event-hubs-csharp-ephcs-getstarted)\n\n* [Oracle Java Developer Kit (JDK) 版本 7](https://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html) 或同等版本，例如 [OpenJDK](http://openjdk.java.net/)\n\n* [Maven](https://maven.apache.org/download.cgi)：Maven 是 Java 项目的项目生成系统。\n\n* 一个文本编辑器或 Java 集成开发环境 (IDE)\n\n    > [AZURE.NOTE]你的编辑器或 IDE 可能具有处理 Maven 的特定功能，但本文档中未提供说明。有关环境编辑功能的详细信息，请参阅所使用产品的文档。\n\n* 一个 SCP 客户端。对于 Windows 客户端，建议使用可从 [PuTTY 下载页](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html)获取的 PSCP。\n\n##了解示例\n\n[hdinsight-java-storm-eventhub](https://github.com/Blackmist/hdinsight-java-storm-eventhub) 示例包含两个拓扑：\n\n__com.microsoft.example.EventHubWriter__ 将随机数据写入 Azure 事件中心。数据由 Spout 生成，是随机设备 ID 和设备值。因此它可以模拟发出字符串 ID 和数字值的某些硬件。\n\n__com.microsoft.example.EventHubReader__ 从事件中心读取数据（EventHubWriter 写入的数据），并将其存储到 HDFS（在本例中为 WASB，因为它是使用 Azure HDInsight 编写和测试的）上的 /devicedata 目录中。\n\n数据在写入事件中心之前已格式化为 JSON 文档，在被读取器读取时，将从 JSON 解析成 Tuple。JSON 格式如下：\n\n    { \"deviceId\": \"unique identifier\", \"deviceValue\": some value }\n\n使用 JSON 文档将数据存储到事件中心的原因是让我们知道格式是什么，而不是依赖于事件中心 Spout 和 Bolt 的内部格式化机制。\n\n###项目配置\n\n**POM.xml** 文件包含此 Maven 项目的配置信息。需要关注的部分是：\n\n####EventHubs Storm Spout 依赖项\n\n    <dependency>\n      <groupId>com.microsoft.eventhubs</groupId>\n      <artifactId>eventhubs-storm-spout</artifactId>\n      <version>0.9.3</version>\n    </dependency>\n\n这会添加 eventhubs-storm-spout 包的依赖项，包含用于从事件中心读取的 Spout 和写入事件中心的 Bolt。\n\n> [AZURE.NOTE]此包不适用于 Maven，在稍后的步骤中将手动安装在本地 Maven 存储库中。\n\n####HdfsBolt 和 WASB 组件\n\nHdfsBolt 一般用于将数据存储到 Hadoop 分布式文件系统 (HDFS)。但是，HDInsight 群集使用 Azure 存储空间 (WASB) 作为默认的数据存储区，因此我们必须加载多个组件，使 HdfsBolt 识别 WASB 文件系统。\n\n      <!--HdfsBolt stuff -->\n      <dependency>\n        <groupId>org.apache.storm</groupId>\n        <artifactId>storm-hdfs</artifactId>\n        <exclusions>\n          <exclusion>\n            <groupId>org.apache.hadoop</groupId>\n            <artifactId>hadoop-client</artifactId>\n          </exclusion>\n          <exclusion>\n            <groupId>org.apache.hadoop</groupId>\n            <artifactId>hadoop-hdfs</artifactId>\n          </exclusion>\n        </exclusions>\n        <version>0.9.3</version>\n      </dependency>\n      <!--\n     This is a temporary workaround to make HdfsBolt work with WASB through hadoop-azure project.\n     For now, we have to build hadoop-client, hadoop-hdfs and hadoop-azure from Hadoop trunk\n     (which defaults to 3.0.0-SNAPSHOT version). And push those jars and dependencies to local\n     mvn repo (take a look at push_lib_mvn.ps1).\n\n     Once Hadoop 2.7 is released, we can just switch to that version.\n     Note that hadoop-azure is added to Hadoop on Hadoop 2.7.\n     -->\n     <dependency>\n       <groupId>org.apache.hadoop</groupId>\n       <artifactId>hadoop-client</artifactId>\n       <version>3.0.0-SNAPSHOT</version>\n     </dependency>\n     <dependency>\n       <groupId>org.apache.hadoop</groupId>\n       <artifactId>hadoop-hdfs</artifactId>\n       <version>3.0.0-SNAPSHOT</version>\n     </dependency>\n     <dependency>\n       <groupId>org.apache.hadoop</groupId>\n       <artifactId>hadoop-azure</artifactId>\n       <version>3.0.0-SNAPSHOT</version>\n     </dependency>\n     <dependency>\n       <groupId>org.apache.hadoop</groupId>\n       <artifactId>hadoop-common</artifactId>\n       <version>3.0.0-SNAPSHOT</version>\n       <exclusions>\n         <exclusion>\n           <groupId>org.slf4j</groupId>\n           <artifactId>slf4j-log4j12</artifactId>\n         </exclusion>\n       </exclusions>\n     </dependency>\n     <dependency>\n       <groupId>com.microsoft.windowsazure.storage</groupId>\n       <artifactId>microsoft-windowsazure-storage-sdk</artifactId>\n       <version>0.6.0</version>\n     </dependency>\n\n> [AZURE.NOTE]用于启用 WASB 的包不适用于 Maven 存储库，将在稍后的步骤中手动安装。\n\n####maven-compiler-plugin\n\n    <plugin>\n      <groupId>org.apache.maven.plugins</groupId>\n      <artifactId>maven-compiler-plugin</artifactId>\n      <version>2.3.2</version>\n      <configuration>\n        <source>1.7</source>\n        <target>1.7</target>\n      </configuration>\n    </plugin>\n\n告诉 Maven，编译后的项目应与 HDInsight 群集所用的Java 7 版本兼容。\n\n####maven-shade-plugin\n\n      <plugin>\n        <groupId>org.apache.maven.plugins</groupId>\n        <artifactId>maven-shade-plugin</artifactId>\n        <version>2.3</version>\n        <configuration>\n          <!-- Keep us from getting a can't overwrite file error -->\n          <transformers>\n            <transformer implementation=\"org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer\">\n            </transformer>\n          </transformers>\n          <!-- Keep us from getting a bad signature error -->\n          <filters>\n            <filter>\n                <artifact>*:*</artifact>\n                <excludes>\n                    <exclude>META-INF/*.SF</exclude>\n                    <exclude>META-INF/*.DSA</exclude>\n                    <exclude>META-INF/*.RSA</exclude>\n                </excludes>\n            </filter>\n        </filters>\n        </configuration>\n        <executions>\n          <execution>\n            <phase>package</phase>\n            <goals>\n              <goal>shade</goal>\n            </goals>\n          </execution>\n        </executions>\n      </plugin>\n\n用于将解决方案打包成 uber jar，其中包含项目代码和所需的依赖项。它还用于：\n\n* 重命名依赖项的许可证文件：如果不这样做，基于 Windows 的 HDInsight 群集在运行时可能会出错。\n\n* 排除安全性/签名：如果不这样做，HDInsight 群集在运行时可能会出错。\n\n####exec-maven-plugin\n\n    <plugin>\n      <groupId>org.codehaus.mojo</groupId>\n      <artifactId>exec-maven-plugin</artifactId>\n      <version>1.2.1</version>\n      <executions>\n        <execution>\n        <goals>\n          <goal>exec</goal>\n        </goals>\n        </execution>\n      </executions>\n      <configuration>\n        <executable>java</executable>\n        <includeProjectDependencies>true</includeProjectDependencies>\n        <includePluginDependencies>false</includePluginDependencies>\n        <classpathScope>compile</classpathScope>\n        <mainClass>${storm.topology}</mainClass>\n      </configuration>\n    </plugin>\n\n可让你使用以下命令在开发环境上本地运行拓扑：\n\n    mvn compile exec:java -Dstorm.topology=<CLASSNAME>\n\n例如，`mvn compile exec:java -Dstorm.topology=com.microsoft.example.EventHubWriter`。\n\n####resources 节\n\n    <resources>\n      <resource>\n        <directory>${basedir}/conf</directory>\n        <filtering>false</filtering>\n        <includes>\n          <include>EventHubs.properties</include>\n          <include>core-site.xml</include>\n        </includes>\n      </resource>\n    </resources>\n\n定义项目所需的资源：\n\n- **EventHubs.properties**：包含用于连接到 Azure 事件中心的信息\n- **core-site.xml**：包含 HDInsight 群集使用的 Azure 存储空间的相关信息。\n\n必须在这两节中填充事件中心与 HDInsight 群集的相关信息。\n\n##配置环境变量\n\n可以在开发工作站上安装 Java 和 JDK 时设置以下环境变量。不过，你应该检查它们是否存在并且包含系统的正确值。\n\n* **JAVA\\_HOME** - 应该指向已安装 Java 运行时环境 (JRE) 的目录。例如，在 Windows 中，它的值类似于 `c:\\Program Files (x86)\\Java\\jre1.7`\n\n* **PATH** - 应该包含以下路径：\n\n    * **JAVA\\_HOME**（或等效的路径）\n\n    * **JAVA\\_HOME\\\\bin**（或等效的路径）\n\n    * 安装 Maven 的目录\n\n## 配置事件中心\n\n事件中心是此示例的数据源。按照下列步骤创建一个新的事件中心。\n\n1. 在 [Azure 管理门户](https://manage.windowsazure.cn)中，选择“新建”>“服务总线”>“事件中心”>“自定义创建”。\n\n2. 在“添加新事件中心”屏幕中，输入“事件中心名称”，选择要在其中创建中心的“区域”，然后创建新的命名空间或选择现有的命名空间。单击**箭头**继续。\n\n    ![向导页 1](./media/hdinsight-storm-develop-csharp-event-hub-topology/wiz1.png)\n\n    > [AZURE.NOTE]应该选择与 Storm on HDInsight 服务器相同的**位置**，以降低延迟和成本。\n\n2. 在“配置事件中心”屏幕中，输入“分区计数”和“消息保留期”值。对于本示例，请使用分区计数 10，消息保留期 1。记下分区计数，因为稍后需要用到。\n\n    ![向导页 2](./media/hdinsight-storm-develop-csharp-event-hub-topology/wiz2.png)\n\n3. 创建事件中心之后，请选择命名空间，选择“事件中心”，然后选择你前面创建的事件中心。\n\n4. 选择“配置”，然后使用以下信息创建两个新的访问策略。\n\n    <table>\n    <tr><th>Name</th><th>权限</th></tr>\n    <tr><td>写入器</td><td>发送</td></tr>\n    <tr><td>读取器</td><td>侦听</td></tr>\n    </table>\n\n    创建权限后，在页面底部选择“保存”图标。这将会创建共享访问策略，用于对此事件中心进行发送 (writer) 和侦听 (reader)。\n\n    ![策略](./media/hdinsight-storm-develop-csharp-event-hub-topology/policy.png)\n\n5. 保存策略后，使用页面底部的“共享访问密钥生成器”检索 **writer** 和 **reader** 策略的密钥。保存这些密钥，因为稍后将要用到。\n\n## 下载并构建项目\n\n1. 从 GitHub 下载项目：[hdinsight-java-storm-eventhub](https://github.com/Blackmist/hdinsight-java-storm-eventhub)。可以下载 zip 存档形式的包，或者使用 [git](https://git-scm.com/) 在本地克隆项目。\n\n2. 使用以下命令以将项目中包含的包安装到本地 Maven 存储库。这些包将启用事件中心 Spout 和 Bolt，以及使用 HdfsBolt 写入 Azure 存储空间 (WASB) 的功能。\n\n        mvn -q install:install-file -Dfile=lib/eventhubs/eventhubs-storm-spout-0.9.3-jar-with-dependencies.jar -DgroupId=com.microsoft.eventhubs -DartifactId=eventhubs-storm-spout -Dversion=0.9.3 -Dpackaging=jar\n\n        mvn -q org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=lib/hadoop/hadoop-azure-3.0.0-SNAPSHOT.jar\n\n        mvn -q org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=lib/hadoop/hadoop-client-3.0.0-SNAPSHOT.jar\n\n        mvn -q org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=lib/hadoop/hadoop-hdfs-3.0.0-SNAPSHOT.jar\n\n        mvn -q org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=lib/hadoop/hadoop-common-3.0.0-SNAPSHOT.jar -DpomFile=lib/hadoop/hadoop-common-3.0.0-SNAPSHOT.pom\n\n        mvn -q org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=lib/hadoop/hadoop-project-dist-3.0.0-SNAPSHOT.pom -DpomFile=lib/hadoop/hadoop-project-dist-3.0.0-SNAPSHOT.pom\n\n        mvn -q org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=lib/hadoop/hadoop-project-3.0.0-SNAPSHOT.pom -DpomFile=lib/hadoop/hadoop-project-3.0.0-SNAPSHOT.pom\n\n        mvn -q org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=lib/hadoop/hadoop-main-3.0.0-SNAPSHOT.pom -DpomFile=lib/hadoop/hadoop-main-3.0.0-SNAPSHOT.pom\n\n    > [AZURE.NOTE]如果使用 Powershell，必须用引号括住 `-D` 参数。例如，`\"-Dfile=lib/hadoop/hadoop-main-3.0.0-SNAPSHOT.pom\"`。\n\n    这些文件最初来自 https://github.com/hdinsight/hdinsight-storm-examples，因此可以在那里找到最新版本。\n\n3. 使用以下命令构建和打包项目：\n\n        mvn package\n\n    这会下载所需的依赖项，构建然后打包项目。输出在 __/target__ 目录中存储为 __EventHubExample-1.0-SNAPSHOT.jar__。\n\n## 部署拓扑\n\n此项目创建的 jar 包含两个拓扑；__com.microsoft.example.EventHubWriter__ 和 __com.microsoft.example.EventHubReader__。应该先启动 EventHubWriter 拓扑，因为它会将事件写入事件中心，然后由 EventHubReader 读取事件。\n\n###如果使用基于 Windows 的群集\n\n1. 在浏览器中打开 https://CLUSTERNAME.azurehdinsight.cn。出现提示时，输入 HDInsight 群集的管理员凭据。随后你将进入 Storm 仪表板。\n\n2. 使用“Jar 文件”下拉列表在构建环境中浏览并选择 EventHubExample-1.0-SNAPSHOT.jar 文件。\n\n3. 对于“类名”，请输入 `com.mirosoft.example.EventHubWriter`。\n\n4. 对于“其他参数”，请输入 `writer`。最后，单击“提交”上载 jar 并启动 EventHubWriter 拓扑。\n\n5. 启动拓扑后，使用窗体来启动 EventHubReader：\n\n    * __Jar 文件__：选择前面上载的 EventHubExample-1.0-SNAPSHOT.jar\n    * __类名__：输入 `com.microsoft.example.EventHubReader`\n    * __其他参数__：输入 `reader`\n\n    单击“提交”启动 EventHubReader 拓扑。\n\n6. 等待几分钟让拓扑生成事件并将事件存储到 Azure 存储空间，然后选择“Storm 仪表板”页面顶部的“查询控制台”选项卡。\n\n7. 在“查询控制台”上，选择“Hive 编辑器”并将默认的 `select * from hivesampletable` 替换为以下内容：\n\n        create external table devicedata (deviceid string, devicevalue int) row format delimited fields terminated by ',' stored as textfile location 'wasb:///devicedata/';\n        select * from devicedata limit 10;\n\n    单击“选择”以运行查询。这会返回 10 行由 EventHubReader 写入 Azure 存储空间 (WASB) 的数据。完成查询后，你应会看到类似于下面的数据：\n\n        3409e622-c85d-4d64-8622-af45e30bf774,848981614\n        c3305f7e-6948-4cce-89b0-d9fbc2330c36,-1638780537\n        788b9796-e2ab-49c4-91e3-bc5b6af1f07e,-1662107246\n        6403df8a-6495-402f-bca0-3244be67f225,275738503\n        d7c7f96c-581a-45b1-b66c-e32de6d47fce,543829859\n        9a692795-e6aa-4946-98c1-2de381b37593,1857409996\n        3c8d199b-0003-4a79-8d03-24e13bde7086,-1271260574\n\n8. 选择页面顶部的“Storm 仪表板”，然后选择“Storm UI”。从“Storm UI”中选择__读取器__拓扑的链接，然后使用“终止”按钮停止拓扑。针对__写入器__拓扑重复该过程。\n\n\n\n### 检查点\n\nEventHubSpout 定期检查点其状态为 Zookeeper 节点，将保存当前的偏移量的消息从队列中读取。这样，要开始在以下情况下接收已保存的偏移量处的消息的组件：\n\n* 组件实例失败，并已重新启动。\n\n* 通过添加或删除节点扩大或收缩群集。\n\n* 拓扑已终止并已**使用相同的名称**重新启动。\n\n####在基于 Windows 的 HDInsight 群集上\n\n你可以将持久性检查点导入和导出到 WASB（HDInsight 群集使用的 Azure 存储空间。） 用于执行此操作的脚本位于 Storm on HDInsight 上的 **c:\\\\apps\\\\dist\\\\storm-0.9.3.2.2.1.0-2340\\\\zkdatatool-1.0\\\\bin** 中。\n\n>[AZURE.NOTE]路径中的版本号可能不同，因为群集上安装的 Storm 版本将来可能会更改。\n\n此目录中的脚本是：\n\n* **stormmeta\\_import.cmd**：将所有 Storm 元数据从群集默认存储容器导入 Zookeeper。\n\n* **stormmeta\\_export.cmd**：将所有 Storm 元数据从 Zookeeper 导出到群集默认存储容器。\n\n* **stormmeta\\_delete.cmd**：从 Zookeeper 中删除所有 Storm 元数据。\n\n当你需要删除群集，但在将新群集重新联机的情况下想要从中心的当前偏移量恢复处理时，可以使用导出和导入来保存检查点数据。\n\n> [AZURE.NOTE]由于数据将保存到默认的存储容器，新群集**必须**使用前一群集所用的同一个存储帐户和容器。\n\n##故障排除\n\n如果你未看到文件存储在 /devicedata 位置（使用 `hadoop fs -ls /devicedata` 命令或在查询控制台中使用 Hive 命令），请使用 Storm UI 来查找拓扑返回的任何错误。\n\n有关使用 Storm UI 的详细信息，请参阅以下主题：\n\n* 如果你在 HDInsight 群集上使用__基于 Windows__ 的 Storm，请参阅[部署和管理基于 Windows 的 HDInsight 上的 Apache Storm 拓扑](/documentation/articles/hdinsight-storm-deploy-monitor-topology)\n\n##后续步骤\n\n* [Storm on HDInsight 的示例拓扑](/documentation/articles/hdinsight-storm-example-topology)\n\n<!---HONumber=82-->"
+}

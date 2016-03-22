@@ -1,0 +1,649 @@
+{
+  "nodes": [
+    {
+      "content": "Azure 资源管理器策略 | Azure",
+      "pos": [
+        27,
+        48
+      ]
+    },
+    {
+      "content": "介绍如何使用 Azure 资源管理器策略来防止订阅、资源组或单个资源等不同的范围发生冲突。",
+      "pos": [
+        67,
+        112
+      ]
+    },
+    {
+      "content": "使用策略来管理资源和控制访问",
+      "pos": [
+        350,
+        364
+      ]
+    },
+    {
+      "content": "Azure 资源管理器现在可让你通过自定义策略来控制访问。使用策略可以防止组织中的用户违反管理组织资源所需的惯例。",
+      "pos": [
+        366,
+        423
+      ]
+    },
+    {
+      "content": "你可以创建策略定义来描述会明确遭到拒绝的操作或资源。你可以在所需范围（例如订阅、资源组或是单个资源）分配这些策略定义。",
+      "pos": [
+        425,
+        484
+      ]
+    },
+    {
+      "content": "在本文中，我们将说明可用于创建策略的策略定义语言的基本结构。然后说明如何在不同范围应用这些策略，最后演示有关如何通过 REST API 实现此目的的一些示例。",
+      "pos": [
+        486,
+        565
+      ]
+    },
+    {
+      "content": "策略当前以预览版提供。",
+      "pos": [
+        567,
+        578
+      ]
+    },
+    {
+      "content": "策略与 RBAC 有什么不同？",
+      "pos": [
+        583,
+        598
+      ]
+    },
+    {
+      "content": "策略与基于角色的访问控制之间有几个重要的差别，但首先你必须了解策略是和 RBAC 一起工作的。若要使用策略，用户必须通过 RBAC 完成身份验证。不同于 RBAC，策略是默认的允许和明确拒绝系统。",
+      "pos": [
+        600,
+        698
+      ]
+    },
+    {
+      "pos": [
+        700,
+        769
+      ],
+      "content": "RBAC 着重于<bpt id=\"p1\">**</bpt>用户<ept id=\"p1\">**</ept>在不同的范围可执行的操作。例如，将特定用户添加到所需范围的资源组的参与者角色后，该用户便可对该资源组做出更改。"
+    },
+    {
+      "pos": [
+        771,
+        825
+      ],
+      "content": "策略着重于各种范围的<bpt id=\"p1\">**</bpt>资源<ept id=\"p1\">**</ept>操作。例如，通过策略，你可以控制可预配的资源类型，或限制可以预配资源的位置。"
+    },
+    {
+      "content": "常见方案",
+      "pos": [
+        830,
+        834
+      ]
+    },
+    {
+      "content": "一个常见方案是为了费用分摊而要求提供部门标记。组织可能只想在有关联的适当成本中心时允许操作，否则将拒绝请求。这将帮助它们向适当的成本中心对所执行的操作收费。",
+      "pos": [
+        836,
+        914
+      ]
+    },
+    {
+      "content": "另一个常见方案是组织可能想要控制创建资源的位置。或者它们可能想要通过仅允许预配特定类型的资源，来控制对资源的访问。",
+      "pos": [
+        916,
+        973
+      ]
+    },
+    {
+      "content": "同样地，组织可以控制服务类别或为资源强制运行所需的命名约定。",
+      "pos": [
+        975,
+        1005
+      ]
+    },
+    {
+      "content": "使用策略可轻松实现这些方案，如下所述。",
+      "pos": [
+        1007,
+        1026
+      ]
+    },
+    {
+      "content": "策略定义结构",
+      "pos": [
+        1031,
+        1037
+      ]
+    },
+    {
+      "content": "策略定义是使用 JSON 创建的。它包含定义操作和效果的一个或多个条件/逻辑运算符，告诉你满足条件时产生的效果。",
+      "pos": [
+        1039,
+        1095
+      ]
+    },
+    {
+      "content": "简单而言，策略包含以下各项：",
+      "pos": [
+        1097,
+        1111
+      ]
+    },
+    {
+      "pos": [
+        1113,
+        1145
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>条件/逻辑运算符：<ept id=\"p1\">**</ept>包含可通过一组逻辑运算符操作的条件集。"
+    },
+    {
+      "pos": [
+        1147,
+        1241
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>效果：<ept id=\"p1\">**</ept>描述当满足条件时产生的效果 – 拒绝或审核。审核效果将发出警告事件服务日志。例如，管理员可以创建策略，如果有任何人创建大型 VM，则此策略会引发审核，然后管理员可以审查日志。"
+    },
+    {
+      "content": "逻辑运算符",
+      "pos": [
+        1384,
+        1389
+      ]
+    },
+    {
+      "content": "下面列出了支持的逻辑运算符和语法：",
+      "pos": [
+        1391,
+        1408
+      ]
+    },
+    {
+      "content": "运算符名称",
+      "pos": [
+        1412,
+        1417
+      ]
+    },
+    {
+      "content": "语法",
+      "pos": [
+        1420,
+        1422
+      ]
+    },
+    {
+      "content": "Not",
+      "pos": [
+        1463,
+        1466
+      ]
+    },
+    {
+      "content": "\"not\" : {&amp;lt;condition or operator &amp;gt;}",
+      "pos": [
+        1469,
+        1509
+      ]
+    },
+    {
+      "content": "And",
+      "pos": [
+        1514,
+        1517
+      ]
+    },
+    {
+      "content": "\"allOf\" : [ {&amp;lt;condition or operator &amp;gt;},{&amp;lt;condition or operator &amp;gt;}]",
+      "pos": [
+        1520,
+        1598
+      ]
+    },
+    {
+      "content": "或",
+      "pos": [
+        1603,
+        1604
+      ]
+    },
+    {
+      "content": "\"anyOf\" : [ {&amp;lt;condition or operator &amp;gt;},{&amp;lt;condition or operator &amp;gt;}]",
+      "pos": [
+        1607,
+        1685
+      ]
+    },
+    {
+      "content": "资源管理器可让你通过嵌套的运算符在策略中指定复杂逻辑。例如，你可以拒绝在指定资源类型的特定位置创建资源。下面显示了嵌套运算符的示例。",
+      "pos": [
+        1689,
+        1755
+      ]
+    },
+    {
+      "content": "条件",
+      "pos": [
+        1760,
+        1762
+      ]
+    },
+    {
+      "pos": [
+        1764,
+        1806
+      ],
+      "content": "条件评估<bpt id=\"p1\">**</bpt>字段<ept id=\"p1\">**</ept>或<bpt id=\"p2\">**</bpt>源<ept id=\"p2\">**</ept>是否符合特定的准则。下面列出了支持的条件名称和语法："
+    },
+    {
+      "content": "条件名称",
+      "pos": [
+        1810,
+        1814
+      ]
+    },
+    {
+      "content": "语法",
+      "pos": [
+        1817,
+        1819
+      ]
+    },
+    {
+      "content": "等于",
+      "pos": [
+        1860,
+        1862
+      ]
+    },
+    {
+      "content": "\"equals\" : \"&amp;lt;value&amp;gt;\"",
+      "pos": [
+        1865,
+        1891
+      ]
+    },
+    {
+      "content": "Like",
+      "pos": [
+        1896,
+        1900
+      ]
+    },
+    {
+      "content": "\"like\" : \"&amp;lt;value&amp;gt;\"",
+      "pos": [
+        1903,
+        1927
+      ]
+    },
+    {
+      "content": "Contains",
+      "pos": [
+        1932,
+        1940
+      ]
+    },
+    {
+      "content": "\"contains\" : \"&amp;lt;value&amp;gt;\"",
+      "pos": [
+        1943,
+        1971
+      ]
+    },
+    {
+      "content": "In",
+      "pos": [
+        1975,
+        1977
+      ]
+    },
+    {
+      "content": "\"in\" : [ \"&amp;lt;value1&amp;gt;\",\"&amp;lt;value2&amp;gt;\" ]",
+      "pos": [
+        1980,
+        2024
+      ]
+    },
+    {
+      "content": "ContainsKey",
+      "pos": [
+        2028,
+        2039
+      ]
+    },
+    {
+      "content": "\"containsKey\" : \"&amp;lt;keyName&amp;gt;\"",
+      "pos": [
+        2042,
+        2075
+      ]
+    },
+    {
+      "content": "字段和源",
+      "pos": [
+        2083,
+        2087
+      ]
+    },
+    {
+      "content": "条件是使用字段和源构成的。字段表示资源请求负载中的属性。源表示请求本身的特征。",
+      "pos": [
+        2089,
+        2128
+      ]
+    },
+    {
+      "content": "支持以下字段和源：",
+      "pos": [
+        2130,
+        2139
+      ]
+    },
+    {
+      "pos": [
+        2141,
+        2204
+      ],
+      "content": "字段：<bpt id=\"p1\">**</bpt>name<ept id=\"p1\">**</ept>、<bpt id=\"p2\">**</bpt>kind<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>type<ept id=\"p3\">**</ept>、<bpt id=\"p4\">**</bpt>location<ept id=\"p4\">**</ept>、<bpt id=\"p5\">**</bpt>tags<ept id=\"p5\">**</ept>、<bpt id=\"p6\">**</bpt>tags.<ept id=\"p6\">**</ept>*。"
+    },
+    {
+      "pos": [
+        2206,
+        2218
+      ],
+      "content": "源：<bpt id=\"p1\">**</bpt>action<ept id=\"p1\">**</ept>"
+    },
+    {
+      "content": "策略定义示例",
+      "pos": [
+        2224,
+        2230
+      ]
+    },
+    {
+      "content": "现在让我们看一下如何定义策略，以实现以上所列的方案。",
+      "pos": [
+        2232,
+        2258
+      ]
+    },
+    {
+      "content": "费用分摊：要求提供部门标记",
+      "pos": [
+        2264,
+        2277
+      ]
+    },
+    {
+      "content": "以下策略将拒绝不包含“costCenter”键标记的所有请求。",
+      "pos": [
+        2279,
+        2310
+      ]
+    },
+    {
+      "content": "地区法规遵循：确保资源位置",
+      "pos": [
+        2499,
+        2512
+      ]
+    },
+    {
+      "content": "以下示例显示的策略将拒绝位置不是欧洲北部或欧洲西部的所有请求。",
+      "pos": [
+        2514,
+        2545
+      ]
+    },
+    {
+      "content": "服务策展：选择服务目录",
+      "pos": [
+        2747,
+        2758
+      ]
+    },
+    {
+      "pos": [
+        2760,
+        2882
+      ],
+      "content": "以下示例演示如何使用源。它显示只允许对 Microsoft.Resources/、Microsoft.Compute/<bpt id=\"p1\">*</bpt>、Microsoft.Storage/<ept id=\"p1\">*</ept>、Microsoft.Network/ 类型的服务执行的操作。其他任何请求将被拒绝。"
+    },
+    {
+      "content": "命名约定",
+      "pos": [
+        3475,
+        3479
+      ]
+    },
+    {
+      "content": "以下示例演示如何使用“like”条件支持的通配符。该条件指明，如果名称符合所述模式 (namePrefix*nameSuffix)，则拒绝请求。",
+      "pos": [
+        3481,
+        3553
+      ]
+    },
+    {
+      "content": "只要求存储资源的标记",
+      "pos": [
+        3750,
+        3760
+      ]
+    },
+    {
+      "content": "以下示例演示如何嵌套逻辑运算符，以便要求只对存储资源使用应用程序标记。",
+      "pos": [
+        3762,
+        3797
+      ]
+    },
+    {
+      "content": "策略分配",
+      "pos": [
+        4209,
+        4213
+      ]
+    },
+    {
+      "content": "策略可在不同的范围应用，如订阅、资源组和单个资源。策略由所有子资源继承。因此，如果将策略应用到资源组，则会将它应用到该资源组中的所有资源。",
+      "pos": [
+        4215,
+        4284
+      ]
+    },
+    {
+      "content": "创建策略",
+      "pos": [
+        4289,
+        4293
+      ]
+    },
+    {
+      "content": "本部分提供有关如何使用 REST API 创建策略的详细信息。",
+      "pos": [
+        4295,
+        4326
+      ]
+    },
+    {
+      "content": "使用 REST API 创建策略定义",
+      "pos": [
+        4332,
+        4350
+      ]
+    },
+    {
+      "pos": [
+        4352,
+        4478
+      ],
+      "content": "你可以使用<bpt id=\"p1\">[</bpt>用于策略定义的 REST API<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/mt588471.aspx)</ept> 来创建策略。REST API 可让你创建和删除策略定义，以及获取现有定义的信息。"
+    },
+    {
+      "content": "若要创建新策略，请运行：",
+      "pos": [
+        4480,
+        4492
+      ]
+    },
+    {
+      "content": "使用类似于下面的请求正文：",
+      "pos": [
+        4667,
+        4680
+      ]
+    },
+    {
+      "pos": [
+        5254,
+        5409
+      ],
+      "content": "策略定义可以定义为如上所示的示例之一。对于 api-version，请使用 <bpt id=\"p1\">*</bpt>2015-10-01-preview<ept id=\"p1\">*</ept>。有关示例与其他详细信息，请参阅<bpt id=\"p2\">[</bpt>用于策略定义的 REST API<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/mt588471.aspx)</ept>。"
+    },
+    {
+      "content": "使用 PowerShell 创建策略定义",
+      "pos": [
+        5415,
+        5435
+      ]
+    },
+    {
+      "content": "可以使用 New-AzureRmPolicyDefinition cmdlet 创建新的策略定义，如下所示。以下示例将创建一个策略，只允许欧洲北部和欧洲西部的资源。",
+      "pos": [
+        5437,
+        5519
+      ]
+    },
+    {
+      "content": "执行输出将存储在 $policy 对象中，以便稍后可在分配策略期间使用。对于策略参数，也可以提供包含策略的 .json 文件的路径，而不是指定内联策略，如下所示。",
+      "pos": [
+        6096,
+        6177
+      ]
+    },
+    {
+      "content": "应用策略",
+      "pos": [
+        6359,
+        6363
+      ]
+    },
+    {
+      "content": "使用 REST API 分配策略",
+      "pos": [
+        6369,
+        6385
+      ]
+    },
+    {
+      "pos": [
+        6387,
+        6519
+      ],
+      "content": "可以通过<bpt id=\"p1\">[</bpt>用于策略分配的 REST API<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/mt588466.aspx)</ept>，在所需范围内应用策略定义。REST API 可让你创建和删除策略分配，以及获取现有分配的信息。"
+    },
+    {
+      "content": "若要创建新的策略分配，请运行：",
+      "pos": [
+        6521,
+        6536
+      ]
+    },
+    {
+      "pos": [
+        6710,
+        6779
+      ],
+      "content": "{policy-assignment} 是策略分配的名称。对于 api-version，请使用 <bpt id=\"p1\">*</bpt>2015-10-01-preview<ept id=\"p1\">*</ept>。"
+    },
+    {
+      "content": "使用类似于下面的请求正文：",
+      "pos": [
+        6781,
+        6794
+      ]
+    },
+    {
+      "pos": [
+        7307,
+        7403
+      ],
+      "content": "有关示例与其他详细信息，请参阅<bpt id=\"p1\">[</bpt>用于策略分配的 REST API<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/mt588466.aspx)</ept>。"
+    },
+    {
+      "content": "使用 PowerShell 分配策略",
+      "pos": [
+        7409,
+        7427
+      ]
+    },
+    {
+      "content": "你可以使用 New-AzureRmPolicyAssignment cmdlet 将上面通过 PowerShell 创建的策略应用到所需的范围，如下所示：",
+      "pos": [
+        7429,
+        7506
+      ]
+    },
+    {
+      "content": "此处的 $policy 是执行 New-AzureRmPolicyDefinition cmdlet 后返回的策略对象，如下所示。此处的范围是指定的资源组的名称。",
+      "pos": [
+        7703,
+        7784
+      ]
+    },
+    {
+      "content": "如果你要删除上述策略分配，可执行以下操作：",
+      "pos": [
+        7786,
+        7807
+      ]
+    },
+    {
+      "content": "可以分别通过 Get-AzureRmPolicyDefinition、Set-AzureRmPolicyDefinition 和 Remove-AzureRmPolicyDefinition cmdlet 来获取、更改或删除策略定义。",
+      "pos": [
+        7970,
+        8087
+      ]
+    },
+    {
+      "content": "同样地，可以分别通过 Get-AzureRmPolicyAssignment、Set-AzureRmPolicyAssignment 和 Remove-AzureRmPolicyAssignment 来获取、更改或删除策略分配。",
+      "pos": [
+        8089,
+        8203
+      ]
+    },
+    {
+      "content": "策略审核事件",
+      "pos": [
+        8207,
+        8213
+      ]
+    },
+    {
+      "content": "在应用策略之后，即可看到与策略相关的事件。你可以转到门户，或使用 PowerShell 来获取此数据。",
+      "pos": [
+        8215,
+        8266
+      ]
+    },
+    {
+      "content": "若要查看拒绝效果相关的所有事件，可以使用以下命令。",
+      "pos": [
+        8268,
+        8293
+      ]
+    },
+    {
+      "content": "若要查看审核效果相关的所有事件，可以使用以下命令。",
+      "pos": [
+        8359,
+        8384
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"Azure 资源管理器策略 | Azure\"\n    description=\"介绍如何使用 Azure 资源管理器策略来防止订阅、资源组或单个资源等不同的范围发生冲突。\"\n    services=\"azure-resource-manager\"\n    documentationCenter=\"na\"\n    authors=\"ravbhatnagar\"\n    manager=\"ryjones\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"azure-resource-manager\"\n    ms.date=\"12/18/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n# 使用策略来管理资源和控制访问\n\nAzure 资源管理器现在可让你通过自定义策略来控制访问。使用策略可以防止组织中的用户违反管理组织资源所需的惯例。\n\n你可以创建策略定义来描述会明确遭到拒绝的操作或资源。你可以在所需范围（例如订阅、资源组或是单个资源）分配这些策略定义。\n\n在本文中，我们将说明可用于创建策略的策略定义语言的基本结构。然后说明如何在不同范围应用这些策略，最后演示有关如何通过 REST API 实现此目的的一些示例。\n\n策略当前以预览版提供。\n\n## 策略与 RBAC 有什么不同？\n\n策略与基于角色的访问控制之间有几个重要的差别，但首先你必须了解策略是和 RBAC 一起工作的。若要使用策略，用户必须通过 RBAC 完成身份验证。不同于 RBAC，策略是默认的允许和明确拒绝系统。\n\nRBAC 着重于**用户**在不同的范围可执行的操作。例如，将特定用户添加到所需范围的资源组的参与者角色后，该用户便可对该资源组做出更改。\n\n策略着重于各种范围的**资源**操作。例如，通过策略，你可以控制可预配的资源类型，或限制可以预配资源的位置。\n\n## 常见方案\n\n一个常见方案是为了费用分摊而要求提供部门标记。组织可能只想在有关联的适当成本中心时允许操作，否则将拒绝请求。这将帮助它们向适当的成本中心对所执行的操作收费。\n\n另一个常见方案是组织可能想要控制创建资源的位置。或者它们可能想要通过仅允许预配特定类型的资源，来控制对资源的访问。\n\n同样地，组织可以控制服务类别或为资源强制运行所需的命名约定。\n\n使用策略可轻松实现这些方案，如下所述。\n\n## 策略定义结构\n\n策略定义是使用 JSON 创建的。它包含定义操作和效果的一个或多个条件/逻辑运算符，告诉你满足条件时产生的效果。\n\n简单而言，策略包含以下各项：\n\n**条件/逻辑运算符：**包含可通过一组逻辑运算符操作的条件集。\n\n**效果：**描述当满足条件时产生的效果 – 拒绝或审核。审核效果将发出警告事件服务日志。例如，管理员可以创建策略，如果有任何人创建大型 VM，则此策略会引发审核，然后管理员可以审查日志。\n\n    {\n      \"if\" : {\n        <condition> | <logical operator>\n      },\n      \"then\" : {\n        \"effect\" : \"deny | audit\"\n      }\n    }\n\n\n## 逻辑运算符\n\n下面列出了支持的逻辑运算符和语法：\n\n| 运算符名称 | 语法 |\n| :------------- | :------------- |\n| Not | \"not\" : {&lt;condition or operator &gt;} |\n| And | \"allOf\" : [ {&lt;condition or operator &gt;},{&lt;condition or operator &gt;}] |\n| 或 | \"anyOf\" : [ {&lt;condition or operator &gt;},{&lt;condition or operator &gt;}] |\n\n资源管理器可让你通过嵌套的运算符在策略中指定复杂逻辑。例如，你可以拒绝在指定资源类型的特定位置创建资源。下面显示了嵌套运算符的示例。\n\n## 条件\n\n条件评估**字段**或**源**是否符合特定的准则。下面列出了支持的条件名称和语法：\n\n| 条件名称 | 语法 |\n| :------------- | :------------- |\n| 等于 | \"equals\" : \"&lt;value&gt;\" |\n| Like | \"like\" : \"&lt;value&gt;\" |\n| Contains | \"contains\" : \"&lt;value&gt;\"|\n| In | \"in\" : [ \"&lt;value1&gt;\",\"&lt;value2&gt;\" ]|\n| ContainsKey | \"containsKey\" : \"&lt;keyName&gt;\" |\n\n\n## 字段和源\n\n条件是使用字段和源构成的。字段表示资源请求负载中的属性。源表示请求本身的特征。\n\n支持以下字段和源：\n\n字段：**name**、**kind**、**type**、**location**、**tags**、**tags.***。\n\n源：**action**\n\n\n## 策略定义示例\n\n现在让我们看一下如何定义策略，以实现以上所列的方案。\n\n### 费用分摊：要求提供部门标记\n\n以下策略将拒绝不包含“costCenter”键标记的所有请求。\n\n    {\n      \"if\": {\n        \"not\" : {\n          \"field\" : \"tags\",\n          \"containsKey\" : \"costCenter\"\n        }\n      },\n      \"then\" : {\n        \"effect\" : \"deny\"\n      }\n    }\n\n\n### 地区法规遵循：确保资源位置\n\n以下示例显示的策略将拒绝位置不是欧洲北部或欧洲西部的所有请求。\n\n    {\n      \"if\" : {\n        \"not\" : {\n          \"field\" : \"location\",\n          \"in\" : [\"northeurope\" , \"westeurope\"]\n        }\n      },\n      \"then\" : {\n        \"effect\" : \"deny\"\n      }\n    }\n\n### 服务策展：选择服务目录\n\n以下示例演示如何使用源。它显示只允许对 Microsoft.Resources/、Microsoft.Compute/*、Microsoft.Storage/*、Microsoft.Network/ 类型的服务执行的操作。其他任何请求将被拒绝。\n\n    {\n      \"if\" : {\n        \"not\" : {\n          \"anyOf\" : [\n            {\n              \"source\" : \"action\",\n              \"like\" : \"Microsoft.Resources/*\"\n            },\n            {\n              \"source\" : \"action\",\n              \"like\" : \"Microsoft.Compute/*\"\n            },\n            {\n              \"source\" : \"action\",\n              \"like\" : \"Microsoft.Storage/*\"\n            },\n            {\n              \"source\" : \"action\",\n              \"like\" : \"Microsoft.Network/*\"\n            }\n          ]\n        }\n      },\n      \"then\" : {\n        \"effect\" : \"deny\"\n      }\n    }\n\n### 命名约定\n\n以下示例演示如何使用“like”条件支持的通配符。该条件指明，如果名称符合所述模式 (namePrefix*nameSuffix)，则拒绝请求。\n\n    {\n      \"if\" : {\n        \"not\" : {\n          \"field\" : \"name\",\n          \"like\" : \"namePrefix*nameSuffix\"\n        }\n      },\n      \"then\" : {\n        \"effect\" : \"deny\"\n      }\n    }\n    \n### 只要求存储资源的标记\n\n以下示例演示如何嵌套逻辑运算符，以便要求只对存储资源使用应用程序标记。\n\n    {\n        \"if\": {\n            \"allOf\": [\n              {\n                \"not\": {\n                  \"field\": \"tags\",\n                  \"containsKey\": \"application\"\n                }\n              },\n              {\n                \"source\": \"action\",\n                \"like\": \"Microsoft.Storage/*\"\n              }\n            ]\n        },\n        \"then\": {\n            \"effect\": \"audit\"\n        }\n    }\n\n## 策略分配\n\n策略可在不同的范围应用，如订阅、资源组和单个资源。策略由所有子资源继承。因此，如果将策略应用到资源组，则会将它应用到该资源组中的所有资源。\n\n## 创建策略\n\n本部分提供有关如何使用 REST API 创建策略的详细信息。\n\n### 使用 REST API 创建策略定义\n\n你可以使用[用于策略定义的 REST API](https://msdn.microsoft.com/zh-cn/library/azure/mt588471.aspx) 来创建策略。REST API 可让你创建和删除策略定义，以及获取现有定义的信息。\n\n若要创建新策略，请运行：\n\n    PUT https://manage.windowsazure.cn/subscriptions/{subscription-id}/providers/Microsoft.authorization/policydefinitions/{policyDefinitionName}?api-version={api-version}\n\n使用类似于下面的请求正文：\n\n    {\n      \"properties\":{\n        \"policyType\":\"Custom\",\n        \"description\":\"Test Policy\",\n        \"policyRule\":{\n          \"if\" : {\n            \"not\" : {\n              \"field\" : \"tags\",\n              \"containsKey\" : \"costCenter\"\n            }\n          },\n          \"then\" : {\n            \"effect\" : \"deny\"\n          }\n        }\n      },\n      \"id\":\"/subscriptions/########-####-####-####-############/providers/Microsoft.Authorization/policyDefinitions/testdefinition\",\n      \"type\":\"Microsoft.Authorization/policyDefinitions\",\n      \"name\":\"testdefinition\"\n    }\n\n\n策略定义可以定义为如上所示的示例之一。对于 api-version，请使用 *2015-10-01-preview*。有关示例与其他详细信息，请参阅[用于策略定义的 REST API](https://msdn.microsoft.com/zh-cn/library/azure/mt588471.aspx)。\n\n### 使用 PowerShell 创建策略定义\n\n可以使用 New-AzureRmPolicyDefinition cmdlet 创建新的策略定义，如下所示。以下示例将创建一个策略，只允许欧洲北部和欧洲西部的资源。\n\n    $policy = New-AzureRmPolicyDefinition -Name regionPolicyDefinition -Description \"Policy to allow resource creation onlyin certain regions\" -Policy '{   \"if\" : {\n                            \"not\" : {\n                                \"field\" : \"location\",\n                                    \"in\" : [\"northeurope\" , \"westeurope\"]\n                                }\n                              },\n                                \"then\" : {\n                                    \"effect\" : \"deny\"\n                                    }\n                            }'          \n\n执行输出将存储在 $policy 对象中，以便稍后可在分配策略期间使用。对于策略参数，也可以提供包含策略的 .json 文件的路径，而不是指定内联策略，如下所示。\n\n    New-AzureRmPolicyDefinition -Name regionPolicyDefinition -Description \"Policy to allow resource creation only in certain    regions\" -Policy \"path-to-policy-json-on-disk\"\n\n\n## 应用策略\n\n### 使用 REST API 分配策略\n\n可以通过[用于策略分配的 REST API](https://msdn.microsoft.com/zh-cn/library/azure/mt588466.aspx)，在所需范围内应用策略定义。REST API 可让你创建和删除策略分配，以及获取现有分配的信息。\n\n若要创建新的策略分配，请运行：\n\n    PUT https://management.azure.com /subscriptions/{subscription-id}/providers/Microsoft.authorization/policyassignments/{policyAssignmentName}?api-version={api-version}\n\n{policy-assignment} 是策略分配的名称。对于 api-version，请使用 *2015-10-01-preview*。\n\n使用类似于下面的请求正文：\n\n    {\n      \"properties\":{\n        \"displayName\":\"VM_Policy_Assignment\",\n        \"policyDefinitionId\":\"/subscriptions/########/providers/Microsoft.Authorization/policyDefinitions/testdefinition\",\n        \"scope\":\"/subscriptions/########-####-####-####-############\"\n      },\n      \"id\":\"/subscriptions/########-####-####-####-############/providers/Microsoft.Authorization/policyAssignments/VMPolicyAssignment\",\n      \"type\":\"Microsoft.Authorization/policyAssignments\",\n      \"name\":\"VMPolicyAssignment\"\n    }\n\n有关示例与其他详细信息，请参阅[用于策略分配的 REST API](https://msdn.microsoft.com/zh-cn/library/azure/mt588466.aspx)。\n\n### 使用 PowerShell 分配策略\n\n你可以使用 New-AzureRmPolicyAssignment cmdlet 将上面通过 PowerShell 创建的策略应用到所需的范围，如下所示：\n\n    New-AzureRmPolicyAssignment -Name regionPolicyAssignment -PolicyDefinition $policy -Scope    /subscriptions/########-####-####-####-############/resourceGroups/<resource-group-name>\n        \n此处的 $policy 是执行 New-AzureRmPolicyDefinition cmdlet 后返回的策略对象，如下所示。此处的范围是指定的资源组的名称。\n\n如果你要删除上述策略分配，可执行以下操作：\n\n    Remove-AzureRmPolicyAssignment -Name regionPolicyAssignment -Scope /subscriptions/########-####-####-####-############/resourceGroups/<resource-group-name>\n\n可以分别通过 Get-AzureRmPolicyDefinition、Set-AzureRmPolicyDefinition 和 Remove-AzureRmPolicyDefinition cmdlet 来获取、更改或删除策略定义。\n\n同样地，可以分别通过 Get-AzureRmPolicyAssignment、Set-AzureRmPolicyAssignment 和 Remove-AzureRmPolicyAssignment 来获取、更改或删除策略分配。\n\n##策略审核事件\n\n在应用策略之后，即可看到与策略相关的事件。你可以转到门户，或使用 PowerShell 来获取此数据。\n\n若要查看拒绝效果相关的所有事件，可以使用以下命令。\n\n    Get-AzureRmLog | where {$_.subStatus -eq \"Forbidden\"}     \n\n若要查看审核效果相关的所有事件，可以使用以下命令。\n\n    Get-AzureRmLog | where {$_.OperationName -eq \"Microsoft.Authorization/policies/audit/action\"} \n    \n\n<!---HONumber=Mooncake_0104_2016-->"
+}

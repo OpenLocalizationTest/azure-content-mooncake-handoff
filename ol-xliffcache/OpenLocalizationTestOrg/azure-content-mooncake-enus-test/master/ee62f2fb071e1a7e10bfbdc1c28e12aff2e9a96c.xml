@@ -1,0 +1,159 @@
+{
+  "nodes": [
+    {
+      "content": "SQL 数据仓库中的临时表 | Azure",
+      "pos": [
+        26,
+        47
+      ]
+    },
+    {
+      "content": "有关在开发解决方案时使用 Azure SQL 数据仓库中的临时表的技巧。",
+      "pos": [
+        65,
+        101
+      ]
+    },
+    {
+      "content": "SQL 数据仓库中的临时表",
+      "pos": [
+        320,
+        333
+      ]
+    },
+    {
+      "content": "临时表存在于 SQL 数据仓库中的会话级别。这些表定义为本地临时表，与 SQL Server 表不同的是，可以从会话中的任何位置访问它们。",
+      "pos": [
+        334,
+        403
+      ]
+    },
+    {
+      "content": "临时表在处理数据时非常有用 - 尤其是具有暂时性中间结果的转换期间。",
+      "pos": [
+        405,
+        439
+      ]
+    },
+    {
+      "content": "本文重点介绍利用临时表的一些具体方法，以帮助你将代码模块化。",
+      "pos": [
+        441,
+        471
+      ]
+    },
+    {
+      "content": "模块化代码",
+      "pos": [
+        476,
+        481
+      ]
+    },
+    {
+      "content": "可以利用临时表会出现在用户会话中的任何位置这一事实，帮助将应用程序代码模块化。",
+      "pos": [
+        483,
+        522
+      ]
+    },
+    {
+      "content": "我们举个可行的示例。",
+      "pos": [
+        524,
+        534
+      ]
+    },
+    {
+      "content": "以下存储过程将生成更新数据库中每个列的统计信息所需的 DDL：",
+      "pos": [
+        536,
+        567
+      ]
+    },
+    {
+      "content": "请注意，实际上并未对此数据做任何处理。该程序只是生成了 DDL 并将其存储在临时表中。",
+      "pos": [
+        2984,
+        3027
+      ]
+    },
+    {
+      "pos": [
+        3029,
+        3106
+      ],
+      "content": "但是，在 SQL 数据仓库中有可能将该临时表用于创建它的程序之外。这与 SQL Server 有所不同。事实上，可以在会话中的<bpt id=\"p1\">**</bpt>任何位置<ept id=\"p1\">**</ept>使用临时表。"
+    },
+    {
+      "content": "这可以提高代码的模块化程度与易管理性。",
+      "pos": [
+        3108,
+        3127
+      ]
+    },
+    {
+      "content": "在某些情况下，还可以使用这种方法来取代内联和多语句函数。",
+      "pos": [
+        3518,
+        3546
+      ]
+    },
+    {
+      "pos": [
+        3550,
+        3613
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>此外，你还可以扩展此解决方案。举例来说，如果你只想要更新单个表，则只需筛选 #stats\\_ddl 表"
+    },
+    {
+      "content": "临时表的限制",
+      "pos": [
+        3618,
+        3624
+      ]
+    },
+    {
+      "content": "SQL 数据仓库在实现临时表时确实会施加一些限制。",
+      "pos": [
+        3625,
+        3650
+      ]
+    },
+    {
+      "content": "主要限制为：",
+      "pos": [
+        3652,
+        3658
+      ]
+    },
+    {
+      "content": "不支持全局临时表",
+      "pos": [
+        3662,
+        3670
+      ]
+    },
+    {
+      "content": "不能基于临时表创建视图",
+      "pos": [
+        3673,
+        3684
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        3690,
+        3694
+      ]
+    },
+    {
+      "pos": [
+        3695,
+        3716
+      ],
+      "content": "有关更多开发技巧，请参阅<bpt id=\"p1\">[</bpt>开发概述<ept id=\"p1\">][]</ept>。"
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"SQL 数据仓库中的临时表 | Azure\"\n   description=\"有关在开发解决方案时使用 Azure SQL 数据仓库中的临时表的技巧。\"\n   services=\"sql-data-warehouse\"\n   documentationCenter=\"NA\"\n   authors=\"twounder\"\n   manager=\"barbkess\"\n   editor=\"\"/>\n\n<tags\n   ms.service=\"sql-data-warehouse\"\n   ms.date=\"10/19/2015\"\n   wacn.date=\"01/20/2016\"/>\n\n# SQL 数据仓库中的临时表\n临时表存在于 SQL 数据仓库中的会话级别。这些表定义为本地临时表，与 SQL Server 表不同的是，可以从会话中的任何位置访问它们。\n\n临时表在处理数据时非常有用 - 尤其是具有暂时性中间结果的转换期间。\n\n本文重点介绍利用临时表的一些具体方法，以帮助你将代码模块化。\n\n## 模块化代码\n\n可以利用临时表会出现在用户会话中的任何位置这一事实，帮助将应用程序代码模块化。\n\n我们举个可行的示例。\n\n以下存储过程将生成更新数据库中每个列的统计信息所需的 DDL：\n\n```\nCREATE PROCEDURE    [dbo].[prc_sqldw_update_stats]\n(   @update_type    tinyint -- 1 default 2 fullscan 3 sample 4 resample\n    ,@sample_pct     tinyint\n)\nAS\nIF @update_type NOT IN (1,2,3,4)\nBEGIN;\n    THROW 151000,'Invalid value for @update_type parameter. Valid range 1 (default), 2 (fullscan), 3 (sample) or 4 (resample).',1;\nEND;\nIF @sample_pct IS NULL\nBEGIN;\n    SET @sample_pct = 20;\nEND;\nCREATE TABLE #stats_ddl\nWITH\n(\n    DISTRIBUTION = HASH([seq_nmbr])\n)\nAS\n(\nSELECT\n        sm.[name]                                                               AS [schema_name]\n,       tb.[name]                                                               AS [table_name]\n,       st.[name]                                                               AS [stats_name]\n,       st.[has_filter]                                                         AS [stats_is_filtered]\n,       ROW_NUMBER()\n        OVER(ORDER BY (SELECT NULL))                                            AS [seq_nmbr]\n,                                QUOTENAME(sm.[name])+'.'+QUOTENAME(tb.[name])  AS [two_part_name]\n,       QUOTENAME(DB_NAME())+'.'+QUOTENAME(sm.[name])+'.'+QUOTENAME(tb.[name])  AS [three_part_name]\nFROM    sys.objects         AS ob\nJOIN    sys.stats           AS st   ON  ob.[object_id]      = st.[object_id]\nJOIN    sys.stats_columns   AS sc   ON  st.[stats_id]       = sc.[stats_id]\n                                    AND st.[object_id]      = sc.[object_id]\nJOIN    sys.columns         AS co   ON  sc.[column_id]      = co.[column_id]\n                                    AND sc.[object_id]      = co.[object_id]\nJOIN    sys.tables          AS tb   ON  co.[object_id]      = tb.[object_id]\nJOIN    sys.schemas         AS sm   ON  tb.[schema_id]      = sm.[schema_id]\nWHERE   1=1\nAND     st.[user_created]   = 1\nGROUP BY\n        sm.[name]\n,       tb.[name]\n,       st.[name]\n,       st.[filter_definition]\n,       st.[has_filter]\n)\nSELECT\n    CASE @update_type\n    WHEN 1\n    THEN 'UPDATE STATISTICS '+[two_part_name]+'('+[stats_name]+');'\n    WHEN 2\n    THEN 'UPDATE STATISTICS '+[two_part_name]+'('+[stats_name]+') WITH FULLSCAN;'\n    WHEN 3\n    THEN 'UPDATE STATISTICS '+[two_part_name]+'('+[stats_name]+') WITH SAMPLE '+CAST(@sample_pct AS VARCHAR(20))+' PERCENT;'\n    WHEN 4\n    THEN 'UPDATE STATISTICS '+[two_part_name]+'('+[stats_name]+') WITH RESAMPLE;'\n    END AS [update_stats_ddl]\n,   [seq_nmbr]\nFROM    t1\n;\n```\n\n请注意，实际上并未对此数据做任何处理。该程序只是生成了 DDL 并将其存储在临时表中。\n\n但是，在 SQL 数据仓库中有可能将该临时表用于创建它的程序之外。这与 SQL Server 有所不同。事实上，可以在会话中的**任何位置**使用临时表。\n\n这可以提高代码的模块化程度与易管理性。\n\n```\nEXEC [dbo].[prc_sqldw_update_stats] @update_type = 1, @sample_pct = NULL;\nDECLARE @i INT              = 1\n,       @t INT              = (SELECT COUNT(*) FROM #stats_ddl)\n,       @s NVARCHAR(4000)   = N''\nWHILE @i <= @t\nBEGIN\n    SET @s=(SELECT update_stats_ddl FROM #stats_ddl WHERE seq_nmbr = @i);\n    PRINT @s\n    EXEC sp_executesql @s\n    SET @i+=1;\nEND\nDROP TABLE #stats_ddl;\n```\n\n在某些情况下，还可以使用这种方法来取代内联和多语句函数。\n\n> [AZURE.NOTE]此外，你还可以扩展此解决方案。举例来说，如果你只想要更新单个表，则只需筛选 #stats\\_ddl 表\n\n## 临时表的限制\nSQL 数据仓库在实现临时表时确实会施加一些限制。\n\n主要限制为：\n\n- 不支持全局临时表\n- 不能基于临时表创建视图\n\n\n## 后续步骤\n有关更多开发技巧，请参阅[开发概述][]。\n\n<!--Image references-->\n\n<!--Article references-->\n[开发概述]: /documentation/articles/sql-data-warehouse-overview-develop\n\n<!--MSDN references-->\n\n<!--Other Web references-->\n\n<!---HONumber=Mooncake_1207_2015-->\n"
+}

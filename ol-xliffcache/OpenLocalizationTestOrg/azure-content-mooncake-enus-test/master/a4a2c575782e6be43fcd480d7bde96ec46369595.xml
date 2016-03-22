@@ -1,0 +1,872 @@
+{
+  "nodes": [
+    {
+      "content": "在 Linux VM 上设置 Apache Tomcat | Azure",
+      "pos": [
+        27,
+        63
+      ]
+    },
+    {
+      "content": "了解如何使用运行 Linux 的 Azure 虚拟机 (VM) 设置 Apache Tomcat7。",
+      "pos": [
+        82,
+        132
+      ]
+    },
+    {
+      "content": "如何使用 Azure 在 Linux 虚拟机上设置 Tomcat7",
+      "pos": [
+        387,
+        420
+      ]
+    },
+    {
+      "content": "Apache Tomcat（或简称 Tomcat，以前也称为 Jakarta Tomcat）是由 Apache Software Foundation (ASF) 开发的一个开源 Web 服务器和 servlet 容器。Tomcat 实现了 Sun Microsystems 提出的 Java Servlet 和 JavaServer Pages (JSP) 规范，并提供了用于运行 Java 代码的纯 Java HTTP Web 服务器环境。在最简单的配置中，Tomcat 在单个操作系统进程中运行。此进程运行 Java 虚拟机 (JVM)。浏览器向 Tomcat 发出的每个 HTTP 请求都作为 Tomcat 进程中的单独线程进行处理。",
+      "pos": [
+        423,
+        744
+      ]
+    },
+    {
+      "pos": [
+        746,
+        832
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]"
+    },
+    {
+      "content": "在本指南中，将在 Linux 映像上安装 tomcat7，并将其部署在 Azure 中。",
+      "pos": [
+        834,
+        878
+      ]
+    },
+    {
+      "content": "你将学习以下内容：",
+      "pos": [
+        880,
+        889
+      ]
+    },
+    {
+      "content": "如何在 Azure 中创建虚拟机。",
+      "pos": [
+        895,
+        912
+      ]
+    },
+    {
+      "content": "如何准备用于 tomcat7 的虚拟机。",
+      "pos": [
+        917,
+        937
+      ]
+    },
+    {
+      "content": "如何安装 tomcat7。",
+      "pos": [
+        942,
+        955
+      ]
+    },
+    {
+      "pos": [
+        957,
+        1060
+      ],
+      "content": "假定读者已拥有 Azure 订阅。如果没有，你可以在 <bpt id=\"p1\">[</bpt>http://windowsazure.cn<ept id=\"p1\">](http://windowsazure.cn)</ept> 中注册 1rmb 试用版。如果你拥有 MSDN 订阅。"
+    },
+    {
+      "content": "本主题假定你具有 tomcat 和 Linux 的基本专业知识。",
+      "pos": [
+        1062,
+        1094
+      ]
+    },
+    {
+      "content": "阶段 1：创建映像",
+      "pos": [
+        1098,
+        1107
+      ]
+    },
+    {
+      "content": "在此阶段中，你将在 Azure 中使用 Linux 映像创建虚拟机。",
+      "pos": [
+        1108,
+        1142
+      ]
+    },
+    {
+      "content": "步骤 1：生成 SSH 身份验证密钥",
+      "pos": [
+        1147,
+        1165
+      ]
+    },
+    {
+      "content": "SSH 是面向系统管理员的重要工具。但是，基于人工确定的密码配置访问安全性并不是最佳做法。恶意用户可以根据用户名和弱密码侵入你的系统。",
+      "pos": [
+        1166,
+        1233
+      ]
+    },
+    {
+      "content": "好消息是，有办法使远程访问保持打开状态，而无需担心密码。此方法包括使用非对称加密进行身份验证。用户的私钥是授予身份验证的密钥。你甚至可以锁定用户的帐户，以完全禁止密码身份验证。",
+      "pos": [
+        1235,
+        1323
+      ]
+    },
+    {
+      "content": "此方法的另一个优点是不需要使用不同的密码来登录到不同的服务器。你可以使用个人私钥在所有服务器上进行身份验证，从而使你不必记住多个密码。",
+      "pos": [
+        1325,
+        1392
+      ]
+    },
+    {
+      "content": "使用此方法还可以要求提供密码进行登录。",
+      "pos": [
+        1394,
+        1413
+      ]
+    },
+    {
+      "content": "按照下列步骤进行操作可生成 SSH 身份验证密钥。",
+      "pos": [
+        1415,
+        1440
+      ]
+    },
+    {
+      "pos": [
+        1446,
+        1596
+      ],
+      "content": "从以下位置下载并安装 puttygen：<bpt id=\"p1\">[</bpt>http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html<ept id=\"p1\">](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html)</ept>"
+    },
+    {
+      "content": "运行 PUTTYGEN.EXE。",
+      "pos": [
+        1601,
+        1617
+      ]
+    },
+    {
+      "content": "单击<bpt id=\"p1\">**</bpt>“生成”<ept id=\"p1\">**</ept>以生成密钥。在此过程中，可以通过将鼠标放在窗口中的空白区域上来增加随机性。",
+      "pos": [
+        1622,
+        1669
+      ]
+    },
+    {
+      "content": "在生成过程结束后，Puttygen.exe 将显示生成的密钥。例如：",
+      "pos": [
+        1683,
+        1717
+      ]
+    },
+    {
+      "pos": [
+        1731,
+        1818
+      ],
+      "content": "在<bpt id=\"p1\">**</bpt>“密钥”<ept id=\"p1\">**</ept>中选择并复制公钥，然后将它保存在一个名为 publicKey.pem 的文件中。不要单击<bpt id=\"p2\">**</bpt>“保存公钥”<ept id=\"p2\">**</ept>，因为保存的公钥的文件格式不同于我们所需的公钥。"
+    },
+    {
+      "pos": [
+        1823,
+        1865
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“保存私钥”<ept id=\"p1\">**</ept>，并将其保存到名为 privateKey.ppk 的文件中。"
+    },
+    {
+      "content": "步骤 2：在 Azure 门户中创建映像。",
+      "pos": [
+        1870,
+        1891
+      ]
+    },
+    {
+      "content": "在 <bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>中，单击任务栏中的<bpt id=\"p2\">**</bpt>“新建”<ept id=\"p2\">**</ept>以创建映像，并根据你的需要选择 Linux 映像。以下示例使用 Ubuntu 14.04 映像。",
+      "pos": [
+        1892,
+        2001
+      ]
+    },
+    {
+      "pos": [
+        2010,
+        2133
+      ],
+      "content": "对于<bpt id=\"p1\">**</bpt>“主机名”<ept id=\"p1\">**</ept>，指定你和 Internet 客户端将用于访问此虚拟机的 URL 的名称。定义 DNS 名称的最后部分（例如 tomcatdemo），Azure 将生成 tomcatdemo.chinacloudapp.cn 作为 URL。"
+    },
+    {
+      "content": "对于<bpt id=\"p1\">**</bpt>“SSH 身份验证密钥”<ept id=\"p1\">**</ept>，从 <bpt id=\"p2\">**</bpt>publicKey.pem<ept id=\"p2\">**</ept> 文件中复制密钥值，其中包含由 puttygen 生成的公钥。",
+      "pos": [
+        2135,
+        2204
+      ]
+    },
+    {
+      "content": "根据需要配置其他设置，然后单击“创建”。",
+      "pos": [
+        2215,
+        2235
+      ]
+    },
+    {
+      "content": "阶段 2：准备用于 Tomcat7 的虚拟机",
+      "pos": [
+        2239,
+        2261
+      ]
+    },
+    {
+      "content": "在此阶段中，将为 tomcat 通信配置终结点，然后连接到新的虚拟机。",
+      "pos": [
+        2262,
+        2297
+      ]
+    },
+    {
+      "content": "步骤 1：打开 HTTP 端口，以允许 Web 访问",
+      "pos": [
+        2301,
+        2327
+      ]
+    },
+    {
+      "content": "Azure 中的终结点由协议（TCP 或 UDP）以及公用和专用端口组成。专用端口是服务侦听虚拟机的端口。公用端口是 Azure 云服务从外部侦听基于 Internet 的传入通信的端口。",
+      "pos": [
+        2328,
+        2422
+      ]
+    },
+    {
+      "content": "TCP 端口 8080 是 tomcat 侦听的默认端口号。使用 Azure 终结点打开此端口将允许你和其他 Internet 客户端访问 tomcat 页。",
+      "pos": [
+        2424,
+        2503
+      ]
+    },
+    {
+      "content": "在 Azure 门户中，单击<bpt id=\"p1\">**</bpt>“浏览”<ept id=\"p1\">**</ept>-&gt;<bpt id=\"p2\">**</bpt>“虚拟机”<ept id=\"p2\">**</ept>，然后单击你创建的虚拟机。",
+      "pos": [
+        2509,
+        2555
+      ]
+    },
+    {
+      "content": "若要将终结点添加到虚拟机，请单击<bpt id=\"p1\">**</bpt>“终结点”<ept id=\"p1\">**</ept> 框。",
+      "pos": [
+        2569,
+        2597
+      ]
+    },
+    {
+      "pos": [
+        2609,
+        2620
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“添加”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        2631,
+        2677
+      ],
+      "content": "对于<bpt id=\"p1\">**</bpt>终结点<ept id=\"p1\">**</ept>，在“终结点”中键入终结点的名称，然后在<bpt id=\"p2\">**</bpt>“公用端口”<ept id=\"p2\">**</ept>中键入 80。"
+    },
+    {
+      "content": "如果将其设置为 80，则无需在 URL 中包括端口号即可允许你访问 tomcat。例如，http://tomcatdemo.chinacloudapp.cn。",
+      "pos": [
+        2689,
+        2768
+      ]
+    },
+    {
+      "content": "如果将其设置为其他值（例如 81），则需要将端口号添加到 URL 才能访问 tomcat。例如，http://tomcatdemo.chinacloudapp.cn:81/。",
+      "pos": [
+        2778,
+        2865
+      ]
+    },
+    {
+      "pos": [
+        2874,
+        2979
+      ],
+      "content": "在“专用端口”中键入 8080。默认情况下，tomcat 侦听 TCP 端口 8080。如果你更改了 tomcat 的默认侦听端口，则应将专用端口更新为与 tomcat 侦听端口相同。  \n![][7]",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "在“专用端口”中键入 8080。默认情况下，tomcat 侦听 TCP 端口 8080。如果你更改了 tomcat 的默认侦听端口，则应将专用端口更新为与 tomcat 侦听端口相同。",
+          "pos": [
+            0,
+            92
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        2985,
+        3009
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“确定”<ept id=\"p1\">**</ept>将该终结点添加到你的虚拟机。"
+    },
+    {
+      "content": "步骤 2：连接到你创建的映像",
+      "pos": [
+        3016,
+        3030
+      ]
+    },
+    {
+      "content": "你可以选择用于连接到虚拟机的任何 SSH 工具。在此示例中，我们使用 Putty。",
+      "pos": [
+        3031,
+        3072
+      ]
+    },
+    {
+      "pos": [
+        3074,
+        3173
+      ],
+      "content": "首先，从 Azure 门户获取你的虚拟机的 DNS 名称。依次单击<bpt id=\"p1\">**</bpt>“浏览”<ept id=\"p1\">**</ept>-&gt;<bpt id=\"p2\">**</bpt>“虚拟机”<ept id=\"p2\">**</ept>-&gt;你的虚拟机的名称-&gt;<bpt id=\"p3\">**</bpt>“属性”<ept id=\"p3\">**</ept>，然后查看<bpt id=\"p4\">**</bpt>“属性”<ept id=\"p4\">**</ept>磁贴的<bpt id=\"p5\">**</bpt>“域名”<ept id=\"p5\">**</ept>字段。"
+    },
+    {
+      "content": "从 <bpt id=\"p1\">**</bpt>SSH<ept id=\"p1\">**</ept> 字段获取 SSH 连接的端口号。下面是一个示例。",
+      "pos": [
+        3175,
+        3209
+      ]
+    },
+    {
+      "pos": [
+        3220,
+        3257
+      ],
+      "content": "从<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](http://www.putty.org/)</ept>下载 Putty。"
+    },
+    {
+      "content": "下载后，单击可执行文件 PUTTY.EXE。使用从虚拟机的属性获取的主机名和端口号配置基本选项。下面是一个示例：",
+      "pos": [
+        3259,
+        3315
+      ]
+    },
+    {
+      "content": "在左窗格中，单击<bpt id=\"p1\">**</bpt>“连接”<ept id=\"p1\">**</ept>-&gt; <bpt id=\"p2\">**</bpt>SSH<ept id=\"p2\">**</ept> -&gt;<bpt id=\"p3\">**</bpt>“身份验证”<ept id=\"p3\">**</ept>，然后单击<bpt id=\"p4\">**</bpt>“浏览”<ept id=\"p4\">**</ept>以指定 <bpt id=\"p5\">**</bpt>privateKey.ppk<ept id=\"p5\">**</ept> 文件（其中包含在“第 1 阶段：创建映像”中 puttygen 生成的私钥）的位置。下面是一个示例：",
+      "pos": [
+        3326,
+        3451
+      ]
+    },
+    {
+      "content": "单击<bpt id=\"p1\">**</bpt>“打开”<ept id=\"p1\">**</ept>。此时可能会通过一个消息框提醒你。如果你已正确配置 DNS 名称和端口号，请单击<bpt id=\"p2\">**</bpt>“是”<ept id=\"p2\">**</ept>。",
+      "pos": [
+        3463,
+        3521
+      ]
+    },
+    {
+      "content": "你应该看到以下内容：",
+      "pos": [
+        3534,
+        3544
+      ]
+    },
+    {
+      "content": "输入在“第 1 阶段：创建映像”中创建虚拟机时指定的用户名。你会看到如下内容：",
+      "pos": [
+        3556,
+        3595
+      ]
+    },
+    {
+      "content": "第 3 阶段：安装软件",
+      "pos": [
+        3613,
+        3624
+      ]
+    },
+    {
+      "content": "在此阶段中，你将安装 Java 运行时环境、tomcat 和其他 tomcat 组件。",
+      "pos": [
+        3625,
+        3668
+      ]
+    },
+    {
+      "content": "Java 运行时环境",
+      "pos": [
+        3673,
+        3683
+      ]
+    },
+    {
+      "content": "Tomcat 是用 Java 编写的。有两种类型的 Java 开发工具包 (Jdk)（OpenJDK 和 Oracle JDK），你可以选择所需的那个。",
+      "pos": [
+        3684,
+        3760
+      ]
+    },
+    {
+      "content": "AZURE.NOTE：这两个 JDK 对于 Java API 中的类，几乎包含相同的代码，但虚拟机的代码实际上不同。涉及到库时，OpenJDK 倾向于使用开放库，而 Oracle 倾向于使用已关闭的库。但 Oracle JDK 包含更多类和一些修复的 bug，并且 Oracle JDK 比 OpenJDK 更稳定。",
+      "pos": [
+        3763,
+        3921
+      ]
+    },
+    {
+      "content": "以下命令下载不同 JDK。",
+      "pos": [
+        3923,
+        3936
+      ]
+    },
+    {
+      "content": "open-jdk",
+      "pos": [
+        3938,
+        3946
+      ]
+    },
+    {
+      "content": "oracle-jdk",
+      "pos": [
+        4016,
+        4026
+      ]
+    },
+    {
+      "content": "若要从 Oracle 网站下载 JDK，请执行以下命令：",
+      "pos": [
+        4032,
+        4060
+      ]
+    },
+    {
+      "content": "若要创建一个包含 JDK 文件的目录，请执行以下命令：",
+      "pos": [
+        4221,
+        4248
+      ]
+    },
+    {
+      "content": "若要将 JDK 文件解压到 /usr/lib/jvm/ 目录，请执行以下命令：",
+      "pos": [
+        4289,
+        4328
+      ]
+    },
+    {
+      "content": "若要将 Oracle JDK 设置为默认 JVM，请执行以下命令：",
+      "pos": [
+        4402,
+        4435
+      ]
+    },
+    {
+      "content": "测试：",
+      "pos": [
+        4649,
+        4652
+      ]
+    },
+    {
+      "content": "可以使用如下命令测试是否已正确安装 Java 运行时环境：",
+      "pos": [
+        4653,
+        4682
+      ]
+    },
+    {
+      "content": "如果已安装 open-jdk，你应看到如下消息：",
+      "pos": [
+        4705,
+        4729
+      ]
+    },
+    {
+      "content": "如果已安装 oracle-jdk，你应看到如下消息：",
+      "pos": [
+        4739,
+        4765
+      ]
+    },
+    {
+      "content": "Tomcat7",
+      "pos": [
+        4778,
+        4785
+      ]
+    },
+    {
+      "content": "使用以下命令安装 tomcat7：",
+      "pos": [
+        4786,
+        4803
+      ]
+    },
+    {
+      "content": "如果你未使用 tomcat7，请使用此命令的相应变体。",
+      "pos": [
+        4841,
+        4868
+      ]
+    },
+    {
+      "content": "测试：",
+      "pos": [
+        4874,
+        4877
+      ]
+    },
+    {
+      "content": "若要检查 tomcat7 是否已成功安装，请浏览到 tomcat 服务器的 DNS 名称（http://tomcatexample.chinacloudapp.cn/ 是本文中的示例 URL）。如果你看到如下页面，则 tomcat7 已正确安装。",
+      "pos": [
+        4879,
+        5002
+      ]
+    },
+    {
+      "content": "安装其他 Tomcat 组件",
+      "pos": [
+        5016,
+        5030
+      ]
+    },
+    {
+      "content": "你还可以安装其他可选 tomcat 组件。",
+      "pos": [
+        5031,
+        5052
+      ]
+    },
+    {
+      "pos": [
+        5054,
+        5121
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>sudo apt-cache search tomcat7<ept id=\"p1\">**</ept> 命令可查看所有可用的组件。以下命令是安装某些有用部件的示例。"
+    },
+    {
+      "content": "第 4 阶段：配置 Tomcat",
+      "pos": [
+        5274,
+        5290
+      ]
+    },
+    {
+      "content": "在此阶段中，你可以管理 tomcat。",
+      "pos": [
+        5291,
+        5310
+      ]
+    },
+    {
+      "content": "启动和停止 tomcat7",
+      "pos": [
+        5314,
+        5327
+      ]
+    },
+    {
+      "content": "当你安装 tomcat7 服务器时，该服务器会自动启动。你也可以使用以下命令自己启动它：",
+      "pos": [
+        5328,
+        5372
+      ]
+    },
+    {
+      "content": "若要停止 tomcat7，请执行以下命令：",
+      "pos": [
+        5410,
+        5431
+      ]
+    },
+    {
+      "content": "若要查看 tomcat7 的状态，请执行以下命令：",
+      "pos": [
+        5468,
+        5493
+      ]
+    },
+    {
+      "content": "若要重启 tomcat 服务，请执行以下命令：",
+      "pos": [
+        5532,
+        5555
+      ]
+    },
+    {
+      "content": "Tomcat 管理",
+      "pos": [
+        5598,
+        5607
+      ]
+    },
+    {
+      "content": "可以编辑 Tomcat 用户配置文件，以使用以下命令设置管理员凭据：",
+      "pos": [
+        5608,
+        5642
+      ]
+    },
+    {
+      "content": "下面是一个示例：",
+      "pos": [
+        5691,
+        5699
+      ]
+    },
+    {
+      "content": "AZURE.NOTE：为管理员用户名创建强密码。",
+      "pos": [
+        5712,
+        5736
+      ]
+    },
+    {
+      "content": "编辑此文件之后，你应使用以下命令重启 tomcat7 服务，以确保所做的更改生效：",
+      "pos": [
+        5738,
+        5779
+      ]
+    },
+    {
+      "pos": [
+        5821,
+        5955
+      ],
+      "content": "打开浏览器，并输入 URL <bpt id=\"p1\">**</bpt>http://<ph id=\"ph1\">&lt;your tomcat server DNS name&gt;</ph>/manager/html<ept id=\"p1\">**</ept>。对于本文中的示例，URL 为 http://tomcatexample.chinacloudapp.cn/manager/html。"
+    },
+    {
+      "content": "连接后，你应该会看到如下内容：",
+      "pos": [
+        5957,
+        5972
+      ]
+    },
+    {
+      "content": "常见问题",
+      "pos": [
+        5986,
+        5990
+      ]
+    },
+    {
+      "content": "无法通过 Internet 使用 Tomcat 和 Moodle 访问虚拟机",
+      "pos": [
+        5995,
+        6033
+      ]
+    },
+    {
+      "content": "症状",
+      "pos": [
+        6041,
+        6043
+      ]
+    },
+    {
+      "content": "Tomcat 正在运行，但你使用浏览器看不到 Tomcat 默认页。",
+      "pos": [
+        6048,
+        6082
+      ]
+    },
+    {
+      "content": "可能的根本原因",
+      "pos": [
+        6089,
+        6096
+      ]
+    },
+    {
+      "content": "tomcat 侦听端口与用于 tomcat 通信的虚拟机终结点的专用端口不同。",
+      "pos": [
+        6110,
+        6149
+      ]
+    },
+    {
+      "content": "检查你的公用端口和专用端口终结点设置，并确保专用端口与 tomcat 侦听端口相同。有关如何为你的虚拟机配置终结点的说明，请参阅“第 1 阶段：创建映像”。",
+      "pos": [
+        6161,
+        6239
+      ]
+    },
+    {
+      "content": "若要确定 tomcat 侦听端口，请打开 /etc/httpd/conf/httpd.conf（Red Hat 发行版）或 /etc/tomcat7/server.xml（Debian 发行版）。默认情况下，tomcat 侦听端口为 8080。下面是一个示例：",
+      "pos": [
+        6249,
+        6379
+      ]
+    },
+    {
+      "content": "如果要使用 Debian 或 Ubuntu 等虚拟机并且要更改 Tomcat 侦听的默认端口（例如 8081），则还应为操作系统打开该端口。首先，打开配置文件：",
+      "pos": [
+        6529,
+        6609
+      ]
+    },
+    {
+      "content": "然后，取消注释最后一行并将“no”更改为“yes”。",
+      "pos": [
+        6663,
+        6689
+      ]
+    },
+    {
+      "content": "防火墙已禁用 tomcat 侦听端口。",
+      "pos": [
+        6725,
+        6744
+      ]
+    },
+    {
+      "content": "如果你只能在本地主机上看到 Tomcat 默认页，则问题很可能出在 Tomcat 所侦听的端口被防火墙阻止。可以使用 w3m 工具来浏览网页。以下命令安装 w3m 并浏览到 Tomcat 默认页：",
+      "pos": [
+        6754,
+        6852
+      ]
+    },
+    {
+      "content": "解决方案",
+      "pos": [
+        6943,
+        6947
+      ]
+    },
+    {
+      "content": "如果 tomcat 侦听端口与发往虚拟机的通信的终结点专用端口不同，则需要将该专用端口更改为与 tomcat 侦听端口相同。",
+      "pos": [
+        6957,
+        7019
+      ]
+    },
+    {
+      "content": "如果此问题是由防火墙/iptables 导致的，请将以下行添加到 /etc/sysconfig/iptables：",
+      "pos": [
+        7032,
+        7089
+      ]
+    },
+    {
+      "content": "请注意，只有 https 通信才需要第二行。",
+      "pos": [
+        7215,
+        7237
+      ]
+    },
+    {
+      "content": "请确保该行在全局限制访问权限的所有行上方，如下所示：",
+      "pos": [
+        7247,
+        7273
+      ]
+    },
+    {
+      "content": "若要重新加载 iptables，请运行以下命令：",
+      "pos": [
+        7352,
+        7376
+      ]
+    },
+    {
+      "content": "这已在 CentOS 6.3 上进行了测试。",
+      "pos": [
+        7426,
+        7448
+      ]
+    },
+    {
+      "content": "将项目文件上载到 /var/lib/tomcat7/webapps/ 时，权限被拒绝",
+      "pos": [
+        7453,
+        7495
+      ]
+    },
+    {
+      "content": "症状",
+      "pos": [
+        7505,
+        7507
+      ]
+    },
+    {
+      "content": "当你使用任何 SFTP 客户端（例如 FileZilla）连接到虚拟机并导航到 /var/lib/tomcat7/webapps/ 来发布站点时，你收到如下错误消息：",
+      "pos": [
+        7512,
+        7595
+      ]
+    },
+    {
+      "content": "可能的根本原因",
+      "pos": [
+        7856,
+        7863
+      ]
+    },
+    {
+      "content": "你无权访问 /var/lib/tomcat7/webapps 文件夹。",
+      "pos": [
+        7866,
+        7901
+      ]
+    },
+    {
+      "content": "解决方案",
+      "pos": [
+        7908,
+        7912
+      ]
+    },
+    {
+      "content": "你需要获得根帐户权限。你可以将该文件夹的所有权从 root 更改为在设置计算机时使用的用户名。下面是使用 azureuser 帐户名称的示例：",
+      "pos": [
+        7917,
+        7988
+      ]
+    },
+    {
+      "content": "也使用 -R 选项对目录内的所有文件应用权限。",
+      "pos": [
+        8054,
+        8077
+      ]
+    },
+    {
+      "content": "请注意，此命令也适用于目录。-R 选项可更改目录内的所有文件和目录的权限。下面是一个示例：",
+      "pos": [
+        8083,
+        8128
+      ]
+    },
+    {
+      "content": "此命令将更改目录内的所有文件和目录以及目录本身的所有权（用户和组）。",
+      "pos": [
+        8184,
+        8218
+      ]
+    },
+    {
+      "content": "以下命令只会更改文件夹目录的权限，但不会更改目录内的文件和文件夹的权限。",
+      "pos": [
+        8224,
+        8260
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"在 Linux VM 上设置 Apache Tomcat | Azure\"\n    description=\"了解如何使用运行 Linux 的 Azure 虚拟机 (VM) 设置 Apache Tomcat7。\"\n    services=\"virtual-machines\"\n    documentationCenter=\"\"\n    authors=\"NingKuang\"\n    manager=\"timlt\"\n    editor=\"\"\n    tags=\"azure-service-management\"/>\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"12/15/2015\"\n    wacn.date=\"01/29/2016\"/>\n\n# 如何使用 Azure 在 Linux 虚拟机上设置 Tomcat7 \n\nApache Tomcat（或简称 Tomcat，以前也称为 Jakarta Tomcat）是由 Apache Software Foundation (ASF) 开发的一个开源 Web 服务器和 servlet 容器。Tomcat 实现了 Sun Microsystems 提出的 Java Servlet 和 JavaServer Pages (JSP) 规范，并提供了用于运行 Java 代码的纯 Java HTTP Web 服务器环境。在最简单的配置中，Tomcat 在单个操作系统进程中运行。此进程运行 Java 虚拟机 (JVM)。浏览器向 Tomcat 发出的每个 HTTP 请求都作为 Tomcat 进程中的单独线程进行处理。\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]\n\n在本指南中，将在 Linux 映像上安装 tomcat7，并将其部署在 Azure 中。\n\n你将学习以下内容：\n\n-   如何在 Azure 中创建虚拟机。\n-   如何准备用于 tomcat7 的虚拟机。\n-   如何安装 tomcat7。\n\n假定读者已拥有 Azure 订阅。如果没有，你可以在 [http://windowsazure.cn](http://windowsazure.cn) 中注册 1rmb 试用版。如果你拥有 MSDN 订阅。\n\n本主题假定你具有 tomcat 和 Linux 的基本专业知识。\n\n##阶段 1：创建映像\n在此阶段中，你将在 Azure 中使用 Linux 映像创建虚拟机。\n\n###步骤 1：生成 SSH 身份验证密钥\nSSH 是面向系统管理员的重要工具。但是，基于人工确定的密码配置访问安全性并不是最佳做法。恶意用户可以根据用户名和弱密码侵入你的系统。\n\n好消息是，有办法使远程访问保持打开状态，而无需担心密码。此方法包括使用非对称加密进行身份验证。用户的私钥是授予身份验证的密钥。你甚至可以锁定用户的帐户，以完全禁止密码身份验证。\n\n此方法的另一个优点是不需要使用不同的密码来登录到不同的服务器。你可以使用个人私钥在所有服务器上进行身份验证，从而使你不必记住多个密码。\n\n使用此方法还可以要求提供密码进行登录。\n\n按照下列步骤进行操作可生成 SSH 身份验证密钥。\n\n1.  从以下位置下载并安装 puttygen：[http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html)\n2.  运行 PUTTYGEN.EXE。\n3.  单击**“生成”**以生成密钥。在此过程中，可以通过将鼠标放在窗口中的空白区域上来增加随机性。  \n![][1]\n4.  在生成过程结束后，Puttygen.exe 将显示生成的密钥。例如：  \n![][2]\n5.  在**“密钥”**中选择并复制公钥，然后将它保存在一个名为 publicKey.pem 的文件中。不要单击**“保存公钥”**，因为保存的公钥的文件格式不同于我们所需的公钥。\n6.  单击**“保存私钥”**，并将其保存到名为 privateKey.ppk 的文件中。\n\n###步骤 2：在 Azure 门户中创建映像。\n在 [Azure 门户](https://manage.windowsazure.cn)中，单击任务栏中的**“新建”**以创建映像，并根据你的需要选择 Linux 映像。以下示例使用 Ubuntu 14.04 映像。\n![][3]\n\n对于**“主机名”**，指定你和 Internet 客户端将用于访问此虚拟机的 URL 的名称。定义 DNS 名称的最后部分（例如 tomcatdemo），Azure 将生成 tomcatdemo.chinacloudapp.cn 作为 URL。\n\n对于**“SSH 身份验证密钥”**，从 **publicKey.pem** 文件中复制密钥值，其中包含由 puttygen 生成的公钥。  \n![][4]\n\n根据需要配置其他设置，然后单击“创建”。\n\n##阶段 2：准备用于 Tomcat7 的虚拟机\n在此阶段中，将为 tomcat 通信配置终结点，然后连接到新的虚拟机。\n###步骤 1：打开 HTTP 端口，以允许 Web 访问\nAzure 中的终结点由协议（TCP 或 UDP）以及公用和专用端口组成。专用端口是服务侦听虚拟机的端口。公用端口是 Azure 云服务从外部侦听基于 Internet 的传入通信的端口。\n\nTCP 端口 8080 是 tomcat 侦听的默认端口号。使用 Azure 终结点打开此端口将允许你和其他 Internet 客户端访问 tomcat 页。\n\n1.  在 Azure 门户中，单击**“浏览”**->**“虚拟机”**，然后单击你创建的虚拟机。  \n![][5]\n2.  若要将终结点添加到虚拟机，请单击**“终结点”** 框。\n![][6]\n3.  单击**“添加”**。  \n    1.  对于**终结点**，在“终结点”中键入终结点的名称，然后在**“公用端口”**中键入 80。  \n\n        如果将其设置为 80，则无需在 URL 中包括端口号即可允许你访问 tomcat。例如，http://tomcatdemo.chinacloudapp.cn。\n\n        如果将其设置为其他值（例如 81），则需要将端口号添加到 URL 才能访问 tomcat。例如，http://tomcatdemo.chinacloudapp.cn:81/。\n    2.  在“专用端口”中键入 8080。默认情况下，tomcat 侦听 TCP 端口 8080。如果你更改了 tomcat 的默认侦听端口，则应将专用端口更新为与 tomcat 侦听端口相同。  \n    ![][7]\n\n4.  单击**“确定”**将该终结点添加到你的虚拟机。\n\n\n\n###步骤 2：连接到你创建的映像\n你可以选择用于连接到虚拟机的任何 SSH 工具。在此示例中，我们使用 Putty。\n\n首先，从 Azure 门户获取你的虚拟机的 DNS 名称。依次单击**“浏览”**->**“虚拟机”**->你的虚拟机的名称->**“属性”**，然后查看**“属性”**磁贴的**“域名”**字段。\n\n从 **SSH** 字段获取 SSH 连接的端口号。下面是一个示例。  \n![][8]\n\n从[此处](http://www.putty.org/)下载 Putty。\n\n下载后，单击可执行文件 PUTTY.EXE。使用从虚拟机的属性获取的主机名和端口号配置基本选项。下面是一个示例：  \n![][9]\n\n在左窗格中，单击**“连接”**-> **SSH** ->**“身份验证”**，然后单击**“浏览”**以指定 **privateKey.ppk** 文件（其中包含在“第 1 阶段：创建映像”中 puttygen 生成的私钥）的位置。下面是一个示例：  \n![][10]\n\n单击**“打开”**。此时可能会通过一个消息框提醒你。如果你已正确配置 DNS 名称和端口号，请单击**“是”**。\n![][11]  \n\n\n你应该看到以下内容：  \n![][12]\n\n输入在“第 1 阶段：创建映像”中创建虚拟机时指定的用户名。你会看到如下内容：  \n![][13]\n\n\n\n\n\n##第 3 阶段：安装软件\n在此阶段中，你将安装 Java 运行时环境、tomcat 和其他 tomcat 组件。\n\n###Java 运行时环境\nTomcat 是用 Java 编写的。有两种类型的 Java 开发工具包 (Jdk)（OpenJDK 和 Oracle JDK），你可以选择所需的那个。\n\n>AZURE.NOTE：这两个 JDK 对于 Java API 中的类，几乎包含相同的代码，但虚拟机的代码实际上不同。涉及到库时，OpenJDK 倾向于使用开放库，而 Oracle 倾向于使用已关闭的库。但 Oracle JDK 包含更多类和一些修复的 bug，并且 Oracle JDK 比 OpenJDK 更稳定。\n\n以下命令下载不同 JDK。\n\nopen-jdk\n\n    sudo apt-get update  \n    sudo apt-get install openjdk-7-jre  \n\noracle-jdk\n\n-   若要从 Oracle 网站下载 JDK，请执行以下命令：  \n\n        wget --header \"Cookie: oraclelicense=accept-securebackup-cookie\" http://download.oracle.com/otn-pub/java/jdk/8u5-b13/jdk-8u5-linux-x64.tar.gz  \n\n-   若要创建一个包含 JDK 文件的目录，请执行以下命令：\n\n        sudo mkdir /usr/lib/jvm  \n\n-   若要将 JDK 文件解压到 /usr/lib/jvm/ 目录，请执行以下命令：\n\n        sudo tar -zxf jdk-8u5-linux-x64.tar.gz  -C /usr/lib/jvm/  \n\n-   若要将 Oracle JDK 设置为默认 JVM，请执行以下命令：\n\n        sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk1.8.0_05/bin/java 100  \n        sudo update-alternatives --install /usr/bin/javac javac /usr/lib/jvm/jdk1.8.0_05/bin/javac 100  \n\n####测试：\n可以使用如下命令测试是否已正确安装 Java 运行时环境：\n\n    java -version  \n\n如果已安装 open-jdk，你应看到如下消息：\n![][14]\n\n如果已安装 oracle-jdk，你应看到如下消息：\n![][15]\n\n###Tomcat7\n使用以下命令安装 tomcat7：\n\n    sudo apt-get install tomcat7  \n\n如果你未使用 tomcat7，请使用此命令的相应变体。\n\n####测试：\n\n若要检查 tomcat7 是否已成功安装，请浏览到 tomcat 服务器的 DNS 名称（http://tomcatexample.chinacloudapp.cn/ 是本文中的示例 URL）。如果你看到如下页面，则 tomcat7 已正确安装。\n![][16]\n\n\n###安装其他 Tomcat 组件\n你还可以安装其他可选 tomcat 组件。\n\n使用 **sudo apt-cache search tomcat7** 命令可查看所有可用的组件。以下命令是安装某些有用部件的示例。\n\n    sudo apt-get install tomcat7-admin      #admin web applications\n    sudo apt-get install tomcat7-user         #tools to create user instances  \n\n##第 4 阶段：配置 Tomcat\n在此阶段中，你可以管理 tomcat。\n###启动和停止 tomcat7\n当你安装 tomcat7 服务器时，该服务器会自动启动。你也可以使用以下命令自己启动它：\n\n    sudo /etc/init.d/tomcat7 start\n\n若要停止 tomcat7，请执行以下命令：\n\n    sudo /etc/init.d/tomcat7 stop\n\n若要查看 tomcat7 的状态，请执行以下命令：\n\n    sudo /etc/init.d/tomcat7 status\n\n若要重启 tomcat 服务，请执行以下命令：\n\n    sudo /etc/init.d/tomcat7 restart\n\n###Tomcat 管理\n可以编辑 Tomcat 用户配置文件，以使用以下命令设置管理员凭据：\n\n    sudo vi  /etc/tomcat7/tomcat-users.xml   \n\n下面是一个示例：\n![][17]  \n\n>AZURE.NOTE：为管理员用户名创建强密码。\n\n编辑此文件之后，你应使用以下命令重启 tomcat7 服务，以确保所做的更改生效：\n\n    sudo /etc/init.d/tomcat7 restart  \n\n打开浏览器，并输入 URL **http://<your tomcat server DNS name>/manager/html**。对于本文中的示例，URL 为 http://tomcatexample.chinacloudapp.cn/manager/html。\n\n连接后，你应该会看到如下内容：  \n![][18]\n\n##常见问题\n\n###无法通过 Internet 使用 Tomcat 和 Moodle 访问虚拟机\n\n-   **症状**  \nTomcat 正在运行，但你使用浏览器看不到 Tomcat 默认页。\n-   **可能的根本原因**   \n    1.  tomcat 侦听端口与用于 tomcat 通信的虚拟机终结点的专用端口不同。  \n\n        检查你的公用端口和专用端口终结点设置，并确保专用端口与 tomcat 侦听端口相同。有关如何为你的虚拟机配置终结点的说明，请参阅“第 1 阶段：创建映像”。\n\n        若要确定 tomcat 侦听端口，请打开 /etc/httpd/conf/httpd.conf（Red Hat 发行版）或 /etc/tomcat7/server.xml（Debian 发行版）。默认情况下，tomcat 侦听端口为 8080。下面是一个示例：\n\n            <Connector port=\"8080\" protocol=\"HTTP/1.1\"  connectionTimeout=\"20000\"  URIEncoding=\"UTF-8\"            redirectPort=\"8443\" />  \n\n        如果要使用 Debian 或 Ubuntu 等虚拟机并且要更改 Tomcat 侦听的默认端口（例如 8081），则还应为操作系统打开该端口。首先，打开配置文件：\n\n            sudo vi /etc/default/tomcat7  \n\n        然后，取消注释最后一行并将“no”更改为“yes”。\n\n            AUTHBIND=yes\n\n    2.  防火墙已禁用 tomcat 侦听端口。\n\n        如果你只能在本地主机上看到 Tomcat 默认页，则问题很可能出在 Tomcat 所侦听的端口被防火墙阻止。可以使用 w3m 工具来浏览网页。以下命令安装 w3m 并浏览到 Tomcat 默认页：\n\n            sudo yum  install w3m w3m-img\n            w3m http://localhost:8080  \n\n-   **解决方案**\n    1. 如果 tomcat 侦听端口与发往虚拟机的通信的终结点专用端口不同，则需要将该专用端口更改为与 tomcat 侦听端口相同。   \n\n    2.  如果此问题是由防火墙/iptables 导致的，请将以下行添加到 /etc/sysconfig/iptables：\n\n            -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT\n            -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT  \n\n        请注意，只有 https 通信才需要第二行。\n\n        请确保该行在全局限制访问权限的所有行上方，如下所示：\n\n            -A INPUT -j REJECT --reject-with icmp-host-prohibited  \n\n        若要重新加载 iptables，请运行以下命令：\n\n            service iptables restart  \n\n        这已在 CentOS 6.3 上进行了测试。\n\n###将项目文件上载到 /var/lib/tomcat7/webapps/ 时，权限被拒绝  \n\n-   **症状**  \n当你使用任何 SFTP 客户端（例如 FileZilla）连接到虚拟机并导航到 /var/lib/tomcat7/webapps/ 来发布站点时，你收到如下错误消息：  \n\n        status: Listing directory /var/lib/tomcat7/webapps\n        Command:    put \"C:\\Users\\liang\\Desktop\\info.jsp\" \"info.jsp\"\n        Error:  /var/lib/tomcat7/webapps/info.jsp: open for write: permission denied\n        Error:  File transfer failed\n\n-   **可能的根本原因**\n你无权访问 /var/lib/tomcat7/webapps 文件夹。\n-   **解决方案**  \n你需要获得根帐户权限。你可以将该文件夹的所有权从 root 更改为在设置计算机时使用的用户名。下面是使用 azureuser 帐户名称的示例：  \n\n        sudo chown azureuser -R /var/lib/tomcat7/webapps\n\n    也使用 -R 选项对目录内的所有文件应用权限。\n\n    请注意，此命令也适用于目录。-R 选项可更改目录内的所有文件和目录的权限。下面是一个示例：\n\n        sudo chown -R username:group directory  \n\n    此命令将更改目录内的所有文件和目录以及目录本身的所有权（用户和组）。\n\n    以下命令只会更改文件夹目录的权限，但不会更改目录内的文件和文件夹的权限。\n\n        sudo chown username:group directory\n\n\n\n[1]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-01.png\n[2]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-02.png\n[3]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-03.png\n[4]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-04.png\n[5]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-05.png\n[6]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-06.png\n[7]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-07.png\n[8]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-08.png\n[9]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-09.png\n[10]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-10.png\n[11]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-11.png\n[12]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-12.png\n[13]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-13.png\n[14]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-14.png\n[15]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-15.png\n[16]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-16.png\n[17]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-17.png\n[18]: ./media/virtual-machines-linux-setup-tomcat7-linux/virtual-machines-linux-setup-tomcat7-linux-18.png\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

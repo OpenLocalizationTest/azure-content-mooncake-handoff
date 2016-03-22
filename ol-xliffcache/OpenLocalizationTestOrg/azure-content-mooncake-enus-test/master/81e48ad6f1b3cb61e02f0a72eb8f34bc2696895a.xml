@@ -1,0 +1,782 @@
+{
+  "nodes": [
+    {
+      "content": "映射 Azure Site Recovery 中的存储，以便在本地数据中心之间进行 Hyper-V 虚拟机复制 | Azure",
+      "pos": [
+        27,
+        90
+      ]
+    },
+    {
+      "content": "准备存储映射，以便通过 Azure Site Recovery 在两个本地数据中心之间进行 Hyper-V 虚拟机复制。",
+      "pos": [
+        109,
+        169
+      ]
+    },
+    {
+      "content": "准备存储映射，以便通过 Azure Site Recovery 在两个本地数据中心之间进行 Hyper-V 虚拟机复制",
+      "pos": [
+        390,
+        449
+      ]
+    },
+    {
+      "content": "Azure Site Recovery 有助于业务连续性和灾难恢复 (BCDR) 策略，因为它可以协调虚拟机和物理服务器的复制、故障转移和恢复。本文介绍存储映射。当你使用 Site Recovery 在两个本地数据中心之间复制 Hyper-V 虚拟机时，你可以通过存储映射来充分利用存储空间。",
+      "pos": [
+        452,
+        598
+      ]
+    },
+    {
+      "pos": [
+        600,
+        705
+      ],
+      "content": "阅读本文后，可在 <bpt id=\"p1\">[</bpt>Azure 恢复服务论坛<ept id=\"p1\">](https://social.msdn.microsoft.com/Forums/zh-CN/home?forum=hypervrecovmgr)</ept>上发布任何问题。"
+    },
+    {
+      "content": "概述",
+      "pos": [
+        710,
+        712
+      ]
+    },
+    {
+      "content": "如下所示，仅当你需要使用 Hyper-V 副本或 SAN 复制将 VMM 云中的 Hyper-V 虚拟机从主数据中心复制到辅助数据中心时，才需要使用存储映射：",
+      "pos": [
+        714,
+        793
+      ]
+    },
+    {
+      "pos": [
+        798,
+        867
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>使用 Hyper-V 副本进行本地到本地复制<ept id=\"p1\">**</ept> - 设置存储映射时，你可以在源和目标 VMM 服务器上映射存储分类，以实现以下功能："
+    },
+    {
+      "pos": [
+        875,
+        929
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>标识副本虚拟机的目标存储<ept id=\"p1\">**</ept> - 虚拟机将复制到选择的存储目标（SMB 共享或群集共享卷 (CSV)）。"
+    },
+    {
+      "pos": [
+        936,
+        1009
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>放置副本虚拟机<ept id=\"p1\">**</ept> - 使用存储映射能以最佳方式在 Hyper-V 主机服务器上放置副本虚拟机。副本虚拟机将放置在可访问映射存储分类的主机上。"
+    },
+    {
+      "pos": [
+        1016,
+        1079
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>无存储映射<ept id=\"p1\">**</ept> - 如果未配置存储映射，虚拟机将复制到与副本虚拟机关联的 Hyper-V 主机服务器上指定的默认存储位置。"
+    },
+    {
+      "pos": [
+        1083,
+        1139
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>使用 SAN 进行本地到本地复制<ept id=\"p1\">**</ept> - 设置存储映射时，你可以在源和目标 VMM 服务器上映射存储阵列池。"
+    },
+    {
+      "pos": [
+        1146,
+        1176
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>指定池<ept id=\"p1\">**</ept> - 指定哪个辅助存储池要从主池接收复制数据。"
+    },
+    {
+      "pos": [
+        1183,
+        1225
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>标识目标存储池<ept id=\"p1\">**</ept> - 确保将源复制组中的 LUN 复制到所选的映射目标存储池。"
+    },
+    {
+      "content": "针对 Hyper-V 复制设置存储分类",
+      "pos": [
+        1230,
+        1249
+      ]
+    },
+    {
+      "content": "当你使用 Hyper-V 副本通过 Site Recovery 进行复制时，可以在源和目标 VMM 服务器上的存储分类之间映射；如果两个站点由同一个 VMM 服务器管理，则可以在单个 VMM 服务器上映射。请注意：",
+      "pos": [
+        1251,
+        1358
+      ]
+    },
+    {
+      "content": "在正确配置映射并启用复制后，位于主位置的虚拟机的虚拟硬盘将复制到位于映射目标位置的存储。",
+      "pos": [
+        1362,
+        1406
+      ]
+    },
+    {
+      "content": "存储分类必须可供源和目标云中的主机组使用。",
+      "pos": [
+        1409,
+        1430
+      ]
+    },
+    {
+      "content": "分类不需要具有相同类型的存储。例如，你可以将包含 SMB 共享的源分类映射到包含 CSV 的目标分类。",
+      "pos": [
+        1433,
+        1484
+      ]
+    },
+    {
+      "pos": [
+        1487,
+        1574
+      ],
+      "content": "有关详细信息，请阅读<bpt id=\"p1\">[</bpt>如何在 VMM 中创建存储分类<ept id=\"p1\">](https://technet.microsoft.com/zh-cn/library/gg610685.aspx)</ept>。"
+    },
+    {
+      "content": "示例",
+      "pos": [
+        1579,
+        1581
+      ]
+    },
+    {
+      "content": "如果已在 VMM 中正确配置分类，则当你在执行存储映射期间选择源和目标 VMM 服务器时，将显示源和目标分类。下面是在北京和上海具有两个位置的组织的存储文件共享与分类示例。",
+      "pos": [
+        1583,
+        1669
+      ]
+    },
+    {
+      "content": "位置",
+      "pos": [
+        1673,
+        1675
+      ]
+    },
+    {
+      "content": "VMM 服务器",
+      "pos": [
+        1682,
+        1689
+      ]
+    },
+    {
+      "content": "文件共享（源）",
+      "pos": [
+        1696,
+        1703
+      ]
+    },
+    {
+      "content": "分类（源）",
+      "pos": [
+        1710,
+        1715
+      ]
+    },
+    {
+      "content": "映射到",
+      "pos": [
+        1722,
+        1725
+      ]
+    },
+    {
+      "content": "文件共享（目标）",
+      "pos": [
+        1732,
+        1740
+      ]
+    },
+    {
+      "content": "北京",
+      "pos": [
+        1768,
+        1770
+      ]
+    },
+    {
+      "content": "VMM_Source",
+      "pos": [
+        1773,
+        1783
+      ]
+    },
+    {
+      "content": "SourceShare1",
+      "pos": [
+        1785,
+        1797
+      ]
+    },
+    {
+      "content": "GOLD",
+      "pos": [
+        1800,
+        1804
+      ]
+    },
+    {
+      "content": "GOLD_TARGET",
+      "pos": [
+        1807,
+        1818
+      ]
+    },
+    {
+      "content": "TargetShare1",
+      "pos": [
+        1821,
+        1833
+      ]
+    },
+    {
+      "content": "SourceShare2",
+      "pos": [
+        1839,
+        1851
+      ]
+    },
+    {
+      "content": "SILVER",
+      "pos": [
+        1854,
+        1860
+      ]
+    },
+    {
+      "content": "SILVER_TARGET",
+      "pos": [
+        1863,
+        1876
+      ]
+    },
+    {
+      "content": "TargetShare2",
+      "pos": [
+        1879,
+        1891
+      ]
+    },
+    {
+      "content": "SourceShare3",
+      "pos": [
+        1897,
+        1909
+      ]
+    },
+    {
+      "content": "BRONZE",
+      "pos": [
+        1912,
+        1918
+      ]
+    },
+    {
+      "content": "BRONZE_TARGET",
+      "pos": [
+        1921,
+        1934
+      ]
+    },
+    {
+      "content": "TargetShare3",
+      "pos": [
+        1937,
+        1949
+      ]
+    },
+    {
+      "content": "上海",
+      "pos": [
+        1950,
+        1952
+      ]
+    },
+    {
+      "content": "VMM_Target",
+      "pos": [
+        1955,
+        1965
+      ]
+    },
+    {
+      "content": "GOLD_TARGET",
+      "pos": [
+        1970,
+        1981
+      ]
+    },
+    {
+      "content": "未映射",
+      "pos": [
+        1984,
+        1987
+      ]
+    },
+    {
+      "content": "SILVER_TARGET",
+      "pos": [
+        1996,
+        2009
+      ]
+    },
+    {
+      "content": "未映射",
+      "pos": [
+        2012,
+        2015
+      ]
+    },
+    {
+      "content": "BRONZE_TARGET",
+      "pos": [
+        2025,
+        2038
+      ]
+    },
+    {
+      "content": "未映射",
+      "pos": [
+        2041,
+        2044
+      ]
+    },
+    {
+      "content": "可以在 Site Recovery 门户的“资源”页中的“服务器存储”选项卡上配置这些设置。",
+      "pos": [
+        2046,
+        2092
+      ]
+    },
+    {
+      "content": "配置存储映射",
+      "pos": [
+        2096,
+        2102
+      ]
+    },
+    {
+      "content": "对于此示例：",
+      "pos": [
+        2164,
+        2170
+      ]
+    },
+    {
+      "content": "在为 GOLD 存储 (SourceShare1) 上的任一虚拟机创建副本虚拟机后，该副本虚拟机将复制到 GOLD_TARGET 存储 (TargetShare1)。",
+      "pos": [
+        2173,
+        2256
+      ]
+    },
+    {
+      "content": "在为 SILVER 存储 (SourceShare2) 上的任一虚拟机创建副本虚拟机后，该副本虚拟机将复制到 SILVER_TARGET 存储 (TargetShare2) 存储。依此类推。",
+      "pos": [
+        2259,
+        2354
+      ]
+    },
+    {
+      "content": "下一屏幕截图显示了 VMM 中的实际文件共享及其分配的分类。",
+      "pos": [
+        2356,
+        2386
+      ]
+    },
+    {
+      "content": "VMM 中的存储分类",
+      "pos": [
+        2390,
+        2400
+      ]
+    },
+    {
+      "content": "多个存储位置",
+      "pos": [
+        2465,
+        2471
+      ]
+    },
+    {
+      "content": "如果将目标分类分配到了多个 SMB 共享或 CSV，则在保护虚拟机时，将自动选择最佳存储位置。如果指定的分类没有合适的目标存储，则使用 Hyper-V 主机上指定的默认存储来放置副本虚拟硬盘。",
+      "pos": [
+        2473,
+        2569
+      ]
+    },
+    {
+      "content": "下表显示了本示例中的存储分类和群集共享卷是如何设置的。",
+      "pos": [
+        2571,
+        2598
+      ]
+    },
+    {
+      "content": "位置",
+      "pos": [
+        2602,
+        2604
+      ]
+    },
+    {
+      "content": "分类",
+      "pos": [
+        2611,
+        2613
+      ]
+    },
+    {
+      "content": "关联的存储",
+      "pos": [
+        2620,
+        2625
+      ]
+    },
+    {
+      "content": "北京",
+      "pos": [
+        2640,
+        2642
+      ]
+    },
+    {
+      "content": "GOLD",
+      "pos": [
+        2645,
+        2649
+      ]
+    },
+    {
+      "content": "C:\\ClusterStorage\\SourceVolume1",
+      "pos": [
+        2655,
+        2686
+      ]
+    },
+    {
+      "content": "\\FileServer\\SourceShare1",
+      "pos": [
+        2693,
+        2717
+      ]
+    },
+    {
+      "content": "SILVER",
+      "pos": [
+        2725,
+        2731
+      ]
+    },
+    {
+      "content": "C:\\ClusterStorage\\SourceVolume2",
+      "pos": [
+        2737,
+        2768
+      ]
+    },
+    {
+      "content": "\\FileServer\\SourceShare2",
+      "pos": [
+        2775,
+        2799
+      ]
+    },
+    {
+      "content": "上海",
+      "pos": [
+        2804,
+        2806
+      ]
+    },
+    {
+      "content": "GOLD_TARGET",
+      "pos": [
+        2809,
+        2820
+      ]
+    },
+    {
+      "content": "C:\\ClusterStorage\\TargetVolume1",
+      "pos": [
+        2826,
+        2857
+      ]
+    },
+    {
+      "content": "\\FileServer\\TargetShare1",
+      "pos": [
+        2864,
+        2888
+      ]
+    },
+    {
+      "content": "SILVER_TARGET",
+      "pos": [
+        2896,
+        2909
+      ]
+    },
+    {
+      "content": "C:\\ClusterStorage\\TargetVolume2",
+      "pos": [
+        2914,
+        2945
+      ]
+    },
+    {
+      "content": "\\FileServer\\TargetShare2",
+      "pos": [
+        2952,
+        2976
+      ]
+    },
+    {
+      "content": "下表汇总了当你在此示例环境中为虚拟机 (VM1 - VM5) 启用保护时的行为。",
+      "pos": [
+        2982,
+        3022
+      ]
+    },
+    {
+      "content": "虚拟机",
+      "pos": [
+        3026,
+        3029
+      ]
+    },
+    {
+      "content": "源存储",
+      "pos": [
+        3036,
+        3039
+      ]
+    },
+    {
+      "content": "源分类",
+      "pos": [
+        3046,
+        3049
+      ]
+    },
+    {
+      "content": "映射的目标存储",
+      "pos": [
+        3056,
+        3063
+      ]
+    },
+    {
+      "content": "VM1",
+      "pos": [
+        3082,
+        3085
+      ]
+    },
+    {
+      "content": "C:\\ClusterStorage\\SourceVolume1",
+      "pos": [
+        3088,
+        3119
+      ]
+    },
+    {
+      "content": "GOLD",
+      "pos": [
+        3122,
+        3126
+      ]
+    },
+    {
+      "content": "C:\\ClusterStorage\\SourceVolume1",
+      "pos": [
+        3132,
+        3163
+      ]
+    },
+    {
+      "content": "\\\\FileServer\\SourceShare1",
+      "pos": [
+        3170,
+        3195
+      ]
+    },
+    {
+      "content": "两个 GOLD_TARGET",
+      "pos": [
+        3202,
+        3216
+      ]
+    },
+    {
+      "content": "VM2",
+      "pos": [
+        3221,
+        3224
+      ]
+    },
+    {
+      "content": "\\FileServer\\SourceShare1",
+      "pos": [
+        3227,
+        3251
+      ]
+    },
+    {
+      "content": "GOLD",
+      "pos": [
+        3254,
+        3258
+      ]
+    },
+    {
+      "content": "C:\\ClusterStorage\\SourceVolume1",
+      "pos": [
+        3264,
+        3295
+      ]
+    },
+    {
+      "content": "\\FileServer\\SourceShare1",
+      "pos": [
+        3302,
+        3326
+      ]
+    },
+    {
+      "content": "两个 GOLD_TARGET",
+      "pos": [
+        3334,
+        3348
+      ]
+    },
+    {
+      "content": "VM3",
+      "pos": [
+        3353,
+        3356
+      ]
+    },
+    {
+      "content": "C:\\ClusterStorage\\SourceVolume2",
+      "pos": [
+        3359,
+        3390
+      ]
+    },
+    {
+      "content": "SILVER",
+      "pos": [
+        3393,
+        3399
+      ]
+    },
+    {
+      "content": "C:\\ClusterStorage\\SourceVolume2",
+      "pos": [
+        3405,
+        3436
+      ]
+    },
+    {
+      "content": "\\FileServer\\SourceShare2",
+      "pos": [
+        3443,
+        3467
+      ]
+    },
+    {
+      "content": "VM4",
+      "pos": [
+        3472,
+        3475
+      ]
+    },
+    {
+      "content": "\\FileServer\\SourceShare2",
+      "pos": [
+        3478,
+        3502
+      ]
+    },
+    {
+      "content": "SILVER",
+      "pos": [
+        3505,
+        3511
+      ]
+    },
+    {
+      "content": "C:\\ClusterStorage\\SourceVolume2",
+      "pos": [
+        3516,
+        3547
+      ]
+    },
+    {
+      "content": "\\FileServer\\SourceShare2",
+      "pos": [
+        3554,
+        3578
+      ]
+    },
+    {
+      "content": "两个 SILVER_TARGET",
+      "pos": [
+        3585,
+        3601
+      ]
+    },
+    {
+      "content": "VM5",
+      "pos": [
+        3606,
+        3609
+      ]
+    },
+    {
+      "content": "C:\\ClusterStorage\\SourceVolume3",
+      "pos": [
+        3612,
+        3643
+      ]
+    },
+    {
+      "content": "不适用",
+      "pos": [
+        3646,
+        3649
+      ]
+    },
+    {
+      "content": "无映射，因此将使用 Hyper-V 主机的默认存储位置",
+      "pos": [
+        3652,
+        3679
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        3684,
+        3688
+      ]
+    },
+    {
+      "pos": [
+        3690,
+        3796
+      ],
+      "content": "现在，你已经对存储映射有了更好的了解，因此可以<bpt id=\"p1\">[</bpt>准备部署 Azure Site Recovery<ept id=\"p1\">](/documentation/articles/site-recovery-best-practices)</ept> 了。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"映射 Azure Site Recovery 中的存储，以便在本地数据中心之间进行 Hyper-V 虚拟机复制 | Azure\"\n    description=\"准备存储映射，以便通过 Azure Site Recovery 在两个本地数据中心之间进行 Hyper-V 虚拟机复制。\"\n    services=\"site-recovery\"\n    documentationCenter=\"\"\n    authors=\"rayne-wiselman\"\n    manager=\"jwhit\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"site-recovery\"  \n    ms.date=\"12/14/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n\n# 准备存储映射，以便通过 Azure Site Recovery 在两个本地数据中心之间进行 Hyper-V 虚拟机复制\n\n\nAzure Site Recovery 有助于业务连续性和灾难恢复 (BCDR) 策略，因为它可以协调虚拟机和物理服务器的复制、故障转移和恢复。本文介绍存储映射。当你使用 Site Recovery 在两个本地数据中心之间复制 Hyper-V 虚拟机时，你可以通过存储映射来充分利用存储空间。\n\n阅读本文后，可在 [Azure 恢复服务论坛](https://social.msdn.microsoft.com/Forums/zh-CN/home?forum=hypervrecovmgr)上发布任何问题。\n\n## 概述\n\n如下所示，仅当你需要使用 Hyper-V 副本或 SAN 复制将 VMM 云中的 Hyper-V 虚拟机从主数据中心复制到辅助数据中心时，才需要使用存储映射：\n\n\n- **使用 Hyper-V 副本进行本地到本地复制** - 设置存储映射时，你可以在源和目标 VMM 服务器上映射存储分类，以实现以下功能：\n\n    - **标识副本虚拟机的目标存储** - 虚拟机将复制到选择的存储目标（SMB 共享或群集共享卷 (CSV)）。\n    - **放置副本虚拟机** - 使用存储映射能以最佳方式在 Hyper-V 主机服务器上放置副本虚拟机。副本虚拟机将放置在可访问映射存储分类的主机上。\n    - **无存储映射** - 如果未配置存储映射，虚拟机将复制到与副本虚拟机关联的 Hyper-V 主机服务器上指定的默认存储位置。\n\n- **使用 SAN 进行本地到本地复制** - 设置存储映射时，你可以在源和目标 VMM 服务器上映射存储阵列池。\n    - **指定池** - 指定哪个辅助存储池要从主池接收复制数据。\n    - **标识目标存储池** - 确保将源复制组中的 LUN 复制到所选的映射目标存储池。\n\n## 针对 Hyper-V 复制设置存储分类\n\n当你使用 Hyper-V 副本通过 Site Recovery 进行复制时，可以在源和目标 VMM 服务器上的存储分类之间映射；如果两个站点由同一个 VMM 服务器管理，则可以在单个 VMM 服务器上映射。请注意：\n\n- 在正确配置映射并启用复制后，位于主位置的虚拟机的虚拟硬盘将复制到位于映射目标位置的存储。\n- 存储分类必须可供源和目标云中的主机组使用。\n- 分类不需要具有相同类型的存储。例如，你可以将包含 SMB 共享的源分类映射到包含 CSV 的目标分类。\n- 有关详细信息，请阅读[如何在 VMM 中创建存储分类](https://technet.microsoft.com/zh-cn/library/gg610685.aspx)。\n\n## 示例\n\n如果已在 VMM 中正确配置分类，则当你在执行存储映射期间选择源和目标 VMM 服务器时，将显示源和目标分类。下面是在北京和上海具有两个位置的组织的存储文件共享与分类示例。\n\n**位置** | **VMM 服务器** | **文件共享（源）** | **分类（源）** | **映射到** | **文件共享（目标）**\n---|---|--- |---|---|---\n北京 | VMM_Source| SourceShare1 | GOLD | GOLD_TARGET | TargetShare1\n | | SourceShare2 | SILVER | SILVER_TARGET | TargetShare2\n | | SourceShare3 | BRONZE | BRONZE_TARGET | TargetShare3\n上海 | VMM_Target | | GOLD_TARGET | 未映射 |\n| | | SILVER_TARGET | 未映射 |\n | | | BRONZE_TARGET | 未映射\n\n可以在 Site Recovery 门户的“资源”页中的“服务器存储”选项卡上配置这些设置。\n\n![配置存储映射](./media/site-recovery-storage-mapping/StorageMapping1.png)\n\n对于此示例：\n- 在为 GOLD 存储 (SourceShare1) 上的任一虚拟机创建副本虚拟机后，该副本虚拟机将复制到 GOLD_TARGET 存储 (TargetShare1)。\n- 在为 SILVER 存储 (SourceShare2) 上的任一虚拟机创建副本虚拟机后，该副本虚拟机将复制到 SILVER_TARGET 存储 (TargetShare2) 存储。依此类推。\n\n下一屏幕截图显示了 VMM 中的实际文件共享及其分配的分类。\n\n![VMM 中的存储分类](./media/site-recovery-storage-mapping/StorageMapping2.png)\n\n## 多个存储位置\n\n如果将目标分类分配到了多个 SMB 共享或 CSV，则在保护虚拟机时，将自动选择最佳存储位置。如果指定的分类没有合适的目标存储，则使用 Hyper-V 主机上指定的默认存储来放置副本虚拟硬盘。\n\n下表显示了本示例中的存储分类和群集共享卷是如何设置的。\n\n**位置** | **分类** | **关联的存储**\n---|---|---\n北京 | GOLD | <p>C:\\ClusterStorage\\SourceVolume1</p><p>\\FileServer\\SourceShare1</p>\n | SILVER | <p>C:\\ClusterStorage\\SourceVolume2</p><p>\\FileServer\\SourceShare2</p>\n上海 | GOLD_TARGET | <p>C:\\ClusterStorage\\TargetVolume1</p><p>\\FileServer\\TargetShare1</p>\n | SILVER_TARGET| <p>C:\\ClusterStorage\\TargetVolume2</p><p>\\FileServer\\TargetShare2</p>\n\n下表汇总了当你在此示例环境中为虚拟机 (VM1 - VM5) 启用保护时的行为。\n\n**虚拟机** | **源存储** | **源分类** | **映射的目标存储**\n---|---|---|---\nVM1 | C:\\ClusterStorage\\SourceVolume1 | GOLD | <p>C:\\ClusterStorage\\SourceVolume1</p><p>\\\\FileServer\\SourceShare1</p><p>两个 GOLD_TARGET</p>\nVM2 | \\FileServer\\SourceShare1 | GOLD | <p>C:\\ClusterStorage\\SourceVolume1</p><p>\\FileServer\\SourceShare1</p> <p>两个 GOLD_TARGET</p>\nVM3 | C:\\ClusterStorage\\SourceVolume2 | SILVER | <p>C:\\ClusterStorage\\SourceVolume2</p><p>\\FileServer\\SourceShare2</p>\nVM4 | \\FileServer\\SourceShare2 | SILVER |<p>C:\\ClusterStorage\\SourceVolume2</p><p>\\FileServer\\SourceShare2</p><p>两个 SILVER_TARGET</p>\nVM5 | C:\\ClusterStorage\\SourceVolume3 | 不适用 | 无映射，因此将使用 Hyper-V 主机的默认存储位置\n\n## 后续步骤\n\n现在，你已经对存储映射有了更好的了解，因此可以[准备部署 Azure Site Recovery](/documentation/articles/site-recovery-best-practices) 了。\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

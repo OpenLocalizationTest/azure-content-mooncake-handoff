@@ -1,0 +1,467 @@
+{
+  "nodes": [
+    {
+      "content": "EntLib 重试连接到 SQL 数据库 | Azure",
+      "pos": [
+        28,
+        56
+      ]
+    },
+    {
+      "content": "Enterprise Library 旨在简化云服务的客户端程序的多个任务，包括集成暂时性故障的重试逻辑。",
+      "pos": [
+        75,
+        128
+      ]
+    },
+    {
+      "content": "代码示例：Enterprise Library 6 中用于连接到 SQL 数据库的 C&amp;#x23; 重试逻辑",
+      "pos": [
+        348,
+        402
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        407,
+        423
+      ]
+    },
+    {
+      "content": "PHP",
+      "pos": [
+        427,
+        430
+      ]
+    },
+    {
+      "content": "C",
+      "pos": [
+        499,
+        500
+      ]
+    },
+    {
+      "content": "C# EntLib6",
+      "pos": [
+        573,
+        583
+      ]
+    },
+    {
+      "content": "本主题提供了一个用于演示 Enterprise Library (EntLib) 的完整代码示例。EntLib 简化了与云服务（如 Azure SQL 数据库）进行交互的客户端程序的许多任务。我们的示例重点介绍包括暂时性故障的重试逻辑在内的重要任务。",
+      "pos": [
+        661,
+        786
+      ]
+    },
+    {
+      "content": "EntLib 类旨在区分两种类别的运行时错误：",
+      "pos": [
+        789,
+        812
+      ]
+    },
+    {
+      "content": "永远不会自行更正的错误，如拼写错误的服务器名称。",
+      "pos": [
+        816,
+        840
+      ]
+    },
+    {
+      "content": "暂时性故障，例如，在 Azure 系统进行负载平衡的情况下，服务器在接受新连接时暂停了几秒钟。",
+      "pos": [
+        843,
+        890
+      ]
+    },
+    {
+      "content": "Enterprise Library 6 (EntLib60) 是最新版本，并已于 2013 年 4 月发布。",
+      "pos": [
+        893,
+        948
+      ]
+    },
+    {
+      "content": "Microsoft 已向公众发布源代码。",
+      "pos": [
+        952,
+        972
+      ]
+    },
+    {
+      "content": "Microsoft 没有进一步维护源代码的计划。",
+      "pos": [
+        975,
+        999
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        1005,
+        1009
+      ]
+    },
+    {
+      "content": ".NET Framework 4.0 或更高版本",
+      "pos": [
+        1017,
+        1041
+      ]
+    },
+    {
+      "content": "必须安装 Microsoft.NET Framework 4.0 或更高版本。在撰写本文时版本 4.6 可用，建议使用最新版本。",
+      "pos": [
+        1044,
+        1108
+      ]
+    },
+    {
+      "content": "Visual Studio Community 版本是免费的",
+      "pos": [
+        1116,
+        1146
+      ]
+    },
+    {
+      "pos": [
+        1149,
+        1286
+      ],
+      "content": "你需要有方法编译此示例中的源代码。一种方法是安装<bpt id=\"p1\">[</bpt>免费的 Microsoft Visual Studio <bpt id=\"p2\">*</bpt>Community<ept id=\"p2\">*</ept> 版本<ept id=\"p1\">](http://www.visualstudio.com/products/free-developer-offers-vs.aspx)</ept>。"
+    },
+    {
+      "content": "你可能需要向 MSDN 注册你的电子邮件地址。步骤与下面类似：",
+      "pos": [
+        1289,
+        1320
+      ]
+    },
+    {
+      "pos": [
+        1326,
+        1363
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>转到 MSDN<ept id=\"p1\">](http://msdn.microsoft.com)</ept>。"
+    },
+    {
+      "content": "单击顶部附近的“MSDN 订阅”。",
+      "pos": [
+        1367,
+        1384
+      ]
+    },
+    {
+      "content": "单击“立即注册”。",
+      "pos": [
+        1388,
+        1397
+      ]
+    },
+    {
+      "content": "在表单中填写你的信息。",
+      "pos": [
+        1401,
+        1412
+      ]
+    },
+    {
+      "content": "单击底部的“创建帐户”。",
+      "pos": [
+        1416,
+        1428
+      ]
+    },
+    {
+      "content": "Enterprise Library 6 (EntLib60)",
+      "pos": [
+        1436,
+        1467
+      ]
+    },
+    {
+      "content": "可以安装 EntLib60 的方式：",
+      "pos": [
+        1470,
+        1488
+      ]
+    },
+    {
+      "pos": [
+        1493,
+        1528
+      ],
+      "content": "使用 Visual Studio 中的 <bpt id=\"p1\">*</bpt>NuGet<ept id=\"p1\">*</ept> 包管理器功能："
+    },
+    {
+      "pos": [
+        1532,
+        1567
+      ],
+      "content": "在 NuGet 中，搜索 <bpt id=\"p1\">**</bpt>enterpriselibrary<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        1572,
+        1766
+      ],
+      "content": "在“<bpt id=\"p1\">[</bpt>EntLib60 的家庭文档主题<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/dn169621.aspx)</ept>”中，找到标记为“下载”的行，然后单击 <bpt id=\"p2\">[</bpt>Microsoft Enterprise Library 6<ept id=\"p2\">](http://go.microsoft.com/fwlink/?linkid=290898)</ept>，以下载该二进制 .DLL 程序集文件。"
+    },
+    {
+      "pos": [
+        1769,
+        1883
+      ],
+      "content": "EntLib60 包含若干个 .DLL 程序集文件，这些文件的名称均以相同的前缀 <bpt id=\"p1\">**</bpt>Microsoft.Practices.EnterpriseLibrary.&amp;#x2a;.dll<ept id=\"p1\">**</ept> 开头，但此代码示例仅关注以下两个程序集："
+    },
+    {
+      "pos": [
+        1887,
+        1955
+      ],
+      "content": "Microsoft.Practices.EnterpriseLibrary.<bpt id=\"p1\">**</bpt>TransientFaultHandling<ept id=\"p1\">**</ept>.dll"
+    },
+    {
+      "pos": [
+        1958,
+        2031
+      ],
+      "content": "Microsoft.Practices.EnterpriseLibrary.<bpt id=\"p1\">**</bpt>TransientFaultHandling.Data<ept id=\"p1\">**</ept>.dll"
+    },
+    {
+      "content": "EntLib 类如何组合在一起",
+      "pos": [
+        2037,
+        2052
+      ]
+    },
+    {
+      "content": "EntLib 类用于构造其他 EntLib 类。在此代码示例中，构造和使用顺序如下面所列出：",
+      "pos": [
+        2055,
+        2101
+      ]
+    },
+    {
+      "pos": [
+        2107,
+        2136
+      ],
+      "content": "构造 <bpt id=\"p1\">**</bpt>ExponentialBackoff<ept id=\"p1\">**</ept> 对象。"
+    },
+    {
+      "pos": [
+        2140,
+        2193
+      ],
+      "content": "构造 <bpt id=\"p1\">**</bpt>SqlDatabaseTransientErrorDetectionStrategy<ept id=\"p1\">**</ept> 对象。"
+    },
+    {
+      "pos": [
+        2197,
+        2226
+      ],
+      "content": "构造 <bpt id=\"p1\">**</bpt>RetryPolicy<ept id=\"p1\">**</ept> 对象。输入参数包括："
+    },
+    {
+      "pos": [
+        2230,
+        2256
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>ExponentialBackoff<ept id=\"p1\">**</ept> 对象。"
+    },
+    {
+      "pos": [
+        2260,
+        2310
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>SqlDatabaseTransientErrorDetectionStrategy<ept id=\"p1\">**</ept> 对象。"
+    },
+    {
+      "pos": [
+        2314,
+        2353
+      ],
+      "content": "构造 <bpt id=\"p1\">**</bpt>ReliableSqlConnection<ept id=\"p1\">**</ept> 对象。输入参数包括："
+    },
+    {
+      "pos": [
+        2357,
+        2391
+      ],
+      "content": "一个 <bpt id=\"p1\">**</bpt>String<ept id=\"p1\">**</ept> 对象 - 包含服务器名称和其他连接信息。"
+    },
+    {
+      "pos": [
+        2395,
+        2414
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>RetryPolicy<ept id=\"p1\">**</ept> 对象。"
+    },
+    {
+      "pos": [
+        2418,
+        2462
+      ],
+      "content": "调用以通过 <bpt id=\"p1\">**</bpt>RetryPolicy .ExecuteAction<ept id=\"p1\">**</ept> 方法进行连接。"
+    },
+    {
+      "pos": [
+        2466,
+        2513
+      ],
+      "content": "调用 <bpt id=\"p1\">**</bpt>ReliableSqlConnection .CreateCommand<ept id=\"p1\">**</ept> 方法。"
+    },
+    {
+      "pos": [
+        2517,
+        2577
+      ],
+      "content": "返回 <bpt id=\"p1\">**</bpt>System.SqlClient.Data.DbCommand<ept id=\"p1\">**</ept> 对象，该对象是 ADO.NET 的一部分。"
+    },
+    {
+      "pos": [
+        2581,
+        2625
+      ],
+      "content": "调用以通过 <bpt id=\"p1\">**</bpt>RetryPolicy .ExecuteAction<ept id=\"p1\">**</ept> 方法进行查询。"
+    },
+    {
+      "content": "编译并运行代码示例",
+      "pos": [
+        2631,
+        2640
+      ]
+    },
+    {
+      "content": "Program.cs 源代码示例将在本主题后面部分提供。可以使用以下步骤编译和运行该示例：",
+      "pos": [
+        2643,
+        2688
+      ]
+    },
+    {
+      "content": "在 Visual Studio 中，通过 C# 控制台应用程序模板创建一个新项目。",
+      "pos": [
+        2694,
+        2735
+      ]
+    },
+    {
+      "content": "在“解决方案资源管理器”窗格中，通过将初始内容替换为本主题后面提供的 Program.cs 代码来编辑几乎是空的 Program.cs 文件。",
+      "pos": [
+        2740,
+        2811
+      ]
+    },
+    {
+      "content": "使用 Visual Studio 中的“生成”&gt;“生成解决方案”菜单编译你的项目。",
+      "pos": [
+        2816,
+        2857
+      ]
+    },
+    {
+      "content": "在 cmd.exe 命令窗口中，按如下所示运行程序。图中还显示了运行后的实际输出：",
+      "pos": [
+        2862,
+        2903
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        3236,
+        3242
+      ]
+    },
+    {
+      "content": "Program.cs 源代码",
+      "pos": [
+        3248,
+        3262
+      ]
+    },
+    {
+      "content": "下面的 Program.cs 文件中包含此 EntLib 示例的所有源代码。",
+      "pos": [
+        3265,
+        3303
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        9442,
+        9448
+      ]
+    },
+    {
+      "content": "相关链接",
+      "pos": [
+        9454,
+        9458
+      ]
+    },
+    {
+      "pos": [
+        9463,
+        9572
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Enterprise Library 6 – 2013 年 4 月<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/dn169621.aspx)</ept>中提供了大量链接来帮助你了解更多信息。"
+    },
+    {
+      "pos": [
+        9576,
+        9665
+      ],
+      "content": "如果你想要查看源代码，本主题顶部的按钮提供了<bpt id=\"p1\">[</bpt>下载 EntLib60 源代码<ept id=\"p1\">](http://go.microsoft.com/fwlink/p/?LinkID=290898)</ept>。"
+    },
+    {
+      "content": "Microsoft 提供的 .PDF 格式的免费电子书：",
+      "pos": [
+        9670,
+        9698
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">[</bpt>Microsoft Enterprise Library 版本 2 开发人员指南<ept id=\"p1\">](http://www.microsoft.com/zh-cn/download/details.aspx?id=41145)</ept>。",
+      "pos": [
+        9699,
+        9805
+      ]
+    },
+    {
+      "content": "Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling 命名空间",
+      "pos": [
+        9811,
+        9876
+      ]
+    },
+    {
+      "content": "Enterprise Library 6 类库参考",
+      "pos": [
+        9990,
+        10015
+      ]
+    },
+    {
+      "content": "代码示例：使用 ADO.NET 连接到 SQL 数据库的 C# 重试逻辑",
+      "pos": [
+        10077,
+        10113
+      ]
+    },
+    {
+      "content": "SQL 数据库的客户端快速入门代码示例",
+      "pos": [
+        10187,
+        10206
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"EntLib 重试连接到 SQL 数据库 | Azure\"\n    description=\"Enterprise Library 旨在简化云服务的客户端程序的多个任务，包括集成暂时性故障的重试逻辑。\"\n    services=\"sql-database\"\n    documentationCenter=\"\"\n    authors=\"MightyPen\"\n    manager=\"jeffreyg\"\n    editor=\"\" />\n\n\n<tags \n    ms.service=\"sql-database\" \n    ms.date=\"12/17/2015\" \n    wacn.date=\"01/15/2016\"/>\n\n\n# 代码示例：Enterprise Library 6 中用于连接到 SQL 数据库的 C&#x23; 重试逻辑\n\n\n> [AZURE.SELECTOR]\n- [PHP](/documentation/articles/sql-database-develop-php-retry-windows)\n- [C#](/documentation/articles/sql-database-develop-csharp-retry-windows)\n- [C# EntLib6](/documentation/articles/sql-database-develop-entlib-csharp-retry-windows)\n\n\n本主题提供了一个用于演示 Enterprise Library (EntLib) 的完整代码示例。EntLib 简化了与云服务（如 Azure SQL 数据库）进行交互的客户端程序的许多任务。我们的示例重点介绍包括暂时性故障的重试逻辑在内的重要任务。\n\n\nEntLib 类旨在区分两种类别的运行时错误：\n\n- 永远不会自行更正的错误，如拼写错误的服务器名称。\n- 暂时性故障，例如，在 Azure 系统进行负载平衡的情况下，服务器在接受新连接时暂停了几秒钟。\n\n\nEnterprise Library 6 (EntLib60) 是最新版本，并已于 2013 年 4 月发布。\n\n- Microsoft 已向公众发布源代码。\n- Microsoft 没有进一步维护源代码的计划。\n\n\n## 先决条件\n\n\n#### .NET Framework 4.0 或更高版本\n\n\n必须安装 Microsoft.NET Framework 4.0 或更高版本。在撰写本文时版本 4.6 可用，建议使用最新版本。\n\n\n#### Visual Studio Community 版本是免费的\n\n\n你需要有方法编译此示例中的源代码。一种方法是安装[免费的 Microsoft Visual Studio *Community* 版本](http://www.visualstudio.com/products/free-developer-offers-vs.aspx)。\n\n\n你可能需要向 MSDN 注册你的电子邮件地址。步骤与下面类似：\n\n\n1. [转到 MSDN](http://msdn.microsoft.com)。\n2. 单击顶部附近的“MSDN 订阅”。\n3. 单击“立即注册”。\n4. 在表单中填写你的信息。\n5. 单击底部的“创建帐户”。\n\n\n#### Enterprise Library 6 (EntLib60)\n\n\n可以安装 EntLib60 的方式：\n\n\n- 使用 Visual Studio 中的 *NuGet* 包管理器功能：\n - 在 NuGet 中，搜索 **enterpriselibrary**。\n\n\n- 在“[EntLib60 的家庭文档主题](http://msdn.microsoft.com/zh-cn/library/dn169621.aspx)”中，找到标记为“下载”的行，然后单击 [Microsoft Enterprise Library 6](http://go.microsoft.com/fwlink/?linkid=290898)，以下载该二进制 .DLL 程序集文件。\n\n\nEntLib60 包含若干个 .DLL 程序集文件，这些文件的名称均以相同的前缀 **Microsoft.Practices.EnterpriseLibrary.&#x2a;.dll** 开头，但此代码示例仅关注以下两个程序集：\n\n- Microsoft.Practices.EnterpriseLibrary.**TransientFaultHandling**.dll\n- Microsoft.Practices.EnterpriseLibrary.**TransientFaultHandling.Data**.dll\n\n\n## EntLib 类如何组合在一起\n\n\nEntLib 类用于构造其他 EntLib 类。在此代码示例中，构造和使用顺序如下面所列出：\n\n\n1. 构造 **ExponentialBackoff** 对象。\n2. 构造 **SqlDatabaseTransientErrorDetectionStrategy** 对象。\n3. 构造 **RetryPolicy** 对象。输入参数包括：\n - **ExponentialBackoff** 对象。\n - **SqlDatabaseTransientErrorDetectionStrategy** 对象。\n4. 构造 **ReliableSqlConnection** 对象。输入参数包括：\n - 一个 **String** 对象 - 包含服务器名称和其他连接信息。\n - **RetryPolicy** 对象。\n5. 调用以通过 **RetryPolicy .ExecuteAction** 方法进行连接。\n6. 调用 **ReliableSqlConnection .CreateCommand** 方法。\n - 返回 **System.SqlClient.Data.DbCommand** 对象，该对象是 ADO.NET 的一部分。\n7. 调用以通过 **RetryPolicy .ExecuteAction** 方法进行查询。\n\n\n## 编译并运行代码示例\n\n\nProgram.cs 源代码示例将在本主题后面部分提供。可以使用以下步骤编译和运行该示例：\n\n\n1. 在 Visual Studio 中，通过 C# 控制台应用程序模板创建一个新项目。\n\n2. 在“解决方案资源管理器”窗格中，通过将初始内容替换为本主题后面提供的 Program.cs 代码来编辑几乎是空的 Program.cs 文件。\n\n3. 使用 Visual Studio 中的“生成”>“生成解决方案”菜单编译你的项目。\n\n4. 在 cmd.exe 命令窗口中，按如下所示运行程序。图中还显示了运行后的实际输出：\n \n    \n        [C:\\MyVS\\EntLib60Retry\\EntLib60Retry\\bin\\Debug]\n        >> EntLib60Retry.exe\n        \n        database_firewall_rules_table   245575913\n        filestream_tombstone_2073058421 2073058421\n        filetable_updates_2105058535    2105058535\n        \n        [C:\\MyVS\\EntLib60Retry\\EntLib60Retry\\bin\\Debug]\n        >>\n\n\n\n&nbsp;\n\n\n## Program.cs 源代码\n\n\n下面的 Program.cs 文件中包含此 EntLib 示例的所有源代码。\n\n     \n    using     System;   // C#\n    using G = System.Collections.Generic;\n    using D = System.Data;\n    using C = System.Data.SqlClient;\n    using X = System.Text;\n    using H = System.Threading;\n    using Y = Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling;\n    \n    namespace EntLib60Retry\n    {\n       class Program\n       {\n          static void Main(string[] args)\n          {\n             Program program = new Program();\n    \n             if (program.Run(args) == false)\n             {\n                Console.WriteLine(\"Something was unable to complete.  :-( \");\n             }\n          }\n    \n          bool Run(string[] _args)\n          {\n             int retryIntervalSeconds = 10;\n             bool returnBool = false;\n    \n             this.InitializeEntLibObjects();\n    \n             for (int tries = 1; tries <= 3; tries++)\n             {\n                if (tries > 1)\n                {\n                   H.Thread.Sleep(1000 * retryIntervalSeconds);\n                   retryIntervalSeconds = Convert.ToInt32(retryIntervalSeconds * 1.5);\n                }\n    \n                try\n                {\n                   this.reliableSqlConnection = new Y.ReliableSqlConnection(\n                      this.sqlConnectionSB.ToString(),\n                      this.retryPolicy, null\n                      );\n                   this.retryPolicy.ExecuteAction(this.OpenTheConnection_action);  // Open the connection.\n    \n                   this.dbCommand = this.reliableSqlConnection.CreateCommand();\n                   this.dbCommand.CommandText = @\"SELECT TOP 3 ob.name, CAST(ob.object_id as nvarchar(32)) as [object_id] FROM sys.objects as ob WHERE ob.type='IT' ORDER BY ob.name;\";\n    \n                   // We retry connection .Open after transient faults, but\n                   // we do not retry commands that use the connection.\n                   this.IssueTheQuery();  // Run the query, loop through results.\n    \n                   returnBool = true;\n                   break;\n                }\n    \n                catch (C.SqlException sqlExc)\n                {\n                   if (false == this.sqlDatabaseTransientErrorDetectionStrategy.IsTransient(sqlExc))\n                   {\n                      throw sqlExc;\n                   }\n                }\n             }\n             return returnBool;\n          }\n    \n          void OpenTheConnection()  // Called by .ExecuteAction.\n          {\n             this.reliableSqlConnection.Open();\n          }\n    \n          void IssueTheQuery()      // Called by .ExecuteAction.\n          {\n             X.StringBuilder sBuilder = new X.StringBuilder(256);\n    \n             this.dataReader = this.dbCommand.ExecuteReader();\n    \n             while (this.dataReader.Read())\n             {\n                sBuilder.Length = 0;\n                sBuilder.Append(this.dataReader.GetString(0));\n                sBuilder.Append(\"\\t\");\n                sBuilder.Append(this.dataReader.GetString(1));\n    \n                Console.WriteLine(sBuilder.ToString());\n             }\n          }\n    \n          void InitializeEntLibObjects()\n          {\n             this.InitializeSqlConnectionStringBuilder();\n    \n             this.exponentialBackoff = new Y.ExponentialBackoff(\n                \"exponentialBackoff\",\n                 3,                    // Maximum number of times to retry, then let exception bubble up.\n                 TimeSpan.FromMilliseconds(10000), // Minimum interval between retries.\n                 TimeSpan.FromMilliseconds(30000), // Maximum interval between retries.\n                 TimeSpan.FromMilliseconds( 2000)  // For random differences in interval between retries.\n                );\n             this.sqlDatabaseTransientErrorDetectionStrategy =\n                new Y.SqlDatabaseTransientErrorDetectionStrategy();\n             this.retryPolicy = new Y.RetryPolicy(\n                   this.sqlDatabaseTransientErrorDetectionStrategy,\n                   this.exponentialBackoff\n                   );\n             this.OpenTheConnection_action = delegate() { this.OpenTheConnection(); };\n          }\n    \n          void InitializeSqlConnectionStringBuilder()\n          {\n             // Prepare the connection string to Azure SQL Database.\n             this.sqlConnectionSB = new C.SqlConnectionStringBuilder();\n    \n             // Change these values to your values.\n             this.sqlConnectionSB[\"Server\"] = \"tcp:myazuresqldbserver.database.chinacloudapi.cn,1433\";\n             this.sqlConnectionSB[\"User ID\"] = \"MyLogin\";  // \"@yourservername\"  as suffix sometimes.\n             this.sqlConnectionSB[\"Password\"] = \"MyPassword\";\n             this.sqlConnectionSB[\"Database\"] = \"MyDatabase\";\n    \n             // Leave these values as they are.\n             this.sqlConnectionSB[\"Trusted_Connection\"] = false;\n             this.sqlConnectionSB[\"Integrated Security\"] = false;\n             this.sqlConnectionSB[\"Encrypt\"] = true;\n             this.sqlConnectionSB[\"Connection Timeout\"] = 30;\n          }\n    \n          Program()   // Constructor.\n          {\n             int[] arrayOfTransientErrorNumbers =\n                    { 4060, 10928, 10929, 40197, 40501, 40613, 49918, 49919, 49920\n                        //,11001   // 11001 for testing, pretend network error is transient.\n                        //,18456   // 18456 for testing, purposely misspell database name.\n                    };\n             listTransientErrorNumbers = new G.List<int>(arrayOfTransientErrorNumbers);\n          }\n    \n          // Fields.\n          private G.List<int> listTransientErrorNumbers;\n    \n          private Y.ReliableSqlConnection reliableSqlConnection;\n          private Y.ExponentialBackoff exponentialBackoff;\n          private Y.SqlDatabaseTransientErrorDetectionStrategy\n                       sqlDatabaseTransientErrorDetectionStrategy;\n          private Y.RetryPolicy retryPolicy;\n    \n          private Action OpenTheConnection_action;\n    \n          private C.SqlConnectionStringBuilder sqlConnectionSB;\n          private D.IDbCommand dbCommand;\n          private D.IDataReader dataReader;\n       }\n    }\n\n\n\n&nbsp;\n\n\n## 相关链接\n\n\n- [Enterprise Library 6 – 2013 年 4 月](http://msdn.microsoft.com/zh-cn/library/dn169621.aspx)中提供了大量链接来帮助你了解更多信息。\n - 如果你想要查看源代码，本主题顶部的按钮提供了[下载 EntLib60 源代码](http://go.microsoft.com/fwlink/p/?LinkID=290898)。\n\n\n- Microsoft 提供的 .PDF 格式的免费电子书：\n[Microsoft Enterprise Library 版本 2 开发人员指南](http://www.microsoft.com/zh-cn/download/details.aspx?id=41145)。\n\n\n- [Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling 命名空间](http://msdn.microsoft.com/zh-cn/library/microsoft.practices.enterpriselibrary.transientfaulthandling.aspx)\n\n\n- [Enterprise Library 6 类库参考](http://msdn.microsoft.com/zh-cn/library/dn170426.aspx)\n\n\n- [代码示例：使用 ADO.NET 连接到 SQL 数据库的 C# 重试逻辑](/documentation/articles/sql-database-develop-csharp-retry-windows)\n\n\n- [SQL 数据库的客户端快速入门代码示例](/documentation/articles/sql-database-develop-quick-start-client-code-samples)\n\n<!---HONumber=Mooncake_0104_2016-->\n"
+}

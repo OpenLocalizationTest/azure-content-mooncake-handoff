@@ -1,0 +1,348 @@
+{
+  "nodes": [
+    {
+      "content": "将数据载入 SQL 数据仓库 | Azure",
+      "pos": [
+        29,
+        51
+      ]
+    },
+    {
+      "content": "了解有关在 SQL 数据仓库中加载数据的常见方案",
+      "pos": [
+        69,
+        93
+      ]
+    },
+    {
+      "content": "将数据载入 SQL 数据仓库",
+      "pos": [
+        325,
+        339
+      ]
+    },
+    {
+      "content": "SQL 数据仓库提供许多选项用于加载数据，包括：",
+      "pos": [
+        340,
+        364
+      ]
+    },
+    {
+      "content": "PolyBase",
+      "pos": [
+        368,
+        376
+      ]
+    },
+    {
+      "content": "Azure 数据工厂",
+      "pos": [
+        379,
+        389
+      ]
+    },
+    {
+      "content": "BCP 命令行实用程序",
+      "pos": [
+        392,
+        403
+      ]
+    },
+    {
+      "content": "SQL Server 集成服务 (SSIS)",
+      "pos": [
+        406,
+        428
+      ]
+    },
+    {
+      "content": "第三方数据加载工具",
+      "pos": [
+        431,
+        440
+      ]
+    },
+    {
+      "pos": [
+        442,
+        617
+      ],
+      "content": "尽管上述所有方法可以配合 SQL 数据仓库使用，但 PolyBase 能够以透明方式并行处理 Azure Blob 存储的负载，这使它成为加载数据最快的工具。查看有关<bpt id=\"p1\">[</bpt>使用 PolyBase 加载数据<ept id=\"p1\">][]</ept>的更多信息。此外，由于许多用户都在寻求从本地源初始加载数百 GB 到数十 TB 的数据，因此在以下部分中，我们将针对初始数据的加载提供一些指导。"
+    },
+    {
+      "content": "从 SQL Server 初始加载到 SQL 数据仓库",
+      "pos": [
+        622,
+        649
+      ]
+    },
+    {
+      "content": "从本地 SQL Server 实例加载到 SQL 数据仓库时，建议采用以下步骤：",
+      "pos": [
+        651,
+        691
+      ]
+    },
+    {
+      "pos": [
+        696,
+        723
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>BCP<ept id=\"p1\">**</ept> SQL Server 数据转为平面文件"
+    },
+    {
+      "pos": [
+        728,
+        774
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>AZCopy<ept id=\"p1\">**</ept> 或<bpt id=\"p2\">**</bpt>导入/导出<ept id=\"p2\">**</ept>（适用于大型数据集）将文件转移到 Azure"
+    },
+    {
+      "content": "将 PolyBase 配置为从你的存储帐户读取你的文件",
+      "pos": [
+        778,
+        805
+      ]
+    },
+    {
+      "pos": [
+        809,
+        834
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>PolyBase<ept id=\"p1\">**</ept> 创建新表并加载数据"
+    },
+    {
+      "content": "在以下部分中，我们将深入探讨每个步骤并提供过程示例。",
+      "pos": [
+        836,
+        862
+      ]
+    },
+    {
+      "pos": [
+        866,
+        936
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>从 SQL Server 等系统移动数据之前，建议参阅文档 Web 应用上的<bpt id=\"p1\">[</bpt>迁移架构<ept id=\"p1\">][]</ept>和<bpt id=\"p2\">[</bpt>迁移代码<ept id=\"p2\">][]</ept>文章。"
+    },
+    {
+      "content": "使用 BCP 导出文件",
+      "pos": [
+        941,
+        952
+      ]
+    },
+    {
+      "pos": [
+        954,
+        1076
+      ],
+      "content": "若要准备将文件转移到 Azure，必须将它们导出到平面文件。最佳做法是使用 BCP 命令行实用程序。如果你还没有此实用程序，可以与<bpt id=\"p1\">[</bpt>适用于 SQL Server 的 Microsoft 命令行实用程序<ept id=\"p1\">][]</ept>一起下载。示例 BCP 命令如下所示："
+    },
+    {
+      "content": "此命令将获取查询的结果，并将它们导出到所选目录中的文件。可以通过一次对不同的表运行多个 BCP 命令，来并行处理该过程。这样可让你对服务器的每个核心最多运行一个 BCP 进程。我们建议以不同的配置尝试几个较小的操作，以确定哪种配置最适合你的环境。",
+      "pos": [
+        1153,
+        1276
+      ]
+    },
+    {
+      "content": "此外，在使用 PolyBase 加载时，请注意，PolyBase 尚不支持 UTF-16，所有文件必须采用 UTF-8。可以轻松地完成此操作，方法是在 BCP 命令中包含“-c”标志，或者，可以使用以下代码将平面文件从 UTF-16 转换为 UTF-8：",
+      "pos": [
+        1278,
+        1405
+      ]
+    },
+    {
+      "content": "成功将数据导出到文件后，可以开始将它们移到 Azure。完成此操作的方法是使用 AZCopy 或使用导入/导出服务，如以下部分所述。",
+      "pos": [
+        1513,
+        1579
+      ]
+    },
+    {
+      "content": "使用 AZCopy 或导入/导出加载到 Azure",
+      "pos": [
+        1584,
+        1609
+      ]
+    },
+    {
+      "pos": [
+        1610,
+        1750
+      ],
+      "content": "如果要移动 5-10 TB 范围或以上的数据，建议使用我们的磁盘传送服务<bpt id=\"p1\">[</bpt>导入/导出<ept id=\"p1\">][]</ept>来完成移动。但是，在我们的研究中，我们已经能够使用公共 Internet 配合 AZCopy，轻松地移动单个数字 TB 范围中的数据。此过程还可以加速或通过 ExpressRoute 扩展。"
+    },
+    {
+      "pos": [
+        1752,
+        1874
+      ],
+      "content": "以下步骤详细说明如何使用 AZCopy 将数据从本地移入 Azure 存储帐户。如果你在同一区域没有 Azure 存储帐户，可以遵循 <bpt id=\"p1\">[</bpt>Azure 存储空间文档<ept id=\"p1\">][]</ept>创建一个。还可以从不同区域中的存储帐户加载数据，但在此情况下，性能不是最佳的。"
+    },
+    {
+      "pos": [
+        1878,
+        1965
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>本文档假设你已安装的 AZCopy 命令行实用程序，而且能够使用 Powershell 运行它。如果不是这样，请遵循 <bpt id=\"p1\">[</bpt>AZCopy 安装说明<ept id=\"p1\">][]</ept>。"
+    },
+    {
+      "content": "现在，已提供一组使用 BCP 创建的文件，因此 AzCopy 只需从 Azure powershell 或通过运行 powershell 脚本来运行。在更高的级别中，运行 AZCopy 所需的提示将采用以下格式：",
+      "pos": [
+        1967,
+        2073
+      ]
+    },
+    {
+      "content": "除了基本做法外，我们还建议采用以下最佳实践，使用 AZCopy 加载：",
+      "pos": [
+        2202,
+        2237
+      ]
+    },
+    {
+      "pos": [
+        2242,
+        2384
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>并发连接<ept id=\"p1\">**</ept>：除了增加同时运行的 AZCopy 操作数目外，还可以设置 /NC 参数来进一步并行处理 AZCopy 操作本身，这对目标打开多个并发连接。尽管此参数最高可以设置为 512，但是我们发现最佳的数据传输发生在 256，因此建议测试值的数目，以确定哪个数目最适合你的配置。"
+    },
+    {
+      "pos": [
+        2388,
+        2483
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Express Route<ept id=\"p1\">**</ept>：如上所述，如果启用 Express Route，可以加速此过程。ExpressRoute 和步骤的概述可在 <bpt id=\"p2\">[</bpt>ExpressRoute 文档<ept id=\"p2\">][]</ept>中找到。"
+    },
+    {
+      "pos": [
+        2487,
+        2608
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>文件夹结构<ept id=\"p1\">**</ept>：若要更轻松地使用 PolyBase 进行传输，请确定每个表都映射到自己的文件夹。这样，稍后使用 PolyBase 加载时，将简化步骤并将其减到最少。换言之，如果表分区成多个文件，或者即使是文件夹中的子目录，也没有任何影响。"
+    },
+    {
+      "content": "配置 PolyBase",
+      "pos": [
+        2619,
+        2630
+      ]
+    },
+    {
+      "pos": [
+        2633,
+        2775
+      ],
+      "content": "既然数据位于 Azure 存储 Blob 中，我们就可以使用 PolyBase 将它导入 SQL 数据仓库实例。以下步骤仅适用于配置，而且对于每个 SQL 数据仓库实例、用户或存储帐户，其中许多步骤只需完成一次即可。<bpt id=\"p1\">[</bpt>使用 PolyBase 加载数据<ept id=\"p1\">][]</ept>文档中也详细描述了这些步骤。"
+    },
+    {
+      "pos": [
+        2780,
+        2810
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>创建数据库主密钥。<ept id=\"p1\">**</ept> 每个数据库只需完成这项操作一次。"
+    },
+    {
+      "pos": [
+        2816,
+        2870
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>创建数据库范围的凭据。<ept id=\"p1\">**</ept> 仅当你要创建新的凭据/用户时，才需要创建此操作，否则可以使用前面创建的凭据。"
+    },
+    {
+      "pos": [
+        2875,
+        2927
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>创建外部文件格式。<ept id=\"p1\">**</ept> 外部文件格式也可以重复使用。仅当你要上载新类型的文件时，才需要创建一个格式。"
+    },
+    {
+      "pos": [
+        2932,
+        3064
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>创建外部数据源。<ept id=\"p1\">**</ept> 指向存储帐户时，如果从同一个容器加载，则你可以使用外部数据源。对于 'LOCATION' 参数，请使用以下格式的位置：'wasbs://mycontainer@ test.blob.core.chinacloudapi.cn/path'。"
+    },
+    {
+      "content": "适当配置存储帐户后，你可以继续将数据载入 SQL 数据仓库。",
+      "pos": [
+        3874,
+        3904
+      ]
+    },
+    {
+      "content": "使用 PolyBase 加载数据",
+      "pos": [
+        3909,
+        3925
+      ]
+    },
+    {
+      "content": "配置 PolyBase 后，只需创建一个外部表，指向存储中的数据，然后将该数据映射到 SQL 数据仓库内的新表，即可将数据直接载入 SQL 数据仓库。可以使用以下两个简单命令来完成此操作。",
+      "pos": [
+        3927,
+        4021
+      ]
+    },
+    {
+      "content": "使用 'CREATE EXTERNAL TABLE' 命令来定义数据结构。若要确保快速且有效地捕获数据的状态，我们建议在 SSMS 中编写 SQL Server 表的脚本，然后根据外部表的差异手动调整。在 Azure 中创建外部表之后，它将继续指向相同的位置，即使更新了数据或添加了其他数据。",
+      "pos": [
+        4026,
+        4172
+      ]
+    },
+    {
+      "content": "使用 'CREATE TABLE...AS SELECT' 语句加载数据。",
+      "pos": [
+        4502,
+        4539
+      ]
+    },
+    {
+      "content": "请注意，你还可以使用更详细的 SELECT 语句，从表加载行的子部分。但是，由于 PolyBase 目前不会将额外的计算资源推送到存储帐户，因此，如果你使用 SELECT 语句加载子部分，速度不会比加载整个数据集更快。",
+      "pos": [
+        4663,
+        4772
+      ]
+    },
+    {
+      "pos": [
+        4774,
+        4850
+      ],
+      "content": "除了 <ph id=\"ph1\">`CREATE TABLE...AS SELECT`</ph> 语句外，还可以使用 'INSERT...INTO' 语句，将数据从外部表加载到预先存在的表。"
+    },
+    {
+      "content": "基于新加载的数据创建统计信息",
+      "pos": [
+        4856,
+        4870
+      ]
+    },
+    {
+      "pos": [
+        4873,
+        5016
+      ],
+      "content": "Azure SQL 数据仓库尚不支持自动创建或自动更新统计信息。为了获得查询的最佳性能，在首次加载数据或者在数据发生重大更改之后，创建所有表的所有列统计信息非常重要。有关统计信息的详细说明，请参阅开发主题组中的<bpt id=\"p1\">[</bpt>统计信息<ept id=\"p1\">][]</ept>主题。以下快速示例说明如何基于此示例中加载的表创建统计信息。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        5175,
+        5179
+      ]
+    },
+    {
+      "pos": [
+        5180,
+        5201
+      ],
+      "content": "有关更多开发技巧，请参阅<bpt id=\"p1\">[</bpt>开发概述<ept id=\"p1\">][]</ept>。"
+    }
+  ],
+  "content": "   <properties\n   pageTitle=\"将数据载入 SQL 数据仓库 | Azure\"\n   description=\"了解有关在 SQL 数据仓库中加载数据的常见方案\"\n   services=\"sql-data-warehouse\"\n   documentationCenter=\"NA\"\n   authors=\"lodipalm\"\n   manager=\"barbkess\"\n   editor=\"jrowlandjones\"/>\n\n<tags\n   ms.service=\"sql-data-warehouse\"\n   ms.date=\"11/04/2015\"\n   wacn.date=\"01/21/2016\"/>\n\n# 将数据载入 SQL 数据仓库\nSQL 数据仓库提供许多选项用于加载数据，包括：\n\n- PolyBase\n- Azure 数据工厂\n- BCP 命令行实用程序\n- SQL Server 集成服务 (SSIS)\n- 第三方数据加载工具\n\n尽管上述所有方法可以配合 SQL 数据仓库使用，但 PolyBase 能够以透明方式并行处理 Azure Blob 存储的负载，这使它成为加载数据最快的工具。查看有关[使用 PolyBase 加载数据][]的更多信息。此外，由于许多用户都在寻求从本地源初始加载数百 GB 到数十 TB 的数据，因此在以下部分中，我们将针对初始数据的加载提供一些指导。\n\n## 从 SQL Server 初始加载到 SQL 数据仓库 \n从本地 SQL Server 实例加载到 SQL 数据仓库时，建议采用以下步骤：\n\n1. **BCP** SQL Server 数据转为平面文件 \n2. 使用 **AZCopy** 或**导入/导出**（适用于大型数据集）将文件转移到 Azure\n3. 将 PolyBase 配置为从你的存储帐户读取你的文件\n4. 使用 **PolyBase** 创建新表并加载数据\n\n在以下部分中，我们将深入探讨每个步骤并提供过程示例。\n\n> [AZURE.NOTE]从 SQL Server 等系统移动数据之前，建议参阅文档 Web 应用上的[迁移架构][]和[迁移代码][]文章。\n\n## 使用 BCP 导出文件\n\n若要准备将文件转移到 Azure，必须将它们导出到平面文件。最佳做法是使用 BCP 命令行实用程序。如果你还没有此实用程序，可以与[适用于 SQL Server 的 Microsoft 命令行实用程序][]一起下载。示例 BCP 命令如下所示：\n\n```\nbcp \"<Directory><File>\" -c -T -S <Server Name> -d <Database Name>\n```\n\n此命令将获取查询的结果，并将它们导出到所选目录中的文件。可以通过一次对不同的表运行多个 BCP 命令，来并行处理该过程。这样可让你对服务器的每个核心最多运行一个 BCP 进程。我们建议以不同的配置尝试几个较小的操作，以确定哪种配置最适合你的环境。\n\n此外，在使用 PolyBase 加载时，请注意，PolyBase 尚不支持 UTF-16，所有文件必须采用 UTF-8。可以轻松地完成此操作，方法是在 BCP 命令中包含“-c”标志，或者，可以使用以下代码将平面文件从 UTF-16 转换为 UTF-8：\n\n```\nGet-Content <input_file_name> -Encoding Unicode | Set-Content <output_file_name> -Encoding utf8\n```\n \n成功将数据导出到文件后，可以开始将它们移到 Azure。完成此操作的方法是使用 AZCopy 或使用导入/导出服务，如以下部分所述。\n\n## 使用 AZCopy 或导入/导出加载到 Azure\n如果要移动 5-10 TB 范围或以上的数据，建议使用我们的磁盘传送服务[导入/导出][]来完成移动。但是，在我们的研究中，我们已经能够使用公共 Internet 配合 AZCopy，轻松地移动单个数字 TB 范围中的数据。此过程还可以加速或通过 ExpressRoute 扩展。\n\n以下步骤详细说明如何使用 AZCopy 将数据从本地移入 Azure 存储帐户。如果你在同一区域没有 Azure 存储帐户，可以遵循 [Azure 存储空间文档][]创建一个。还可以从不同区域中的存储帐户加载数据，但在此情况下，性能不是最佳的。\n\n> [AZURE.NOTE]本文档假设你已安装的 AZCopy 命令行实用程序，而且能够使用 Powershell 运行它。如果不是这样，请遵循 [AZCopy 安装说明][]。\n\n现在，已提供一组使用 BCP 创建的文件，因此 AzCopy 只需从 Azure powershell 或通过运行 powershell 脚本来运行。在更高的级别中，运行 AZCopy 所需的提示将采用以下格式：\n\n```\nAZCopy /Source:<File Location> /Dest:<Storage Container Location> /destkey:<Storage Key> /Pattern:<File Name> /NC:256\n```\n\n除了基本做法外，我们还建议采用以下最佳实践，使用 AZCopy 加载：\n\n\n+ **并发连接**：除了增加同时运行的 AZCopy 操作数目外，还可以设置 /NC 参数来进一步并行处理 AZCopy 操作本身，这对目标打开多个并发连接。尽管此参数最高可以设置为 512，但是我们发现最佳的数据传输发生在 256，因此建议测试值的数目，以确定哪个数目最适合你的配置。\n\n+ **Express Route**：如上所述，如果启用 Express Route，可以加速此过程。ExpressRoute 和步骤的概述可在 [ExpressRoute 文档][]中找到。\n\n+ **文件夹结构**：若要更轻松地使用 PolyBase 进行传输，请确定每个表都映射到自己的文件夹。这样，稍后使用 PolyBase 加载时，将简化步骤并将其减到最少。换言之，如果表分区成多个文件，或者即使是文件夹中的子目录，也没有任何影响。\n     \n\n## 配置 PolyBase \n\n既然数据位于 Azure 存储 Blob 中，我们就可以使用 PolyBase 将它导入 SQL 数据仓库实例。以下步骤仅适用于配置，而且对于每个 SQL 数据仓库实例、用户或存储帐户，其中许多步骤只需完成一次即可。[使用 PolyBase 加载数据][]文档中也详细描述了这些步骤。\n\n1. **创建数据库主密钥。** 每个数据库只需完成这项操作一次。 \n\n2. **创建数据库范围的凭据。** 仅当你要创建新的凭据/用户时，才需要创建此操作，否则可以使用前面创建的凭据。\n\n3. **创建外部文件格式。** 外部文件格式也可以重复使用。仅当你要上载新类型的文件时，才需要创建一个格式。\n\n4. **创建外部数据源。** 指向存储帐户时，如果从同一个容器加载，则你可以使用外部数据源。对于 'LOCATION' 参数，请使用以下格式的位置：'wasbs://mycontainer@ test.blob.core.chinacloudapi.cn/path'。\n\n```\n    -- Creating master key\n    CREATE MASTER KEY;  \n    -- Creating a database scoped credential\n    CREATE DATABASE SCOPED CREDENTIAL <Credential Name> \n    WITH \n        IDENTITY = '<User Name>'\n    ,   Secret = '<Azure Storage Key>'\n    ;   \n    -- Creating external file format (delimited text file)\n    CREATE EXTERNAL FILE FORMAT text_file_format \n    WITH \n    (\n        FORMAT_TYPE = DELIMITEDTEXT \n    ,   FORMAT_OPTIONS  (\n                            FIELD_TERMINATOR ='|' \n                        ,   USE_TYPE_DEFAULT = TRUE\n                        )\n    );  \n    --Creating an external data source\n    CREATE EXTERNAL DATA SOURCE azure_storage \n    WITH \n    (\n        TYPE = HADOOP \n    ,   LOCATION ='wasbs://<Container>@<Blob Path>'\n    ,   CREDENTIAL = <Credential Name>\n    )\n    ;\n```\n\n适当配置存储帐户后，你可以继续将数据载入 SQL 数据仓库。\n\n## 使用 PolyBase 加载数据 \n配置 PolyBase 后，只需创建一个外部表，指向存储中的数据，然后将该数据映射到 SQL 数据仓库内的新表，即可将数据直接载入 SQL 数据仓库。可以使用以下两个简单命令来完成此操作。\n\n1. 使用 'CREATE EXTERNAL TABLE' 命令来定义数据结构。若要确保快速且有效地捕获数据的状态，我们建议在 SSMS 中编写 SQL Server 表的脚本，然后根据外部表的差异手动调整。在 Azure 中创建外部表之后，它将继续指向相同的位置，即使更新了数据或添加了其他数据。  \n```\n    -- Creating external table pointing to file stored in Azure Storage\n    CREATE EXTERNAL TABLE <External Table Name> \n    (\n        <Column name>, <Column type>, <NULL/NOT NULL>\n    )\n    WITH \n    (   LOCATION='<Folder Path>'\n    ,   DATA_SOURCE = <Data Source>\n    ,   FILE_FORMAT = <File Format>      \n    );\n```\n\n2. 使用 'CREATE TABLE...AS SELECT' 语句加载数据。 \n\n```\nCREATE TABLE <Table Name> \nWITH \n(\nCLUSTERED COLUMNSTORE INDEX\n)\nAS \nSELECT  * \nFROM    <External Table Name>\n;\n```\n\n请注意，你还可以使用更详细的 SELECT 语句，从表加载行的子部分。但是，由于 PolyBase 目前不会将额外的计算资源推送到存储帐户，因此，如果你使用 SELECT 语句加载子部分，速度不会比加载整个数据集更快。\n\n除了 `CREATE TABLE...AS SELECT` 语句外，还可以使用 'INSERT...INTO' 语句，将数据从外部表加载到预先存在的表。\n\n##  基于新加载的数据创建统计信息 \n\nAzure SQL 数据仓库尚不支持自动创建或自动更新统计信息。为了获得查询的最佳性能，在首次加载数据或者在数据发生重大更改之后，创建所有表的所有列统计信息非常重要。有关统计信息的详细说明，请参阅开发主题组中的[统计信息][]主题。以下快速示例说明如何基于此示例中加载的表创建统计信息。\n\n\n```\ncreate statistics [<name>] on [<Table Name>] ([<Column Name>]);\ncreate statistics [<another name>] on [<Table Name>] ([<Another Column Name>]);\n```\n\n## 后续步骤\n有关更多开发技巧，请参阅[开发概述][]。\n\n<!--Image references-->\n\n<!--Article references-->\n[Load data with bcp]: /documentation/articles/sql-data-warehouse-load-with-bcp\n[使用 PolyBase 加载数据]: /documentation/articles/sql-data-warehouse-load-with-polybase\n[solution partners]: /documentation/articles/sql-data-warehouse-solution-partners\n[开发概述]: /documentation/articles/sql-data-warehouse-overview-develop\n[迁移架构]: /documentation/articles/sql-data-warehouse-migrate-schema\n[迁移代码]: /documentation/articles/sql-data-warehouse-migrate-code\n[统计信息]: /documentation/articles/sql-data-warehouse-develop-statistics\n\n<!--MSDN references-->\n[supported source/sink]: https://msdn.microsoft.com/zh-cn/library/dn894007.aspx\n[copy activity]: https://msdn.microsoft.com/zh-cn/library/dn835035.aspx\n[SQL Server destination adapter]: https://msdn.microsoft.com/zh-cn/library/ms141237.aspx\n[SSIS]: https://msdn.microsoft.com/zh-cn/library/ms141026.aspx\n\n<!--Other Web references-->\n[AZCopy 安装说明]: /documentation/articles/storage-use-azcopy/\n[适用于 SQL Server 的 Microsoft 命令行实用程序]: http://www.microsoft.com/zh-cn/download/details.aspx?id=36433\n[导入/导出]: /documentation/articles/storage-import-export-service/\n[Azure 存储空间文档]: /documentation/articles/storage-create-storage-account/\n[ExpressRoute 文档]: /documentation/services/expressroute/\n\n<!---HONumber=Mooncake_1207_2015-->\n"
+}

@@ -1,0 +1,480 @@
+{
+  "nodes": [
+    {
+      "content": "移动服务 .NET 后端故障排除 | Azure",
+      "pos": [
+        28,
+        52
+      ]
+    },
+    {
+      "content": "了解如何诊断和修复使用 .NET 后端的移动服务遇到的问题",
+      "pos": [
+        72,
+        101
+      ]
+    },
+    {
+      "content": "移动服务 .NET 后端故障排除",
+      "pos": [
+        335,
+        351
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        453,
+        459
+      ]
+    },
+    {
+      "content": "使用移动服务进行开发通常是简单轻松的工作，但即便如此，有时还是可能会出错。本教程提供了一些技巧，以帮助你排查移动服务 .NET 后端可能出现的常见问题。",
+      "pos": [
+        461,
+        537
+      ]
+    },
+    {
+      "content": "HTTP 调试",
+      "pos": [
+        543,
+        550
+      ]
+    },
+    {
+      "content": "运行时调试",
+      "pos": [
+        572,
+        577
+      ]
+    },
+    {
+      "content": "分析诊断日志",
+      "pos": [
+        602,
+        608
+      ]
+    },
+    {
+      "content": "调试云程序集解析",
+      "pos": [
+        621,
+        629
+      ]
+    },
+    {
+      "content": "实体框架迁移疑难解答",
+      "pos": [
+        656,
+        666
+      ]
+    },
+    {
+      "content": "HTTP 调试",
+      "pos": [
+        716,
+        723
+      ]
+    },
+    {
+      "content": "使用移动服务开发应用程序时，通常会将移动服务客户端 SDK 用于你所使用的平台（Windows 应用商店、iOS、Android 等）。但有时候，深入了解 HTTP 级别并观察网络上发生的原始调用可能会有所帮助。此方法在调试连接和序列化问题时特别有用。通过移动服务 .NET 后端，你可以将此方法与 Visual Studio 本地和远程调试搭配使用（下一部分将详细说明），以了解 HTTP 调用在调用服务代码之前所创建的路径。",
+      "pos": [
+        725,
+        939
+      ]
+    },
+    {
+      "pos": [
+        941,
+        1265
+      ],
+      "content": "你可以使用任何 HTTP 调试器来发送和检查 HTTP 流量。<bpt id=\"p1\">[</bpt>Fiddler<ept id=\"p1\">](http://www.telerik.com/fiddler)</ept> 是开发人员针对此目的而经常使用的工具。为了让开发人员的工作更轻松，移动服务捆绑了基于 Web 的 HTTP 调试器（也称为测试客户端），以减少使用外部工具的需求。当你在本地托管移动服务时，可从类似于 http://localhost:59233 的 URI 获取该移动服务；而托管在云中时，此 URI 的格式为 <bpt id=\"p2\">[</bpt>http://todo-list.azure-mobile.net<ept id=\"p2\">](http://todo-list.azure-mobile.net)</ept>。无论在何处托管服务，以下步骤都会以相同方式运行："
+    },
+    {
+      "pos": [
+        1270,
+        1385
+      ],
+      "content": "首先，在 <bpt id=\"p1\">**</bpt>Visual Studio 2013 Update 2<ept id=\"p1\">**</ept> 或更高版本中打开移动服务服务器项目。如果你尚无此项目，可以通过依次选择“文件”、“新建”、“项目”、“云”节点和“Azure 移动服务”模板来创建一个项目。"
+    },
+    {
+      "pos": [
+        1389,
+        1421
+      ],
+      "content": "按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept>，以生成并运行该项目。在起始页上，选择“试用”。"
+    },
+    {
+      "pos": [
+        1429,
+        1625
+      ],
+      "content": "[AZURE.NOTE]\n如果服务在本地托管，则单击链接会定向至下一页。但是，如果在云中托管，则系统会提示你提供一组凭据。这是为了确保未经授权的用户无法访问你的 API 和负载的相关信息。若要查看该页，你需要使用**空白用户名**以及**应用程序密钥**（充当密码）来登录。若要获取应用程序密钥，你可以在 Azure 经典门户中导航至移动服务的“仪表板”选项卡，并选择“管理密钥”。",
+      "leadings": [
+        "",
+        "    >"
+      ],
+      "nodes": [
+        {
+          "content": "如果服务在本地托管，则单击链接会定向至下一页。但是，如果在云中托管，则系统会提示你提供一组凭据。这是为了确保未经授权的用户无法访问你的 API 和负载的相关信息。若要查看该页，你需要使用<bpt id=\"p1\">**</bpt>空白用户名<ept id=\"p1\">**</ept>以及<bpt id=\"p2\">**</bpt>应用程序密钥<ept id=\"p2\">**</ept>（充当密码）来登录。若要获取应用程序密钥，你可以在 Azure 经典门户中导航至移动服务的“仪表板”选项卡，并选择“管理密钥”。",
+          "pos": [
+            13,
+            191
+          ]
+        }
+      ]
+    },
+    {
+      "content": "访问帮助页时的身份验证提示",
+      "pos": [
+        1640,
+        1653
+      ]
+    },
+    {
+      "pos": [
+        1673,
+        1789
+      ],
+      "content": "你所查看的页面（称为“帮助页”）将显示移动服务启用的 HTTP API 完整列表。选择其中一个 API（如果你是在 Visual Studio 中开始使用移动服务项目的，则应会看见 <bpt id=\"p1\">**</bpt>GET tables/TodoItem<ept id=\"p1\">**</ept>）。"
+    },
+    {
+      "content": "帮助页",
+      "pos": [
+        1797,
+        1800
+      ]
+    },
+    {
+      "content": "生成的页面将显示 API 预期的请求和响应的任何文档与 JSON 示例。选择“试用”按钮。",
+      "pos": [
+        1816,
+        1861
+      ]
+    },
+    {
+      "content": "API 的测试页",
+      "pos": [
+        1869,
+        1877
+      ]
+    },
+    {
+      "content": "这是“测试客户端”，可让你发送 HTTP 请求以试用你的 API。选择“发送”。",
+      "pos": [
+        1896,
+        1936
+      ]
+    },
+    {
+      "content": "测试客户端",
+      "pos": [
+        1944,
+        1949
+      ]
+    },
+    {
+      "content": "你将在浏览器窗口中看到移动服务传回的 HTTP 响应。",
+      "pos": [
+        1967,
+        1994
+      ]
+    },
+    {
+      "content": "包含 HTTP 响应的测试客户端",
+      "pos": [
+        2002,
+        2018
+      ]
+    },
+    {
+      "content": "现在，你可以在 Web 浏览器中浏览移动服务公开的不同 HTTP API。",
+      "pos": [
+        2041,
+        2078
+      ]
+    },
+    {
+      "content": "运行时调试",
+      "pos": [
+        2115,
+        2120
+      ]
+    },
+    {
+      "content": ".NET 后端的主要功能之一是在本地调试服务代码，以及调试在云环境中实时运行的代码。执行以下步骤:",
+      "pos": [
+        2122,
+        2171
+      ]
+    },
+    {
+      "pos": [
+        2176,
+        2230
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>Visual Studio 2013 Update 2<ept id=\"p1\">**</ept> 或更高版本中打开你要调试的移动服务项目。"
+    },
+    {
+      "content": "配置符号加载。导航至“调试”菜单，然后选择“选项和设置”。确保未选中“启用‘仅我的代码’”，并选中“启用源服务器支持”。",
+      "pos": [
+        2234,
+        2294
+      ]
+    },
+    {
+      "content": "配置符号加载",
+      "pos": [
+        2302,
+        2308
+      ]
+    },
+    {
+      "pos": [
+        2329,
+        2480
+      ],
+      "content": "选择左边的“符号”节点，并使用 URI <bpt id=\"p1\">[</bpt>http://srv.symbolsource.org/pdb/Public<ept id=\"p1\">](http://srv.symbolsource.org/pdb/Public)</ept> 添加对 <bpt id=\"p2\">[</bpt><ept id=\"p2\">SymbolSource]</ept> 服务器的引用。移动服务 .NET 后端的符号将以最新版本启用。"
+    },
+    {
+      "content": "配置符号服务器",
+      "pos": [
+        2488,
+        2495
+      ]
+    },
+    {
+      "pos": [
+        2515,
+        2624
+      ],
+      "content": "在代码段中要进行调试的位置设置一个断点。你可以在 Visual Studio 中移动服务项目模板随附的 <bpt id=\"p1\">**</bpt>TodoItemController<ept id=\"p1\">**</ept> 的 <bpt id=\"p2\">**</bpt>GetAllTodoItems()<ept id=\"p2\">**</ept> 方法中设置一个断点。"
+    },
+    {
+      "pos": [
+        2628,
+        2694
+      ],
+      "content": "按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 在本地调试服务。第一次加载可能会比较慢，因为 Visual Studio 必须为移动服务 .NET 后端下载符号。"
+    },
+    {
+      "pos": [
+        2698,
+        2837
+      ],
+      "content": "如前面有关 HTTP 调试的部分中所述，你可以使用测试客户端将 HTTP 请求发送到设置断点的方法中。例如，可以选择帮助页上的 <bpt id=\"p1\">**</bpt>GET tables/TodoItem<ept id=\"p1\">**</ept>，然后选择“试用”，然后选择“发送”，以将请求发送到 <bpt id=\"p2\">**</bpt>GetAllTodoItems()<ept id=\"p2\">**</ept> 方法。"
+    },
+    {
+      "content": "Visual Studio 应会在你设置的断点处中断，Visual Studio 中的“调用堆栈”窗口中应会提供附有源代码的完整堆栈跟踪。",
+      "pos": [
+        2841,
+        2910
+      ]
+    },
+    {
+      "content": "命中断点",
+      "pos": [
+        2918,
+        2922
+      ]
+    },
+    {
+      "content": "现在，你可以将服务发布到 Azure，我们能够以上述方式使用调试。在“解决方案资源管理器”中，右键单击该项目并选择“发布”以发布该项目。",
+      "pos": [
+        2940,
+        3008
+      ]
+    },
+    {
+      "content": "在发布向导的“设置”选项卡上，选择“调试”配置。这可以确保随你的代码一起发布相关的调试符号。",
+      "pos": [
+        3012,
+        3058
+      ]
+    },
+    {
+      "content": "发布调试",
+      "pos": [
+        3066,
+        3070
+      ]
+    },
+    {
+      "content": "成功发布服务后，打开“服务器资源管理器”并展开“Azure”和“移动服务”节点。视需要登录。",
+      "pos": [
+        3091,
+        3137
+      ]
+    },
+    {
+      "content": "右键单击刚刚发布到的移动服务，然后选择“附加调试器”。",
+      "pos": [
+        3142,
+        3169
+      ]
+    },
+    {
+      "content": "附加调试程序",
+      "pos": [
+        3177,
+        3183
+      ]
+    },
+    {
+      "content": "就像在步骤 6 中一样，发送 HTTP 请求以调用你已在其中设置断点的方法。这次请使用 Azure 托管的移动服务的帮助页和测试客户端。",
+      "pos": [
+        3206,
+        3274
+      ]
+    },
+    {
+      "content": "Visual Studio 将在断点处中断。",
+      "pos": [
+        3279,
+        3301
+      ]
+    },
+    {
+      "content": "现在，当你在 Azure 中进行本地开发以及针对实时移动服务进行开发时，可以访问 Visual Studio 调试器的完整功能。",
+      "pos": [
+        3303,
+        3367
+      ]
+    },
+    {
+      "content": "分析诊断日志",
+      "pos": [
+        3392,
+        3398
+      ]
+    },
+    {
+      "pos": [
+        3400,
+        3833
+      ],
+      "content": "当移动服务处理来自客户的请求时，会生成各种有用的诊断信息，并捕获遇到的任何异常。除此之外，你还可以利用每个 <bpt id=\"p1\">[</bpt><bpt id=\"p2\">**</bpt>TableController<ept id=\"p2\">**</ept><ept id=\"p1\">](http://msdn.microsoft.com/library/microsoft.windowsazure.mobile.service.tables.tablecontroller.aspx)</ept> 的 <bpt id=\"p3\">[</bpt><bpt id=\"p4\">**</bpt>Services<ept id=\"p4\">**</ept><ept id=\"p3\">](http://msdn.microsoft.com/library/microsoft.windowsazure.mobile.service.tables.tablecontroller.services.aspx)</ept> 属性上提供的 <bpt id=\"p5\">[</bpt><bpt id=\"p6\">**</bpt>Log<ept id=\"p6\">**</ept><ept id=\"p5\">](http://msdn.microsoft.com/library/microsoft.windowsazure.mobile.service.apiservices.log.aspx)</ept> 属性，参考其他日志来检测控制器代码。"
+    },
+    {
+      "content": "在本地调试时，日志显示在 Visual Studio 的“输出”窗口中。",
+      "pos": [
+        3835,
+        3871
+      ]
+    },
+    {
+      "content": "Visual Studio“输出”窗口中的日志",
+      "pos": [
+        3875,
+        3898
+      ]
+    },
+    {
+      "content": "将服务发布到 Azure 后，你可以在 Visual Studio 的“服务器资源管理器”中，右键单击移动服务，然后选择“查看日志”，以获取云中运行的服务实例的日志。",
+      "pos": [
+        3919,
+        4002
+      ]
+    },
+    {
+      "content": "Visual Studio 服务器资源管理器中的日志",
+      "pos": [
+        4006,
+        4032
+      ]
+    },
+    {
+      "content": "也可以从 Azure 经典门户中移动服务的“日志”选项卡获取相同的日志。",
+      "pos": [
+        4055,
+        4091
+      ]
+    },
+    {
+      "content": "登录 Azure 经典门户",
+      "pos": [
+        4095,
+        4108
+      ]
+    },
+    {
+      "content": "调试云程序集解析",
+      "pos": [
+        4160,
+        4168
+      ]
+    },
+    {
+      "pos": [
+        4170,
+        4357
+      ],
+      "content": "当你将移动服务发布到 Azure 时，此服务将由移动服务托管环境加载，以确保能够无缝地升级和修补托管控制器代码的 HTTP 管道。这包括 <bpt id=\"p1\">[</bpt>.NET 后端 NuGet 包<ept id=\"p1\">](http://www.nuget.org/packages?q=%22mobile+services+.net+backend%22)</ept>引用的所有程序集：团队需持续更新服务才能使用这些程序集的最新版本。"
+    },
+    {
+      "pos": [
+        4359,
+        4449
+      ],
+      "content": "有时，版本会因为引用了所需程序集的<bpt id=\"p1\">*</bpt>不同主要版本<ept id=\"p1\">*</ept>而发生冲突（允许不同的<bpt id=\"p2\">*</bpt>次要<ept id=\"p2\">*</ept>版本）。当 NuGet 提示你升级到移动服务 .NET 后端所用某个包的最新版本时，经常发生此情况。"
+    },
+    {
+      "pos": [
+        4452,
+        4545
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>移动服务目前只与 ASP.NET 5.1 兼容；当前不支持 ASP.NET 5.2。部署后，将 ASP.NET NuGet 包升级到 5.2.* 可能会导致错误。"
+    },
+    {
+      "content": "如果升级了任何此类的包，当你将更新的服务发布到 Azure 时，将会看到指出冲突的警告页：",
+      "pos": [
+        4547,
+        4592
+      ]
+    },
+    {
+      "content": "指示程序集加载冲突的帮助页",
+      "pos": [
+        4596,
+        4609
+      ]
+    },
+    {
+      "content": "同时，将在服务日志中记录如下所示的异常消息：",
+      "pos": [
+        4626,
+        4648
+      ]
+    },
+    {
+      "content": "此问题很容易解决：只需恢复到所需程序集的支持版本，然后重新发布服务。",
+      "pos": [
+        4888,
+        4922
+      ]
+    },
+    {
+      "content": "Entity Framework 迁移故障排除",
+      "pos": [
+        4955,
+        4978
+      ]
+    },
+    {
+      "pos": [
+        4980,
+        5175
+      ],
+      "content": "使用包含 SQL 数据库的移动服务 .NET 后端时，将以 Entity Framework (EF) 作为数据访问技术，让你查询数据库及保存对象。EF 代表开发人员处理的重要方面之一是数据库列（也称为<bpt id=\"p1\">*</bpt>架构<ept id=\"p1\">*</ept>）如何随着代码中指定的模型类的更改而更改。此过程称为 <bpt id=\"p2\">[</bpt>Code First 迁移<ept id=\"p2\">](http://msdn.microsoft.com/zh-cn/data/jj591621)</ept>。"
+    },
+    {
+      "pos": [
+        5177,
+        5351
+      ],
+      "content": "迁移可能很复杂，只有数据库状态与 EF 模型保持同步才能成功。有关如何处理移动服务的迁移和可能发生的错误的说明，请参阅<bpt id=\"p1\">[</bpt>如何对 .NET 后端移动服务进行数据模型更改<ept id=\"p1\">](/documentation/articles/mobile-services-dotnet-backend-how-to-use-code-first-migrations)</ept>。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"移动服务 .NET 后端故障排除 | Azure\" \n    description=\"了解如何诊断和修复使用 .NET 后端的移动服务遇到的问题\" \n    services=\"mobile-services\" \n    documentationCenter=\"\" \n    authors=\"wesmc7777\" \n    manager=\"dwrede\" \n    editor=\"mollybos\"/>\n\n<tags \n    ms.service=\"mobile-services\" \n    ms.date=\"12/01/2015\" \n    wacn.date=\"01/29/2016\"/>\n\n# 移动服务 .NET 后端故障排除\n\n[AZURE.INCLUDE [mobile-service-note-mobile-apps](../includes/mobile-services-note-mobile-apps.md)]\n\n&nbsp;\n\n使用移动服务进行开发通常是简单轻松的工作，但即便如此，有时还是可能会出错。本教程提供了一些技巧，以帮助你排查移动服务 .NET 后端可能出现的常见问题。\n\n1. [HTTP 调试](#HttpDebugging)\n2. [运行时调试](#RuntimeDebugging)\n3. [分析诊断日志](#Logs)\n4. [调试云程序集解析](#AssemblyResolution)\n5. [实体框架迁移疑难解答](#EFMigrations)\n\n<a name=\"HttpDebugging\"></a>\n## HTTP 调试\n\n使用移动服务开发应用程序时，通常会将移动服务客户端 SDK 用于你所使用的平台（Windows 应用商店、iOS、Android 等）。但有时候，深入了解 HTTP 级别并观察网络上发生的原始调用可能会有所帮助。此方法在调试连接和序列化问题时特别有用。通过移动服务 .NET 后端，你可以将此方法与 Visual Studio 本地和远程调试搭配使用（下一部分将详细说明），以了解 HTTP 调用在调用服务代码之前所创建的路径。\n\n你可以使用任何 HTTP 调试器来发送和检查 HTTP 流量。[Fiddler](http://www.telerik.com/fiddler) 是开发人员针对此目的而经常使用的工具。为了让开发人员的工作更轻松，移动服务捆绑了基于 Web 的 HTTP 调试器（也称为测试客户端），以减少使用外部工具的需求。当你在本地托管移动服务时，可从类似于 http://localhost:59233 的 URI 获取该移动服务；而托管在云中时，此 URI 的格式为 [http://todo-list.azure-mobile.net](http://todo-list.azure-mobile.net)。无论在何处托管服务，以下步骤都会以相同方式运行：\n\n1. 首先，在 **Visual Studio 2013 Update 2** 或更高版本中打开移动服务服务器项目。如果你尚无此项目，可以通过依次选择“文件”、“新建”、“项目”、“云”节点和“Azure 移动服务”模板来创建一个项目。\n2. 按 **F5**，以生成并运行该项目。在起始页上，选择“试用”。 \n\n    >[AZURE.NOTE]\n    >如果服务在本地托管，则单击链接会定向至下一页。但是，如果在云中托管，则系统会提示你提供一组凭据。这是为了确保未经授权的用户无法访问你的 API 和负载的相关信息。若要查看该页，你需要使用**空白用户名**以及**应用程序密钥**（充当密码）来登录。若要获取应用程序密钥，你可以在 Azure 经典门户中导航至移动服务的“仪表板”选项卡，并选择“管理密钥”。\n    >\n    > ![访问帮助页时的身份验证提示][HelpPageAuth]\n\n3. 你所查看的页面（称为“帮助页”）将显示移动服务启用的 HTTP API 完整列表。选择其中一个 API（如果你是在 Visual Studio 中开始使用移动服务项目的，则应会看见 **GET tables/TodoItem**）。\n\n    ![帮助页][HelpPage]\n\n4. 生成的页面将显示 API 预期的请求和响应的任何文档与 JSON 示例。选择“试用”按钮。\n\n    ![API 的测试页][HelpPageApi]\n\n5. 这是“测试客户端”，可让你发送 HTTP 请求以试用你的 API。选择“发送”。\n\n    ![测试客户端][TestClient]\n\n6. 你将在浏览器窗口中看到移动服务传回的 HTTP 响应。\n\n    ![包含 HTTP 响应的测试客户端][TestClientResponse]\n\n现在，你可以在 Web 浏览器中浏览移动服务公开的不同 HTTP API。\n\n<a name=\"RuntimeDebugging\"></a>\n## 运行时调试\n\n.NET 后端的主要功能之一是在本地调试服务代码，以及调试在云环境中实时运行的代码。执行以下步骤:\n\n1. 在 **Visual Studio 2013 Update 2** 或更高版本中打开你要调试的移动服务项目。\n2. 配置符号加载。导航至“调试”菜单，然后选择“选项和设置”。确保未选中“启用‘仅我的代码’”，并选中“启用源服务器支持”。\n\n    ![配置符号加载][SymbolLoading]\n\n3. 选择左边的“符号”节点，并使用 URI [http://srv.symbolsource.org/pdb/Public](http://srv.symbolsource.org/pdb/Public) 添加对 [SymbolSource] 服务器的引用。移动服务 .NET 后端的符号将以最新版本启用。\n\n    ![配置符号服务器][SymbolServer]\n\n4. 在代码段中要进行调试的位置设置一个断点。你可以在 Visual Studio 中移动服务项目模板随附的 **TodoItemController** 的 **GetAllTodoItems()** 方法中设置一个断点。\n5. 按 **F5** 在本地调试服务。第一次加载可能会比较慢，因为 Visual Studio 必须为移动服务 .NET 后端下载符号。\n6. 如前面有关 HTTP 调试的部分中所述，你可以使用测试客户端将 HTTP 请求发送到设置断点的方法中。例如，可以选择帮助页上的 **GET tables/TodoItem**，然后选择“试用”，然后选择“发送”，以将请求发送到 **GetAllTodoItems()** 方法。\n7. Visual Studio 应会在你设置的断点处中断，Visual Studio 中的“调用堆栈”窗口中应会提供附有源代码的完整堆栈跟踪。\n\n    ![命中断点][Breakpoint]\n\n8. 现在，你可以将服务发布到 Azure，我们能够以上述方式使用调试。在“解决方案资源管理器”中，右键单击该项目并选择“发布”以发布该项目。\n9. 在发布向导的“设置”选项卡上，选择“调试”配置。这可以确保随你的代码一起发布相关的调试符号。\n\n    ![发布调试][PublishDebug]\n\n10. 成功发布服务后，打开“服务器资源管理器”并展开“Azure”和“移动服务”节点。视需要登录。\n11. 右键单击刚刚发布到的移动服务，然后选择“附加调试器”。\n\n    ![附加调试程序][AttachDebugger]\n\n12. 就像在步骤 6 中一样，发送 HTTP 请求以调用你已在其中设置断点的方法。这次请使用 Azure 托管的移动服务的帮助页和测试客户端。\n13. Visual Studio 将在断点处中断。\n\n现在，当你在 Azure 中进行本地开发以及针对实时移动服务进行开发时，可以访问 Visual Studio 调试器的完整功能。\n\n<a name=\"Logs\"></a>\n## 分析诊断日志\n\n当移动服务处理来自客户的请求时，会生成各种有用的诊断信息，并捕获遇到的任何异常。除此之外，你还可以利用每个 [**TableController**](http://msdn.microsoft.com/library/microsoft.windowsazure.mobile.service.tables.tablecontroller.aspx) 的 [**Services**](http://msdn.microsoft.com/library/microsoft.windowsazure.mobile.service.tables.tablecontroller.services.aspx) 属性上提供的 [**Log**](http://msdn.microsoft.com/library/microsoft.windowsazure.mobile.service.apiservices.log.aspx) 属性，参考其他日志来检测控制器代码。\n\n在本地调试时，日志显示在 Visual Studio 的“输出”窗口中。\n\n![Visual Studio“输出”窗口中的日志][LogsOutputWindow]\n\n将服务发布到 Azure 后，你可以在 Visual Studio 的“服务器资源管理器”中，右键单击移动服务，然后选择“查看日志”，以获取云中运行的服务实例的日志。\n\n![Visual Studio 服务器资源管理器中的日志][LogsServerExplorer]\n\n也可以从 Azure 经典门户中移动服务的“日志”选项卡获取相同的日志。\n\n![登录 Azure 经典门户][LogsPortal]\n\n<a name=\"AssemblyResolution\"></a>\n## 调试云程序集解析\n\n当你将移动服务发布到 Azure 时，此服务将由移动服务托管环境加载，以确保能够无缝地升级和修补托管控制器代码的 HTTP 管道。这包括 [.NET 后端 NuGet 包](http://www.nuget.org/packages?q=%22mobile+services+.net+backend%22)引用的所有程序集：团队需持续更新服务才能使用这些程序集的最新版本。\n\n有时，版本会因为引用了所需程序集的*不同主要版本*而发生冲突（允许不同的*次要*版本）。当 NuGet 提示你升级到移动服务 .NET 后端所用某个包的最新版本时，经常发生此情况。\n\n>[AZURE.NOTE]移动服务目前只与 ASP.NET 5.1 兼容；当前不支持 ASP.NET 5.2。部署后，将 ASP.NET NuGet 包升级到 5.2.* 可能会导致错误。\n\n如果升级了任何此类的包，当你将更新的服务发布到 Azure 时，将会看到指出冲突的警告页：\n\n![指示程序集加载冲突的帮助页][HelpConflict]\n\n同时，将在服务日志中记录如下所示的异常消息：\n\n    Found conflicts between different versions of the same dependent assembly 'Microsoft.ServiceBus': 2.2.0.0, 2.3.0.0. Please change your project to use version '2.2.0.0' which is the one currently supported by the hosting environment.\n\n此问题很容易解决：只需恢复到所需程序集的支持版本，然后重新发布服务。\n\n<a name=\"EFMigrations\"></a>\n## Entity Framework 迁移故障排除\n\n使用包含 SQL 数据库的移动服务 .NET 后端时，将以 Entity Framework (EF) 作为数据访问技术，让你查询数据库及保存对象。EF 代表开发人员处理的重要方面之一是数据库列（也称为*架构*）如何随着代码中指定的模型类的更改而更改。此过程称为 [Code First 迁移](http://msdn.microsoft.com/zh-cn/data/jj591621)。\n\n迁移可能很复杂，只有数据库状态与 EF 模型保持同步才能成功。有关如何处理移动服务的迁移和可能发生的错误的说明，请参阅[如何对 .NET 后端移动服务进行数据模型更改](/documentation/articles/mobile-services-dotnet-backend-how-to-use-code-first-migrations)。\n\n<!-- IMAGES -->\n\n[HelpPageAuth]: ./media/mobile-services-dotnet-backend-how-to-troubleshoot/6.png\n[HelpPage]: ./media/mobile-services-dotnet-backend-how-to-troubleshoot/7.png\n[HelpPageApi]: ./media/mobile-services-dotnet-backend-how-to-troubleshoot/8.png\n[TestClient]: ./media/mobile-services-dotnet-backend-how-to-troubleshoot/9.png\n[TestClientResponse]: ./media/mobile-services-dotnet-backend-how-to-troubleshoot/10.png\n[SymbolLoading]: ./media/mobile-services-dotnet-backend-how-to-troubleshoot/1.png\n[SymbolServer]: ./media/mobile-services-dotnet-backend-how-to-troubleshoot/2.png\n[Breakpoint]: ./media/mobile-services-dotnet-backend-how-to-troubleshoot/3.png\n[PublishDebug]: ./media/mobile-services-dotnet-backend-how-to-troubleshoot/4.png\n[AttachDebugger]: ./media/mobile-services-dotnet-backend-how-to-troubleshoot/5.png\n[LogsOutputWindow]: ./media/mobile-services-dotnet-backend-how-to-troubleshoot/11.png\n[LogsServerExplorer]: ./media/mobile-services-dotnet-backend-how-to-troubleshoot/12.png\n[LogsPortal]: ./media/mobile-services-dotnet-backend-how-to-troubleshoot/13.png\n[HelpConflict]: ./media/mobile-services-dotnet-backend-how-to-troubleshoot/14.png\n\n\n<!-- Links -->\n[SymbolSource]: http://symbolsource.org\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

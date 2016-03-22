@@ -1,0 +1,473 @@
+{
+  "nodes": [
+    {
+      "content": "通过自定义媒体编码器标准预设执行高级编码任务",
+      "pos": [
+        28,
+        50
+      ]
+    },
+    {
+      "content": "本主题说明如何通过自定义媒体编码器标准任务预设执行高级编码。本主题说明如何使用媒体服务 .NET SDK 创建编码任务和作业。此外，还说明如何向编码作业提供自定义预设。",
+      "pos": [
+        70,
+        154
+      ]
+    },
+    {
+      "content": "通过自定义媒体编码器标准预设执行高级编码任务",
+      "pos": [
+        379,
+        401
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        405,
+        407
+      ]
+    },
+    {
+      "pos": [
+        409,
+        668
+      ],
+      "content": "本主题说明如何通过自定义媒体编码器标准任务预设执行高级编码。本主题说明<bpt id=\"p1\">[</bpt>如何使用 .NET 创建一个编码任务，以及用于执行此任务的作业<ept id=\"p1\">](/documentation/articles/media-services-custom-mes-presets-with-dotnet#encoding_with_dotnet)</ept>。此外，还说明如何向编码任务提供自定义预设。有关预设所用元素的说明，请参阅<bpt id=\"p2\">[</bpt>此文档<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/mt269962.aspx)</ept>。"
+    },
+    {
+      "content": "下面演示了执行以下编码任务的自定义预设：",
+      "pos": [
+        670,
+        690
+      ]
+    },
+    {
+      "content": "生成缩略图",
+      "pos": [
+        695,
+        700
+      ]
+    },
+    {
+      "content": "修剪视频（裁剪）",
+      "pos": [
+        787,
+        795
+      ]
+    },
+    {
+      "content": "创建覆盖层",
+      "pos": [
+        882,
+        887
+      ]
+    },
+    {
+      "content": "在输入不包含音频时插入静音曲目",
+      "pos": [
+        971,
+        986
+      ]
+    },
+    {
+      "content": "禁用自动取消隔行扫描",
+      "pos": [
+        1075,
+        1085
+      ]
+    },
+    {
+      "pos": [
+        1175,
+        1228
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"encoding_with_dotnet\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>使用媒体服务 .NET SDK 进行编码"
+    },
+    {
+      "content": "以下代码示例使用媒体服务 .NET SDK 执行下列任务：",
+      "pos": [
+        1230,
+        1259
+      ]
+    },
+    {
+      "content": "创建编码作业。",
+      "pos": [
+        1263,
+        1270
+      ]
+    },
+    {
+      "content": "获取对媒体编码器标准版编码器的引用。",
+      "pos": [
+        1273,
+        1291
+      ]
+    },
+    {
+      "pos": [
+        1294,
+        1519
+      ],
+      "content": "加载自定义 XML 或 JSON 预设。可以在某个文件中保存 XML 或 JSON（例如<bpt id=\"p1\">[</bpt>XML<ept id=\"p1\">](/documentation/articles/media-services-custom-mes-presets-with-dotnet#xml)</ept> 或 <bpt id=\"p2\">[</bpt>JSON<ept id=\"p2\">](/documentation/articles/media-services-custom-mes-presets-with-dotnet#json)</ept>），然后使用以下代码加载该文件。"
+    },
+    {
+      "content": "将编码任务添加到作业。",
+      "pos": [
+        1647,
+        1658
+      ]
+    },
+    {
+      "content": "指定要编码的输入资产。",
+      "pos": [
+        1662,
+        1673
+      ]
+    },
+    {
+      "content": "创建将包含所编码资产的输出资产。",
+      "pos": [
+        1676,
+        1692
+      ]
+    },
+    {
+      "content": "添加事件处理程序以检查作业进度。",
+      "pos": [
+        1695,
+        1711
+      ]
+    },
+    {
+      "content": "提交作业。",
+      "pos": [
+        1714,
+        1719
+      ]
+    },
+    {
+      "pos": [
+        9497,
+        9525
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"thumbnails\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>生成缩略图"
+    },
+    {
+      "pos": [
+        9527,
+        9673
+      ],
+      "content": "本部分说明如何自定义生成缩略图的预设。下面定义的预设包含有关如何将文件编码的信息，以及生成缩略图时所需的信息。你可以使用<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/mt269960.aspx)</ept>所述的任何 MES 预设，以及添加生成缩略图的代码。"
+    },
+    {
+      "pos": [
+        9676,
+        9802
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果要编码为单比特视频，以下预设中的 <bpt id=\"p1\">**</bpt>SceneChangeDetection<ept id=\"p1\">**</ept> 设置只能设为 true。如果要编码为多比特率视频并将 <bpt id=\"p2\">**</bpt>SceneChangeDetection<ept id=\"p2\">**</ept> 设为 true，则编码器将返回错误。"
+    },
+    {
+      "pos": [
+        9805,
+        9878
+      ],
+      "content": "有关架构的信息，请参阅<bpt id=\"p1\">[</bpt>此主题<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/mt269962.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        9880,
+        9982
+      ],
+      "content": "请务必仔细阅读<bpt id=\"p1\">[</bpt>注意事项<ept id=\"p1\">](/documentation/articles/media-services-custom-mes-presets-with-dotnet#considerations)</ept>部分。"
+    },
+    {
+      "pos": [
+        9987,
+        10011
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"json\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>JSON 预设"
+    },
+    {
+      "pos": [
+        12289,
+        12311
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"xml\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>XML 预设"
+    },
+    {
+      "content": "注意事项",
+      "pos": [
+        14781,
+        14785
+      ]
+    },
+    {
+      "content": "请注意以下事项：",
+      "pos": [
+        14787,
+        14795
+      ]
+    },
+    {
+      "content": "为 Start/Step/Range 使用的显式时间戳假设输入源的长度至少为 1 分钟。",
+      "pos": [
+        14799,
+        14843
+      ]
+    },
+    {
+      "content": "Jpg/Png/BmpImage 元素包含 Start、Step 和 Range 字符串属性 – 这些属性解释如下：",
+      "pos": [
+        14846,
+        14904
+      ]
+    },
+    {
+      "content": "帧数（如果为非负整数），例如：\"Start\": \"120\"；",
+      "pos": [
+        14912,
+        14942
+      ]
+    },
+    {
+      "content": "相对于源持续时间（如果以 % 后缀表示），例如：\"Start\": \"15%\"，或者",
+      "pos": [
+        14949,
+        14990
+      ]
+    },
+    {
+      "content": "时间戳（如果以 HH:MM:SS... 格式表示）。例如\"Start\" : \"00:01:00\"",
+      "pos": [
+        14997,
+        15045
+      ]
+    },
+    {
+      "content": "你可以随意混搭使用表示法。",
+      "pos": [
+        15051,
+        15064
+      ]
+    },
+    {
+      "pos": [
+        15074,
+        15163
+      ],
+      "content": "此外，Start 还支持特殊的宏 {Best}，它会尝试判断第一个“有意义”的内容帧。 \n  注意：（Start 设置为 {Best} 时，将忽略 Step 与 Range）",
+      "leadings": [
+        "",
+        "  "
+      ],
+      "nodes": [
+        {
+          "content": "此外，Start 还支持特殊的宏 {Best}，它会尝试判断第一个“有意义”的内容帧。",
+          "pos": [
+            0,
+            43
+          ]
+        },
+        {
+          "content": "注意：（Start 设置为 {Best} 时，将忽略 Step 与 Range）",
+          "pos": [
+            47,
+            87
+          ]
+        }
+      ]
+    },
+    {
+      "content": "默认值：Start:{Best}",
+      "pos": [
+        15175,
+        15191
+      ]
+    },
+    {
+      "content": "需要显式提供每个图像格式的输出格式：Jpg/Png/BmpFormat。MES 会将 JpgVideo（如果已指定）与 JpgFormat 进行匹配，依此类推。OutputFormat 引入了新的图像编解码器特定宏 {Index}，需要为图像输出格式提供该宏一次（且只需一次）。",
+      "pos": [
+        15194,
+        15333
+      ]
+    },
+    {
+      "pos": [
+        15337,
+        15368
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"trim_video\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>修剪视频（裁剪）"
+    },
+    {
+      "pos": [
+        15370,
+        15559
+      ],
+      "content": "本部分说明如何修改编码器预设，以裁剪或修剪其输入为所谓的夹层文件或按需文件的输入视频。也可以使用编码器来裁剪或修剪从实时流捕获或存档的资产 – <bpt id=\"p1\">[</bpt>此博客<ept id=\"p1\">](https://azure.microsoft.com/blog/sub-clipping-and-live-archive-extraction-with-media-encoder-standard/)</ept>提供了详细信息。"
+    },
+    {
+      "pos": [
+        15561,
+        15693
+      ],
+      "content": "若要修剪视频，可以使用<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/mt269960.aspx)</ept>所述的任何 MES 预设并修改 <bpt id=\"p2\">**</bpt>Sources<ept id=\"p2\">**</ept> 元素（如下所示）。请注意，<bpt id=\"p3\">**</bpt>Sources<ept id=\"p3\">**</ept> 应位于架构顶部。"
+    },
+    {
+      "pos": [
+        15698,
+        15722
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"json\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>JSON 预设"
+    },
+    {
+      "content": "XML 预设",
+      "pos": [
+        18985,
+        18991
+      ]
+    },
+    {
+      "pos": [
+        18997,
+        19105
+      ],
+      "content": "若要修剪视频，可以使用<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/mt269960.aspx)</ept>所述的任何 MES 预设并修改 <bpt id=\"p2\">**</bpt>Sources<ept id=\"p2\">**</ept> 元素（如下所示）。"
+    },
+    {
+      "pos": [
+        23471,
+        23496
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"overlay\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>创建覆盖层"
+    },
+    {
+      "content": "媒体编码器标准允许你在现有视频上覆盖图像。目前支持以下格式：png、jpg、gif 和 bmp。下面定义的预设是视频覆盖层的基本示例。",
+      "pos": [
+        23498,
+        23565
+      ]
+    },
+    {
+      "pos": [
+        23568,
+        23595
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>目前不支持覆盖层不透明度设置。"
+    },
+    {
+      "pos": [
+        23597,
+        23695
+      ],
+      "content": "除了定义预设文件外，你还必须让媒体服务知道哪些资产包含覆盖层图像，以及哪些资产包含你要在其上覆盖图像的源视频。请参阅上面定义的 <bpt id=\"p1\">**</bpt>EncodeWithOverlay<ept id=\"p1\">**</ept> 方法的 .NET 示例。"
+    },
+    {
+      "content": "JSON 预设",
+      "pos": [
+        23700,
+        23707
+      ]
+    },
+    {
+      "content": "XML 预设",
+      "pos": [
+        25574,
+        25580
+      ]
+    },
+    {
+      "pos": [
+        27811,
+        27851
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"silent_audio\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>在输入不包含音频时插入静音曲目"
+    },
+    {
+      "content": "默认情况下，如果你要向编码器发送仅包含视频而不包含音频的输入，输出资产将包含仅有视频数据的文件。某些播放器可能无法处理此类输出流。对于这种方案，你可以使用此设置来强制编码器将静音曲目添加到输出。",
+      "pos": [
+        27853,
+        27950
+      ]
+    },
+    {
+      "content": "若要强制编码器在输入不包含音频时生成包含静音曲目的资产，请指定“InsertSilenceIfNoAudio”值。",
+      "pos": [
+        27952,
+        28009
+      ]
+    },
+    {
+      "pos": [
+        28011,
+        28097
+      ],
+      "content": "你可以使用<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/mt269960.aspx)</ept>所述的任何 MES 预设，并进行以下修改："
+    },
+    {
+      "content": "JSON 预设",
+      "pos": [
+        28102,
+        28109
+      ]
+    },
+    {
+      "content": "XML 预设",
+      "pos": [
+        28268,
+        28274
+      ]
+    },
+    {
+      "pos": [
+        28443,
+        28479
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"deinterlacing\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>禁用自动取消隔行扫描"
+    },
+    {
+      "content": "如果客户想要将隔行扫描内容自动取消隔行扫描，不需要执行任何操作。当自动取消隔行扫描打开（默认设置）时，MES 将自动检测隔行扫描帧，并且只将标记为隔行扫描的帧取消隔行扫描。",
+      "pos": [
+        28481,
+        28567
+      ]
+    },
+    {
+      "content": "你可以关闭自动取消隔行扫描，但不建议这样做。",
+      "pos": [
+        28569,
+        28591
+      ]
+    },
+    {
+      "content": "JSON 预设",
+      "pos": [
+        28596,
+        28603
+      ]
+    },
+    {
+      "content": "XML 预设",
+      "pos": [
+        28734,
+        28740
+      ]
+    },
+    {
+      "content": "另请参阅",
+      "pos": [
+        28915,
+        28919
+      ]
+    },
+    {
+      "content": "媒体服务编码概述",
+      "pos": [
+        28923,
+        28931
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"通过自定义媒体编码器标准预设执行高级编码任务\" \n    description=\"本主题说明如何通过自定义媒体编码器标准任务预设执行高级编码。本主题说明如何使用媒体服务 .NET SDK 创建编码任务和作业。此外，还说明如何向编码作业提供自定义预设。\" \n    services=\"media-services\" \n    documentationCenter=\"\" \n    authors=\"juliako\" \n    manager=\"dwrede\" \n    editor=\"\"/>\n\n<tags \n    ms.service=\"media-services\" \n    ms.date=\"01/28/2016\"    \n    wacn.date=\"03/17/2016\"/>\n\n\n#通过自定义媒体编码器标准预设执行高级编码任务\n\n##概述\n\n本主题说明如何通过自定义媒体编码器标准任务预设执行高级编码。本主题说明[如何使用 .NET 创建一个编码任务，以及用于执行此任务的作业](/documentation/articles/media-services-custom-mes-presets-with-dotnet#encoding_with_dotnet)。此外，还说明如何向编码任务提供自定义预设。有关预设所用元素的说明，请参阅[此文档](https://msdn.microsoft.com/zh-cn/library/mt269962.aspx)。\n\n下面演示了执行以下编码任务的自定义预设：\n\n- [生成缩略图](/documentation/articles/media-services-custom-mes-presets-with-dotnet#thumbnails)\n- [修剪视频（裁剪）](/documentation/articles/media-services-custom-mes-presets-with-dotnet#trim_video)\n- [创建覆盖层](/documentation/articles/media-services-custom-mes-presets-with-dotnet#overlay)\n- [在输入不包含音频时插入静音曲目](/documentation/articles/media-services-custom-mes-presets-with-dotnet#silent_audio)\n- [禁用自动取消隔行扫描](/documentation/articles/media-services-custom-mes-presets-with-dotnet#deinterlacing)\n\n##<a id=\"encoding_with_dotnet\"></a>使用媒体服务 .NET SDK 进行编码\n\n以下代码示例使用媒体服务 .NET SDK 执行下列任务：\n\n- 创建编码作业。\n- 获取对媒体编码器标准版编码器的引用。\n- 加载自定义 XML 或 JSON 预设。可以在某个文件中保存 XML 或 JSON（例如[XML](/documentation/articles/media-services-custom-mes-presets-with-dotnet#xml) 或 [JSON](/documentation/articles/media-services-custom-mes-presets-with-dotnet#json)），然后使用以下代码加载该文件。\n\n            // Load the XML (or JSON) from the local file.\n            string configuration = File.ReadAllText(fileName);  \n- 将编码任务添加到作业。 \n- 指定要编码的输入资产。\n- 创建将包含所编码资产的输出资产。\n- 添加事件处理程序以检查作业进度。\n- 提交作业。\n    \n        using System;\n        using System.Collections.Generic;\n        using System.Configuration;\n        using System.IO;\n        using System.Linq;\n        using System.Net;\n        using System.Security.Cryptography;\n        using System.Text;\n        using System.Threading.Tasks;\n        using Microsoft.WindowsAzure.MediaServices.Client;\n        using Newtonsoft.Json.Linq;\n        using System.Threading;\n        using Microsoft.WindowsAzure.MediaServices.Client.ContentKeyAuthorization;\n        using Microsoft.WindowsAzure.MediaServices.Client.DynamicEncryption;\n        using System.Web;\n        using System.Globalization;\n        \n        namespace CustomizeMESPresests\n        {\n            class Program\n            {\n                // Read values from the App.config file.\n                private static readonly string _mediaServicesAccountName =\n                    ConfigurationManager.AppSettings[\"MediaServicesAccountName\"];\n                private static readonly string _mediaServicesAccountKey =\n                    ConfigurationManager.AppSettings[\"MediaServicesAccountKey\"];\n        \n                // Field for service context.\n                private static CloudMediaContext _context = null;\n                private static MediaServicesCredentials _cachedCredentials = null;\n        \n                private static readonly string _mediaFiles =\n                    Path.GetFullPath(@\"../..\\Media\");\n        \n                private static readonly string _singleMP4File =\n                    Path.Combine(_mediaFiles, @\"BigBuckBunny.mp4\");\n        \n                static void Main(string[] args)\n                {\n                    // Create and cache the Media Services credentials in a static class variable.\n                    _cachedCredentials = new MediaServicesCredentials(\n                                    _mediaServicesAccountName,\n                                    _mediaServicesAccountKey);\n                    // Used the chached credentials to create CloudMediaContext.\n                    _context = new CloudMediaContext(_cachedCredentials);\n        \n                    // Get an uploaded asset.\n                    var asset = _context.Assets.FirstOrDefault();\n        \n                    // Encode and generate the output using custom presets.\n                    EncodeToAdaptiveBitrateMP4Set(asset);\n        \n                    Console.ReadLine();\n                }\n        \n                static public IAsset EncodeToAdaptiveBitrateMP4Set(IAsset asset)\n                {\n                    // Declare a new job.\n                    IJob job = _context.Jobs.Create(\"Media Encoder Standard Job\");\n                    // Get a media processor reference, and pass to it the name of the \n                    // processor to use for the specific task.\n                    IMediaProcessor processor = GetLatestMediaProcessorByName(\"Media Encoder Standard\");\n                \n        \n                    // Load the XML (or JSON) from the local file.\n                    string configuration = File.ReadAllText(\"CustomPreset_JSON.json\");\n                \n                    // Create a task\n                    ITask task = job.Tasks.AddNew(\"Media Encoder Standard encoding task\",\n                        processor,\n                        configuration,\n                        TaskOptions.None);\n                \n                    // Specify the input asset to be encoded.\n                    task.InputAssets.Add(asset);\n                    // Add an output asset to contain the results of the job. \n                    // This output is specified as AssetCreationOptions.None, which \n                    // means the output asset is not encrypted. \n                    task.OutputAssets.AddNew(\"Output asset\",\n                        AssetCreationOptions.None);\n                \n                    job.StateChanged += new EventHandler<JobStateChangedEventArgs>(JobStateChanged);\n                    job.Submit();\n                    job.GetExecutionProgressTask(CancellationToken.None).Wait();\n                \n                    return job.OutputMediaAssets[0];\n                }\n        \n                static public IAsset EncodeWithOverlay(IAsset assetSource, IAsset assetOverlay, string customPresetFileName)\n                {\n                    // Declare a new job.\n                    IJob job = _context.Jobs.Create(\"Media Encoder Standard Job\");\n                    // Get a media processor reference, and pass to it the name of the \n                    // processor to use for the specific task.\n                    IMediaProcessor processor = GetLatestMediaProcessorByName(\"Media Encoder Standard\");\n        \n        \n                    // Load the XML (or JSON) from the local file.\n                    string configuration = File.ReadAllText(customPresetFileName);\n        \n                    // Create a task\n                    ITask task = job.Tasks.AddNew(\"Media Encoder Standard encoding task\",\n                        processor,\n                        configuration,\n                        TaskOptions.None);\n        \n                    // Specify the input assets to be encoded.\n                    task.InputAssets.Add(assetSource);\n                    task.InputAssets.Add(assetOverlay);\n        \n                    // Add an output asset to contain the results of the job. \n                    task.OutputAssets.AddNew(\"Output asset\",\n                        AssetCreationOptions.None);\n        \n                    job.StateChanged += new EventHandler<JobStateChangedEventArgs>(JobStateChanged);\n                    job.Submit();\n                    job.GetExecutionProgressTask(CancellationToken.None).Wait();\n        \n                    return job.OutputMediaAssets[0];\n                }\n\n                private static void JobStateChanged(object sender, JobStateChangedEventArgs e)\n                {\n                    Console.WriteLine(\"Job state changed event:\");\n                    Console.WriteLine(\"  Previous state: \" + e.PreviousState);\n                    Console.WriteLine(\"  Current state: \" + e.CurrentState);\n                    switch (e.CurrentState)\n                    {\n                        case JobState.Finished:\n                            Console.WriteLine();\n                            Console.WriteLine(\"Job is finished. Please wait while local tasks or downloads complete...\");\n                            break;\n                        case JobState.Canceling:\n                        case JobState.Queued:\n                        case JobState.Scheduled:\n                        case JobState.Processing:\n                            Console.WriteLine(\"Please wait...\\n\");\n                            break;\n                        case JobState.Canceled:\n                        case JobState.Error:\n        \n                            // Cast sender as a job.\n                            IJob job = (IJob)sender;\n        \n                            // Display or log error details as needed.\n                            break;\n                        default:\n                            break;\n                    }\n                }\n        \n        \n                private static IMediaProcessor GetLatestMediaProcessorByName(string mediaProcessorName)\n                {\n                    var processor = _context.MediaProcessors.Where(p => p.Name == mediaProcessorName).\n                    ToList().OrderBy(p => new Version(p.Version)).LastOrDefault();\n        \n                    if (processor == null)\n                        throw new ArgumentException(string.Format(\"Unknown media processor\", mediaProcessorName));\n        \n                    return processor;\n                }\n        \n            }\n        }\n\n\n##<a id=\"thumbnails\"></a>生成缩略图\n\n本部分说明如何自定义生成缩略图的预设。下面定义的预设包含有关如何将文件编码的信息，以及生成缩略图时所需的信息。你可以使用[此处](https://msdn.microsoft.com/zh-cn/library/mt269960.aspx)所述的任何 MES 预设，以及添加生成缩略图的代码。\n\n>[AZURE.NOTE]如果要编码为单比特视频，以下预设中的 **SceneChangeDetection** 设置只能设为 true。如果要编码为多比特率视频并将 **SceneChangeDetection** 设为 true，则编码器将返回错误。\n\n\n有关架构的信息，请参阅[此主题](https://msdn.microsoft.com/zh-cn/library/mt269962.aspx)。\n\n请务必仔细阅读[注意事项](/documentation/articles/media-services-custom-mes-presets-with-dotnet#considerations)部分。\n\n###<a id=\"json\"></a>JSON 预设\n\n\n    {\n      \"Version\": 1.0,\n      \"Codecs\": [\n        {\n          \"KeyFrameInterval\": \"00:00:02\",\n          \"SceneChangeDetection\": \"true\",\n          \"H264Layers\": [\n            {\n              \"Profile\": \"Auto\",\n              \"Level\": \"auto\",\n              \"Bitrate\": 4500,\n              \"MaxBitrate\": 4500,\n              \"BufferWindow\": \"00:00:05\",\n              \"Width\": 1280,\n              \"Height\": 720,\n              \"ReferenceFrames\": 3,\n              \"EntropyMode\": \"Cabac\",\n              \"AdaptiveBFrame\": true,\n              \"Type\": \"H264Layer\",\n              \"FrameRate\": \"0/1\"\n       \n            }\n          ],\n          \"Type\": \"H264Video\"\n        },\n        {\n          \"JpgLayers\": [\n            {\n              \"Quality\": 90,\n              \"Type\": \"JpgLayer\",\n              \"Width\": 640,\n              \"Height\": 360\n            }\n          ],\n          \"Start\": \"{Best}\",\n          \"Type\": \"JpgImage\"\n        },\n        {\n          \"PngLayers\": [\n            {\n              \"Type\": \"PngLayer\",\n              \"Width\": 640,\n              \"Height\": 360,\n            }\n          ],\n          \"Start\": \"00:00:01\",\n          \"Step\": \"00:00:10\",\n          \"Range\": \"00:00:58\",\n          \"Type\": \"PngImage\"\n        },\n        {\n          \"BmpLayers\": [\n            {\n              \"Type\": \"BmpLayer\",\n              \"Width\": 640,\n              \"Height\": 360\n            }\n          ],\n          \"Start\": \"10%\",\n          \"Step\": \"10%\",\n          \"Range\": \"90%\",\n          \"Type\": \"BmpImage\"\n        },\n        {\n          \"Channels\": 2,\n          \"SamplingRate\": 48000,\n          \"Bitrate\": 128,\n          \"Type\": \"AACAudio\"\n        }\n      ],\n      \"Outputs\": [\n        {\n          \"FileName\": \"{Basename}_{Index}{Extension}\",\n          \"Format\": {\n            \"Type\": \"JpgFormat\"\n          }\n        },\n        {\n          \"FileName\": \"{Basename}_{Index}{Extension}\",\n          \"Format\": {\n            \"Type\": \"PngFormat\"\n          }\n        },\n        {\n          \"FileName\": \"{Basename}_{Index}{Extension}\",\n          \"Format\": {\n            \"Type\": \"BmpFormat\"\n          }\n        },\n        {\n          \"FileName\": \"{Basename}_{Width}x{Height}_{VideoBitrate}.mp4\",\n          \"Format\": {\n            \"Type\": \"MP4Format\"\n          }\n        }\n      ]\n    }\n\n\n###<a id=\"xml\"></a>XML 预设\n\n\n    <?xml version=\"1.0\" encoding=\"utf-16\"?>\n    <Preset xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Version=\"1.0\" xmlns=\"http://www.windowsazure.com/media/encoding/Preset/2014/03\">\n      <Encoding>\n        <H264Video>\n          <KeyFrameInterval>00:00:02</KeyFrameInterval>\n          <SceneChangeDetection>true</SceneChangeDetection>\n          <H264Layers>\n            <H264Layer>\n              <Bitrate>4500</Bitrate>\n              <Width>1280</Width>\n              <Height>720</Height>\n              <FrameRate>0/1</FrameRate>\n              <Profile>Auto</Profile>\n              <Level>auto</Level>\n              <BFrames>3</BFrames>\n              <ReferenceFrames>3</ReferenceFrames>\n              <Slices>0</Slices>\n              <AdaptiveBFrame>true</AdaptiveBFrame>\n              <EntropyMode>Cabac</EntropyMode>\n              <BufferWindow>00:00:05</BufferWindow>\n              <MaxBitrate>4500</MaxBitrate>\n            </H264Layer>\n          </H264Layers>\n          <Chapters />\n        </H264Video>\n        <AACAudio>\n          <Profile>AACLC</Profile>\n          <Channels>2</Channels>\n          <SamplingRate>48000</SamplingRate>\n          <Bitrate>128</Bitrate>\n        </AACAudio>\n        <JpgImage Start=\"{Best}\">\n          <JpgLayers>\n            <JpgLayer>\n              <Width>640</Width>\n              <Height>360</Height>\n              <Quality>90</Quality>\n            </JpgLayer>\n          </JpgLayers>\n        </JpgImage>\n        <BmpImage Start=\"10%\" Step=\"10%\" Range=\"90%\">\n          <BmpLayers>\n            <BmpLayer>\n              <Width>640</Width>\n              <Height>360</Height>\n            </BmpLayer>\n          </BmpLayers>\n        </BmpImage>\n        <PngImage Start=\"00:00:01\" Step=\"00:00:10\" Range=\"00:00:58\">\n          <PngLayers>\n            <PngLayer>\n              <Width>640</Width>\n              <Height>360</Height>\n            </PngLayer>\n          </PngLayers>\n        </PngImage>\n      </Encoding>\n      <Outputs>\n        <Output FileName=\"{Basename}_{Width}x{Height}_{VideoBitrate}.mp4\">\n          <MP4Format />\n        </Output>\n        <Output FileName=\"{Basename}_{Index}{Extension}\">\n          <JpgFormat />\n        </Output>\n        <Output FileName=\"{Basename}_{Index}{Extension}\">\n          <BmpFormat />\n        </Output>\n        <Output FileName=\"{Basename}_{Index}{Extension}\">\n          <PngFormat />\n        </Output>\n      </Outputs>\n    </Preset>\n\n###注意事项\n\n请注意以下事项：\n\n- 为 Start/Step/Range 使用的显式时间戳假设输入源的长度至少为 1 分钟。\n- Jpg/Png/BmpImage 元素包含 Start、Step 和 Range 字符串属性 – 这些属性解释如下：\n\n    - 帧数（如果为非负整数），例如：\"Start\": \"120\"；\n    - 相对于源持续时间（如果以 % 后缀表示），例如：\"Start\": \"15%\"，或者\n    - 时间戳（如果以 HH:MM:SS... 格式表示）。例如\"Start\" : \"00:01:00\"\n\n    你可以随意混搭使用表示法。\n    \n    此外，Start 还支持特殊的宏 {Best}，它会尝试判断第一个“有意义”的内容帧。 \n    注意：（Start 设置为 {Best} 时，将忽略 Step 与 Range）\n    \n    - 默认值：Start:{Best}\n- 需要显式提供每个图像格式的输出格式：Jpg/Png/BmpFormat。MES 会将 JpgVideo（如果已指定）与 JpgFormat 进行匹配，依此类推。OutputFormat 引入了新的图像编解码器特定宏 {Index}，需要为图像输出格式提供该宏一次（且只需一次）。\n\n##<a id=\"trim_video\"></a>修剪视频（裁剪）\n\n本部分说明如何修改编码器预设，以裁剪或修剪其输入为所谓的夹层文件或按需文件的输入视频。也可以使用编码器来裁剪或修剪从实时流捕获或存档的资产 – [此博客](https://azure.microsoft.com/blog/sub-clipping-and-live-archive-extraction-with-media-encoder-standard/)提供了详细信息。\n\n若要修剪视频，可以使用[此处](https://msdn.microsoft.com/zh-cn/library/mt269960.aspx)所述的任何 MES 预设并修改 **Sources** 元素（如下所示）。请注意，**Sources** 应位于架构顶部。\n\n###<a id=\"json\"></a>JSON 预设\n    \n    {\n      \"Version\": 1.0,\n      \"Sources\": [\n        {\n          \"StartTime\": \"00:00:04\",\n          \"Duration\": \"00:00:16\"\n        }\n      ],\n      \"Codecs\": [\n        {\n          \"KeyFrameInterval\": \"00:00:02\",\n          \"StretchMode\": \"AutoSize\",\n          \"H264Layers\": [\n            {\n              \"Profile\": \"Auto\",\n              \"Level\": \"auto\",\n              \"Bitrate\": 3400,\n              \"MaxBitrate\": 3400,\n              \"BufferWindow\": \"00:00:05\",\n              \"Width\": 1280,\n              \"Height\": 720,\n              \"BFrames\": 3,\n              \"ReferenceFrames\": 3,\n              \"AdaptiveBFrame\": true,\n              \"Type\": \"H264Layer\",\n              \"FrameRate\": \"0/1\"\n            },\n            {\n              \"Profile\": \"Auto\",\n              \"Level\": \"auto\",\n              \"Bitrate\": 2250,\n              \"MaxBitrate\": 2250,\n              \"BufferWindow\": \"00:00:05\",\n              \"Width\": 960,\n              \"Height\": 540,\n              \"BFrames\": 3,\n              \"ReferenceFrames\": 3,\n              \"AdaptiveBFrame\": true,\n              \"Type\": \"H264Layer\",\n              \"FrameRate\": \"0/1\"\n            },\n            {\n              \"Profile\": \"Auto\",\n              \"Level\": \"auto\",\n              \"Bitrate\": 1500,\n              \"MaxBitrate\": 1500,\n              \"BufferWindow\": \"00:00:05\",\n              \"Width\": 960,\n              \"Height\": 540,\n              \"BFrames\": 3,\n              \"ReferenceFrames\": 3,\n              \"AdaptiveBFrame\": true,\n              \"Type\": \"H264Layer\",\n              \"FrameRate\": \"0/1\"\n            },\n            {\n              \"Profile\": \"Auto\",\n              \"Level\": \"auto\",\n              \"Bitrate\": 1000,\n              \"MaxBitrate\": 1000,\n              \"BufferWindow\": \"00:00:05\",\n              \"Width\": 640,\n              \"Height\": 360,\n              \"BFrames\": 3,\n              \"ReferenceFrames\": 3,\n              \"AdaptiveBFrame\": true,\n              \"Type\": \"H264Layer\",\n              \"FrameRate\": \"0/1\"\n            },\n            {\n              \"Profile\": \"Auto\",\n              \"Level\": \"auto\",\n              \"Bitrate\": 650,\n              \"MaxBitrate\": 650,\n              \"BufferWindow\": \"00:00:05\",\n              \"Width\": 640,\n              \"Height\": 360,\n              \"BFrames\": 3,\n              \"ReferenceFrames\": 3,\n              \"AdaptiveBFrame\": true,\n              \"Type\": \"H264Layer\",\n              \"FrameRate\": \"0/1\"\n            },\n            {\n              \"Profile\": \"Auto\",\n              \"Level\": \"auto\",\n              \"Bitrate\": 400,\n              \"MaxBitrate\": 400,\n              \"BufferWindow\": \"00:00:05\",\n              \"Width\": 320,\n              \"Height\": 180,\n              \"BFrames\": 3,\n              \"ReferenceFrames\": 3,\n              \"AdaptiveBFrame\": true,\n              \"Type\": \"H264Layer\",\n              \"FrameRate\": \"0/1\"\n            }\n          ],\n          \"Type\": \"H264Video\"\n        },\n        {\n          \"Profile\": \"AACLC\",\n          \"Channels\": 2,\n          \"SamplingRate\": 48000,\n          \"Bitrate\": 128,\n          \"Type\": \"AACAudio\"\n        }\n      ],\n      \"Outputs\": [\n        {\n          \"FileName\": \"{Basename}_{Width}x{Height}_{VideoBitrate}.mp4\",\n          \"Format\": {\n            \"Type\": \"MP4Format\"\n          }\n        }\n      ]\n    } \n\n###XML 预设\n    \n若要修剪视频，可以使用[此处](https://msdn.microsoft.com/zh-cn/library/mt269960.aspx)所述的任何 MES 预设并修改 **Sources** 元素（如下所示）。\n\n    <?xml version=\"1.0\" encoding=\"utf-16\"?>\n    <Preset xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Version=\"1.0\" xmlns=\"http://www.windowsazure.com/media/encoding/Preset/2014/03\">\n      <Sources>\n        <Source StartTime=\"PT4S\" Duration=\"PT14S\"/>\n      </Sources>\n      <Encoding>\n        <H264Video>\n          <KeyFrameInterval>00:00:02</KeyFrameInterval>\n          <H264Layers>\n            <H264Layer>\n              <Bitrate>3400</Bitrate>\n              <Width>1280</Width>\n              <Height>720</Height>\n              <FrameRate>0/1</FrameRate>\n              <Profile>Auto</Profile>\n              <Level>auto</Level>\n              <BFrames>3</BFrames>\n              <ReferenceFrames>3</ReferenceFrames>\n              <Slices>0</Slices>\n              <AdaptiveBFrame>true</AdaptiveBFrame>\n              <EntropyMode>Cabac</EntropyMode>\n              <BufferWindow>00:00:05</BufferWindow>\n              <MaxBitrate>3400</MaxBitrate>\n            </H264Layer>\n            <H264Layer>\n              <Bitrate>2250</Bitrate>\n              <Width>960</Width>\n              <Height>540</Height>\n              <FrameRate>0/1</FrameRate>\n              <Profile>Auto</Profile>\n              <Level>auto</Level>\n              <BFrames>3</BFrames>\n              <ReferenceFrames>3</ReferenceFrames>\n              <Slices>0</Slices>\n              <AdaptiveBFrame>true</AdaptiveBFrame>\n              <EntropyMode>Cabac</EntropyMode>\n              <BufferWindow>00:00:05</BufferWindow>\n              <MaxBitrate>2250</MaxBitrate>\n            </H264Layer>\n            <H264Layer>\n              <Bitrate>1500</Bitrate>\n              <Width>960</Width>\n              <Height>540</Height>\n              <FrameRate>0/1</FrameRate>\n              <Profile>Auto</Profile>\n              <Level>auto</Level>\n              <BFrames>3</BFrames>\n              <ReferenceFrames>3</ReferenceFrames>\n              <Slices>0</Slices>\n              <AdaptiveBFrame>true</AdaptiveBFrame>\n              <EntropyMode>Cabac</EntropyMode>\n              <BufferWindow>00:00:05</BufferWindow>\n              <MaxBitrate>1500</MaxBitrate>\n            </H264Layer>\n            <H264Layer>\n              <Bitrate>1000</Bitrate>\n              <Width>640</Width>\n              <Height>360</Height>\n              <FrameRate>0/1</FrameRate>\n              <Profile>Auto</Profile>\n              <Level>auto</Level>\n              <BFrames>3</BFrames>\n              <ReferenceFrames>3</ReferenceFrames>\n              <Slices>0</Slices>\n              <AdaptiveBFrame>true</AdaptiveBFrame>\n              <EntropyMode>Cabac</EntropyMode>\n              <BufferWindow>00:00:05</BufferWindow>\n              <MaxBitrate>1000</MaxBitrate>\n            </H264Layer>\n            <H264Layer>\n              <Bitrate>650</Bitrate>\n              <Width>640</Width>\n              <Height>360</Height>\n              <FrameRate>0/1</FrameRate>\n              <Profile>Auto</Profile>\n              <Level>auto</Level>\n              <BFrames>3</BFrames>\n              <ReferenceFrames>3</ReferenceFrames>\n              <Slices>0</Slices>\n              <AdaptiveBFrame>true</AdaptiveBFrame>\n              <EntropyMode>Cabac</EntropyMode>\n              <BufferWindow>00:00:05</BufferWindow>\n              <MaxBitrate>650</MaxBitrate>\n            </H264Layer>\n            <H264Layer>\n              <Bitrate>400</Bitrate>\n              <Width>320</Width>\n              <Height>180</Height>\n              <FrameRate>0/1</FrameRate>\n              <Profile>Auto</Profile>\n              <Level>auto</Level>\n              <BFrames>3</BFrames>\n              <ReferenceFrames>3</ReferenceFrames>\n              <Slices>0</Slices>\n              <AdaptiveBFrame>true</AdaptiveBFrame>\n              <EntropyMode>Cabac</EntropyMode>\n              <BufferWindow>00:00:05</BufferWindow>\n              <MaxBitrate>400</MaxBitrate>\n            </H264Layer>\n          </H264Layers>\n          <Chapters />\n        </H264Video>\n        <AACAudio>\n          <Profile>AACLC</Profile>\n          <Channels>2</Channels>\n          <SamplingRate>48000</SamplingRate>\n          <Bitrate>128</Bitrate>\n        </AACAudio>\n      </Encoding>\n      <Outputs>\n        <Output FileName=\"{Basename}_{Width}x{Height}_{VideoBitrate}.mp4\">\n          <MP4Format />\n        </Output>\n      </Outputs>\n    </Preset>\n\n##<a id=\"overlay\"></a>创建覆盖层\n\n媒体编码器标准允许你在现有视频上覆盖图像。目前支持以下格式：png、jpg、gif 和 bmp。下面定义的预设是视频覆盖层的基本示例。\n\n>[AZURE.NOTE]目前不支持覆盖层不透明度设置。\n\n除了定义预设文件外，你还必须让媒体服务知道哪些资产包含覆盖层图像，以及哪些资产包含你要在其上覆盖图像的源视频。请参阅上面定义的 **EncodeWithOverlay** 方法的 .NET 示例。\n\n###JSON 预设\n    \n    {\n      \"Version\": 1.0,\n      \"Sources\": [\n        {\n          \"Streams\": [],\n          \"Filters\": {\n            \"VideoOverlay\": {\n              \"Position\": {\n                \"X\": 100,\n                \"Y\": 100,\n                \"Width\": 100,\n                \"Height\": 50\n              },\n              \"AudioGainLevel\": 0.0,\n              \"MediaParams\": [\n                {\n                  \"OverlayLoopCount\": 1\n                },\n                {\n                  \"IsOverlay\": true,\n                  \"OverlayLoopCount\": 1,\n                  \"InputLoop\": true\n                }\n              ],\n              \"Source\": \"Image001.jpg\",\n              \"Clip\": {\n                \"Duration\": \"00:00:05\"\n              },\n              \"FadeInDuration\": {\n                \"Duration\": \"00:00:01\"\n              },\n              \"FadeOutDuration\": {\n                \"StartTime\": \"00:00:03\",\n                \"Duration\": \"00:00:04\"\n              }\n            }\n          },\n          \"Pad\": true\n        }\n      ],\n      \"Codecs\": [\n        {\n          \"KeyFrameInterval\": \"00:00:02\",\n          \"H264Layers\": [\n            {\n              \"Profile\": \"Baseline\",\n              \"Level\": \"auto\",\n              \"Bitrate\": 1045,\n              \"MaxBitrate\": 1045,\n              \"BufferWindow\": \"00:00:05\",\n              \"ReferenceFrames\": 3,\n              \"EntropyMode\": \"Cavlc\",\n              \"AdaptiveBFrame\": true,\n              \"Type\": \"H264Layer\",\n              \"Width\": \"400\",\n              \"Height\": \"400\",\n              \"FrameRate\": \"0/1\"\n            }\n          ],\n          \"Chapters\": [],\n          \"Type\": \"H264Video\"\n        },\n        {\n          \"Type\": \"CopyAudio\"\n        }\n      ],\n      \"Outputs\": [\n        {\n          \"FileName\": \"{Basename}{Extension}\",\n          \"Format\": {\n            \"Type\": \"MP4Format\"\n          }\n        }\n      ]\n    }\n\n###XML 预设\n    \n    <?xml version=\"1.0\" encoding=\"utf-16\"?>\n    <Preset xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Version=\"1.0\" xmlns=\"http://www.windowsazure.com/media/encoding/Preset/2014/03\">\n      <Sources>\n        <Source>\n          <Streams />\n          <Filters>\n            <VideoOverlay>\n              <Source>Image001.jpg</Source>\n              <Clip Duration=\"PT5S\" />\n              <FadeInDuration Duration=\"PT1S\" />\n              <FadeOutDuration StartTime=\"PT3S\" Duration=\"PT4S\" />\n              <Position X=\"100\" Y=\"100\" Width=\"100\" Height=\"50\" />\n              <Opacity>0</Opacity>\n              <AudioGainLevel>0</AudioGainLevel>\n              <MediaParams>\n                <MediaParam>\n                  <IsOverlay>false</IsOverlay>\n                  <OverlayLoopCount>1</OverlayLoopCount>\n                  <InputLoop>false</InputLoop>\n                </MediaParam>\n                <MediaParam>\n                  <IsOverlay>true</IsOverlay>\n                  <OverlayLoopCount>1</OverlayLoopCount>\n                  <InputLoop>true</InputLoop>\n                </MediaParam>\n              </MediaParams>\n            </VideoOverlay>\n          </Filters>\n          <Pad>true</Pad>\n        </Source>\n      </Sources>\n      <Encoding>\n        <H264Video>\n          <KeyFrameInterval>00:00:02</KeyFrameInterval>\n          <H264Layers>\n            <H264Layer>\n              <Bitrate>1045</Bitrate>\n              <Width>400</Width>\n              <Height>400</Height>\n              <FrameRate>0/1</FrameRate>\n              <Profile>Baseline</Profile>\n              <Level>auto</Level>\n              <BFrames>0</BFrames>\n              <ReferenceFrames>3</ReferenceFrames>\n              <Slices>0</Slices>\n              <AdaptiveBFrame>true</AdaptiveBFrame>\n              <EntropyMode>Cavlc</EntropyMode>\n              <BufferWindow>00:00:05</BufferWindow>\n              <MaxBitrate>1045</MaxBitrate>\n            </H264Layer>\n          </H264Layers>\n          <Chapters />\n        </H264Video>\n        <CopyAudio />\n      </Encoding>\n      <Outputs>\n        <Output FileName=\"{Basename}{Extension}\">\n          <MP4Format />\n        </Output>\n      </Outputs>\n    </Preset>\n\n##<a id=\"silent_audio\"></a>在输入不包含音频时插入静音曲目\n\n默认情况下，如果你要向编码器发送仅包含视频而不包含音频的输入，输出资产将包含仅有视频数据的文件。某些播放器可能无法处理此类输出流。对于这种方案，你可以使用此设置来强制编码器将静音曲目添加到输出。\n\n若要强制编码器在输入不包含音频时生成包含静音曲目的资产，请指定“InsertSilenceIfNoAudio”值。\n\n你可以使用[此处](https://msdn.microsoft.com/zh-cn/library/mt269960.aspx)所述的任何 MES 预设，并进行以下修改：\n\n###JSON 预设\n\n    {\n      \"Channels\": 2,\n      \"SamplingRate\": 44100,\n      \"Bitrate\": 96,\n      \"Type\": \"AACAudio\",\n      \"Condition\": \"InsertSilenceIfNoAudio\"\n    }\n\n###XML 预设\n\n    <AACAudio Condition=\"InsertSilenceIfNoAudio\">\n      <Channels>2</Channels>\n      <SamplingRate>44100</SamplingRate>\n      <Bitrate>96</Bitrate>\n    </AACAudio>\n\n##<a id=\"deinterlacing\"></a>禁用自动取消隔行扫描\n\n如果客户想要将隔行扫描内容自动取消隔行扫描，不需要执行任何操作。当自动取消隔行扫描打开（默认设置）时，MES 将自动检测隔行扫描帧，并且只将标记为隔行扫描的帧取消隔行扫描。\n\n你可以关闭自动取消隔行扫描，但不建议这样做。\n\n###JSON 预设\n    \n    \"Sources\": [\n    {\n     \"Filters\": {\n        \"Deinterlace\": {\n          \"Mode\": \"Off\"\n        }\n      },\n    }\n    ]\n\n###XML 预设\n    \n    <Sources>\n    <Source>\n      <Filters>\n        <Deinterlace>\n          <Mode>Off</Mode>\n        </Deinterlace>\n      </Filters>\n    </Source>\n    </Sources>\n\n\n\n\n\n\n##另请参阅 \n\n[媒体服务编码概述](/documentation/articles/media-services-encode-asset)\n\n<!---HONumber=Mooncake_0307_2016-->"
+}

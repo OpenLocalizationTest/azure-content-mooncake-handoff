@@ -1,0 +1,306 @@
+{
+  "nodes": [
+    {
+      "content": "如何通过 Python 使用服务总线主题 | Microsoft Azure",
+      "pos": [
+        28,
+        66
+      ]
+    },
+    {
+      "content": "了解如何使用 Python 中的 Azure 服务总线主题和订阅",
+      "pos": [
+        86,
+        118
+      ]
+    },
+    {
+      "content": "如何使用服务总线主题和订阅",
+      "pos": [
+        343,
+        356
+      ]
+    },
+    {
+      "pos": [
+        449,
+        617
+      ],
+      "content": "本文介绍了如何使用服务总线主题和订阅。相关示例是使用 Python 编写的，并使用 <bpt id=\"p1\">[</bpt>Python Azure 包<ept id=\"p1\">][]</ept>。涉及的任务包括<bpt id=\"p2\">**</bpt>创建主题和订阅<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>创建订阅筛选器<ept id=\"p3\">**</ept>、<bpt id=\"p4\">**</bpt>将消息发送到主题<ept id=\"p4\">**</ept>、<bpt id=\"p5\">**</bpt>从订阅接收消息<ept id=\"p5\">**</ept>以及<bpt id=\"p6\">**</bpt>删除主题和订阅<ept id=\"p6\">**</ept>。有关主题和订阅的详细信息，请参阅<bpt id=\"p7\">[</bpt>后续步骤<ept id=\"p7\">](#next-steps)</ept>部分。"
+    },
+    {
+      "pos": [
+        704,
+        812
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>如果你需要安装 Python 或 <bpt id=\"p2\">[</bpt>Python Azure 包<ept id=\"p2\">][]</ept>，请参阅 <bpt id=\"p3\">[</bpt>Python 安装指南<ept id=\"p3\">](/documentation/articles/python-how-to-install)</ept>。"
+    },
+    {
+      "content": "创建主题",
+      "pos": [
+        817,
+        821
+      ]
+    },
+    {
+      "pos": [
+        823,
+        901
+      ],
+      "content": "可以通过 <bpt id=\"p1\">**</bpt>ServiceBusService<ept id=\"p1\">**</ept> 对象处理主题。将以下代码添加到任何 Python 文件的顶部附近，你希望在其中以编程方式访问服务总线："
+    },
+    {
+      "pos": [
+        1000,
+        1123
+      ],
+      "content": "以下代码创建 <bpt id=\"p1\">**</bpt>ServiceBusService<ept id=\"p1\">**</ept> 对象。将 <ph id=\"ph1\">`mynamespace`</ph>、<ph id=\"ph2\">`sharedaccesskeyname`</ph> 和 <ph id=\"ph3\">`sharedaccesskey`</ph> 替换为实际的命名空间、共享访问签名 (SAS) 密钥名称和密钥值。"
+    },
+    {
+      "pos": [
+        1301,
+        1344
+      ],
+      "content": "你可以从 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">][]</ept>中的“连接信息”窗口获得 SAS 密钥名称和值。"
+    },
+    {
+      "pos": [
+        1391,
+        1488
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>create\\_topic<ept id=\"p1\">**</ept> 还支持其他选项，以允许你重写默认主题设置，例如消息生存时间或最大主题大小。以下示例将最大主题大小设置为 5 GB，将生存时间 (TTL) 值设置为 1 分钟："
+    },
+    {
+      "content": "创建订阅",
+      "pos": [
+        1675,
+        1679
+      ]
+    },
+    {
+      "pos": [
+        1681,
+        1753
+      ],
+      "content": "主题订阅也是使用 <bpt id=\"p1\">**</bpt>ServiceBusService<ept id=\"p1\">**</ept> 对象创建的。订阅已命名，并且具有一个限制传递到订阅的虚拟队列的消息集的可选筛选器。"
+    },
+    {
+      "pos": [
+        1757,
+        1805
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 订阅是永久性的，除非删除它们或删除订阅它们的主题，否则订阅将一直存在。"
+    },
+    {
+      "content": "创建具有默认 (MatchAll) 筛选器的订阅",
+      "pos": [
+        1811,
+        1835
+      ]
+    },
+    {
+      "pos": [
+        1837,
+        1973
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>MatchAll<ept id=\"p1\">**</ept> 筛选器是默认筛选器，在创建新订阅时未指定筛选器的情况下使用。使用 <bpt id=\"p2\">**</bpt>MatchAll<ept id=\"p2\">**</ept> 筛选器时，发布到主题的所有消息都将置于订阅的虚拟队列中。以下示例创建名为“AllMessages”的订阅，并使用默认的 <bpt id=\"p3\">**</bpt>MatchAll<ept id=\"p3\">**</ept> 筛选器。"
+    },
+    {
+      "content": "创建具有筛选器的订阅",
+      "pos": [
+        2046,
+        2056
+      ]
+    },
+    {
+      "content": "还可以定义筛选器，以指定发送到主题的哪些消息应该在特定主题订阅中显示。",
+      "pos": [
+        2058,
+        2093
+      ]
+    },
+    {
+      "pos": [
+        2095,
+        2225
+      ],
+      "content": "订阅支持的最灵活的一种筛选器是 <bpt id=\"p1\">**</bpt>SqlFilter<ept id=\"p1\">**</ept>，它实现了一部分 SQL92 功能。SQL 筛选器将对发布到主题的消息的属性进行操作。有关可用于 SQL 筛选器的表达式的详细信息，请参阅 <bpt id=\"p2\">[</bpt>SqlFilter.SqlExpression<ept id=\"p2\">][]</ept> 语法。"
+    },
+    {
+      "pos": [
+        2227,
+        2306
+      ],
+      "content": "可以使用 <bpt id=\"p1\">**</bpt>ServiceBusService<ept id=\"p1\">**</ept> 对象的 <bpt id=\"p2\">**</bpt>create\\_rule<ept id=\"p2\">**</ept> 方法向订阅中添加筛选器。此方法允许你向现有订阅中添加新筛选器。"
+    },
+    {
+      "pos": [
+        2310,
+        2448
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 由于默认筛选器会自动应用到所有新订阅，因此，你必须首先删除默认筛选器，否则 <bpt id=\"p1\">**</bpt>MatchAll<ept id=\"p1\">**</ept> 会替代你可能指定的任何其他筛选器。可以使用 <bpt id=\"p2\">**</bpt>ServiceBusService<ept id=\"p2\">**</ept> 对象的 <bpt id=\"p3\">**</bpt>delete\\_rule<ept id=\"p3\">**</ept> 方法删除默认规则。"
+    },
+    {
+      "pos": [
+        2450,
+        2535
+      ],
+      "content": "以下示例创建了一个名为 <ph id=\"ph1\">`HighMessages`</ph> 的订阅（带有只选择自定义 <bpt id=\"p1\">**</bpt>messagenumber<ept id=\"p1\">**</ept> 属性大于 3 的消息的 <bpt id=\"p2\">**</bpt>SqlFilter<ept id=\"p2\">**</ept>）："
+    },
+    {
+      "pos": [
+        2845,
+        2930
+      ],
+      "content": "类似地，以下示例创建一个名为 <ph id=\"ph1\">`LowMessages`</ph> 的订阅，其 <bpt id=\"p1\">**</bpt>SqlFilter<ept id=\"p1\">**</ept> 只选择 <bpt id=\"p2\">**</bpt>messagenumber<ept id=\"p2\">**</ept> 属性小于或等于 3 的消息："
+    },
+    {
+      "pos": [
+        3237,
+        3363
+      ],
+      "content": "现在，当消息发送到 <ph id=\"ph1\">`mytopic`</ph> 时，始终会将它传送到订阅了 <bpt id=\"p1\">**</bpt>AllMessages<ept id=\"p1\">**</ept> 主题订阅的接收方，并选择性地传送到订阅了 <bpt id=\"p2\">**</bpt>HighMessages<ept id=\"p2\">**</ept> 和 <bpt id=\"p3\">**</bpt>LowMessages<ept id=\"p3\">**</ept> 主题订阅的接收方（具体取决于消息内容）。"
+    },
+    {
+      "content": "将消息发送到主题",
+      "pos": [
+        3368,
+        3376
+      ]
+    },
+    {
+      "pos": [
+        3378,
+        3458
+      ],
+      "content": "若要将消息发送到服务总线主题，你的应用程序必须使用 <bpt id=\"p1\">**</bpt>ServiceBusService<ept id=\"p1\">**</ept> 对象的 <bpt id=\"p2\">**</bpt>send\\_topic\\_message<ept id=\"p2\">**</ept> 方法。"
+    },
+    {
+      "pos": [
+        3460,
+        3541
+      ],
+      "content": "以下示例演示如何向 <ph id=\"ph1\">`mytopic`</ph> 发送五条测试消息。请注意，每条消息的 <bpt id=\"p1\">**</bpt>messagenumber<ept id=\"p1\">**</ept> 属性值因循环迭代而异（这将确定哪些订阅接收它）："
+    },
+    {
+      "pos": [
+        3716,
+        3862
+      ],
+      "content": "Service Bus 主题支持最大为 256 MB 的消息（标头最大为 64 MB，其中包括标准和自定义应用程序属性）。一个主题中包含的消息数量不受限制，但消息的总大小受限制。此主题大小是在创建时定义的，上限为 5 GB。有关配额的详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 队列和服务总线队列<ept id=\"p1\">][]</ept>。"
+    },
+    {
+      "content": "从订阅接收消息",
+      "pos": [
+        3867,
+        3874
+      ]
+    },
+    {
+      "pos": [
+        3876,
+        3951
+      ],
+      "content": "对 <bpt id=\"p1\">**</bpt>ServiceBusService<ept id=\"p1\">**</ept> 对象使用 <bpt id=\"p2\">**</bpt>receive\\_subscription\\_message<ept id=\"p2\">**</ept> 方法可从订阅接收消息："
+    },
+    {
+      "pos": [
+        4068,
+        4177
+      ],
+      "content": "当 <bpt id=\"p1\">**</bpt>peek‑lock<ept id=\"p1\">**</ept> 参数设置为 <bpt id=\"p2\">**</bpt>False<ept id=\"p2\">**</ept> 时，将在读取消息后将其从订阅中删除。通过将参数 <bpt id=\"p3\">**</bpt>peek\\_lock<ept id=\"p3\">**</ept> 设置为 <bpt id=\"p4\">**</bpt>True<ept id=\"p4\">**</ept>，你可以读取（扫视）并锁定消息而不会从队列中删除它。"
+    },
+    {
+      "content": "在接收过程中读取并删除消息的行为是最简单的模式，并且最适合在发生故障时应用程序可以容忍不处理消息的情况。为了理解这一点，可以考虑这样一种情形：使用方发出接收请求，但在处理该请求前发生了崩溃。由于 Service Bus 会将消息标记为“将使用”，因此当应用程序重启并重新开始使用消息时，它会丢失在发生崩溃前使用的消息。",
+      "pos": [
+        4179,
+        4338
+      ]
+    },
+    {
+      "pos": [
+        4340,
+        4583
+      ],
+      "content": "如果将 <bpt id=\"p1\">**</bpt>peek\\_lock<ept id=\"p1\">**</ept> 参数设置为 <bpt id=\"p2\">**</bpt>True<ept id=\"p2\">**</ept>，则接收将变成一个两阶段操作，这样就可以支持无法容忍遗漏消息的应用程序。当 Service Bus 收到请求时，它会查找下一条要使用的消息，锁定该消息以防其他使用者接收，然后将该消息返回到应用程序。在应用程序处理完消息（或安全存储该消息以供将来处理）后，它会通过对 <bpt id=\"p3\">**</bpt>Message<ept id=\"p3\">**</ept> 对象调用 <bpt id=\"p4\">**</bpt>delete<ept id=\"p4\">**</ept> 方法来完成接收过程的第二个阶段。<bpt id=\"p5\">**</bpt>delete<ept id=\"p5\">**</ept> 方法会将消息标记为已使用，并从订阅中删除它。"
+    },
+    {
+      "content": "如何处理应用程序崩溃和不可读消息",
+      "pos": [
+        4716,
+        4732
+      ]
+    },
+    {
+      "pos": [
+        4734,
+        4892
+      ],
+      "content": "Service Bus 提供了相关功能来帮助你轻松地从应用程序错误或消息处理问题中恢复。如果接收方应用程序因某种原因无法处理消息，则它可以对 <bpt id=\"p1\">**</bpt>Message<ept id=\"p1\">**</ept> 对象调用 <bpt id=\"p2\">**</bpt>unlock<ept id=\"p2\">**</ept> 方法。这会导致 Service Bus 在订阅中将该消息解锁，使之再次可供同一使用方应用程序或其他使用方应用程序接收。"
+    },
+    {
+      "content": "还存在与订阅中的锁定消息关联的超时，如果应用程序未能在锁定超时过期前处理消息（例如，如果应用程序崩溃），服务总线将自动解锁该消息并使它重新可供接收。",
+      "pos": [
+        4894,
+        4968
+      ]
+    },
+    {
+      "pos": [
+        4970,
+        5177
+      ],
+      "content": "如果应用程序在处理消息之后，但在调用 <bpt id=\"p1\">**</bpt>delete<ept id=\"p1\">**</ept> 方法之前崩溃，则在应用程序重新启动时会将该消息重新传送给它。此情况通常称作<bpt id=\"p2\">**</bpt>至少处理一次<ept id=\"p2\">**</ept>，即每条消息将至少被处理一次，但在某些情况下，同一消息可能会被重新传送。如果方案无法容忍重复处理，则应用程序开发人员应向其应用程序添加更多逻辑以处理重复消息传送。这通常可以通过使用消息的 <bpt id=\"p3\">**</bpt>MessageId<ept id=\"p3\">**</ept> 属性来实现，该属性在多次传送尝试中保持不变。"
+    },
+    {
+      "content": "删除主题和订阅",
+      "pos": [
+        5182,
+        5189
+      ]
+    },
+    {
+      "pos": [
+        5191,
+        5259
+      ],
+      "content": "主题和订阅具有持久性，必须通过 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">][]</ept>或以编程方式显式删除。以下示例演示如何删除名为 <ph id=\"ph1\">`mytopic`</ph> 的主题："
+    },
+    {
+      "pos": [
+        5306,
+        5385
+      ],
+      "content": "删除某个主题也会删除向该主题注册的所有订阅。也可以单独删除订阅。以下代码演示如何从 <ph id=\"ph1\">`mytopic`</ph> 主题中删除名为 <ph id=\"ph2\">`HighMessages`</ph> 的订阅："
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        5458,
+        5462
+      ]
+    },
+    {
+      "content": "现在，你已了解有关 Service Bus 主题的基础知识，单击下面的链接可了解更多信息。",
+      "pos": [
+        5464,
+        5509
+      ]
+    },
+    {
+      "pos": [
+        5515,
+        5531
+      ],
+      "content": "请参阅<bpt id=\"p1\">[</bpt>队列、主题和订阅<ept id=\"p1\">][]</ept>。"
+    },
+    {
+      "pos": [
+        5536,
+        5567
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>SqlFilter.SqlExpression<ept id=\"p1\">][]</ept> 参考。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"如何通过 Python 使用服务总线主题 | Microsoft Azure\" \n    description=\"了解如何使用 Python 中的 Azure 服务总线主题和订阅\" \n    services=\"service-bus\" \n    documentationCenter=\"python\" \n    authors=\"sethmanheim\" \n    manager=\"timlt\" \n    editor=\"\"/>\n\n<tags \n    ms.service=\"service-bus\" \n    ms.date=\"01/26/2016\" \n    wacn.date=\"03/17/2016\"/>\n\n# 如何使用服务总线主题和订阅\n\n[AZURE.INCLUDE [service-bus-selector-topics](../includes/service-bus-selector-topics.md)]\n\n本文介绍了如何使用服务总线主题和订阅。相关示例是使用 Python 编写的，并使用 [Python Azure 包][]。涉及的任务包括**创建主题和订阅**、**创建订阅筛选器**、**将消息发送到主题**、**从订阅接收消息**以及**删除主题和订阅**。有关主题和订阅的详细信息，请参阅[后续步骤](#next-steps)部分。\n\n[AZURE.INCLUDE [howto-service-bus-topics](../includes/howto-service-bus-topics.md)]\n\n**注意：**如果你需要安装 Python 或 [Python Azure 包][]，请参阅 [Python 安装指南](/documentation/articles/python-how-to-install)。\n\n## 创建主题\n\n可以通过 **ServiceBusService** 对象处理主题。将以下代码添加到任何 Python 文件的顶部附近，你希望在其中以编程方式访问服务总线：\n\n```\nfrom azure.servicebus import ServiceBusService, Message, Topic, Rule, DEFAULT_RULE_NAME\n```\n\n以下代码创建 **ServiceBusService** 对象。将 `mynamespace`、`sharedaccesskeyname` 和 `sharedaccesskey` 替换为实际的命名空间、共享访问签名 (SAS) 密钥名称和密钥值。\n\n```\nbus_service = ServiceBusService(\n    service_namespace='mynamespace',\n    shared_access_key_name='sharedaccesskeyname',\n    shared_access_key_value='sharedaccesskey')\n```\n\n你可以从 [Azure 经典门户][]中的“连接信息”窗口获得 SAS 密钥名称和值。\n\n```\nbus_service.create_topic('mytopic')\n```\n\n**create\\_topic** 还支持其他选项，以允许你重写默认主题设置，例如消息生存时间或最大主题大小。以下示例将最大主题大小设置为 5 GB，将生存时间 (TTL) 值设置为 1 分钟：\n\n```\ntopic_options = Topic()\ntopic_options.max_size_in_megabytes = '5120'\ntopic_options.default_message_time_to_live = 'PT1M'\n\nbus_service.create_topic('mytopic', topic_options)\n```\n\n## 创建订阅\n\n主题订阅也是使用 **ServiceBusService** 对象创建的。订阅已命名，并且具有一个限制传递到订阅的虚拟队列的消息集的可选筛选器。\n\n> [AZURE.NOTE] 订阅是永久性的，除非删除它们或删除订阅它们的主题，否则订阅将一直存在。\n\n### 创建具有默认 (MatchAll) 筛选器的订阅\n\n**MatchAll** 筛选器是默认筛选器，在创建新订阅时未指定筛选器的情况下使用。使用 **MatchAll** 筛选器时，发布到主题的所有消息都将置于订阅的虚拟队列中。以下示例创建名为“AllMessages”的订阅，并使用默认的 **MatchAll** 筛选器。\n\n```\nbus_service.create_subscription('mytopic', 'AllMessages')\n```\n\n### 创建具有筛选器的订阅\n\n还可以定义筛选器，以指定发送到主题的哪些消息应该在特定主题订阅中显示。\n\n订阅支持的最灵活的一种筛选器是 **SqlFilter**，它实现了一部分 SQL92 功能。SQL 筛选器将对发布到主题的消息的属性进行操作。有关可用于 SQL 筛选器的表达式的详细信息，请参阅 [SqlFilter.SqlExpression][] 语法。\n\n可以使用 **ServiceBusService** 对象的 **create\\_rule** 方法向订阅中添加筛选器。此方法允许你向现有订阅中添加新筛选器。\n\n> [AZURE.NOTE] 由于默认筛选器会自动应用到所有新订阅，因此，你必须首先删除默认筛选器，否则 **MatchAll** 会替代你可能指定的任何其他筛选器。可以使用 **ServiceBusService** 对象的 **delete\\_rule** 方法删除默认规则。\n\n以下示例创建了一个名为 `HighMessages` 的订阅（带有只选择自定义 **messagenumber** 属性大于 3 的消息的 **SqlFilter**）：\n\n```\nbus_service.create_subscription('mytopic', 'HighMessages')\n\nrule = Rule()\nrule.filter_type = 'SqlFilter'\nrule.filter_expression = 'messagenumber > 3'\n\nbus_service.create_rule('mytopic', 'HighMessages', 'HighMessageFilter', rule)\nbus_service.delete_rule('mytopic', 'HighMessages', DEFAULT_RULE_NAME)\n```\n\n类似地，以下示例创建一个名为 `LowMessages` 的订阅，其 **SqlFilter** 只选择 **messagenumber** 属性小于或等于 3 的消息：\n\n```\nbus_service.create_subscription('mytopic', 'LowMessages')\n\nrule = Rule()\nrule.filter_type = 'SqlFilter'\nrule.filter_expression = 'messagenumber <= 3'\n\nbus_service.create_rule('mytopic', 'LowMessages', 'LowMessageFilter', rule)\nbus_service.delete_rule('mytopic', 'LowMessages', DEFAULT_RULE_NAME)\n```\n\n现在，当消息发送到 `mytopic` 时，始终会将它传送到订阅了 **AllMessages** 主题订阅的接收方，并选择性地传送到订阅了 **HighMessages** 和 **LowMessages** 主题订阅的接收方（具体取决于消息内容）。\n\n## 将消息发送到主题\n\n若要将消息发送到服务总线主题，你的应用程序必须使用 **ServiceBusService** 对象的 **send\\_topic\\_message** 方法。\n\n以下示例演示如何向 `mytopic` 发送五条测试消息。请注意，每条消息的 **messagenumber** 属性值因循环迭代而异（这将确定哪些订阅接收它）：\n\n```\nfor i in range(5):\n    msg = Message('Msg {0}'.format(i).encode('utf-8'), custom_properties={'messagenumber':i})\n    bus_service.send_topic_message('mytopic', msg)\n```\n\nService Bus 主题支持最大为 256 MB 的消息（标头最大为 64 MB，其中包括标准和自定义应用程序属性）。一个主题中包含的消息数量不受限制，但消息的总大小受限制。此主题大小是在创建时定义的，上限为 5 GB。有关配额的详细信息，请参阅 [Azure 队列和服务总线队列][]。\n\n## 从订阅接收消息\n\n对 **ServiceBusService** 对象使用 **receive\\_subscription\\_message** 方法可从订阅接收消息：\n\n```\nmsg = bus_service.receive_subscription_message('mytopic', 'LowMessages', peek_lock=False)\nprint(msg.body)\n```\n\n当 **peek‑lock** 参数设置为 **False** 时，将在读取消息后将其从订阅中删除。通过将参数 **peek\\_lock** 设置为 **True**，你可以读取（扫视）并锁定消息而不会从队列中删除它。\n\n在接收过程中读取并删除消息的行为是最简单的模式，并且最适合在发生故障时应用程序可以容忍不处理消息的情况。为了理解这一点，可以考虑这样一种情形：使用方发出接收请求，但在处理该请求前发生了崩溃。由于 Service Bus 会将消息标记为“将使用”，因此当应用程序重启并重新开始使用消息时，它会丢失在发生崩溃前使用的消息。\n\n如果将 **peek\\_lock** 参数设置为 **True**，则接收将变成一个两阶段操作，这样就可以支持无法容忍遗漏消息的应用程序。当 Service Bus 收到请求时，它会查找下一条要使用的消息，锁定该消息以防其他使用者接收，然后将该消息返回到应用程序。在应用程序处理完消息（或安全存储该消息以供将来处理）后，它会通过对 **Message** 对象调用 **delete** 方法来完成接收过程的第二个阶段。**delete** 方法会将消息标记为已使用，并从订阅中删除它。\n\n```\nmsg = bus_service.receive_subscription_message('mytopic', 'LowMessages', peek_lock=True)\nprint(msg.body)\n\nmsg.delete()\n```\n\n## 如何处理应用程序崩溃和不可读消息\n\nService Bus 提供了相关功能来帮助你轻松地从应用程序错误或消息处理问题中恢复。如果接收方应用程序因某种原因无法处理消息，则它可以对 **Message** 对象调用 **unlock** 方法。这会导致 Service Bus 在订阅中将该消息解锁，使之再次可供同一使用方应用程序或其他使用方应用程序接收。\n\n还存在与订阅中的锁定消息关联的超时，如果应用程序未能在锁定超时过期前处理消息（例如，如果应用程序崩溃），服务总线将自动解锁该消息并使它重新可供接收。\n\n如果应用程序在处理消息之后，但在调用 **delete** 方法之前崩溃，则在应用程序重新启动时会将该消息重新传送给它。此情况通常称作**至少处理一次**，即每条消息将至少被处理一次，但在某些情况下，同一消息可能会被重新传送。如果方案无法容忍重复处理，则应用程序开发人员应向其应用程序添加更多逻辑以处理重复消息传送。这通常可以通过使用消息的 **MessageId** 属性来实现，该属性在多次传送尝试中保持不变。\n\n## 删除主题和订阅\n\n主题和订阅具有持久性，必须通过 [Azure 经典门户][]或以编程方式显式删除。以下示例演示如何删除名为 `mytopic` 的主题：\n\n```\nbus_service.delete_topic('mytopic')\n```\n\n删除某个主题也会删除向该主题注册的所有订阅。也可以单独删除订阅。以下代码演示如何从 `mytopic` 主题中删除名为 `HighMessages` 的订阅：\n\n```\nbus_service.delete_subscription('mytopic', 'HighMessages')\n```\n\n## 后续步骤\n\n现在，你已了解有关 Service Bus 主题的基础知识，单击下面的链接可了解更多信息。\n\n-   请参阅[队列、主题和订阅][]。\n-   [SqlFilter.SqlExpression][] 参考。\n\n[Azure 经典门户]: http://manage.windowsazure.cn\n[Python Azure 包]: https://pypi.python.org/pypi/azure\n[队列、主题和订阅]: /documentation/articles/service-bus-queues-topics-subscriptions\n[SqlFilter.SqlExpression]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sqlfilter.sqlexpression.aspx\n[Azure 队列和服务总线队列]: /documentation/articles/service-bus-azure-and-service-bus-queues-compared-contrasted/#capacity-and-quotas\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

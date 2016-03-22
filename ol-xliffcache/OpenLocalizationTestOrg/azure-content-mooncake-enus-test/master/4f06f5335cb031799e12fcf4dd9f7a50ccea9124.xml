@@ -1,0 +1,250 @@
+{
+  "nodes": [
+    {
+      "content": "在经典部署模型中使用 PowerShell 部署多 NIC VM | Azure",
+      "pos": [
+        27,
+        67
+      ]
+    },
+    {
+      "content": "了解如何在经典部署模型中使用 PowerShell 部署多 NIC VM",
+      "pos": [
+        85,
+        121
+      ]
+    },
+    {
+      "content": "使用 PowerShell 部署多 NIC VM（经典）",
+      "pos": [
+        374,
+        402
+      ]
+    },
+    {
+      "pos": [
+        942,
+        1098
+      ],
+      "content": "由于目前你不能使用具有单个 NIC 的 VM 以及具有同一个云服务中的多个 NIC 的 VM，因此你将在一个云服务中实现后端服务器，而在其他云服务中实现方案中的所有其他组件。以下步骤使用名为 <bpt id=\"p1\">*</bpt>IaaSStory<ept id=\"p1\">*</ept> 的云服务作为主资源，并在名为 <bpt id=\"p2\">*</bpt>IaaSStory-BackEnd<ept id=\"p2\">*</ept> 的云服务中实现后端服务器。"
+    },
+    {
+      "pos": [
+        1102,
+        1135
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"Prerequisites\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 先决条件"
+    },
+    {
+      "pos": [
+        1137,
+        1302
+      ],
+      "content": "在部署后端服务器之前，你需要先使用此方案的所有必需资源部署主云服务。至少，你需要创建包含后端子网的虚拟网络。若要了解如何部署虚拟网络，请访问<bpt id=\"p1\">[</bpt>使用 PowerShell 创建虚拟网络<ept id=\"p1\">](/documentation/articles/virtual-networks-create-vnet-classic-netcfg-ps)</ept>。"
+    },
+    {
+      "content": "部署后端 VM",
+      "pos": [
+        1407,
+        1414
+      ]
+    },
+    {
+      "content": "后端 VM 取决于下面列出的资源的创建。",
+      "pos": [
+        1416,
+        1436
+      ]
+    },
+    {
+      "pos": [
+        1440,
+        1506
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>后端子网<ept id=\"p1\">**</ept>。数据库服务器将是单独子网的一部分，以隔离流量。以下脚本需要在名为 <bpt id=\"p2\">*</bpt>WTestVnet<ept id=\"p2\">*</ept> 的虚拟网络中存在此子网。"
+    },
+    {
+      "pos": [
+        1509,
+        1593
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>数据磁盘的存储帐户<ept id=\"p1\">**</ept>。为了提高性能，数据库服务器上的数据磁盘将使用固态驱动器 (SSD) 技术，这需要高级存储帐户。请确保你部署的 Azure 位置支持高级存储。"
+    },
+    {
+      "pos": [
+        1596,
+        1651
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>可用性集<ept id=\"p1\">**</ept>。所有数据库服务器都将添加到单个可用性集，以确保在维护期间至少有一个 VM 已启动且正在运行。"
+    },
+    {
+      "content": "步骤 1 - 启动脚本",
+      "pos": [
+        1658,
+        1669
+      ]
+    },
+    {
+      "pos": [
+        1671,
+        1876
+      ],
+      "content": "你可以在<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/IaaS-Story/11-MultiNIC/classic/virtual-network-deploy-multinic-classic-ps.ps1)</ept>下载所用的完整 PowerShell 脚本。请按照以下步骤更改要在你的环境中使用的脚本。"
+    },
+    {
+      "pos": [
+        1881,
+        1922
+      ],
+      "content": "基于你在上面<bpt id=\"p1\">[</bpt>先决条件<ept id=\"p1\">](#Prerequisites)</ept>中部署的更改以下变量的值。"
+    },
+    {
+      "content": "基于要用于后端部署的值更改以下变量的值。",
+      "pos": [
+        2063,
+        2083
+      ]
+    },
+    {
+      "content": "步骤 2 - 为你的 VM 创建必要的资源",
+      "pos": [
+        2486,
+        2507
+      ]
+    },
+    {
+      "content": "你需要为所有 VM 的数据磁盘创建一个新的云服务和一个存储帐户。你还需要为 VM 指定映像和一个本地管理员帐户。若要创建这些资源，请执行以下步骤。",
+      "pos": [
+        2509,
+        2582
+      ]
+    },
+    {
+      "content": "创建新的云服务。",
+      "pos": [
+        2587,
+        2595
+      ]
+    },
+    {
+      "content": "创建新的高级存储帐户。",
+      "pos": [
+        2674,
+        2685
+      ]
+    },
+    {
+      "content": "将上面创建的存储帐户设置为订阅的当前存储帐户。",
+      "pos": [
+        2832,
+        2855
+      ]
+    },
+    {
+      "content": "为 VM 选择映像。",
+      "pos": [
+        3099,
+        3109
+      ]
+    },
+    {
+      "content": "设置本地管理员帐户凭据。",
+      "pos": [
+        3348,
+        3360
+      ]
+    },
+    {
+      "content": "步骤 3 - 创建 VM",
+      "pos": [
+        3461,
+        3473
+      ]
+    },
+    {
+      "content": "你需要使用循环来根据需要创建任意多的 VM，并在循环中创建所需的 NIC 和 VM。若要创建 NIC 和 VM，请执行以下步骤。",
+      "pos": [
+        3475,
+        3539
+      ]
+    },
+    {
+      "pos": [
+        3544,
+        3609
+      ],
+      "content": "启动 <ph id=\"ph1\">`for`</ph> 循环以基于 <ph id=\"ph2\">`$numberOfVMs`</ph> 变量的值重复执行命令以根据需要创建任意多次一个 VM 和两个 NIC。"
+    },
+    {
+      "pos": [
+        3697,
+        3733
+      ],
+      "content": "创建 <ph id=\"ph1\">`VMConfig`</ph> 对象，它为 VM 指定映像、大小和可用性集。"
+    },
+    {
+      "content": "将 VM 预配为 Windows VM。",
+      "pos": [
+        4011,
+        4031
+      ]
+    },
+    {
+      "content": "设置默认 NIC，并为其分配一个静态 IP 地址。",
+      "pos": [
+        4191,
+        4216
+      ]
+    },
+    {
+      "content": "为每个 VM 添加第二个 NIC。",
+      "pos": [
+        4390,
+        4407
+      ]
+    },
+    {
+      "content": "为每个 VM 创建两个数据磁盘。",
+      "pos": [
+        4656,
+        4672
+      ]
+    },
+    {
+      "content": "创建每个 VM，然后结束循环。",
+      "pos": [
+        5169,
+        5184
+      ]
+    },
+    {
+      "content": "步骤 4 - 运行脚本",
+      "pos": [
+        5361,
+        5372
+      ]
+    },
+    {
+      "content": "现在，你已根据需要下载并更改了脚本，请运行该脚本以创建具有多个 NIC 的后端数据库 VM。",
+      "pos": [
+        5374,
+        5420
+      ]
+    },
+    {
+      "pos": [
+        5425,
+        5492
+      ],
+      "content": "保存脚本并从 <bpt id=\"p1\">**</bpt>PowerShell<ept id=\"p1\">**</ept> 命令提示符或 <bpt id=\"p2\">**</bpt>PowerShell ISE<ept id=\"p2\">**</ept> 运行它。你将看到最初的输出，如下所示。"
+    },
+    {
+      "content": "填写凭据提示中所需的信息，然后单击“确定”。此时将显示以下输出。",
+      "pos": [
+        5993,
+        6025
+      ]
+    }
+  ],
+  "content": "<properties \n   pageTitle=\"在经典部署模型中使用 PowerShell 部署多 NIC VM | Azure\"\n   description=\"了解如何在经典部署模型中使用 PowerShell 部署多 NIC VM\"\n   services=\"virtual-network\"\n   documentationCenter=\"na\"\n   authors=\"telmosampaio\"\n   manager=\"carmonm\"\n   editor=\"\"\n   tags=\"azure-service-management\"\n/>\n<tags\n    ms.service=\"virtual-network\"\n    ms.date=\"11/12/2015\"\n    wacn.date=\"12/31/2015\"/>\n\n#使用 PowerShell 部署多 NIC VM（经典）\n\n[AZURE.INCLUDE [virtual-network-deploy-multinic-classic-selectors-include.md](../includes/virtual-network-deploy-multinic-classic-selectors-include.md)]\n\n[AZURE.INCLUDE [virtual-network-deploy-multinic-intro-include.md](../includes/virtual-network-deploy-multinic-intro-include.md)]\n\n[AZURE.INCLUDE [azure-arm-classic-important-include](../includes/learn-about-deployment-models-classic-include.md)] \n\n[AZURE.INCLUDE [virtual-network-deploy-multinic-scenario-include.md](../includes/virtual-network-deploy-multinic-scenario-include.md)]\n\n由于目前你不能使用具有单个 NIC 的 VM 以及具有同一个云服务中的多个 NIC 的 VM，因此你将在一个云服务中实现后端服务器，而在其他云服务中实现方案中的所有其他组件。以下步骤使用名为 *IaaSStory* 的云服务作为主资源，并在名为 *IaaSStory-BackEnd* 的云服务中实现后端服务器。\n\n##<a name=\"Prerequisites\"></a> 先决条件\n\n在部署后端服务器之前，你需要先使用此方案的所有必需资源部署主云服务。至少，你需要创建包含后端子网的虚拟网络。若要了解如何部署虚拟网络，请访问[使用 PowerShell 创建虚拟网络](/documentation/articles/virtual-networks-create-vnet-classic-netcfg-ps)。\n\n[AZURE.INCLUDE [azure-ps-prerequisites-include.md](../includes/azure-ps-prerequisites-include.md)]\n\n## 部署后端 VM\n\n后端 VM 取决于下面列出的资源的创建。\n\n- **后端子网**。数据库服务器将是单独子网的一部分，以隔离流量。以下脚本需要在名为 *WTestVnet* 的虚拟网络中存在此子网。\n- **数据磁盘的存储帐户**。为了提高性能，数据库服务器上的数据磁盘将使用固态驱动器 (SSD) 技术，这需要高级存储帐户。请确保你部署的 Azure 位置支持高级存储。\n- **可用性集**。所有数据库服务器都将添加到单个可用性集，以确保在维护期间至少有一个 VM 已启动且正在运行。 \n\n### 步骤 1 - 启动脚本\n\n你可以在[此处](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/IaaS-Story/11-MultiNIC/classic/virtual-network-deploy-multinic-classic-ps.ps1)下载所用的完整 PowerShell 脚本。请按照以下步骤更改要在你的环境中使用的脚本。\n\n1. 基于你在上面[先决条件](#Prerequisites)中部署的更改以下变量的值。\n\n        $location              = \"China North\"\n        $vnetName              = \"WTestVNet\"\n        $backendSubnetName     = \"BackEnd\"\n\n2. 基于要用于后端部署的值更改以下变量的值。\n\n        $backendCSName         = \"IaaSStory-Backend\"\n        $prmStorageAccountName = \"iaasstoryprmstorage\"\n        $avSetName             = \"ASDB\"\n        $vmSize                = \"Standard_DS3\"\n        $diskSize              = 127\n        $vmNamePrefix          = \"DB\"\n        $dataDiskSuffix        = \"datadisk\"\n        $ipAddressPrefix       = \"192.168.2.\"\n        $numberOfVMs           = 2\n\n### 步骤 2 - 为你的 VM 创建必要的资源\n\n你需要为所有 VM 的数据磁盘创建一个新的云服务和一个存储帐户。你还需要为 VM 指定映像和一个本地管理员帐户。若要创建这些资源，请执行以下步骤。\n\n1. 创建新的云服务。\n\n        New-AzureService -ServiceName $backendCSName -Location $location\n\n2. 创建新的高级存储帐户。\n\n        New-AzureStorageAccount -StorageAccountName $prmStorageAccountName `\n            -Location $location `\n            -Type Premium_LRS\n\n3. 将上面创建的存储帐户设置为订阅的当前存储帐户。\n\n        $subscription = Get-AzureSubscription `\n            | where {$_.IsCurrent -eq $true}  \n        Set-AzureSubscription -SubscriptionName $subscription.SubscriptionName `\n            -CurrentStorageAccountName $prmStorageAccountName\n\n4. 为 VM 选择映像。\n\n        $image = Get-AzureVMImage `\n            | where{$_.ImageFamily -eq \"SQL Server 2014 RTM Web on Windows Server 2012 R2\"} `\n            | sort PublishedDate -Descending `\n            | select -ExpandProperty ImageName -First 1\n\n5. 设置本地管理员帐户凭据。\n\n        $cred = Get-Credential -Message \"Enter username and password for local admin account\"\n\n### 步骤 3 - 创建 VM\n\n你需要使用循环来根据需要创建任意多的 VM，并在循环中创建所需的 NIC 和 VM。若要创建 NIC 和 VM，请执行以下步骤。\n\n1. 启动 `for` 循环以基于 `$numberOfVMs` 变量的值重复执行命令以根据需要创建任意多次一个 VM 和两个 NIC。\n\n        for ($suffixNumber = 1; $suffixNumber -le $numberOfVMs; $suffixNumber++){\n\n2. 创建 `VMConfig` 对象，它为 VM 指定映像、大小和可用性集。\n\n            $vmName = $vmNamePrefix + $suffixNumber\n            $vmConfig = New-AzureVMConfig -Name $vmName `\n                            -ImageName $image `\n                            -InstanceSize $vmSize `\n                            -AvailabilitySetName $avSetName  \n\n3. 将 VM 预配为 Windows VM。\n\n            Add-AzureProvisioningConfig -VM $vmConfig -Windows `\n                -AdminUsername $cred.UserName `\n                -Password $cred.Password\n\n4. 设置默认 NIC，并为其分配一个静态 IP 地址。\n\n            Set-AzureSubnet -SubnetNames $backendSubnetName -VM $vmConfig\n            Set-AzureStaticVNetIP -IPAddress ($ipAddressPrefix+$suffixNumber+3) -VM $vmConfig\n\n5. 为每个 VM 添加第二个 NIC。\n\n            Add-AzureNetworkInterfaceConfig -Name (\"RemoteAccessNIC\"+$suffixNumber) `\n                -SubnetName $backendSubnetName `\n                -StaticVNetIPAddress ($ipAddressPrefix+(53+$suffixNumber)) `\n                -VM $vmConfig \n\n6. 为每个 VM 创建两个数据磁盘。\n\n            $dataDisk1Name = $vmName + \"-\" + $dataDiskSuffix + \"-1\"    \n            Add-AzureDataDisk -CreateNew -VM $vmConfig `\n                -DiskSizeInGB $diskSize `\n                -DiskLabel $dataDisk1Name `\n                -LUN 0       \n        \n            $dataDisk2Name = $vmName + \"-\" + $dataDiskSuffix + \"-2\"   \n            Add-AzureDataDisk -CreateNew -VM $vmConfig `\n                -DiskSizeInGB $diskSize `\n                -DiskLabel $dataDisk2Name `\n                -LUN 1\n\n7. 创建每个 VM，然后结束循环。\n\n            New-AzureVM -VM $vmConfig `\n                -ServiceName $backendCSName `\n                -Location $location `\n                -VNetName $vnetName\n        }\n\n### 步骤 4 - 运行脚本\n\n现在，你已根据需要下载并更改了脚本，请运行该脚本以创建具有多个 NIC 的后端数据库 VM。\n\n1. 保存脚本并从 **PowerShell** 命令提示符或 **PowerShell ISE** 运行它。你将看到最初的输出，如下所示。\n\n        OperationDescription    OperationId                          OperationStatus\n        --------------------    -----------                          ---------------\n        New-AzureService        xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx Succeeded      \n        New-AzureStorageAccount xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx Succeeded      \n                                                                                    \n        WARNING: No deployment found in service: 'IaaSStory-Backend'.\n\n2. 填写凭据提示中所需的信息，然后单击“确定”。此时将显示以下输出。\n\n        New-AzureVM             xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx Succeeded\n        New-AzureVM             xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx Succeeded \n\n<!---HONumber=Mooncake_1221_2015-->"
+}

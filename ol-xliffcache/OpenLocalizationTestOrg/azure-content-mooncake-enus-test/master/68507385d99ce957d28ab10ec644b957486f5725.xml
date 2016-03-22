@@ -1,0 +1,75 @@
+{
+  "nodes": [
+    {
+      "content": "先前示例显示标准登录，这要求在此应用每次启动时客户端同时联系标识提供商和移动服务。此方法不仅效率低下，而且如果很多客户尝试同时启动你的应用程序，你会遇到关于使用率的问题。更好的方法是缓存移动服务返回的授权令牌，然后在使用基于提供商的登录之前首先尝试使用此令牌。",
+      "pos": [
+        1,
+        131
+      ]
+    },
+    {
+      "pos": [
+        135,
+        201
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>无论您使用客户端管理的还是服务管理的身份验证，都可以缓存由移动服务颁发的令牌。本教程使用服务管理的身份验证。"
+    },
+    {
+      "content": "在 Eclipse 中，打开 ToDoActivity.java 文件并添加以下 import 语句：",
+      "pos": [
+        207,
+        258
+      ]
+    },
+    {
+      "pos": [
+        411,
+        438
+      ],
+      "content": "将以下成员添加到  <ph id=\"ph1\">`ToDoActivity`</ph> 类。"
+    },
+    {
+      "pos": [
+        620,
+        673
+      ],
+      "content": "在 ToDoActivity.java 文件中，为  <ph id=\"ph1\">`cacheUserToken`</ph> 方法添加以下定义。"
+    },
+    {
+      "content": "此方法将用户 ID 和令牌存储在标记为私有的首选项文件中。这应保护对缓存的访问，以便在设备上的其他应用没有令牌的访问权，因为将应用程序的首选项进行沙箱处理。但是，如果有人获取了设备的访问权，则它们可能会通过其他方式获得对令牌缓存的访问权。",
+      "pos": [
+        1067,
+        1186
+      ]
+    },
+    {
+      "pos": [
+        1194,
+        1290
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果对您数据的令牌访问被认为非常敏感，并且有人可能会获得对设备的访问权，则可以使用加密进一步保护令牌。但是，完全安全的解决方案超出了本教程的范围并且取决于您的安全要求。"
+    },
+    {
+      "pos": [
+        1296,
+        1353
+      ],
+      "content": "在 ToDoActivity.java 文件中，为  <ph id=\"ph1\">`loadUserTokenCache`</ph> 方法添加以下定义。"
+    },
+    {
+      "pos": [
+        2043,
+        2140
+      ],
+      "content": "在  <bpt id=\"p1\">*</bpt>ToDoActivity.java<ept id=\"p1\">*</ept> 文件中，将  <ph id=\"ph1\">`authenticate`</ph> 方法替换为使用令牌缓存的以下方法。如果您想要使用的帐户不是 Microsoft 帐户，请更改登录提供商。"
+    },
+    {
+      "content": "构建此应用并使用有效帐户来测试验证。至少两次运行它。在第一次运行期间，你应收到要求登录并创建令牌缓存的提示。此后，每次运行将尝试加载令牌缓存以进行身份验证，您不需要登录。",
+      "pos": [
+        3406,
+        3491
+      ]
+    }
+  ],
+  "content": "\n先前示例显示标准登录，这要求在此应用每次启动时客户端同时联系标识提供商和移动服务。此方法不仅效率低下，而且如果很多客户尝试同时启动你的应用程序，你会遇到关于使用率的问题。更好的方法是缓存移动服务返回的授权令牌，然后在使用基于提供商的登录之前首先尝试使用此令牌。 \n\n>[AZURE.NOTE]无论您使用客户端管理的还是服务管理的身份验证，都可以缓存由移动服务颁发的令牌。本教程使用服务管理的身份验证。\n\n\n1. 在 Eclipse 中，打开 ToDoActivity.java 文件并添加以下 import 语句：\n\n        import android.content.Context;\n        import android.content.SharedPreferences;\n        import android.content.SharedPreferences.Editor;\n\n2. 将以下成员添加到  `ToDoActivity` 类。\n\n        public static final String SHAREDPREFFILE = \"temp\"; \n        public static final String USERIDPREF = \"uid\";  \n        public static final String TOKENPREF = \"tkn\";   \n\n\n3. 在 ToDoActivity.java 文件中，为  `cacheUserToken` 方法添加以下定义。\n \n        private void cacheUserToken(MobileServiceUser user)\n        {\n            SharedPreferences prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE);\n            Editor editor = prefs.edit();\n            editor.putString(USERIDPREF, user.getUserId());\n            editor.putString(TOKENPREF, user.getAuthenticationToken());\n            editor.commit();\n        }   \n  \n    此方法将用户 ID 和令牌存储在标记为私有的首选项文件中。这应保护对缓存的访问，以便在设备上的其他应用没有令牌的访问权，因为将应用程序的首选项进行沙箱处理。但是，如果有人获取了设备的访问权，则它们可能会通过其他方式获得对令牌缓存的访问权。 \n\n    >[AZURE.NOTE]如果对您数据的令牌访问被认为非常敏感，并且有人可能会获得对设备的访问权，则可以使用加密进一步保护令牌。但是，完全安全的解决方案超出了本教程的范围并且取决于您的安全要求。\n\n\n4. 在 ToDoActivity.java 文件中，为  `loadUserTokenCache` 方法添加以下定义。\n\n        private boolean loadUserTokenCache(MobileServiceClient client)\n        {\n            SharedPreferences prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE);\n            String userId = prefs.getString(USERIDPREF, \"undefined\"); \n            if (userId == \"undefined\")\n                return false;\n            String token = prefs.getString(TOKENPREF, \"undefined\"); \n            if (token == \"undefined\")\n                return false;\n                \n            MobileServiceUser user = new MobileServiceUser(userId);\n            user.setAuthenticationToken(token);\n            client.setCurrentUser(user);\n                \n            return true;\n        }\n\n\n\n5. 在  *ToDoActivity.java* 文件中，将  `authenticate` 方法替换为使用令牌缓存的以下方法。如果您想要使用的帐户不是 Microsoft 帐户，请更改登录提供商。\n\n        private void authenticate() {\n            // We first try to load a token cache if one exists.\n            if (loadUserTokenCache(mClient))\n            {\n                createTable();\n            }\n            // If we failed to load a token cache, login and create a token cache\n            else\n            {\n                // Login using the Google provider.    \n                ListenableFuture<MobileServiceUser> mLogin = mClient.login(MobileServiceAuthenticationProvider.Google);\n        \n                Futures.addCallback(mLogin, new FutureCallback<MobileServiceUser>() {\n                    @Override\n                    public void onFailure(Throwable exc) {\n                        createAndShowDialog(\"You must log in. Login Required\", \"Error\");\n                    }           \n                    @Override\n                    public void onSuccess(MobileServiceUser user) {\n                        createAndShowDialog(String.format(\n                                \"You are now logged in - %1$2s\",\n                                user.getUserId()), \"Success\");\n                        cacheUserToken(mClient.getCurrentUser());\n                        createTable();  \n                    }\n                });\n            }\n        }\n\n6. 构建此应用并使用有效帐户来测试验证。至少两次运行它。在第一次运行期间，你应收到要求登录并创建令牌缓存的提示。此后，每次运行将尝试加载令牌缓存以进行身份验证，您不需要登录。\n\n\n\n\n<!--HONumber=50-->"
+}

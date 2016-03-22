@@ -1,0 +1,733 @@
+{
+  "nodes": [
+    {
+      "content": "使用负载平衡集群集化 Linux 上的 MySQL",
+      "pos": [
+        27,
+        52
+      ]
+    },
+    {
+      "content": "该文章作为示例说明了在 Azure 中使用 MySQL 设置负载平衡的高可用性 Linux 群集的模式",
+      "pos": [
+        71,
+        122
+      ]
+    },
+    {
+      "content": "使用负载平衡集群集化 Linux 上的 MySQL",
+      "pos": [
+        339,
+        364
+      ]
+    },
+    {
+      "content": "做好准备",
+      "pos": [
+        369,
+        373
+      ]
+    },
+    {
+      "content": "设置群集",
+      "pos": [
+        394,
+        398
+      ]
+    },
+    {
+      "content": "设置 MySQL",
+      "pos": [
+        428,
+        436
+      ]
+    },
+    {
+      "content": "设置 Corosync",
+      "pos": [
+        460,
+        471
+      ]
+    },
+    {
+      "content": "设置 Pacemaker",
+      "pos": [
+        498,
+        510
+      ]
+    },
+    {
+      "content": "测试",
+      "pos": [
+        538,
+        540
+      ]
+    },
+    {
+      "content": "STONITH",
+      "pos": [
+        555,
+        562
+      ]
+    },
+    {
+      "content": "限制",
+      "pos": [
+        577,
+        579
+      ]
+    },
+    {
+      "content": "介绍",
+      "pos": [
+        599,
+        601
+      ]
+    },
+    {
+      "content": "本文旨在探索并说明可用于在 Azure 上部署基于 Linux 的高度可用服务的不同方法，并作为入门书探索 MySQL Server 的高可用性。",
+      "pos": [
+        603,
+        676
+      ]
+    },
+    {
+      "content": "我们将基于 DRBD、Corosync 和 Pacemaker 概述无共享双节点单主机 MySQL 高可用性解决方案。一次只有一个节点运行 MySQL。读取和写入 DRBD 资源也限制为一次只有一个节点。",
+      "pos": [
+        678,
+        780
+      ]
+    },
+    {
+      "content": "无需使用类似 LVS 的 VIP 解决方案，因为我们使用 Azure 负载平衡集来同时提供轮循功能和 VIP 的终结点检测、删除和正常恢复功能。VIP 是在首次创建云服务时由 Azure 分配的全局可路由 IPv4 地址。",
+      "pos": [
+        782,
+        893
+      ]
+    },
+    {
+      "pos": [
+        895,
+        1076
+      ],
+      "content": "MySQL 的其他可能体系结构包括 NBD 群集、Percona 和 Galera 以及多个中间件解决方案，其中至少有一个以 <bpt id=\"p1\">[</bpt>VM Depot<ept id=\"p1\">](http://vmdepot.msopentech.com)</ept> 中的 VM 的形式提供。只要这些解决方案可以复制到单播、多播或广播上，并且不要依赖于共享存储或多个网络接口，这些方案就应该很容易在 Azure 上部署。"
+    },
+    {
+      "content": "当然，这些群集体系结构可以类似方式扩展到其他产品（如 PostgreSQL 和 OpenLDAP）。例如，此无共享的负载平衡过程已成功在多主机 OpenLDAP 上测试，并可以在我们的第 9 频道博客上观看。",
+      "pos": [
+        1078,
+        1182
+      ]
+    },
+    {
+      "content": "做好准备",
+      "pos": [
+        1187,
+        1191
+      ]
+    },
+    {
+      "content": "你将需要一个具有有效订阅可以创建至少两 (2) 个虚拟机的 Azure 帐户（在此示例中使用 XS）、一个网络和一个子网、一个地缘组和一个可用性集，以及能够在同一区域中创建新的 VHD 作为云服务，并将这些 VHD 附加到 Linux 虚拟机。",
+      "pos": [
+        1193,
+        1315
+      ]
+    },
+    {
+      "content": "已测试的环境",
+      "pos": [
+        1321,
+        1327
+      ]
+    },
+    {
+      "content": "Ubuntu 13.10",
+      "pos": [
+        1331,
+        1343
+      ]
+    },
+    {
+      "content": "DRBD",
+      "pos": [
+        1348,
+        1352
+      ]
+    },
+    {
+      "content": "MySQL Server",
+      "pos": [
+        1357,
+        1369
+      ]
+    },
+    {
+      "content": "Corosync 和 Pacemaker",
+      "pos": [
+        1374,
+        1394
+      ]
+    },
+    {
+      "content": "地缘组",
+      "pos": [
+        1400,
+        1403
+      ]
+    },
+    {
+      "content": "解决方案的地缘组是通过登录到 Azure 门户，向下滚动到“设置”并创建新地缘组来创建的。稍后创建的已分配资源将分配给此地缘组。",
+      "pos": [
+        1405,
+        1469
+      ]
+    },
+    {
+      "content": "网络",
+      "pos": [
+        1475,
+        1477
+      ]
+    },
+    {
+      "content": "将创建新网络，并在该网络内部创建子网。我们选择了其中只有一个 /24 子网的 10.10.10.0/24 网络。",
+      "pos": [
+        1479,
+        1535
+      ]
+    },
+    {
+      "content": "虚拟机",
+      "pos": [
+        1541,
+        1544
+      ]
+    },
+    {
+      "pos": [
+        1546,
+        1740
+      ],
+      "content": "第一个 Ubuntu 13.10 VM 是使用 Endorsed Ubuntu 库映像并调用 <ph id=\"ph1\">`hadb01`</ph> 创建的。在此过程中，将创建名为 hadb 的新云服务。我们这样命名它是为了说明当我们添加更多资源时该服务所具有的共享的负载平衡性质。创建 <ph id=\"ph2\">`hadb01`</ph> 是平淡无奇的，可以使用门户完成。将自动创建 SSH 的终结点，并选择我们创建的网络。我们还选择为虚拟机创建新的可用性集。"
+    },
+    {
+      "pos": [
+        1742,
+        1906
+      ],
+      "content": "创建第一个虚拟机后（从技术上讲，创建云服务时），我们将继续创建第二个虚拟机 <ph id=\"ph1\">`hadb02`</ph>。对于第二个虚拟机，我们还将通过门户使用库中的 Ubuntu 13.10 VM，但我们将选择使用现有的云服务 <ph id=\"ph2\">`hadb.chinacloudapp.cn`</ph>，而不是创建一个新的。应为我们自动选择网络和可用性集。也将创建 SSH 终结点。"
+    },
+    {
+      "pos": [
+        1908,
+        1975
+      ],
+      "content": "创建两个 VM 后，我们将记下 <ph id=\"ph1\">`hadb01`</ph> 的 SSH 端口 (TCP 22) 和 <ph id=\"ph2\">`hadb02`</ph>（由 Azure 自动分配）"
+    },
+    {
+      "content": "附加存储",
+      "pos": [
+        1981,
+        1985
+      ]
+    },
+    {
+      "pos": [
+        1987,
+        2115
+      ],
+      "content": "我们将新磁盘附加到这两个 VM，并在进程中创建新的 5 GB 磁盘。磁盘将在 VHD 容器中托管，用作我们的主要操作系统磁盘。创建并附加磁盘后，无需重启 Linux，因为内核将会发现新设备（通常为 <ph id=\"ph1\">`/dev/sdc`</ph>，你可以检查 <ph id=\"ph2\">`dmesg`</ph> 的输出）"
+    },
+    {
+      "pos": [
+        2117,
+        2186
+      ],
+      "content": "在每个虚拟机上，我们继续使用 <ph id=\"ph1\">`cfdisk`</ph> 创建新分区（主 Linux 分区），并写入新的分区表。<bpt id=\"p1\">**</bpt>不要在此分区上创建文件系统<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "设置群集",
+      "pos": [
+        2191,
+        2195
+      ]
+    },
+    {
+      "pos": [
+        2197,
+        2266
+      ],
+      "content": "在这两个 Ubuntu VM 中，将需要使用 APT 安装 Corosync、Pacemaker 和 DRBD。使用 <ph id=\"ph1\">`apt-get`</ph>："
+    },
+    {
+      "pos": [
+        2326,
+        2433
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>这次不安装 MySQL<ept id=\"p1\">**</ept>。Debian 和 Ubuntu 安装脚本将在 <ph id=\"ph1\">`/var/lib/mysql`</ph> 上初始化 MySQL 数据目录，但由于该目录将由 DRBD 文件系统取代，因此我们需要稍后执行此操作。"
+    },
+    {
+      "pos": [
+        2435,
+        2586
+      ],
+      "content": "此时我们还应该验证（使用 <ph id=\"ph1\">`/sbin/ifconfig`</ph>）这两个 VM 是否使用 10.10.10.0/24 子网中的地址，并且它们是否可以用名称彼此 ping 通。如果需要，还可以使用 <ph id=\"ph2\">`ssh-keygen`</ph> 和 <ph id=\"ph3\">`ssh-copy-id`</ph> 以确保这两个 VM 可以通过 SSH 通信而无需密码。"
+    },
+    {
+      "content": "设置 DRBD",
+      "pos": [
+        2592,
+        2599
+      ]
+    },
+    {
+      "pos": [
+        2601,
+        2743
+      ],
+      "content": "我们将创建一个 DRBD 资源，该资源使用基础 <ph id=\"ph1\">`/dev/sdc1`</ph> 分区生成能够使用 ext3 格式化并在主节点和辅助节点中使用的 <ph id=\"ph2\">`/dev/drbd1`</ph> 资源。若要执行此操作，请打开 <ph id=\"ph3\">`/etc/drbd.d/r0.res`</ph> 并复制以下资源定义。在这两个 VM 中执行此操作："
+    },
+    {
+      "pos": [
+        3058,
+        3093
+      ],
+      "content": "执行此操作后，在这两个 VM 中使用 <ph id=\"ph1\">`drbdadm`</ph> 初始化资源："
+    },
+    {
+      "pos": [
+        3162,
+        3202
+      ],
+      "content": "最后，在主节点 (<ph id=\"ph1\">`hadb01`</ph>) 中强制实施 DRBD 资源的所有权（主）："
+    },
+    {
+      "pos": [
+        3241,
+        3423
+      ],
+      "content": "如果你在这两个 VM 中检查 /proc/drbd (<ph id=\"ph1\">`sudo cat /proc/drbd`</ph>) 的内容，你应在 <ph id=\"ph2\">`hadb01`</ph> 上看到 <ph id=\"ph3\">`Primary/Secondary`</ph>，在 <ph id=\"ph4\">`hadb02`</ph> 上看到 <ph id=\"ph5\">`Secondary/Primary`</ph>，与此时的解决方案保持一致。5 GB 磁盘将通过 10.10.10.0/24 网络进行同步，而不会向客户收取费用。"
+    },
+    {
+      "pos": [
+        3425,
+        3493
+      ],
+      "content": "同步磁盘后，便可以在 <ph id=\"ph1\">`hadb01`</ph> 上创建文件系统了。出于测试目的，我们使用了 ext2，但以下指令将创建一个 ext3 文件系统："
+    },
+    {
+      "content": "装载 DRBD 资源",
+      "pos": [
+        3525,
+        3535
+      ]
+    },
+    {
+      "pos": [
+        3537,
+        3662
+      ],
+      "content": "在 <ph id=\"ph1\">`hadb01`</ph> 上，我们现已准备好装载 DRBD 资源。Debian 和派生物使用 <ph id=\"ph2\">`/var/lib/mysql`</ph> 作为 MySQL 的数据目录。由于我们尚未安装 MySQL，我们将创建该目录并装载 DRBD 资源。在 <ph id=\"ph3\">`hadb01`</ph> 上："
+    },
+    {
+      "content": "设置 MySQL",
+      "pos": [
+        3739,
+        3747
+      ]
+    },
+    {
+      "pos": [
+        3749,
+        3777
+      ],
+      "content": "现在你已准备好在 <ph id=\"ph1\">`hadb01`</ph> 上安装 MySQL："
+    },
+    {
+      "pos": [
+        3818,
+        3918
+      ],
+      "content": "对于 <ph id=\"ph1\">`hadb02`</ph>，可以使用两个选项。现在可以安装 mysql-server 了，这将创建 /var/lib/mysql 并填入一个新的数据目录，然后继续执行以删除内容。在 <ph id=\"ph2\">`hadb02`</ph> 上："
+    },
+    {
+      "pos": [
+        4020,
+        4082
+      ],
+      "content": "第二个选项用于故障转移到 <ph id=\"ph1\">`hadb02`</ph>，然后在该处安装 mysql-server（安装脚本会注意到现有安装并且不会动它）"
+    },
+    {
+      "pos": [
+        4084,
+        4097
+      ],
+      "content": "在 <ph id=\"ph1\">`hadb01`</ph> 上："
+    },
+    {
+      "pos": [
+        4137,
+        4150
+      ],
+      "content": "在 <ph id=\"ph1\">`hadb02`</ph> 上："
+    },
+    {
+      "pos": [
+        4226,
+        4322
+      ],
+      "content": "如果你现在不打算故障转移 DRBD，则第一个选项虽说算不上极好但更容易。设置此项后，但可以开始处理 MySQL 数据库了。在 <ph id=\"ph1\">`hadb02`</ph>（或根据 DRBD 处于活动状态的服务器之一）上："
+    },
+    {
+      "pos": [
+        4525,
+        4590
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>警告<ept id=\"p1\">**</ept>：此最后一条语句有效地对该表中的根用户禁用身份验证。这应替换为生产级别 GRANT 语句，并且仅为说明目的才包括在内。"
+    },
+    {
+      "pos": [
+        4592,
+        4759
+      ],
+      "content": "如果要从 VM 外部进行查询，则还需要为 MySQL 启用网络，这是本指南的目的。在这两个 VM 上，打开 <ph id=\"ph1\">`/etc/mysql/my.cnf`</ph> 并浏览到 <ph id=\"ph2\">`bind-address`</ph>，将它从 127.0.0.1 更改为 0.0.0.0。保存该文件之后，在当前主节点上发出 <ph id=\"ph3\">`sudo service mysql restart`</ph>。"
+    },
+    {
+      "content": "创建 MySQL 负载平衡集",
+      "pos": [
+        4765,
+        4779
+      ]
+    },
+    {
+      "pos": [
+        4781,
+        4937
+      ],
+      "content": "我们将返回到 Azure 门户并浏览到 <ph id=\"ph1\">`hadb01`</ph> VM，然后终结点。我们将创建一个新的终结点，从下拉列表中选择 MySQL (TCP 3306)，并勾选<bpt id=\"p1\">*</bpt>“新建负载平衡集”<ept id=\"p1\">*</ept>框。我们将调用我们的负载平衡终结点 <ph id=\"ph2\">`lb-mysql`</ph>。我们将保留大多数选项不动，但时间除外，我们会将其减少到 5（秒，最小值）"
+    },
+    {
+      "pos": [
+        4939,
+        5029
+      ],
+      "content": "创建终结点后，我们将转到 <ph id=\"ph1\">`hadb02`</ph> 终结点并创建新的终结点，但我们将选择 <ph id=\"ph2\">`lb-mysql`</ph>，然后从下拉菜单中选择 MySQL。还可以将 Azure CLI 用于此步骤。"
+    },
+    {
+      "content": "此时，我们已具备对群集执行手动操作所需的一切条件。",
+      "pos": [
+        5031,
+        5056
+      ]
+    },
+    {
+      "content": "测试负载平衡集",
+      "pos": [
+        5062,
+        5069
+      ]
+    },
+    {
+      "content": "可以从外部计算机使用任何 MySQL 客户端以及应用程序（例如，作为 Azure Web 应用运行的 phpMyAdmin）执行测试。在这种情况下，我们在另一台 Linux 计算机上使用 MySQL 的命令行工具：",
+      "pos": [
+        5071,
+        5178
+      ]
+    },
+    {
+      "content": "手动故障转移",
+      "pos": [
+        5263,
+        5269
+      ]
+    },
+    {
+      "content": "现在可以通过关闭 MySQL、切换 DRBD 的主节点并重启 MySQL 来模拟故障转移。",
+      "pos": [
+        5271,
+        5316
+      ]
+    },
+    {
+      "content": "在 hadb01 上：",
+      "pos": [
+        5318,
+        5329
+      ]
+    },
+    {
+      "content": "然后，在 hadb02 上：",
+      "pos": [
+        5403,
+        5417
+      ]
+    },
+    {
+      "content": "手动故障转移后，你可以重复执行远程查询，并且它应该能够完美运行。",
+      "pos": [
+        5500,
+        5532
+      ]
+    },
+    {
+      "content": "设置 Corosync",
+      "pos": [
+        5537,
+        5548
+      ]
+    },
+    {
+      "content": "Corosync 是使 Pacemaker 工作所需的基础群集基础结构。对于检测信号 v1 和 v2 用户（以及 Ultramonkey 等其他方法），Corosync 是 CRM 功能的拆分，而 Pacemaker 将保持更类似于功能中的检测信号。",
+      "pos": [
+        5550,
+        5675
+      ]
+    },
+    {
+      "content": "Azure 上 Corosync 的主要约束是 Corosync 首选多播，其次广播，再其次单播通信，但 Azure 网络仅支持单播。",
+      "pos": [
+        5677,
+        5744
+      ]
+    },
+    {
+      "pos": [
+        5746,
+        5939
+      ],
+      "content": "幸运的是，Corosync 具有一种工作单播模式，并且唯一的真正约束是，由于并非所有节点之间都<bpt id=\"p1\">*</bpt>自动<ept id=\"p1\">*</ept>互相通信，因此需要在配置文件中定义节点，包括其 IP 地址。我们可以对单播使用 Corosync 示例文件，并只需更改绑定地址、节点列表和日志记录目录（Ubuntu 使用 <ph id=\"ph1\">`/var/log/corosync`</ph>，而示例文件使用 <ph id=\"ph2\">`/var/log/cluster`</ph>），并启用仲裁工具。"
+    },
+    {
+      "pos": [
+        5941,
+        5989
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>请记下下面的 <ph id=\"ph1\">`transport: udpu`</ph> 指令以及为节点手动定义的 IP 地址<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        5991,
+        6030
+      ],
+      "content": "在两个节点的 <ph id=\"ph1\">`/etc/corosync/corosync.conf`</ph> 上："
+    },
+    {
+      "content": "我们将此配置文件复制到这两个 VM 中，并在这两个节点中启动 Corosync：",
+      "pos": [
+        6721,
+        6761
+      ]
+    },
+    {
+      "content": "启动该服务后不久，群集应在当前环中建立，并应构成仲裁。我们可以通过查看日志或以下项来检查此功能：",
+      "pos": [
+        6796,
+        6844
+      ]
+    },
+    {
+      "content": "应符合类似于下图所示的输出：",
+      "pos": [
+        6879,
+        6893
+      ]
+    },
+    {
+      "content": "corosync-quorumtool -l sample output",
+      "pos": [
+        6897,
+        6933
+      ]
+    },
+    {
+      "content": "设置 Pacemaker",
+      "pos": [
+        6998,
+        7010
+      ]
+    },
+    {
+      "content": "Pacemaker 使用群集监视资源、定义主节点何时停机，并将这些资源切换到辅助节点。可以通过一组可用脚本或 LSB（类似 init）脚本以及其他选项定义资源。",
+      "pos": [
+        7012,
+        7092
+      ]
+    },
+    {
+      "content": "我们想要 Pacemaker“拥有”DRBD 资源、装入点和 MySQL 服务。如果在主节点出现问题时 Pacemaker 可以启用和关闭 DRBD，请按正确的顺序装载/卸载它，并启动/停止 MySQL，我们的设置已完成。",
+      "pos": [
+        7094,
+        7205
+      ]
+    },
+    {
+      "content": "首次安装 Pacemaker 时，你的配置应足够简单，如下所示：",
+      "pos": [
+        7207,
+        7239
+      ]
+    },
+    {
+      "pos": [
+        7352,
+        7428
+      ],
+      "content": "通过运行 <ph id=\"ph1\">`sudo crm configure show`</ph> 来检查它。现在，使用以下资源创建一个文件（假设 <ph id=\"ph2\">`/tmp/cluster.conf`</ph>）："
+    },
+    {
+      "content": "并立即将其加载到配置中（只需在一个节点上执行此操作）：",
+      "pos": [
+        8217,
+        8244
+      ]
+    },
+    {
+      "content": "此处，请确保 Pacemaker 在这两个节点中引导时启动：",
+      "pos": [
+        8330,
+        8360
+      ]
+    },
+    {
+      "pos": [
+        8403,
+        8487
+      ],
+      "content": "几秒钟后，请使用 <ph id=\"ph1\">`sudo crm_mon –L`</ph> 验证你的节点之一是否已成为群集的主机并且正在运行所有资源。可以使用 mount 和 PS 来检查资源是否正在运行。"
+    },
+    {
+      "pos": [
+        8489,
+        8533
+      ],
+      "content": "下面的屏幕截图显示一个节点已停止的 <ph id=\"ph1\">`crm_mon`</ph>（使用 Control-C 退出）"
+    },
+    {
+      "content": "crm\\_mon 节点已停止",
+      "pos": [
+        8537,
+        8551
+      ]
+    },
+    {
+      "content": "并且此屏幕截图显示这两个节点（一个主节点和一个从节点）：",
+      "pos": [
+        8613,
+        8641
+      ]
+    },
+    {
+      "content": "crm\\_mon 操作主/从",
+      "pos": [
+        8645,
+        8659
+      ]
+    },
+    {
+      "content": "测试",
+      "pos": [
+        8724,
+        8726
+      ]
+    },
+    {
+      "pos": [
+        8728,
+        8882
+      ],
+      "content": "我们已准备好进行自动故障转移模拟。可通过两种方式执行此操作：软方式和硬方式。软方式使用群集的关闭功能：<ph id=\"ph1\">``crm_standby -U `uname -n` -v on``</ph>。在主节点上使用此功能时，从节点将接管。记住将此功能重新设为 off（crm_mon 会指示一个节点处于启用状态，其他节点处入待机状态）"
+    },
+    {
+      "content": "硬方式是通过门户关闭主虚拟机 (hadb01) 或更改虚拟机上的运行级别（即，停止、关闭），然后，我们将通过指示主节点将要关闭来帮助 Corosync 和 Pacemaker。我们可以对此进行测试（适用于维护窗口），但我们也可以通过只冻结虚拟机来强制实施该方案。",
+      "pos": [
+        8884,
+        9015
+      ]
+    },
+    {
+      "content": "STONITH",
+      "pos": [
+        9020,
+        9027
+      ]
+    },
+    {
+      "pos": [
+        9029,
+        9185
+      ],
+      "content": "它应该能够通过 Azure CLI 代替用于控制物理设备的 STONITH 脚本向 VM 发出关闭命令。可以使用 <ph id=\"ph1\">`/usr/lib/stonith/plugins/external/ssh`</ph> 作为基础并在群集的配置中启用 STONITH。应全局安装 Azure CLI 并应为群集的用户加载发布设置/配置文件。"
+    },
+    {
+      "pos": [
+        9187,
+        9291
+      ],
+      "content": "资源的示例代码可在 <bpt id=\"p1\">[</bpt>GitHub<ept id=\"p1\">](https://github.com/bureado/aztonith)</ept> 上找到。你需要更改群集的配置，方法是将以下代码添加到 <ph id=\"ph1\">`sudo crm configure`</ph>："
+    },
+    {
+      "pos": [
+        9464,
+        9533
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept> 该脚本不执行向上/向下检查。原始 SSH 资源使用 15 次 ping 检查，但 Azure VM 的恢复时间可能更多变。"
+    },
+    {
+      "content": "限制",
+      "pos": [
+        9538,
+        9540
+      ]
+    },
+    {
+      "content": "以下限制适用：",
+      "pos": [
+        9542,
+        9549
+      ]
+    },
+    {
+      "pos": [
+        9553,
+        9719
+      ],
+      "content": "管理 DRBD 的 linbit DRBD 资源脚本作为 Pacemaker 中的资源在关闭节点时使用 <ph id=\"ph1\">`drbdadm down`</ph>，即使该节点只是转为待机状态也是如此。这并不理想，因为当主节点获得写入时，从节点将不会同步 DRBD 资源。如果主节点未优雅地失败，则从节点可以接受较旧的文件系统状态。可通过两种可能方式来解决此问题："
+    },
+    {
+      "pos": [
+        9724,
+        9769
+      ],
+      "content": "在所有群集节点上通过本地（非群集化）监视程序强制执行 <ph id=\"ph1\">`drbdadm up r0`</ph>，或者"
+    },
+    {
+      "pos": [
+        9774,
+        9846
+      ],
+      "content": "编辑 linbit DRBD 脚本以确保未在 <ph id=\"ph1\">`/usr/lib/ocf/resource.d/linbit/drbd`</ph> 中调用 <ph id=\"ph2\">`down`</ph>。"
+    },
+    {
+      "content": "负载平衡器至少需要 5 秒钟才能做出响应，因此应用程序应是群集感知的并更容忍超时；其他体系结构也会有帮助，例如应用程序中队列、查询中间件等。",
+      "pos": [
+        9849,
+        9919
+      ]
+    },
+    {
+      "content": "有必要进行 MySQL 优化以确保以合理的速度完成写入，并且尽可能频繁地将缓存刷新到磁盘",
+      "pos": [
+        9922,
+        9966
+      ]
+    },
+    {
+      "content": "写入性能将依赖于虚拟交换机中的 VM 互连，因为这是 DRBD 用于复制设备的机制",
+      "pos": [
+        9969,
+        10010
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"使用负载平衡集群集化 Linux 上的 MySQL\"\n    description=\"该文章作为示例说明了在 Azure 中使用 MySQL 设置负载平衡的高可用性 Linux 群集的模式\"\n    services=\"virtual-machines\"\n    documentationCenter=\"\"\n    authors=\"bureado\"\n    manager=\"timlt\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"04/14/2015\"\n    wacn.date=\"01/21/2016\"/>\n\n# 使用负载平衡集群集化 Linux 上的 MySQL\n\n* [做好准备](#getting-ready)\n* [设置群集](#setting-up-the-cluster)\n* [设置 MySQL](#setting-up-mysql)\n* [设置 Corosync](#setting-up-corosync)\n* [设置 Pacemaker](#setting-up-pacemaker)\n* [测试](#testing)\n* [STONITH](#stonith)\n* [限制](#limitations)\n\n## 介绍\n\n本文旨在探索并说明可用于在 Azure 上部署基于 Linux 的高度可用服务的不同方法，并作为入门书探索 MySQL Server 的高可用性。\n\n我们将基于 DRBD、Corosync 和 Pacemaker 概述无共享双节点单主机 MySQL 高可用性解决方案。一次只有一个节点运行 MySQL。读取和写入 DRBD 资源也限制为一次只有一个节点。\n\n无需使用类似 LVS 的 VIP 解决方案，因为我们使用 Azure 负载平衡集来同时提供轮循功能和 VIP 的终结点检测、删除和正常恢复功能。VIP 是在首次创建云服务时由 Azure 分配的全局可路由 IPv4 地址。\n\nMySQL 的其他可能体系结构包括 NBD 群集、Percona 和 Galera 以及多个中间件解决方案，其中至少有一个以 [VM Depot](http://vmdepot.msopentech.com) 中的 VM 的形式提供。只要这些解决方案可以复制到单播、多播或广播上，并且不要依赖于共享存储或多个网络接口，这些方案就应该很容易在 Azure 上部署。\n\n当然，这些群集体系结构可以类似方式扩展到其他产品（如 PostgreSQL 和 OpenLDAP）。例如，此无共享的负载平衡过程已成功在多主机 OpenLDAP 上测试，并可以在我们的第 9 频道博客上观看。\n\n## 做好准备\n\n你将需要一个具有有效订阅可以创建至少两 (2) 个虚拟机的 Azure 帐户（在此示例中使用 XS）、一个网络和一个子网、一个地缘组和一个可用性集，以及能够在同一区域中创建新的 VHD 作为云服务，并将这些 VHD 附加到 Linux 虚拟机。\n\n### 已测试的环境\n\n- Ubuntu 13.10\n  - DRBD\n  - MySQL Server\n  - Corosync 和 Pacemaker\n\n### 地缘组\n\n解决方案的地缘组是通过登录到 Azure 门户，向下滚动到“设置”并创建新地缘组来创建的。稍后创建的已分配资源将分配给此地缘组。\n\n### 网络\n\n将创建新网络，并在该网络内部创建子网。我们选择了其中只有一个 /24 子网的 10.10.10.0/24 网络。\n\n### 虚拟机\n\n第一个 Ubuntu 13.10 VM 是使用 Endorsed Ubuntu 库映像并调用 `hadb01` 创建的。在此过程中，将创建名为 hadb 的新云服务。我们这样命名它是为了说明当我们添加更多资源时该服务所具有的共享的负载平衡性质。创建 `hadb01` 是平淡无奇的，可以使用门户完成。将自动创建 SSH 的终结点，并选择我们创建的网络。我们还选择为虚拟机创建新的可用性集。\n\n创建第一个虚拟机后（从技术上讲，创建云服务时），我们将继续创建第二个虚拟机 `hadb02`。对于第二个虚拟机，我们还将通过门户使用库中的 Ubuntu 13.10 VM，但我们将选择使用现有的云服务 `hadb.chinacloudapp.cn`，而不是创建一个新的。应为我们自动选择网络和可用性集。也将创建 SSH 终结点。\n\n创建两个 VM 后，我们将记下 `hadb01` 的 SSH 端口 (TCP 22) 和 `hadb02`（由 Azure 自动分配）\n\n### 附加存储\n\n我们将新磁盘附加到这两个 VM，并在进程中创建新的 5 GB 磁盘。磁盘将在 VHD 容器中托管，用作我们的主要操作系统磁盘。创建并附加磁盘后，无需重启 Linux，因为内核将会发现新设备（通常为 `/dev/sdc`，你可以检查 `dmesg` 的输出）\n\n在每个虚拟机上，我们继续使用 `cfdisk` 创建新分区（主 Linux 分区），并写入新的分区表。**不要在此分区上创建文件系统**。\n\n## 设置群集\n\n在这两个 Ubuntu VM 中，将需要使用 APT 安装 Corosync、Pacemaker 和 DRBD。使用 `apt-get`：\n\n    sudo apt-get install corosync pacemaker drbd8-utils.\n\n**这次不安装 MySQL**。Debian 和 Ubuntu 安装脚本将在 `/var/lib/mysql` 上初始化 MySQL 数据目录，但由于该目录将由 DRBD 文件系统取代，因此我们需要稍后执行此操作。\n\n此时我们还应该验证（使用 `/sbin/ifconfig`）这两个 VM 是否使用 10.10.10.0/24 子网中的地址，并且它们是否可以用名称彼此 ping 通。如果需要，还可以使用 `ssh-keygen` 和 `ssh-copy-id` 以确保这两个 VM 可以通过 SSH 通信而无需密码。\n\n### 设置 DRBD\n\n我们将创建一个 DRBD 资源，该资源使用基础 `/dev/sdc1` 分区生成能够使用 ext3 格式化并在主节点和辅助节点中使用的 `/dev/drbd1` 资源。若要执行此操作，请打开 `/etc/drbd.d/r0.res` 并复制以下资源定义。在这两个 VM 中执行此操作：\n\n    resource r0 {\n      on `hadb01` {\n        device  /dev/drbd1;\n        disk   /dev/sdc1;\n        address  10.10.10.4:7789;\n        meta-disk internal;\n      }\n      on `hadb02` {\n        device  /dev/drbd1;\n        disk   /dev/sdc1;\n        address  10.10.10.5:7789;\n        meta-disk internal;\n      }\n    }\n\n执行此操作后，在这两个 VM 中使用 `drbdadm` 初始化资源：\n\n    sudo drbdadm -c /etc/drbd.conf role r0\n    sudo drbdadm up r0\n\n最后，在主节点 (`hadb01`) 中强制实施 DRBD 资源的所有权（主）：\n\n    sudo drbdadm primary --force r0\n\n如果你在这两个 VM 中检查 /proc/drbd (`sudo cat /proc/drbd`) 的内容，你应在 `hadb01` 上看到 `Primary/Secondary`，在 `hadb02` 上看到 `Secondary/Primary`，与此时的解决方案保持一致。5 GB 磁盘将通过 10.10.10.0/24 网络进行同步，而不会向客户收取费用。\n\n同步磁盘后，便可以在 `hadb01` 上创建文件系统了。出于测试目的，我们使用了 ext2，但以下指令将创建一个 ext3 文件系统：\n\n    mkfs.ext3 /dev/drbd1\n\n### 装载 DRBD 资源\n\n在 `hadb01` 上，我们现已准备好装载 DRBD 资源。Debian 和派生物使用 `/var/lib/mysql` 作为 MySQL 的数据目录。由于我们尚未安装 MySQL，我们将创建该目录并装载 DRBD 资源。在 `hadb01` 上：\n\n    sudo mkdir /var/lib/mysql\n    sudo mount /dev/drbd1 /var/lib/mysql\n\n## 设置 MySQL\n\n现在你已准备好在 `hadb01` 上安装 MySQL：\n\n    sudo apt-get install mysql-server\n\n对于 `hadb02`，可以使用两个选项。现在可以安装 mysql-server 了，这将创建 /var/lib/mysql 并填入一个新的数据目录，然后继续执行以删除内容。在 `hadb02` 上：\n\n    sudo apt-get install mysql-server\n    sudo service mysql stop\n    sudo rm –rf /var/lib/mysql/*\n\n第二个选项用于故障转移到 `hadb02`，然后在该处安装 mysql-server（安装脚本会注意到现有安装并且不会动它）\n\n在 `hadb01` 上：\n\n    sudo drbdadm secondary –force r0\n\n在 `hadb02` 上：\n\n    sudo drbdadm primary –force r0\n    sudo apt-get install mysql-server\n\n如果你现在不打算故障转移 DRBD，则第一个选项虽说算不上极好但更容易。设置此项后，但可以开始处理 MySQL 数据库了。在 `hadb02`（或根据 DRBD 处于活动状态的服务器之一）上：\n\n    mysql –u root –p\n    CREATE DATABASE azureha;\n    CREATE TABLE things ( id SERIAL, name VARCHAR(255) );\n    INSERT INTO things VALUES (1, \"Yet another entity\");\n    GRANT ALL ON things.* TO root;\n\n**警告**：此最后一条语句有效地对该表中的根用户禁用身份验证。这应替换为生产级别 GRANT 语句，并且仅为说明目的才包括在内。\n\n如果要从 VM 外部进行查询，则还需要为 MySQL 启用网络，这是本指南的目的。在这两个 VM 上，打开 `/etc/mysql/my.cnf` 并浏览到 `bind-address`，将它从 127.0.0.1 更改为 0.0.0.0。保存该文件之后，在当前主节点上发出 `sudo service mysql restart`。\n\n### 创建 MySQL 负载平衡集\n\n我们将返回到 Azure 门户并浏览到 `hadb01` VM，然后终结点。我们将创建一个新的终结点，从下拉列表中选择 MySQL (TCP 3306)，并勾选*“新建负载平衡集”*框。我们将调用我们的负载平衡终结点 `lb-mysql`。我们将保留大多数选项不动，但时间除外，我们会将其减少到 5（秒，最小值）\n\n创建终结点后，我们将转到 `hadb02` 终结点并创建新的终结点，但我们将选择 `lb-mysql`，然后从下拉菜单中选择 MySQL。还可以将 Azure CLI 用于此步骤。\n\n此时，我们已具备对群集执行手动操作所需的一切条件。\n\n### 测试负载平衡集\n\n可以从外部计算机使用任何 MySQL 客户端以及应用程序（例如，作为 Azure Web 应用运行的 phpMyAdmin）执行测试。在这种情况下，我们在另一台 Linux 计算机上使用 MySQL 的命令行工具：\n\n    mysql azureha –u root –h hadb.chinacloudapp.cn –e \"select * from things;\"\n\n### 手动故障转移\n\n现在可以通过关闭 MySQL、切换 DRBD 的主节点并重启 MySQL 来模拟故障转移。\n\n在 hadb01 上：\n\n    service mysql stop && umount /var/lib/mysql ; drbdadm secondary r0\n\n然后，在 hadb02 上：\n\n    drbdadm primary r0 ; mount /dev/drbd1 /var/lib/mysql && service mysql start\n\n手动故障转移后，你可以重复执行远程查询，并且它应该能够完美运行。\n\n## 设置 Corosync\n\nCorosync 是使 Pacemaker 工作所需的基础群集基础结构。对于检测信号 v1 和 v2 用户（以及 Ultramonkey 等其他方法），Corosync 是 CRM 功能的拆分，而 Pacemaker 将保持更类似于功能中的检测信号。\n\nAzure 上 Corosync 的主要约束是 Corosync 首选多播，其次广播，再其次单播通信，但 Azure 网络仅支持单播。\n\n幸运的是，Corosync 具有一种工作单播模式，并且唯一的真正约束是，由于并非所有节点之间都*自动*互相通信，因此需要在配置文件中定义节点，包括其 IP 地址。我们可以对单播使用 Corosync 示例文件，并只需更改绑定地址、节点列表和日志记录目录（Ubuntu 使用 `/var/log/corosync`，而示例文件使用 `/var/log/cluster`），并启用仲裁工具。\n\n**请记下下面的 `transport: udpu` 指令以及为节点手动定义的 IP 地址**。\n\n在两个节点的 `/etc/corosync/corosync.conf` 上：\n\n    totem {\n      version: 2\n      crypto_cipher: none\n      crypto_hash: none\n      interface {\n        ringnumber: 0\n        bindnetaddr: 10.10.10.0\n        mcastport: 5405\n        ttl: 1\n      }\n      transport: udpu\n    }\n\n    logging {\n      fileline: off\n      to_logfile: yes\n      to_syslog: yes\n      logfile: /var/log/corosync/corosync.log\n      debug: off\n      timestamp: on\n      logger_subsys {\n        subsys: QUORUM\n        debug: off\n        }\n      }\n\n    nodelist {\n      node {\n        ring0_addr: 10.10.10.4\n        nodeid: 1\n      }\n\n      node {\n        ring0_addr: 10.10.10.5\n        nodeid: 2\n      }\n    }\n\n    quorum {\n      provider: corosync_votequorum\n    }\n\n我们将此配置文件复制到这两个 VM 中，并在这两个节点中启动 Corosync：\n\n    sudo service start corosync\n\n启动该服务后不久，群集应在当前环中建立，并应构成仲裁。我们可以通过查看日志或以下项来检查此功能：\n\n    sudo corosync-quorumtool –l\n\n应符合类似于下图所示的输出：\n\n![corosync-quorumtool -l sample output](./media/virtual-machines-linux-mysql-cluster/image001.png)\n\n## 设置 Pacemaker\n\nPacemaker 使用群集监视资源、定义主节点何时停机，并将这些资源切换到辅助节点。可以通过一组可用脚本或 LSB（类似 init）脚本以及其他选项定义资源。\n\n我们想要 Pacemaker“拥有”DRBD 资源、装入点和 MySQL 服务。如果在主节点出现问题时 Pacemaker 可以启用和关闭 DRBD，请按正确的顺序装载/卸载它，并启动/停止 MySQL，我们的设置已完成。\n\n首次安装 Pacemaker 时，你的配置应足够简单，如下所示：\n\n    node $id=\"1\" hadb01\n      attributes standby=\"off\"\n    node $id=\"2\" hadb02\n      attributes standby=\"off\"\n\n通过运行 `sudo crm configure show` 来检查它。现在，使用以下资源创建一个文件（假设 `/tmp/cluster.conf`）：\n\n    primitive drbd_mysql ocf:linbit:drbd \\\n          params drbd_resource=\"r0\" \\\n          op monitor interval=\"29s\" role=\"Master\" \\\n          op monitor interval=\"31s\" role=\"Slave\"\n\n    ms ms_drbd_mysql drbd_mysql \\\n          meta master-max=\"1\" master-node-max=\"1\" \\\n            clone-max=\"2\" clone-node-max=\"1\" \\\n            notify=\"true\"\n\n    primitive fs_mysql ocf:heartbeat:Filesystem \\\n          params device=\"/dev/drbd/by-res/r0\" \\\n          directory=\"/var/lib/mysql\" fstype=\"ext3\"\n\n    primitive mysqld lsb:mysql\n\n    group mysql fs_mysql mysqld\n\n    colocation mysql_on_drbd \\\n           inf: mysql ms_drbd_mysql:Master\n\n    order mysql_after_drbd \\\n           inf: ms_drbd_mysql:promote mysql:start\n\n    property stonith-enabled=false\n\n    property no-quorum-policy=ignore\n\n并立即将其加载到配置中（只需在一个节点上执行此操作）：\n\n    sudo crm configure\n      load update /tmp/cluster.conf\n      commit\n      exit\n\n此处，请确保 Pacemaker 在这两个节点中引导时启动：\n\n    sudo update-rc.d pacemaker defaults\n\n几秒钟后，请使用 `sudo crm_mon –L` 验证你的节点之一是否已成为群集的主机并且正在运行所有资源。可以使用 mount 和 PS 来检查资源是否正在运行。\n\n下面的屏幕截图显示一个节点已停止的 `crm_mon`（使用 Control-C 退出）\n\n![crm\\_mon 节点已停止](./media/virtual-machines-linux-mysql-cluster/image002.png)\n\n并且此屏幕截图显示这两个节点（一个主节点和一个从节点）：\n\n![crm\\_mon 操作主/从](./media/virtual-machines-linux-mysql-cluster/image003.png)\n\n## 测试\n\n我们已准备好进行自动故障转移模拟。可通过两种方式执行此操作：软方式和硬方式。软方式使用群集的关闭功能：``crm_standby -U `uname -n` -v on``。在主节点上使用此功能时，从节点将接管。记住将此功能重新设为 off（crm_mon 会指示一个节点处于启用状态，其他节点处入待机状态）\n\n硬方式是通过门户关闭主虚拟机 (hadb01) 或更改虚拟机上的运行级别（即，停止、关闭），然后，我们将通过指示主节点将要关闭来帮助 Corosync 和 Pacemaker。我们可以对此进行测试（适用于维护窗口），但我们也可以通过只冻结虚拟机来强制实施该方案。\n\n## STONITH\n\n它应该能够通过 Azure CLI 代替用于控制物理设备的 STONITH 脚本向 VM 发出关闭命令。可以使用 `/usr/lib/stonith/plugins/external/ssh` 作为基础并在群集的配置中启用 STONITH。应全局安装 Azure CLI 并应为群集的用户加载发布设置/配置文件。\n\n资源的示例代码可在 [GitHub](https://github.com/bureado/aztonith) 上找到。你需要更改群集的配置，方法是将以下代码添加到 `sudo crm configure`：\n\n    primitive st-azure stonith:external/azure \\\n      params hostlist=\"hadb01 hadb02\" \\\n      clone fencing st-azure \\\n      property stonith-enabled=true \\\n      commit\n\n**注意：** 该脚本不执行向上/向下检查。原始 SSH 资源使用 15 次 ping 检查，但 Azure VM 的恢复时间可能更多变。\n\n## 限制\n\n以下限制适用：\n\n- 管理 DRBD 的 linbit DRBD 资源脚本作为 Pacemaker 中的资源在关闭节点时使用 `drbdadm down`，即使该节点只是转为待机状态也是如此。这并不理想，因为当主节点获得写入时，从节点将不会同步 DRBD 资源。如果主节点未优雅地失败，则从节点可以接受较旧的文件系统状态。可通过两种可能方式来解决此问题：\n  - 在所有群集节点上通过本地（非群集化）监视程序强制执行 `drbdadm up r0`，或者\n  - 编辑 linbit DRBD 脚本以确保未在 `/usr/lib/ocf/resource.d/linbit/drbd` 中调用 `down`。\n- 负载平衡器至少需要 5 秒钟才能做出响应，因此应用程序应是群集感知的并更容忍超时；其他体系结构也会有帮助，例如应用程序中队列、查询中间件等。\n- 有必要进行 MySQL 优化以确保以合理的速度完成写入，并且尽可能频繁地将缓存刷新到磁盘\n- 写入性能将依赖于虚拟交换机中的 VM 互连，因为这是 DRBD 用于复制设备的机制\n\n<!---HONumber=79-->"
+}

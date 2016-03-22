@@ -1,0 +1,271 @@
+{
+  "nodes": [
+    {
+      "content": "使用 .NET SDK 配置资产传送策略",
+      "pos": [
+        28,
+        48
+      ]
+    },
+    {
+      "content": "本主题说明如何通过 Azure 媒体服务 .NET SDK 配置不同的资产传送策略。",
+      "pos": [
+        68,
+        110
+      ]
+    },
+    {
+      "content": "使用 .NET SDK 配置资产传送策略",
+      "pos": [
+        337,
+        357
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        487,
+        489
+      ]
+    },
+    {
+      "content": "如果你打算传送加密资产，媒体服务内容传送工作流中的步骤之一是为资产配置传送策略。资产传送策略告知媒体服务你希望如何传送资产：应该将资产动态打包成哪种流式处理协议（例如 MPEG DASH、HLS、平滑流或全部），是否要动态加密资产以及如何加密（信封或常用加密）。",
+      "pos": [
+        491,
+        622
+      ]
+    },
+    {
+      "content": "本主题介绍为何以及如何创建和配置资产传送策略。",
+      "pos": [
+        624,
+        647
+      ]
+    },
+    {
+      "pos": [
+        650,
+        803
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>若要使用动态打包和动态加密，必须确保至少有一个缩放单位（也称为流式处理单位）。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何缩放媒体服务<ept id=\"p1\">](/documentation/articles/media-services-manage-origins#scale_streaming_endpoints)</ept>。"
+    },
+    {
+      "content": "此外，你的资产必须包含一组自适应比特率 MP4 或自适应比特率平滑流文件。",
+      "pos": [
+        807,
+        844
+      ]
+    },
+    {
+      "content": "可以将不同的策略应用到同一个资产。例如，可以将 PlayReady 加密应用到平滑流，将 AES 信封应用到 MPEG DASH 和 HLS。将阻止流式处理传送策略中未定义的任何协议（例如，添加仅将 HLS 指定为协议的单个策略）。如果你根本没有定义任何传送策略，则情况不是这样。此时，将允许所有明文形式的协议。",
+      "pos": [
+        846,
+        1002
+      ]
+    },
+    {
+      "pos": [
+        1004,
+        1226
+      ],
+      "content": "请注意，如果要传送存储加密资产，则必须配置资产的传送策略。在流式传输资产之前，流式处理服务器会删除存储加密，然后再使用指定的传送策略流式传输你的内容。例如，若要传送使用高级加密标准 (AES) 信封加密密钥加密的资产，请将策略类型设为 <bpt id=\"p1\">**</bpt>DynamicEnvelopeEncryption<ept id=\"p1\">**</ept>。若要删除存储加密并以明文的形式流式传输资产，请将策略类型设为 <bpt id=\"p2\">**</bpt>NoDynamicEncryption<ept id=\"p2\">**</ept>。下面是演示如何配置这些策略类型的示例。"
+    },
+    {
+      "content": "根据配置资产传送策略的方式，你可以动态打包、动态加密和流式传输以下流式处理协议：平滑流式处理、HLS、MPEG DASH 和 HDS 流。",
+      "pos": [
+        1228,
+        1297
+      ]
+    },
+    {
+      "content": "以下列表显示了用于流式传输平滑流、HLS DASH 和 HDS 的格式。",
+      "pos": [
+        1299,
+        1335
+      ]
+    },
+    {
+      "content": "平滑流：",
+      "pos": [
+        1337,
+        1341
+      ]
+    },
+    {
+      "content": "HLS：",
+      "pos": [
+        1480,
+        1484
+      ]
+    },
+    {
+      "content": "MPEG DASH",
+      "pos": [
+        1641,
+        1650
+      ]
+    },
+    {
+      "content": "HDS",
+      "pos": [
+        1811,
+        1814
+      ]
+    },
+    {
+      "pos": [
+        1969,
+        2069
+      ],
+      "content": "有关如何发布资产和生成流 URL 的说明，请参阅<bpt id=\"p1\">[</bpt>生成流 URL<ept id=\"p1\">](/documentation/articles/media-services-deliver-streaming-content)</ept>。"
+    },
+    {
+      "content": "注意事项",
+      "pos": [
+        2073,
+        2077
+      ]
+    },
+    {
+      "content": "如果某个资产存在 OnDemand（流式处理）定位符，则不能与该资产关联的 AssetDeliveryPolicy。在删除策略之前，建议先从资产中删除该策略。",
+      "pos": [
+        2081,
+        2160
+      ]
+    },
+    {
+      "content": "如果未设置资产传送策略，则无法在存储加密的资产上创建流式处理定位符。如果资产未经过存储加密，则即使未设置资产传送策略，系统也可让你顺利地创建定位符和流式处理资产。",
+      "pos": [
+        2163,
+        2244
+      ]
+    },
+    {
+      "content": "可将多个资产传送策略关联到单个资产，但只能指定一种方法来处理给定的 AssetDeliveryProtocol。也就是说，如果你尝试链接两个指定 AssetDeliveryProtocol.SmoothStreaming 协议的传送策略，则会导致出错，因为当客户端发出平滑流请求时，系统不知道你要应用哪个策略。",
+      "pos": [
+        2247,
+        2402
+      ]
+    },
+    {
+      "content": "如果你的资产包含现有的流式处理定位符，则不能将新策略链接到该资产（可以取消现有策略与资产的链接，或者更新与该资产关联的传送策略）。必须先删除流式传输定位符，再调整策略，然后重新创建流式传输定位符。在重新创建流式传输定位符时可以使用同一个 locatorId，但应确保该操作不会导致客户端出现问题，因为内容可能已被来源或下游 CDN 缓存。",
+      "pos": [
+        2407,
+        2576
+      ]
+    },
+    {
+      "content": "清除资产传送策略",
+      "pos": [
+        2583,
+        2591
+      ]
+    },
+    {
+      "pos": [
+        2594,
+        2699
+      ],
+      "content": "以下 <bpt id=\"p1\">**</bpt>ConfigureClearAssetDeliveryPolicy<ept id=\"p1\">**</ept> 方法会指定不应用动态加密，而是使用以下任一协议传送流：MPEG DASH、HLS 和平滑流。你可能需要对存储加密资产应用此策略。"
+    },
+    {
+      "pos": [
+        2703,
+        2785
+      ],
+      "content": "有关创建 AssetDeliveryPolicy 时可以指定哪些值的信息，请参阅<bpt id=\"p1\">[</bpt>定义 AssetDeliveryPolicy 时使用的类型<ept id=\"p1\">](#types)</ept>部分。"
+    },
+    {
+      "content": "DynamicCommonEncryption 资产传送策略",
+      "pos": [
+        3195,
+        3225
+      ]
+    },
+    {
+      "pos": [
+        3229,
+        3547
+      ],
+      "content": "以下 <bpt id=\"p1\">**</bpt>CreateAssetDeliveryPolicy<ept id=\"p1\">**</ept> 方法将创建 <bpt id=\"p2\">**</bpt>AssetDeliveryPolicy<ept id=\"p2\">**</ept>，该策略配置为将动态常用加密 (<bpt id=\"p3\">**</bpt>DynamicCommonEncryption<ept id=\"p3\">**</ept>) 应用到平滑流式处理协议（将阻止流式处理其他协议）。该方法采用以下两种参数：<bpt id=\"p4\">**</bpt>Asset<ept id=\"p4\">**</ept>（要将传送策略应用到的资产）和 <bpt id=\"p5\">**</bpt>IContentKey<ept id=\"p5\">**</ept>（<bpt id=\"p6\">**</bpt>CommonEncryption<ept id=\"p6\">**</ept> 类型的内容密钥。有关详细信息，请参阅：<bpt id=\"p7\">[</bpt>创建内容密钥<ept id=\"p7\">](/documentation/articles/media-services-dotnet-create-contentkey#common_contentkey)</ept>）。"
+    },
+    {
+      "pos": [
+        3549,
+        3631
+      ],
+      "content": "有关创建 AssetDeliveryPolicy 时可以指定哪些值的信息，请参阅<bpt id=\"p1\">[</bpt>定义 AssetDeliveryPolicy 时使用的类型<ept id=\"p1\">](#types)</ept>部分。"
+    },
+    {
+      "content": "Azure 媒体服务还允许你添加 Widevine 加密。以下示例演示将 PlayReady 和 Widevine 添加到资产传送策略。",
+      "pos": [
+        4650,
+        4718
+      ]
+    },
+    {
+      "pos": [
+        5768,
+        5828
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>使用 Widevine 加密时，只能使用 DASH 传送。请确保在资产传送协议中指定 DASH。"
+    },
+    {
+      "content": "DynamicEnvelopeEncryption 资产传送策略",
+      "pos": [
+        5833,
+        5865
+      ]
+    },
+    {
+      "pos": [
+        5868,
+        6199
+      ],
+      "content": "以下 <bpt id=\"p1\">**</bpt>CreateAssetDeliveryPolicy<ept id=\"p1\">**</ept> 方法将创建 <bpt id=\"p2\">**</bpt>AssetDeliveryPolicy<ept id=\"p2\">**</ept>，该策略配置为将动态信封加密 (<bpt id=\"p3\">**</bpt>DynamicEnvelopeEncryption<ept id=\"p3\">**</ept>) 应用到 HLS 和 DASH 协议（将阻止流式处理的其他协议）。该方法采用以下两种参数：<bpt id=\"p4\">**</bpt>Asset<ept id=\"p4\">**</ept>（要将传送策略应用到的资产）和 <bpt id=\"p5\">**</bpt>IContentKey<ept id=\"p5\">**</ept>（<bpt id=\"p6\">**</bpt>EnvelopeEncryption<ept id=\"p6\">**</ept> 类型的内容密钥。有关详细信息，请参阅：<bpt id=\"p7\">[</bpt>创建内容密钥<ept id=\"p7\">](/documentation/articles/media-services-dotnet-create-contentkey#envelope_contentkey)</ept>）。"
+    },
+    {
+      "pos": [
+        6202,
+        6284
+      ],
+      "content": "有关创建 AssetDeliveryPolicy 时可以指定哪些值的信息，请参阅<bpt id=\"p1\">[</bpt>定义 AssetDeliveryPolicy 时使用的类型<ept id=\"p1\">](#types)</ept>部分。"
+    },
+    {
+      "pos": [
+        8315,
+        8362
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"types\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>定义 AssetDeliveryPolicy 时使用的类型"
+    },
+    {
+      "pos": [
+        8367,
+        8422
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"AssetDeliveryProtocol\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>AssetDeliveryProtocol"
+    },
+    {
+      "pos": [
+        9245,
+        9304
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"AssetDeliveryPolicyType\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>AssetDeliveryPolicyType"
+    },
+    {
+      "pos": [
+        10115,
+        10172
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"ContentKeyDeliveryType\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>ContentKeyDeliveryType"
+    },
+    {
+      "pos": [
+        10785,
+        10868
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"AssetDeliveryPolicyConfigurationKey\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>AssetDeliveryPolicyConfigurationKey"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"使用 .NET SDK 配置资产传送策略\" \n    description=\"本主题说明如何通过 Azure 媒体服务 .NET SDK 配置不同的资产传送策略。\" \n    services=\"media-services\" \n    documentationCenter=\"\" \n    authors=\"juliako,Mingfeiy\" \n    manager=\"dwrede\" \n    editor=\"\"/>\n\n<tags\n    ms.service=\"media-services\"\n    ms.date=\"02/03/2016\"\n    wacn.date=\"03/17/2016\"/>\n\n#使用 .NET SDK 配置资产传送策略\n[AZURE.INCLUDE [media-services-selector-asset-delivery-policy](../includes/media-services-selector-asset-delivery-policy.md)]\n\n##概述\n\n如果你打算传送加密资产，媒体服务内容传送工作流中的步骤之一是为资产配置传送策略。资产传送策略告知媒体服务你希望如何传送资产：应该将资产动态打包成哪种流式处理协议（例如 MPEG DASH、HLS、平滑流或全部），是否要动态加密资产以及如何加密（信封或常用加密）。\n\n本主题介绍为何以及如何创建和配置资产传送策略。\n\n>[AZURE.NOTE]若要使用动态打包和动态加密，必须确保至少有一个缩放单位（也称为流式处理单位）。有关详细信息，请参阅[如何缩放媒体服务](/documentation/articles/media-services-manage-origins#scale_streaming_endpoints)。\n>\n>此外，你的资产必须包含一组自适应比特率 MP4 或自适应比特率平滑流文件。\n\n可以将不同的策略应用到同一个资产。例如，可以将 PlayReady 加密应用到平滑流，将 AES 信封应用到 MPEG DASH 和 HLS。将阻止流式处理传送策略中未定义的任何协议（例如，添加仅将 HLS 指定为协议的单个策略）。如果你根本没有定义任何传送策略，则情况不是这样。此时，将允许所有明文形式的协议。\n\n请注意，如果要传送存储加密资产，则必须配置资产的传送策略。在流式传输资产之前，流式处理服务器会删除存储加密，然后再使用指定的传送策略流式传输你的内容。例如，若要传送使用高级加密标准 (AES) 信封加密密钥加密的资产，请将策略类型设为 **DynamicEnvelopeEncryption**。若要删除存储加密并以明文的形式流式传输资产，请将策略类型设为 **NoDynamicEncryption**。下面是演示如何配置这些策略类型的示例。\n\n根据配置资产传送策略的方式，你可以动态打包、动态加密和流式传输以下流式处理协议：平滑流式处理、HLS、MPEG DASH 和 HDS 流。\n\n以下列表显示了用于流式传输平滑流、HLS DASH 和 HDS 的格式。\n\n平滑流：\n\n    {streaming endpoint name-media services account name}.streaming.mediaservices.chinacloudapi.cn/{locator ID}/{filename}.ism/Manifest\n\nHLS：\n\n    {streaming endpoint name-media services account name}.streaming.mediaservices.chinacloudapi.cn/{locator ID}/{filename}.ism/Manifest(format=m3u8-aapl)\n\nMPEG DASH\n\n    {streaming endpoint name-media services account name}.streaming.mediaservices.chinacloudapi.cn/{locator ID}/{filename}.ism/Manifest(format=mpd-time-csf) \n\nHDS\n\n    {streaming endpoint name-media services account name}.streaming.mediaservices.chinacloudapi.cn/{locator ID}/{filename}.ism/Manifest(format=f4m-f4f)\n\n有关如何发布资产和生成流 URL 的说明，请参阅[生成流 URL](/documentation/articles/media-services-deliver-streaming-content)。\n\n##注意事项\n\n- 如果某个资产存在 OnDemand（流式处理）定位符，则不能与该资产关联的 AssetDeliveryPolicy。在删除策略之前，建议先从资产中删除该策略。\n- 如果未设置资产传送策略，则无法在存储加密的资产上创建流式处理定位符。如果资产未经过存储加密，则即使未设置资产传送策略，系统也可让你顺利地创建定位符和流式处理资产。\n- 可将多个资产传送策略关联到单个资产，但只能指定一种方法来处理给定的 AssetDeliveryProtocol。也就是说，如果你尝试链接两个指定 AssetDeliveryProtocol.SmoothStreaming 协议的传送策略，则会导致出错，因为当客户端发出平滑流请求时，系统不知道你要应用哪个策略。  \n- 如果你的资产包含现有的流式处理定位符，则不能将新策略链接到该资产（可以取消现有策略与资产的链接，或者更新与该资产关联的传送策略）。必须先删除流式传输定位符，再调整策略，然后重新创建流式传输定位符。在重新创建流式传输定位符时可以使用同一个 locatorId，但应确保该操作不会导致客户端出现问题，因为内容可能已被来源或下游 CDN 缓存。  \n\n\n##清除资产传送策略 \n\n以下 **ConfigureClearAssetDeliveryPolicy** 方法会指定不应用动态加密，而是使用以下任一协议传送流：MPEG DASH、HLS 和平滑流。你可能需要对存储加密资产应用此策略。\n  \n有关创建 AssetDeliveryPolicy 时可以指定哪些值的信息，请参阅[定义 AssetDeliveryPolicy 时使用的类型](#types)部分。\n\n    static public void ConfigureClearAssetDeliveryPolicy(IAsset asset)\n    {\n        IAssetDeliveryPolicy policy =\n            _context.AssetDeliveryPolicies.Create(\"Clear Policy\",\n            AssetDeliveryPolicyType.NoDynamicEncryption, \n            AssetDeliveryProtocol.HLS | AssetDeliveryProtocol.SmoothStreaming | AssetDeliveryProtocol.Dash, null);\n\n        asset.DeliveryPolicies.Add(policy);\n    }\n\n##DynamicCommonEncryption 资产传送策略 \n\n\n以下 **CreateAssetDeliveryPolicy** 方法将创建 **AssetDeliveryPolicy**，该策略配置为将动态常用加密 (**DynamicCommonEncryption**) 应用到平滑流式处理协议（将阻止流式处理其他协议）。该方法采用以下两种参数：**Asset**（要将传送策略应用到的资产）和 **IContentKey**（**CommonEncryption** 类型的内容密钥。有关详细信息，请参阅：[创建内容密钥](/documentation/articles/media-services-dotnet-create-contentkey#common_contentkey)）。\n\n有关创建 AssetDeliveryPolicy 时可以指定哪些值的信息，请参阅[定义 AssetDeliveryPolicy 时使用的类型](#types)部分。\n\n\n    static public void CreateAssetDeliveryPolicy(IAsset asset, IContentKey key)\n    {\n        Uri acquisitionUrl = key.GetKeyDeliveryUrl(ContentKeyDeliveryType.PlayReadyLicense);\n\n        Dictionary<AssetDeliveryPolicyConfigurationKey, string> assetDeliveryPolicyConfiguration =\n            new Dictionary<AssetDeliveryPolicyConfigurationKey, string>\n        {\n            {AssetDeliveryPolicyConfigurationKey.PlayReadyLicenseAcquisitionUrl, acquisitionUrl.ToString()},\n        };\n\n        var assetDeliveryPolicy = _context.AssetDeliveryPolicies.Create(\n                \"AssetDeliveryPolicy\",\n            AssetDeliveryPolicyType.DynamicCommonEncryption,\n            AssetDeliveryProtocol.SmoothStreaming,\n            assetDeliveryPolicyConfiguration);\n\n        // Add AssetDelivery Policy to the asset\n        asset.DeliveryPolicies.Add(assetDeliveryPolicy);\n\n        Console.WriteLine();\n        Console.WriteLine(\"Adding Asset Delivery Policy: \" +\n            assetDeliveryPolicy.AssetDeliveryPolicyType);\n    }\n\nAzure 媒体服务还允许你添加 Widevine 加密。以下示例演示将 PlayReady 和 Widevine 添加到资产传送策略。\n\n\n    static public void CreateAssetDeliveryPolicy(IAsset asset, IContentKey key)\n    {\n        Uri acquisitionUrl = key.GetKeyDeliveryUrl(ContentKeyDeliveryType.PlayReadyLicense);\n        Uri widevineURl = key.GetKeyDeliveryUrl(ContentKeyDeliveryType.Widevine);\n\n        Dictionary<AssetDeliveryPolicyConfigurationKey, string> assetDeliveryPolicyConfiguration =\n            new Dictionary<AssetDeliveryPolicyConfigurationKey, string>\n        {\n            {AssetDeliveryPolicyConfigurationKey.PlayReadyLicenseAcquisitionUrl, acquisitionUrl.ToString()},\n            {AssetDeliveryPolicyConfigurationKey.WidevineLicenseAcquisitionUrl, widevineURl.ToString()},\n\n        };\n\n        var assetDeliveryPolicy = _context.AssetDeliveryPolicies.Create(\n                \"AssetDeliveryPolicy\",\n            AssetDeliveryPolicyType.DynamicCommonEncryption,\n            AssetDeliveryProtocol.Dash,\n            assetDeliveryPolicyConfiguration);\n\n\n        // Add AssetDelivery Policy to the asset\n        asset.DeliveryPolicies.Add(assetDeliveryPolicy);\n\n    }\n\n>[AZURE.NOTE]使用 Widevine 加密时，只能使用 DASH 传送。请确保在资产传送协议中指定 DASH。\n\n\n##DynamicEnvelopeEncryption 资产传送策略 \n\n以下 **CreateAssetDeliveryPolicy** 方法将创建 **AssetDeliveryPolicy**，该策略配置为将动态信封加密 (**DynamicEnvelopeEncryption**) 应用到 HLS 和 DASH 协议（将阻止流式处理的其他协议）。该方法采用以下两种参数：**Asset**（要将传送策略应用到的资产）和 **IContentKey**（**EnvelopeEncryption** 类型的内容密钥。有关详细信息，请参阅：[创建内容密钥](/documentation/articles/media-services-dotnet-create-contentkey#envelope_contentkey)）。\n\n\n有关创建 AssetDeliveryPolicy 时可以指定哪些值的信息，请参阅[定义 AssetDeliveryPolicy 时使用的类型](#types)部分。\n\n    private static void CreateAssetDeliveryPolicy(IAsset asset, IContentKey key)\n    {\n        \n        //  Get the Key Delivery Base Url by removing the Query parameter.  The Dynamic Encryption service will\n        //  automatically add the correct key identifier to the url when it generates the Envelope encrypted content\n        //  manifest.  Omitting the IV will also cause the Dynamice Encryption service to generate a deterministic\n        //  IV for the content automatically.  By using the EnvelopeBaseKeyAcquisitionUrl and omitting the IV, this\n        //  allows the AssetDelivery policy to be reused by more than one asset.\n        //\n        Uri keyAcquisitionUri = key.GetKeyDeliveryUrl(ContentKeyDeliveryType.BaselineHttp);\n        UriBuilder uriBuilder = new UriBuilder(keyAcquisitionUri);\n        uriBuilder.Query = String.Empty;\n        keyAcquisitionUri = uriBuilder.Uri;\n\n        // The following policy configuration specifies: \n        //   key url that will have KID=<Guid> appended to the envelope and\n        //   the Initialization Vector (IV) to use for the envelope encryption.\n        Dictionary<AssetDeliveryPolicyConfigurationKey, string> assetDeliveryPolicyConfiguration =\n            new Dictionary<AssetDeliveryPolicyConfigurationKey, string> \n        {\n            {AssetDeliveryPolicyConfigurationKey.EnvelopeBaseKeyAcquisitionUrl, keyAcquisitionUri.ToString()},\n        };\n\n        IAssetDeliveryPolicy assetDeliveryPolicy =\n            _context.AssetDeliveryPolicies.Create(\n                        \"AssetDeliveryPolicy\",\n                        AssetDeliveryPolicyType.DynamicEnvelopeEncryption,\n                        AssetDeliveryProtocol.HLS | AssetDeliveryProtocol.Dash,\n                        assetDeliveryPolicyConfiguration);\n\n        // Add AssetDelivery Policy to the asset\n        asset.DeliveryPolicies.Add(assetDeliveryPolicy);\n\n        Console.WriteLine();\n        Console.WriteLine(\"Adding Asset Delivery Policy: \" + assetDeliveryPolicy.AssetDeliveryPolicyType);\n    }\n\n\n##<a id=\"types\"></a>定义 AssetDeliveryPolicy 时使用的类型\n\n###<a id=\"AssetDeliveryProtocol\"></a>AssetDeliveryProtocol \n\n    /// <summary>\n    /// Delivery protocol for an asset delivery policy.\n    /// </summary>\n    [Flags]\n    public enum AssetDeliveryProtocol\n    {\n        /// <summary>\n        /// No protocols.\n        /// </summary>\n        None = 0x0,\n\n        /// <summary>\n        /// Smooth streaming protocol.\n        /// </summary>\n        SmoothStreaming = 0x1,\n\n        /// <summary>\n        /// MPEG Dynamic Adaptive Streaming over HTTP (DASH)\n        /// </summary>\n        Dash = 0x2,\n\n        /// <summary>\n        /// Apple HTTP Live Streaming protocol.\n        /// </summary>\n        HLS = 0x4,\n\n        /// <summary>\n        /// Adobe HTTP Dynamic Streaming (HDS)\n        /// </summary>\n        Hds = 0x8,\n\n        /// <summary>\n        /// Include all protocols.\n        /// </summary>\n        All = 0xFFFF\n    }\n\n###<a id=\"AssetDeliveryPolicyType\"></a>AssetDeliveryPolicyType\n\n    /// <summary>\n    /// Policy type for dynamic encryption of assets.\n    /// </summary>\n    public enum AssetDeliveryPolicyType\n    {\n        /// <summary>\n        /// Delivery Policy Type not set.  An invalid value.\n        /// </summary>\n        None,\n\n        /// <summary>\n        /// The Asset should not be delivered via this AssetDeliveryProtocol. \n        /// </summary>\n        Blocked, \n\n        /// <summary>\n        /// Do not apply dynamic encryption to the asset.\n        /// </summary>\n        /// \n        NoDynamicEncryption,  \n\n        /// <summary>\n        /// Apply Dynamic Envelope encryption.\n        /// </summary>\n        DynamicEnvelopeEncryption,\n\n        /// <summary>\n        /// Apply Dynamic Common encryption.\n        /// </summary>\n        DynamicCommonEncryption\n    }\n\n###<a id=\"ContentKeyDeliveryType\"></a>ContentKeyDeliveryType\n\n    /// <summary>\n    /// Delivery method of the content key to the client.\n    /// </summary>\n    public enum ContentKeyDeliveryType\n    {\n        /// <summary>\n        /// None.\n        /// </summary>\n        None = 0,\n\n        /// <summary>\n        /// Use PlayReady License acquistion protocol\n        /// </summary>\n        PlayReadyLicense = 1,\n\n        /// <summary>\n        /// Use MPEG Baseline HTTP key protocol.\n        /// </summary>\n        BaselineHttp = 2,\n\n        /// <summary>\n        /// Use Widevine License acquistion protocol\n        ///\n        </summary>\n        Widevine = 3\n\n    }\n\n###<a id=\"AssetDeliveryPolicyConfigurationKey\"></a>AssetDeliveryPolicyConfigurationKey\n\n    /// <summary>\n    /// Keys used to get specific configuration for an asset delivery policy.\n    /// </summary>\n    public enum AssetDeliveryPolicyConfigurationKey\n    {\n        /// <summary>\n        /// No policies.\n        /// </summary>\n        None,\n\n        /// <summary>\n        /// Exact Envelope key URL.\n        /// </summary>\n        EnvelopeKeyAcquisitionUrl,\n\n        /// <summary>\n        /// Base key url that will have KID=<Guid> appended for Envelope.\n        /// </summary>\n        EnvelopeBaseKeyAcquisitionUrl,\n        \n        /// <summary>\n        /// The initialization vector to use for envelope encryption in Base64 format.\n        /// </summary>\n        EnvelopeEncryptionIVAsBase64,\n\n        /// <summary>\n        /// The PlayReady License Acquisition Url to use for common encryption.\n        /// </summary>\n        PlayReadyLicenseAcquisitionUrl,\n\n        /// <summary>\n        /// The PlayReady Custom Attributes to add to the PlayReady Content Header\n        /// </summary>\n        PlayReadyCustomAttributes,\n\n        /// <summary>\n        /// The initialization vector to use for envelope encryption.\n        /// </summary>\n        EnvelopeEncryptionIV,\n\n        /// <summary>\n        /// Widevine DRM acquisition url\n        /// </summary>\n        WidevineLicenseAcquisitionUrl\n    }\n\n<!---HONumber=Mooncake_0307_2016-->"
+}

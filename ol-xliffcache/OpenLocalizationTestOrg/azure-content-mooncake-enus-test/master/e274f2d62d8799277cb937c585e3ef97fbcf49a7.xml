@@ -1,0 +1,459 @@
+{
+  "nodes": [
+    {
+      "content": "在 HDInsight 中将 Hadoop Hive 与 Curl 配合使用 | Azure",
+      "pos": [
+        26,
+        72
+      ]
+    },
+    {
+      "content": "了解如何使用 Curl 向 HDInsight 远程提交 Pig 作业。",
+      "pos": [
+        90,
+        126
+      ]
+    },
+    {
+      "content": "使用 Curl 在 HDInsight 中以 Hadoop 运行 Hive 查询",
+      "pos": [
+        359,
+        399
+      ]
+    },
+    {
+      "content": "在本文档中，你将学习如何使用 Curl 在 Azure HDInsight 群集上对 Hadoop 运行 Hive 查询。",
+      "pos": [
+        478,
+        539
+      ]
+    },
+    {
+      "content": "本文档使用 Curl 演示如何通过使用原始 HTTP 请求来与 HDInsight 交互，以便运行、监视和检索 Hive 查询的结果。若要执行这些操作，需要使用 HDInsight 群集提供的 WebHCat REST API（前称 Templeton）。",
+      "pos": [
+        541,
+        669
+      ]
+    },
+    {
+      "pos": [
+        673,
+        696
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"prereq\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>先决条件"
+    },
+    {
+      "content": "若要完成本文中的步骤，你将需要：",
+      "pos": [
+        698,
+        714
+      ]
+    },
+    {
+      "content": "HDInsight 群集上的 Hadoop（基于 Windows）",
+      "pos": [
+        718,
+        751
+      ]
+    },
+    {
+      "content": "Curl",
+      "pos": [
+        756,
+        760
+      ]
+    },
+    {
+      "content": "jq",
+      "pos": [
+        788,
+        790
+      ]
+    },
+    {
+      "pos": [
+        826,
+        863
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"curl\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>通过使用 Curl 运行 Hive 查询"
+    },
+    {
+      "pos": [
+        867,
+        998
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>使用 Curl 或者与 WebHCat 进行任何其他形式的 REST 通信时，必须提供 HDInsight 群集管理员用户名和密码对请求进行身份验证。此外，还必须使用群集名称作为用来向服务器发送请求的统一资源标识符 (URI) 的一部分。"
+    },
+    {
+      "pos": [
+        1001,
+        1234
+      ],
+      "content": "<p>对本部分中的所有命令，请将 **USERNAME** 替换为在群集上进行身份验证的用户，并将 **PASSWORD** 替换为用户帐户的密码。将 **CLUSTERNAME** 替换为群集名称。\n<p>REST API 通过[基本身份验证](http://en.wikipedia.org/wiki/Basic_access_authentication)进行保护。你始终应该使用安全 HTTP (HTTPS) 来发出请求，以确保安全地将凭据发送到服务器。",
+      "leadings": [
+        "",
+        "> "
+      ],
+      "nodes": [
+        {
+          "content": "对本部分中的所有命令，请将 <bpt id=\"p1\">**</bpt>USERNAME<ept id=\"p1\">**</ept> 替换为在群集上进行身份验证的用户，并将 <bpt id=\"p2\">**</bpt>PASSWORD<ept id=\"p2\">**</ept> 替换为用户帐户的密码。将 <bpt id=\"p3\">**</bpt>CLUSTERNAME<ept id=\"p3\">**</ept> 替换为群集名称。",
+          "pos": [
+            3,
+            100
+          ]
+        },
+        {
+          "content": "REST API 通过<bpt id=\"p1\">[</bpt><ept id=\"p1\">基本身份验证](http://en.wikipedia.org/wiki/Basic_access_authentication)</ept>进行保护。你始终应该使用安全 HTTP (HTTPS) 来发出请求，以确保安全地将凭据发送到服务器。",
+          "pos": [
+            104,
+            231
+          ]
+        }
+      ]
+    },
+    {
+      "content": "在命令行中，使用以下命令验证你是否可以连接到 HDInsight 群集。",
+      "pos": [
+        1239,
+        1275
+      ]
+    },
+    {
+      "content": "你应会收到类似于下面的响应：",
+      "pos": [
+        1377,
+        1391
+      ]
+    },
+    {
+      "content": "此命令中使用的参数如下：",
+      "pos": [
+        1437,
+        1449
+      ]
+    },
+    {
+      "pos": [
+        1457,
+        1485
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-u<ept id=\"p1\">**</ept> - 用来对请求进行身份验证的用户名和密码。"
+    },
+    {
+      "pos": [
+        1492,
+        1513
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-G<ept id=\"p1\">**</ept> - 指出这是 GET 请求。"
+    },
+    {
+      "pos": [
+        1519,
+        1671
+      ],
+      "content": "所有请求的 URL 开头 <bpt id=\"p1\">**</bpt>https://CLUSTERNAME.azurehdinsight.cn/templeton/v1<ept id=\"p1\">**</ept> 都是一样的。路径 <bpt id=\"p2\">**</bpt>/status<ept id=\"p2\">**</ept> 指示，请求是返回服务器的 WebHCat（也称为 Templeton）的状态。你还可以通过使用以下命令请求 Hive 的版本："
+    },
+    {
+      "content": "这应该会返回如下响应：",
+      "pos": [
+        1779,
+        1790
+      ]
+    },
+    {
+      "pos": [
+        1854,
+        1883
+      ],
+      "content": "使用以下命令创建名为 <bpt id=\"p1\">**</bpt>log4jLogs<ept id=\"p1\">**</ept> 的新表："
+    },
+    {
+      "content": "此命令中使用的参数如下：",
+      "pos": [
+        2394,
+        2406
+      ]
+    },
+    {
+      "pos": [
+        2414,
+        2467
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-d<ept id=\"p1\">**</ept> - 由于未使用 <ph id=\"ph1\">`-G`</ph>，请求默认为 POST 方法。<ph id=\"ph2\">`-d`</ph> 指定与请求一起发送的数据值。"
+    },
+    {
+      "pos": [
+        2479,
+        2505
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>user.name<ept id=\"p1\">**</ept> - 正在运行命令的用户。"
+    },
+    {
+      "pos": [
+        2517,
+        2546
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>execute<ept id=\"p1\">**</ept> - 要执行的 HiveQL 语句。"
+    },
+    {
+      "pos": [
+        2558,
+        2588
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>statusdir<ept id=\"p1\">**</ept> - 此作业的状态要写入到的目录。"
+    },
+    {
+      "content": "这些语句将执行以下操作：",
+      "pos": [
+        2594,
+        2606
+      ]
+    },
+    {
+      "pos": [
+        2614,
+        2649
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>DROP TABLE<ept id=\"p1\">**</ept> - 删除表和数据文件（如果该表已存在）。"
+    },
+    {
+      "pos": [
+        2657,
+        2732
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>CREATE EXTERNAL TABLE<ept id=\"p1\">**</ept> - 在 Hive 中创建新的“外部”表。外部表仅在 Hive 中存储表定义。数据将保留在原始位置。"
+    },
+    {
+      "pos": [
+        2744,
+        2837
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>当你预期以外部源更新基础数据（例如自动化数据上载过程），或以其他 MapReduce 操作更新基础数据，但希望 Hive 查询始终使用最新数据时，必须使用外部表。"
+    },
+    {
+      "content": "删除外部表<bpt id=\"p1\">**</bpt>不会<ept id=\"p1\">**</ept>删除数据，只会删除表定义。",
+      "pos": [
+        2851,
+        2875
+      ]
+    },
+    {
+      "pos": [
+        2883,
+        2938
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>ROW FORMAT<ept id=\"p1\">**</ept> - 告知 Hive 如何设置数据的格式。在此情况下，每个日志中的字段以空格分隔。"
+    },
+    {
+      "pos": [
+        2946,
+        3025
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>STORED AS TEXTFILE LOCATION<ept id=\"p1\">**</ept> - 让 Hive 知道数据的存储位置（example/data 目录），并且数据已存储为文本。"
+    },
+    {
+      "pos": [
+        3033,
+        3106
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>SELECT<ept id=\"p1\">**</ept> - 选择第 <bpt id=\"p2\">**</bpt>t4<ept id=\"p2\">**</ept> 列包含值 <bpt id=\"p3\">**</bpt>[ERROR]<ept id=\"p3\">**</ept> 的所有行的计数。这应会返回值 <bpt id=\"p4\">**</bpt>3<ept id=\"p4\">**</ept>，因为有三个行包含此值。"
+    },
+    {
+      "pos": [
+        3114,
+        3201
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>请注意，在与 Curl 配合使用时，将用 <ph id=\"ph2\">`+`</ph> 字符替换 HiveQL 语句之间的空格。如果带引号的值包含空格（例如分隔符），则不应替换为 <ph id=\"ph3\">`+`</ph>。"
+    },
+    {
+      "pos": [
+        3209,
+        3330
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>INPUT\\_\\_FILE\\_\\_NAME LIKE '%25.log'<ept id=\"p1\">**</ept> - 此项会对搜索进行限制，仅使用以 .log 结尾的文件。如果此项不存在，Hive 会尝试搜索此目录及其子目录中的所有文件，包括不符合为此表定义的列架构的文件。"
+    },
+    {
+      "pos": [
+        3338,
+        3430
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>请注意，%25 是 % 的 URL 编码形式，因此实际条件是 <ph id=\"ph2\">`like '%.log'`</ph>。% 必须是 URL 编码的，因为系统将其视为 URL 中的特殊字符。"
+    },
+    {
+      "content": "此命令应会返回可用来检查作业状态的作业 ID。",
+      "pos": [
+        3436,
+        3459
+      ]
+    },
+    {
+      "pos": [
+        3505,
+        3631
+      ],
+      "content": "若要检查作业的状态，请使用以下命令。将 <bpt id=\"p1\">**</bpt>JOBID<ept id=\"p1\">**</ept> 替换为上一步骤返回的值。例如，如果返回值为 <ph id=\"ph1\">`{\"id\":\"job_1415651640909_0026\"}`</ph>，则 <bpt id=\"p2\">**</bpt>JOBID<ept id=\"p2\">**</ept> 将是 <ph id=\"ph2\">`job_1415651640909_0026`</ph>。"
+    },
+    {
+      "pos": [
+        3778,
+        3805
+      ],
+      "content": "如果作业已完成，状态将是 <bpt id=\"p1\">**</bpt>SUCCEEDED<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        3813,
+        3888
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>此 Curl 请求返回具有作业相关信息的 JavaScript 对象表示法 (JSON) 文档；使用 jq 可以仅检索状态值。"
+    },
+    {
+      "pos": [
+        3893,
+        4068
+      ],
+      "content": "在作业的状态更改为 <bpt id=\"p1\">**</bpt>SUCCEEDED<ept id=\"p1\">**</ept> 后，你可以从 Azure Blob 存储中检索作业的结果。随查询一起传递的 <ph id=\"ph1\">`statusdir`</ph> 参数包含输出文件的位置；在本例中为 <bpt id=\"p2\">**</bpt>wasb:///example/curl<ept id=\"p2\">**</ept>。此地址会将作业的输出存储在 HDInsight 群集所用的默认存储容器的 <bpt id=\"p3\">**</bpt>example/curl<ept id=\"p3\">**</ept> 目录中。"
+    },
+    {
+      "pos": [
+        4074,
+        4182
+      ],
+      "content": "可以使用 <bpt id=\"p1\">[</bpt>Azure CLI<ept id=\"p1\">](/documentation/articles/xplat-cli-install)</ept> 列出并下载这些文件。例如，若要列出 <bpt id=\"p2\">**</bpt>example/curl<ept id=\"p2\">**</ept> 中的文件，请使用以下命令："
+    },
+    {
+      "content": "若要下载文件，请使用以下命令：",
+      "pos": [
+        4251,
+        4266
+      ]
+    },
+    {
+      "pos": [
+        4359,
+        4565
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>你必须使用 <ph id=\"ph2\">`-a`</ph> 和 <ph id=\"ph3\">`-k`</ph> 参数指定包含 Blob 的存储帐户名称，或者设置 <bpt id=\"p1\">**</bpt>AZURE\\_STORAGE\\_ACCOUNT<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>AZURE\\_STORAGE\\_ACCESS\\_KEY<ept id=\"p2\">**</ept> 环境变量。请参阅 &lt;a href=\"/documentation/articles/hdinsight-upload-data\" target=\"\\_blank\" 了解详细信息。"
+    },
+    {
+      "pos": [
+        4570,
+        4603
+      ],
+      "content": "使用以下语句创建名为 <bpt id=\"p1\">**</bpt>errorLogs<ept id=\"p1\">**</ept> 的新“内部”表："
+    },
+    {
+      "content": "这些语句将执行以下操作：",
+      "pos": [
+        5052,
+        5064
+      ]
+    },
+    {
+      "pos": [
+        5072,
+        5183
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>CREATE TABLE IF NOT EXISTS<ept id=\"p1\">**</ept> - 创建表（如果该表尚不存在）。由于未使用 <bpt id=\"p2\">**</bpt>EXTERNAL<ept id=\"p2\">**</ept> 关键字，因此这是一个“内部”表，它存储在 Hive 数据仓库中并完全受 Hive 的管理。"
+    },
+    {
+      "pos": [
+        5195,
+        5229
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>与外部表不同，删除内部表会同时删除基础数据。"
+    },
+    {
+      "pos": [
+        5237,
+        5301
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>STORED AS ORC<ept id=\"p1\">**</ept> - 以优化行纵栏表 (ORC) 格式存储数据。这是高度优化且有效的 Hive 数据存储格式。"
+    },
+    {
+      "pos": [
+        5308,
+        5404
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>INSERT OVERWRITE ...SELECT<ept id=\"p1\">**</ept> - 从包含 <bpt id=\"p2\">**</bpt>[ERROR]<ept id=\"p2\">**</ept> 的 <bpt id=\"p3\">**</bpt>log4jLogs<ept id=\"p3\">**</ept> 表中选择行，然后将数据插入 <bpt id=\"p4\">**</bpt>errorLogs<ept id=\"p4\">**</ept> 表中。"
+    },
+    {
+      "pos": [
+        5411,
+        5449
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>SELECT<ept id=\"p1\">**</ept> - 选择新 <bpt id=\"p2\">**</bpt>errorLogs<ept id=\"p2\">**</ept> 表中的所有行。"
+    },
+    {
+      "pos": [
+        5454,
+        5545
+      ],
+      "content": "使用返回的作业 ID 检查作业的状态。成功后，如前面所述使用适用于 Windows 的 Azure CLI 下载并查看结果。输出应包含三行，其中所有行都包含 <bpt id=\"p1\">**</bpt>[ERROR]<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        5550,
+        5572
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"summary\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>摘要"
+    },
+    {
+      "content": "如本文档中所示，你可以使用原始 HTTP 请求来运行、监视和查看 HDInsight 群集上的 Hive 作业的结果。",
+      "pos": [
+        5574,
+        5633
+      ]
+    },
+    {
+      "pos": [
+        5635,
+        5769
+      ],
+      "content": "有关本文中使用的 REST 接口的详细信息，请参阅 <ph id=\"ph1\">&lt;a href=\"https://cwiki.apache.org/confluence/display/Hive/WebHCat+Reference\" target=\"_blank\"&gt;</ph>WebHCat 参考<ph id=\"ph2\">&lt;/a&gt;</ph>。"
+    },
+    {
+      "pos": [
+        5773,
+        5799
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"nextsteps\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>后续步骤"
+    },
+    {
+      "content": "有关将 Hive 与 HDInsight 配合使用的一般信息：",
+      "pos": [
+        5801,
+        5832
+      ]
+    },
+    {
+      "content": "将 Hive 与 HDInsight 上的 Hadoop 配合使用",
+      "pos": [
+        5837,
+        5870
+      ]
+    },
+    {
+      "content": "有关 HDInsight 上的 Hadoop 的其他使用方法的信息：",
+      "pos": [
+        5917,
+        5951
+      ]
+    },
+    {
+      "content": "将 Pig 与 HDInsight 上的 Hadoop 配合使用",
+      "pos": [
+        5956,
+        5988
+      ]
+    },
+    {
+      "content": "将 MapReduce 与 HDInsight 上的 Hadoop 配合使用",
+      "pos": [
+        6037,
+        6075
+      ]
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"在 HDInsight 中将 Hadoop Hive 与 Curl 配合使用 | Azure\"\n   description=\"了解如何使用 Curl 向 HDInsight 远程提交 Pig 作业。\"\n   services=\"hdinsight\"\n   documentationCenter=\"\"\n   authors=\"Blackmist\"\n   manager=\"paulettm\"\n   editor=\"cgronlun\"\n   tags=\"azure-portal\"/>\n\n<tags\n    ms.service=\"hdinsight\"\n    ms.date=\"12/04/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n#使用 Curl 在 HDInsight 中以 Hadoop 运行 Hive 查询\n\n[AZURE.INCLUDE [hive-selector](../includes/hdinsight-selector-use-hive.md)]\n\n在本文档中，你将学习如何使用 Curl 在 Azure HDInsight 群集上对 Hadoop 运行 Hive 查询。\n\n本文档使用 Curl 演示如何通过使用原始 HTTP 请求来与 HDInsight 交互，以便运行、监视和检索 Hive 查询的结果。若要执行这些操作，需要使用 HDInsight 群集提供的 WebHCat REST API（前称 Templeton）。\n\n##<a id=\"prereq\"></a>先决条件\n\n若要完成本文中的步骤，你将需要：\n\n* HDInsight 群集上的 Hadoop（基于 Windows）\n\n* [Curl](http://curl.haxx.se/)\n\n* [jq](http://stedolan.github.io/jq/)\n\n##<a id=\"curl\"></a>通过使用 Curl 运行 Hive 查询\n\n> [AZURE.NOTE]使用 Curl 或者与 WebHCat 进行任何其他形式的 REST 通信时，必须提供 HDInsight 群集管理员用户名和密码对请求进行身份验证。此外，还必须使用群集名称作为用来向服务器发送请求的统一资源标识符 (URI) 的一部分。\n> <p>对本部分中的所有命令，请将 **USERNAME** 替换为在群集上进行身份验证的用户，并将 **PASSWORD** 替换为用户帐户的密码。将 **CLUSTERNAME** 替换为群集名称。\n> <p>REST API 通过[基本身份验证](http://en.wikipedia.org/wiki/Basic_access_authentication)进行保护。你始终应该使用安全 HTTP (HTTPS) 来发出请求，以确保安全地将凭据发送到服务器。\n\n1. 在命令行中，使用以下命令验证你是否可以连接到 HDInsight 群集。\n\n        curl -u USERNAME:PASSWORD -G https://CLUSTERNAME.azurehdinsight.cn/templeton/v1/status\n\n    你应会收到类似于下面的响应：\n\n        {\"status\":\"ok\",\"version\":\"v1\"}\n\n    此命令中使用的参数如下：\n\n    * **-u** - 用来对请求进行身份验证的用户名和密码。\n    * **-G** - 指出这是 GET 请求。\n\n    所有请求的 URL 开头 **https://CLUSTERNAME.azurehdinsight.cn/templeton/v1** 都是一样的。路径 **/status** 指示，请求是返回服务器的 WebHCat（也称为 Templeton）的状态。你还可以通过使用以下命令请求 Hive 的版本：\n\n        curl -u USERNAME:PASSWORD -G https://CLUSTERNAME.azurehdinsight.cn/templeton/v1/version/hive\n\n    这应该会返回如下响应：\n\n        {\"module\":\"hive\",\"version\":\"0.13.0.2.1.6.0-2103\"}\n\n2. 使用以下命令创建名为 **log4jLogs** 的新表：\n\n        curl -u USERNAME:PASSWORD -d user.name=USERNAME -d execute=\"DROP+TABLE+log4jLogs;CREATE+EXTERNAL+TABLE+log4jLogs(t1+string,t2+string,t3+string,t4+string,t5+string,t6+string,t7+string)+ROW+FORMAT+DELIMITED+FIELDS+TERMINATED+BY+' '+STORED+AS+TEXTFILE+LOCATION+'wasb:///example/data/';SELECT+t4+AS+sev,COUNT(*)+AS+count+FROM+log4jLogs+WHERE+t4+=+'[ERROR]'+AND+INPUT__FILE__NAME+LIKE+'%25.log'+GROUP+BY+t4;\" -d statusdir=\"wasb:///example/curl\" https://CLUSTERNAME.azurehdinsight.cn/templeton/v1/hive\n\n    此命令中使用的参数如下：\n\n    * **-d** - 由于未使用 `-G`，请求默认为 POST 方法。`-d` 指定与请求一起发送的数据值。\n\n        * **user.name** - 正在运行命令的用户。\n\n        * **execute** - 要执行的 HiveQL 语句。\n\n        * **statusdir** - 此作业的状态要写入到的目录。\n\n    这些语句将执行以下操作：\n\n    * **DROP TABLE** - 删除表和数据文件（如果该表已存在）。\n\n    * **CREATE EXTERNAL TABLE** - 在 Hive 中创建新的“外部”表。外部表仅在 Hive 中存储表定义。数据将保留在原始位置。\n\n        > [AZURE.NOTE]当你预期以外部源更新基础数据（例如自动化数据上载过程），或以其他 MapReduce 操作更新基础数据，但希望 Hive 查询始终使用最新数据时，必须使用外部表。\n        > <p>删除外部表**不会**删除数据，只会删除表定义。\n\n    * **ROW FORMAT** - 告知 Hive 如何设置数据的格式。在此情况下，每个日志中的字段以空格分隔。\n\n    * **STORED AS TEXTFILE LOCATION** - 让 Hive 知道数据的存储位置（example/data 目录），并且数据已存储为文本。\n\n    * **SELECT** - 选择第 **t4** 列包含值 **[ERROR]** 的所有行的计数。这应会返回值 **3**，因为有三个行包含此值。\n\n    > [AZURE.NOTE]请注意，在与 Curl 配合使用时，将用 `+` 字符替换 HiveQL 语句之间的空格。如果带引号的值包含空格（例如分隔符），则不应替换为 `+`。\n\n    * **INPUT\\_\\_FILE\\_\\_NAME LIKE '%25.log'** - 此项会对搜索进行限制，仅使用以 .log 结尾的文件。如果此项不存在，Hive 会尝试搜索此目录及其子目录中的所有文件，包括不符合为此表定义的列架构的文件。\n\n    > [AZURE.NOTE]请注意，%25 是 % 的 URL 编码形式，因此实际条件是 `like '%.log'`。% 必须是 URL 编码的，因为系统将其视为 URL 中的特殊字符。\n\n    此命令应会返回可用来检查作业状态的作业 ID。\n\n        {\"id\":\"job_1415651640909_0026\"}\n\n3. 若要检查作业的状态，请使用以下命令。将 **JOBID** 替换为上一步骤返回的值。例如，如果返回值为 `{\"id\":\"job_1415651640909_0026\"}`，则 **JOBID** 将是 `job_1415651640909_0026`。\n\n        curl -G -u USERNAME:PASSWORD -d user.name=USERNAME https://CLUSTERNAME.azurehdinsight.cn/templeton/v1/jobs/JOBID | jq .status.state\n\n    如果作业已完成，状态将是 **SUCCEEDED**。\n\n    > [AZURE.NOTE]此 Curl 请求返回具有作业相关信息的 JavaScript 对象表示法 (JSON) 文档；使用 jq 可以仅检索状态值。\n\n4. 在作业的状态更改为 **SUCCEEDED** 后，你可以从 Azure Blob 存储中检索作业的结果。随查询一起传递的 `statusdir` 参数包含输出文件的位置；在本例中为 **wasb:///example/curl**。此地址会将作业的输出存储在 HDInsight 群集所用的默认存储容器的 **example/curl** 目录中。\n\n    可以使用 [Azure CLI](/documentation/articles/xplat-cli-install) 列出并下载这些文件。例如，若要列出 **example/curl** 中的文件，请使用以下命令：\n\n        azure storage blob list <container-name> example/curl\n\n    若要下载文件，请使用以下命令：\n\n        azure storage blob download <container-name> <blob-name> <destination-file>\n\n    > [AZURE.NOTE]你必须使用 `-a` 和 `-k` 参数指定包含 Blob 的存储帐户名称，或者设置 **AZURE\\_STORAGE\\_ACCOUNT** 和 **AZURE\\_STORAGE\\_ACCESS\\_KEY** 环境变量。请参阅 <a href=\"/documentation/articles/hdinsight-upload-data\" target=\"\\_blank\" 了解详细信息。\n\n6. 使用以下语句创建名为 **errorLogs** 的新“内部”表：\n\n        curl -u USERNAME:PASSWORD -d user.name=USERNAME -d execute=\"CREATE+TABLE+IF+NOT+EXISTS+errorLogs(t1+string,t2+string,t3+string,t4+string,t5+string,t6+string,t7+string)+STORED+AS+ORC;INSERT+OVERWRITE+TABLE+errorLogs+SELECT+t1,t2,t3,t4,t5,t6,t7+FROM+log4jLogs+WHERE+t4+=+'[ERROR]'+AND+INPUT__FILE__NAME+LIKE+'%25.log';SELECT+*+from+errorLogs;\" -d statusdir=\"wasb:///example/curl\" https://CLUSTERNAME.azurehdinsight.cn/templeton/v1/hive\n\n    这些语句将执行以下操作：\n\n    * **CREATE TABLE IF NOT EXISTS** - 创建表（如果该表尚不存在）。由于未使用 **EXTERNAL** 关键字，因此这是一个“内部”表，它存储在 Hive 数据仓库中并完全受 Hive 的管理。\n\n        > [AZURE.NOTE]与外部表不同，删除内部表会同时删除基础数据。\n\n    * **STORED AS ORC** - 以优化行纵栏表 (ORC) 格式存储数据。这是高度优化且有效的 Hive 数据存储格式。\n    * **INSERT OVERWRITE ...SELECT** - 从包含 **[ERROR]** 的 **log4jLogs** 表中选择行，然后将数据插入 **errorLogs** 表中。\n    * **SELECT** - 选择新 **errorLogs** 表中的所有行。\n\n7. 使用返回的作业 ID 检查作业的状态。成功后，如前面所述使用适用于 Windows 的 Azure CLI 下载并查看结果。输出应包含三行，其中所有行都包含 **[ERROR]**。\n\n\n##<a id=\"summary\"></a>摘要\n\n如本文档中所示，你可以使用原始 HTTP 请求来运行、监视和查看 HDInsight 群集上的 Hive 作业的结果。\n\n有关本文中使用的 REST 接口的详细信息，请参阅 <a href=\"https://cwiki.apache.org/confluence/display/Hive/WebHCat+Reference\" target=\"_blank\">WebHCat 参考</a>。\n\n##<a id=\"nextsteps\"></a>后续步骤\n\n有关将 Hive 与 HDInsight 配合使用的一般信息：\n\n* [将 Hive 与 HDInsight 上的 Hadoop 配合使用](/documentation/articles/hdinsight-use-hive)\n\n有关 HDInsight 上的 Hadoop 的其他使用方法的信息：\n\n* [将 Pig 与 HDInsight 上的 Hadoop 配合使用](/documentation/articles/hdinsight-use-pig)\n\n* [将 MapReduce 与 HDInsight 上的 Hadoop 配合使用](/documentation/articles/hdinsight-use-mapreduce)\n\n\n[hdinsight-sdk-documentation]: http://msdnstage.redmond.corp.microsoft.com/zh-cn/library/dn479185.aspx\n\n[azure-purchase-options]: /pricing/overview/\n[azure-member-offers]: /pricing/member-offers/\n[azure-trial]: /pricing/1rmb-trial/\n\n[apache-tez]: http://tez.apache.org\n[apache-hive]: http://hive.apache.org/\n[apache-log4j]: http://zh.wikipedia.org/wiki/Log4j\n[hive-on-tez-wiki]: https://cwiki.apache.org/confluence/display/Hive/Hive+on+Tez\n[import-to-excel]: /documentation/articles/hdinsight-connect-excel-power-query/\n\n\n[hdinsight-use-oozie]: /documentation/articles/hdinsight-use-oozie\n[hdinsight-analyze-flight-data]: /documentation/articles/hdinsight-analyze-flight-delay-data\n[hdinsight-storage]: /documentation/articles/hdinsight-use-blob-storage\n[hdinsight-provision]: /documentation/articles/hdinsight-provision-clusters-v1\n[hdinsight-submit-jobs]: /documentation/articles/hdinsight-submit-hadoop-jobs-programmatically\n[hdinsight-upload-data]: /documentation/articles/hdinsight-upload-data\n[hdinsight-get-started]: /documentation/articles/hdinsight-get-started\n[Powershell-install-configure]: /documentation/articles/powershell-install-configure\n[powershell-here-strings]: http://technet.microsoft.com/zh-cn/library/ee692792.aspx\n\n[image-hdi-hive-powershell]: ./media/hdinsight-use-hive/HDI.HIVE.PowerShell.png\n[img-hdi-hive-powershell-output]: ./media/hdinsight-use-hive/HDI.Hive.PowerShell.Output.png\n[image-hdi-hive-architecture]: ./media/hdinsight-use-hive/HDI.Hive.Architecture.png\n\n<!---HONumber=79-->"
+}

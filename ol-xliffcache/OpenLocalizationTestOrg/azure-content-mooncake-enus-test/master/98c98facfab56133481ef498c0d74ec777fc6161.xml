@@ -1,0 +1,824 @@
+{
+  "nodes": [
+    {
+      "content": "在 Azure 中配置 AlwaysOn 可用性组 (PowerShell)",
+      "pos": [
+        28,
+        66
+      ]
+    },
+    {
+      "content": "使用 PowerShell 在 Azure 中创建 AlwaysOn 可用性组。",
+      "pos": [
+        85,
+        125
+      ]
+    },
+    {
+      "content": "在 Azure 中配置 AlwaysOn 可用性组 (PowerShell)",
+      "pos": [
+        355,
+        393
+      ]
+    },
+    {
+      "pos": [
+        396,
+        549
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>有关同一方案的基于 GUI 的教程，请参阅<bpt id=\"p1\">[</bpt>在 Azure 中配置 AlwaysOn 可用性组 (GUI)<ept id=\"p1\">](/documentation/articles/virtual-machines-sql-server-alwayson-availability-groups-gui)</ept>。"
+    },
+    {
+      "content": "Azure 虚拟机 (VM) 可帮助数据库管理员降低高可用性 SQL Server 系统的成本。本教程介绍如何在 Azure 环境中使用端到端 SQL Server AlwaysOn 实施可用性组。完成本教程后，Azure 中的 SQL Server AlwaysOn 解决方案将包括以下要素：",
+      "pos": [
+        551,
+        698
+      ]
+    },
+    {
+      "content": "一个包含多个子网（包括前端子网和后端子网）的虚拟网络",
+      "pos": [
+        702,
+        728
+      ]
+    },
+    {
+      "content": "包含 Active Directory (AD) 域的域控制器",
+      "pos": [
+        732,
+        763
+      ]
+    },
+    {
+      "content": "部署到后端子网并加入 AD 域的两个 SQL Server VM",
+      "pos": [
+        767,
+        799
+      ]
+    },
+    {
+      "content": "具有节点多数仲裁模型的 3 节点 WSFC 群集",
+      "pos": [
+        803,
+        827
+      ]
+    },
+    {
+      "content": "具有可用性数据库的两个同步提交副本的可用性组",
+      "pos": [
+        831,
+        853
+      ]
+    },
+    {
+      "content": "之所以选择此方案是因为其简易性，而非其成本效益或 Azure 上的其他功能。例如，你可最大程度减少 2 副本可用性组的虚拟机数目，以便通过将域控制器作为 2 节点 WSFC 群集中的仲裁文件共享见证服务器来节省 Azure 中的计算时间。通过此方法，上述配置中的 VM 数目可以减少一个。",
+      "pos": [
+        855,
+        999
+      ]
+    },
+    {
+      "content": "本教程介绍设置上述解决方案所需的步骤，但不详细阐述每一步的细节。因此，我们没有列出 GUI 配置步骤，而是借助 PowerShell 脚本带你迅速完成每个步骤。假设如下：",
+      "pos": [
+        1001,
+        1086
+      ]
+    },
+    {
+      "content": "你已有一个用于虚拟机订阅的 Azure 帐户。",
+      "pos": [
+        1090,
+        1113
+      ]
+    },
+    {
+      "pos": [
+        1117,
+        1201
+      ],
+      "content": "已安装 <bpt id=\"p1\">[</bpt>Azure PowerShell cmdlet<ept id=\"p1\">](/documentation/articles/powershell-install-configure)</ept>。"
+    },
+    {
+      "pos": [
+        1205,
+        1342
+      ],
+      "content": "你已经知道如何使用 GUI 从虚拟机库预配 SQL Server VM。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>在 Azure 上预配 SQL Server 虚拟机<ept id=\"p1\">](/documentation/articles/virtual-machines-provision-sql-server)</ept>"
+    },
+    {
+      "pos": [
+        1346,
+        1470
+      ],
+      "content": "你已深入了解本地解决方案的 AlwaysOn 可用性组。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>AlwaysOn 可用性组 (SQL Server)<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/hh510230.aspx)</ept>。"
+    },
+    {
+      "content": "连接到你的 Azure 订阅并创建虚拟网络",
+      "pos": [
+        1475,
+        1496
+      ]
+    },
+    {
+      "content": "在本地计算机上的 PowerShell 窗口中，导入 Azure 模块，将发布设置文件下载到计算机，然后通过导入所下载的发布设置将 PowerShell 会话连接至你的 Azure 订阅。",
+      "pos": [
+        1501,
+        1595
+      ]
+    },
+    {
+      "pos": [
+        1860,
+        2098
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Get-AzurePublishgSettingsFile<ept id=\"p1\">**</ept> 命令自动生成管理证书，Azure 将其下载到你的计算机。浏览器将自动打开，提示输入 Azure 订阅的 Microsoft 帐户凭据。所下载的 <bpt id=\"p2\">**</bpt>.publishsettings<ept id=\"p2\">**</ept> 文件包含管理 Azure 订阅所需的一切信息。将该文件保存到本地目录后，使用 <bpt id=\"p3\">**</bpt>Import-AzurePublishSettingsFile -Environment AzureChinaCloud<ept id=\"p3\">**</ept> 命令将其导入。"
+    },
+    {
+      "pos": [
+        2109,
+        2304
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>publishsettings 文件中含有你的凭据（未编码），这些凭据用于管理你的 Azure 订阅和服务。确保此文件安全的最佳做法是，将其暂时存储在您的源目录的外部（例如存储在 Libraries\\\\Documents 文件夹中），然后在完成导入后将其删除。恶意用户获得 publishsettings 文件的访问权限后，可编辑、创建和删除你的 Azure 服务。"
+    },
+    {
+      "content": "定义将用于创建云 IT 基础结构的一系列变量。",
+      "pos": [
+        2309,
+        2332
+      ]
+    },
+    {
+      "content": "请注意以下几点，以确保后面的命令可以成功执行：",
+      "pos": [
+        3401,
+        3424
+      ]
+    },
+    {
+      "pos": [
+        3436,
+        3520
+      ],
+      "content": "变量 <bpt id=\"p1\">**</bpt>$storageAccountName<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>$dcServiceName<ept id=\"p2\">**</ept> 分别用于标识 Internet 上的云存储帐户和云服务器，因此必须唯一。"
+    },
+    {
+      "pos": [
+        3532,
+        3611
+      ],
+      "content": "为变量 <bpt id=\"p1\">**</bpt>$affinityGroupName<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>$virtualNetworkName<ept id=\"p2\">**</ept> 指定的名称（在稍后将使用的虚拟网络配置文档中配置）。"
+    },
+    {
+      "pos": [
+        3623,
+        3709
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>$sqlImageName<ept id=\"p1\">**</ept> 指定包含 SQL Server 2012 Service Pack 1 Enterprise Edition 的 VM 映像的更新名称。"
+    },
+    {
+      "pos": [
+        3721,
+        3756
+      ],
+      "content": "为简单起见，在整个教程中使用同一密码 <bpt id=\"p1\">**</bpt>Contoso!000<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "创建地缘组",
+      "pos": [
+        3761,
+        3766
+      ]
+    },
+    {
+      "content": "通过导入配置文件创建虚拟网络。",
+      "pos": [
+        3970,
+        3985
+      ]
+    },
+    {
+      "pos": [
+        4072,
+        4361
+      ],
+      "content": "配置文件包含以下 XML 文档。简言之，它在名为 <bpt id=\"p1\">**</bpt>ContosoAG<ept id=\"p1\">**</ept> 的地缘组中指定名为 <bpt id=\"p2\">**</bpt>ContosoNET<ept id=\"p2\">**</ept> 的虚拟网络，其地址空间为 <bpt id=\"p3\">**</bpt>10.10.0.0/16<ept id=\"p3\">**</ept>，有两个子网 <bpt id=\"p4\">**</bpt>10.10.1.0/24<ept id=\"p4\">**</ept> 和 <bpt id=\"p5\">**</bpt>10.10.2.0/24<ept id=\"p5\">**</ept>，分别是前端子网和后端子网。前端子网是放置 Microsoft SharePoint 等客户端应用程序的位置，后端子网是放置 SQL Server VM 的位置。如果之前更改过 <bpt id=\"p6\">**</bpt>$affinityGroupName<ept id=\"p6\">**</ept> 和 <bpt id=\"p7\">**</bpt>$virtualNetworkName<ept id=\"p7\">**</ept> 变量，则还必须更改以下相应名称。"
+    },
+    {
+      "content": "创建与所创建的地缘组关联的存储帐户，然后将其设置为订阅中的当前存储帐户。",
+      "pos": [
+        5336,
+        5372
+      ]
+    },
+    {
+      "content": "在新的云服务和可用性集中创建 DC 服务器。",
+      "pos": [
+        5744,
+        5766
+      ]
+    },
+    {
+      "content": "这一系列的管接命令执行以下操作：",
+      "pos": [
+        6402,
+        6418
+      ]
+    },
+    {
+      "pos": [
+        6430,
+        6461
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>New-AzureVMConfig<ept id=\"p1\">**</ept> 创建 VM 配置。"
+    },
+    {
+      "pos": [
+        6473,
+        6527
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Add-AzureProvisioningConfig<ept id=\"p1\">**</ept> 提供独立 Windows 服务器的配置参数。"
+    },
+    {
+      "pos": [
+        6539,
+        6607
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Add-AzureDataDisk<ept id=\"p1\">**</ept> 添加将用于保存 Active Directory 数据的数据磁盘，缓存选项设置为 None。"
+    },
+    {
+      "pos": [
+        6619,
+        6665
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>New-AzureVM<ept id=\"p1\">**</ept> 创建新的云服务，并在新的云服务中创建新的 Azure VM。"
+    },
+    {
+      "content": "请等待新 VM 预配完毕，然后将远程桌面文件下载到工作目录中。由于新 Azure VM 的预配要用很长时间，while 循环会持续轮询新 VM，直到其使用就绪。",
+      "pos": [
+        6670,
+        6750
+      ]
+    },
+    {
+      "content": "现在已成功预配 DC 服务器。接下来，请在 DC 服务器上配置 Active Directory 域。在本地计算机上使 PowerShell 窗口保持打开。稍后将再次使用它来创建两个 SQL Server VM。",
+      "pos": [
+        7317,
+        7423
+      ]
+    },
+    {
+      "content": "配置域控制器",
+      "pos": [
+        7428,
+        7434
+      ]
+    },
+    {
+      "pos": [
+        7439,
+        7514
+      ],
+      "content": "通过启动远程桌面文件连接到 DC 服务器。使用创建新 VM 时指定的计算机管理员用户名 AzureAdmin 和密码 <bpt id=\"p1\">**</bpt>Contoso!000<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "在管理员模式下打开 PowerShell 窗口。",
+      "pos": [
+        7519,
+        7543
+      ]
+    },
+    {
+      "pos": [
+        7548,
+        7612
+      ],
+      "content": "运行以下 <bpt id=\"p1\">**</bpt>DCPROMO.EXE<ept id=\"p1\">**</ept> 命令来设置 <bpt id=\"p2\">**</bpt>corp.contoso.com<ept id=\"p2\">**</ept> 域，数据目录位于驱动器 M 上。"
+    },
+    {
+      "content": "命令完成后，VM 会自动重新启动。",
+      "pos": [
+        8162,
+        8179
+      ]
+    },
+    {
+      "pos": [
+        8184,
+        8241
+      ],
+      "content": "通过启动远程桌面文件再次连接到 DC 服务器。此时，以 <bpt id=\"p1\">**</bpt>CORP\\\\Administrator<ept id=\"p1\">**</ept> 身份登录。"
+    },
+    {
+      "content": "在管理员模式下打开 PowerShell 窗口，使用以下命令导入 Active Directory PowerShell 模块：",
+      "pos": [
+        8246,
+        8310
+      ]
+    },
+    {
+      "content": "运行以下命令将三个用户添加到域。",
+      "pos": [
+        8354,
+        8370
+      ]
+    },
+    {
+      "pos": [
+        9052,
+        9181
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>CORP\\\\Install<ept id=\"p1\">**</ept> 用于全面配置 SQL Server 服务实例、WSFC 群集和可用性组。<bpt id=\"p2\">**</bpt>CORP\\\\SQLSvc1<ept id=\"p2\">**</ept> 和 <bpt id=\"p3\">**</bpt>CORP\\\\SQLSvc2<ept id=\"p3\">**</ept> 用作两个 SQL Server VM 的 SQL Server 服务帐户。"
+    },
+    {
+      "pos": [
+        9186,
+        9232
+      ],
+      "content": "接下来，运行以下命令为 <bpt id=\"p1\">**</bpt>CORP\\\\Install<ept id=\"p1\">**</ept> 提供在域中创建计算机对象的权限。"
+    },
+    {
+      "pos": [
+        9735,
+        10019
+      ],
+      "content": "上面指定的 GUID 是计算机对象类型的 GUID。<bpt id=\"p1\">**</bpt>CORP\\\\Install<ept id=\"p1\">**</ept> 帐户需要有“读取所有属性”和“创建计算对象”权限才能为 WSFC 群集创建 Active Direct 对象。默认情况下，已经将“读取所有属性”权限授予 CORP\\\\Install，因此无需显式授予该权限。有关创建 WSFC 群集所需权限的详细信息，请参阅<bpt id=\"p2\">[</bpt>故障转移群集循序渐进指南：在 Active Directory 中配置帐户<ept id=\"p2\">](https://technet.microsoft.com/zh-cn/library/cc731002%28v=WS.10%29.aspx)</ept>。"
+    },
+    {
+      "content": "现在你已完成 Active Directory 和用户对象的配置，接下来，你将创建两个 SQL Server VM 并将其加入到此域中。",
+      "pos": [
+        10025,
+        10093
+      ]
+    },
+    {
+      "content": "创建 SQL Server VM",
+      "pos": [
+        10098,
+        10114
+      ]
+    },
+    {
+      "content": "继续使用在本地计算机上已打开的 PowerShell 窗口。定义以下附加变量：",
+      "pos": [
+        10119,
+        10158
+      ]
+    },
+    {
+      "pos": [
+        10580,
+        10687
+      ],
+      "content": "通常将 IP 地址 <bpt id=\"p1\">**</bpt>10.10.0.4<ept id=\"p1\">**</ept> 分配给在 Azure 虚拟网络的 <bpt id=\"p2\">**</bpt>10.10.0.0/16<ept id=\"p2\">**</ept> 子网中创建的第一个 VM。应通过运行 <bpt id=\"p3\">**</bpt>IPCONFIG<ept id=\"p3\">**</ept> 验证这是不是 DC 服务器的地址。"
+    },
+    {
+      "pos": [
+        10692,
+        10741
+      ],
+      "content": "运行以下管接命令在 WSFC 群集中创建名为 <bpt id=\"p1\">**</bpt>ContosoQuorum<ept id=\"p1\">**</ept> 的第一个 VM："
+    },
+    {
+      "content": "注意与上述命令相关的以下几点：",
+      "pos": [
+        11769,
+        11784
+      ]
+    },
+    {
+      "pos": [
+        11796,
+        11869
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>New-AzureVMConfig<ept id=\"p1\">**</ept> 创建具有所需可用性集名称的 VM 配置。后续 VM 将以该可用性集名称创建，因此会加入同一可用性集中。"
+    },
+    {
+      "pos": [
+        11881,
+        11944
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Add-AzureProvisioningConfig<ept id=\"p1\">**</ept> 将 VM 加入创建的 Active Directory 域中。"
+    },
+    {
+      "pos": [
+        11956,
+        11992
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Set-AzureSubnet<ept id=\"p1\">**</ept> 将 VM 放入 Back 子网。"
+    },
+    {
+      "pos": [
+        12004,
+        12259
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>New-AzureVM<ept id=\"p1\">**</ept> 创建新的云服务，并在新的云服务中创建新的 Azure VM。<bpt id=\"p2\">**</bpt>DnsSettings<ept id=\"p2\">**</ept> 参数指定新云服务中的服务器的 DNS 服务器具有 IP 地址 <bpt id=\"p3\">**</bpt>10.10.0.4<ept id=\"p3\">**</ept>，这是 DC 服务器的 IP 地址。需要该参数来启用云服务中的新 VM 才能成功加入 Active Directory 域。如果没有该参数，预配 VM 后必须在 VM 中手动设置 IPv4 设置才能将 DC 服务器作为主 DNS 服务器，然后 VM 才能加入 Active Directory 域。"
+    },
+    {
+      "pos": [
+        12264,
+        12328
+      ],
+      "content": "运行以下管接命令来创建名为 <bpt id=\"p1\">**</bpt>ContosoSQL1<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>ContosoSQL2<ept id=\"p2\">**</ept> 的 SQL Server VM。"
+    },
+    {
+      "content": "注意与上述命令相关的以下几点：",
+      "pos": [
+        14602,
+        14617
+      ]
+    },
+    {
+      "pos": [
+        14625,
+        14837
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>New-AzureVMConfig<ept id=\"p1\">**</ept> 使用与 DC 服务器相同的可用性集名称，并使用虚拟机库中的 SQL Server 2012 Service Pack 1 Enterprise Edition 映像。它还将操作系统磁盘设置为只读缓存（无写缓存）。建议将这些数据库文件迁移到一个附加到 VM 的独立数据磁盘中，并将其配置为无读或写缓存。不过，次优建议是移除操作系统磁盘上的写缓存，因为无法移除操作系统磁盘上的读缓存。"
+    },
+    {
+      "pos": [
+        14849,
+        14912
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Add-AzureProvisioningConfig<ept id=\"p1\">**</ept> 将 VM 加入创建的 Active Directory 域中。"
+    },
+    {
+      "pos": [
+        14924,
+        14960
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Set-AzureSubnet<ept id=\"p1\">**</ept> 将 VM 放入 Back 子网。"
+    },
+    {
+      "pos": [
+        14972,
+        15081
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Add-AzureEndpoint<ept id=\"p1\">**</ept> 添加访问端点，以便客户端应用程序能够在 Internet 上访问这些 SQL Server 服务实例。为 ContosoSQL1 和 ContosoSQL2 提供了不同端口。"
+    },
+    {
+      "pos": [
+        15093,
+        15187
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>New-AzureVM<ept id=\"p1\">**</ept> 在与 ContosoQuorum 相同的云服务中创建新的 SQL Server VM。如果这些 VM 需要在同一可用性集中，则必须将它们放置在同一云服务中。"
+    },
+    {
+      "content": "请等待每个 VM 预配完毕，然后将其远程桌面文件下载到工作目录中。for 循环会循环访问三个新 VM，并为每个 VM 执行上级大括号内的命令。",
+      "pos": [
+        15192,
+        15263
+      ]
+    },
+    {
+      "content": "这些 SQL Server VM 现在已预配并正在运行，但它们是使用默认选项与 SQL Server 一同安装的。",
+      "pos": [
+        16020,
+        16077
+      ]
+    },
+    {
+      "content": "初始化 WSFC 群集 VM",
+      "pos": [
+        16082,
+        16096
+      ]
+    },
+    {
+      "content": "在本部分中，需要修改将在 WSFC 群集和 SQL Server 安装中使用的三个服务器。具体而言：",
+      "pos": [
+        16098,
+        16148
+      ]
+    },
+    {
+      "pos": [
+        16152,
+        16176
+      ],
+      "content": "（所有服务器）需要安装<bpt id=\"p1\">**</bpt>故障转移群集<ept id=\"p1\">**</ept>功能。"
+    },
+    {
+      "pos": [
+        16180,
+        16223
+      ],
+      "content": "（所有服务器）需要添加 <bpt id=\"p1\">**</bpt>CORP\\\\Install<ept id=\"p1\">**</ept> 作为计算机<bpt id=\"p2\">**</bpt>管理员<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "pos": [
+        16227,
+        16306
+      ],
+      "content": "（仅限 ContosoSQL1 和 ContosoSQL2）需要添加 <bpt id=\"p1\">**</bpt>CORP\\\\Install<ept id=\"p1\">**</ept> 作为默认数据库中的 <bpt id=\"p2\">**</bpt>sysadmin<ept id=\"p2\">**</ept> 角色。"
+    },
+    {
+      "pos": [
+        16310,
+        16383
+      ],
+      "content": "（仅限 ContosoSQL1 和 ContosoSQL2）需要添加 NT <bpt id=\"p1\">**</bpt>AUTHORITY\\\\System<ept id=\"p1\">**</ept> 作为具有以下权限的登录名："
+    },
+    {
+      "content": "更改任何可用性组",
+      "pos": [
+        16391,
+        16399
+      ]
+    },
+    {
+      "content": "连接 SQL",
+      "pos": [
+        16411,
+        16417
+      ]
+    },
+    {
+      "content": "查看服务器状态",
+      "pos": [
+        16429,
+        16436
+      ]
+    },
+    {
+      "pos": [
+        16440,
+        16531
+      ],
+      "content": "（仅限 ContosoSQL1 和 ContosoSQL2）在 SQL Server VM 上已启用了 <bpt id=\"p1\">**</bpt>TCP<ept id=\"p1\">**</ept> 协议。但是，仍需打开防火墙以便远程访问 SQL Server。"
+    },
+    {
+      "pos": [
+        16533,
+        16571
+      ],
+      "content": "现在，准备启动。从 <bpt id=\"p1\">**</bpt>ContosoQuorum<ept id=\"p1\">**</ept> 开始，执行以下步骤："
+    },
+    {
+      "pos": [
+        16576,
+        16665
+      ],
+      "content": "通过启动远程桌面文件连接到 <bpt id=\"p1\">**</bpt>ContosoQuorum<ept id=\"p1\">**</ept>。使用创建 VM 时指定的计算机管理员用户名 <bpt id=\"p2\">**</bpt>AzureAdmin<ept id=\"p2\">**</ept> 和密码 <bpt id=\"p3\">**</bpt>Contoso!000<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "pos": [
+        16670,
+        16704
+      ],
+      "content": "验证计算机是否已成功加入 <bpt id=\"p1\">**</bpt>corp.contoso.com<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "等待 SQL Server 安装完成自动初始化任务，然后继续。",
+      "pos": [
+        16709,
+        16740
+      ]
+    },
+    {
+      "content": "在管理员模式下打开 PowerShell 窗口。",
+      "pos": [
+        16745,
+        16769
+      ]
+    },
+    {
+      "content": "安装 Windows 故障转移群集功能。",
+      "pos": [
+        16774,
+        16794
+      ]
+    },
+    {
+      "pos": [
+        16883,
+        16912
+      ],
+      "content": "添加 <bpt id=\"p1\">**</bpt>CORP\\\\Install<ept id=\"p1\">**</ept> 作为本地管理员。"
+    },
+    {
+      "content": "从 ContosoQuorum 注销。现已完成此服务器的操作。",
+      "pos": [
+        16976,
+        17007
+      ]
+    },
+    {
+      "pos": [
+        17029,
+        17106
+      ],
+      "content": "接下来，请初始化 <bpt id=\"p1\">**</bpt>ContosoSQL1<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>ContosoSQL2<ept id=\"p2\">**</ept>。执行以下步骤，对于这两个 SQL Server VM，这些步骤相同。"
+    },
+    {
+      "pos": [
+        17111,
+        17199
+      ],
+      "content": "通过启动远程桌面文件连接到这两个 SQL Server VM。使用创建 VM 时指定的计算机管理员用户名 <bpt id=\"p1\">**</bpt>AzureAdmin<ept id=\"p1\">**</ept> 和密码 <bpt id=\"p2\">**</bpt>Contoso!000<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "pos": [
+        17204,
+        17238
+      ],
+      "content": "验证计算机是否已成功加入 <bpt id=\"p1\">**</bpt>corp.contoso.com<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "等待 SQL Server 安装完成自动初始化任务，然后继续。",
+      "pos": [
+        17243,
+        17274
+      ]
+    },
+    {
+      "content": "在管理员模式下打开 PowerShell 窗口。",
+      "pos": [
+        17279,
+        17303
+      ]
+    },
+    {
+      "content": "安装 Windows 故障转移群集功能。",
+      "pos": [
+        17308,
+        17328
+      ]
+    },
+    {
+      "pos": [
+        17417,
+        17446
+      ],
+      "content": "添加 <bpt id=\"p1\">**</bpt>CORP\\\\Install<ept id=\"p1\">**</ept> 作为本地管理员。"
+    },
+    {
+      "content": "导入 SQL Server PowerShell 提供程序。",
+      "pos": [
+        17510,
+        17540
+      ]
+    },
+    {
+      "pos": [
+        17662,
+        17715
+      ],
+      "content": "将 <bpt id=\"p1\">**</bpt>CORP\\\\Install<ept id=\"p1\">**</ept> 作为 sysadmin 角色添加到默认 SQL Server 实例"
+    },
+    {
+      "pos": [
+        17882,
+        17925
+      ],
+      "content": "添加 <bpt id=\"p1\">**</bpt>NT AUTHORITY\\\\System<ept id=\"p1\">**</ept> 作为具有上述三个权限的登录名。"
+    },
+    {
+      "content": "打开防火墙以便远程访问 SQL Server。",
+      "pos": [
+        18354,
+        18377
+      ]
+    },
+    {
+      "content": "从两个 VM 注销。",
+      "pos": [
+        18579,
+        18589
+      ]
+    },
+    {
+      "pos": [
+        18611,
+        18680
+      ],
+      "content": "最后，准备配置可用性组。将使用 SQL Server PowerShell 提供程序来执行 <bpt id=\"p1\">**</bpt>ContosoSQL1<ept id=\"p1\">**</ept> 上的所有工作。"
+    },
+    {
+      "content": "配置可用性组",
+      "pos": [
+        18685,
+        18691
+      ]
+    },
+    {
+      "pos": [
+        18696,
+        18761
+      ],
+      "content": "通过启动远程桌面文件再次连接到 <bpt id=\"p1\">**</bpt>ContosoSQL1<ept id=\"p1\">**</ept>。使用 <bpt id=\"p2\">**</bpt>CORP\\\\Install<ept id=\"p2\">**</ept>（而不是计算机帐户）登录。"
+    },
+    {
+      "content": "在管理员模式下打开 PowerShell 窗口。",
+      "pos": [
+        18766,
+        18790
+      ]
+    },
+    {
+      "content": "定义以下变量：",
+      "pos": [
+        18795,
+        18802
+      ]
+    },
+    {
+      "content": "导入 SQL Server PowerShell 提供程序。",
+      "pos": [
+        19243,
+        19273
+      ]
+    },
+    {
+      "content": "将 ContosoSQL1 的 SQL Server 服务帐户更改为 CORP\\\\SQLSvc1。",
+      "pos": [
+        19378,
+        19427
+      ]
+    },
+    {
+      "content": "将 ContosoSQL2 的 SQL Server 服务帐户更改为 CORP\\\\SQLSvc2。",
+      "pos": [
+        19941,
+        19990
+      ]
+    },
+    {
+      "pos": [
+        20504,
+        20831
+      ],
+      "content": "从<bpt id=\"p1\">[</bpt>为 Azure VM 中的 AlwaysOn 可用性组创建 WSFC 群集<ept id=\"p1\">](http://gallery.technet.microsoft.com/scriptcenter/Create-WSFC-Cluster-for-7c207d3a)</ept>，将 <bpt id=\"p2\">**</bpt>CreateAzureFailoverCluster.ps1<ept id=\"p2\">**</ept> 下载到本地工作目录中。该脚本将帮助你创建一个正常运行的 WSFC 群集。有关 WSFC 如何与 Azure 网络交互的重要信息，请参阅 <bpt id=\"p3\">[</bpt>Azure 虚拟机中 SQL Server 的高可用性和灾难恢复<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/azure/jj870962.aspx)</ept>。"
+    },
+    {
+      "content": "切换至工作目录并使用下载的脚本创建 WSFC 群集。",
+      "pos": [
+        20836,
+        20862
+      ]
+    },
+    {
+      "pos": [
+        21036,
+        21107
+      ],
+      "content": "为 <bpt id=\"p1\">**</bpt>ContosoSQL1<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>ContosoSQL2<ept id=\"p2\">**</ept> 上的默认 SQL Server 实例启用 AlwaysOn 可用性组。"
+    },
+    {
+      "content": "创建备份目录，并为 SQL Server 服务帐户授予权限。你将使用该目录在辅助副本上准备可用性数据库。",
+      "pos": [
+        21559,
+        21611
+      ]
+    },
+    {
+      "pos": [
+        21857,
+        21961
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>ContosoSQL1<ept id=\"p1\">**</ept> 上创建一个名为 <bpt id=\"p2\">**</bpt>MyDB1<ept id=\"p2\">**</ept> 的数据库，获取完整备份和日志备份，然后使用 <bpt id=\"p3\">**</bpt>WITH NORECOVERY<ept id=\"p3\">**</ept> 选项在 <bpt id=\"p4\">**</bpt>ContosoSQL2<ept id=\"p4\">**</ept> 上还原它们。"
+    },
+    {
+      "content": "在 SQL Server VM 上创建可用性组终结点，并在这些终结点上设置适当的权限。",
+      "pos": [
+        22481,
+        22524
+      ]
+    },
+    {
+      "content": "创建可用性副本。",
+      "pos": [
+        23451,
+        23459
+      ]
+    },
+    {
+      "content": "最后，创建可用性组，并将辅助副本加入该可用性组。",
+      "pos": [
+        24077,
+        24101
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        24571,
+        24575
+      ]
+    },
+    {
+      "pos": [
+        24576,
+        24783
+      ],
+      "content": "现在，你已通过在 Azure 中创建可用性组，成功实施了 SQL Server AlwaysOn。若要为此可用性组配置侦听器，请参阅<bpt id=\"p1\">[</bpt>在 Azure 中配置 AlwaysOn 可用性组的 ILB 侦听器<ept id=\"p1\">](/documentation/articles/virtual-machines-sql-server-configure-ilb-alwayson-availability-group-listener)</ept>。"
+    },
+    {
+      "pos": [
+        24785,
+        24922
+      ],
+      "content": "有关在 Azure 中使用 SQL Server 的其他信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 虚拟机上的 SQL Server<ept id=\"p1\">](/documentation/articles/virtual-machines-sql-server-infrastructure-services)</ept>。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"在 Azure 中配置 AlwaysOn 可用性组 (PowerShell)\"\n    description=\"使用 PowerShell 在 Azure 中创建 AlwaysOn 可用性组。\"\n    services=\"virtual-machines\"\n    documentationCenter=\"na\"\n    authors=\"rothja\"\n    manager=\"jeffreyg\"\n    editor=\"monicar\" />\n<tags \n    ms.service=\"virtual-machines\"\n    ms.date=\"12/04/2015\"\n    wacn.date=\"03/03/2016\" />\n\n# 在 Azure 中配置 AlwaysOn 可用性组 (PowerShell)\n\n>[AZURE.NOTE]有关同一方案的基于 GUI 的教程，请参阅[在 Azure 中配置 AlwaysOn 可用性组 (GUI)](/documentation/articles/virtual-machines-sql-server-alwayson-availability-groups-gui)。\n\nAzure 虚拟机 (VM) 可帮助数据库管理员降低高可用性 SQL Server 系统的成本。本教程介绍如何在 Azure 环境中使用端到端 SQL Server AlwaysOn 实施可用性组。完成本教程后，Azure 中的 SQL Server AlwaysOn 解决方案将包括以下要素：\n\n- 一个包含多个子网（包括前端子网和后端子网）的虚拟网络\n\n- 包含 Active Directory (AD) 域的域控制器\n\n- 部署到后端子网并加入 AD 域的两个 SQL Server VM\n\n- 具有节点多数仲裁模型的 3 节点 WSFC 群集\n\n- 具有可用性数据库的两个同步提交副本的可用性组\n\n之所以选择此方案是因为其简易性，而非其成本效益或 Azure 上的其他功能。例如，你可最大程度减少 2 副本可用性组的虚拟机数目，以便通过将域控制器作为 2 节点 WSFC 群集中的仲裁文件共享见证服务器来节省 Azure 中的计算时间。通过此方法，上述配置中的 VM 数目可以减少一个。\n\n本教程介绍设置上述解决方案所需的步骤，但不详细阐述每一步的细节。因此，我们没有列出 GUI 配置步骤，而是借助 PowerShell 脚本带你迅速完成每个步骤。假设如下：\n\n- 你已有一个用于虚拟机订阅的 Azure 帐户。\n\n- 已安装 [Azure PowerShell cmdlet](/documentation/articles/powershell-install-configure)。\n\n- 你已经知道如何使用 GUI 从虚拟机库预配 SQL Server VM。有关详细信息，请参阅[在 Azure 上预配 SQL Server 虚拟机](/documentation/articles/virtual-machines-provision-sql-server)\n\n- 你已深入了解本地解决方案的 AlwaysOn 可用性组。有关详细信息，请参阅 [AlwaysOn 可用性组 (SQL Server)](https://msdn.microsoft.com/zh-cn/library/hh510230.aspx)。\n\n## 连接到你的 Azure 订阅并创建虚拟网络\n\n1. 在本地计算机上的 PowerShell 窗口中，导入 Azure 模块，将发布设置文件下载到计算机，然后通过导入所下载的发布设置将 PowerShell 会话连接至你的 Azure 订阅。\n\n        Import-Module \"C:\\Program Files (x86)\\Microsoft SDKs\\Azure\\PowerShell\\Azure\\Azure.psd1\"\n        Get-AzurePublishSettingsFile -Environment AzureChinaCloud\n        Import-AzurePublishSettingsFile -Environment AzureChinaCloud <publishsettingsfilepath> \n\n    **Get-AzurePublishgSettingsFile** 命令自动生成管理证书，Azure 将其下载到你的计算机。浏览器将自动打开，提示输入 Azure 订阅的 Microsoft 帐户凭据。所下载的 **.publishsettings** 文件包含管理 Azure 订阅所需的一切信息。将该文件保存到本地目录后，使用 **Import-AzurePublishSettingsFile -Environment AzureChinaCloud** 命令将其导入。\n    \n    >[AZURE.NOTE]publishsettings 文件中含有你的凭据（未编码），这些凭据用于管理你的 Azure 订阅和服务。确保此文件安全的最佳做法是，将其暂时存储在您的源目录的外部（例如存储在 Libraries\\\\Documents 文件夹中），然后在完成导入后将其删除。恶意用户获得 publishsettings 文件的访问权限后，可编辑、创建和删除你的 Azure 服务。\n\n1. 定义将用于创建云 IT 基础结构的一系列变量。\n\n        $location = \"China North\"\n        $affinityGroupName = \"ContosoAG\"\n        $affinityGroupDescription = \"Contoso SQL HADR Affinity Group\"\n        $affinityGroupLabel = \"IaaS BI Affinity Group\"\n        $networkConfigPath = \"C:\\scripts\\Network.netcfg\"\n        $virtualNetworkName = \"ContosoNET\"\n        $storageAccountName = \"<uniquestorageaccountname>\"\n        $storageAccountLabel = \"Contoso SQL HADR Storage Account\"\n        $storageAccountContainer = \"https://\" + $storageAccountName + \".blob.core.chinacloudapi.cn/vhds/\"\n        $winImageName = (Get-AzureVMImage | where {$_.Label -like \"Windows Server 2008 R2 SP1*\"} | sort PublishedDate -Descending)[0].ImageName\n        $sqlImageName = (Get-AzureVMImage | where {$_.Label -like \"SQL Server 2012 SP1 Enterprise*\"} | sort PublishedDate -Descending)[0].ImageName\n        $dcServerName = \"ContosoDC\"\n        $dcServiceName = \"<uniqueservicename>\" \n        $availabilitySetName = \"SQLHADR\"\n        $vmAdminUser = \"AzureAdmin\" \n        $vmAdminPassword = \"Contoso!000\" \n        $workingDir = \"c:\\scripts\"\n\n    请注意以下几点，以确保后面的命令可以成功执行：\n    \n    - 变量 **$storageAccountName** 和 **$dcServiceName** 分别用于标识 Internet 上的云存储帐户和云服务器，因此必须唯一。\n    \n    - 为变量 **$affinityGroupName** 和 **$virtualNetworkName** 指定的名称（在稍后将使用的虚拟网络配置文档中配置）。\n    \n    - **$sqlImageName** 指定包含 SQL Server 2012 Service Pack 1 Enterprise Edition 的 VM 映像的更新名称。\n    \n    - 为简单起见，在整个教程中使用同一密码 **Contoso!000**。\n\n1. 创建地缘组\n\n        New-AzureAffinityGroup `\n            -Name $affinityGroupName `\n            -Location $location `\n            -Description $affinityGroupDescription `\n            -Label $affinityGroupLabel\n\n1. 通过导入配置文件创建虚拟网络。\n\n        Set-AzureVNetConfig `\n            -ConfigurationPath $networkConfigPath\n\n    配置文件包含以下 XML 文档。简言之，它在名为 **ContosoAG** 的地缘组中指定名为 **ContosoNET** 的虚拟网络，其地址空间为 **10.10.0.0/16**，有两个子网 **10.10.1.0/24** 和 **10.10.2.0/24**，分别是前端子网和后端子网。前端子网是放置 Microsoft SharePoint 等客户端应用程序的位置，后端子网是放置 SQL Server VM 的位置。如果之前更改过 **$affinityGroupName** 和 **$virtualNetworkName** 变量，则还必须更改以下相应名称。\n\n        <NetworkConfiguration xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"http://schemas.microsoft.com/ServiceHosting/2011/07/NetworkConfiguration\">\n          <VirtualNetworkConfiguration>\n            <Dns />\n            <VirtualNetworkSites>\n              <VirtualNetworkSite name=\"ContosoNET\" AffinityGroup=\"ContosoAG\">\n                <AddressSpace>\n                  <AddressPrefix>10.10.0.0/16</AddressPrefix>\n                </AddressSpace>\n                <Subnets>\n                  <Subnet name=\"Front\">\n                    <AddressPrefix>10.10.1.0/24</AddressPrefix>\n                  </Subnet>\n                  <Subnet name=\"Back\">\n                    <AddressPrefix>10.10.2.0/24</AddressPrefix>\n                  </Subnet>\n                </Subnets>\n              </VirtualNetworkSite>\n            </VirtualNetworkSites>\n          </VirtualNetworkConfiguration>\n        </NetworkConfiguration>\n\n1. 创建与所创建的地缘组关联的存储帐户，然后将其设置为订阅中的当前存储帐户。\n\n        New-AzureStorageAccount `\n            -StorageAccountName $storageAccountName `\n            -Label $storageAccountLabel `\n            -AffinityGroup $affinityGroupName \n        Set-AzureSubscription -Environment AzureChinaCloud `\n            -SubscriptionName (Get-AzureSubscription).SubscriptionName `\n            -CurrentStorageAccount $storageAccountName\n\n1. 在新的云服务和可用性集中创建 DC 服务器。\n\n        New-AzureVMConfig `\n            -Name $dcServerName `\n            -InstanceSize Medium `\n            -ImageName $winImageName `\n            -MediaLocation \"$storageAccountContainer$dcServerName.vhd\" `\n            -DiskLabel \"OS\" | \n            Add-AzureProvisioningConfig `\n                -Windows `\n                -DisableAutomaticUpdates `\n                -AdminUserName $vmAdminUser `\n                -Password $vmAdminPassword |\n                New-AzureVM `\n                    -ServiceName $dcServiceName `\n                    –AffinityGroup $affinityGroupName `\n                    -VNetName $virtualNetworkName\n\n    这一系列的管接命令执行以下操作：\n    \n    - **New-AzureVMConfig** 创建 VM 配置。\n    \n    - **Add-AzureProvisioningConfig** 提供独立 Windows 服务器的配置参数。\n    \n    - **Add-AzureDataDisk** 添加将用于保存 Active Directory 数据的数据磁盘，缓存选项设置为 None。\n    \n    - **New-AzureVM** 创建新的云服务，并在新的云服务中创建新的 Azure VM。\n\n1. 请等待新 VM 预配完毕，然后将远程桌面文件下载到工作目录中。由于新 Azure VM 的预配要用很长时间，while 循环会持续轮询新 VM，直到其使用就绪。\n\n        $VMStatus = Get-AzureVM -ServiceName $dcServiceName -Name $dcServerName\n        \n        While ($VMStatus.InstanceStatus -ne \"ReadyRole\")\n        {\n            write-host \"Waiting for \" $VMStatus.Name \"... Current Status = \" $VMStatus.InstanceStatus\n            Start-Sleep -Seconds 15\n            $VMStatus = Get-AzureVM -ServiceName $dcServiceName -Name $dcServerName\n        }\n        \n        Get-AzureRemoteDesktopFile `\n            -ServiceName $dcServiceName `\n            -Name $dcServerName `\n            -LocalPath \"$workingDir$dcServerName.rdp\"\n\n现在已成功预配 DC 服务器。接下来，请在 DC 服务器上配置 Active Directory 域。在本地计算机上使 PowerShell 窗口保持打开。稍后将再次使用它来创建两个 SQL Server VM。\n\n## 配置域控制器\n\n1. 通过启动远程桌面文件连接到 DC 服务器。使用创建新 VM 时指定的计算机管理员用户名 AzureAdmin 和密码 **Contoso!000**。\n\n1. 在管理员模式下打开 PowerShell 窗口。\n\n1. 运行以下 **DCPROMO.EXE** 命令来设置 **corp.contoso.com** 域，数据目录位于驱动器 M 上。\n\n        dcpromo.exe `\n            /unattend `\n            /ReplicaOrNewDomain:Domain `\n            /NewDomain:Forest `\n            /NewDomainDNSName:corp.contoso.com `\n            /ForestLevel:4 `\n            /DomainNetbiosName:CORP `\n            /DomainLevel:4 `\n            /InstallDNS:Yes `\n            /ConfirmGc:Yes `\n            /CreateDNSDelegation:No `\n            /DatabasePath:\"C:\\Windows\\NTDS\" `\n            /LogPath:\"C:\\Windows\\NTDS\" `\n            /SYSVOLPath:\"C:\\Windows\\SYSVOL\" `\n            /SafeModeAdminPassword:\"Contoso!000\"\n\n    命令完成后，VM 会自动重新启动。\n\n1. 通过启动远程桌面文件再次连接到 DC 服务器。此时，以 **CORP\\\\Administrator** 身份登录。\n\n1. 在管理员模式下打开 PowerShell 窗口，使用以下命令导入 Active Directory PowerShell 模块：\n\n        Import-Module ActiveDirectory\n\n1. 运行以下命令将三个用户添加到域。\n\n        $pwd = ConvertTo-SecureString \"Contoso!000\" -AsPlainText -Force\n        New-ADUser `\n            -Name 'Install' `\n            -AccountPassword  $pwd `\n            -PasswordNeverExpires $true `\n            -ChangePasswordAtLogon $false `\n            -Enabled $true\n        New-ADUser `\n            -Name 'SQLSvc1' `\n            -AccountPassword  $pwd `\n            -PasswordNeverExpires $true `\n            -ChangePasswordAtLogon $false `\n            -Enabled $true\n        New-ADUser `\n            -Name 'SQLSvc2' `\n            -AccountPassword  $pwd `\n            -PasswordNeverExpires $true `\n            -ChangePasswordAtLogon $false `\n            -Enabled $true\n\n    **CORP\\\\Install** 用于全面配置 SQL Server 服务实例、WSFC 群集和可用性组。**CORP\\\\SQLSvc1** 和 **CORP\\\\SQLSvc2** 用作两个 SQL Server VM 的 SQL Server 服务帐户。\n\n1. 接下来，运行以下命令为 **CORP\\\\Install** 提供在域中创建计算机对象的权限。\n\n        Cd ad:\n        $sid = new-object System.Security.Principal.SecurityIdentifier (Get-ADUser \"Install\").SID\n        $guid = new-object Guid bf967a86-0de6-11d0-a285-00aa003049e2\n        $ace1 = new-object System.DirectoryServices.ActiveDirectoryAccessRule $sid,\"CreateChild\",\"Allow\",$guid,\"All\"\n        $corp = Get-ADObject -Identity \"DC=corp,DC=contoso,DC=com\"\n        $acl = Get-Acl $corp\n        $acl.AddAccessRule($ace1)\n        Set-Acl -Path \"DC=corp,DC=contoso,DC=com\" -AclObject $acl \n\n    上面指定的 GUID 是计算机对象类型的 GUID。**CORP\\\\Install** 帐户需要有“读取所有属性”和“创建计算对象”权限才能为 WSFC 群集创建 Active Direct 对象。默认情况下，已经将“读取所有属性”权限授予 CORP\\\\Install，因此无需显式授予该权限。有关创建 WSFC 群集所需权限的详细信息，请参阅[故障转移群集循序渐进指南：在 Active Directory 中配置帐户](https://technet.microsoft.com/zh-cn/library/cc731002%28v=WS.10%29.aspx)。\n\n    现在你已完成 Active Directory 和用户对象的配置，接下来，你将创建两个 SQL Server VM 并将其加入到此域中。\n\n## 创建 SQL Server VM\n\n1. 继续使用在本地计算机上已打开的 PowerShell 窗口。定义以下附加变量：\n\n        $domainName= \"corp\"\n        $FQDN = \"corp.contoso.com\"\n        $subnetName = \"Back\"\n        $sqlServiceName = \"<uniqueservicename>\"\n        $quorumServerName = \"ContosoQuorum\"\n        $sql1ServerName = \"ContosoSQL1\"\n        $sql2ServerName = \"ContosoSQL2\"\n        $availabilitySetName = \"SQLHADR\"\n        $dataDiskSize = 100\n        $dnsSettings = New-AzureDns -Name \"ContosoBackDNS\" -IPAddress \"10.10.0.4\"\n\n    通常将 IP 地址 **10.10.0.4** 分配给在 Azure 虚拟网络的 **10.10.0.0/16** 子网中创建的第一个 VM。应通过运行 **IPCONFIG** 验证这是不是 DC 服务器的地址。\n\n1. 运行以下管接命令在 WSFC 群集中创建名为 **ContosoQuorum** 的第一个 VM：\n\n        New-AzureVMConfig `\n            -Name $quorumServerName `\n            -InstanceSize Medium `\n            -ImageName $winImageName `\n            -MediaLocation \"$storageAccountContainer$quorumServerName.vhd\" `\n            -AvailabilitySetName $availabilitySetName `\n            -DiskLabel \"OS\" | \n            Add-AzureProvisioningConfig `\n                -WindowsDomain `\n                -AdminUserName $vmAdminUser `\n                -Password $vmAdminPassword `\n                -DisableAutomaticUpdates `\n                -Domain $domainName `\n                -JoinDomain $FQDN `\n                -DomainUserName $vmAdminUser `\n                -DomainPassword $vmAdminPassword |\n                Set-AzureSubnet `\n                    -SubnetNames $subnetName |\n                    New-AzureVM `\n                        -ServiceName $sqlServiceName `\n                        –AffinityGroup $affinityGroupName `\n                        -VNetName $virtualNetworkName `\n                        -DnsSettings $dnsSettings\n\n    注意与上述命令相关的以下几点：\n    \n    - **New-AzureVMConfig** 创建具有所需可用性集名称的 VM 配置。后续 VM 将以该可用性集名称创建，因此会加入同一可用性集中。\n    \n    - **Add-AzureProvisioningConfig** 将 VM 加入创建的 Active Directory 域中。\n    \n    - **Set-AzureSubnet** 将 VM 放入 Back 子网。\n    \n    - **New-AzureVM** 创建新的云服务，并在新的云服务中创建新的 Azure VM。**DnsSettings** 参数指定新云服务中的服务器的 DNS 服务器具有 IP 地址 **10.10.0.4**，这是 DC 服务器的 IP 地址。需要该参数来启用云服务中的新 VM 才能成功加入 Active Directory 域。如果没有该参数，预配 VM 后必须在 VM 中手动设置 IPv4 设置才能将 DC 服务器作为主 DNS 服务器，然后 VM 才能加入 Active Directory 域。\n\n1. 运行以下管接命令来创建名为 **ContosoSQL1** 和 **ContosoSQL2** 的 SQL Server VM。\n\n        # Create ContosoSQL1...\n        New-AzureVMConfig `\n            -Name $sql1ServerName `\n            -InstanceSize Large `\n            -ImageName $sqlImageName `\n            -MediaLocation \"$storageAccountContainer$sql1ServerName.vhd\" `\n            -AvailabilitySetName $availabilitySetName `\n            -HostCaching \"ReadOnly\" `\n            -DiskLabel \"OS\" | \n            Add-AzureProvisioningConfig `\n                -WindowsDomain `\n                -AdminUserName $vmAdminUser `\n                -Password $vmAdminPassword `\n                -DisableAutomaticUpdates `\n                -Domain $domainName `\n                -JoinDomain $FQDN `\n                -DomainUserName $vmAdminUser `\n                -DomainPassword $vmAdminPassword |\n                Set-AzureSubnet `\n                    -SubnetNames $subnetName |\n                    Add-AzureEndpoint `\n                        -Name \"SQL\" `\n                        -Protocol \"tcp\" `\n                        -PublicPort 1 `\n                        -LocalPort 1433 | \n                        New-AzureVM `\n                            -ServiceName $sqlServiceName\n        \n        # Create ContosoSQL2...\n        New-AzureVMConfig `\n            -Name $sql2ServerName `\n            -InstanceSize Large `\n            -ImageName $sqlImageName `\n            -MediaLocation \"$storageAccountContainer$sql2ServerName.vhd\" `\n            -AvailabilitySetName $availabilitySetName `\n            -HostCaching \"ReadOnly\" `\n            -DiskLabel \"OS\" | \n            Add-AzureProvisioningConfig `\n                -WindowsDomain `\n                -AdminUserName $vmAdminUser `\n                -Password $vmAdminPassword `\n                -DisableAutomaticUpdates `\n                -Domain $domainName `\n                -JoinDomain $FQDN `\n                -DomainUserName $vmAdminUser `\n                -DomainPassword $vmAdminPassword |\n                Set-AzureSubnet `\n                    -SubnetNames $subnetName |\n                    Add-AzureEndpoint `\n                        -Name \"SQL\" `\n                        -Protocol \"tcp\" `\n                        -PublicPort 2 `\n                        -LocalPort 1433 | \n                        New-AzureVM `\n                            -ServiceName $sqlServiceName\n\n    注意与上述命令相关的以下几点：\n\n    - **New-AzureVMConfig** 使用与 DC 服务器相同的可用性集名称，并使用虚拟机库中的 SQL Server 2012 Service Pack 1 Enterprise Edition 映像。它还将操作系统磁盘设置为只读缓存（无写缓存）。建议将这些数据库文件迁移到一个附加到 VM 的独立数据磁盘中，并将其配置为无读或写缓存。不过，次优建议是移除操作系统磁盘上的写缓存，因为无法移除操作系统磁盘上的读缓存。\n    \n    - **Add-AzureProvisioningConfig** 将 VM 加入创建的 Active Directory 域中。\n    \n    - **Set-AzureSubnet** 将 VM 放入 Back 子网。\n    \n    - **Add-AzureEndpoint** 添加访问端点，以便客户端应用程序能够在 Internet 上访问这些 SQL Server 服务实例。为 ContosoSQL1 和 ContosoSQL2 提供了不同端口。\n    \n    - **New-AzureVM** 在与 ContosoQuorum 相同的云服务中创建新的 SQL Server VM。如果这些 VM 需要在同一可用性集中，则必须将它们放置在同一云服务中。\n\n1. 请等待每个 VM 预配完毕，然后将其远程桌面文件下载到工作目录中。for 循环会循环访问三个新 VM，并为每个 VM 执行上级大括号内的命令。\n\n        Foreach ($VM in $VMs = Get-AzureVM -ServiceName $sqlServiceName)\n        {\n            write-host \"Waiting for \" $VM.Name \"...\"\n        \n            # Loop until the VM status is \"ReadyRole\"\n            While ($VM.InstanceStatus -ne \"ReadyRole\")\n            {\n                write-host \"  Current Status = \" $VM.InstanceStatus\n                Start-Sleep -Seconds 15\n                $VM = Get-AzureVM -ServiceName $VM.ServiceName -Name $VM.InstanceName\n            }\n        \n            write-host \"  Current Status = \" $VM.InstanceStatus\n        \n            # Download remote desktop file\n            Get-AzureRemoteDesktopFile -ServiceName $VM.ServiceName -Name $VM.InstanceName -LocalPath \"$workingDir$($VM.InstanceName).rdp\"\n        }\n\n    这些 SQL Server VM 现在已预配并正在运行，但它们是使用默认选项与 SQL Server 一同安装的。\n\n## 初始化 WSFC 群集 VM\n\n在本部分中，需要修改将在 WSFC 群集和 SQL Server 安装中使用的三个服务器。具体而言：\n\n- （所有服务器）需要安装**故障转移群集**功能。\n\n- （所有服务器）需要添加 **CORP\\\\Install** 作为计算机**管理员**。\n\n- （仅限 ContosoSQL1 和 ContosoSQL2）需要添加 **CORP\\\\Install** 作为默认数据库中的 **sysadmin** 角色。\n\n- （仅限 ContosoSQL1 和 ContosoSQL2）需要添加 NT **AUTHORITY\\\\System** 作为具有以下权限的登录名：\n\n    - 更改任何可用性组\n    \n    - 连接 SQL\n    \n    - 查看服务器状态\n\n- （仅限 ContosoSQL1 和 ContosoSQL2）在 SQL Server VM 上已启用了 **TCP** 协议。但是，仍需打开防火墙以便远程访问 SQL Server。\n\n现在，准备启动。从 **ContosoQuorum** 开始，执行以下步骤：\n\n1. 通过启动远程桌面文件连接到 **ContosoQuorum**。使用创建 VM 时指定的计算机管理员用户名 **AzureAdmin** 和密码 **Contoso!000**。\n\n1. 验证计算机是否已成功加入 **corp.contoso.com**。\n\n1. 等待 SQL Server 安装完成自动初始化任务，然后继续。\n\n1. 在管理员模式下打开 PowerShell 窗口。\n\n1. 安装 Windows 故障转移群集功能。\n\n        Import-Module ServerManager\n        Add-WindowsFeature Failover-Clustering\n\n1. 添加 **CORP\\\\Install** 作为本地管理员。\n\n        net localgroup administrators \"CORP\\Install\" /Add\n\n1. 从 ContosoQuorum 注销。现已完成此服务器的操作。\n\n        logoff.exe\n\n接下来，请初始化 **ContosoSQL1** 和 **ContosoSQL2**。执行以下步骤，对于这两个 SQL Server VM，这些步骤相同。\n\n1. 通过启动远程桌面文件连接到这两个 SQL Server VM。使用创建 VM 时指定的计算机管理员用户名 **AzureAdmin** 和密码 **Contoso!000**。\n\n1. 验证计算机是否已成功加入 **corp.contoso.com**。\n\n1. 等待 SQL Server 安装完成自动初始化任务，然后继续。\n\n1. 在管理员模式下打开 PowerShell 窗口。\n\n1. 安装 Windows 故障转移群集功能。\n\n        Import-Module ServerManager\n        Add-WindowsFeature Failover-Clustering\n\n1. 添加 **CORP\\\\Install** 作为本地管理员。\n\n        net localgroup administrators \"CORP\\Install\" /Add\n\n1. 导入 SQL Server PowerShell 提供程序。\n\n        Set-ExecutionPolicy -Execution RemoteSigned -Force\n        Import-Module -Name \"sqlps\" -DisableNameChecking\n\n1. 将 **CORP\\\\Install** 作为 sysadmin 角色添加到默认 SQL Server 实例\n\n        net localgroup administrators \"CORP\\Install\" /Add\n        Invoke-SqlCmd -Query \"EXEC sp_addsrvrolemember 'CORP\\Install', 'sysadmin'\" -ServerInstance \".\"\n\n1. 添加 **NT AUTHORITY\\\\System** 作为具有上述三个权限的登录名。\n\n        Invoke-SqlCmd -Query \"CREATE LOGIN [NT AUTHORITY\\SYSTEM] FROM WINDOWS\" -ServerInstance \".\"\n        Invoke-SqlCmd -Query \"GRANT ALTER ANY AVAILABILITY GROUP TO [NT AUTHORITY\\SYSTEM] AS SA\" -ServerInstance \".\" \n        Invoke-SqlCmd -Query \"GRANT CONNECT SQL TO [NT AUTHORITY\\SYSTEM] AS SA\" -ServerInstance \".\"\n        Invoke-SqlCmd -Query \"GRANT VIEW SERVER STATE TO [NT AUTHORITY\\SYSTEM] AS SA\" -ServerInstance \".\"\n\n1. 打开防火墙以便远程访问 SQL Server。\n\n        netsh advfirewall firewall add rule name='SQL Server (TCP-In)' program='C:\\Program Files\\Microsoft SQL Server\\MSSQL11.MSSQLSERVER\\MSSQL\\Binn\\sqlservr.exe' dir=in action=allow protocol=TCP\n\n1. 从两个 VM 注销。\n\n        logoff.exe\n\n最后，准备配置可用性组。将使用 SQL Server PowerShell 提供程序来执行 **ContosoSQL1** 上的所有工作。\n\n## 配置可用性组\n\n1. 通过启动远程桌面文件再次连接到 **ContosoSQL1**。使用 **CORP\\\\Install**（而不是计算机帐户）登录。\n\n1. 在管理员模式下打开 PowerShell 窗口。\n\n1. 定义以下变量：\n\n        $server1 = \"ContosoSQL1\"\n        $server2 = \"ContosoSQL2\"\n        $serverQuorum = \"ContosoQuorum\"\n        $acct1 = \"CORP\\SQLSvc1\"\n        $acct2 = \"CORP\\SQLSvc2\"\n        $password = \"Contoso!000\"\n        $clusterName = \"Cluster1\"\n        $timeout = New-Object System.TimeSpan -ArgumentList 0, 0, 30\n        $db = \"MyDB1\"\n        $backupShare = \"\\\\$server1\\backup\"\n        $quorumShare = \"\\\\$server1\\quorum\"\n        $ag = \"AG1\"\n\n1. 导入 SQL Server PowerShell 提供程序。\n\n        Set-ExecutionPolicy RemoteSigned -Force\n        Import-Module \"sqlps\" -DisableNameChecking\n\n1. 将 ContosoSQL1 的 SQL Server 服务帐户更改为 CORP\\\\SQLSvc1。\n\n        $wmi1 = new-object (\"Microsoft.SqlServer.Management.Smo.Wmi.ManagedComputer\") $server1\n        $wmi1.services | where {$_.Type -eq 'SqlServer'} | foreach{$_.SetServiceAccount($acct1,$password)}\n        $svc1 = Get-Service -ComputerName $server1 -Name 'MSSQLSERVER'\n        $svc1.Stop()\n        $svc1.WaitForStatus([System.ServiceProcess.ServiceControllerStatus]::Stopped,$timeout)\n        $svc1.Start(); \n        $svc1.WaitForStatus([System.ServiceProcess.ServiceControllerStatus]::Running,$timeout)\n\n1. 将 ContosoSQL2 的 SQL Server 服务帐户更改为 CORP\\\\SQLSvc2。\n\n        $wmi2 = new-object (\"Microsoft.SqlServer.Management.Smo.Wmi.ManagedComputer\") $server2\n        $wmi2.services | where {$_.Type -eq 'SqlServer'} | foreach{$_.SetServiceAccount($acct2,$password)}\n        $svc2 = Get-Service -ComputerName $server2 -Name 'MSSQLSERVER'\n        $svc2.Stop()\n        $svc2.WaitForStatus([System.ServiceProcess.ServiceControllerStatus]::Stopped,$timeout)\n        $svc2.Start(); \n        $svc2.WaitForStatus([System.ServiceProcess.ServiceControllerStatus]::Running,$timeout)\n\n1. 从[为 Azure VM 中的 AlwaysOn 可用性组创建 WSFC 群集](http://gallery.technet.microsoft.com/scriptcenter/Create-WSFC-Cluster-for-7c207d3a)，将 **CreateAzureFailoverCluster.ps1** 下载到本地工作目录中。该脚本将帮助你创建一个正常运行的 WSFC 群集。有关 WSFC 如何与 Azure 网络交互的重要信息，请参阅 [Azure 虚拟机中 SQL Server 的高可用性和灾难恢复](https://msdn.microsoft.com/zh-cn/library/azure/jj870962.aspx)。\n\n1. 切换至工作目录并使用下载的脚本创建 WSFC 群集。\n\n        Set-ExecutionPolicy Unrestricted -Force\n        .\\CreateAzureFailoverCluster.ps1 -ClusterName \"$clusterName\" -ClusterNode \"$server1\",\"$server2\",\"$serverQuorum\"\n\n1. 为 **ContosoSQL1** 和 **ContosoSQL2** 上的默认 SQL Server 实例启用 AlwaysOn 可用性组。\n\n        Enable-SqlAlwaysOn `\n            -Path SQLSERVER:\\SQL\\$server1\\Default `\n            -Force\n        Enable-SqlAlwaysOn `\n            -Path SQLSERVER:\\SQL\\$server2\\Default `\n            -NoServiceRestart\n        $svc2.Stop()\n        $svc2.WaitForStatus([System.ServiceProcess.ServiceControllerStatus]::Stopped,$timeout)\n        $svc2.Start(); \n        $svc2.WaitForStatus([System.ServiceProcess.ServiceControllerStatus]::Running,$timeout)\n\n1. 创建备份目录，并为 SQL Server 服务帐户授予权限。你将使用该目录在辅助副本上准备可用性数据库。\n\n        $backup = \"C:\\backup\"\n        New-Item $backup -ItemType directory\n        net share backup=$backup \"/grant:$acct1,FULL\" \"/grant:$acct2,FULL\"\n        icacls.exe \"$backup\" /grant:r (\"$acct1\" + \":(OI)(CI)F\") (\"$acct2\" + \":(OI)(CI)F\")\n\n1. 在 **ContosoSQL1** 上创建一个名为 **MyDB1** 的数据库，获取完整备份和日志备份，然后使用 **WITH NORECOVERY** 选项在 **ContosoSQL2** 上还原它们。\n\n        Invoke-SqlCmd -Query \"CREATE database $db\"\n        Backup-SqlDatabase -Database $db -BackupFile \"$backupShare\\db.bak\" -ServerInstance $server1\n        Backup-SqlDatabase -Database $db -BackupFile \"$backupShare\\db.log\" -ServerInstance $server1 -BackupAction Log\n        Restore-SqlDatabase -Database $db -BackupFile \"$backupShare\\db.bak\" -ServerInstance $server2 -NoRecovery\n        Restore-SqlDatabase -Database $db -BackupFile \"$backupShare\\db.log\" -ServerInstance $server2 -RestoreAction Log -NoRecovery\n\n1. 在 SQL Server VM 上创建可用性组终结点，并在这些终结点上设置适当的权限。\n\n        $endpoint = \n            New-SqlHadrEndpoint MyMirroringEndpoint `\n            -Port 5022 `\n            -Path \"SQLSERVER:\\SQL\\$server1\\Default\"\n        Set-SqlHadrEndpoint `\n            -InputObject $endpoint `\n            -State \"Started\"\n        $endpoint = \n            New-SqlHadrEndpoint MyMirroringEndpoint `\n            -Port 5022 `\n            -Path \"SQLSERVER:\\SQL\\$server2\\Default\"\n        Set-SqlHadrEndpoint `\n            -InputObject $endpoint `\n            -State \"Started\"\n        \n        Invoke-SqlCmd -Query \"CREATE LOGIN [$acct2] FROM WINDOWS\" -ServerInstance $server1\n        Invoke-SqlCmd -Query \"GRANT CONNECT ON ENDPOINT::[MyMirroringEndpoint] TO [$acct2]\" -ServerInstance $server1\n        Invoke-SqlCmd -Query \"CREATE LOGIN [$acct1] FROM WINDOWS\" -ServerInstance $server2\n        Invoke-SqlCmd -Query \"GRANT CONNECT ON ENDPOINT::[MyMirroringEndpoint] TO [$acct1]\" -ServerInstance $server2\n\n1. 创建可用性副本。\n\n        $primaryReplica = \n            New-SqlAvailabilityReplica `\n            -Name $server1 `\n            -EndpointURL \"TCP://$server1.corp.contoso.com:5022\" `\n            -AvailabilityMode \"SynchronousCommit\" `\n            -FailoverMode \"Automatic\" `\n            -Version 11 `\n            -AsTemplate\n        $secondaryReplica = \n            New-SqlAvailabilityReplica `\n            -Name $server2 `\n            -EndpointURL \"TCP://$server2.corp.contoso.com:5022\" `\n            -AvailabilityMode \"SynchronousCommit\" `\n            -FailoverMode \"Automatic\" `\n            -Version 11 `\n            -AsTemplate\n\n1. 最后，创建可用性组，并将辅助副本加入该可用性组。\n\n        New-SqlAvailabilityGroup `\n            -Name $ag `\n            -Path \"SQLSERVER:\\SQL\\$server1\\Default\" `\n            -AvailabilityReplica @($primaryReplica,$secondaryReplica) `\n            -Database $db\n        Join-SqlAvailabilityGroup `\n            -Path \"SQLSERVER:\\SQL\\$server2\\Default\" `\n            -Name $ag\n        Add-SqlAvailabilityDatabase `\n            -Path \"SQLSERVER:\\SQL\\$server2\\Default\\AvailabilityGroups\\$ag\" `\n            -Database $db\n\n## 后续步骤\n现在，你已通过在 Azure 中创建可用性组，成功实施了 SQL Server AlwaysOn。若要为此可用性组配置侦听器，请参阅[在 Azure 中配置 AlwaysOn 可用性组的 ILB 侦听器](/documentation/articles/virtual-machines-sql-server-configure-ilb-alwayson-availability-group-listener)。\n\n有关在 Azure 中使用 SQL Server 的其他信息，请参阅 [Azure 虚拟机上的 SQL Server](/documentation/articles/virtual-machines-sql-server-infrastructure-services)。\n\n<!---HONumber=70-->"
+}

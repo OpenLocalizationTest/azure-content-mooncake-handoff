@@ -1,0 +1,243 @@
+{
+  "nodes": [
+    {
+      "content": "管理：负载平衡器空闲超时",
+      "pos": [
+        130,
+        142
+      ]
+    },
+    {
+      "content": "Azure 负载平衡器空闲超时的管理功能",
+      "pos": [
+        161,
+        181
+      ]
+    },
+    {
+      "content": "管理虚拟网络：负载平衡器 TCP 空闲超时",
+      "pos": [
+        322,
+        343
+      ]
+    },
+    {
+      "pos": [
+        345,
+        508
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>TCP 空闲超时<ept id=\"p1\">**</ept>允许开发人员指定一个确定的阈值，该阈值针对客户端-服务器会话期间出现的与 Azure 负载平衡器相关的非活动状态。TCP 空闲超时值为 4 分钟（Azure 负载平衡器的默认值）意味着，如果在客户端-服务器会话期间出现的与 Azure 负载平衡器相关的非活动状态的持续时间超过 4 分钟，则会关闭连接。"
+    },
+    {
+      "content": "当客户端-服务器连接关闭时，客户端应用程序会收到一条类似于下面这样的错误消息：“基础连接已关闭: 应保持活动状态的连接已由服务器关闭”。",
+      "pos": [
+        510,
+        578
+      ]
+    },
+    {
+      "pos": [
+        580,
+        887
+      ],
+      "content": "长时间处于非活动状态时，通常使用 <bpt id=\"p1\">[</bpt>TCP Keep-Alive<ept id=\"p1\">](http://tools.ietf.org/html/rfc1122#page-101)</ept> 来保持连接<bpt id=\"p2\">[</bpt>（MSDN 示例）<ept id=\"p2\">](https://msdn.microsoft.com/zh-CN/library/system.net.servicepoint.settcpkeepalive.aspx)</ept>。使用 TCP Keep-Alive 时，客户端会定期发送简单的数据包（其频率周期通常短于服务器的空闲超时阈值）。服务器会将这些传输内容视为存在连接活动的证据，即使除传输本身外并没有出现其他活动，这样就永远达不到空闲超时值，因此就可以长时间维持连接。"
+    },
+    {
+      "content": "虽然 TCP Keep-Alive 很有效，但通常不适用于移动应用程序，因为它会消耗移动设备上有限的能源。使用 TCP Keep-Alive 的移动应用程序会更快地耗尽设备电池的能源，因为它会持续地汲取需要在网络上使用的能源。",
+      "pos": [
+        889,
+        1002
+      ]
+    },
+    {
+      "content": "Azure 负载平衡器支持对 TCP 空闲超时进行配置，因此支持移动设备方案。对于入站连接，开发人员可以将 TCP 空闲超时设置为 4 到 30 分钟（可配置的 TCP 空闲超时不适用于出站连接）。这样客户端就可以与服务器维持很长时间的会话，即使长时间处于非活动状态也不会断开连接。移动设备上的应用程序仍然可以选择利用 TCP Keep-Alive 技术来保留非活动时间预计会超过 30 分钟的连接，不过在使用这种空闲时间更长的 TCP 空闲超时时，应用程序发出 TCP Keep-Alive 请求的频率要比以前低得多，因此会大大降低移动设备能源的消耗。",
+      "pos": [
+        1004,
+        1281
+      ]
+    },
+    {
+      "content": "实现",
+      "pos": [
+        1286,
+        1288
+      ]
+    },
+    {
+      "content": "TCP 空闲超时可以针对以下情况进行配置：",
+      "pos": [
+        1290,
+        1311
+      ]
+    },
+    {
+      "content": "实例级公共 IP",
+      "pos": [
+        1316,
+        1324
+      ]
+    },
+    {
+      "content": "虚拟机终结点",
+      "pos": [
+        1465,
+        1471
+      ]
+    },
+    {
+      "content": "Web 角色",
+      "pos": [
+        1535,
+        1541
+      ]
+    },
+    {
+      "content": "辅助角色",
+      "pos": [
+        1608,
+        1612
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        1680,
+        1684
+      ]
+    },
+    {
+      "content": "TBD",
+      "pos": [
+        1687,
+        1690
+      ]
+    },
+    {
+      "content": "PowerShell 示例",
+      "pos": [
+        1695,
+        1708
+      ]
+    },
+    {
+      "pos": [
+        1709,
+        1795
+      ],
+      "content": "为获得最佳结果，请下载<bpt id=\"p1\">[</bpt>最新版的 Azure PowerShell<ept id=\"p1\">](https://github.com/Azure/azure-sdk-tools/releases)</ept>。"
+    },
+    {
+      "content": "将你的实例级公共 IP 的 TCP 超时配置为 15 分钟",
+      "pos": [
+        1801,
+        1830
+      ]
+    },
+    {
+      "content": "IdleTimeoutInMinutes 为可选。在未设置的情况下，默认超时为 4 分钟。其值现在可以设置为 4 到 30 分钟。",
+      "pos": [
+        1909,
+        1974
+      ]
+    },
+    {
+      "content": "在虚拟机上创建 Azure 终结点时设置空闲超时",
+      "pos": [
+        1980,
+        2004
+      ]
+    },
+    {
+      "content": "检索空闲超时配置",
+      "pos": [
+        2185,
+        2193
+      ]
+    },
+    {
+      "content": "在负载平衡终结点集上设置 TCP 超时",
+      "pos": [
+        2712,
+        2731
+      ]
+    },
+    {
+      "content": "如果终结点是负载平衡终结点集的一部分，则必须在负载平衡终结点集上设置 TCP 超时：",
+      "pos": [
+        2733,
+        2775
+      ]
+    },
+    {
+      "content": "云服务示例",
+      "pos": [
+        2947,
+        2952
+      ]
+    },
+    {
+      "content": "你可以利用 Azure SDK for .NET 来更新云服务",
+      "pos": [
+        2954,
+        2985
+      ]
+    },
+    {
+      "content": "云服务的终结点设置在 .csdef 中进行。因此，若要更新云服务部署中的 TCP 超时，部署升级是必需的。例外情况是仅针对公共 IP 指定 TCP 超时。公共 IP 设置位于 .cscfg 中，可以通过部署更新和升级进行更新。",
+      "pos": [
+        2987,
+        3100
+      ]
+    },
+    {
+      "content": "终结点设置的 .csdef 更改如下：",
+      "pos": [
+        3102,
+        3121
+      ]
+    },
+    {
+      "content": "API 示例",
+      "pos": [
+        3968,
+        3974
+      ]
+    },
+    {
+      "content": "开发人员可以使用服务管理 API 配置负载平衡器分发。请确保添加的 x-ms-version 标头设置为 2014-06-01 或更高版本。",
+      "pos": [
+        3976,
+        4046
+      ]
+    },
+    {
+      "content": "通过一次部署，在所有虚拟机上更新指定的负载平衡输入终结点的配置",
+      "pos": [
+        4052,
+        4083
+      ]
+    },
+    {
+      "content": "请求",
+      "pos": [
+        4090,
+        4092
+      ]
+    },
+    {
+      "content": "LoadBalancerDistribution 的值可以是 sourceIP（用于 2 元组关联）、sourceIPProtocol（用于 3 元组关联）或 none（用于无关联，即 5 元组）",
+      "pos": [
+        4237,
+        4335
+      ]
+    },
+    {
+      "content": "响应",
+      "pos": [
+        4342,
+        4344
+      ]
+    }
+  ],
+  "content": "<properties \n   authors=\"danielceckert\" \n   documentationCenter=\"dev-center-name\" \n   editor=\"\"\n   manager=\"jefco\" \n   pageTitle=\"管理：负载平衡器空闲超时\" \n   description=\"Azure 负载平衡器空闲超时的管理功能\" \n   services=\"virtual-network\" \n   />\n\n<tags\n   ms.date=\"09/01/2015\"\n   ms.service=\"virtual-network\"\n   wacn.date=\"10/17/2015\"\n   />\n   \n# 管理虚拟网络：负载平衡器 TCP 空闲超时\n\n**TCP 空闲超时**允许开发人员指定一个确定的阈值，该阈值针对客户端-服务器会话期间出现的与 Azure 负载平衡器相关的非活动状态。TCP 空闲超时值为 4 分钟（Azure 负载平衡器的默认值）意味着，如果在客户端-服务器会话期间出现的与 Azure 负载平衡器相关的非活动状态的持续时间超过 4 分钟，则会关闭连接。\n\n当客户端-服务器连接关闭时，客户端应用程序会收到一条类似于下面这样的错误消息：“基础连接已关闭: 应保持活动状态的连接已由服务器关闭”。\n\n长时间处于非活动状态时，通常使用 [TCP Keep-Alive](http://tools.ietf.org/html/rfc1122#page-101) 来保持连接[（MSDN 示例）](https://msdn.microsoft.com/zh-CN/library/system.net.servicepoint.settcpkeepalive.aspx)。使用 TCP Keep-Alive 时，客户端会定期发送简单的数据包（其频率周期通常短于服务器的空闲超时阈值）。服务器会将这些传输内容视为存在连接活动的证据，即使除传输本身外并没有出现其他活动，这样就永远达不到空闲超时值，因此就可以长时间维持连接。\n\n虽然 TCP Keep-Alive 很有效，但通常不适用于移动应用程序，因为它会消耗移动设备上有限的能源。使用 TCP Keep-Alive 的移动应用程序会更快地耗尽设备电池的能源，因为它会持续地汲取需要在网络上使用的能源。\n\nAzure 负载平衡器支持对 TCP 空闲超时进行配置，因此支持移动设备方案。对于入站连接，开发人员可以将 TCP 空闲超时设置为 4 到 30 分钟（可配置的 TCP 空闲超时不适用于出站连接）。这样客户端就可以与服务器维持很长时间的会话，即使长时间处于非活动状态也不会断开连接。移动设备上的应用程序仍然可以选择利用 TCP Keep-Alive 技术来保留非活动时间预计会超过 30 分钟的连接，不过在使用这种空闲时间更长的 TCP 空闲超时时，应用程序发出 TCP Keep-Alive 请求的频率要比以前低得多，因此会大大降低移动设备能源的消耗。\n\n## 实现\n\nTCP 空闲超时可以针对以下情况进行配置：\n\n* [实例级公共 IP](/documentation/articles/virtual-networks-instance-level-public-ip)\n<!--* [负载平衡的终结点集](/documentation/articles/load-balancer-overview)-->\n* [虚拟机终结点](/documentation/articles/virtual-machines-set-up-endpoints)\n* [Web 角色](https://msdn.microsoft.com/zh-cn/library/azure/ee758711.aspx)\n* [辅助角色](https://msdn.microsoft.com/zh-cn/library/azure/ee758711.aspx)\n\n## 后续步骤\n* TBD\n\n## PowerShell 示例\n为获得最佳结果，请下载[最新版的 Azure PowerShell](https://github.com/Azure/azure-sdk-tools/releases)。\n\n### 将你的实例级公共 IP 的 TCP 超时配置为 15 分钟\n\n    Set-AzurePublicIP -PublicIPName webip -VM MyVM -IdleTimeoutInMinutes 15\n\nIdleTimeoutInMinutes 为可选。在未设置的情况下，默认超时为 4 分钟。其值现在可以设置为 4 到 30 分钟。\n\n### 在虚拟机上创建 Azure 终结点时设置空闲超时\n\n    Get-AzureVM -ServiceName \"mySvc\" -Name \"MyVM1\" | Add-AzureEndpoint -Name \"HttpIn\" -Protocol \"tcp\" -PublicPort 80 -LocalPort 8080 -IdleTimeoutInMinutes 15| Update-AzureVM\n\n### 检索空闲超时配置\n\n    PS C:\\> Get-AzureVM -ServiceName \"MyService\" -Name \"MyVM\" | Get-AzureEndpoint\n    \n    VERBOSE: 6:43:50 PM - Completed Operation: Get Deployment\n    LBSetName : MyLoadBalancedSet\n    LocalPort : 80\n    Name : HTTP\n    Port : 80\n    Protocol : tcp\n    Vip : 65.52.xxx.xxx\n    ProbePath :\n    ProbePort : 80\n    ProbeProtocol : tcp\n    ProbeIntervalInSeconds : 15\n    ProbeTimeoutInSeconds : 31\n    EnableDirectServerReturn : False\n    Acl : {}\n    InternalLoadBalancerName :\n    IdleTimeoutInMinutes : 15\n    \n### 在负载平衡终结点集上设置 TCP 超时\n\n如果终结点是负载平衡终结点集的一部分，则必须在负载平衡终结点集上设置 TCP 超时：\n\n    Set-AzureLoadBalancedEndpoint -ServiceName \"MyService\" -LBSetName \"LBSet1\" -Protocol tcp -LocalPort 80 -ProbeProtocolTCP -ProbePort 8080 -IdleTimeoutInMinutes 15\n\n## 云服务示例\n\n你可以利用 Azure SDK for .NET 来更新云服务\n\n云服务的终结点设置在 .csdef 中进行。因此，若要更新云服务部署中的 TCP 超时，部署升级是必需的。例外情况是仅针对公共 IP 指定 TCP 超时。公共 IP 设置位于 .cscfg 中，可以通过部署更新和升级进行更新。\n\n终结点设置的 .csdef 更改如下：\n\n    <WorkerRole name=\"worker-role-name\" vmsize=\"worker-role-size\" enableNativeCodeExecution=\"[true|false]\">\n      <Endpoints>\n        <InputEndpoint name=\"input-endpoint-name\" protocol=\"[http|https|tcp|udp]\" localPort=\"local-port-number\" port=\"port-number\" certificate=\"certificate-name\" loadBalancerProbe=\"load-balancer-probe-name\" idleTimeoutInMinutes=\"tcp-timeout\" />\n      </Endpoints>\n    </WorkerRole>The .cscfg changes for the timeout setting on Public IPs are:\n    \n    <NetworkConfiguration>\n      <VirtualNetworkSite name=\"VNet\"/>\n      <AddressAssignments>\n        <InstanceAddress roleName=\"VMRolePersisted\">\n          <PublicIPs>\n            <PublicIP name=\"public-ip-name\" idleTimeoutInMinutes=\"timeout-in-minutes\"/>\n          </PublicIPs>\n        </InstanceAddress>\n      </AddressAssignments>\n    </NetworkConfiguration>\n    \n## API 示例\n\n开发人员可以使用服务管理 API 配置负载平衡器分发。请确保添加的 x-ms-version 标头设置为 2014-06-01 或更高版本。\n\n### 通过一次部署，在所有虚拟机上更新指定的负载平衡输入终结点的配置\n\n#### 请求\n\n    POST https://management.core.chinacloudapi.cn/<subscription-id>/services/hostedservices/<cloudservice-name>/deployments/<deployment-name>\n\nLoadBalancerDistribution 的值可以是 sourceIP（用于 2 元组关联）、sourceIPProtocol（用于 3 元组关联）或 none（用于无关联，即 5 元组）\n\n#### 响应\n\n    <LoadBalancedEndpointList xmlns=\"http://schemas.microsoft.com/windowsazure\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\">\n      <InputEndpoint>\n        <LoadBalancedEndpointSetName>endpoint-set-name</LoadBalancedEndpointSetName>\n        <LocalPort>local-port-number</LocalPort>\n        <Port>external-port-number</Port>\n        <LoadBalancerProbe>\n          <Path>path-of-probe</Path>\n          <Port>port-assigned-to-probe</Port>\n          <Protocol>probe-protocol</Protocol>\n          <IntervalInSeconds>interval-of-probe</IntervalInSeconds>\n          <TimeoutInSeconds>timeout-for-probe</TimeoutInSeconds>\n        </LoadBalancerProbe>\n        <LoadBalancerName>name-of-internal-loadbalancer</LoadBalancerName>\n        <Protocol>endpoint-protocol</Protocol>\n        <IdleTimeoutInMinutes>15</IdleTimeoutInMinutes>\n        <EnableDirectServerReturn>enable-direct-server-return</EnableDirectServerReturn>\n        <EndpointACL>\n          <Rules>\n            <Rule>\n              <Order>priority-of-the-rule</Order>\n              <Action>permit-rule</Action>\n              <RemoteSubnet>subnet-of-the-rule</RemoteSubnet>\n              <Description>description-of-the-rule</Description>\n            </Rule>\n          </Rules>\n        </EndpointACL>\n      </InputEndpoint>\n    </LoadBalancedEndpointList>\n\n<!---HONumber=74-->"
+}

@@ -1,0 +1,327 @@
+{
+  "nodes": [
+    {
+      "content": "使用 PowerShell 管理 Service Bus 和事件中心资源",
+      "pos": [
+        26,
+        62
+      ]
+    },
+    {
+      "content": "使用 PowerShell 创建和管理 Service Bus 和事件中心资源",
+      "pos": [
+        80,
+        119
+      ]
+    },
+    {
+      "content": "使用 PowerShell 管理 Service Bus 和事件中心资源",
+      "pos": [
+        326,
+        362
+      ]
+    },
+    {
+      "content": "Azure PowerShell 是一个脚本编写环境，可用于控制和自动执行 Azure 服务的部署和管理。本文介绍如何通过本地 Azure PowerShell 控制台使用 PowerShell 来设置和管理 Service Bus 实体（如命名空间、队列和事件中心）。",
+      "pos": [
+        364,
+        499
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        504,
+        508
+      ]
+    },
+    {
+      "content": "在开始之前，你需要具备以下项：",
+      "pos": [
+        510,
+        525
+      ]
+    },
+    {
+      "pos": [
+        529,
+        580
+      ],
+      "content": "Azure 订阅。Azure 是基于订阅的平台。有关获取订阅的详细信息，请参阅<bpt id=\"p1\">[</bpt>购买选项<ept id=\"p1\">][试用版]</ept>。"
+    },
+    {
+      "pos": [
+        584,
+        644
+      ],
+      "content": "配备 Azure PowerShell 的计算机。有关说明，请参阅<bpt id=\"p1\">[</bpt>安装和配置 Azure PowerShell<ept id=\"p1\">][]</ept>。"
+    },
+    {
+      "content": "大致了解 PowerShell 脚本、NuGet 包和 .NET Framework。",
+      "pos": [
+        648,
+        691
+      ]
+    },
+    {
+      "content": "包含对用于 Service Bus 的 .NET 程序集的引用",
+      "pos": [
+        696,
+        727
+      ]
+    },
+    {
+      "pos": [
+        729,
+        865
+      ],
+      "content": "通过有限数量的 PowerShell cmdlet 可以管理 Service Bus。若要设置未通过现有 cmdlet 公开的实体，可以通过引用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Service Bus NuGet 包]</ept>从 PowerShell 中使用用于 Service Bus 的 .NET 客户端。"
+    },
+    {
+      "pos": [
+        867,
+        945
+      ],
+      "content": "首先，请确保该脚本可以找到随 NuGet 包一起安装的 <bpt id=\"p1\">**</bpt>Microsoft.ServiceBus.dll<ept id=\"p1\">**</ept> 程序集。为了灵活起见，该脚本执行以下步骤："
+    },
+    {
+      "content": "确定调用它的路径。",
+      "pos": [
+        950,
+        959
+      ]
+    },
+    {
+      "pos": [
+        963,
+        1013
+      ],
+      "content": "遍历路径直到找到名为 <ph id=\"ph1\">`packages`</ph> 的文件夹为止。该文件夹是在安装 NuGet 包时创建的。"
+    },
+    {
+      "pos": [
+        1017,
+        1078
+      ],
+      "content": "以递归方式在 <ph id=\"ph1\">`packages`</ph> 文件夹中搜索名为 <bpt id=\"p1\">**</bpt>Microsoft.ServiceBus.dll<ept id=\"p1\">**</ept> 的程序集。"
+    },
+    {
+      "content": "引用该程序集，以便类型可供以后使用。",
+      "pos": [
+        1082,
+        1100
+      ]
+    },
+    {
+      "content": "下面说明如何在 PowerShell 脚本中实现这些步骤：",
+      "pos": [
+        1102,
+        1131
+      ]
+    },
+    {
+      "content": "设置 Service Bus 命名空间",
+      "pos": [
+        1912,
+        1931
+      ]
+    },
+    {
+      "pos": [
+        1933,
+        2030
+      ],
+      "content": "使用 Service Bus 命名空间时，你可以使用两个 cmdlet：<bpt id=\"p1\">[</bpt><ept id=\"p1\">Get-AzureSBNamespace]</ept> 和 <bpt id=\"p2\">[</bpt><ept id=\"p2\">New-AzureSBNamespace]</ept>，而不是 .NET SDK。"
+    },
+    {
+      "pos": [
+        2032,
+        2075
+      ],
+      "content": "本示例在脚本中创建几个本地变量：<ph id=\"ph1\">`$Namespace`</ph> 和 <ph id=\"ph2\">`$Location`</ph>。"
+    },
+    {
+      "pos": [
+        2079,
+        2120
+      ],
+      "content": "<ph id=\"ph1\">`$Namespace`</ph> 是我们要使用的 Service Bus 命名空间的名称。"
+    },
+    {
+      "pos": [
+        2123,
+        2155
+      ],
+      "content": "<ph id=\"ph1\">`$Location`</ph> 标识我们要在其中设置命名空间的数据中心。"
+    },
+    {
+      "pos": [
+        2158,
+        2198
+      ],
+      "content": "<ph id=\"ph1\">`$CurrentNamespace`</ph> 将存储我们检索（或创建）的引用命名空间。"
+    },
+    {
+      "pos": [
+        2200,
+        2242
+      ],
+      "content": "在实际脚本中，<ph id=\"ph1\">`$Namespace`</ph> 和 <ph id=\"ph2\">`$Location`</ph> 可作为参数传递。"
+    },
+    {
+      "content": "此部分脚本执行以下任务：",
+      "pos": [
+        2244,
+        2256
+      ]
+    },
+    {
+      "content": "尝试使用提供的名称检索 Service Bus 命名空间。",
+      "pos": [
+        2261,
+        2290
+      ]
+    },
+    {
+      "content": "如果找到该命名空间，则报告它找到的内容。",
+      "pos": [
+        2294,
+        2314
+      ]
+    },
+    {
+      "content": "如果找不到该命名空间，则会创建该命名空间，然后检索新创建的命名空间。",
+      "pos": [
+        2318,
+        2352
+      ]
+    },
+    {
+      "pos": [
+        3323,
+        3537
+      ],
+      "content": "若要设置其他 Service Bus 实体，请从 SDK 创建 <ph id=\"ph1\">`NamespaceManager`</ph> 对象的一个实例。可以使用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Get-AzureSBAuthorizationRule]</ept> cmdlet 来检索用于提供连接字符串的授权规则。此示例在 <ph id=\"ph2\">`$NamespaceManager`</ph> 变量中存储对 <ph id=\"ph3\">`NamespaceManager`</ph> 实例的引用。此脚本稍后将使用 <ph id=\"ph4\">`$NamespaceManager`</ph> 来设置其他实体。"
+    },
+    {
+      "content": "设置其他 Service Bus 实体",
+      "pos": [
+        4006,
+        4025
+      ]
+    },
+    {
+      "pos": [
+        4027,
+        4104
+      ],
+      "content": "若要设置其他实体（如队列、主题和事件中心），可以使用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">.NET API for Service Bus]</ept>。更多详细示例（包括其他实体）将在本文末尾提及。"
+    },
+    {
+      "content": "创建事件中心",
+      "pos": [
+        4110,
+        4116
+      ]
+    },
+    {
+      "pos": [
+        4118,
+        4179
+      ],
+      "content": "此部分脚本将再创建四个本地变量。这些变量用于实例化 <ph id=\"ph1\">`EventHubDescription`</ph> 对象。此脚本执行以下任务："
+    },
+    {
+      "pos": [
+        4184,
+        4232
+      ],
+      "content": "使用 <ph id=\"ph1\">`NamespaceManager`</ph> 对象检查由 <ph id=\"ph2\">`$Path`</ph> 标识的事件中心是否存在。"
+    },
+    {
+      "pos": [
+        4236,
+        4328
+      ],
+      "content": "如果不存在，将创建 <ph id=\"ph1\">`EventHubDescription`</ph> 并将其传递到 <ph id=\"ph2\">`NamespaceManager`</ph> 类的 <ph id=\"ph3\">`CreateEventHubIfNotExists`</ph> 方法。"
+    },
+    {
+      "pos": [
+        4332,
+        4401
+      ],
+      "content": "确定事件中心可用后，请使用 <ph id=\"ph1\">`ConsumerGroupDescription`</ph> 和 <ph id=\"ph2\">`NamespaceManager`</ph> 创建使用者组。"
+    },
+    {
+      "content": "创建队列",
+      "pos": [
+        6090,
+        6094
+      ]
+    },
+    {
+      "content": "若要创建队列或主题，请按前一部分所述执行命名空间检查。",
+      "pos": [
+        6096,
+        6123
+      ]
+    },
+    {
+      "content": "创建主题",
+      "pos": [
+        8301,
+        8305
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        10078,
+        10082
+      ]
+    },
+    {
+      "content": "本文提供使用 PowerShell 预配服务总线实体的基本概述。尽管通过引用 Microsoft.ServiceBus.dll 程序集有有限数量的 PowerShell cmdlet 可用于管理 Service Bus 消息实体，但可以使用 .NET 客户端库执行的任何操作几乎也可以在 PowerShell 脚本中执行。",
+      "pos": [
+        10084,
+        10245
+      ]
+    },
+    {
+      "content": "以下博客文章提供了更多详细示例：",
+      "pos": [
+        10247,
+        10263
+      ]
+    },
+    {
+      "content": "如何使用 PowerShell 脚本创建 Service Bus 队列、主题和订阅",
+      "pos": [
+        10268,
+        10309
+      ]
+    },
+    {
+      "content": "如何使用 PowerShell 脚本创建 Service Bus 命名空间和事件中心",
+      "pos": [
+        10456,
+        10498
+      ]
+    },
+    {
+      "content": "一些现成的脚本也可供下载：",
+      "pos": [
+        10638,
+        10651
+      ]
+    },
+    {
+      "content": "服务总线 PowerShell 脚本",
+      "pos": [
+        10655,
+        10673
+      ]
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"使用 PowerShell 管理 Service Bus 和事件中心资源\"\n   description=\"使用 PowerShell 创建和管理 Service Bus 和事件中心资源\"\n   services=\"service-bus\"\n   documentationCenter=\".NET\"\n   authors=\"sethmanheim\"\n   manager=\"timlt\"\n   editor=\"\"/>\n\n<tags\n   ms.service=\"service-bus\"\n   ms.date=\"12/09/2015\"\n   wacn.date=\"01/14/2016\"/>\n\n# 使用 PowerShell 管理 Service Bus 和事件中心资源\n\nAzure PowerShell 是一个脚本编写环境，可用于控制和自动执行 Azure 服务的部署和管理。本文介绍如何通过本地 Azure PowerShell 控制台使用 PowerShell 来设置和管理 Service Bus 实体（如命名空间、队列和事件中心）。\n\n## 先决条件\n\n在开始之前，你需要具备以下项：\n\n- Azure 订阅。Azure 是基于订阅的平台。有关获取订阅的详细信息，请参阅[购买选项][试用版]。\n\n- 配备 Azure PowerShell 的计算机。有关说明，请参阅[安装和配置 Azure PowerShell][]。\n\n- 大致了解 PowerShell 脚本、NuGet 包和 .NET Framework。\n\n## 包含对用于 Service Bus 的 .NET 程序集的引用\n\n通过有限数量的 PowerShell cmdlet 可以管理 Service Bus。若要设置未通过现有 cmdlet 公开的实体，可以通过引用 [Service Bus NuGet 包]从 PowerShell 中使用用于 Service Bus 的 .NET 客户端。\n\n首先，请确保该脚本可以找到随 NuGet 包一起安装的 **Microsoft.ServiceBus.dll** 程序集。为了灵活起见，该脚本执行以下步骤：\n\n1. 确定调用它的路径。\n2. 遍历路径直到找到名为 `packages` 的文件夹为止。该文件夹是在安装 NuGet 包时创建的。\n3. 以递归方式在 `packages` 文件夹中搜索名为 **Microsoft.ServiceBus.dll** 的程序集。\n4. 引用该程序集，以便类型可供以后使用。\n\n下面说明如何在 PowerShell 脚本中实现这些步骤：\n\n```powershell\n\ntry\n{\n    # IMPORTANT: Make sure to reference the latest version of Microsoft.ServiceBus.dll\n    Write-Output \"Adding the [Microsoft.ServiceBus.dll] assembly to the script...\"\n    $scriptPath = Split-Path (Get-Variable MyInvocation -Scope 0).Value.MyCommand.Path\n    $packagesFolder = (Split-Path $scriptPath -Parent) + \"\\packages\"\n    $assembly = Get-ChildItem $packagesFolder -Include \"Microsoft.ServiceBus.dll\" -Recurse\n    Add-Type -Path $assembly.FullName\n\n    Write-Output \"The [Microsoft.ServiceBus.dll] assembly has been successfully added to the script.\"\n}\n\ncatch [System.Exception]\n{\n    Write-Error(\"Could not add the Microsoft.ServiceBus.dll assembly to the script. Make sure you build the solution before running the provisioning script.\")\n}\n\n```\n\n## 设置 Service Bus 命名空间\n\n使用 Service Bus 命名空间时，你可以使用两个 cmdlet：[Get-AzureSBNamespace] 和 [New-AzureSBNamespace]，而不是 .NET SDK。\n\n本示例在脚本中创建几个本地变量：`$Namespace` 和 `$Location`。\n\n- `$Namespace` 是我们要使用的 Service Bus 命名空间的名称。\n- `$Location` 标识我们要在其中设置命名空间的数据中心。\n- `$CurrentNamespace` 将存储我们检索（或创建）的引用命名空间。\n\n在实际脚本中，`$Namespace` 和 `$Location` 可作为参数传递。\n\n此部分脚本执行以下任务：\n\n1. 尝试使用提供的名称检索 Service Bus 命名空间。\n2. 如果找到该命名空间，则报告它找到的内容。\n3. 如果找不到该命名空间，则会创建该命名空间，然后检索新创建的命名空间。\n\n    ``` powershell\n        \n        $Namespace = \"MyServiceBusNS\"\n        $Location = \"China East\"\n        \n        # Query to see if the namespace currently exists\n        $CurrentNamespace = Get-AzureSBNamespace -Name $Namespace\n\n        # Check if the namespace already exists or needs to be created\n        if ($CurrentNamespace)\n        {\n            Write-Output \"The namespace [$Namespace] already exists in the [$($CurrentNamespace.Region)] region.\"\n        }\n        else\n        {\n            Write-Host \"The [$Namespace] namespace does not exist.\"\n            Write-Output \"Creating the [$Namespace] namespace in the [$Location] region...\"\n            New-AzureSBNamespace -Name $Namespace -Location $Location -CreateACSNamespace false -NamespaceType Messaging\n            $CurrentNamespace = Get-AzureSBNamespace -Name $Namespace\n            Write-Host \"The [$Namespace] namespace in the [$Location] region has been successfully created.\"\n        }\n    ```\n若要设置其他 Service Bus 实体，请从 SDK 创建 `NamespaceManager` 对象的一个实例。可以使用 [Get-AzureSBAuthorizationRule] cmdlet 来检索用于提供连接字符串的授权规则。此示例在 `$NamespaceManager` 变量中存储对 `NamespaceManager` 实例的引用。此脚本稍后将使用 `$NamespaceManager` 来设置其他实体。\n\n    ``` powershell\n    $sbr = Get-AzureSBAuthorizationRule -Namespace $Namespace\n    # Create the NamespaceManager object to create the Event Hub\n    Write-Output \"Creating a NamespaceManager object for the [$Namespace] namespace...\"\n    $NamespaceManager = [Microsoft.ServiceBus.NamespaceManager]::CreateFromConnectionString($sbr.ConnectionString);\n    Write-Output \"NamespaceManager object for the [$Namespace] namespace has been successfully created.\"\n    ```\n\n## 设置其他 Service Bus 实体\n\n若要设置其他实体（如队列、主题和事件中心），可以使用 [.NET API for Service Bus]。更多详细示例（包括其他实体）将在本文末尾提及。\n\n### 创建事件中心\n\n此部分脚本将再创建四个本地变量。这些变量用于实例化 `EventHubDescription` 对象。此脚本执行以下任务：\n\n1. 使用 `NamespaceManager` 对象检查由 `$Path` 标识的事件中心是否存在。\n2. 如果不存在，将创建 `EventHubDescription` 并将其传递到 `NamespaceManager` 类的 `CreateEventHubIfNotExists` 方法。\n3. 确定事件中心可用后，请使用 `ConsumerGroupDescription` 和 `NamespaceManager` 创建使用者组。\n\n    ``` powershell\n\n    $Path  = \"MyEventHub\"\n    $PartitionCount = 12\n    $MessageRetentionInDays = 7\n    $UserMetadata = $null\n    $ConsumerGroupName = \"MyConsumerGroup\"\n\n    # Check if the Event Hub already exists\n    if ($NamespaceManager.EventHubExists($Path))\n    {\n        Write-Output \"The [$Path] event hub already exists in the [$Namespace] namespace.\"  \n    }\n    else\n    {\n        Write-Output \"Creating the [$Path] event hub in the [$Namespace] namespace: PartitionCount=[$PartitionCount] MessageRetentionInDays=[$MessageRetentionInDays]...\"\n        $EventHubDescription = New-Object -TypeName Microsoft.ServiceBus.Messaging.EventHubDescription -ArgumentList $Path\n        $EventHubDescription.PartitionCount = $PartitionCount\n        $EventHubDescription.MessageRetentionInDays = $MessageRetentionInDays\n        $EventHubDescription.UserMetadata = $UserMetadata\n        $EventHubDescription.Path = $Path\n        $NamespaceManager.CreateEventHubIfNotExists($EventHubDescription);\n        Write-Output \"The [$Path] event hub in the [$Namespace] namespace has been successfully created.\"\n    }\n\n    # Create the consumer group if it doesn't exist\n    Write-Output \"Creating the consumer group [$ConsumerGroupName] for the [$Path] event hub...\"\n    $ConsumerGroupDescription = New-Object -TypeName Microsoft.ServiceBus.Messaging.ConsumerGroupDescription -ArgumentList $Path, $ConsumerGroupName\n    $ConsumerGroupDescription.UserMetadata = $ConsumerGroupUserMetadata\n    $NamespaceManager.CreateConsumerGroupIfNotExists($ConsumerGroupDescription);\n    Write-Output \"The consumer group [$ConsumerGroupName] for the [$Path] event hub has been successfully created.\"\n    ```\n\n### 创建队列\n\n若要创建队列或主题，请按前一部分所述执行命名空间检查。\n\n    if ($NamespaceManager.QueueExists($Path))\n    {\n        Write-Output \"The [$Path] queue already exists in the [$Namespace] namespace.\"\n    }\n    else\n    {\n        Write-Output \"Creating the [$Path] queue in the [$Namespace] namespace...\"\n        $QueueDescription = New-Object -TypeName Microsoft.ServiceBus.Messaging.QueueDescription -ArgumentList $Path\n        if ($AutoDeleteOnIdle -ge 5)\n        {\n            $QueueDescription.AutoDeleteOnIdle = [System.TimeSpan]::FromMinutes($AutoDeleteOnIdle)\n        }\n        if ($DefaultMessageTimeToLive -gt 0)\n        {\n            $QueueDescription.DefaultMessageTimeToLive = [System.TimeSpan]::FromMinutes($DefaultMessageTimeToLive)\n        }\n        if ($DuplicateDetectionHistoryTimeWindow -gt 0)\n        {\n            $QueueDescription.DuplicateDetectionHistoryTimeWindow = [System.TimeSpan]::FromMinutes($DuplicateDetectionHistoryTimeWindow)\n        }\n        $QueueDescription.EnableBatchedOperations = $EnableBatchedOperations\n        $QueueDescription.EnableDeadLetteringOnMessageExpiration = $EnableDeadLetteringOnMessageExpiration\n        $QueueDescription.EnableExpress = $EnableExpress\n        $QueueDescription.EnablePartitioning = $EnablePartitioning\n        $QueueDescription.ForwardDeadLetteredMessagesTo = $ForwardDeadLetteredMessagesTo\n        $QueueDescription.ForwardTo = $ForwardTo\n        $QueueDescription.IsAnonymousAccessible = $IsAnonymousAccessible\n        if ($LockDuration -gt 0)\n        {\n            $QueueDescription.LockDuration = [System.TimeSpan]::FromSeconds($LockDuration)\n        }\n        $QueueDescription.MaxDeliveryCount = $MaxDeliveryCount\n        $QueueDescription.MaxSizeInMegabytes = $MaxSizeInMegabytes\n        $QueueDescription.RequiresDuplicateDetection = $RequiresDuplicateDetection\n        $QueueDescription.RequiresSession = $RequiresSession\n        if ($EnablePartitioning)\n        {\n            $QueueDescription.SupportOrdering = $False\n        }\n        else\n        {\n            $QueueDescription.SupportOrdering = $SupportOrdering\n        }\n        $QueueDescription.UserMetadata = $UserMetadata\n        $NamespaceManager.CreateQueue($QueueDescription);\n    }\n\n### 创建主题\n\n    if ($NamespaceManager.TopicExists($Path))\n    {\n        Write-Output \"The [$Path] topic already exists in the [$Namespace] namespace.\"\n    }\n    else\n    {\n        Write-Output \"Creating the [$Path] topic in the [$Namespace] namespace...\"\n        $TopicDescription = New-Object -TypeName Microsoft.ServiceBus.Messaging.TopicDescription -ArgumentList $Path\n        if ($AutoDeleteOnIdle -ge 5)\n        {\n            $TopicDescription.AutoDeleteOnIdle = [System.TimeSpan]::FromMinutes($AutoDeleteOnIdle)\n        }\n        if ($DefaultMessageTimeToLive -gt 0)\n        {\n            $TopicDescription.DefaultMessageTimeToLive = [System.TimeSpan]::FromMinutes($DefaultMessageTimeToLive)\n        }\n        if ($DuplicateDetectionHistoryTimeWindow -gt 0)\n        {\n            $TopicDescription.DuplicateDetectionHistoryTimeWindow = [System.TimeSpan]::FromMinutes($DuplicateDetectionHistoryTimeWindow)\n        }\n        $TopicDescription.EnableBatchedOperations = $EnableBatchedOperations\n        $TopicDescription.EnableExpress = $EnableExpress\n        $TopicDescription.EnableFilteringMessagesBeforePublishing = $EnableFilteringMessagesBeforePublishing\n        $TopicDescription.EnablePartitioning = $EnablePartitioning\n        $TopicDescription.IsAnonymousAccessible = $IsAnonymousAccessible\n        $TopicDescription.MaxSizeInMegabytes = $MaxSizeInMegabytes\n        $TopicDescription.RequiresDuplicateDetection = $RequiresDuplicateDetection\n        if ($EnablePartitioning)\n        {\n            $TopicDescription.SupportOrdering = $False\n        }\n        else\n        {\n            $TopicDescription.SupportOrdering = $SupportOrdering\n        }\n        $TopicDescription.UserMetadata = $UserMetadata\n        $NamespaceManager.CreateTopic($TopicDescription);\n    }\n\n## 后续步骤\n\n本文提供使用 PowerShell 预配服务总线实体的基本概述。尽管通过引用 Microsoft.ServiceBus.dll 程序集有有限数量的 PowerShell cmdlet 可用于管理 Service Bus 消息实体，但可以使用 .NET 客户端库执行的任何操作几乎也可以在 PowerShell 脚本中执行。\n\n以下博客文章提供了更多详细示例：\n\n- [如何使用 PowerShell 脚本创建 Service Bus 队列、主题和订阅](http://blogs.msdn.com/b/paolos/archive/2014/12/02/how-to-create-a-service-bus-queues-topics-and-subscriptions-using-a-powershell-script.aspx)\n- [如何使用 PowerShell 脚本创建 Service Bus 命名空间和事件中心](http://blogs.msdn.com/b/paolos/archive/2014/12/01/how-to-create-a-service-bus-namespace-and-an-event-hub-using-a-powershell-script.aspx)\n\n一些现成的脚本也可供下载：\n- [服务总线 PowerShell 脚本](https://code.msdn.microsoft.com/windowsazure/Service-Bus-PowerShell-a46b7059)\n\n<!--Anchors-->\n\n[购买选项]: /pricing/overview/\n[试用版]: /pricing/1rmb-trial/\n[Service Bus NuGet 包]: http://www.nuget.org/packages/WindowsAzure.ServiceBus/\n[Get-AzureSBNamespace]: https://msdn.microsoft.com/zh-cn/library/azure/dn495122.aspx\n[New-AzureSBNamespace]: https://msdn.microsoft.com/zh-cn/library/azure/dn495165.aspx\n[Get-AzureSBAuthorizationRule]: https://msdn.microsoft.com/zh-cn/library/azure/dn495113.aspx\n[.NET API for Service Bus]: https://msdn.microsoft.com/zh-cn/library/microsoft.servicebus.aspx\n[安装和配置 Azure PowerShell]: /documentation/articles/powershell-install-configure\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

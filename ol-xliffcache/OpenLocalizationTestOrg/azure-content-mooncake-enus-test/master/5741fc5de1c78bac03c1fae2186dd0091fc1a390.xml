@@ -1,0 +1,40 @@
+{
+  "nodes": [
+    {
+      "pos": [
+        4,
+        79
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">](https://manage.windowsazure.cn/)</ept>中，单击“数据”选项卡，然后单击“TodoItem”表。"
+    },
+    {
+      "pos": [
+        86,
+        122
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>todoitem<ept id=\"p1\">**</ept> 中，单击“脚本”选项卡，然后选择“插入”。"
+    },
+    {
+      "pos": [
+        131,
+        163
+      ],
+      "content": "将显示当 <bpt id=\"p1\">**</bpt>TodoItem<ept id=\"p1\">**</ept> 表中发生插入时所调用的函数。"
+    },
+    {
+      "content": "将 insert 函数替换为以下代码，然后单击“保存”：",
+      "pos": [
+        168,
+        196
+      ]
+    },
+    {
+      "pos": [
+        1239,
+        1346
+      ],
+      "content": "这将会注册一个新的插入脚本，插入成功后，该脚本将使用 <bpt id=\"p1\">[</bpt>gcm 对象<ept id=\"p1\">](https://msdn.microsoft.com/zh-CN/library/dn126137.aspx)</ept>向所有已注册的设备发送推送通知。"
+    }
+  ],
+  "content": "\n1. 在 [Azure 经典门户](https://manage.windowsazure.cn/)中，单击“数据”选项卡，然后单击“TodoItem”表。 \n \n2. 在 **todoitem** 中，单击“脚本”选项卡，然后选择“插入”。\n   \n    将显示当 **TodoItem** 表中发生插入时所调用的函数。\n\n3. 将 insert 函数替换为以下代码，然后单击“保存”：\n\n        function insert(item, user, request) {\n        // Define a simple payload for a GCM notification.\n        var payload = {\n            \"data\": {\n                \"message\": item.text\n            }\n        };      \n        request.execute({\n            success: function() {\n                // If the insert succeeds, send a notification.\n                push.gcm.send(null, payload, {\n                    success: function(pushResponse) {\n                        console.log(\"Sent push:\", pushResponse, payload);\n                        request.respond();\n                        },              \n                    error: function (pushResponse) {\n                        console.log(\"Error Sending push:\", pushResponse);\n                        request.respond(500, { error: pushResponse });\n                        }\n                    });\n                },\n            error: function(err) {\n                console.log(\"request.execute error\", err)\n                request.respond();\n            }\n          });\n        }\n\n    这将会注册一个新的插入脚本，插入成功后，该脚本将使用 [gcm 对象](https://msdn.microsoft.com/zh-CN/library/dn126137.aspx)向所有已注册的设备发送推送通知。 \n\n<!---HONumber=Mooncake_0118_2016-->"
+}

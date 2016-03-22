@@ -1,0 +1,1895 @@
+{
+  "nodes": [
+    {
+      "content": "使用 JavaScript 后端移动服务",
+      "pos": [
+        28,
+        48
+      ]
+    },
+    {
+      "content": "提供有关如何在 Azure 移动服务中定义、注册以及使用服务器脚本的示例。",
+      "pos": [
+        68,
+        105
+      ]
+    },
+    {
+      "content": "使用 JavaScript 后端移动服务",
+      "pos": [
+        334,
+        354
+      ]
+    },
+    {
+      "content": "本文提供有关如何在 Azure 移动服务中使用 JavaScript 后端的详细信息和示例。",
+      "pos": [
+        358,
+        404
+      ]
+    },
+    {
+      "pos": [
+        409,
+        431
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"intro\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>介绍"
+    },
+    {
+      "content": "在 JavaScript 后端移动服务中，你可以定义 JavaScript 代码形式的自定义业务逻辑，该代码将在服务器中存储和执行。此服务器脚本代码将分配到下列服务器功能之一：",
+      "pos": [
+        433,
+        521
+      ]
+    },
+    {
+      "pos": [
+        525,
+        566
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>对给定表执行的插入、读取、更新或删除操作<ept id=\"p1\">][Table operations]</ept>。"
+    },
+    {
+      "pos": [
+        569,
+        592
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>计划的作业<ept id=\"p1\">][Job Scheduler]</ept>。"
+    },
+    {
+      "pos": [
+        595,
+        637
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>自定义 API 中定义的 HTTP 方法<ept id=\"p1\">][Custom API anchor]</ept>。"
+    },
+    {
+      "pos": [
+        640,
+        780
+      ],
+      "content": "服务器脚本中 main 函数的签名取决于脚本的具体使用位置。你还可以将公用脚本代码定义为可在脚本之间共享的 nodes.js 模块。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>源代码管理和共享代码<ept id=\"p1\">][Source control, shared code, and helper functions]</ept>。"
+    },
+    {
+      "pos": [
+        782,
+        817
+      ],
+      "content": "有关各个服务器脚本对象和函数的说明，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">移动服务服务器脚本参考]</ept>。"
+    },
+    {
+      "pos": [
+        823,
+        854
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"table-scripts\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>表操作"
+    },
+    {
+      "pos": [
+        856,
+        948
+      ],
+      "content": "表操作脚本是一种服务器脚本，它将注册到对表执行的操作 &amp;mdash; 插入、读取、更新或删除 (<bpt id=\"p1\">*</bpt>del<ept id=\"p1\">*</ept>)。本部分介绍如何在 JavaScript 后端使用表操作，具体包括以下小节："
+    },
+    {
+      "content": "表操作概述",
+      "pos": [
+        953,
+        958
+      ]
+    },
+    {
+      "content": "如何：注册表操作",
+      "pos": [
+        987,
+        995
+      ]
+    },
+    {
+      "content": "如何：重写默认响应",
+      "pos": [
+        1000,
+        1009
+      ]
+    },
+    {
+      "content": "如何：重写 execute success",
+      "pos": [
+        1014,
+        1035
+      ]
+    },
+    {
+      "content": "如何：重写默认错误处理",
+      "pos": [
+        1040,
+        1051
+      ]
+    },
+    {
+      "content": "如何：生成唯一 ID 值",
+      "pos": [
+        1056,
+        1068
+      ]
+    },
+    {
+      "content": "如何：添加自定义参数",
+      "pos": [
+        1090,
+        1100
+      ]
+    },
+    {
+      "content": "如何：处理表用户",
+      "pos": [
+        1105,
+        1113
+      ]
+    },
+    {
+      "pos": [
+        1145,
+        1180
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"basic-table-ops\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>表操作概述"
+    },
+    {
+      "pos": [
+        1182,
+        1406
+      ],
+      "content": "该脚本的名称必须与注册的操作类型相匹配。对于一个给定的表操作，只能注册一个脚本。每当 REST 请求调用给定的操作时（例如，当收到要在表中插入项的 POST 请求时），就会执行该脚本。移动服务不会保存每次执行脚本后的状态。由于每次运行脚本时都会创建一个新的全局上下文，因此脚本中定义的所有状态变量都会重新初始化。如果你想要存储执行不同请求后的状态，请在移动服务中创建一个表，然后读取状态并将状态写入该表。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">如何：从脚本访问表]</ept>。"
+    },
+    {
+      "pos": [
+        1408,
+        1483
+      ],
+      "content": "如果需要在执行操作时强制实施自定义的业务逻辑，请编写表操作脚本。例如，当 <ph id=\"ph1\">`text`</ph> 字段的字符串长度大于 10 个字符时，以下脚本将拒绝插入操作："
+    },
+    {
+      "content": "表脚本函数始终采用三个参数。",
+      "pos": [
+        1748,
+        1762
+      ]
+    },
+    {
+      "content": "第一个参数根据表操作的不同而异。",
+      "pos": [
+        1766,
+        1782
+      ]
+    },
+    {
+      "pos": [
+        1791,
+        1896
+      ],
+      "content": "对于插入和更新，它是一个 <bpt id=\"p1\">**</bpt>item<ept id=\"p1\">**</ept> 对象，即操作所影响的行的 JSON 表示形式。这样，你便可以按名称（例如 <bpt id=\"p2\">*</bpt>item.Owner<ept id=\"p2\">*</ept>，其中 <bpt id=\"p3\">*</bpt>Owner<ept id=\"p3\">*</ept> 是 JSON 表示形式的名称之一）访问列值。"
+    },
+    {
+      "content": "对于删除，它是要删除的记录的 ID。",
+      "pos": [
+        1903,
+        1921
+      ]
+    },
+    {
+      "pos": [
+        1929,
+        1959
+      ],
+      "content": "对于读取，它是用于指定要返回的行集的 <bpt id=\"p1\">[</bpt><ept id=\"p1\">query 对象]</ept>。"
+    },
+    {
+      "pos": [
+        1963,
+        2006
+      ],
+      "content": "第二个参数始终是 <bpt id=\"p1\">[</bpt>user 对象<ept id=\"p1\">][User object]</ept>，表示提交了请求的用户。"
+    },
+    {
+      "pos": [
+        2010,
+        2077
+      ],
+      "content": "第三个参数始终是 <bpt id=\"p1\">[</bpt>request 对象<ept id=\"p1\">][request object]</ept>，你可以凭此控制所请求的操作的执行，以及发送到客户端的响应。"
+    },
+    {
+      "content": "以下是表操作的规范主函数签名：",
+      "pos": [
+        2079,
+        2094
+      ]
+    },
+    {
+      "pos": [
+        2098,
+        2171
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Insert<ept id=\"p1\">][insert function]</ept>：<ph id=\"ph1\">`function insert (item, user, request) { ... }`</ph>"
+    },
+    {
+      "pos": [
+        2174,
+        2247
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Update<ept id=\"p1\">][update function]</ept>：<ph id=\"ph1\">`function update (item, user, request) { ... }`</ph>"
+    },
+    {
+      "pos": [
+        2250,
+        2318
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Delete<ept id=\"p1\">][delete function]</ept>：<ph id=\"ph1\">`function del (id, user, request) { ... }`</ph>"
+    },
+    {
+      "pos": [
+        2321,
+        2389
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Read<ept id=\"p1\">][read function]</ept>：<ph id=\"ph1\">`function read (query, user, request) { ... }`</ph>"
+    },
+    {
+      "pos": [
+        2392,
+        2457
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>注册到删除操作的函数必须命名为 <bpt id=\"p1\">_</bpt>del<ept id=\"p1\">_</ept>，因为 delete 是 JavaScript 中的保留关键字。"
+    },
+    {
+      "pos": [
+        2459,
+        2622
+      ],
+      "content": "每个服务器脚本都有一个主函数，并包含可选的 Helper 函数。即使服务器脚本是为特定表创建的，它也可以引用同一数据库中的其他表。你还可以将公用函数定义为可在脚本之间共享的模块。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>源代码管理和共享代码<ept id=\"p1\">][Source control, shared code, and helper functions]</ept>。"
+    },
+    {
+      "pos": [
+        2628,
+        2673
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"register-table-scripts\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：注册表脚本"
+    },
+    {
+      "content": "你可以使用下列方式之一定义可注册到表操作的服务器脚本：",
+      "pos": [
+        2675,
+        2702
+      ]
+    },
+    {
+      "pos": [
+        2706,
+        2798
+      ],
+      "content": "通过 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 经典门户]</ept>。在给定表的“脚本”选项卡中访问表操作的脚本。下面显示了已注册到 <ph id=\"ph1\">`TodoItem`</ph> 表的插入脚本的默认代码。你可以使用自己的自定义业务逻辑重写此代码。"
+    },
+    {
+      "content": "1",
+      "pos": [
+        2806,
+        2807
+      ]
+    },
+    {
+      "pos": [
+        2821,
+        2859
+      ],
+      "content": "若要了解如何执行此操作，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">使用服务器脚本在移动服务中验证和修改数据]</ept>。"
+    },
+    {
+      "pos": [
+        2863,
+        3107
+      ],
+      "content": "使用源代码管理。启用源代码管理后，只需在 git 存储库中的 .\\\\service\\\\table 子文件夹内创建一个名为 <ph id=\"ph1\">&lt;em&gt;</ph><ph id=\"ph2\">`&lt;table&gt;`</ph><ph id=\"ph3\">&lt;/em&gt;</ph>.<ph id=\"ph4\">&lt;em&gt;</ph><ph id=\"ph5\">`&lt;operation&gt;`</ph><ph id=\"ph6\">&lt;/em&gt;</ph>.js 的文件，其中，<ph id=\"ph7\">&lt;em&gt;</ph><ph id=\"ph8\">`&lt;table&gt;`</ph><ph id=\"ph9\">&lt;/em&gt;</ph> 是表的名称，<ph id=\"ph10\">&lt;em&gt;</ph><ph id=\"ph11\">`&lt;operation&gt;`</ph><ph id=\"ph12\">&lt;/em&gt;</ph> 是要注册的表操作。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>源代码管理和共享代码<ept id=\"p1\">][Source control, shared code, and helper functions]</ept>。"
+    },
+    {
+      "pos": [
+        3111,
+        3153
+      ],
+      "content": "使用 Azure 命令行工具中的命令提示符。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">使用命令行工具]</ept>。"
+    },
+    {
+      "pos": [
+        3156,
+        3199
+      ],
+      "content": "表操作脚本必须至少调用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">request 对象]</ept>的下列函数之一，以确保客户端收到响应。"
+    },
+    {
+      "pos": [
+        3204,
+        3237
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>execute 函数<ept id=\"p1\">**</ept>：已按请求完成操作，并已返回标准响应。"
+    },
+    {
+      "pos": [
+        3242,
+        3266
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>respond 函数<ept id=\"p1\">**</ept>：已返回自定义响应。"
+    },
+    {
+      "pos": [
+        3270,
+        3344
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>如果在脚本的某个代码路径中 <bpt id=\"p1\">**</bpt>execute<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>respond<ept id=\"p2\">**</ept> 均未调用，则该操作可能不返回响应。"
+    },
+    {
+      "pos": [
+        3346,
+        3382
+      ],
+      "content": "以下脚本将调用 <bpt id=\"p1\">**</bpt>execute<ept id=\"p1\">**</ept> 函数来完成客户端请求的数据操作："
+    },
+    {
+      "content": "在此示例中，将向数据库中插入项目，并且将相应的状态代码返回给用户。",
+      "pos": [
+        3463,
+        3496
+      ]
+    },
+    {
+      "pos": [
+        3498,
+        3627
+      ],
+      "content": "调用 <bpt id=\"p1\">**</bpt>execute<ept id=\"p1\">**</ept> 函数时，作为第一个参数传入脚本函数的 <ph id=\"ph1\">`item`</ph>、<bpt id=\"p2\">[</bpt>query<ept id=\"p2\">][query object]</ept> 或 <ph id=\"ph2\">`id`</ph> 值用于执行该操作。对于插入、更新或查询操作，你可以在调用 <bpt id=\"p3\">**</bpt>execute<ept id=\"p3\">**</ept> 之前修改 item 或 query："
+    },
+    {
+      "pos": [
+        4190,
+        4236
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在删除脚本中，更改所提供的 userId 变量不会影响所删除的记录。"
+    },
+    {
+      "pos": [
+        4238,
+        4272
+      ],
+      "content": "有关更多示例，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">读取和写入数据]</ept>、<bpt id=\"p2\">[</bpt><ept id=\"p2\">修改请求]</ept>和<bpt id=\"p3\">[</bpt><ept id=\"p3\">验证数据]</ept>。"
+    },
+    {
+      "pos": [
+        4279,
+        4320
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"override-response\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：重写默认响应"
+    },
+    {
+      "pos": [
+        4322,
+        4406
+      ],
+      "content": "你还可以使用脚本来实现能够重写默认响应行为的验证逻辑。如果验证失败，则只需调用 <bpt id=\"p1\">**</bpt>respond<ept id=\"p1\">**</ept> 函数而不是 <bpt id=\"p2\">**</bpt>execute<ept id=\"p2\">**</ept> 函数，然后将响应写入客户端："
+    },
+    {
+      "pos": [
+        4673,
+        4835
+      ],
+      "content": "在此示例中，当所插入项的 <ph id=\"ph1\">`userId`</ph> 属性与为经过身份验证的客户端提供提供的 <bpt id=\"p1\">[</bpt><ept id=\"p1\">user 对象]</ept>的 <ph id=\"ph2\">`userId`</ph> 不匹配时，该请求将被拒绝。在这种情况下，数据库操作 (<bpt id=\"p2\">*</bpt>insert<ept id=\"p2\">*</ept>) 将不会发生，并且会将 HTTP 状态代码为 403 的响应以及自定义的错误消息返回到客户端。有关更多示例，请参阅<bpt id=\"p3\">[</bpt><ept id=\"p3\">修改响应]</ept>。"
+    },
+    {
+      "pos": [
+        4841,
+        4893
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"override-success\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：重写 execute success"
+    },
+    {
+      "pos": [
+        4895,
+        4976
+      ],
+      "content": "默认情况下，在表操作中，<bpt id=\"p1\">**</bpt>execute<ept id=\"p1\">**</ept> 函数会自动写入响应。但是，你可以向 execute 函数传递两个可选参数，用于重写该函数在成功和/或出错时的行为。"
+    },
+    {
+      "pos": [
+        4978,
+        5120
+      ],
+      "content": "通过在调用 execute 时传入 <bpt id=\"p1\">**</bpt>success<ept id=\"p1\">**</ept> 处理程序，你可以先修改查询的结果，然后再将结果写入到响应中。以下示例调用 <ph id=\"ph1\">`execute({ success: function(results) { ... })`</ph>，以便在从数据库读取数据后但在写入响应之前执行附加操作："
+    },
+    {
+      "pos": [
+        5482,
+        5622
+      ],
+      "content": "如果为 <bpt id=\"p1\">**</bpt>execute<ept id=\"p1\">**</ept> 函数提供了 <bpt id=\"p2\">**</bpt>success<ept id=\"p2\">**</ept> 处理程序，则还必须在 <bpt id=\"p3\">**</bpt>success<ept id=\"p3\">**</ept> 处理程序中调用 <bpt id=\"p4\">**</bpt>respond<ept id=\"p4\">**</ept> 函数，使运行时知道脚本已完成，并且可写入响应。如果在调用 <bpt id=\"p5\">**</bpt>respond<ept id=\"p5\">**</ept> 时未传递任何参数，则移动服务将生成默认响应。"
+    },
+    {
+      "pos": [
+        5625,
+        5691
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>只有在先调用 <bpt id=\"p1\">**</bpt>execute<ept id=\"p1\">**</ept> 函数之后，才能调用不带参数的 <bpt id=\"p2\">**</bpt>respond<ept id=\"p2\">**</ept> 来调用默认响应。"
+    },
+    {
+      "pos": [
+        5698,
+        5738
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"override-error\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：重写默认错误处理"
+    },
+    {
+      "pos": [
+        5740,
+        5858
+      ],
+      "content": "如果与数据库的连接断开、对象无效或者查询不正确，<bpt id=\"p1\">**</bpt>execute<ept id=\"p1\">**</ept> 函数可能会失败。默认情况下，当发生错误时，服务器脚本会记录错误，并将错误结果写入到响应中。由于移动服务提供了默认的错误处理，因此你不需要处理服务中可能会发生的错误。"
+    },
+    {
+      "pos": [
+        5860,
+        5966
+      ],
+      "content": "如果你想要采取特定的补救措施，或者想要使用全局控制台对象向日志写入更详细信息，则可以通过实施显式错误处理来重写默认的错误处理。向 <bpt id=\"p1\">**</bpt>execute<ept id=\"p1\">**</ept> 函数提供一个 <bpt id=\"p2\">**</bpt>error<ept id=\"p2\">**</ept> 处理程序即可实现此目的："
+    },
+    {
+      "pos": [
+        6187,
+        6235
+      ],
+      "content": "提供 error 处理程序后，调用 <bpt id=\"p1\">**</bpt>respond<ept id=\"p1\">**</ept> 时，移动服务会向客户端返回错误结果。"
+    },
+    {
+      "pos": [
+        6237,
+        6280
+      ],
+      "content": "如果需要，你也可以同时提供 <bpt id=\"p1\">**</bpt>success<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>error<ept id=\"p2\">**</ept> 处理程序。"
+    },
+    {
+      "pos": [
+        6286,
+        6327
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"generate-guids\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：生成唯一 ID 值"
+    },
+    {
+      "pos": [
+        6329,
+        6394
+      ],
+      "content": "移动服务支持为表的 <bpt id=\"p1\">**</bpt>ID<ept id=\"p1\">**</ept> 列使用唯一的自定义字符串值。这样，应用程序便可为 ID 使用自定义值（如电子邮件地址或用户名）。"
+    },
+    {
+      "content": "字符串 ID 可提供以下优势：",
+      "pos": [
+        6396,
+        6411
+      ]
+    },
+    {
+      "content": "无需往返访问数据库即可生成 ID。",
+      "pos": [
+        6415,
+        6432
+      ]
+    },
+    {
+      "content": "更方便地合并不同表或数据库中的记录。",
+      "pos": [
+        6435,
+        6453
+      ]
+    },
+    {
+      "content": "ID 值能够更好地与应用程序的逻辑相集成。",
+      "pos": [
+        6456,
+        6477
+      ]
+    },
+    {
+      "content": "如果插入的记录中未设置字符串 ID 值，移动服务将为 ID 生成唯一值。你可以在服务器脚本中生成自己的唯一 ID 值。下面的脚本示例将生成一个自定义 GUID 并将其分配给新记录的 ID。此 ID 类似于你未传入记录的 ID 值时，移动服务生成的 ID 值。",
+      "pos": [
+        6479,
+        6608
+      ]
+    },
+    {
+      "content": "如果应用程序提供了某个 ID 的值，移动服务将按原样存储该值，包括前导和尾随空格。不会从值中裁剪掉空格。",
+      "pos": [
+        7139,
+        7191
+      ]
+    },
+    {
+      "pos": [
+        7193,
+        7219
+      ],
+      "content": "<ph id=\"ph1\">`id`</ph> 的值必须唯一，并且不能包含以下集中的字符："
+    },
+    {
+      "pos": [
+        7223,
+        7358
+      ],
+      "content": "控制字符：[0x0000-0x001F] 和 [0x007F-0x009F]。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>ASCII 控制代码 C0 和 C1<ept id=\"p1\">](http://zh.wikipedia.org/wiki/Data_link_escape_character#C1_set)</ept>。"
+    },
+    {
+      "content": "可打印字符：<bpt id=\"p1\">**</bpt>\"<ept id=\"p1\">**</ept>(0x0022), <bpt id=\"p2\">**</bpt>+<ept id=\"p2\">**</ept> (0x002B), <bpt id=\"p3\">**</bpt>/<ept id=\"p3\">**</ept> (0x002F), <bpt id=\"p4\">**</bpt>?<ept id=\"p4\">**</ept>",
+      "pos": [
+        7362,
+        7420
+      ]
+    },
+    {
+      "content": "(0x003F), *<bpt id=\"p1\">*</bpt>\\*<ept id=\"p1\">*</ept> (0x005C), <bpt id=\"p2\">**</bpt>`<ept id=\"p2\">**</ept> (0x0060)",
+      "pos": [
+        7421,
+        7461
+      ]
+    },
+    {
+      "content": "ID“.”和“..”",
+      "pos": [
+        7465,
+        7475
+      ]
+    },
+    {
+      "pos": [
+        7477,
+        7695
+      ],
+      "content": "也可以为表使用整数 ID。若要使用整数 ID，必须结合 <ph id=\"ph1\">`--integerId`</ph> 选项使用 <ph id=\"ph2\">`mobile table create`</ph> 命令创建表。应在适用于 Azure 的命令行界面 (CLI) 中使用此命令。有关使用 CLI 的详细信息，请参阅<bpt id=\"p1\">[</bpt>用于管理移动服务表的 CLI<ept id=\"p1\">](/documentation/articles/virtual-machines-command-line-tools/#Mobile_Tables)</ept>。"
+    },
+    {
+      "pos": [
+        7702,
+        7741
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"access-headers\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：访问自定义参数"
+    },
+    {
+      "content": "向移动服务发送请求时，你可以在请求 URI 中包含自定义参数，以指示表操作脚本如何处理给定的请求。然后，你可以修改脚本，通过检查参数的方式来确定处理路径。",
+      "pos": [
+        7743,
+        7820
+      ]
+    },
+    {
+      "pos": [
+        7822,
+        7876
+      ],
+      "content": "例如，以下 POST 请求 URI 将指示服务不要允许插入具有相同 text 值的新 <bpt id=\"p1\">*</bpt>TodoItem<ept id=\"p1\">*</ept>："
+    },
+    {
+      "pos": [
+        7957,
+        8097
+      ],
+      "content": "可从 <bpt id=\"p1\">[</bpt><ept id=\"p1\">request 对象]</ept>的 <bpt id=\"p2\">**</bpt>parameters<ept id=\"p2\">**</ept> 属性访问这些以 JSON 值提供的自定义查询参数。移动服务向已注册到表操作的任何函数提供 <bpt id=\"p3\">**</bpt>request<ept id=\"p3\">**</ept> 对象。以下用于插入操作的服务器脚本将在运行插入操作之前检查 <ph id=\"ph1\">`duplicateText`</ph> 参数的值："
+    },
+    {
+      "pos": [
+        9195,
+        9313
+      ],
+      "content": "请注意，在 <bpt id=\"p1\">**</bpt>insertItemIfNotComplete<ept id=\"p1\">**</ept> 中，如果不存在重复文本，则会调用 <bpt id=\"p2\">[</bpt><ept id=\"p2\">request 对象]</ept>的 <bpt id=\"p3\">**</bpt>execute<ept id=\"p3\">**</ept> 函数来插入项；否则，会调用 <bpt id=\"p4\">**</bpt>respond<ept id=\"p4\">**</ept> 函数来通知客户端存在重复文本。"
+    },
+    {
+      "pos": [
+        9315,
+        9344
+      ],
+      "content": "请注意上述代码中 <bpt id=\"p1\">**</bpt>success<ept id=\"p1\">**</ept> 函数的调用语法："
+    },
+    {
+      "content": "上述代码较为精简，JavaScript 中更冗长的等效代码为：",
+      "pos": [
+        9446,
+        9477
+      ]
+    },
+    {
+      "pos": [
+        9589,
+        9626
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"work-with-users\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：处理用户"
+    },
+    {
+      "pos": [
+        9628,
+        9814
+      ],
+      "content": "在 Azure 移动服务中，你可以使用标识提供程序对用户进行身份验证。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">身份验证入门]</ept>。当经过身份验证的用户调用表操作时，移动服务将使用 <bpt id=\"p2\">[</bpt><ept id=\"p2\">user 对象]</ept>向已注册的脚本函数提供有关该用户的信息。可以使用 <bpt id=\"p3\">**</bpt>userId<ept id=\"p3\">**</ept> 属性来存储和检索用户特定的信息。以下示例将基于某个经过身份验证的用户的 <bpt id=\"p4\">**</bpt>userId<ept id=\"p4\">**</ept> 来设置项的 owner 属性："
+    },
+    {
+      "pos": [
+        9927,
+        9992
+      ],
+      "content": "以下示例将基于某个经过身份验证的用户的 <bpt id=\"p1\">**</bpt>userId<ept id=\"p1\">**</ept> 向查询添加一个附加的筛选器。此筛选器会将结果限制为属于当前用户的项："
+    },
+    {
+      "pos": [
+        10138,
+        10170
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"custom-api\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>自定义 API"
+    },
+    {
+      "content": "本部分介绍如何创建和使用自定义 API 终结点，具体包括以下小节：",
+      "pos": [
+        10172,
+        10205
+      ]
+    },
+    {
+      "content": "自定义 API 概述",
+      "pos": [
+        10214,
+        10224
+      ]
+    },
+    {
+      "content": "如何：定义自定义 API",
+      "pos": [
+        10251,
+        10263
+      ]
+    },
+    {
+      "content": "如何：实现 HTTP 方法",
+      "pos": [
+        10268,
+        10281
+      ]
+    },
+    {
+      "content": "如何：发送和接收 XML 格式的数据",
+      "pos": [
+        10286,
+        10304
+      ]
+    },
+    {
+      "content": "如何：处理用户和自定义 API 中的标头",
+      "pos": [
+        10309,
+        10329
+      ]
+    },
+    {
+      "content": "如何：在一个自定义 API 中定义多个路由",
+      "pos": [
+        10334,
+        10355
+      ]
+    },
+    {
+      "pos": [
+        10362,
+        10406
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"custom-api-overview\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>自定义 API 概述"
+    },
+    {
+      "pos": [
+        10408,
+        10578
+      ],
+      "content": "自定义 API 是移动服务中可通过一个或多个标准 HTTP 方法访问的终结点，这些方法包括：GET、POST、PUT、PATCH 和 DELETE。可以在单个脚本文件中为自定义 API 支持的每个 HTTP 方法单独定义一个函数导出。收到使用给定方法向自定义 API 发出的请求后，将调用注册的脚本。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">自定义 API]</ept>。"
+    },
+    {
+      "content": "当移动服务运行时调用自定义 API 函数时，将同时提供 <bpt id=\"p1\">[</bpt>request<ept id=\"p1\">][request object]</ept> 和 <bpt id=\"p2\">[</bpt>response<ept id=\"p2\">][response object]</ept> 对象。这些对象将公开 <bpt id=\"p3\">[</bpt><ept id=\"p3\">express.js 库]</ept>的功能，而你的脚本可以利用这些功能。以下名为 <bpt id=\"p4\">**</bpt>hello<ept id=\"p4\">**</ept> 的自定义 API 是一个极简单的示例，它会返回 <bpt id=\"p5\">_</bpt>Hello, world!<ept id=\"p5\">_</ept>",
+      "pos": [
+        10580,
+        10761
+      ]
+    },
+    {
+      "content": "以响应 POST 请求：",
+      "pos": [
+        10762,
+        10774
+      ]
+    },
+    {
+      "pos": [
+        10905,
+        10972
+      ],
+      "content": "<bpt id=\"p1\">[</bpt><ept id=\"p1\">response 对象]</ept>的 <bpt id=\"p2\">**</bpt>send<ept id=\"p2\">**</ept> 函数向客户端返回所需的响应。可以通过向以下 URL 发送 POST 请求来调用此代码："
+    },
+    {
+      "content": "每次执行后都会保留全局状态。",
+      "pos": [
+        11029,
+        11043
+      ]
+    },
+    {
+      "pos": [
+        11049,
+        11093
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"define-custom-api\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：定义自定义 API"
+    },
+    {
+      "content": "你可以使用下列方式之一定义可注册到自定义 API 终结点中 HTTP 方法的服务器脚本：",
+      "pos": [
+        11095,
+        11139
+      ]
+    },
+    {
+      "pos": [
+        11143,
+        11265
+      ],
+      "content": "通过 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 经典门户]</ept>。可以在“API”选项卡中创建和修改自定义 API 脚本。服务器脚本代码位于给定自定义 API 的“脚本”选项卡中。下面显示了向 <ph id=\"ph1\">`CompleteAll`</ph> 自定义 API 终结点发出的 POST 请求调用的脚本。"
+    },
+    {
+      "content": "2",
+      "pos": [
+        11274,
+        11275
+      ]
+    },
+    {
+      "pos": [
+        11289,
+        11355
+      ],
+      "content": "对自定义 API 方法的访问权限在“权限”选项卡中分配。若要了解此自定义 API 的创建方式，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">从客户端调用自定义 API]</ept>。"
+    },
+    {
+      "pos": [
+        11359,
+        11631
+      ],
+      "content": "使用源代码管理。如果已启用源代码管理，只需在 git 存储库的 .\\\\service\\\\api 子文件夹中创建一个名为 <ph id=\"ph1\">&lt;em&gt;</ph><ph id=\"ph2\">`&lt;custom_api&gt;`</ph><ph id=\"ph3\">&lt;/em&gt;</ph>.js 的文件，其中 <ph id=\"ph4\">&lt;em&gt;</ph><ph id=\"ph5\">`&lt;custom_api&gt;`</ph><ph id=\"ph6\">&lt;/em&gt;</ph> 是要注册的自定义 API 的名称。此脚本文件包含自定义 API 公开的每个 HTTP 方法的 <bpt id=\"p1\">_</bpt>exported<ept id=\"p1\">_</ept> 函数。权限在随附的 .json 文件中定义。有关详细信息，请参阅<bpt id=\"p2\">[</bpt>源代码管理和共享代码<ept id=\"p2\">][Source control, shared code, and helper functions]</ept>。"
+    },
+    {
+      "pos": [
+        11635,
+        11677
+      ],
+      "content": "使用 Azure 命令行工具中的命令提示符。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">使用命令行工具]</ept>。"
+    },
+    {
+      "pos": [
+        11683,
+        11725
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"handle-methods\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：实现 HTTP 方法"
+    },
+    {
+      "content": "一个自定义 API 可以处理一个或多个 HTTP 方法：GET、POST、PUT、PATCH 和 DELETE。将为自定义 API 处理的每个 HTTP 方法定义一个导出函数。单个自定义 API 代码文件可以导出下列一个或所有函数：",
+      "pos": [
+        11727,
+        11843
+      ]
+    },
+    {
+      "content": "不能使用服务器脚本中尚未实现的 HTTP 方法调用自定义 API 终结点，该调用会返回 405（“不允许的方法”）错误响应。可向每个支持 HTTP 方法单独分配权限级别。",
+      "pos": [
+        12147,
+        12232
+      ]
+    },
+    {
+      "pos": [
+        12238,
+        12285
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"api-return-xml\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：发送和接收 XML 格式的数据"
+    },
+    {
+      "pos": [
+        12287,
+        12445
+      ],
+      "content": "当客户端存储和检索数据时，移动服务将使用 JavaScript 对象表示法 (JSON) 来表示消息正文中的数据。但是，在某些情况下，你可能希望使用 XML 负载。例如，Windows 应用商店应用程序具有内置的定期通知功能，这就需要服务发出 XML 数据。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">定义支持定期通知的自定义 API]</ept>。"
+    },
+    {
+      "pos": [
+        12447,
+        12497
+      ],
+      "content": "以下 <bpt id=\"p1\">**</bpt>OrderPizza<ept id=\"p1\">**</ept> 自定义 API 函数将返回一个简单的 XML 文档作为响应负载："
+    },
+    {
+      "content": "可以通过向以下终结点发出 HTTP GET 请求来调用此自定义 API 函数：",
+      "pos": [
+        12735,
+        12774
+      ]
+    },
+    {
+      "pos": [
+        12838,
+        12885
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"get-api-user\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：处理用户和自定义 API 中的标头"
+    },
+    {
+      "pos": [
+        12887,
+        13067
+      ],
+      "content": "在 Azure 移动服务中，你可以使用标识提供程序对用户进行身份验证。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">身份验证入门]</ept>。当经过身份验证的用户请求自定义 API 时，移动服务将使用<bpt id=\"p2\">[</bpt><ept id=\"p2\">用户对象]</ept>向自定义 API 代码提供有关该用户的信息。可从 <bpt id=\"p3\">[</bpt><ept id=\"p3\">request 对象]</ept>的 user 属性访问 <bpt id=\"p4\">[</bpt><ept id=\"p4\">user 对象]</ept>。可以使用 <bpt id=\"p5\">**</bpt>userId<ept id=\"p5\">**</ept> 属性来存储和检索用户特定的信息。"
+    },
+    {
+      "pos": [
+        13069,
+        13139
+      ],
+      "content": "以下 <bpt id=\"p1\">**</bpt>OrderPizza<ept id=\"p1\">**</ept> 自定义 API 函数将基于某个经过身份验证的用户的 <bpt id=\"p2\">**</bpt>userId<ept id=\"p2\">**</ept> 来设置项的 owner 属性："
+    },
+    {
+      "content": "可以通过向以下终结点发出 HTTP POST 请求来调用此自定义 API 函数：",
+      "pos": [
+        13582,
+        13622
+      ]
+    },
+    {
+      "pos": [
+        13683,
+        13725
+      ],
+      "content": "你还可以通过 <bpt id=\"p1\">[</bpt><ept id=\"p1\">request 对象]</ept>访问特定的 HTTP 标头，如以下代码中所示："
+    },
+    {
+      "pos": [
+        13911,
+        13959
+      ],
+      "content": "这个简单示例将读取名为 <ph id=\"ph1\">`my-custom-header`</ph> 的自定义标头，然后在响应中返回值。"
+    },
+    {
+      "pos": [
+        13965,
+        14011
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"api-routes\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：在一个自定义 API 中定义多个路由"
+    },
+    {
+      "pos": [
+        14013,
+        14126
+      ],
+      "content": "移动服务允许你在一个自定义 API 中定义多个路径或路由。例如，向 <bpt id=\"p1\">**</bpt>calculator<ept id=\"p1\">**</ept> 自定义 API 中的以下 URL 发出的 HTTP GET 请求将分别调用 <bpt id=\"p2\">**</bpt>add<ept id=\"p2\">**</ept> 或 <bpt id=\"p3\">**</bpt>subtract<ept id=\"p3\">**</ept> 函数："
+    },
+    {
+      "pos": [
+        14245,
+        14402
+      ],
+      "content": "可以通过导出一个传递了 <bpt id=\"p1\">**</bpt>api<ept id=\"p1\">**</ept> 对象（类似于 <bpt id=\"p2\">[</bpt><ept id=\"p2\">express.js 中的 express 对象]</ept>）的 <bpt id=\"p3\">**</bpt>register<ept id=\"p3\">**</ept> 函数来定义多个路由，该对象用于在自定义 API 终结点下注册路由。以下示例将在 <bpt id=\"p4\">**</bpt>calculator<ept id=\"p4\">**</ept> 自定义 API 中实现 <bpt id=\"p5\">**</bpt>add<ept id=\"p5\">**</ept> 和 <bpt id=\"p6\">**</bpt>sub<ept id=\"p6\">**</ept> 方法："
+    },
+    {
+      "pos": [
+        14877,
+        15044
+      ],
+      "content": "传递给 <bpt id=\"p1\">**</bpt>register<ept id=\"p1\">**</ept> 函数的 <bpt id=\"p2\">**</bpt>api<ept id=\"p2\">**</ept> 对象将为每个 HTTP 方法（<bpt id=\"p3\">**</bpt>get<ept id=\"p3\">**</ept>、<bpt id=\"p4\">**</bpt>post<ept id=\"p4\">**</ept>、<bpt id=\"p5\">**</bpt>put<ept id=\"p5\">**</ept>、<bpt id=\"p6\">**</bpt>patch<ept id=\"p6\">**</ept> 和 <bpt id=\"p7\">**</bpt>delete<ept id=\"p7\">**</ept>）公开一个函数。这些函数会将一个路由注册到特定 HTTP 方法的已定义函数。每个函数均采用两个参数，第一个参数是路由名称，第二个参数是注册到路由的函数。"
+    },
+    {
+      "content": "HTTP GET 请求可按如下所示调用上述自定义 API 示例中的两个路由（随响应一起显示）：",
+      "pos": [
+        15046,
+        15093
+      ]
+    },
+    {
+      "pos": [
+        15277,
+        15315
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"scheduler-scripts\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>作业计划程序"
+    },
+    {
+      "pos": [
+        15317,
+        15409
+      ],
+      "content": "移动服务允许你定义按固定计划以作业形式执行或通过 Azure 经典门户按需执行的服务器脚本。计划的作业可用于执行周期性任务，例如，清理表数据和批处理。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">计划作业]</ept>。"
+    },
+    {
+      "pos": [
+        15411,
+        15551
+      ],
+      "content": "注册到计划作业的脚本具有一个与计划作业同名的主函数。由于 HTTP 请求不调用计划的脚本，没有可由服务器运行时传递的上下文，因此该函数不采用任何参数。与其他类型的脚本一样，你可以使用子例程函数并需要使用共享模块。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">源代码管理、共享代码和 Helper 函数]</ept>。"
+    },
+    {
+      "pos": [
+        15557,
+        15601
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"scheduler-scripts\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：定义计划的作业脚本"
+    },
+    {
+      "pos": [
+        15603,
+        15745
+      ],
+      "content": "可将一个服务器脚本分配到移动服务计划程序中定义的作业。这些脚本属于该作业，并根据作业计划执行。（你也可以使用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 经典门户]</ept>按需运行作业。） 定义计划作业的脚本不带参数，因为移动服务不会向它传递任何数据；该脚本作为常规 JavaScript 函数执行，不直接与移动服务交互。"
+    },
+    {
+      "content": "可通过下列方式之一定义计划作业：",
+      "pos": [
+        15747,
+        15763
+      ]
+    },
+    {
+      "pos": [
+        15767,
+        15797
+      ],
+      "content": "通过 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 经典门户]</ept>中的计划程序的“脚本”选项卡："
+    },
+    {
+      "content": "3",
+      "pos": [
+        15805,
+        15806
+      ]
+    },
+    {
+      "pos": [
+        15814,
+        15856
+      ],
+      "content": "使用 Azure 命令行工具中的命令提示符。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">使用命令行工具]</ept>。"
+    },
+    {
+      "pos": [
+        15859,
+        15964
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>启用源代码管理后，你可以直接在 git 存储库的 .\\\\service\\\\scheduler 子文件夹中编辑计划的作业脚本文件。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt><ept id=\"p1\">如何：使用源代码管理来共享代码]</ept>。"
+    },
+    {
+      "pos": [
+        15969,
+        16016
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"shared-code\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>源代码管理、共享代码和 Helper 函数"
+    },
+    {
+      "content": "本部分说明如何利用源代码管理来添加你自己的自定义 node.js 模块、共享的代码和其他代码重用策略，具体包括以下小节：",
+      "pos": [
+        16018,
+        16078
+      ]
+    },
+    {
+      "content": "利用共享代码概述",
+      "pos": [
+        16083,
+        16091
+      ]
+    },
+    {
+      "content": "如何：加载 Node.js 模块",
+      "pos": [
+        16122,
+        16138
+      ]
+    },
+    {
+      "content": "如何：使用 Helper 函数",
+      "pos": [
+        16143,
+        16158
+      ]
+    },
+    {
+      "content": "如何：使用源代码管理来共享代码",
+      "pos": [
+        16163,
+        16178
+      ]
+    },
+    {
+      "content": "如何：使用应用程序设置",
+      "pos": [
+        16183,
+        16194
+      ]
+    },
+    {
+      "pos": [
+        16202,
+        16248
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"leverage-source-control\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>利用共享代码概述"
+    },
+    {
+      "content": "由于移动服务使用服务器上的 Node.js，因此你的脚本已经获取了对内置 Node.js 模块的访问权限。你也可以使用源代码管理定义自己的模块，或者将其他 Node.js 模块添加到你的服务。",
+      "pos": [
+        16250,
+        16346
+      ]
+    },
+    {
+      "pos": [
+        16348,
+        16392
+      ],
+      "content": "下面列出了你可以通过全局 <bpt id=\"p1\">**</bpt>require<ept id=\"p1\">**</ept> 函数在脚本中利用的一些较为有用的模块："
+    },
+    {
+      "pos": [
+        16396,
+        16470
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>azure<ept id=\"p1\">**</ept>：公开 Azure SDK for Node.js 的功能。有关详细信息，请参阅 <bpt id=\"p2\">[</bpt><ept id=\"p2\">Azure SDK for Node.js]</ept>。"
+    },
+    {
+      "pos": [
+        16474,
+        16538
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>crypto<ept id=\"p1\">**</ept>：提供 OpenSSL 的加密功能。有关详细信息，请参阅 <bpt id=\"p2\">[</bpt>Node.js 文档<ept id=\"p2\">][crypto API]</ept>。"
+    },
+    {
+      "pos": [
+        16541,
+        16600
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>path<ept id=\"p1\">**</ept>：包含用于处理文件路径的实用工具。有关详细信息，请参阅 <bpt id=\"p2\">[</bpt>Node.js 文档<ept id=\"p2\">][path API]</ept>。"
+    },
+    {
+      "pos": [
+        16603,
+        16677
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>querystring<ept id=\"p1\">**</ept>：包含用于处理查询字符串的实用工具。有关详细信息，请参阅 <bpt id=\"p2\">[</bpt>Node.js 文档<ept id=\"p2\">][querystring API]</ept>。"
+    },
+    {
+      "pos": [
+        16680,
+        16758
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>request<ept id=\"p1\">**</ept>：向 Twitter 和 Facebook 等外部 REST 服务发送 HTTP 请求。有关详细信息，请参阅<bpt id=\"p2\">[</bpt><ept id=\"p2\">发送 HTTP 请求]</ept>。"
+    },
+    {
+      "pos": [
+        16761,
+        16844
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>sendgrid<ept id=\"p1\">**</ept>：使用 Azure 中的 Sendgrid 电子邮件服务发送电子邮件。有关详细信息，请参阅<bpt id=\"p2\">[</bpt><ept id=\"p2\">使用 SendGrid 从移动服务发送电子邮件]</ept>。"
+    },
+    {
+      "pos": [
+        16847,
+        16908
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>url<ept id=\"p1\">**</ept>：包含用于分析和解析 URL 的实用工具。有关详细信息，请参阅 <bpt id=\"p2\">[</bpt>Node.js 文档<ept id=\"p2\">][url API]</ept>。"
+    },
+    {
+      "pos": [
+        16911,
+        16980
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>util<ept id=\"p1\">**</ept>：包含各种实用工具，例如字符串格式设置和对象类型检查。有关详细信息，请参阅 <bpt id=\"p2\">[</bpt>Node.js 文档<ept id=\"p2\">][util API]</ept>。"
+    },
+    {
+      "pos": [
+        16984,
+        17052
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>zlib<ept id=\"p1\">**</ept>：公开压缩功能，例如 gzip 和 deflate。有关详细信息，请参阅 <bpt id=\"p2\">[</bpt>Node.js 文档<ept id=\"p2\">][zlib API]</ept>。"
+    },
+    {
+      "pos": [
+        17059,
+        17105
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"modules-helper-functions\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：利用模块"
+    },
+    {
+      "pos": [
+        17107,
+        17180
+      ],
+      "content": "移动服务公开了脚本可以使用全局 <bpt id=\"p1\">**</bpt>require<ept id=\"p1\">**</ept> 函数加载的一组模块。例如，脚本可以要求使用 <bpt id=\"p2\">**</bpt>request<ept id=\"p2\">**</ept> 发出 HTTP 请求："
+    },
+    {
+      "pos": [
+        17394,
+        17450
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"shared-code-source-control\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：使用源代码管理来共享代码"
+    },
+    {
+      "content": "你可以将源代码管理与 Node.js 程序包管理器 (npm) 结合使用，以控制可供移动服务使用的模块。可通过两种方式实现此目的：",
+      "pos": [
+        17452,
+        17517
+      ]
+    },
+    {
+      "pos": [
+        17521,
+        17691
+      ],
+      "content": "对于已发布到 npm 的模块以及 npm 安装的模块，可以使用 package.json 文件来声明你希望通过移动服务进行安装的程序包。这样，你的服务始终都能访问所需程序包的最新版本。package.json 文件驻留在 <ph id=\"ph1\">`.\\service`</ph> 目录中。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 移动服务中对 package.json 的支持]</ept>。"
+    },
+    {
+      "pos": [
+        17695,
+        17805
+      ],
+      "content": "对于专用或自定义模块，你可以使用 npm 手动将模块安装到源代码管理的 <ph id=\"ph1\">`.\\service\\node_modules`</ph> 目录中。有关如何手动上载模块的示例，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">在服务器脚本中利用共享代码和 Node.js 模块]</ept>。"
+    },
+    {
+      "pos": [
+        17812,
+        17949
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果 <ph id=\"ph2\">`node_modules`</ph> 已在目录层次结构中存在，NPM 将在该目录中创建 <ph id=\"ph3\">`\\node-uuid`</ph> 子目录，而不是在存储库中创建一个新的 <ph id=\"ph4\">`node_modules`</ph>。在此情况下，你只需删除现有的 <ph id=\"ph5\">`node_modules`</ph> 目录即可。"
+    },
+    {
+      "pos": [
+        17951,
+        18014
+      ],
+      "content": "将 package.json 文件或自定义模块提交到移动服务的存储库后，请使用 <bpt id=\"p1\">**</bpt>require<ept id=\"p1\">**</ept> 来按名称引用这些模块。"
+    },
+    {
+      "pos": [
+        18017,
+        18091
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在 package.json 中指定的模块或者上载到移动服务的模块只会在服务器脚本代码中使用。移动服务运行时不使用这些模块。"
+    },
+    {
+      "pos": [
+        18097,
+        18143
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"helper-functions\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：使用 Helper 函数"
+    },
+    {
+      "content": "除了要求使用模块外，单个服务器脚本还可以包含 Helper 函数。这些函数与主函数不同，后者可用于分离脚本中的代码。",
+      "pos": [
+        18145,
+        18203
+      ]
+    },
+    {
+      "pos": [
+        18205,
+        18263
+      ],
+      "content": "在以下示例中，表脚本已注册到包含 Helper 函数 <bpt id=\"p1\">**</bpt>handleUnapprovedItem<ept id=\"p1\">**</ept> 的插入操作："
+    },
+    {
+      "content": "在脚本中，Helper 函数必须在主函数之后声明。必须声明脚本中的所有变量。未声明的变量会导致出错。",
+      "pos": [
+        18602,
+        18652
+      ]
+    },
+    {
+      "pos": [
+        18654,
+        18794
+      ],
+      "content": "Helper 函数也可以只定义一次，然后在服务器脚本之间共享。若要在脚本之间共享某个函数，必须导出该函数，并且脚本文件必须在 <ph id=\"ph1\">`.\\service\\shared`</ph> 目录中存在。以下模板演示了如何在文件 <ph id=\"ph2\">`.\\services\\shared\\helpers.js`</ph> 中导出共享函数："
+    },
+    {
+      "content": "然后，你可以在表操作脚本中使用类似于下面的函数：",
+      "pos": [
+        19027,
+        19051
+      ]
+    },
+    {
+      "pos": [
+        19387,
+        19478
+      ],
+      "content": "在此示例中，必须将 <bpt id=\"p1\">[</bpt><ept id=\"p1\">tables 对象]</ept>和 <bpt id=\"p2\">[</bpt><ept id=\"p2\">user 对象]</ept>都传递给共享函数。这是因为共享脚本不能访问全局 <bpt id=\"p3\">[</bpt><ept id=\"p3\">tables 对象]</ept>，而 <bpt id=\"p4\">[</bpt><ept id=\"p4\">user 对象]</ept>只在请求的上下文中存在。"
+    },
+    {
+      "pos": [
+        19480,
+        19585
+      ],
+      "content": "可以使用<bpt id=\"p1\">[</bpt>源代码管理<ept id=\"p1\">][How to: Share code by using source control]</ept>或<bpt id=\"p2\">[</bpt>命令行工具<ept id=\"p2\">][Using the command line tool]</ept>将脚本文件上载到共享目录。"
+    },
+    {
+      "pos": [
+        19591,
+        19629
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"app-settings\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：使用应用程序设置"
+    },
+    {
+      "pos": [
+        19631,
+        19756
+      ],
+      "content": "移动服务允许你将值安全地存储为应用程序设置，服务器脚本在运行时可以访问这些设置。将数据添加到移动服务的应用程序设置时，名称/值对将以加密的形式存储，你可以在服务器脚本中访问这些数据，而无需在脚本文件中对其进行硬编码。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">应用设置]</ept>。"
+    },
+    {
+      "pos": [
+        19758,
+        19801
+      ],
+      "content": "以下自定义 API 示例使用提供的 <bpt id=\"p1\">[</bpt><ept id=\"p1\">service 对象]</ept>来检索某个应用程序设置值。"
+    },
+    {
+      "content": "以下代码使用配置模块来检索计划作业脚本使用的应用程序设置中存储的 Twitter 访问令牌值：",
+      "pos": [
+        20116,
+        20163
+      ]
+    },
+    {
+      "content": "请注意，此代码还会检索门户的“标识”选项卡中存储的 Twitter 使用者密钥值。由于 <bpt id=\"p1\">**</bpt>config 对象<ept id=\"p1\">**</ept>在表操作和计划的作业脚本中不可用，因此你必须要求配置模块访问应用程序设置。",
+      "pos": [
+        20650,
+        20744
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a name=\"command-prompt\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>使用命令行工具",
+      "pos": [
+        20749,
+        20785
+      ]
+    },
+    {
+      "content": "在移动服务中，你可以使用 Azure 命令行工具创建、修改和删除服务器脚本。上载脚本之前，请确保使用的是以下目录结构：",
+      "pos": [
+        20792,
+        20851
+      ]
+    },
+    {
+      "content": "4",
+      "pos": [
+        20855,
+        20856
+      ]
+    },
+    {
+      "content": "请注意，此目录结构与使用源代码管理时的 git 存储库相同。",
+      "pos": [
+        20862,
+        20892
+      ]
+    },
+    {
+      "pos": [
+        20894,
+        20978
+      ],
+      "content": "从命令行工具上载脚本文件时，必须先导航到 <ph id=\"ph1\">`.\\services`</ph> 目录。以下命令从 <ph id=\"ph2\">`table`</ph> 子目录上载名为 <ph id=\"ph3\">`todoitem.insert.js`</ph> 的脚本："
+    },
+    {
+      "content": "以下命令返回移动服务中维护的每个脚本文件的相关信息：",
+      "pos": [
+        21157,
+        21183
+      ]
+    },
+    {
+      "pos": [
+        22600,
+        22631
+      ],
+      "content": "有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">用于管理 Azure 移动服务的命令]</ept>。"
+    },
+    {
+      "pos": [
+        22636,
+        22673
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"working-with-tables\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>使用表"
+    },
+    {
+      "content": "本部分详细介绍了用于直接处理 SQL 数据库表数据的策略，具体包括以下小节：",
+      "pos": [
+        22675,
+        22713
+      ]
+    },
+    {
+      "content": "使用表的概述",
+      "pos": [
+        22718,
+        22724
+      ]
+    },
+    {
+      "content": "如何：从脚本访问表",
+      "pos": [
+        22747,
+        22756
+      ]
+    },
+    {
+      "content": "如何：执行批量插入",
+      "pos": [
+        22761,
+        22770
+      ]
+    },
+    {
+      "content": "如何：将 JSON 类型映射到数据库类型",
+      "pos": [
+        22775,
+        22795
+      ]
+    },
+    {
+      "content": "使用 Transact-SQL 访问表",
+      "pos": [
+        22800,
+        22819
+      ]
+    },
+    {
+      "pos": [
+        22826,
+        22862
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"overview-tables\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>使用表的概述"
+    },
+    {
+      "content": "移动服务中的许多情况都要求服务器脚本访问数据库中的表。例如，由于每次执行脚本后移动服务不保存状态，因此，必须在表中存储每次执行脚本后需要持久保留的数据。你还可能想要检查权限表中的条目，或者要存储审核数据而不仅仅是写入日志，因为日志中的数据保留期有限，并且无法以编程方式访问。",
+      "pos": [
+        22864,
+        23001
+      ]
+    },
+    {
+      "pos": [
+        23003,
+        23138
+      ],
+      "content": "移动服务提供两种用于访问表的方法：使用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">table 对象]</ept>代理，或者通过使用 <bpt id=\"p2\">[</bpt><ept id=\"p2\">mssql 对象]</ept>撰写 Transact-SQL 查询。使用 <bpt id=\"p3\">[</bpt><ept id=\"p3\">table 对象]</ept>可以轻松访问服务器脚本代码中的表数据，不过，<bpt id=\"p4\">[</bpt><ept id=\"p4\">mssql 对象]</ept>支持更复杂的数据操作，并提供最大的灵活性。"
+    },
+    {
+      "pos": [
+        23144,
+        23181
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"access-tables\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：从脚本访问表"
+    },
+    {
+      "pos": [
+        23183,
+        23282
+      ],
+      "content": "从脚本访问表的最简单方法就是使用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">tables 对象]</ept>。<bpt id=\"p2\">**</bpt>getTable<ept id=\"p2\">**</ept> 函数将返回一个 <bpt id=\"p3\">[</bpt><ept id=\"p3\">table 对象]</ept>实例，即用于访问所请求表的代理。然后，你可以调用该代理的函数来访问和更改数据。"
+    },
+    {
+      "pos": [
+        23284,
+        23367
+      ],
+      "content": "已同时注册到表操作和计划作业的脚本可以访问全局对象形式的 <bpt id=\"p1\">[</bpt><ept id=\"p1\">tables 对象]</ept>。以下代码行将从全局 <bpt id=\"p2\">[</bpt><ept id=\"p2\">tables 对象]</ept>中获取 <bpt id=\"p3\">*</bpt>TodoItems<ept id=\"p3\">*</ept> 表的代理："
+    },
+    {
+      "pos": [
+        23429,
+        23526
+      ],
+      "content": "自定义 API 脚本可从提供的 <bpt id=\"p1\">[</bpt><ept id=\"p1\">request 对象]</ept>的 <ph id=\"ph1\">&lt;strong&gt;</ph>service<ph id=\"ph2\">&lt;/strong&gt;</ph> 属性访问 <bpt id=\"p2\">[</bpt><ept id=\"p2\">tables 对象]</ept>。以下代码行将从请求中获取 <bpt id=\"p3\">[</bpt><ept id=\"p3\">tables 对象]</ept>："
+    },
+    {
+      "pos": [
+        23605,
+        23662
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>共享函数不能直接访问 <bpt id=\"p1\">**</bpt>tables<ept id=\"p1\">**</ept> 对象。在共享函数中，必须将表对象传递给该函数。"
+    },
+    {
+      "pos": [
+        23664,
+        23750
+      ],
+      "content": "获得 <bpt id=\"p1\">[</bpt><ept id=\"p1\">table 对象]</ept>后，可以调用一个或多个表操作函数：insert、update、delete 或 read。以下示例将从 permissions 表中读取用户权限："
+    },
+    {
+      "pos": [
+        24473,
+        24498
+      ],
+      "content": "下一个示例将审核信息写入 <bpt id=\"p1\">**</bpt>audit<ept id=\"p1\">**</ept> 表："
+    },
+    {
+      "pos": [
+        25151,
+        25215
+      ],
+      "content": "以下部分的代码示例中提供了最后一个示例：<bpt id=\"p1\">[</bpt>如何：访问自定义参数<ept id=\"p1\">][How to: Add custom parameters]</ept>。"
+    },
+    {
+      "pos": [
+        25221,
+        25257
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"bulk-inserts\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：执行批量插入"
+    },
+    {
+      "pos": [
+        25259,
+        25419
+      ],
+      "content": "如果你使用 <bpt id=\"p1\">**</bpt>for<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>while<ept id=\"p2\">**</ept> 循环直接在表中插入大量的项（例如 1000 个），可能会遇到 SQL 连接限制，导致某些插入操作失败。你的请求可能永远无法完成，或者返回 HTTP 500 内部服务器错误。若要避免此问题，可以按照大约每 10 个一批的形式插入项。插入第一批后，再提交下一批，直至完成。"
+    },
+    {
+      "pos": [
+        25421,
+        25632
+      ],
+      "content": "使用以下脚本可以设置要同时插入的记录批的大小。建议保持使用较小的记录数。完成异步插入批时，<bpt id=\"p1\">**</bpt>insertItems<ept id=\"p1\">**</ept> 函数将以递归方式调用自身。末尾的 for 循环一次插入一条记录，并在成功时调用 <bpt id=\"p2\">**</bpt>insertComplete<ept id=\"p2\">**</ept>，在出错时调用 <bpt id=\"p3\">**</bpt>errorHandler<ept id=\"p3\">**</ept>。<bpt id=\"p4\">**</bpt>insertComplete<ept id=\"p4\">**</ept> 控制是以递归方式为下一批调用 <bpt id=\"p5\">**</bpt>insertItems<ept id=\"p5\">**</ept>，还是在作业已完成的情况下退出脚本。"
+    },
+    {
+      "pos": [
+        27218,
+        27406
+      ],
+      "content": "可以在此<bpt id=\"p1\">[</bpt>博客文章<ept id=\"p1\">](http://blogs.msdn.com/b/jpsanders/archive/2013/03/20/server-script-to-insert-table-items-in-windows-azure-mobile-services.aspx)</ept>中找到整个代码示例和相关的讨论。如果使用此代码，你可以根据你的具体情况对它进行改写，并全面进行测试。"
+    },
+    {
+      "pos": [
+        27412,
+        27457
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"JSON-types\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：将 JSON 类型映射到数据库类型"
+    },
+    {
+      "content": "客户端上的数据类型集合不同于移动服务数据库表中的数据类型集合。有时它们可以轻松地映射到另一种类型，而其他时候不会映射。移动服务执行映射中的多种类型转换：",
+      "pos": [
+        27459,
+        27535
+      ]
+    },
+    {
+      "content": "客户端语言特定的类型将序列化为 JSON。",
+      "pos": [
+        27539,
+        27560
+      ]
+    },
+    {
+      "content": "JSON 表示形式在出现于服务器脚本中之前将转换成 JavaScript。",
+      "pos": [
+        27563,
+        27600
+      ]
+    },
+    {
+      "pos": [
+        27603,
+        27656
+      ],
+      "content": "使用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">tables 对象]</ept>保存 JavaScript 数据类型时，这些类型将转换成 SQL 数据库类型。"
+    },
+    {
+      "content": "从客户端架构到 JSON 的转换根据平台的不同而异。Windows 应用商店和 Windows Phone 客户端使用 JSON.NET。Android 客户端使用 gson 库。iOS 客户端使用 NSJSONSerialization 类。将使用其中每个库的默认序列化行为，不过，日期对象将转换成 JSON 字符串，这些字符串包含使用 ISO 8601 编码的日期。",
+      "pos": [
+        27658,
+        27843
+      ]
+    },
+    {
+      "pos": [
+        27845,
+        28060
+      ],
+      "content": "当你编写使用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">insert]</ept>、<bpt id=\"p2\">[</bpt><ept id=\"p2\">update]</ept>、<bpt id=\"p3\">[</bpt><ept id=\"p3\">read]</ept> 或 <bpt id=\"p4\">[</bpt><ept id=\"p4\">delete]</ept> 函数的服务器脚本时，可以访问数据的 JavaScript 表示形式。移动服务使用 Node.js 的反序列化函数 (<bpt id=\"p5\">[</bpt>JSON.parse<ept id=\"p5\">](http://es5.github.io/#x15.12)</ept>) 将 JSON 在线转换为 JavaScript 对象。但是，移动服务将执行转换以提取 ISO 8601 字符串中的 <bpt id=\"p6\">**</bpt>Date<ept id=\"p6\">**</ept> 对象。"
+    },
+    {
+      "pos": [
+        28062,
+        28159
+      ],
+      "content": "当你使用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">tables 对象]</ept>或 <bpt id=\"p2\">[</bpt><ept id=\"p2\">mssql 对象]</ept>时，或只是执行表脚本时，将在 SQL 数据库中插入反序列化的 JavaScript 对象。在此过程中，对象属性将映射到 T-SQL 类型："
+    },
+    {
+      "content": "JavaScript 属性",
+      "pos": [
+        28161,
+        28174
+      ]
+    },
+    {
+      "content": "T-SQL 类型",
+      "pos": [
+        28175,
+        28183
+      ]
+    },
+    {
+      "content": "Number",
+      "pos": [
+        28192,
+        28198
+      ]
+    },
+    {
+      "content": "Float(53)",
+      "pos": [
+        28199,
+        28208
+      ]
+    },
+    {
+      "content": "Boolean",
+      "pos": [
+        28209,
+        28216
+      ]
+    },
+    {
+      "content": "Bit",
+      "pos": [
+        28217,
+        28220
+      ]
+    },
+    {
+      "content": "Date",
+      "pos": [
+        28221,
+        28225
+      ]
+    },
+    {
+      "content": "DateTimeOffset(3)",
+      "pos": [
+        28226,
+        28243
+      ]
+    },
+    {
+      "content": "String",
+      "pos": [
+        28245,
+        28251
+      ]
+    },
+    {
+      "content": "Nvarchar(max)",
+      "pos": [
+        28252,
+        28265
+      ]
+    },
+    {
+      "content": "Buffer",
+      "pos": [
+        28266,
+        28272
+      ]
+    },
+    {
+      "content": "不支持",
+      "pos": [
+        28273,
+        28276
+      ]
+    },
+    {
+      "content": "对象",
+      "pos": [
+        28277,
+        28279
+      ]
+    },
+    {
+      "content": "不支持",
+      "pos": [
+        28280,
+        28283
+      ]
+    },
+    {
+      "content": "Array",
+      "pos": [
+        28284,
+        28289
+      ]
+    },
+    {
+      "content": "不支持",
+      "pos": [
+        28290,
+        28293
+      ]
+    },
+    {
+      "content": "Stream",
+      "pos": [
+        28294,
+        28300
+      ]
+    },
+    {
+      "content": "不支持",
+      "pos": [
+        28301,
+        28304
+      ]
+    },
+    {
+      "pos": [
+        28310,
+        28348
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"TSQL\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>使用 Transact-SQL 访问表"
+    },
+    {
+      "pos": [
+        28350,
+        28498
+      ],
+      "content": "从服务器脚本处理表数据的最简单方法就是使用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">table 对象]</ept>代理。但是，<bpt id=\"p2\">[</bpt><ept id=\"p2\">table 对象]</ept>并不支持一些较为高级的方案，例如，联接查询和其他一些复杂查询，以及存储过程的调用。在这些情况下，你必须使用 <bpt id=\"p3\">[</bpt><ept id=\"p3\">mssql 对象]</ept>针对关系表直接执行 Transact-SQL 语句。此对象提供以下函数："
+    },
+    {
+      "pos": [
+        28502,
+        28596
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>query<ept id=\"p1\">**</ept>：执行 TSQL 字符串指定的查询；结果将返回到 <bpt id=\"p2\">**</bpt>options<ept id=\"p2\">**</ept> 对象中的 <bpt id=\"p3\">**</bpt>success<ept id=\"p3\">**</ept> 回调。如果存在 <bpt id=\"p4\">*</bpt>params<ept id=\"p4\">*</ept> 参数，则该查询可以包含参数。"
+    },
+    {
+      "pos": [
+        28599,
+        28655
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>queryRaw<ept id=\"p1\">**</ept>：与 <bpt id=\"p2\">*</bpt>query<ept id=\"p2\">*</ept> 类似，不过，从查询返回的结果集采用“原始”格式（请参阅以下示例）。"
+    },
+    {
+      "pos": [
+        28658,
+        28725
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>open<ept id=\"p1\">**</ept>：用于获取与移动服务数据库建立的连接，获取该连接后，你可以使用连接对象来调用 transactions 等数据库操作。"
+    },
+    {
+      "content": "这些方法可以进一步让你对查询处理进行低级别的控制。",
+      "pos": [
+        28727,
+        28752
+      ]
+    },
+    {
+      "content": "如何：运行静态查询",
+      "pos": [
+        28757,
+        28766
+      ]
+    },
+    {
+      "content": "如何：运行动态查询",
+      "pos": [
+        28771,
+        28780
+      ]
+    },
+    {
+      "content": "如何：联接关系表",
+      "pos": [
+        28785,
+        28793
+      ]
+    },
+    {
+      "pos": [
+        28798,
+        28817
+      ],
+      "content": "如何：运行返回 <bpt id=\"p1\">*</bpt>raw<ept id=\"p1\">*</ept> 结果的查询"
+    },
+    {
+      "content": "如何：获取对数据库连接的访问权限",
+      "pos": [
+        28822,
+        28838
+      ]
+    },
+    {
+      "pos": [
+        28850,
+        28886
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"static-query\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：运行静态查询"
+    },
+    {
+      "pos": [
+        28888,
+        28940
+      ],
+      "content": "以下查询不带参数，将返回 <ph id=\"ph1\">`statusupdate`</ph> 表中的三条记录。行集采用标准的 JSON 格式。"
+    },
+    {
+      "pos": [
+        29212,
+        29252
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"dynamic-query\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：运行动态参数化查询"
+    },
+    {
+      "content": "以下示例通过从权限表中读取每个用户的权限来实现自定义授权。执行该查询时，占位符 (?) 将被替换为提供的参数。",
+      "pos": [
+        29254,
+        29309
+      ]
+    },
+    {
+      "pos": [
+        30106,
+        30134
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"joins\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：联接关系表"
+    },
+    {
+      "pos": [
+        30136,
+        30255
+      ],
+      "content": "你可以使用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">mssql 对象]</ept>的 <bpt id=\"p2\">**</bpt>query<ept id=\"p2\">**</ept> 方法联接两个表，以传入实现联接的 TSQL 代码。假设 <bpt id=\"p3\">**</bpt>ToDoItem<ept id=\"p3\">**</ept> 表中有一些项，其中每个项都有一个对应于表中的列的 <bpt id=\"p4\">**</bpt>priority<ept id=\"p4\">**</ept> 属性。其中一个项类似于："
+    },
+    {
+      "pos": [
+        30326,
+        30455
+      ],
+      "content": "另外，我们假设还有一个名为 <bpt id=\"p1\">**</bpt>Priority<ept id=\"p1\">**</ept> 的表，它的行包含优先级 <bpt id=\"p2\">**</bpt>number<ept id=\"p2\">**</ept> 和文本 <bpt id=\"p3\">**</bpt>description<ept id=\"p3\">**</ept>。如果优先级编号 (number) 1 的描述 (description) 为“Critical”，则相应的对象类似于："
+    },
+    {
+      "pos": [
+        30504,
+        30563
+      ],
+      "content": "现在，我们可以将项中的 <bpt id=\"p1\">**</bpt>priority<ept id=\"p1\">**</ept> 编号替换为优先级编号的文本描述。将两个表进行关系联接即可实现此目的。"
+    },
+    {
+      "content": "该脚本将联接两个表，并将结果写入日志。最终的对象可能类似于：",
+      "pos": [
+        30895,
+        30925
+      ]
+    },
+    {
+      "pos": [
+        31014,
+        31051
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"raw\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：运行返回 <bpt id=\"p1\">*</bpt>raw<ept id=\"p1\">*</ept> 结果的查询"
+    },
+    {
+      "content": "此示例将像前面一样执行查询，不过，这次会逐行逐列地返回需要你予以分析的“原始”格式结果集。用到此查询的可能情况是你需要访问移动服务不支持的数据类型。此代码会直接将输出写入控制台日志，使你能够检查原始格式。",
+      "pos": [
+        31053,
+        31155
+      ]
+    },
+    {
+      "content": "下面显示了运行此查询后的输出。其中包含有关表中每个列的元数据，后接行和列的表示形式。",
+      "pos": [
+        31413,
+        31455
+      ]
+    },
+    {
+      "pos": [
+        32375,
+        32416
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"connection\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：获取对数据库连接的访问权限"
+    },
+    {
+      "pos": [
+        32418,
+        32470
+      ],
+      "content": "可以使用 <bpt id=\"p1\">**</bpt>open<ept id=\"p1\">**</ept> 方法获取对数据库连接的访问权限。执行此操作的原因之一是你需要使用数据库事务。"
+    },
+    {
+      "pos": [
+        32472,
+        32618
+      ],
+      "content": "成功执行 <bpt id=\"p1\">**</bpt>open<ept id=\"p1\">**</ept> 后，将在 <bpt id=\"p2\">**</bpt>success<ept id=\"p2\">**</ept> 函数中以参数形式传入数据库连接。你可以对 <bpt id=\"p3\">**</bpt>connection<ept id=\"p3\">**</ept> 对象调用以下任何函数：<bpt id=\"p4\">*</bpt>close<ept id=\"p4\">*</ept>、<bpt id=\"p5\">*</bpt>queryRaw<ept id=\"p5\">*</ept>、<bpt id=\"p6\">*</bpt>query<ept id=\"p6\">*</ept>、<bpt id=\"p7\">*</bpt>beginTransaction<ept id=\"p7\">*</ept>、<bpt id=\"p8\">*</bpt>commit<ept id=\"p8\">*</ept> 和 <bpt id=\"p9\">*</bpt>rollback<ept id=\"p9\">*</ept>。"
+    },
+    {
+      "pos": [
+        32900,
+        32931
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"debugging\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>调试和故障排除"
+    },
+    {
+      "content": "调试服务器脚本及排查其错误的主要方法是写入服务日志。默认情况下，移动服务会将执行服务脚本期间发生的错误写入服务日志。你的脚本也可以对日志执行写入操作。写入日志是调试脚本及验证其行为是否符合预期的良好方法。",
+      "pos": [
+        32933,
+        33035
+      ]
+    },
+    {
+      "pos": [
+        33041,
+        33083
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"write-to-logs\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：将输出写入移动服务日志"
+    },
+    {
+      "pos": [
+        33085,
+        33192
+      ],
+      "content": "若要写入日志，请使用全局 <bpt id=\"p1\">[</bpt><ept id=\"p1\">console 对象]</ept>。使用 <bpt id=\"p2\">**</bpt>log<ept id=\"p2\">**</ept> 或 <bpt id=\"p3\">**</bpt>info<ept id=\"p3\">**</ept> 函数记录信息级警告。<bpt id=\"p4\">**</bpt>warning<ept id=\"p4\">**</ept> 和 <bpt id=\"p5\">**</bpt>error<ept id=\"p5\">**</ept> 函数将记录其对应级别，这些级别已在日志中予以标注。"
+    },
+    {
+      "pos": [
+        33196,
+        33292
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>若要查看移动服务的日志，请登录到 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">](https://manage.windowsazure.cn/)</ept>，选择你的移动服务，然后选择“日志”选项卡。"
+    },
+    {
+      "pos": [
+        33294,
+        33361
+      ],
+      "content": "你还可以使用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">console 对象]</ept>的日志记录功能通过参数来设置消息格式。以下示例向消息字符串提供了一个参数形式的 JSON 对象："
+    },
+    {
+      "pos": [
+        33513,
+        33553
+      ],
+      "content": "请注意，字符串 <ph id=\"ph1\">`%j`</ph> 用作 JSON 对象的占位符，并且参数是按顺序提供的。"
+    },
+    {
+      "content": "为了避免在日志中记录过多的信息，你应该删除或禁用生产环境不需要使用的 console.log() 调用。",
+      "pos": [
+        33555,
+        33607
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"使用 JavaScript 后端移动服务\" \n    description=\"提供有关如何在 Azure 移动服务中定义、注册以及使用服务器脚本的示例。\" \n    services=\"mobile-services\" \n    documentationCenter=\"\" \n    authors=\"RickSaling\" \n    manager=\"dwrede\" \n    editor=\"\"/>\n\n<tags \n    ms.service=\"mobile-services\" \n    ms.date=\"12/01/2015\" \n    wacn.date=\"01/29/2016\"/>\n\n\n#  使用 JavaScript 后端移动服务\n\n \n本文提供有关如何在 Azure 移动服务中使用 JavaScript 后端的详细信息和示例。\n\n## <a name=\"intro\"></a>介绍\n\n在 JavaScript 后端移动服务中，你可以定义 JavaScript 代码形式的自定义业务逻辑，该代码将在服务器中存储和执行。此服务器脚本代码将分配到下列服务器功能之一：\n\n+ [对给定表执行的插入、读取、更新或删除操作][Table operations]。\n+ [计划的作业][Job Scheduler]。\n+ [自定义 API 中定义的 HTTP 方法][Custom API anchor]。 \n\n服务器脚本中 main 函数的签名取决于脚本的具体使用位置。你还可以将公用脚本代码定义为可在脚本之间共享的 nodes.js 模块。有关详细信息，请参阅[源代码管理和共享代码][Source control, shared code, and helper functions]。\n\n有关各个服务器脚本对象和函数的说明，请参阅[移动服务服务器脚本参考]。\n\n\n## <a name=\"table-scripts\"></a>表操作\n\n表操作脚本是一种服务器脚本，它将注册到对表执行的操作 &mdash; 插入、读取、更新或删除 (*del*)。本部分介绍如何在 JavaScript 后端使用表操作，具体包括以下小节：\n\n+ [表操作概述][Basic table operations]\n+ [如何：注册表操作]\n+ [如何：重写默认响应]\n+ [如何：重写 execute success]\n+ [如何：重写默认错误处理]\n+ [如何：生成唯一 ID 值](#generate-guids)\n+ [如何：添加自定义参数]\n+ [如何：处理表用户][How to: Work with users]\n\n### <a name=\"basic-table-ops\"></a>表操作概述\n\n该脚本的名称必须与注册的操作类型相匹配。对于一个给定的表操作，只能注册一个脚本。每当 REST 请求调用给定的操作时（例如，当收到要在表中插入项的 POST 请求时），就会执行该脚本。移动服务不会保存每次执行脚本后的状态。由于每次运行脚本时都会创建一个新的全局上下文，因此脚本中定义的所有状态变量都会重新初始化。如果你想要存储执行不同请求后的状态，请在移动服务中创建一个表，然后读取状态并将状态写入该表。有关详细信息，请参阅[如何：从脚本访问表]。\n\n如果需要在执行操作时强制实施自定义的业务逻辑，请编写表操作脚本。例如，当 `text` 字段的字符串长度大于 10 个字符时，以下脚本将拒绝插入操作：\n\n    function insert(item, user, request) {\n        if (item.text.length > 10) {\n            request.respond(statusCodes.BAD_REQUEST, \n                'Text length must be less than 10 characters');\n        } else {\n            request.execute();\n        }\n    }\n\n表脚本函数始终采用三个参数。\n\n- 第一个参数根据表操作的不同而异。 \n\n    - 对于插入和更新，它是一个 **item** 对象，即操作所影响的行的 JSON 表示形式。这样，你便可以按名称（例如 *item.Owner*，其中 *Owner* 是 JSON 表示形式的名称之一）访问列值。\n    - 对于删除，它是要删除的记录的 ID。 \n    - 对于读取，它是用于指定要返回的行集的 [query 对象]。\n\n- 第二个参数始终是 [user 对象][User object]，表示提交了请求的用户。\n\n- 第三个参数始终是 [request 对象][request object]，你可以凭此控制所请求的操作的执行，以及发送到客户端的响应。\n\n以下是表操作的规范主函数签名：\n\n+ [Insert][insert function]：`function insert (item, user, request) { ... }`\n+ [Update][update function]：`function update (item, user, request) { ... }`\n+ [Delete][delete function]：`function del (id, user, request) { ... }`\n+ [Read][read function]：`function read (query, user, request) { ... }`\n\n>[AZURE.NOTE]注册到删除操作的函数必须命名为 _del_，因为 delete 是 JavaScript 中的保留关键字。\n\n每个服务器脚本都有一个主函数，并包含可选的 Helper 函数。即使服务器脚本是为特定表创建的，它也可以引用同一数据库中的其他表。你还可以将公用函数定义为可在脚本之间共享的模块。有关详细信息，请参阅[源代码管理和共享代码][Source control, shared code, and helper functions]。\n\n### <a name=\"register-table-scripts\"></a>如何：注册表脚本\n\n你可以使用下列方式之一定义可注册到表操作的服务器脚本：\n\n+ 通过 [Azure 经典门户]。在给定表的“脚本”选项卡中访问表操作的脚本。下面显示了已注册到 `TodoItem` 表的插入脚本的默认代码。你可以使用自己的自定义业务逻辑重写此代码。\n\n    ![1][1]\n    \n    若要了解如何执行此操作，请参阅[使用服务器脚本在移动服务中验证和修改数据]。\n\n+ 使用源代码管理。启用源代码管理后，只需在 git 存储库中的 .\\\\service\\\\table 子文件夹内创建一个名为 <em>`<table>`</em>.<em>`<operation>`</em>.js 的文件，其中，<em>`<table>`</em> 是表的名称，<em>`<operation>`</em> 是要注册的表操作。有关详细信息，请参阅[源代码管理和共享代码][Source control, shared code, and helper functions]。\n\n+ 使用 Azure 命令行工具中的命令提示符。有关详细信息，请参阅[使用命令行工具]。\n\n\n表操作脚本必须至少调用 [request 对象]的下列函数之一，以确保客户端收到响应。\n \n+ **execute 函数**：已按请求完成操作，并已返回标准响应。\n \n+ **respond 函数**：已返回自定义响应。\n\n> [AZURE.IMPORTANT]如果在脚本的某个代码路径中 **execute** 和 **respond** 均未调用，则该操作可能不返回响应。\n\n以下脚本将调用 **execute** 函数来完成客户端请求的数据操作：\n\n    function insert(item, user, request) { \n        request.execute(); \n    }\n\n在此示例中，将向数据库中插入项目，并且将相应的状态代码返回给用户。\n\n调用 **execute** 函数时，作为第一个参数传入脚本函数的 `item`、[query][query object] 或 `id` 值用于执行该操作。对于插入、更新或查询操作，你可以在调用 **execute** 之前修改 item 或 query：\n\n    function insert(item, user, request) { \n        item.scriptComment =\n            'this was added by a script and will be saved to the database'; \n        request.execute(); \n    } \n \n    function update(item, user, request) { \n        item.scriptComment = \n            'this was added by a script and will be saved to the database'; \n        request.execute(); \n    } \n\n    function read(query, user, request) { \n        // Only return records for the current user         \n        query.where({ userid: user.userId}); \n        request.execute(); \n    }\n \n>[AZURE.NOTE]在删除脚本中，更改所提供的 userId 变量不会影响所删除的记录。\n\n有关更多示例，请参阅[读取和写入数据]、[修改请求]和[验证数据]。\n\n\n### <a name=\"override-response\"></a>如何：重写默认响应\n\n你还可以使用脚本来实现能够重写默认响应行为的验证逻辑。如果验证失败，则只需调用 **respond** 函数而不是 **execute** 函数，然后将响应写入客户端：\n\n    function insert(item, user, request) {\n        if (item.userId !== user.userId) {\n            request.respond(statusCodes.FORBIDDEN, \n            'You may only insert records with your userId.');\n        } else {\n            request.execute();\n        }\n    }\n\n在此示例中，当所插入项的 `userId` 属性与为经过身份验证的客户端提供提供的 [user 对象]的 `userId` 不匹配时，该请求将被拒绝。在这种情况下，数据库操作 (*insert*) 将不会发生，并且会将 HTTP 状态代码为 403 的响应以及自定义的错误消息返回到客户端。有关更多示例，请参阅[修改响应]。\n\n### <a name=\"override-success\"></a>如何：重写 execute success\n\n默认情况下，在表操作中，**execute** 函数会自动写入响应。但是，你可以向 execute 函数传递两个可选参数，用于重写该函数在成功和/或出错时的行为。\n\n通过在调用 execute 时传入 **success** 处理程序，你可以先修改查询的结果，然后再将结果写入到响应中。以下示例调用 `execute({ success: function(results) { ... })`，以便在从数据库读取数据后但在写入响应之前执行附加操作：\n\n    function read(query, user, request) {\n        request.execute({\n            success: function(results) {\n                results.forEach(function(r) {\n                    r.scriptComment = \n                    'this was added by a script after querying the database';\n                });\n                request.respond();\n            }\n        });\n    }\n\n如果为 **execute** 函数提供了 **success** 处理程序，则还必须在 **success** 处理程序中调用 **respond** 函数，使运行时知道脚本已完成，并且可写入响应。如果在调用 **respond** 时未传递任何参数，则移动服务将生成默认响应。\n\n>[AZURE.NOTE]只有在先调用 **execute** 函数之后，才能调用不带参数的 **respond** 来调用默认响应。\n \n### <a name=\"override-error\"></a>如何：重写默认错误处理\n\n如果与数据库的连接断开、对象无效或者查询不正确，**execute** 函数可能会失败。默认情况下，当发生错误时，服务器脚本会记录错误，并将错误结果写入到响应中。由于移动服务提供了默认的错误处理，因此你不需要处理服务中可能会发生的错误。\n\n如果你想要采取特定的补救措施，或者想要使用全局控制台对象向日志写入更详细信息，则可以通过实施显式错误处理来重写默认的错误处理。向 **execute** 函数提供一个 **error** 处理程序即可实现此目的：\n\n    function update(item, user, request) { \n      request.execute({ \n        error: function(err) { \n          // Do some custom logging, then call respond. \n          request.respond(); \n        } \n      }); \n    }\n \n\n提供 error 处理程序后，调用 **respond** 时，移动服务会向客户端返回错误结果。\n\n如果需要，你也可以同时提供 **success** 和 **error** 处理程序。\n\n### <a name=\"generate-guids\"></a>如何：生成唯一 ID 值\n\n移动服务支持为表的 **ID** 列使用唯一的自定义字符串值。这样，应用程序便可为 ID 使用自定义值（如电子邮件地址或用户名）。\n\n字符串 ID 可提供以下优势：\n\n+ 无需往返访问数据库即可生成 ID。\n+ 更方便地合并不同表或数据库中的记录。\n+ ID 值能够更好地与应用程序的逻辑相集成。\n\n如果插入的记录中未设置字符串 ID 值，移动服务将为 ID 生成唯一值。你可以在服务器脚本中生成自己的唯一 ID 值。下面的脚本示例将生成一个自定义 GUID 并将其分配给新记录的 ID。此 ID 类似于你未传入记录的 ID 值时，移动服务生成的 ID 值。\n\n    // Example of generating an id. This is not required since Mobile Services\n    // will generate an id if one is not passed in.\n    item.id = item.id || newGuid();\n    request.execute();\n\n    function newGuid() {\n        var pad4 = function(str) { return \"0000\".substring(str.length) + str; };\n        var hex4 = function () { return pad4(Math.floor(Math.random() * 0x10000 /* 65536 */ ).toString(16)); };\n        return (hex4() + hex4() + \"-\" + hex4() + \"-\" + hex4() + \"-\" + hex4() + \"-\" + hex4() + hex4() + hex4());\n    }\n\n\n如果应用程序提供了某个 ID 的值，移动服务将按原样存储该值，包括前导和尾随空格。不会从值中裁剪掉空格。\n\n`id` 的值必须唯一，并且不能包含以下集中的字符：\n\n+ 控制字符：[0x0000-0x001F] 和 [0x007F-0x009F]。有关详细信息，请参阅 [ASCII 控制代码 C0 和 C1](http://zh.wikipedia.org/wiki/Data_link_escape_character#C1_set)。\n+  可打印字符：**\"**(0x0022), **+** (0x002B), **/** (0x002F), **?** (0x003F), **\\** (0x005C), **`** (0x0060)\n+  ID“.”和“..”\n\n也可以为表使用整数 ID。若要使用整数 ID，必须结合 `--integerId` 选项使用 `mobile table create` 命令创建表。应在适用于 Azure 的命令行界面 (CLI) 中使用此命令。有关使用 CLI 的详细信息，请参阅[用于管理移动服务表的 CLI](/documentation/articles/virtual-machines-command-line-tools/#Mobile_Tables)。\n\n\n### <a name=\"access-headers\"></a>如何：访问自定义参数\n\n向移动服务发送请求时，你可以在请求 URI 中包含自定义参数，以指示表操作脚本如何处理给定的请求。然后，你可以修改脚本，通过检查参数的方式来确定处理路径。\n\n例如，以下 POST 请求 URI 将指示服务不要允许插入具有相同 text 值的新 *TodoItem*：\n\n        https://todolist.azure-mobile.net/tables/TodoItem?duplicateText=false\n\n可从 [request 对象]的 **parameters** 属性访问这些以 JSON 值提供的自定义查询参数。移动服务向已注册到表操作的任何函数提供 **request** 对象。以下用于插入操作的服务器脚本将在运行插入操作之前检查 `duplicateText` 参数的值：\n\n        function insert(item, user, request) {\n            var todoItemTable = tables.getTable('TodoItem');\n            // Check the supplied custom parameter to see if\n            // we should allow duplicate text items to be inserted.        \n            if (request.parameters.duplicateText === 'false') {\n                // Find all existing items with the same text\n                // and that are not marked 'complete'. \n                todoItemTable.where({\n                    text: item.text,\n                    complete: false\n                }).read({\n                    success: insertItemIfNotComplete\n                });\n            } else {\n                request.execute();\n            }\n\n            function insertItemIfNotComplete(existingItems) {\n                if (existingItems.length > 0) {\n                    request.respond(statusCodes.CONFLICT, \n                        \"Duplicate items are not allowed.\");\n                } else {\n                    // Insert the item as normal. \n                    request.execute();\n                }\n            }\n        }\n\n请注意，在 **insertItemIfNotComplete** 中，如果不存在重复文本，则会调用 [request 对象]的 **execute** 函数来插入项；否则，会调用 **respond** 函数来通知客户端存在重复文本。\n\n请注意上述代码中 **success** 函数的调用语法：\n\n                }).read({\n                    success: insertItemIfNotComplete\n                });\n\n上述代码较为精简，JavaScript 中更冗长的等效代码为：\n\n        success: function(results) \n        { \n            insertItemIfNotComplete(results); \n        }\n\n\n### <a name=\"work-with-users\"></a>如何：处理用户\n\n在 Azure 移动服务中，你可以使用标识提供程序对用户进行身份验证。有关详细信息，请参阅[身份验证入门]。当经过身份验证的用户调用表操作时，移动服务将使用 [user 对象]向已注册的脚本函数提供有关该用户的信息。可以使用 **userId** 属性来存储和检索用户特定的信息。以下示例将基于某个经过身份验证的用户的 **userId** 来设置项的 owner 属性：\n\n    function insert(item, user, request) {\n        item.owner = user.userId;\n        request.execute();\n    }\n\n以下示例将基于某个经过身份验证的用户的 **userId** 向查询添加一个附加的筛选器。此筛选器会将结果限制为属于当前用户的项：\n\n    function read(query, user, request) {\n        query.where({\n            owner: user.userId\n        });\n        request.execute();\n    }\n\n## <a name=\"custom-api\"></a>自定义 API\n\n本部分介绍如何创建和使用自定义 API 终结点，具体包括以下小节：\n    \n+ [自定义 API 概述](#custom-api-overview)\n+ [如何：定义自定义 API]\n+ [如何：实现 HTTP 方法]\n+ [如何：发送和接收 XML 格式的数据]\n+ [如何：处理用户和自定义 API 中的标头]\n+ [如何：在一个自定义 API 中定义多个路由]\n\n### <a name=\"custom-api-overview\"></a>自定义 API 概述\n\n自定义 API 是移动服务中可通过一个或多个标准 HTTP 方法访问的终结点，这些方法包括：GET、POST、PUT、PATCH 和 DELETE。可以在单个脚本文件中为自定义 API 支持的每个 HTTP 方法单独定义一个函数导出。收到使用给定方法向自定义 API 发出的请求后，将调用注册的脚本。有关详细信息，请参阅[自定义 API]。\n\n当移动服务运行时调用自定义 API 函数时，将同时提供 [request][request object] 和 [response][response object] 对象。这些对象将公开 [express.js 库]的功能，而你的脚本可以利用这些功能。以下名为 **hello** 的自定义 API 是一个极简单的示例，它会返回 _Hello, world!_ 以响应 POST 请求：\n\n        exports.post = function(request, response) {\n            response.send(200, \"{ message: 'Hello, world!' }\");\n        } \n\n[response 对象]的 **send** 函数向客户端返回所需的响应。可以通过向以下 URL 发送 POST 请求来调用此代码：\n\n        https://todolist.azure-mobile.net/api/hello  \n\n每次执行后都会保留全局状态。\n\n### <a name=\"define-custom-api\"></a>如何：定义自定义 API\n\n你可以使用下列方式之一定义可注册到自定义 API 终结点中 HTTP 方法的服务器脚本：\n\n+ 通过 [Azure 经典门户]。可以在“API”选项卡中创建和修改自定义 API 脚本。服务器脚本代码位于给定自定义 API 的“脚本”选项卡中。下面显示了向 `CompleteAll` 自定义 API 终结点发出的 POST 请求调用的脚本。 \n\n    ![2][2]\n    \n    对自定义 API 方法的访问权限在“权限”选项卡中分配。若要了解此自定义 API 的创建方式，请参阅[从客户端调用自定义 API]。\n\n+ 使用源代码管理。如果已启用源代码管理，只需在 git 存储库的 .\\\\service\\\\api 子文件夹中创建一个名为 <em>`<custom_api>`</em>.js 的文件，其中 <em>`<custom_api>`</em> 是要注册的自定义 API 的名称。此脚本文件包含自定义 API 公开的每个 HTTP 方法的 _exported_ 函数。权限在随附的 .json 文件中定义。有关详细信息，请参阅[源代码管理和共享代码][Source control, shared code, and helper functions]。\n\n+ 使用 Azure 命令行工具中的命令提示符。有关详细信息，请参阅[使用命令行工具]。\n\n### <a name=\"handle-methods\"></a>如何：实现 HTTP 方法\n\n一个自定义 API 可以处理一个或多个 HTTP 方法：GET、POST、PUT、PATCH 和 DELETE。将为自定义 API 处理的每个 HTTP 方法定义一个导出函数。单个自定义 API 代码文件可以导出下列一个或所有函数：\n\n        exports.get = function(request, response) { ... };\n        exports.post = function(request, response) { ... };\n        exports.patch = function(request, response) { ... };\n        exports.put = function(request, response) { ... };\n        exports.delete = function(request, response) { ... };\n\n不能使用服务器脚本中尚未实现的 HTTP 方法调用自定义 API 终结点，该调用会返回 405（“不允许的方法”）错误响应。可向每个支持 HTTP 方法单独分配权限级别。\n\n### <a name=\"api-return-xml\"></a>如何：发送和接收 XML 格式的数据\n\n当客户端存储和检索数据时，移动服务将使用 JavaScript 对象表示法 (JSON) 来表示消息正文中的数据。但是，在某些情况下，你可能希望使用 XML 负载。例如，Windows 应用商店应用程序具有内置的定期通知功能，这就需要服务发出 XML 数据。有关详细信息，请参阅[定义支持定期通知的自定义 API]。\n\n以下 **OrderPizza** 自定义 API 函数将返回一个简单的 XML 文档作为响应负载：\n\n        exports.get = function(request, response) {\n          response.set('content-type', 'application/xml');\n          var xml = '<?xml version=\"1.0\"?><PizzaOrderForm><PizzaOrderForm/>';\n          response.send(200, xml);\n        };\n\n可以通过向以下终结点发出 HTTP GET 请求来调用此自定义 API 函数：\n\n        https://todolist.azure-mobile.net/api/orderpizza\n\n### <a name=\"get-api-user\"></a>如何：处理用户和自定义 API 中的标头\n\n在 Azure 移动服务中，你可以使用标识提供程序对用户进行身份验证。有关详细信息，请参阅[身份验证入门]。当经过身份验证的用户请求自定义 API 时，移动服务将使用[用户对象]向自定义 API 代码提供有关该用户的信息。可从 [request 对象]的 user 属性访问 [user 对象]。可以使用 **userId** 属性来存储和检索用户特定的信息。\n\n以下 **OrderPizza** 自定义 API 函数将基于某个经过身份验证的用户的 **userId** 来设置项的 owner 属性：\n\n        exports.post = function(request, response) {\n            var userTable = request.service.tables.getTable('user');\n            userTable.lookup(request.user.userId, {\n                success: function(userRecord) {\n                    callPizzaAPI(userRecord, request.body, function(orderResult) {\n                        response.send(201, orderResult);\n                    });\n                }\n            });\n        \n        };\n\n可以通过向以下终结点发出 HTTP POST 请求来调用此自定义 API 函数：\n\n        https://<service>.azure-mobile.net/api/orderpizza\n\n你还可以通过 [request 对象]访问特定的 HTTP 标头，如以下代码中所示：\n\n        exports.get = function(request, response) {    \n            var header = request.header('my-custom-header');\n            response.send(200, \"You sent: \" + header);\n        };\n\n这个简单示例将读取名为 `my-custom-header` 的自定义标头，然后在响应中返回值。\n\n### <a name=\"api-routes\"></a>如何：在一个自定义 API 中定义多个路由\n\n移动服务允许你在一个自定义 API 中定义多个路径或路由。例如，向 **calculator** 自定义 API 中的以下 URL 发出的 HTTP GET 请求将分别调用 **add** 或 **subtract** 函数：\n\n+ `https://<service>.azure-mobile.net/api/calculator/add`\n+ `https://<service>.azure-mobile.net/api/calculator/sub`\n\n可以通过导出一个传递了 **api** 对象（类似于 [express.js 中的 express 对象]）的 **register** 函数来定义多个路由，该对象用于在自定义 API 终结点下注册路由。以下示例将在 **calculator** 自定义 API 中实现 **add** 和 **sub** 方法：\n\n        exports.register = function (api) {\n            api.get('add', add);\n            api.get('sub', subtract);\n        }\n        \n        function add(req, res) {\n            var result = parseInt(req.query.a) + parseInt(req.query.b);\n            res.send(200, { result: result });\n        }\n        \n        function subtract(req, res) {\n            var result = parseInt(req.query.a) - parseInt(req.query.b);\n            res.send(200, { result: result });\n        }\n\n传递给 **register** 函数的 **api** 对象将为每个 HTTP 方法（**get**、**post**、**put**、**patch** 和 **delete**）公开一个函数。这些函数会将一个路由注册到特定 HTTP 方法的已定义函数。每个函数均采用两个参数，第一个参数是路由名称，第二个参数是注册到路由的函数。\n\nHTTP GET 请求可按如下所示调用上述自定义 API 示例中的两个路由（随响应一起显示）：\n\n+ `https://<service>.azure-mobile.net/api/calculator/add?a=1&b=2`\n\n        {\"result\":3}\n\n+ `https://<service>.azure-mobile.net/api/calculator/sub?a=3&b=5`\n\n        {\"result\":-2}\n\n## <a name=\"scheduler-scripts\"></a>作业计划程序\n\n移动服务允许你定义按固定计划以作业形式执行或通过 Azure 经典门户按需执行的服务器脚本。计划的作业可用于执行周期性任务，例如，清理表数据和批处理。有关详细信息，请参阅[计划作业]。\n\n注册到计划作业的脚本具有一个与计划作业同名的主函数。由于 HTTP 请求不调用计划的脚本，没有可由服务器运行时传递的上下文，因此该函数不采用任何参数。与其他类型的脚本一样，你可以使用子例程函数并需要使用共享模块。有关详细信息，请参阅[源代码管理、共享代码和 Helper 函数]。\n\n### <a name=\"scheduler-scripts\"></a>如何：定义计划的作业脚本\n\n可将一个服务器脚本分配到移动服务计划程序中定义的作业。这些脚本属于该作业，并根据作业计划执行。（你也可以使用 [Azure 经典门户]按需运行作业。） 定义计划作业的脚本不带参数，因为移动服务不会向它传递任何数据；该脚本作为常规 JavaScript 函数执行，不直接与移动服务交互。\n\n可通过下列方式之一定义计划作业：\n\n+ 通过 [Azure 经典门户]中的计划程序的“脚本”选项卡：\n\n    ![3][3]\n\n+ 使用 Azure 命令行工具中的命令提示符。有关详细信息，请参阅[使用命令行工具]。\n\n>[AZURE.NOTE]启用源代码管理后，你可以直接在 git 存储库的 .\\\\service\\\\scheduler 子文件夹中编辑计划的作业脚本文件。有关详细信息，请参阅 [如何：使用源代码管理来共享代码]。\n\n## <a name=\"shared-code\"></a>源代码管理、共享代码和 Helper 函数\n\n本部分说明如何利用源代码管理来添加你自己的自定义 node.js 模块、共享的代码和其他代码重用策略，具体包括以下小节：\n\n+ [利用共享代码概述](#leverage-source-control)\n+ [如何：加载 Node.js 模块]\n+ [如何：使用 Helper 函数]\n+ [如何：使用源代码管理来共享代码]\n+ [如何：使用应用程序设置] \n\n### <a name=\"leverage-source-control\"></a>利用共享代码概述\n\n由于移动服务使用服务器上的 Node.js，因此你的脚本已经获取了对内置 Node.js 模块的访问权限。你也可以使用源代码管理定义自己的模块，或者将其他 Node.js 模块添加到你的服务。\n\n下面列出了你可以通过全局 **require** 函数在脚本中利用的一些较为有用的模块：\n\n+ **azure**：公开 Azure SDK for Node.js 的功能。有关详细信息，请参阅 [Azure SDK for Node.js]。 \n+ **crypto**：提供 OpenSSL 的加密功能。有关详细信息，请参阅 [Node.js 文档][crypto API]。\n+ **path**：包含用于处理文件路径的实用工具。有关详细信息，请参阅 [Node.js 文档][path API]。\n+ **querystring**：包含用于处理查询字符串的实用工具。有关详细信息，请参阅 [Node.js 文档][querystring API]。\n+ **request**：向 Twitter 和 Facebook 等外部 REST 服务发送 HTTP 请求。有关详细信息，请参阅[发送 HTTP 请求]。\n+ **sendgrid**：使用 Azure 中的 Sendgrid 电子邮件服务发送电子邮件。有关详细信息，请参阅[使用 SendGrid 从移动服务发送电子邮件]。\n+ **url**：包含用于分析和解析 URL 的实用工具。有关详细信息，请参阅 [Node.js 文档][url API]。\n+ **util**：包含各种实用工具，例如字符串格式设置和对象类型检查。有关详细信息，请参阅 [Node.js 文档][util API]。 \n+ **zlib**：公开压缩功能，例如 gzip 和 deflate。有关详细信息，请参阅 [Node.js 文档][zlib API]。 \n\n### <a name=\"modules-helper-functions\"></a>如何：利用模块\n\n移动服务公开了脚本可以使用全局 **require** 函数加载的一组模块。例如，脚本可以要求使用 **request** 发出 HTTP 请求：\n\n    function update(item, user, request) { \n        var httpRequest = require('request'); \n        httpRequest('http://www.google.com', function(err, response, body) { \n            ... \n        }); \n    } \n\n\n### <a name=\"shared-code-source-control\"></a>如何：使用源代码管理来共享代码\n\n你可以将源代码管理与 Node.js 程序包管理器 (npm) 结合使用，以控制可供移动服务使用的模块。可通过两种方式实现此目的：\n\n+ 对于已发布到 npm 的模块以及 npm 安装的模块，可以使用 package.json 文件来声明你希望通过移动服务进行安装的程序包。这样，你的服务始终都能访问所需程序包的最新版本。package.json 文件驻留在 `.\\service` 目录中。有关详细信息，请参阅 [Azure 移动服务中对 package.json 的支持]。\n\n+ 对于专用或自定义模块，你可以使用 npm 手动将模块安装到源代码管理的 `.\\service\\node_modules` 目录中。有关如何手动上载模块的示例，请参阅[在服务器脚本中利用共享代码和 Node.js 模块]。\n\n    >[AZURE.NOTE]如果 `node_modules` 已在目录层次结构中存在，NPM 将在该目录中创建 `\\node-uuid` 子目录，而不是在存储库中创建一个新的 `node_modules`。在此情况下，你只需删除现有的 `node_modules` 目录即可。\n\n将 package.json 文件或自定义模块提交到移动服务的存储库后，请使用 **require** 来按名称引用这些模块。\n\n>[AZURE.NOTE]在 package.json 中指定的模块或者上载到移动服务的模块只会在服务器脚本代码中使用。移动服务运行时不使用这些模块。\n\n### <a name=\"helper-functions\"></a>如何：使用 Helper 函数\n\n除了要求使用模块外，单个服务器脚本还可以包含 Helper 函数。这些函数与主函数不同，后者可用于分离脚本中的代码。\n\n在以下示例中，表脚本已注册到包含 Helper 函数 **handleUnapprovedItem** 的插入操作：\n\n\n    function insert(item, user, request) {\n        if (!item.approved) {\n            handleUnapprovedItem(item, user, request);\n        } else {\n            request.execute();\n        }\n    }\n    \n    function handleUnapprovedItem(item, user, request) {\n        // Do something with the supplied item, user, or request objects.\n    }\n \n在脚本中，Helper 函数必须在主函数之后声明。必须声明脚本中的所有变量。未声明的变量会导致出错。\n\nHelper 函数也可以只定义一次，然后在服务器脚本之间共享。若要在脚本之间共享某个函数，必须导出该函数，并且脚本文件必须在 `.\\service\\shared` 目录中存在。以下模板演示了如何在文件 `.\\services\\shared\\helpers.js` 中导出共享函数：\n\n        exports.handleUnapprovedItem = function (tables, user, callback) {\n            \n            // Do something with the supplied tables or user objects and \n            // return a value to the callback function.\n        };\n \n然后，你可以在表操作脚本中使用类似于下面的函数：\n\n        function insert(item, user, request) {\n            var helper = require('../shared/helper');\n            helper.handleUnapprovedItem(tables, user, function(result) {\n                    \n                    // Do something based on the result.\n                    request.execute();\n                }\n            }\n        }\n\n在此示例中，必须将 [tables 对象]和 [user 对象]都传递给共享函数。这是因为共享脚本不能访问全局 [tables 对象]，而 [user 对象]只在请求的上下文中存在。\n\n可以使用[源代码管理][How to: Share code by using source control]或[命令行工具][Using the command line tool]将脚本文件上载到共享目录。\n\n### <a name=\"app-settings\"></a>如何：使用应用程序设置\n\n移动服务允许你将值安全地存储为应用程序设置，服务器脚本在运行时可以访问这些设置。将数据添加到移动服务的应用程序设置时，名称/值对将以加密的形式存储，你可以在服务器脚本中访问这些数据，而无需在脚本文件中对其进行硬编码。有关详细信息，请参阅[应用设置]。\n\n以下自定义 API 示例使用提供的 [service 对象]来检索某个应用程序设置值。\n\n        exports.get = function(request, response) {\n        \n            // Get the MY_CUSTOM_SETTING value from app settings.\n            var customSetting = \n                request.service.config.appSettings.my_custom_setting;\n                \n            // Do something and then send a response.\n\n        }\n\n以下代码使用配置模块来检索计划作业脚本使用的应用程序设置中存储的 Twitter 访问令牌值：\n\n        // Get the service configuration module.\n        var config = require('mobileservice-config');\n\n        // Get the stored Twitter consumer key and secret. \n        var consumerKey = config.twitterConsumerKey,\n            consumerSecret = config.twitterConsumerSecret\n        // Get the Twitter access token from app settings.    \n        var accessToken= config.appSettings.TWITTER_ACCESS_TOKEN,\n            accessTokenSecret = config.appSettings.TWITTER_ACCESS_TOKEN_SECRET;\n\n请注意，此代码还会检索门户的“标识”选项卡中存储的 Twitter 使用者密钥值。由于 **config 对象**在表操作和计划的作业脚本中不可用，因此你必须要求配置模块访问应用程序设置。\n<h2><a name=\"command-prompt\"></a>使用命令行工具</h2>\n\n在移动服务中，你可以使用 Azure 命令行工具创建、修改和删除服务器脚本。上载脚本之前，请确保使用的是以下目录结构：\n\n![4][4]\n\n请注意，此目录结构与使用源代码管理时的 git 存储库相同。\n\n从命令行工具上载脚本文件时，必须先导航到 `.\\services` 目录。以下命令从 `table` 子目录上载名为 `todoitem.insert.js` 的脚本：\n\n        ~$azure mobile script upload todolist table/todoitem.insert.js\n        info:    Executing command mobile script upload\n        info:    mobile script upload command OK\n\n以下命令返回移动服务中维护的每个脚本文件的相关信息：\n\n        ~$ azure mobile script list todolist\n        info:    Executing command mobile script list\n        + Retrieving script information\n        info:    Table scripts\n        data:    Name                       Size\n        data:    -------------------------  ----\n        data:    table/channels.insert      1980\n        data:    table/TodoItem.insert      5504\n        data:    table/TodoItem.read        64\n        info:    Shared scripts\n        data:    Name              Size\n        data:    ----------------  ----\n        data:    shared/helper.js  62\n        data:    shared/uuid.js    7452\n        info:    Scheduled job scripts\n        data:    Job name    Script name           Status    Interval     Last run  Next run\n        data:    ----------  --------------------  --------  -----------  --------  --------\n        data:    getUpdates  scheduler/getUpdates  disabled  15 [minute]  N/A       N/A\n        info:    Custom API scripts\n        data:    Name                    Get          Put          Post         Patch        Delete\n        data:    ----------------------  -----------  -----------  -----------  -----------  -----------\n        data:    completeall             application  application  application  application  application\n        data:    register_notifications  application  application  user         application  application\n        info:    mobile script list command OK\n\n有关详细信息，请参阅[用于管理 Azure 移动服务的命令]。\n\n## <a name=\"working-with-tables\"></a>使用表\n\n本部分详细介绍了用于直接处理 SQL 数据库表数据的策略，具体包括以下小节：\n\n+ [使用表的概述](#overview-tables)\n+ [如何：从脚本访问表]\n+ [如何：执行批量插入]\n+ [如何：将 JSON 类型映射到数据库类型]\n+ [使用 Transact-SQL 访问表]\n\n### <a name=\"overview-tables\"></a>使用表的概述\n\n移动服务中的许多情况都要求服务器脚本访问数据库中的表。例如，由于每次执行脚本后移动服务不保存状态，因此，必须在表中存储每次执行脚本后需要持久保留的数据。你还可能想要检查权限表中的条目，或者要存储审核数据而不仅仅是写入日志，因为日志中的数据保留期有限，并且无法以编程方式访问。\n\n移动服务提供两种用于访问表的方法：使用 [table 对象]代理，或者通过使用 [mssql 对象]撰写 Transact-SQL 查询。使用 [table 对象]可以轻松访问服务器脚本代码中的表数据，不过，[mssql 对象]支持更复杂的数据操作，并提供最大的灵活性。\n\n### <a name=\"access-tables\"></a>如何：从脚本访问表\n\n从脚本访问表的最简单方法就是使用 [tables 对象]。**getTable** 函数将返回一个 [table 对象]实例，即用于访问所请求表的代理。然后，你可以调用该代理的函数来访问和更改数据。\n\n已同时注册到表操作和计划作业的脚本可以访问全局对象形式的 [tables 对象]。以下代码行将从全局 [tables 对象]中获取 *TodoItems* 表的代理：\n\n        var todoItemsTable = tables.getTable('TodoItems');\n\n自定义 API 脚本可从提供的 [request 对象]的 <strong>service</strong> 属性访问 [tables 对象]。以下代码行将从请求中获取 [tables 对象]：\n\n        var todoItemsTable = request.service.tables.getTable('TodoItem');\n\n> [AZURE.NOTE]共享函数不能直接访问 **tables** 对象。在共享函数中，必须将表对象传递给该函数。\n\n获得 [table 对象]后，可以调用一个或多个表操作函数：insert、update、delete 或 read。以下示例将从 permissions 表中读取用户权限：\n\n    function insert(item, user, request) {\n        var permissionsTable = tables.getTable('permissions');\n    \n        permissionsTable\n            .where({ userId: user.userId, permission: 'submit order'})\n            .read({ success: checkPermissions });\n            \n        function checkPermissions(results) {\n            if(results.length > 0) {\n                // Permission record was found. Continue normal execution.\n                request.execute();\n            } else {\n                console.log('User %s attempted to submit an order without permissions.', user.userId);\n                request.respond(statusCodes.FORBIDDEN, 'You do not have permission to submit orders.');\n            }\n        }\n    }\n\n下一个示例将审核信息写入 **audit** 表：\n\n    function update(item, user, request) {\n        request.execute({ success: insertAuditEntry });\n        \n        function insertAuditEntry() {\n            var auditTable = tables.getTable('audit');\n            var audit = {\n                record: 'checkins',\n                recordId: item.id,\n                timestamp: new Date(),\n                values: JSON.stringify(item)\n            };\n            auditTable.insert(audit, {\n                success: function() {\n                    // Write to the response now that all data operations are complete\n                    request.respond();\n                }\n            });\n        }\n    }\n\n以下部分的代码示例中提供了最后一个示例：[如何：访问自定义参数][How to: Add custom parameters]。\n\n### <a name=\"bulk-inserts\"></a>如何：执行批量插入\n\n如果你使用 **for** 或 **while** 循环直接在表中插入大量的项（例如 1000 个），可能会遇到 SQL 连接限制，导致某些插入操作失败。你的请求可能永远无法完成，或者返回 HTTP 500 内部服务器错误。若要避免此问题，可以按照大约每 10 个一批的形式插入项。插入第一批后，再提交下一批，直至完成。\n\n使用以下脚本可以设置要同时插入的记录批的大小。建议保持使用较小的记录数。完成异步插入批时，**insertItems** 函数将以递归方式调用自身。末尾的 for 循环一次插入一条记录，并在成功时调用 **insertComplete**，在出错时调用 **errorHandler**。**insertComplete** 控制是以递归方式为下一批调用 **insertItems**，还是在作业已完成的情况下退出脚本。\n\n        var todoTable = tables.getTable('TodoItem');\n        var recordsToInsert = 1000;\n        var batchSize = 10; \n        var totalCount = 0;\n        var errorCount = 0; \n        \n        function insertItems() {        \n            var batchCompletedCount = 0;  \n        \n            var insertComplete = function() { \n                batchCompletedCount++; \n                totalCount++; \n                if(batchCompletedCount === batchSize || totalCount === recordsToInsert) {                        \n                    if(totalCount < recordsToInsert) {\n                        // kick off the next batch \n                        insertItems(); \n                    } else { \n                        // or we are done, report the status of the job \n                        // to the log and don't do any more processing \n                        console.log(\"Insert complete. %d Records processed. There were %d errors.\", totalCount, errorCount); \n                    } \n                } \n            }; \n        \n            var errorHandler = function(err) { \n                errorCount++; \n                console.warn(\"Ignoring insert failure as part of batch.\", err); \n                insertComplete(); \n            };\n        \n            for(var i = 0; i < batchSize; i++) { \n                var item = { text: \"This is item number: \" + totalCount + i }; \n                todoTable.insert(item, { \n                    success: insertComplete, \n                    error: errorHandler \n                }); \n            } \n        } \n        \n        insertItems(); \n\n\n可以在此[博客文章](http://blogs.msdn.com/b/jpsanders/archive/2013/03/20/server-script-to-insert-table-items-in-windows-azure-mobile-services.aspx)中找到整个代码示例和相关的讨论。如果使用此代码，你可以根据你的具体情况对它进行改写，并全面进行测试。\n\n### <a name=\"JSON-types\"></a>如何：将 JSON 类型映射到数据库类型\n\n客户端上的数据类型集合不同于移动服务数据库表中的数据类型集合。有时它们可以轻松地映射到另一种类型，而其他时候不会映射。移动服务执行映射中的多种类型转换：\n\n- 客户端语言特定的类型将序列化为 JSON。\n- JSON 表示形式在出现于服务器脚本中之前将转换成 JavaScript。\n- 使用 [tables 对象]保存 JavaScript 数据类型时，这些类型将转换成 SQL 数据库类型。\n\n从客户端架构到 JSON 的转换根据平台的不同而异。Windows 应用商店和 Windows Phone 客户端使用 JSON.NET。Android 客户端使用 gson 库。iOS 客户端使用 NSJSONSerialization 类。将使用其中每个库的默认序列化行为，不过，日期对象将转换成 JSON 字符串，这些字符串包含使用 ISO 8601 编码的日期。\n\n当你编写使用 [insert]、[update]、[read] 或 [delete] 函数的服务器脚本时，可以访问数据的 JavaScript 表示形式。移动服务使用 Node.js 的反序列化函数 ([JSON.parse](http://es5.github.io/#x15.12)) 将 JSON 在线转换为 JavaScript 对象。但是，移动服务将执行转换以提取 ISO 8601 字符串中的 **Date** 对象。\n\n当你使用 [tables 对象]或 [mssql 对象]时，或只是执行表脚本时，将在 SQL 数据库中插入反序列化的 JavaScript 对象。在此过程中，对象属性将映射到 T-SQL 类型：\n\nJavaScript 属性|T-SQL 类型\n---|---\nNumber|Float(53)\nBoolean|Bit\nDate|DateTimeOffset(3)|\nString|Nvarchar(max)\nBuffer|不支持\n对象|不支持\nArray|不支持\nStream|不支持\n\n### <a name=\"TSQL\"></a>使用 Transact-SQL 访问表\n\n从服务器脚本处理表数据的最简单方法就是使用 [table 对象]代理。但是，[table 对象]并不支持一些较为高级的方案，例如，联接查询和其他一些复杂查询，以及存储过程的调用。在这些情况下，你必须使用 [mssql 对象]针对关系表直接执行 Transact-SQL 语句。此对象提供以下函数：\n\n- **query**：执行 TSQL 字符串指定的查询；结果将返回到 **options** 对象中的 **success** 回调。如果存在 *params* 参数，则该查询可以包含参数。\n- **queryRaw**：与 *query* 类似，不过，从查询返回的结果集采用“原始”格式（请参阅以下示例）。\n- **open**：用于获取与移动服务数据库建立的连接，获取该连接后，你可以使用连接对象来调用 transactions 等数据库操作。\n\n这些方法可以进一步让你对查询处理进行低级别的控制。\n\n+ [如何：运行静态查询]\n+ [如何：运行动态查询]\n+ [如何：联接关系表]\n+ [如何：运行返回 *raw* 结果的查询]\n+ [如何：获取对数据库连接的访问权限]    \n\n#### <a name=\"static-query\"></a>如何：运行静态查询\n\n以下查询不带参数，将返回 `statusupdate` 表中的三条记录。行集采用标准的 JSON 格式。\n\n        mssql.query('select top 3 * from statusupdates', {\n            success: function(results) {\n                console.log(results);\n            },\n            error: function(err) {\n                console.log(\"error is: \" + err);\n            }\n        });\n\n\n#### <a name=\"dynamic-query\"></a>如何：运行动态参数化查询\n\n以下示例通过从权限表中读取每个用户的权限来实现自定义授权。执行该查询时，占位符 (?) 将被替换为提供的参数。\n\n            var sql = \"SELECT _id FROM permissions WHERE userId = ? AND permission = 'submit order'\";\n            mssql.query(sql, [user.userId], {\n                success: function(results) {\n                    if (results.length > 0) {\n                        // Permission record was found. Continue normal execution. \n                        request.execute();\n                    } else {\n                        console.log('User %s attempted to submit an order without permissions.', user.userId);\n                        request.respond(statusCodes.FORBIDDEN, 'You do not have permission to submit orders.');\n                    }\n                },\n                error: function(err) {\n                    console.log(\"error is: \" + err);\n                }   \n            });\n\n\n#### <a name=\"joins\"></a>如何：联接关系表\n\n你可以使用 [mssql 对象]的 **query** 方法联接两个表，以传入实现联接的 TSQL 代码。假设 **ToDoItem** 表中有一些项，其中每个项都有一个对应于表中的列的 **priority** 属性。其中一个项类似于：\n\n        { text: 'Take out the trash', complete: false, priority: 1}\n\n另外，我们假设还有一个名为 **Priority** 的表，它的行包含优先级 **number** 和文本 **description**。如果优先级编号 (number) 1 的描述 (description) 为“Critical”，则相应的对象类似于：\n\n        { number: 1, description: 'Critical'}\n\n现在，我们可以将项中的 **priority** 编号替换为优先级编号的文本描述。将两个表进行关系联接即可实现此目的。\n\n        mssql.query('SELECT t.text, t.complete, p.description FROM ToDoItem as t INNER JOIN Priority as p ON t.priority = p.number', {\n            success: function(results) {\n                console.log(results);\n            },\n            error: function(err) {\n                console.log(\"error is: \" + err);\n        });\n    \n该脚本将联接两个表，并将结果写入日志。最终的对象可能类似于：\n\n        { text: 'Take out the trash', complete: false, description: 'Critical'}\n\n\n#### <a name=\"raw\"></a>如何：运行返回 *raw* 结果的查询\n\n此示例将像前面一样执行查询，不过，这次会逐行逐列地返回需要你予以分析的“原始”格式结果集。用到此查询的可能情况是你需要访问移动服务不支持的数据类型。此代码会直接将输出写入控制台日志，使你能够检查原始格式。\n\n        mssql.queryRaw('SELECT * FROM ToDoItem', {\n            success: function(results) {\n                console.log(results);\n            },\n            error: function(err) {\n                console.log(\"error is: \" + err);\n            }\n        });\n\n下面显示了运行此查询后的输出。其中包含有关表中每个列的元数据，后接行和列的表示形式。\n\n        { meta: \n           [ { name: 'id',\n               size: 19,\n               nullable: false,\n               type: 'number',\n               sqlType: 'bigint identity' },\n             { name: 'text',\n               size: 0,\n               nullable: true,\n               type: 'text',\n               sqlType: 'nvarchar' },\n             { name: 'complete',\n               size: 1,\n               nullable: true,\n               type: 'boolean',\n               sqlType: 'bit' },\n             { name: 'priority',\n               size: 53,\n               nullable: true,\n               type: 'number',\n               sqlType: 'float' } ],\n          rows: \n           [ [ 1, 'good idea for the future', null, 3 ],\n             [ 2, 'this is important but not so much', null, 2 ],\n             [ 3, 'fix this bug now', null, 0 ],\n             [ 4, 'we need to fix this one real soon now', null, 1 ],\n           ] }\n\n#### <a name=\"connection\"></a>如何：获取对数据库连接的访问权限\n\n可以使用 **open** 方法获取对数据库连接的访问权限。执行此操作的原因之一是你需要使用数据库事务。\n\n成功执行 **open** 后，将在 **success** 函数中以参数形式传入数据库连接。你可以对 **connection** 对象调用以下任何函数：*close*、*queryRaw*、*query*、*beginTransaction*、*commit* 和 *rollback*。\n\n            mssql.open({\n                success: function(connection) {\n                    connection.query(//query to execute);\n                },\n                error: function(err) {\n                    console.log(\"error is: \" + err);\n                }\n            });\n\n## <a name=\"debugging\"></a>调试和故障排除\n\n调试服务器脚本及排查其错误的主要方法是写入服务日志。默认情况下，移动服务会将执行服务脚本期间发生的错误写入服务日志。你的脚本也可以对日志执行写入操作。写入日志是调试脚本及验证其行为是否符合预期的良好方法。\n\n### <a name=\"write-to-logs\"></a>如何：将输出写入移动服务日志\n\n若要写入日志，请使用全局 [console 对象]。使用 **log** 或 **info** 函数记录信息级警告。**warning** 和 **error** 函数将记录其对应级别，这些级别已在日志中予以标注。\n\n> [AZURE.NOTE]若要查看移动服务的日志，请登录到 [Azure 经典门户](https://manage.windowsazure.cn/)，选择你的移动服务，然后选择“日志”选项卡。\n\n你还可以使用 [console 对象]的日志记录功能通过参数来设置消息格式。以下示例向消息字符串提供了一个参数形式的 JSON 对象：\n\n    function insert(item, user, request) {\n        console.log(\"Inserting item '%j' for user '%j'.\", item, user);  \n        request.execute();\n    }\n\n请注意，字符串 `%j` 用作 JSON 对象的占位符，并且参数是按顺序提供的。\n\n为了避免在日志中记录过多的信息，你应该删除或禁用生产环境不需要使用的 console.log() 调用。\n\n<!-- Anchors. -->\n\n[Introduction]: #intro\n[Table operations]: #table-scripts\n[Basic table operations]: #basic-table-ops\n[如何：注册表操作]: #register-table-scripts\n[How to: Define table scripts]: #execute-operation\n[如何：重写默认响应]: #override-response\n[How to: Modify an operation]: #modify-operation\n[How to: Override success and error]: #override-success-error\n[如何：重写 execute success]: #override-success\n[如何：重写默认错误处理]: #override-error\n[如何：从脚本访问表]: #access-tables\n[How to: Add custom parameters]: #access-headers\n[如何：添加自定义参数]: #access-headers\n[How to: Work with users]: #work-with-users\n[How to: Define scheduled job scripts]: #scheduler-scripts\n[How to: Refine access to tables]: #authorize-tables\n[使用 Transact-SQL 访问表]: #TSQL\n[如何：运行静态查询]: #static-query\n[如何：运行动态查询]: #dynamic-query\n[如何：运行返回 *raw* 结果的查询]: #raw\n[如何：获取对数据库连接的访问权限]: #connection\n[如何：联接关系表]: #joins\n[如何：执行批量插入]: #bulk-inserts\n[如何：将 JSON 类型映射到数据库类型]: #JSON-types\n[如何：加载 Node.js 模块]: #modules-helper-functions\n[How to: Write output to the mobile service logs]: #write-to-logs\n[Source control, shared code, and helper functions]: #shared-code\n[源代码管理、共享代码和 Helper 函数]: #shared-code\n[Using the command line tool]: #command-prompt\n[使用命令行工具]: #command-prompt\n[Working with tables]: #working-with-tables\n[Custom API anchor]: #custom-api\n[如何：定义自定义 API]: #define-custom-api\n[How to: Share code by using source control]: #shared-code-source-control\n[如何：使用源代码管理来共享代码]: #shared-code-source-control\n[如何：使用 Helper 函数]: #helper-functions\n[Debugging and troubleshooting]: #debugging\n[如何：实现 HTTP 方法]: #handle-methods\n[如何：处理用户和自定义 API 中的标头]: #get-api-user\n[How to: Access custom API request headers]: #get-api-headers\n[Job Scheduler]: #scheduler-scripts\n[如何：在一个自定义 API 中定义多个路由]: #api-routes\n[如何：发送和接收 XML 格式的数据]: #api-return-xml\n[如何：使用应用程序设置]: #app-settings\n\n[1]: ./media/mobile-services-how-to-use-server-scripts/1-mobile-insert-script-users.png\n[2]: ./media/mobile-services-how-to-use-server-scripts/2-mobile-custom-api-script.png\n[3]: ./media/mobile-services-how-to-use-server-scripts/3-mobile-schedule-job-script.png\n[4]: ./media/mobile-services-how-to-use-server-scripts/4-mobile-source-local-cli.png\n\n<!-- URLs. -->\n[移动服务服务器脚本参考]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554226.aspx\n\n[request object]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554218.aspx\n[request 对象]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554218.aspx\n[response object]: http://msdn.microsoft.com/zh-cn/library/windowsazure/dn303373.aspx\n[response 对象]: http://msdn.microsoft.com/zh-cn/library/windowsazure/dn303373.aspx\n[User object]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554220.aspx\n[user 对象]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554220.aspx\n[用户对象]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554220.aspx\n[push object]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554217.aspx\n[insert function]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554229.aspx\n[insert]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554229.aspx\n[update function]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554214.aspx\n[delete function]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554215.aspx\n[read function]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554224.aspx\n[update]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554214.aspx\n[delete]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554215.aspx\n[read]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554224.aspx\n[query object]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj613353.aspx\n[query 对象]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj613353.aspx\n[apns object]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj839711.aspx\n[mpns object]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj871025.aspx\n[wns object]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj860484.aspx\n[table 对象]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554210.aspx\n[tables 对象]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj614364.aspx\n[mssql 对象]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554212.aspx\n[console 对象]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554209.aspx\n[读取和写入数据]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj631640.aspx\n[验证数据]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj631638.aspx\n[修改请求]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj631635.aspx\n[修改响应]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj631631.aspx\n[Azure 经典门户]: https://manage.windowsazure.cn/\n[计划作业]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj860528.aspx\n[使用服务器脚本在移动服务中验证和修改数据]: /zh-cn/documentation/articles/mobile-services-windows-store-dotnet-validate-modify-data-server-scripts/\n[用于管理 Azure 移动服务的命令]: /zh-cn/documentation/articles/command-line-tools/#Commands_to_manage_mobile_services/#Mobile_Scripts\n[Windows Store Push]: /zh-cn/documentation/articles/mobile-services-javascript-backend-windows-store-dotnet-get-started-push/\n[Windows Phone Push]: /zh-cn/documentation/articles/mobile-services-javascript-backend-windows-store-dotnet-get-started-with-push-wp8/\n[iOS Push]: /zh-cn/documentation/articles/mobile-services-javascript-backend-windows-store-dotnet-get-started-with-push-ios/\n[Android Push]: /zh-cn/documentation/articles/mobile-services-javascript-backend-windows-store-dotnet-get-started-with-push-android/\n[Azure SDK for Node.js]: http://go.microsoft.com/fwlink/p/?LinkId=275539\n[发送 HTTP 请求]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj631641.aspx\n[使用 SendGrid 从移动服务发送电子邮件]: /zh-cn/documentation/articles/store-sendgrid-mobile-services-send-email-scripts/\n[身份验证入门]: /zh-cn/documentation/articles/mobile-services-windows-store-dotnet-get-started-users\n[crypto API]: http://go.microsoft.com/fwlink/p/?LinkId=288802\n[path API]: http://go.microsoft.com/fwlink/p/?LinkId=288803\n[querystring API]: http://go.microsoft.com/fwlink/p/?LinkId=288804\n[url API]: http://go.microsoft.com/fwlink/p/?LinkId=288805\n[util API]: http://go.microsoft.com/fwlink/p/?LinkId=288806\n[zlib API]: http://go.microsoft.com/fwlink/p/?LinkId=288807\n[自定义 API]: http://msdn.microsoft.com/zh-cn/library/windowsazure/dn280974.aspx\n[从客户端调用自定义 API]: /zh-cn/documentation/articles/mobile-services-windows-store-dotnet-call-custom-api/#define-custom-api\n[express.js 库]: http://go.microsoft.com/fwlink/p/?LinkId=309046\n[定义支持定期通知的自定义 API]: /zh-cn/documentation/articles/mobile-services-windows-store-dotnet-create-pull-notifications/\n[express.js 中的 express 对象]: http://expressjs.com/api.html#express\n[Store server scripts in source control]: /zh-cn/documentation/articles/mobile-services-store-scripts-source-control/\n[在服务器脚本中利用共享代码和 Node.js 模块]: /zh-cn/documentation/articles/mobile-services-store-scripts-source-control/#use-npm\n[service 对象]: http://msdn.microsoft.com/zh-cn/library/windowsazure/dn303371.aspx\n[应用设置]: http://msdn.microsoft.com/zh-cn/library/dn529070.aspx\n[config module]: http://msdn.microsoft.com/zh-cn/library/dn508125.aspx\n[Azure 移动服务中对 package.json 的支持]: http://go.microsoft.com/fwlink/p/?LinkId=391036\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

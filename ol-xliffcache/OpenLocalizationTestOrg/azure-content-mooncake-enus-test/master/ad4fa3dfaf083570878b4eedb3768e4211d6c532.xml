@@ -1,0 +1,831 @@
+{
+  "nodes": [
+    {
+      "content": "如何使用 HTML 客户端 | Azure",
+      "pos": [
+        27,
+        48
+      ]
+    },
+    {
+      "content": "了解如何使用适用于 Azure 移动服务的 HTML 客户端。",
+      "pos": [
+        67,
+        98
+      ]
+    },
+    {
+      "content": "如何使用适用于 Azure 移动服务的 HTML/JavaScript 客户端",
+      "pos": [
+        320,
+        359
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        479,
+        481
+      ]
+    },
+    {
+      "pos": [
+        483,
+        737
+      ],
+      "content": "本指南说明如何使用适用于 Azure 移动服务的 HTML/JavaScript 客户端（包括 Windows 应用商店 JavaScript 和 PhoneGap/Cordova 应用程序）执行常见任务。所述的任务包括查询数据、插入、更新和删除数据、对用户进行身份验证和处理错误。如果你是第一次使用移动服务，最好先完成<bpt id=\"p1\">[</bpt>移动服务快速入门<ept id=\"p1\">](/documentation/articles/mobile-services-html-get-started)</ept>。快速入门教程可帮助你配置帐户并创建第一个移动服务。"
+    },
+    {
+      "pos": [
+        827,
+        866
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"create-client\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何创建移动服务客户端"
+    },
+    {
+      "content": "添加移动服务客户端引用的方式取决于应用程序平台，其中包括：",
+      "pos": [
+        868,
+        897
+      ]
+    },
+    {
+      "content": "对于 Web 的应用程序，请打开 HTML 文件，然后将以下代码添加到页的脚本引用中：",
+      "pos": [
+        901,
+        944
+      ]
+    },
+    {
+      "pos": [
+        1059,
+        1157
+      ],
+      "content": "对于使用 JavaScript/HTML 编写的 Windows 应用商店应用程序，请将 <bpt id=\"p1\">**</bpt>WindowsAzure.MobileServices.WinJS NuGet<ept id=\"p1\">**</ept> 包添加到你的项目。"
+    },
+    {
+      "pos": [
+        1161,
+        1293
+      ],
+      "content": "对于 PhoneGap 或 Cordova 应用程序，请在项目中添加<bpt id=\"p1\">[</bpt>移动服务插件<ept id=\"p1\">](https://github.com/Azure/azure-mobile-services-cordova)</ept>。此插件支持<bpt id=\"p2\">[</bpt>推送通知<ept id=\"p2\">](#push-notifications)</ept>。"
+    },
+    {
+      "pos": [
+        1295,
+        1416
+      ],
+      "content": "在编辑器中，打开或创建一个 JavaScript 文件，添加以下代码以定义 <ph id=\"ph1\">`MobileServiceClient`</ph> 变量，然后在 <ph id=\"ph2\">`MobileServiceClient`</ph> 构造函数中按顺序提供移动服务的应用程序 URL 和应用程序密钥。"
+    },
+    {
+      "pos": [
+        1545,
+        1649
+      ],
+      "content": "必须将占位符 <ph id=\"ph1\">`AppUrl`</ph> 替换为移动服务的应用程序 URL，将 <ph id=\"ph2\">`AppKey`</ph> 替换为你从 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">](http://manage.windowsazure.cn/)</ept>获取的应用程序密钥。"
+    },
+    {
+      "pos": [
+        1652,
+        1804
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>应用程序密钥用于针对移动服务筛选出随机请求，将随应用程序一起分发。由于此密钥未加密，因此不能被认为是安全的。为确保安全访问你的移动服务数据，你必须改为在允许用户访问前对用户进行身份验证。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何：对用户进行身份验证<ept id=\"p1\">](#authentication)</ept>。"
+    },
+    {
+      "pos": [
+        1809,
+        1843
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"querying\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何从移动服务查询数据"
+    },
+    {
+      "pos": [
+        1845,
+        1955
+      ],
+      "content": "访问或修改 SQL 数据库表中数据的所有代码均将调用 <ph id=\"ph1\">`MobileServiceTable`</ph> 对象的函数。可通过对 <ph id=\"ph2\">`MobileServiceClient`</ph> 实例调用 <ph id=\"ph3\">`getTable()`</ph> 函数来获取对表的引用。"
+    },
+    {
+      "pos": [
+        2017,
+        2050
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"filtering\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何筛选返回的数据"
+    },
+    {
+      "pos": [
+        2052,
+        2239
+      ],
+      "content": "以下代码演示了如何通过在查询中包含 <ph id=\"ph1\">`where`</ph> 子句来筛选数据。该代码将返回 complete 字段等于 <ph id=\"ph2\">`false`</ph> 的 <ph id=\"ph3\">`todoItemTable`</ph> 中的所有项。<ph id=\"ph4\">`todoItemTable`</ph> 是对前面创建的移动服务表的引用。where 函数针对该表将一个行筛选谓词应用到查询。该函数接受 JSON 对象或定义行筛选器的函数作为其参数，并返回可进一步编写的查询。"
+    },
+    {
+      "pos": [
+        2448,
+        2559
+      ],
+      "content": "通过在 Query 对象中调用 <ph id=\"ph1\">`where`</ph> 并传递一个对象作为参数，我们可以指示移动服务仅返回 <ph id=\"ph2\">`complete`</ph> 列包含 <ph id=\"ph3\">`false`</ph> 值的行。另外，请查看以下请求 URI，可以看出，我们正在修改查询字符串本身："
+    },
+    {
+      "content": "可以使用消息检查软件（例如浏览器开发人员工具或 Fiddler）来查看发送到移动服务的请求的 URI。",
+      "pos": [
+        2624,
+        2675
+      ]
+    },
+    {
+      "content": "在服务器端，此请求通常会粗略地转换成以下 SQL 查询：",
+      "pos": [
+        2677,
+        2705
+      ]
+    },
+    {
+      "pos": [
+        2773,
+        2831
+      ],
+      "content": "传递给 <ph id=\"ph1\">`where`</ph> 方法的对象可以包含任意数目的参数，所有这些参数都将解释为查询的 AND 子句。例如，以下行："
+    },
+    {
+      "content": "将粗略地转换为（针对前面显示的同一请求）",
+      "pos": [
+        3072,
+        3092
+      ]
+    },
+    {
+      "pos": [
+        3229,
+        3283
+      ],
+      "content": "上述 <ph id=\"ph1\">`where`</ph> 语句和上述 SQL 查询将查找分配给“david”、难度为“medium”的不完整项。"
+    },
+    {
+      "pos": [
+        3285,
+        3378
+      ],
+      "content": "不过，还可以通过另一种方法来编写相同的查询。对 Query 对象的 <ph id=\"ph1\">`.where`</ph> 调用将在 <ph id=\"ph2\">`WHERE`</ph> 子句中添加一个 <ph id=\"ph3\">`AND`</ph> 表达式，因此，我们也可以在三个行中编写该查询："
+    },
+    {
+      "content": "或者使用 Fluent API：",
+      "pos": [
+        3535,
+        3551
+      ]
+    },
+    {
+      "pos": [
+        3702,
+        3864
+      ],
+      "content": "这两种方法是等效的，可以换用。到目前为止，所有 <ph id=\"ph1\">`where`</ph> 调用都使用了带有某些参数的对象，并且会根据数据库中的数据比较相等性。但是，查询方法的另一个重载使用函数而不是对象。在这种情况下，我们可以在此函数中使用“不等于”等运算符和其他关系运算来编写更复杂的表达式。在这些函数中，关键字 <ph id=\"ph2\">`this`</ph> 将绑定到服务器对象。"
+    },
+    {
+      "content": "函数的正文将转换为开放数据协议 (OData) 布尔表达式，该表达式将传递给查询字符串参数。可以传入不带参数的函数，例如：",
+      "pos": [
+        3866,
+        3927
+      ]
+    },
+    {
+      "pos": [
+        4204,
+        4389
+      ],
+      "content": "如果传入带参数的函数，则 <ph id=\"ph1\">`where`</ph> 子句后面的所有参数都将按顺序绑定到函数参数。来自函数范围以外的任何对象都必须作为参数传递 - 函数无法捕获任何外部变量。在接下来的两个示例中，自变量“david”将绑定到参数 <ph id=\"ph2\">`name`</ph>，在第一个示例中，自变量“medium”也绑定到参数 <ph id=\"ph3\">`level`</ph>。另外，函数必须包含带受支持表达式的单个 <ph id=\"ph4\">`return`</ph> 语句，例如："
+    },
+    {
+      "content": "因此，只要我们遵守规则，就能将更复杂的筛选器添加到数据库查询，例如：",
+      "pos": [
+        4666,
+        4700
+      ]
+    },
+    {
+      "pos": [
+        4996,
+        5055
+      ],
+      "content": "可以将 <ph id=\"ph1\">`where`</ph> 与 <ph id=\"ph2\">`orderBy`</ph>、<ph id=\"ph3\">`take`</ph> 和 <ph id=\"ph4\">`skip`</ph> 组合使用。有关详细信息，请参阅下一节。"
+    },
+    {
+      "pos": [
+        5062,
+        5094
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"sorting\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何为返回的数据排序"
+    },
+    {
+      "pos": [
+        5096,
+        5224
+      ],
+      "content": "以下代码演示了如何通过在查询中包含 <ph id=\"ph1\">`orderBy`</ph> 或 <ph id=\"ph2\">`orderByDescending`</ph> 函数来为数据排序。该代码将返回 <ph id=\"ph3\">`todoItemTable`</ph> 中的项，这些项已按 <ph id=\"ph4\">`text`</ph> 字段的升序排序。默认情况下，服务器只返回前 50 个元素。"
+    },
+    {
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>默认情况下，将使用服务器驱动的页大小来防止返回所有元素。这可以防止对大型数据集发出的默认请求对服务造成负面影响。",
+      "pos": [
+        5228,
+        5296
+      ]
+    },
+    {
+      "content": "你可以根据下一节中所述，通过调用 <ph id=\"ph1\">`take`</ph> 来增加返回的项数。<ph id=\"ph2\">`todoItemTable`</ph> 是对前面创建的移动服务表的引用。",
+      "pos": [
+        5298,
+        5363
+      ]
+    },
+    {
+      "pos": [
+        5999,
+        6029
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"paging\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何在页中返回数据"
+    },
+    {
+      "pos": [
+        6031,
+        6144
+      ],
+      "content": "默认情况下，移动服务只在给定的请求中返回 50 行，除非客户端显式要求在响应中返回更多的数据。以下代码演示了如何通过在查询中使用 <ph id=\"ph1\">`take`</ph> 和 <ph id=\"ph2\">`skip`</ph> 子句来实现返回数据的分页。执行以下查询后，将返回表中的前三个项。"
+    },
+    {
+      "pos": [
+        6320,
+        6363
+      ],
+      "content": "请注意，<ph id=\"ph1\">`take(3)`</ph> 方法已转换成查询 URI 中的查询选项 <ph id=\"ph2\">`$top=3`</ph>。"
+    },
+    {
+      "content": "以下经过修改的查询将跳过前三个结果，返回其后的三个结果。实际上这是数据的第二“页”，其页大小为三个项。",
+      "pos": [
+        6365,
+        6416
+      ]
+    },
+    {
+      "pos": [
+        6600,
+        6668
+      ],
+      "content": "同样，你可以查看发送到移动服务的请求的 URI。请注意，<ph id=\"ph1\">`skip(3)`</ph> 方法已转换成查询 URI 中的查询选项 <ph id=\"ph2\">`$skip=3`</ph>。"
+    },
+    {
+      "pos": [
+        6670,
+        6756
+      ],
+      "content": "这是将硬编码分页值传递给 <ph id=\"ph1\">`take`</ph> 和 <ph id=\"ph2\">`skip`</ph> 函数的简化方案。在实际应用中，你可以对页导航控件或类似的 UI 使用类似于上面的查询，让用户导航到上一页和下一页。"
+    },
+    {
+      "pos": [
+        6763,
+        6795
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"selecting\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何选择特定的列"
+    },
+    {
+      "pos": [
+        6797,
+        6897
+      ],
+      "content": "你可以通过在查询中添加 <ph id=\"ph1\">`select`</ph> 子句来指定要包含在结果中的属性集。例如，以下代码将从 <ph id=\"ph2\">`todoItemTable`</ph> 的每一行中返回 <ph id=\"ph3\">`id`</ph>、<ph id=\"ph4\">`complete`</ph> 和 <ph id=\"ph5\">`text`</ph> 属性："
+    },
+    {
+      "content": "此处，select 函数的参数是要返回的表列的名称。",
+      "pos": [
+        7097,
+        7123
+      ]
+    },
+    {
+      "content": "到目前为止所述的所有函数都是加性函数，我们可以不断地调用它们，每次调用都能进一步影响查询。再提供一个示例：",
+      "pos": [
+        7126,
+        7179
+      ]
+    },
+    {
+      "pos": [
+        7448,
+        7484
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"lookingup\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：按 ID 查找数据"
+    },
+    {
+      "pos": [
+        7486,
+        7565
+      ],
+      "content": "<ph id=\"ph1\">`lookup`</ph> 函数只使用 <ph id=\"ph2\">`id`</ph> 值，并从数据库返回具有该 ID 的对象。创建数据库表时使用了整数或字符串 <ph id=\"ph3\">`id`</ph> 列。默认使用字符串 <ph id=\"ph4\">`id`</ph> 列。"
+    },
+    {
+      "pos": [
+        7761,
+        7800
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"odata-query\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>执行 OData 查询操作"
+    },
+    {
+      "pos": [
+        7802,
+        7941
+      ],
+      "content": "移动服务使用 OData 查询 URI 约定编写和执行 REST 查询。并非所有 OData 查询都可使用内置查询函数编写，尤其是复杂的筛选器操作，如搜索属性中的子字符串。对于这些类型的复杂查询，可以将任何有效的 OData 查询选项字符串传递给 <ph id=\"ph1\">`read`</ph> 函数，如下所示："
+    },
+    {
+      "pos": [
+        8283,
+        8417
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在 <ph id=\"ph2\">`read`</ph> 函数中提供原始 OData 查询选项字符串时，不能在同一查询中使用查询生成器方法。在这种情况下，必须将整个查询编写为 OData 查询字符串。有关 OData 系统查询选项的详细信息，请参阅 <bpt id=\"p1\">[</bpt><ept id=\"p1\">OData 系统查询选项参考]</ept>。"
+    },
+    {
+      "pos": [
+        8422,
+        8458
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"inserting\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何在移动服务中插入数据"
+    },
+    {
+      "content": "以下代码演示了如何在表中插入新行。客户端通过将 POST 请求发送到移动服务来请求插入数据行。请求正文包含要插入的、JSON 对象形式的数据。",
+      "pos": [
+        8460,
+        8531
+      ]
+    },
+    {
+      "content": "以上代码会将提供的 JSON 对象中的数据插入到表中。你还可以指定完成插入时要调用的回调函数：",
+      "pos": [
+        8616,
+        8663
+      ]
+    },
+    {
+      "content": "使用 ID 值",
+      "pos": [
+        8878,
+        8885
+      ]
+    },
+    {
+      "pos": [
+        8887,
+        8993
+      ],
+      "content": "移动服务支持为表的 <bpt id=\"p1\">**</bpt>ID<ept id=\"p1\">**</ept> 列使用唯一的自定义字符串值。这样，应用程序便可为 ID 使用自定义值（如电子邮件地址或用户名）。例如，以下代码将插入 JSON 对象形式的新项，其中，唯一 ID 是电子邮件地址："
+    },
+    {
+      "content": "字符串 ID 可提供以下优势：",
+      "pos": [
+        9144,
+        9159
+      ]
+    },
+    {
+      "content": "无需往返访问数据库即可生成 ID。",
+      "pos": [
+        9163,
+        9180
+      ]
+    },
+    {
+      "content": "更方便地合并不同表或数据库中的记录。",
+      "pos": [
+        9183,
+        9201
+      ]
+    },
+    {
+      "content": "ID 值能够更好地与应用程序的逻辑相集成。",
+      "pos": [
+        9204,
+        9225
+      ]
+    },
+    {
+      "pos": [
+        9227,
+        9400
+      ],
+      "content": "如果插入的记录中尚未设置字符串 ID 值，移动服务将为 ID 生成唯一值。有关如何在客户端上或 .NET 后端中生成自己的 ID 值的详细信息，请参阅<bpt id=\"p1\">[</bpt>如何：生成唯一 ID 值<ept id=\"p1\">](/documentation/articles/mobile-services-how-to-use-server-scripts/#generate-guids)</ept>。"
+    },
+    {
+      "pos": [
+        9402,
+        9620
+      ],
+      "content": "也可以为表使用整数 ID。若要使用整数 ID，必须结合 <ph id=\"ph1\">`--integerId`</ph> 选项使用 <ph id=\"ph2\">`mobile table create`</ph> 命令创建表。应在适用于 Azure 的命令行界面 (CLI) 中使用此命令。有关使用 CLI 的详细信息，请参阅<bpt id=\"p1\">[</bpt>用于管理移动服务表的 CLI<ept id=\"p1\">](/documentation/articles/virtual-machines-command-line-tools/#Mobile_Tables)</ept>。"
+    },
+    {
+      "pos": [
+        9625,
+        9662
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"modifying\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：在移动服务中修改数据"
+    },
+    {
+      "pos": [
+        9664,
+        9770
+      ],
+      "content": "以下代码演示了如何更新表中的数据。客户端通过将 PATCH 请求发送到移动服务来请求更新数据行。请求正文包含要更新的、JSON 对象形式的特定字段。该代码将更新表 <ph id=\"ph1\">`todoItemTable`</ph> 中的某个现有项。"
+    },
+    {
+      "content": "第一个参数使用 ID 指定了表中要更新的实例。",
+      "pos": [
+        9883,
+        9906
+      ]
+    },
+    {
+      "content": "你还可以指定在完成更新时要调用的回调函数：",
+      "pos": [
+        9908,
+        9929
+      ]
+    },
+    {
+      "pos": [
+        10203,
+        10238
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"deleting\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何在移动服务中删除数据"
+    },
+    {
+      "content": "以下代码演示了如何删除表中的数据。客户端通过将 DELETE 请求发送到移动服务来请求删除数据行。该代码将删除表 todoItemTable 中的某个现有项。",
+      "pos": [
+        10240,
+        10319
+      ]
+    },
+    {
+      "content": "第一个参数使用 ID 指定了表中要删除的实例。",
+      "pos": [
+        10399,
+        10422
+      ]
+    },
+    {
+      "content": "你还可以指定在完成删除时要调用的回调函数：",
+      "pos": [
+        10424,
+        10445
+      ]
+    },
+    {
+      "pos": [
+        10668,
+        10703
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"binding\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：在用户界面中显示数据"
+    },
+    {
+      "pos": [
+        10705,
+        10801
+      ],
+      "content": "本部分说明如何使用 UI 元素显示返回的数据对象。若要查询 <ph id=\"ph1\">`todoItemTable`</ph> 中的项并在极简单的列表中显示这些项，可以运行以下示例代码。这里未执行任何形式的选择、筛选或排序操作。"
+    },
+    {
+      "pos": [
+        11587,
+        11728
+      ],
+      "content": "在 Windows 应用商店应用程序中，可以使用查询的结果来创建 [WinJS.Binding.List] 对象，该对象可绑定为 <bpt id=\"p1\">[</bpt><ept id=\"p1\">ListView]</ept> 对象的数据源。有关详细信息，请参阅<bpt id=\"p2\">[</bpt><ept id=\"p2\">数据绑定（使用 JavaScript 和 HTML 的 Windows 应用商店应用程序）]</ept>。"
+    },
+    {
+      "pos": [
+        11732,
+        11769
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"custom-api\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：调用自定义 API"
+    },
+    {
+      "pos": [
+        11771,
+        12008
+      ],
+      "content": "自定义 API 可让你定义自定义终结点，这些终结点将会公开不映射到插入、更新、删除或读取操作的服务器功能。使用自定义 API 能够以更大的力度控制消息传送，包括读取和设置 HTTP 消息标头，以及定义除 JSON 以外的消息正文格式。有关如何在移动服务中创建自定义 API 的示例，请参阅<bpt id=\"p1\">[</bpt>如何：定义自定义 API 终结点<ept id=\"p1\">](/documentation/articles/mobile-services-dotnet-backend-define-custom-api)</ept>。"
+    },
+    {
+      "pos": [
+        12010,
+        12224
+      ],
+      "content": "通过对 <bpt id=\"p1\">**</bpt>MobileServiceClient<ept id=\"p1\">**</ept> 调用 <bpt id=\"p2\">[</bpt>invokeApi<ept id=\"p2\">](https://github.com/Azure/azure-mobile-services/blob/master/sdk/Javascript/src/MobileServiceClient.js#L337)</ept> 方法，从客户端调用自定义 API。例如，以下代码行向移动服务上的 <bpt id=\"p3\">**</bpt>completeAll<ept id=\"p3\">**</ept> API 发送 POST 请求："
+    },
+    {
+      "pos": [
+        12535,
+        12714
+      ],
+      "content": "有关更现实可行的示例和对 <bpt id=\"p1\">**</bpt>invokeApi<ept id=\"p1\">**</ept> 更完整的介绍，请参阅<bpt id=\"p2\">[</bpt>Azure 移动服务客户端 SDK 中的自定义 API<ept id=\"p2\">](http://blogs.msdn.com/b/carlosfigueira/archive/2013/06/19/custom-api-in-azure-mobile-services-client-sdks.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        12718,
+        12758
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"authentication\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何对用户进行身份验证"
+    },
+    {
+      "content": "移动服务支持使用各种外部标识提供者对应用程序用户进行身份验证和授权，这些提供者包括：Facebook、Google、Microsoft 帐户和 Twitter。你可以在表中设置权限，以便将特定操作的访问权限限制给已经过身份验证的用户。你还可以在服务器脚本中使用已经过身份验证的用户的标识来实施授权规则。有关详细信息，请参阅 [身份验证入门] 教程。",
+      "pos": [
+        12760,
+        12934
+      ]
+    },
+    {
+      "pos": [
+        12937,
+        12997
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在 PhoneGap 或 Cordova 应用程序中使用身份验证时，还必须向项目中添加以下插件："
+    },
+    {
+      "content": "https://git-wip-us.apache.org/repos/asf/cordova-plugin-device.git",
+      "pos": [
+        13003,
+        13068
+      ]
+    },
+    {
+      "content": "https://git-wip-us.apache.org/repos/asf/cordova-plugin-inappbrowser.git",
+      "pos": [
+        13072,
+        13143
+      ]
+    },
+    {
+      "pos": [
+        13146,
+        13259
+      ],
+      "content": "支持两种身份验证流：<bpt id=\"p1\">_</bpt>服务器流<ept id=\"p1\">_</ept>和<bpt id=\"p2\">_</bpt>客户端流<ept id=\"p2\">_</ept>。服务器流依赖于提供者的 Web 身份验证界面，因此可提供最简便的身份验证体验。客户端流依赖于提供者和设备特定的 SDK，因此允许与设备特定的功能（例如单一登录）进行更深入的集成。"
+    },
+    {
+      "content": "服务器流",
+      "pos": [
+        13264,
+        13268
+      ]
+    },
+    {
+      "content": "若要让移动服务管理 Windows 应用商店或 HTML5 应用程序中的身份验证过程，必须将你的应用程序注册到标识提供者。然后，需要在移动服务中配置提供者提供的应用程序 ID 和机密。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>向应用程序添加身份验证<ept id=\"p1\">](/documentation/articles/mobile-services-html-get-started-users)</ept>教程。",
+      "pos": [
+        13269,
+        13451
+      ]
+    },
+    {
+      "content": "注册标识提供者后，只需结合提供者的 [MobileServiceAuthenticationProvider] 值调用 [LoginAsync 方法]。例如，若要使用 Facebook 登录，请使用以下代码。",
+      "pos": [
+        13453,
+        13557
+      ]
+    },
+    {
+      "pos": [
+        13763,
+        13896
+      ],
+      "content": "如果你使用的标识提供者不是 Facebook，请将传递给上述 <ph id=\"ph1\">`login`</ph> 方法的值更改为下列项之一：<ph id=\"ph2\">`microsoftaccount`</ph>、<ph id=\"ph3\">`facebook`</ph>、<ph id=\"ph4\">`twitter`</ph>、<ph id=\"ph5\">`google`</ph> 或 <ph id=\"ph6\">`windowsazureactivedirectory`</ph>。"
+    },
+    {
+      "pos": [
+        13898,
+        14123
+      ],
+      "content": "在此情况下，移动服务将通过以下方式管理 OAuth 2.0 身份验证流：显示选定提供者的登录页，并在用户成功使用标识提供者登录后生成移动服务身份验证令牌。<bpt id=\"p1\">[</bpt><ept id=\"p1\">login]</ept> 函数在完成时将返回一个 JSON 对象 (<bpt id=\"p2\">**</bpt>user<ept id=\"p2\">**</ept>)，该对象分别在 <bpt id=\"p3\">**</bpt>userId<ept id=\"p3\">**</ept> 和 <bpt id=\"p4\">**</bpt>authenticationToken<ept id=\"p4\">**</ept> 字段中公开用户 ID 和移动服务身份验证令牌。你可以缓存此令牌，并在它过期之前重复使用。有关详细信息，请参阅“缓存身份验证令牌”。"
+    },
+    {
+      "content": "客户端流",
+      "pos": [
+        14128,
+        14132
+      ]
+    },
+    {
+      "content": "你的应用程序还能够独立联系标识提供者，然后将返回的令牌提供给移动服务以进行身份验证。使用此客户端流可为用户提供单一登录体验，或者从标识提供者中检索其他用户数据。",
+      "pos": [
+        14133,
+        14213
+      ]
+    },
+    {
+      "content": "Facebook/Google SDK 基本示例",
+      "pos": [
+        14219,
+        14243
+      ]
+    },
+    {
+      "content": "此示例使用 Facebook 客户端 SDK 进行身份验证：",
+      "pos": [
+        14245,
+        14275
+      ]
+    },
+    {
+      "pos": [
+        14510,
+        14575
+      ],
+      "content": "此示例假定由相应的提供程序 SDK 提供的令牌存储在 <ph id=\"ph1\">`token`</ph> 变量中。目前，不能使用 Twitter 进行客户端身份验证。"
+    },
+    {
+      "content": "Microsoft 帐户基本示例",
+      "pos": [
+        14581,
+        14597
+      ]
+    },
+    {
+      "content": "以下示例使用 Live SDK，该 SDK 使用 Microsoft 帐户来支持 Windows 应用商店应用程序的单一登录：",
+      "pos": [
+        14598,
+        14661
+      ]
+    },
+    {
+      "pos": [
+        15113,
+        15171
+      ],
+      "content": "这个简化的示例将从 Live Connect 获取一个令牌，并通过调用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">login]</ept> 函数将该令牌提供给移动服务。"
+    },
+    {
+      "content": "Microsoft 帐户完整示例",
+      "pos": [
+        15178,
+        15194
+      ]
+    },
+    {
+      "content": "以下示例演示如何使用 Live SDK 和 WinJS API 来提供增强的单一登录体验：",
+      "pos": [
+        15196,
+        15241
+      ]
+    },
+    {
+      "content": "此代码初始化 Live Connect 客户端，向 Microsoft 帐户发送一个新的登录请求，将返回的身份验证令牌发送到移动服务，然后显示有关已登录用户的信息。在身份验证成功之前，该应用不会启动。",
+      "pos": [
+        17165,
+        17265
+      ]
+    },
+    {
+      "pos": [
+        18244,
+        18286
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"push-notifications\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：注册推送通知"
+    },
+    {
+      "pos": [
+        18288,
+        18638
+      ],
+      "content": "如果你的应用程序是 PhoneGap 或 Apache Cordova HTML/JavaScript 应用程序，则你可以使用本机移动平台在设备上接收推送通知。<bpt id=\"p1\">[</bpt>Azure 移动服务的 Apache Cordova 插件<ept id=\"p1\">](https://github.com/Azure/azure-mobile-services-cordova)</ept>可让你向 Azure 通知中心注册推送通知。使用的具体通知服务取决于执行代码的本机设备平台。有关如何执行此操作的示例，请参阅<bpt id=\"p2\">[</bpt>使用 Azure 将通知推送到 Cordova 应用程序<ept id=\"p2\">](https://github.com/Azure/mobile-services-samples/tree/master/CordovaNotificationsArticle)</ept>。"
+    },
+    {
+      "pos": [
+        18641,
+        18870
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>此插件目前仅支持 iOS 和 Android 设备。有关也包含 Windows 设备的解决方案，请参阅文章<bpt id=\"p1\">[</bpt>使用通知中心集成将通知推送到 PhoneGap 应用程序<ept id=\"p1\">](http://blogs.msdn.com/b/azuremobile/archive/2014/06/17/push-notifications-to-phonegap-apps-using-notification-hubs-integration.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        18875,
+        18903
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"errors\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：处理错误"
+    },
+    {
+      "content": "在移动服务中，你可能会遇到各种形式的错误，并且可以通过多种方式来验证和解决这些错误。",
+      "pos": [
+        18905,
+        18947
+      ]
+    },
+    {
+      "content": "例如，你可以在移动服务中注册服务器脚本，然后使用这些脚本对所要插入和更新的数据执行各种操作，包括验证和数据修改。你可以按如下所示定义并注册一个用于验证和修改数据的服务器脚本：",
+      "pos": [
+        18949,
+        19036
+      ]
+    },
+    {
+      "content": "此服务器端脚本将验证发送到移动服务的字符串数据长度，并拒绝过长（在本例中为 10 个字符以上）的字符串。",
+      "pos": [
+        19333,
+        19385
+      ]
+    },
+    {
+      "content": "由于移动服务能够在服务器端验证数据和发送错误响应，因此你可以更新你的 HTML 应用程序，使其能够处理验证后生成的错误响应。",
+      "pos": [
+        19387,
+        19449
+      ]
+    },
+    {
+      "content": "更明白地说，每次执行数据访问时，你都可以传入错误处理程序作为第二个参数：",
+      "pos": [
+        19736,
+        19772
+      ]
+    },
+    {
+      "pos": [
+        20072,
+        20102
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"promises\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：使用约定"
+    },
+    {
+      "content": "约定提供了一种机制，让你基于尚未计算的值安排有待完成的工作。它是用于管理与异步 API 的交互的抽象。",
+      "pos": [
+        20104,
+        20155
+      ]
+    },
+    {
+      "pos": [
+        20157,
+        20284
+      ],
+      "content": "每当提供给 <ph id=\"ph1\">`done`</ph> 约定的函数已成功完成或者收到错误时，就会立即执行该约定。与 <ph id=\"ph2\">`then`</ph> 约定不同，它肯定会引发无法在函数内部处理的错误；当处理程序完成执行后，此函数将引发当某个约定处于错误状态时返回的错误。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt><ept id=\"p1\">done]</ept>。"
+    },
+    {
+      "content": "例如：",
+      "pos": [
+        20334,
+        20337
+      ]
+    },
+    {
+      "pos": [
+        20564,
+        20703
+      ],
+      "content": "<ph id=\"ph1\">`then`</ph> 约定与 <ph id=\"ph2\">`done`</ph> 约定类似，而与 <ph id=\"ph3\">`then`</ph> 约定的不同之处在于，<ph id=\"ph4\">`done`</ph> 肯定会引发无法在函数内部处理的错误。如果你未向 <ph id=\"ph5\">`then`</ph> 提供错误处理程序，当操作出错时，它不会引发异常，而是返回一个处于错误状态的约定。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt><ept id=\"p1\">then]</ept>。"
+    },
+    {
+      "content": "例如：",
+      "pos": [
+        20799,
+        20802
+      ]
+    },
+    {
+      "pos": [
+        21029,
+        21277
+      ],
+      "content": "你可以通过许多不同的方式使用约定。你可以通过对前一个 <ph id=\"ph1\">`then`</ph> 函数返回的约定调用 <ph id=\"ph2\">`then`</ph> 或 <ph id=\"ph3\">`done`</ph> 来链接约定操作。对于操作的中间阶段使用 <ph id=\"ph4\">`then`</ph>（例如 <ph id=\"ph5\">`.then().then()`</ph>），对于操作的最后阶段使用 <ph id=\"ph6\">`done`</ph>（例如 <ph id=\"ph7\">`.then().then().done()`</ph>）。你可以链接多个 <ph id=\"ph8\">`then`</ph> 函数，因为 <ph id=\"ph9\">`then`</ph> 返回约定。无法链接多个 <ph id=\"ph10\">`done`</ph> 方法，因为该方法返回 undefined。<bpt id=\"p1\">[</bpt><ept id=\"p1\">详细了解 then 和 done 之间的差别]</ept>。"
+    },
+    {
+      "pos": [
+        21605,
+        21644
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"customizing\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：自定义客户端请求标头"
+    },
+    {
+      "pos": [
+        21646,
+        21752
+      ],
+      "content": "你可以使用 <ph id=\"ph1\">`withFilter`</ph> 函数发送自定义请求标头，以便读取和写入筛选器中即将发送的请求的任意属性。如果服务器端脚本需要自定义的 HTTP 标头或者可以使用这种标头增强自身，则你可能需要添加这样的标头。"
+    },
+    {
+      "content": "筛选器的作用远远不只是自定义请求标头，它们还可用于检查或更改请求、检查或更改响应、绕过网络调用、发送多个调用，等等。",
+      "pos": [
+        22039,
+        22097
+      ]
+    },
+    {
+      "pos": [
+        22102,
+        22137
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"hostnames\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：使用跨域资源共享"
+    },
+    {
+      "pos": [
+        22139,
+        22418
+      ],
+      "content": "若要控制允许与移动服务交互以及向其发送请求的网站，请确保将用于托管移动服务的网站主机名添加到跨域资源共享 (CORS) 允许列表。对于 JavaScript 后端移动服务，可以在 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>的“配置”选项卡中配置允许列表。你可以根据需要使用通配符。默认情况下，新的移动服务将指示浏览器只能允许来自 <ph id=\"ph1\">`localhost`</ph> 的访问，跨域资源共享 (CORS) 允许外部主机名上的浏览器中运行的 JavaScript 代码与移动服务交互。对于 WinJS 应用程序，不需要使用此配置。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"如何使用 HTML 客户端 | Azure\"\n    description=\"了解如何使用适用于 Azure 移动服务的 HTML 客户端。\"\n    services=\"mobile-services\"\n    documentationCenter=\"\"\n    authors=\"ggailey777\"\n    manager=\"dwrede\"\n    editor=\"\"/>\n\n<tags \n    ms.service=\"mobile-services\" \n    ms.date=\"10/23/2015\"\n    wacn.date=\"01/29/2016\"/>\n\n#  如何使用适用于 Azure 移动服务的 HTML/JavaScript 客户端\n\n[AZURE.INCLUDE [mobile-services-selector-client-library](../includes/mobile-services-selector-client-library.md)]\n\n## 概述\n\n本指南说明如何使用适用于 Azure 移动服务的 HTML/JavaScript 客户端（包括 Windows 应用商店 JavaScript 和 PhoneGap/Cordova 应用程序）执行常见任务。所述的任务包括查询数据、插入、更新和删除数据、对用户进行身份验证和处理错误。如果你是第一次使用移动服务，最好先完成[移动服务快速入门](/documentation/articles/mobile-services-html-get-started)。快速入门教程可帮助你配置帐户并创建第一个移动服务。\n\n[AZURE.INCLUDE [mobile-services-concepts](../includes/mobile-services-concepts.md)]\n\n## <a name=\"create-client\"></a>如何创建移动服务客户端\n\n添加移动服务客户端引用的方式取决于应用程序平台，其中包括：\n\n- 对于 Web 的应用程序，请打开 HTML 文件，然后将以下代码添加到页的脚本引用中：\n\n        <script src=\"http://ajax.aspnetcdn.com/ajax/mobileservices/MobileServices.Web-1.2.7.min.js\"></script>\n\n- 对于使用 JavaScript/HTML 编写的 Windows 应用商店应用程序，请将 **WindowsAzure.MobileServices.WinJS NuGet** 包添加到你的项目。\n\n- 对于 PhoneGap 或 Cordova 应用程序，请在项目中添加[移动服务插件](https://github.com/Azure/azure-mobile-services-cordova)。此插件支持[推送通知](#push-notifications)。\n\n在编辑器中，打开或创建一个 JavaScript 文件，添加以下代码以定义 `MobileServiceClient` 变量，然后在 `MobileServiceClient` 构造函数中按顺序提供移动服务的应用程序 URL 和应用程序密钥。\n\n    var MobileServiceClient = WindowsAzure.MobileServiceClient;\n    var client = new MobileServiceClient('AppUrl', 'AppKey');\n\n必须将占位符 `AppUrl` 替换为移动服务的应用程序 URL，将 `AppKey` 替换为你从 [Azure 经典门户](http://manage.windowsazure.cn/)获取的应用程序密钥。\n\n>[AZURE.IMPORTANT]应用程序密钥用于针对移动服务筛选出随机请求，将随应用程序一起分发。由于此密钥未加密，因此不能被认为是安全的。为确保安全访问你的移动服务数据，你必须改为在允许用户访问前对用户进行身份验证。有关详细信息，请参阅[如何：对用户进行身份验证](#authentication)。\n\n## <a name=\"querying\"></a>如何从移动服务查询数据\n\n访问或修改 SQL 数据库表中数据的所有代码均将调用 `MobileServiceTable` 对象的函数。可通过对 `MobileServiceClient` 实例调用 `getTable()` 函数来获取对表的引用。\n\n    var todoItemTable = client.getTable('todoitem');\n\n\n###  <a name=\"filtering\"></a>如何筛选返回的数据\n\n以下代码演示了如何通过在查询中包含 `where` 子句来筛选数据。该代码将返回 complete 字段等于 `false` 的 `todoItemTable` 中的所有项。`todoItemTable` 是对前面创建的移动服务表的引用。where 函数针对该表将一个行筛选谓词应用到查询。该函数接受 JSON 对象或定义行筛选器的函数作为其参数，并返回可进一步编写的查询。\n\n    var query = todoItemTable.where({\n        complete: false\n    }).read().done(function (results) {\n        alert(JSON.stringify(results));\n    }, function (err) {\n        alert(\"Error: \" + err);\n    });\n\n通过在 Query 对象中调用 `where` 并传递一个对象作为参数，我们可以指示移动服务仅返回 `complete` 列包含 `false` 值的行。另外，请查看以下请求 URI，可以看出，我们正在修改查询字符串本身：\n\n    GET /tables/todoitem?$filter=(complete+eq+false) HTTP/1.1\n\n可以使用消息检查软件（例如浏览器开发人员工具或 Fiddler）来查看发送到移动服务的请求的 URI。\n\n在服务器端，此请求通常会粗略地转换成以下 SQL 查询：\n\n    SELECT *\n    FROM TodoItem\n    WHERE ISNULL(complete, 0) = 0\n\n传递给 `where` 方法的对象可以包含任意数目的参数，所有这些参数都将解释为查询的 AND 子句。例如，以下行：\n\n    query.where({\n       complete: false,\n       assignee: \"david\",\n       difficulty: \"medium\"\n    }).read().done(function (results) {\n       alert(JSON.stringify(results));\n    }, function (err) {\n       alert(\"Error: \" + err);\n    });\n\n将粗略地转换为（针对前面显示的同一请求）\n\n    SELECT *\n    FROM TodoItem\n    WHERE ISNULL(complete, 0) = 0\n          AND assignee = 'david'\n          AND difficulty = 'medium'\n\n上述 `where` 语句和上述 SQL 查询将查找分配给“david”、难度为“medium”的不完整项。\n\n不过，还可以通过另一种方法来编写相同的查询。对 Query 对象的 `.where` 调用将在 `WHERE` 子句中添加一个 `AND` 表达式，因此，我们也可以在三个行中编写该查询：\n\n    query.where({\n       complete: false\n    });\n    query.where({\n       assignee: \"david\"\n    });\n    query.where({\n       difficulty: \"medium\"\n    });\n\n或者使用 Fluent API：\n\n    query.where({\n       complete: false\n    })\n       .where({\n       assignee: \"david\"\n    })\n       .where({\n       difficulty: \"medium\"\n    });\n\n这两种方法是等效的，可以换用。到目前为止，所有 `where` 调用都使用了带有某些参数的对象，并且会根据数据库中的数据比较相等性。但是，查询方法的另一个重载使用函数而不是对象。在这种情况下，我们可以在此函数中使用“不等于”等运算符和其他关系运算来编写更复杂的表达式。在这些函数中，关键字 `this` 将绑定到服务器对象。\n\n函数的正文将转换为开放数据协议 (OData) 布尔表达式，该表达式将传递给查询字符串参数。可以传入不带参数的函数，例如：\n\n    query.where(function () {\n       return this.assignee == \"david\" && (this.difficulty == \"medium\" || this.difficulty == \"low\");\n    }).read().done(function (results) {\n       alert(JSON.stringify(results));\n    }, function (err) {\n       alert(\"Error: \" + err);\n    });\n\n\n如果传入带参数的函数，则 `where` 子句后面的所有参数都将按顺序绑定到函数参数。来自函数范围以外的任何对象都必须作为参数传递 - 函数无法捕获任何外部变量。在接下来的两个示例中，自变量“david”将绑定到参数 `name`，在第一个示例中，自变量“medium”也绑定到参数 `level`。另外，函数必须包含带受支持表达式的单个 `return` 语句，例如：\n\n     query.where(function (name, level) {\n        return this.assignee == name && this.difficulty == level;\n     }, \"david\", \"medium\").read().done(function (results) {\n        alert(JSON.stringify(results));\n     }, function (err) {\n        alert(\"Error: \" + err);\n     });\n\n因此，只要我们遵守规则，就能将更复杂的筛选器添加到数据库查询，例如：\n\n    query.where(function (name) {\n       return this.assignee == name &&\n          (this.difficulty == \"medium\" || this.difficulty == \"low\");\n    }, \"david\").read().done(function (results) {\n       alert(JSON.stringify(results));\n    }, function (err) {\n       alert(\"Error: \" + err);\n    });\n\n可以将 `where` 与 `orderBy`、`take` 和 `skip` 组合使用。有关详细信息，请参阅下一节。\n\n###  <a name=\"sorting\"></a>如何为返回的数据排序\n\n以下代码演示了如何通过在查询中包含 `orderBy` 或 `orderByDescending` 函数来为数据排序。该代码将返回 `todoItemTable` 中的项，这些项已按 `text` 字段的升序排序。默认情况下，服务器只返回前 50 个元素。\n\n> [AZURE.NOTE]默认情况下，将使用服务器驱动的页大小来防止返回所有元素。这可以防止对大型数据集发出的默认请求对服务造成负面影响。 \n你可以根据下一节中所述，通过调用 `take` 来增加返回的项数。`todoItemTable` 是对前面创建的移动服务表的引用。\n\n    var ascendingSortedTable = todoItemTable.orderBy(\"text\").read().done(function (results) {\n       alert(JSON.stringify(results));\n    }, function (err) {\n       alert(\"Error: \" + err);\n    });\n\n    var descendingSortedTable = todoItemTable.orderByDescending(\"text\").read().done(function (results) {\n       alert(JSON.stringify(results));\n    }, function (err) {\n       alert(\"Error: \" + err);\n    });\n\n    var descendingSortedTable = todoItemTable.orderBy(\"text\").orderByDescending(\"text\").read().done(function (results) {\n       alert(JSON.stringify(results));\n    }, function (err) {\n       alert(\"Error: \" + err);\n    });\n\n###  <a name=\"paging\"></a>如何在页中返回数据\n\n默认情况下，移动服务只在给定的请求中返回 50 行，除非客户端显式要求在响应中返回更多的数据。以下代码演示了如何通过在查询中使用 `take` 和 `skip` 子句来实现返回数据的分页。执行以下查询后，将返回表中的前三个项。\n\n    var query = todoItemTable.take(3).read().done(function (results) {\n       alert(JSON.stringify(results));\n    }, function (err) {\n       alert(\"Error: \" + err);\n    });\n\n请注意，`take(3)` 方法已转换成查询 URI 中的查询选项 `$top=3`。\n\n以下经过修改的查询将跳过前三个结果，返回其后的三个结果。实际上这是数据的第二“页”，其页大小为三个项。\n\n    var query = todoItemTable.skip(3).take(3).read().done(function (results) {\n       alert(JSON.stringify(results));\n    }, function (err) {\n       alert(\"Error: \" + err);\n    });\n\n同样，你可以查看发送到移动服务的请求的 URI。请注意，`skip(3)` 方法已转换成查询 URI 中的查询选项 `$skip=3`。\n\n这是将硬编码分页值传递给 `take` 和 `skip` 函数的简化方案。在实际应用中，你可以对页导航控件或类似的 UI 使用类似于上面的查询，让用户导航到上一页和下一页。\n\n###  <a name=\"selecting\"></a>如何选择特定的列\n\n你可以通过在查询中添加 `select` 子句来指定要包含在结果中的属性集。例如，以下代码将从 `todoItemTable` 的每一行中返回 `id`、`complete` 和 `text` 属性：\n\n    var query = todoItemTable.select(\"id\", \"complete\", \"text\").read().done(function (results) {\n       alert(JSON.stringify(results));\n    }, function (err) {\n       alert(\"Error: \" + err);\n    })\n\n此处，select 函数的参数是要返回的表列的名称。\n\n\n到目前为止所述的所有函数都是加性函数，我们可以不断地调用它们，每次调用都能进一步影响查询。再提供一个示例：\n\n    query.where({\n       complete: false\n    })\n       .select('id', 'assignee')\n       .orderBy('assignee')\n       .take(10)\n       .read().done(function (results) {\n       alert(JSON.stringify(results));\n    }, function (err) {\n       alert(\"Error: \" + err);\n\n###  <a name=\"lookingup\"></a>如何：按 ID 查找数据\n\n`lookup` 函数只使用 `id` 值，并从数据库返回具有该 ID 的对象。创建数据库表时使用了整数或字符串 `id` 列。默认使用字符串 `id` 列。\n\n    todoItemTable.lookup(\"37BBF396-11F0-4B39-85C8-B319C729AF6D\").done(function (result) {\n       alert(JSON.stringify(result));\n    }, function (err) {\n       alert(\"Error: \" + err);\n    })\n\n## <a name=\"odata-query\"></a>执行 OData 查询操作\n\n移动服务使用 OData 查询 URI 约定编写和执行 REST 查询。并非所有 OData 查询都可使用内置查询函数编写，尤其是复杂的筛选器操作，如搜索属性中的子字符串。对于这些类型的复杂查询，可以将任何有效的 OData 查询选项字符串传递给 `read` 函数，如下所示：\n\n    function refreshTodoItems() {\n        todoItemTable.read(\"$filter=substringof('search_text',text)\").then(function(items) {\n            var itemElements = $.map(items, createUiForTodoItem);\n            $(\"#todo-items\").empty().append(itemElements);\n            $(\"#no-items\").toggle(items.length === 0);\n        }, handleError);\n    }\n\n>[AZURE.NOTE]在 `read` 函数中提供原始 OData 查询选项字符串时，不能在同一查询中使用查询生成器方法。在这种情况下，必须将整个查询编写为 OData 查询字符串。有关 OData 系统查询选项的详细信息，请参阅 [OData 系统查询选项参考]。\n\n## <a name=\"inserting\"></a>如何在移动服务中插入数据\n\n以下代码演示了如何在表中插入新行。客户端通过将 POST 请求发送到移动服务来请求插入数据行。请求正文包含要插入的、JSON 对象形式的数据。\n\n    todoItemTable.insert({\n       text: \"New Item\",\n       complete: false\n    })\n\n以上代码会将提供的 JSON 对象中的数据插入到表中。你还可以指定完成插入时要调用的回调函数：\n\n    todoItemTable.insert({\n       text: \"New Item\",\n       complete: false\n    }).done(function (result) {\n       alert(JSON.stringify(result));\n    }, function (err) {\n       alert(\"Error: \" + err);\n    });\n\n### 使用 ID 值\n\n移动服务支持为表的 **ID** 列使用唯一的自定义字符串值。这样，应用程序便可为 ID 使用自定义值（如电子邮件地址或用户名）。例如，以下代码将插入 JSON 对象形式的新项，其中，唯一 ID 是电子邮件地址：\n\n            todoItemTable.insert({\n               id: \"myemail@domain.com\",\n               text: \"New Item\",\n               complete: false\n    });\n\n字符串 ID 可提供以下优势：\n\n+ 无需往返访问数据库即可生成 ID。\n+ 更方便地合并不同表或数据库中的记录。\n+ ID 值能够更好地与应用程序的逻辑相集成。\n\n如果插入的记录中尚未设置字符串 ID 值，移动服务将为 ID 生成唯一值。有关如何在客户端上或 .NET 后端中生成自己的 ID 值的详细信息，请参阅[如何：生成唯一 ID 值](/documentation/articles/mobile-services-how-to-use-server-scripts/#generate-guids)。\n\n也可以为表使用整数 ID。若要使用整数 ID，必须结合 `--integerId` 选项使用 `mobile table create` 命令创建表。应在适用于 Azure 的命令行界面 (CLI) 中使用此命令。有关使用 CLI 的详细信息，请参阅[用于管理移动服务表的 CLI](/documentation/articles/virtual-machines-command-line-tools/#Mobile_Tables)。\n\n## <a name=\"modifying\"></a>如何：在移动服务中修改数据\n\n以下代码演示了如何更新表中的数据。客户端通过将 PATCH 请求发送到移动服务来请求更新数据行。请求正文包含要更新的、JSON 对象形式的特定字段。该代码将更新表 `todoItemTable` 中的某个现有项。\n\n            todoItemTable.update({\n               id: idToUpdate,\n               text: newText\n            })\n\n第一个参数使用 ID 指定了表中要更新的实例。\n\n你还可以指定在完成更新时要调用的回调函数：\n\n            todoItemTable.update({\n               id: idToUpdate,\n               text: newText\n            }).done(function (result) {\n               alert(JSON.stringify(result));\n            }, function (err) {\n               alert(\"Error: \" + err);\n            });\n\n## <a name=\"deleting\"></a>如何在移动服务中删除数据\n\n以下代码演示了如何删除表中的数据。客户端通过将 DELETE 请求发送到移动服务来请求删除数据行。该代码将删除表 todoItemTable 中的某个现有项。\n\n            todoItemTable.del({\n               id: idToDelete\n            })\n\n第一个参数使用 ID 指定了表中要删除的实例。\n\n你还可以指定在完成删除时要调用的回调函数：\n\n            todoItemTable.del({\n               id: idToDelete\n            }).done(function () {\n               /* Do something */\n            }, function (err) {\n               alert(\"Error: \" + err);\n            });\n\n## <a name=\"binding\"></a>如何：在用户界面中显示数据\n\n本部分说明如何使用 UI 元素显示返回的数据对象。若要查询 `todoItemTable` 中的项并在极简单的列表中显示这些项，可以运行以下示例代码。这里未执行任何形式的选择、筛选或排序操作。\n\n            var query = todoItemTable;\n\n            query.read().then(function (todoItems) {\n               // The space specified by 'placeToInsert' is an unordered list element <ul> ... </ul>\n               var listOfItems = document.getElementById('placeToInsert');\n               for (var i = 0; i < todoItems.length; i++) {\n                  var li = document.createElement('li');\n                  var div = document.createElement('div');\n                  div.innerText = todoItems[i].text;\n                  li.appendChild(div);\n                  listOfItems.appendChild(li);\n               }\n            }).read().done(function (results) {\n               alert(JSON.stringify(results));\n            }, function (err) {\n               alert(\"Error: \" + err);\n            });\n\n在 Windows 应用商店应用程序中，可以使用查询的结果来创建 [WinJS.Binding.List] 对象，该对象可绑定为 [ListView] 对象的数据源。有关详细信息，请参阅[数据绑定（使用 JavaScript 和 HTML 的 Windows 应用商店应用程序）]。\n\n##<a name=\"custom-api\"></a>如何：调用自定义 API\n\n自定义 API 可让你定义自定义终结点，这些终结点将会公开不映射到插入、更新、删除或读取操作的服务器功能。使用自定义 API 能够以更大的力度控制消息传送，包括读取和设置 HTTP 消息标头，以及定义除 JSON 以外的消息正文格式。有关如何在移动服务中创建自定义 API 的示例，请参阅[如何：定义自定义 API 终结点](/documentation/articles/mobile-services-dotnet-backend-define-custom-api)。\n\n通过对 **MobileServiceClient** 调用 [invokeApi](https://github.com/Azure/azure-mobile-services/blob/master/sdk/Javascript/src/MobileServiceClient.js#L337) 方法，从客户端调用自定义 API。例如，以下代码行向移动服务上的 **completeAll** API 发送 POST 请求：\n\n    client.invokeApi(\"completeall\", {\n        body: null,\n        method: \"post\"\n    }).done(function (results) {\n        var message = results.result.count + \" item(s) marked as complete.\";\n        alert(message);\n        refreshTodoItems();\n    }, function(error) {\n        alert(error.message);\n    });\n\n \n有关更现实可行的示例和对 **invokeApi** 更完整的介绍，请参阅[Azure 移动服务客户端 SDK 中的自定义 API](http://blogs.msdn.com/b/carlosfigueira/archive/2013/06/19/custom-api-in-azure-mobile-services-client-sdks.aspx)。\n\n##<a name=\"authentication\"></a>如何对用户进行身份验证\n\n移动服务支持使用各种外部标识提供者对应用程序用户进行身份验证和授权，这些提供者包括：Facebook、Google、Microsoft 帐户和 Twitter。你可以在表中设置权限，以便将特定操作的访问权限限制给已经过身份验证的用户。你还可以在服务器脚本中使用已经过身份验证的用户的标识来实施授权规则。有关详细信息，请参阅 [身份验证入门] 教程。\n\n>[AZURE.NOTE]在 PhoneGap 或 Cordova 应用程序中使用身份验证时，还必须向项目中添加以下插件：\n>\n>+ https://git-wip-us.apache.org/repos/asf/cordova-plugin-device.git\n>+ https://git-wip-us.apache.org/repos/asf/cordova-plugin-inappbrowser.git\n\n\n支持两种身份验证流：_服务器流_和_客户端流_。服务器流依赖于提供者的 Web 身份验证界面，因此可提供最简便的身份验证体验。客户端流依赖于提供者和设备特定的 SDK，因此允许与设备特定的功能（例如单一登录）进行更深入的集成。\n\n###服务器流\n若要让移动服务管理 Windows 应用商店或 HTML5 应用程序中的身份验证过程，必须将你的应用程序注册到标识提供者。然后，需要在移动服务中配置提供者提供的应用程序 ID 和机密。有关详细信息，请参阅[向应用程序添加身份验证](/documentation/articles/mobile-services-html-get-started-users)教程。\n\n注册标识提供者后，只需结合提供者的 [MobileServiceAuthenticationProvider] 值调用 [LoginAsync 方法]。例如，若要使用 Facebook 登录，请使用以下代码。\n\n        client.login(\"facebook\").done(function (results) {\n             alert(\"You are now logged in as: \" + results.userId);\n        }, function (err) {\n             alert(\"Error: \" + err);\n        });\n\n如果你使用的标识提供者不是 Facebook，请将传递给上述 `login` 方法的值更改为下列项之一：`microsoftaccount`、`facebook`、`twitter`、`google` 或 `windowsazureactivedirectory`。\n\n在此情况下，移动服务将通过以下方式管理 OAuth 2.0 身份验证流：显示选定提供者的登录页，并在用户成功使用标识提供者登录后生成移动服务身份验证令牌。[login] 函数在完成时将返回一个 JSON 对象 (**user**)，该对象分别在 **userId** 和 **authenticationToken** 字段中公开用户 ID 和移动服务身份验证令牌。你可以缓存此令牌，并在它过期之前重复使用。有关详细信息，请参阅“缓存身份验证令牌”。\n\n###客户端流\n你的应用程序还能够独立联系标识提供者，然后将返回的令牌提供给移动服务以进行身份验证。使用此客户端流可为用户提供单一登录体验，或者从标识提供者中检索其他用户数据。\n\n####Facebook/Google SDK 基本示例\n\n此示例使用 Facebook 客户端 SDK 进行身份验证：\n\n    client.login(\n         \"facebook\",\n         {\"access_token\": token})\n    .done(function (results) {\n         alert(\"You are now logged in as: \" + results.userId);\n    }, function (err) {\n         alert(\"Error: \" + err);\n    });\n\n此示例假定由相应的提供程序 SDK 提供的令牌存储在 `token` 变量中。目前，不能使用 Twitter 进行客户端身份验证。\n\n####Microsoft 帐户基本示例\n以下示例使用 Live SDK，该 SDK 使用 Microsoft 帐户来支持 Windows 应用商店应用程序的单一登录：\n\n        WL.login({ scope: \"wl.basic\"}).then(function (result) {\n              client.login(\n                    \"microsoftaccount\",\n                    {\"authenticationToken\": result.session.authentication_token})\n              .done(function(results){\n                    alert(\"You are now logged in as: \" + results.userId);\n              },\n              function(error){\n                    alert(\"Error: \" + err);\n              });\n        });\n\n这个简化的示例将从 Live Connect 获取一个令牌，并通过调用 [login] 函数将该令牌提供给移动服务。\n\n\n####Microsoft 帐户完整示例\n\n以下示例演示如何使用 Live SDK 和 WinJS API 来提供增强的单一登录体验：\n\n    // Set the mobileClient variable to client variable generated by the tooling.\n    var mobileClient = <yourClient>;\n\n    var session = null;\n    var login = function () {\n        return new WinJS.Promise(function (complete) {\n            WL.login({ scope: \"wl.basic\" }).then(function (result) {\n                session = result.session;\n\n                WinJS.Promise.join([\n                    WL.api({ path: \"me\", method: \"GET\" }),\n                    mobileClient.login(result.session.authentication_token)\n                ]).done(function (results) {\n                    // Build the welcome message from the Microsoft account info.\n                    var profile = results[0];\n                    var title = \"Welcome \" + profile.first_name + \"!\";\n                    var message = \"You are now logged in as: \"\n                        + mobileClient.currentUser.userId;\n                    var dialog = new Windows.UI.Popups.MessageDialog(message, title);\n                    dialog.showAsync().then(function () {\n                        // Reload items from the mobile service.\n                        refreshTodoItems();\n                    }).done(complete);\n\n                }, function (error) {\n\n                });\n            }, function (error) {\n                session = null;\n                var dialog = new Windows.UI.Popups.MessageDialog(\"You must log in.\", \"Login Required\");\n                dialog.showAsync().done(complete);\n            });\n        });\n    }\n\n    var authenticate = function () {\n        // Block until sign-in is successful.\n        login().then(function () {\n            if (session === null) {\n                // Authentication failed, try again.\n                authenticate();\n            }\n        });\n    }\n\n    // Initialize the Live client.\n    WL.init({\n        redirect_uri: mobileClient.applicationUrl\n    });\n\n    // Start the sign-in process.\n    authenticate();\n\n此代码初始化 Live Connect 客户端，向 Microsoft 帐户发送一个新的登录请求，将返回的身份验证令牌发送到移动服务，然后显示有关已登录用户的信息。在身份验证成功之前，该应用不会启动。\n<!--- //this guidance may be bad from an XSS vulnerability standpoint. We need to find better guidance for this\n###Caching the authentication token\nIn some cases, the call to the login method can be avoided after the first time the user authenticates. We can use [sessionStorage] or [localStorage] to cache the current user identity the first time they log in and every subsequent time we check whether we already have the user identity in our cache. If the cache is empty or calls fail (meaning the current login session has expired), we still need to go through the login process.\n\n        // After logging in\n        sessionStorage.loggedInUser = JSON.stringify(client.currentUser);\n\n        // Log in\n        if (sessionStorage.loggedInUser) {\n           client.currentUser = JSON.parse(sessionStorage.loggedInUser);\n        } else {\n           // Regular login flow\n       }\n\n         // Log out\n        client.logout();\n        sessionStorage.loggedInUser = null;\n-->\n\n## <a name=\"push-notifications\"></a>如何：注册推送通知\n\n如果你的应用程序是 PhoneGap 或 Apache Cordova HTML/JavaScript 应用程序，则你可以使用本机移动平台在设备上接收推送通知。[Azure 移动服务的 Apache Cordova 插件](https://github.com/Azure/azure-mobile-services-cordova)可让你向 Azure 通知中心注册推送通知。使用的具体通知服务取决于执行代码的本机设备平台。有关如何执行此操作的示例，请参阅[使用 Azure 将通知推送到 Cordova 应用程序](https://github.com/Azure/mobile-services-samples/tree/master/CordovaNotificationsArticle)。\n\n>[AZURE.NOTE]此插件目前仅支持 iOS 和 Android 设备。有关也包含 Windows 设备的解决方案，请参阅文章[使用通知中心集成将通知推送到 PhoneGap 应用程序](http://blogs.msdn.com/b/azuremobile/archive/2014/06/17/push-notifications-to-phonegap-apps-using-notification-hubs-integration.aspx)。\n\n## <a name=\"errors\"></a>如何：处理错误\n\n在移动服务中，你可能会遇到各种形式的错误，并且可以通过多种方式来验证和解决这些错误。\n\n例如，你可以在移动服务中注册服务器脚本，然后使用这些脚本对所要插入和更新的数据执行各种操作，包括验证和数据修改。你可以按如下所示定义并注册一个用于验证和修改数据的服务器脚本：\n\n            function insert(item, user, request) {\n               if (item.text.length > 10) {\n                  request.respond(statusCodes.BAD_REQUEST, { error: \"Text cannot exceed 10 characters\" });\n               } else {\n                  request.execute();\n               }\n            }\n\n此服务器端脚本将验证发送到移动服务的字符串数据长度，并拒绝过长（在本例中为 10 个字符以上）的字符串。\n\n由于移动服务能够在服务器端验证数据和发送错误响应，因此你可以更新你的 HTML 应用程序，使其能够处理验证后生成的错误响应。\n\n        todoItemTable.insert({\n           text: itemText,\n           complete: false\n        })\n           .then(function (results) {\n           alert(JSON.stringify(results));\n        }, function (error) {\n           alert(JSON.parse(error.request.responseText).error);\n        });\n\n\n更明白地说，每次执行数据访问时，你都可以传入错误处理程序作为第二个参数：\n\n            function handleError(message) {\n               if (window.console && window.console.error) {\n                  window.console.error(message);\n               }\n            }\n\n    client.getTable(\"tablename\").read()\n        .then(function (data) { /* do something */ }, handleError);\n\n## <a name=\"promises\"></a>如何：使用约定\n\n约定提供了一种机制，让你基于尚未计算的值安排有待完成的工作。它是用于管理与异步 API 的交互的抽象。\n\n每当提供给 `done` 约定的函数已成功完成或者收到错误时，就会立即执行该约定。与 `then` 约定不同，它肯定会引发无法在函数内部处理的错误；当处理程序完成执行后，此函数将引发当某个约定处于错误状态时返回的错误。有关详细信息，请参阅 [done]。\n\n            promise.done(onComplete, onError);\n\n例如：\n\n            var query = todoItemTable;\n            query.read().done(function (results) {\n               alert(JSON.stringify(results));\n            }, function (err) {\n               alert(\"Error: \" + err);\n            });\n\n`then` 约定与 `done` 约定类似，而与 `then` 约定的不同之处在于，`done` 肯定会引发无法在函数内部处理的错误。如果你未向 `then` 提供错误处理程序，当操作出错时，它不会引发异常，而是返回一个处于错误状态的约定。有关详细信息，请参阅 [then]。\n\n            promise.then(onComplete, onError).done( /* Your success and error handlers */ );\n\n例如：\n\n            var query = todoItemTable;\n            query.read().done(function (results) {\n               alert(JSON.stringify(results));\n            }, function (err) {\n               alert(\"Error: \" + err);\n            });\n\n你可以通过许多不同的方式使用约定。你可以通过对前一个 `then` 函数返回的约定调用 `then` 或 `done` 来链接约定操作。对于操作的中间阶段使用 `then`（例如 `.then().then()`），对于操作的最后阶段使用 `done`（例如 `.then().then().done()`）。你可以链接多个 `then` 函数，因为 `then` 返回约定。无法链接多个 `done` 方法，因为该方法返回 undefined。[详细了解 then 和 done 之间的差别]。\n\n            todoItemTable.insert({\n               text: \"foo\"\n            }).then(function (inserted) {\n               inserted.newField = 123;\n               return todoItemTable.update(inserted);\n            }).done(function (insertedAndUpdated) {\n               alert(JSON.stringify(insertedAndUpdated));\n            })\n\n##<a name=\"customizing\"></a>如何：自定义客户端请求标头\n\n你可以使用 `withFilter` 函数发送自定义请求标头，以便读取和写入筛选器中即将发送的请求的任意属性。如果服务器端脚本需要自定义的 HTTP 标头或者可以使用这种标头增强自身，则你可能需要添加这样的标头。\n\n            var client = new WindowsAzure.MobileServiceClient('https://your-app-url', 'your-key')\n               .withFilter(function (request, next, callback) {\n               request.headers.MyCustomHttpHeader = \"Some value\";\n               next(request, callback);\n            });\n\n筛选器的作用远远不只是自定义请求标头，它们还可用于检查或更改请求、检查或更改响应、绕过网络调用、发送多个调用，等等。\n\n## <a name=\"hostnames\"></a>如何：使用跨域资源共享\n\n若要控制允许与移动服务交互以及向其发送请求的网站，请确保将用于托管移动服务的网站主机名添加到跨域资源共享 (CORS) 允许列表。对于 JavaScript 后端移动服务，可以在 [Azure 经典门户](https://manage.windowsazure.cn)的“配置”选项卡中配置允许列表。你可以根据需要使用通配符。默认情况下，新的移动服务将指示浏览器只能允许来自 `localhost` 的访问，跨域资源共享 (CORS) 允许外部主机名上的浏览器中运行的 JavaScript 代码与移动服务交互。对于 WinJS 应用程序，不需要使用此配置。\n\n<!-- Anchors. -->\n\n[What is Mobile Services]: #what-is\n[Concepts]: #concepts\n[How to: Create the Mobile Services client]: #create-client\n[How to: Query data from a mobile service]: #querying\n[Filter returned data]: #filtering\n[Sort returned data]: #sorting\n[Return data in pages]: #paging\n[Select specific columns]: #selecting\n[Look up data by ID]: #lookingup\n[How to: Display data in the user interface]: #binding\n[How to: Insert data into a mobile service]: #inserting\n[How to: Modify data in a mobile service]: #modifying\n[How to: Delete data in a mobile service]: #deleting\n[How to: Authenticate users]: #authentication\n[How to: Handle errors]: #errors\n[How to: Use promises]: #promises\n[How to: Customize request headers]: #customizing\n[How to: Use cross-origin resource sharing]: #hostnames\n[Next steps]: #nextsteps\n[Execute an OData query operation]: #odata-query\n\n\n\n<!-- URLs. -->\n\n[then]: http://msdn.microsoft.com/zh-cn/library/windows/apps/br229728.aspx\n[done]: http://msdn.microsoft.com/zh-cn/library/windows/apps/hh701079.aspx\n[详细了解 then 和 done 之间的差别]: http://msdn.microsoft.com/zh-cn/library/windows/apps/hh700334.aspx\n[how to handle errors in promises]: http://msdn.microsoft.com/zh-cn/library/windows/apps/hh700337.aspx\n\n[sessionStorage]: http://msdn.microsoft.com/zh-cn/library/cc197062(v=vs.85).aspx\n[localStorage]: http://msdn.microsoft.com/zh-cn/library/cc197062(v=vs.85).aspx\n\n[ListView]: http://msdn.microsoft.com/zh-cn/library/windows/apps/br211837.aspx\n[数据绑定（使用 JavaScript 和 HTML 的 Windows 应用商店应用程序）]: http://msdn.microsoft.com/zh-cn/library/windows/apps/hh758311.aspx\n[login]: https://github.com/Azure/azure-mobile-services/blob/master/sdk/Javascript/src/MobileServiceClient.js#L301\n[ASCII control codes C0 and C1]: http://zh.wikipedia.org/wiki/Data_link_escape_character#C1_set\n[OData 系统查询选项参考]: http://go.microsoft.com/fwlink/p/?LinkId=444502\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

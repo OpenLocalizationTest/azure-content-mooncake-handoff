@@ -1,0 +1,1755 @@
+{
+  "nodes": [
+    {
+      "content": "服务总线 和 Java 与 AMQP 1.0 | Azure",
+      "pos": [
+        27,
+        57
+      ]
+    },
+    {
+      "content": "使用 AMQP 通过 Java 使用服务总线。",
+      "pos": [
+        75,
+        98
+      ]
+    },
+    {
+      "content": "使用 AMQP 1.0 通过 Java 使用服务总线",
+      "pos": [
+        312,
+        338
+      ]
+    },
+    {
+      "pos": [
+        427,
+        664
+      ],
+      "content": "Java 消息服务 (JMS) 是一种标准 API，用于处理 Java 平台上面向消息的中间件。Azure 服务总线已使用 Apache Qpid 项目开发的基于 AMQP 1.0 的 JMS 客户端库进行测试。此库支持完整的 JMS 1.1 API，并可用于任何 AMQP 1.0 兼容的消息服务。在适用于 Windows Server 的服务总线（本地服务总线）中也支持此方案。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>适用于 Windows Server 的服务总线中的 AMQP<ept id=\"p1\">][]</ept>。"
+    },
+    {
+      "content": "下载 Apache Qpid AMQP 1.0 JMS 客户端库",
+      "pos": [
+        669,
+        701
+      ]
+    },
+    {
+      "pos": [
+        703,
+        893
+      ],
+      "content": "有关下载 Apache Qpid JMS AMQP 1.0 客户端库的最新版本的信息，请访问 <bpt id=\"p1\">[</bpt>http://people.apache.org/~rgodfrey/qpid-java-amqp-1-0-client-jms.html<ept id=\"p1\">](http://people.apache.org/~rgodfrey/qpid-java-amqp-1-0-client-jms.html)</ept>。"
+    },
+    {
+      "content": "使用 Service Bus 构建和运行 JMS 应用程序时必须将以下 4 个 JAR 文件从 Apache Qpid JMS AMQP 1.0 分发存档添加到 Java CLASSPATH：",
+      "pos": [
+        895,
+        991
+      ]
+    },
+    {
+      "content": "geronimo-jms_1.1_spec-[version].jar",
+      "pos": [
+        997,
+        1032
+      ]
+    },
+    {
+      "content": "qpid-amqp-1-0-client-[version].jar",
+      "pos": [
+        1038,
+        1072
+      ]
+    },
+    {
+      "content": "qpid-amqp-1-0-client-jms-[version].jar",
+      "pos": [
+        1078,
+        1116
+      ]
+    },
+    {
+      "content": "qpid-amqp-1-0-common-[version].jar",
+      "pos": [
+        1122,
+        1156
+      ]
+    },
+    {
+      "content": "通过 JMS 使用服务总线队列、主题和订阅",
+      "pos": [
+        1161,
+        1182
+      ]
+    },
+    {
+      "content": "Java 命名和目录接口 (JNDI)",
+      "pos": [
+        1188,
+        1207
+      ]
+    },
+    {
+      "pos": [
+        1209,
+        1419
+      ],
+      "content": "JMS 使用 Java 命名和目录接口 (JNDI) 创建逻辑名称和物理名称之间的分隔。将使用 JNDI 解析以下两种类型的 JMS 对象：<bpt id=\"p1\">**</bpt>ConnectionFactory<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>Destination<ept id=\"p2\">**</ept>。JNDI 使用一个提供程序模型，你可以在其中插入不同目录服务来处理名称解析任务。Apache Qpid JMS AMQP 1.0 库附带一个使用文本文件配置的、基于属性文件的简单 JNDI 提供程序。"
+    },
+    {
+      "content": "Qpid 属性文件 JNDI 提供程序是使用以下格式的属性文件配置的：",
+      "pos": [
+        1421,
+        1456
+      ]
+    },
+    {
+      "content": "配置连接工厂",
+      "pos": [
+        1905,
+        1911
+      ]
+    },
+    {
+      "pos": [
+        1913,
+        1971
+      ],
+      "content": "用于在 Qpid 属性文件 JNDI 提供程序中定义 <bpt id=\"p1\">**</bpt>ConnectionFactory<ept id=\"p1\">**</ept> 的条目的格式如下："
+    },
+    {
+      "pos": [
+        2030,
+        2074
+      ],
+      "content": "其中 <ph id=\"ph1\">`[jndi_name]`</ph> 和 <ph id=\"ph2\">`[ConnectionURL]`</ph> 具有以下含义："
+    },
+    {
+      "content": "Name",
+      "pos": [
+        2078,
+        2082
+      ]
+    },
+    {
+      "content": "含义",
+      "pos": [
+        2085,
+        2087
+      ]
+    },
+    {
+      "pos": [
+        2293,
+        2358
+      ],
+      "content": "连接工厂的逻辑名称。通过使用 JNDI <ph id=\"ph1\">`IntialContext.lookup()`</ph> 方法在 Java 应用程序中解析此名称。"
+    },
+    {
+      "content": "用于向 AMQP 代理提供包含所需信息的 JMS 库的 URL。",
+      "pos": [
+        2391,
+        2423
+      ]
+    },
+    {
+      "content": "连接 URL 的格式如下：",
+      "pos": [
+        2435,
+        2448
+      ]
+    },
+    {
+      "pos": [
+        2529,
+        2581
+      ],
+      "content": "其中 <ph id=\"ph1\">`[namespace]`</ph>、<ph id=\"ph2\">`[username]`</ph> 和 <ph id=\"ph3\">`[password]`</ph> 具有以下含义："
+    },
+    {
+      "content": "Name",
+      "pos": [
+        2585,
+        2589
+      ]
+    },
+    {
+      "content": "含义",
+      "pos": [
+        2592,
+        2594
+      ]
+    },
+    {
+      "pos": [
+        2738,
+        2766
+      ],
+      "content": "从 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">][]</ept>获取的服务总线命名空间。"
+    },
+    {
+      "pos": [
+        2794,
+        2823
+      ],
+      "content": "从 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">][]</ept>获取的服务总线颁发者名称。"
+    },
+    {
+      "pos": [
+        2851,
+        2890
+      ],
+      "content": "从 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">][]</ept>获取的 URL 编码形式的服务总线颁发者密钥。"
+    },
+    {
+      "pos": [
+        2904,
+        3056
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>必须手动为密码进行 URL 编码。在 <bpt id=\"p1\">[</bpt>http://www.w3schools.com/tags/ref\\_urlencode.asp<ept id=\"p1\">](http://www.w3schools.com/tags/ref_urlencode.asp)</ept> 上提供了一个有用的 URL 编码实用工具。"
+    },
+    {
+      "content": "例如，如果从门户获得的信息如下所示：",
+      "pos": [
+        3058,
+        3076
+      ]
+    },
+    {
+      "content": "Namespace：",
+      "pos": [
+        3080,
+        3090
+      ]
+    },
+    {
+      "content": "test.servicebus.chinacloudapi.cn",
+      "pos": [
+        3093,
+        3125
+      ]
+    },
+    {
+      "content": "颁发者名称：",
+      "pos": [
+        3194,
+        3200
+      ]
+    },
+    {
+      "content": "owner",
+      "pos": [
+        3203,
+        3208
+      ]
+    },
+    {
+      "content": "颁发者密钥：",
+      "pos": [
+        3213,
+        3219
+      ]
+    },
+    {
+      "content": "abcdefg",
+      "pos": [
+        3222,
+        3229
+      ]
+    },
+    {
+      "pos": [
+        3233,
+        3303
+      ],
+      "content": "那么，为了定义名为 <ph id=\"ph1\">`SBCONNECTIONFACTORY`</ph> 的 <bpt id=\"p1\">**</bpt>ConnectionFactory<ept id=\"p1\">**</ept> 对象，配置字符串将如下所示："
+    },
+    {
+      "content": "配置目标",
+      "pos": [
+        3414,
+        3418
+      ]
+    },
+    {
+      "content": "用于在 Qpid 属性文件 JNDI 提供程序中定义目标的条目的格式如下：",
+      "pos": [
+        3420,
+        3457
+      ]
+    },
+    {
+      "pos": [
+        3540,
+        3584
+      ],
+      "content": "其中 <ph id=\"ph1\">`[jndi_name]`</ph> 和 <ph id=\"ph2\">`[physical_name]`</ph> 具有以下含义："
+    },
+    {
+      "content": "Name",
+      "pos": [
+        3588,
+        3592
+      ]
+    },
+    {
+      "content": "含义",
+      "pos": [
+        3595,
+        3597
+      ]
+    },
+    {
+      "pos": [
+        3779,
+        3842
+      ],
+      "content": "目标的逻辑名称。通过使用 JNDI <ph id=\"ph1\">`IntialContext.lookup()`</ph> 方法在 Java 应用程序中解析此名称。"
+    },
+    {
+      "content": "应用程序在其中发送或接收消息的 Service Bus 实体的名称。",
+      "pos": [
+        3867,
+        3901
+      ]
+    },
+    {
+      "content": "注意以下事项：",
+      "pos": [
+        3905,
+        3912
+      ]
+    },
+    {
+      "pos": [
+        3916,
+        3948
+      ],
+      "content": "<ph id=\"ph1\">`[physical\\name]`</ph> 值可以是服务总线队列或主题。"
+    },
+    {
+      "content": "在从 Service Bus 主题订阅中接收时，在 JNDI 中指定的物理名称应该是该主题的名称。在 JMS 应用程序代码中创建可持久订阅时提供该订阅名称。",
+      "pos": [
+        3951,
+        4029
+      ]
+    },
+    {
+      "content": "还可以将服务总线主题订阅视为一个 JMS 队列。此方法具有以下几个优点：可以针对队列和主题订阅使用同一接收者代码，并且所有地址信息（主题和订阅名称）都在属性文件中外部化。",
+      "pos": [
+        4032,
+        4117
+      ]
+    },
+    {
+      "pos": [
+        4120,
+        4229
+      ],
+      "content": "若要将服务总线主题订阅视为一个 JMS 队列，属性文件中的条目应采用以下形式：<ph id=\"ph1\">`queue.[jndi_name] = [topic_name]/Subscriptions/[subscription_name]`</ph>。|"
+    },
+    {
+      "content": "若要定义映射到名为“topic1”的服务总线主题的名为“TOPIC”的逻辑 JMS 目标，属性文件中的条目应如下所示：",
+      "pos": [
+        4231,
+        4290
+      ]
+    },
+    {
+      "content": "使用 JMS 发送消息",
+      "pos": [
+        4326,
+        4337
+      ]
+    },
+    {
+      "pos": [
+        4339,
+        4438
+      ],
+      "content": "以下代码演示如何向服务总线主题发送消息。假设在上一部分中所述的 <bpt id=\"p1\">**</bpt>servicebus.properties<ept id=\"p1\">**</ept> 配置文件中定义了 <ph id=\"ph1\">`SBCONNECTIONFACTORY`</ph> 和 <ph id=\"ph2\">`TOPIC`</ph>。"
+    },
+    {
+      "content": "使用 JMS 接收消息",
+      "pos": [
+        5166,
+        5177
+      ]
+    },
+    {
+      "pos": [
+        5179,
+        5309
+      ],
+      "content": "以下代码演示如何从服务总线主题订阅接收消息。<ph id=\"ph1\">`how`</ph>假设在上一部分中所述的 <bpt id=\"p1\">**</bpt>servicebus.properties<ept id=\"p1\">**</ept> 配置文件中定义了 <ph id=\"ph2\">`SBCONNECTIONFACTORY`</ph> 和 TOPIC。它还假定订阅名称是 <ph id=\"ph3\">`subscription1`</ph>。"
+    },
+    {
+      "content": "用于构建可靠的应用程序的准则",
+      "pos": [
+        6029,
+        6043
+      ]
+    },
+    {
+      "content": "JMS 规范定义了应如何编写 API 方法和应用程序代码的异常约定来处理此类异常。下面是有关异常处理需要注意的其他一些要点：",
+      "pos": [
+        6045,
+        6107
+      ]
+    },
+    {
+      "pos": [
+        6113,
+        6386
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>connection.setExceptionListener<ept id=\"p1\">**</ept> 向 JMS 连接注册 <bpt id=\"p2\">**</bpt>ExceptionListener<ept id=\"p2\">**</ept>。这允许以异步方式向客户端通知问题。此通知对于仅使用消息的连接特别重要，因为客户端没有其他方法可以获知其连接已失败。如果底层 AMQP 连接、会话或链接有问题，将调用 <bpt id=\"p3\">**</bpt>ExceptionListener<ept id=\"p3\">**</ept>。在此情况下，应用程序应从零开始重新创建 <bpt id=\"p4\">**</bpt>JMS Connection<ept id=\"p4\">**</ept>、<bpt id=\"p5\">**</bpt>Session<ept id=\"p5\">**</ept>、<bpt id=\"p6\">**</bpt>MessageProducer<ept id=\"p6\">**</ept> 和 <bpt id=\"p7\">**</bpt>MessageConsumer<ept id=\"p7\">**</ept> 对象。"
+    },
+    {
+      "pos": [
+        6392,
+        6636
+      ],
+      "content": "若要验证是否已从 <bpt id=\"p1\">**</bpt>MessageProducer<ept id=\"p1\">**</ept> 将一条消息成功发送到服务总线实体，请确保已为应用程序配置 <bpt id=\"p2\">**</bpt>qpid.sync\\_publish<ept id=\"p2\">**</ept> 系统属性集。可以通过在启动应用程序时在命令行上设置 <bpt id=\"p3\">**</bpt>-Dqpid.sync\\_publish=true<ept id=\"p3\">**</ept> Java VM 选项启动程序来完成此操作。设置此选项可将库配置为不从发送调用返回，直到收到该消息已被服务总线接受的确认为止。如果在发送操作期间出现问题，则将引发 <bpt id=\"p4\">**</bpt>JMSException<ept id=\"p4\">**</ept>。有两个可能的原因："
+    },
+    {
+      "pos": [
+        6644,
+        6855
+      ],
+      "content": "如果问题是由于服务总线拒绝所发送的特定消息所致，则将引发 <bpt id=\"p1\">**</bpt>MessageRejectedException<ept id=\"p1\">**</ept> 异常。此错误是暂时的，或者由于消息出现某些问题所致。建议的操作过程是进行多次尝试，以便使用一些后退逻辑重试该操作。如果问题仍然存在，则应使用本地记录的错误放弃该消息。在这种情况下，无需重新创建 <bpt id=\"p2\">**</bpt>JMS Connection<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>Session<ept id=\"p3\">**</ept> 或 <bpt id=\"p4\">**</bpt>MessageProducer<ept id=\"p4\">**</ept> 对象。"
+    },
+    {
+      "pos": [
+        6864,
+        7069
+      ],
+      "content": "如果问题是由于服务总线关闭 AMQP 链接所致，则将引发 <bpt id=\"p1\">**</bpt>InvalidDestinationException<ept id=\"p1\">**</ept> 异常。这可能是由于暂时性问题或由于消息实体被删除所致。在这两种情况中的任一情况下，均应重新创建 <bpt id=\"p2\">**</bpt>JMS Connection<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>Session<ept id=\"p3\">**</ept> 和 <bpt id=\"p4\">**</bpt>MessageProducer<ept id=\"p4\">**</ept> 对象。如果错误条件是暂时的，则此操作最终将会成功。如果实体已被删除，则失败将是永久的。"
+    },
+    {
+      "content": "在 .NET 和 JMS 之间进行消息传递",
+      "pos": [
+        7074,
+        7095
+      ]
+    },
+    {
+      "content": "消息正文",
+      "pos": [
+        7101,
+        7105
+      ]
+    },
+    {
+      "pos": [
+        7107,
+        7253
+      ],
+      "content": "JMS 定义了五种不同的消息类型：<bpt id=\"p1\">**</bpt>BytesMessage<ept id=\"p1\">**</ept>、<bpt id=\"p2\">**</bpt>MapMessage<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>ObjectMessage<ept id=\"p3\">**</ept>、<bpt id=\"p4\">**</bpt>StreamMessage<ept id=\"p4\">**</ept> 和 <bpt id=\"p5\">**</bpt>TextMessage<ept id=\"p5\">**</ept>。服务总线 .NET API 具有单一消息类型 <bpt id=\"p6\">[</bpt>BrokeredMessage<ept id=\"p6\">][]</ept>。"
+    },
+    {
+      "content": "JMS 到服务总线 .NET API",
+      "pos": [
+        7260,
+        7278
+      ]
+    },
+    {
+      "pos": [
+        7280,
+        7405
+      ],
+      "content": "以下各节演示如何通过 .NET 使用每种 JMS 消息类型的消息。尚未包括 <bpt id=\"p1\">**</bpt>ObjectMessage<ept id=\"p1\">**</ept> 示例，因为 <bpt id=\"p2\">**</bpt>ObjectMessage<ept id=\"p2\">**</ept> 的正文包含使用 Java 编程语言的可序列化对象，而这是 .NET 应用程序所无法解释的。"
+    },
+    {
+      "content": "BytesMessage",
+      "pos": [
+        7413,
+        7425
+      ]
+    },
+    {
+      "pos": [
+        7427,
+        7477
+      ],
+      "content": "以下代码演示如何通过服务总线 .NET API 使用 <bpt id=\"p1\">**</bpt>BytesMessage<ept id=\"p1\">**</ept> 对象的正文。"
+    },
+    {
+      "content": "MapMessage",
+      "pos": [
+        7804,
+        7814
+      ]
+    },
+    {
+      "pos": [
+        7816,
+        7890
+      ],
+      "content": "以下代码演示如何通过服务总线 .NET API 使用 <bpt id=\"p1\">**</bpt>MapMessage<ept id=\"p1\">**</ept> 对象的正文。此代码循环访问映射的元素，并显示每个元素的名称和值。"
+    },
+    {
+      "content": "StreamMessage",
+      "pos": [
+        8203,
+        8216
+      ]
+    },
+    {
+      "pos": [
+        8218,
+        8286
+      ],
+      "content": "以下代码演示如何通过服务总线 .NET API 使用 <bpt id=\"p1\">**</bpt>StreamMessage<ept id=\"p1\">**</ept> 对象的正文。此代码将列出流中的每一项及其类型。"
+    },
+    {
+      "content": "TextMessage",
+      "pos": [
+        8448,
+        8459
+      ]
+    },
+    {
+      "pos": [
+        8461,
+        8531
+      ],
+      "content": "以下代码演示如何通过服务总线 .NET API 使用 <bpt id=\"p1\">**</bpt>TextMessage<ept id=\"p1\">**</ept> 对象的正文。此代码将显示消息的正文中包含的文本字符串。"
+    },
+    {
+      "content": "服务总线 .NET API 到 JMS",
+      "pos": [
+        8604,
+        8623
+      ]
+    },
+    {
+      "pos": [
+        8625,
+        8766
+      ],
+      "content": "以下各节说明 .NET 应用程序如何创建在 JMS 中接收具有每种不同的 JMS 消息类型的消息。尚未包括 <bpt id=\"p1\">**</bpt>ObjectMessage<ept id=\"p1\">**</ept> 示例，因为 <bpt id=\"p2\">**</bpt>ObjectMessage<ept id=\"p2\">**</ept> 的正文包含使用 Java 编程语言的可序列化对象，而这是 .NET 应用程序所无法解释的。"
+    },
+    {
+      "content": "BytesMessage",
+      "pos": [
+        8774,
+        8786
+      ]
+    },
+    {
+      "pos": [
+        8788,
+        8862
+      ],
+      "content": "以下代码演示如何在 .NET 中创建由 JMS 客户端接收作为 <bpt id=\"p1\">**</bpt>BytesMessage<ept id=\"p1\">**</ept> 的 <bpt id=\"p2\">[</bpt>BrokeredMessage<ept id=\"p2\">][]</ept> 对象。"
+    },
+    {
+      "content": "StreamMessage",
+      "pos": [
+        8984,
+        8997
+      ]
+    },
+    {
+      "pos": [
+        8999,
+        9074
+      ],
+      "content": "以下代码演示如何在 .NET 中创建由 JMS 客户端接收作为 <bpt id=\"p1\">**</bpt>StreamMessage<ept id=\"p1\">**</ept> 的 <bpt id=\"p2\">[</bpt>BrokeredMessage<ept id=\"p2\">][]</ept> 对象。"
+    },
+    {
+      "content": "TextMessage",
+      "pos": [
+        9261,
+        9272
+      ]
+    },
+    {
+      "pos": [
+        9274,
+        9342
+      ],
+      "content": "以下代码演示如何通过服务总线 .NET API 使用 <bpt id=\"p1\">**</bpt>TextMessage<ept id=\"p1\">**</ept> 的正文。此代码将显示消息的正文中包含的文本字符串。"
+    },
+    {
+      "content": "应用程序属性",
+      "pos": [
+        9413,
+        9419
+      ]
+    },
+    {
+      "content": "JMS 到服务总线 .NET API",
+      "pos": [
+        9425,
+        9443
+      ]
+    },
+    {
+      "pos": [
+        9445,
+        9580
+      ],
+      "content": "JMS 消息支持以下类型的应用程序属性：<bpt id=\"p1\">**</bpt>boolean<ept id=\"p1\">**</ept>、<bpt id=\"p2\">**</bpt>byte<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>short<ept id=\"p3\">**</ept>、<bpt id=\"p4\">**</bpt>int<ept id=\"p4\">**</ept>、<bpt id=\"p5\">**</bpt>long<ept id=\"p5\">**</ept>、<bpt id=\"p6\">**</bpt>float<ept id=\"p6\">**</ept>、<bpt id=\"p7\">**</bpt>double<ept id=\"p7\">**</ept> 和 <bpt id=\"p8\">**</bpt>String<ept id=\"p8\">**</ept>。以下 Java 代码显示如何使用上述每种属性类型在消息上设置属性。"
+    },
+    {
+      "pos": [
+        9889,
+        9991
+      ],
+      "content": "在服务总线 .NET API 中，在 <bpt id=\"p1\">[</bpt>BrokeredMessage<ept id=\"p1\">][]</ept> 的 <bpt id=\"p2\">**</bpt>Properties<ept id=\"p2\">**</ept> 集合中携带消息应用程序属性。以下代码演示如何读取从 JMS 客户端收到的消息的应用程序属性。"
+    },
+    {
+      "content": "下表显示如何将 JMS 属性类型映射到 .NET 属性类型。",
+      "pos": [
+        10248,
+        10278
+      ]
+    },
+    {
+      "content": "JMS 属性类型",
+      "pos": [
+        10282,
+        10290
+      ]
+    },
+    {
+      "content": ".NET 属性类型",
+      "pos": [
+        10293,
+        10302
+      ]
+    },
+    {
+      "content": "Byte",
+      "pos": [
+        10350,
+        10354
+      ]
+    },
+    {
+      "content": "sbyte",
+      "pos": [
+        10357,
+        10362
+      ]
+    },
+    {
+      "content": "整数",
+      "pos": [
+        10367,
+        10369
+      ]
+    },
+    {
+      "content": "int",
+      "pos": [
+        10372,
+        10375
+      ]
+    },
+    {
+      "content": "Float",
+      "pos": [
+        10380,
+        10385
+      ]
+    },
+    {
+      "content": "float",
+      "pos": [
+        10388,
+        10393
+      ]
+    },
+    {
+      "content": "Double",
+      "pos": [
+        10398,
+        10404
+      ]
+    },
+    {
+      "content": "double",
+      "pos": [
+        10407,
+        10413
+      ]
+    },
+    {
+      "content": "布尔",
+      "pos": [
+        10418,
+        10420
+      ]
+    },
+    {
+      "content": "bool",
+      "pos": [
+        10423,
+        10427
+      ]
+    },
+    {
+      "content": "String",
+      "pos": [
+        10432,
+        10438
+      ]
+    },
+    {
+      "content": "字符串",
+      "pos": [
+        10441,
+        10444
+      ]
+    },
+    {
+      "pos": [
+        10448,
+        10740
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>BrokeredMessage<ept id=\"p1\">][]</ept> 类型支持以下类型的应用程序属性：<bpt id=\"p2\">**</bpt>byte<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>sbyte<ept id=\"p3\">**</ept>、<bpt id=\"p4\">**</bpt>char<ept id=\"p4\">**</ept>、<bpt id=\"p5\">**</bpt>short<ept id=\"p5\">**</ept>、<bpt id=\"p6\">**</bpt>ushort<ept id=\"p6\">**</ept>、<bpt id=\"p7\">**</bpt>int<ept id=\"p7\">**</ept>、<bpt id=\"p8\">**</bpt>uint<ept id=\"p8\">**</ept>、<bpt id=\"p9\">**</bpt>long<ept id=\"p9\">**</ept>、<bpt id=\"p10\">**</bpt>ulong<ept id=\"p10\">**</ept>、<bpt id=\"p11\">**</bpt>float<ept id=\"p11\">**</ept>、<bpt id=\"p12\">**</bpt>double<ept id=\"p12\">**</ept>、<bpt id=\"p13\">**</bpt>decimal<ept id=\"p13\">**</ept>、<bpt id=\"p14\">**</bpt>bool<ept id=\"p14\">**</ept>、<bpt id=\"p15\">**</bpt>Guid<ept id=\"p15\">**</ept>、<bpt id=\"p16\">**</bpt>string<ept id=\"p16\">**</ept>、<bpt id=\"p17\">**</bpt>Uri<ept id=\"p17\">**</ept>、<bpt id=\"p18\">**</bpt>DateTime<ept id=\"p18\">**</ept>、<bpt id=\"p19\">**</bpt>DateTimeOffset<ept id=\"p19\">**</ept> 和 <bpt id=\"p20\">**</bpt>TimeSpan<ept id=\"p20\">**</ept>。以下 .NET 代码显示如何使用上述每种属性类型在 <bpt id=\"p21\">[</bpt>BrokeredMessage<ept id=\"p21\">][]</ept> 对象上设置属性。"
+    },
+    {
+      "content": "以下 Java 代码演示如何读取从服务总线 .NET 客户端收到的消息的应用程序属性。",
+      "pos": [
+        11705,
+        11748
+      ]
+    },
+    {
+      "content": "下表显示如何将 .NET 属性类型映射到 JMS 属性类型。",
+      "pos": [
+        12044,
+        12074
+      ]
+    },
+    {
+      "content": ".NET 属性类型",
+      "pos": [
+        12078,
+        12087
+      ]
+    },
+    {
+      "content": "JMS 属性类型",
+      "pos": [
+        12090,
+        12098
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        12101,
+        12103
+      ]
+    },
+    {
+      "content": "byte",
+      "pos": [
+        12488,
+        12492
+      ]
+    },
+    {
+      "content": "UnsignedByte",
+      "pos": [
+        12509,
+        12521
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        12529,
+        12530
+      ]
+    },
+    {
+      "content": "sbyte",
+      "pos": [
+        12700,
+        12705
+      ]
+    },
+    {
+      "content": "Byte",
+      "pos": [
+        12721,
+        12725
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        12741,
+        12742
+      ]
+    },
+    {
+      "content": "char",
+      "pos": [
+        12911,
+        12915
+      ]
+    },
+    {
+      "content": "Character",
+      "pos": [
+        12932,
+        12941
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        12952,
+        12953
+      ]
+    },
+    {
+      "content": "short",
+      "pos": [
+        13122,
+        13127
+      ]
+    },
+    {
+      "content": "Short",
+      "pos": [
+        13143,
+        13148
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        13163,
+        13164
+      ]
+    },
+    {
+      "content": "ushort",
+      "pos": [
+        13333,
+        13339
+      ]
+    },
+    {
+      "content": "UnsignedShort",
+      "pos": [
+        13354,
+        13367
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        13374,
+        13375
+      ]
+    },
+    {
+      "content": "int",
+      "pos": [
+        13544,
+        13547
+      ]
+    },
+    {
+      "content": "Integer",
+      "pos": [
+        13565,
+        13572
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        13585,
+        13586
+      ]
+    },
+    {
+      "content": "uint",
+      "pos": [
+        13755,
+        13759
+      ]
+    },
+    {
+      "content": "UnsignedInteger",
+      "pos": [
+        13776,
+        13791
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        13796,
+        13797
+      ]
+    },
+    {
+      "content": "long",
+      "pos": [
+        13966,
+        13970
+      ]
+    },
+    {
+      "content": "Long",
+      "pos": [
+        13987,
+        13991
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        14007,
+        14008
+      ]
+    },
+    {
+      "content": "ulong",
+      "pos": [
+        14177,
+        14182
+      ]
+    },
+    {
+      "content": "UnsignedLong",
+      "pos": [
+        14198,
+        14210
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        14218,
+        14219
+      ]
+    },
+    {
+      "content": "float",
+      "pos": [
+        14388,
+        14393
+      ]
+    },
+    {
+      "content": "Float",
+      "pos": [
+        14409,
+        14414
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        14429,
+        14430
+      ]
+    },
+    {
+      "content": "double",
+      "pos": [
+        14599,
+        14605
+      ]
+    },
+    {
+      "content": "Double",
+      "pos": [
+        14620,
+        14626
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        14640,
+        14641
+      ]
+    },
+    {
+      "content": "decimal",
+      "pos": [
+        14810,
+        14817
+      ]
+    },
+    {
+      "content": "BigDecimal",
+      "pos": [
+        14831,
+        14841
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        14851,
+        14852
+      ]
+    },
+    {
+      "content": "bool",
+      "pos": [
+        15021,
+        15025
+      ]
+    },
+    {
+      "content": "Boolean",
+      "pos": [
+        15042,
+        15049
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        15062,
+        15063
+      ]
+    },
+    {
+      "content": "Guid",
+      "pos": [
+        15232,
+        15236
+      ]
+    },
+    {
+      "content": "UUID",
+      "pos": [
+        15253,
+        15257
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        15273,
+        15274
+      ]
+    },
+    {
+      "content": "string",
+      "pos": [
+        15443,
+        15449
+      ]
+    },
+    {
+      "content": "String",
+      "pos": [
+        15464,
+        15470
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        15484,
+        15485
+      ]
+    },
+    {
+      "content": "DateTime",
+      "pos": [
+        15654,
+        15662
+      ]
+    },
+    {
+      "content": "Date",
+      "pos": [
+        15675,
+        15679
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        15695,
+        15696
+      ]
+    },
+    {
+      "content": "DateTimeOffset",
+      "pos": [
+        15865,
+        15879
+      ]
+    },
+    {
+      "content": "DescribedType",
+      "pos": [
+        15886,
+        15899
+      ]
+    },
+    {
+      "content": "映射到 AMQP 类型的 DateTimeOffset.UtcTicks：",
+      "pos": [
+        15906,
+        15943
+      ]
+    },
+    {
+      "content": "TimeSpan",
+      "pos": [
+        16067,
+        16075
+      ]
+    },
+    {
+      "content": "DescribedType",
+      "pos": [
+        16088,
+        16101
+      ]
+    },
+    {
+      "content": "映射到 AMQP 类型的 Timespan.Ticks：",
+      "pos": [
+        16108,
+        16136
+      ]
+    },
+    {
+      "content": "Uri",
+      "pos": [
+        16269,
+        16272
+      ]
+    },
+    {
+      "content": "DescribedType",
+      "pos": [
+        16290,
+        16303
+      ]
+    },
+    {
+      "content": "映射到 AMQP 类型的 Uri.AbsoluteUri：",
+      "pos": [
+        16310,
+        16339
+      ]
+    },
+    {
+      "content": "标准标头",
+      "pos": [
+        16474,
+        16478
+      ]
+    },
+    {
+      "pos": [
+        16480,
+        16537
+      ],
+      "content": "下表显示了如何使用 AMQP 1.0 映射 JMS 标准标头和 <bpt id=\"p1\">[</bpt>BrokeredMessage<ept id=\"p1\">][]</ept> 标准属性。"
+    },
+    {
+      "content": "JMS 到服务总线 .NET API",
+      "pos": [
+        16544,
+        16562
+      ]
+    },
+    {
+      "content": "JMS",
+      "pos": [
+        16566,
+        16569
+      ]
+    },
+    {
+      "content": "服务总线 .NET",
+      "pos": [
+        16572,
+        16581
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        16584,
+        16586
+      ]
+    },
+    {
+      "content": "JMSCorrelationID",
+      "pos": [
+        17591,
+        17607
+      ]
+    },
+    {
+      "content": "Message.CorrelationID",
+      "pos": [
+        17610,
+        17631
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        17634,
+        17635
+      ]
+    },
+    {
+      "content": "JMSDeliveryMode",
+      "pos": [
+        18108,
+        18123
+      ]
+    },
+    {
+      "content": "当前不可用",
+      "pos": [
+        18127,
+        18132
+      ]
+    },
+    {
+      "content": "服务总线仅支持持久消息；例如，DeliveryMode.PERSISTENT，而不考虑指定的内容。",
+      "pos": [
+        18147,
+        18196
+      ]
+    },
+    {
+      "content": "JMSDestination",
+      "pos": [
+        18500,
+        18514
+      ]
+    },
+    {
+      "content": "Message.To",
+      "pos": [
+        18519,
+        18529
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        18543,
+        18544
+      ]
+    },
+    {
+      "content": "JMSExpiration",
+      "pos": [
+        19017,
+        19030
+      ]
+    },
+    {
+      "content": "Message.TimeToLive",
+      "pos": [
+        19036,
+        19054
+      ]
+    },
+    {
+      "content": "转换",
+      "pos": [
+        19060,
+        19062
+      ]
+    },
+    {
+      "content": "JMSMessageID",
+      "pos": [
+        19530,
+        19542
+      ]
+    },
+    {
+      "content": "Message.MessageID",
+      "pos": [
+        19549,
+        19566
+      ]
+    },
+    {
+      "content": "默认情况下，JMSMessageID 在 AMQP 消息中以二进制格式编码。收到二进制消息 ID 后，.NET 客户端库将根据字节的 unicode 值将其转换为字符串表示形式。若要将 JMS 库切换为使用字符串消息 ID，请在 JNDI ConnectionURL 的查询参数后面追加“binary-messageid=false”字符串。例如：“amqps://[username]:[password]@[namespace].servicebus.chinacloudapi.cn?",
+      "pos": [
+        19573,
+        19818
+      ]
+    },
+    {
+      "content": "binary-messageid=false”。",
+      "pos": [
+        19819,
+        19843
+      ]
+    },
+    {
+      "content": "JMSPriority",
+      "pos": [
+        19848,
+        19859
+      ]
+    },
+    {
+      "content": "当前不可用",
+      "pos": [
+        19867,
+        19872
+      ]
+    },
+    {
+      "content": "服务总线不支持消息优先级。",
+      "pos": [
+        19887,
+        19900
+      ]
+    },
+    {
+      "content": "JMSRedelivered",
+      "pos": [
+        20350,
+        20364
+      ]
+    },
+    {
+      "content": "当前不可用",
+      "pos": [
+        20369,
+        20374
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        20389,
+        20390
+      ]
+    },
+    {
+      "content": "JMSReplyTo",
+      "pos": [
+        20862,
+        20872
+      ]
+    },
+    {
+      "content": "消息。ReplyTo",
+      "pos": [
+        20881,
+        20891
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        20903,
+        20904
+      ]
+    },
+    {
+      "content": "JMSTimestamp",
+      "pos": [
+        21374,
+        21386
+      ]
+    },
+    {
+      "content": "Message.EnqueuedTimeUtc",
+      "pos": [
+        21393,
+        21416
+      ]
+    },
+    {
+      "content": "Conversion",
+      "pos": [
+        21426,
+        21436
+      ]
+    },
+    {
+      "content": "JMSType",
+      "pos": [
+        21889,
+        21896
+      ]
+    },
+    {
+      "content": "Message.Properties[“jms-type”]",
+      "pos": [
+        21908,
+        21938
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        21941,
+        21942
+      ]
+    },
+    {
+      "content": "服务总线 .NET API 到 JMS",
+      "pos": [
+        22410,
+        22429
+      ]
+    },
+    {
+      "content": "服务总线 .NET",
+      "pos": [
+        22433,
+        22442
+      ]
+    },
+    {
+      "content": "JMS",
+      "pos": [
+        22456,
+        22459
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        22475,
+        22477
+      ]
+    },
+    {
+      "content": "ContentType",
+      "pos": [
+        22575,
+        22586
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        22601,
+        22602
+      ]
+    },
+    {
+      "content": "当前不可用",
+      "pos": [
+        22622,
+        22627
+      ]
+    },
+    {
+      "content": "CorrelationId",
+      "pos": [
+        22645,
+        22658
+      ]
+    },
+    {
+      "content": "JMSCorrelationID",
+      "pos": [
+        22671,
+        22687
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        22690,
+        22691
+      ]
+    },
+    {
+      "content": "EnqueuedTimeUtc",
+      "pos": [
+        22719,
+        22734
+      ]
+    },
+    {
+      "content": "JMSTimestamp",
+      "pos": [
+        22745,
+        22757
+      ]
+    },
+    {
+      "content": "转换",
+      "pos": [
+        22764,
+        22766
+      ]
+    },
+    {
+      "content": "Label",
+      "pos": [
+        22790,
+        22795
+      ]
+    },
+    {
+      "content": "不适用",
+      "pos": [
+        22816,
+        22819
+      ]
+    },
+    {
+      "content": "当前不可用",
+      "pos": [
+        22833,
+        22838
+      ]
+    },
+    {
+      "content": "MessageId",
+      "pos": [
+        22858,
+        22867
+      ]
+    },
+    {
+      "content": "JMSMessageID",
+      "pos": [
+        22884,
+        22896
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        22903,
+        22904
+      ]
+    },
+    {
+      "content": "ReplyTo",
+      "pos": [
+        22932,
+        22939
+      ]
+    },
+    {
+      "content": "JMSReplyTo",
+      "pos": [
+        22958,
+        22968
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        22977,
+        22978
+      ]
+    },
+    {
+      "content": "ReplyToSessionId",
+      "pos": [
+        23006,
+        23022
+      ]
+    },
+    {
+      "content": "不适用",
+      "pos": [
+        23032,
+        23035
+      ]
+    },
+    {
+      "content": "当前不可用",
+      "pos": [
+        23049,
+        23054
+      ]
+    },
+    {
+      "content": "ScheduledEnqueueTimeUtc",
+      "pos": [
+        23074,
+        23097
+      ]
+    },
+    {
+      "content": "不适用",
+      "pos": [
+        23100,
+        23103
+      ]
+    },
+    {
+      "content": "当前不可用",
+      "pos": [
+        23117,
+        23122
+      ]
+    },
+    {
+      "content": "SessionId",
+      "pos": [
+        23142,
+        23151
+      ]
+    },
+    {
+      "content": "不适用",
+      "pos": [
+        23168,
+        23171
+      ]
+    },
+    {
+      "content": "当前不可用",
+      "pos": [
+        23185,
+        23190
+      ]
+    },
+    {
+      "content": "TimeToLive",
+      "pos": [
+        23210,
+        23220
+      ]
+    },
+    {
+      "content": "JMSExpiration",
+      "pos": [
+        23236,
+        23249
+      ]
+    },
+    {
+      "content": "转换",
+      "pos": [
+        23255,
+        23257
+      ]
+    },
+    {
+      "content": "To",
+      "pos": [
+        23283,
+        23285
+      ]
+    },
+    {
+      "content": "JMSDestination",
+      "pos": [
+        23309,
+        23323
+      ]
+    },
+    {
+      "content": "-",
+      "pos": [
+        23329,
+        23330
+      ]
+    },
+    {
+      "content": "不受支持的功能和限制",
+      "pos": [
+        23359,
+        23369
+      ]
+    },
+    {
+      "content": "通过 AMQP 1.0 将 JMS 用于服务总线时存在以下限制：",
+      "pos": [
+        23371,
+        23403
+      ]
+    },
+    {
+      "pos": [
+        23409,
+        23535
+      ],
+      "content": "每个会话只允许一个 <bpt id=\"p1\">**</bpt>MessageProducer<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>MessageConsumer<ept id=\"p2\">**</ept>。如果你需要在应用程序中创建多个 <bpt id=\"p3\">**</bpt>MessageProducer<ept id=\"p3\">**</ept> 或 <bpt id=\"p4\">**</bpt>MessageConsumer<ept id=\"p4\">**</ept> 对象，请分别为它们创建专用会话。"
+    },
+    {
+      "content": "当前不支持易失性主题订阅。",
+      "pos": [
+        23541,
+        23554
+      ]
+    },
+    {
+      "pos": [
+        23560,
+        23587
+      ],
+      "content": "不支持 <bpt id=\"p1\">**</bpt>MessageSelector<ept id=\"p1\">**</ept> 对象。"
+    },
+    {
+      "pos": [
+        23593,
+        23698
+      ],
+      "content": "不支持临时目标，例如 <bpt id=\"p1\">**</bpt>TemporaryQueue<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>TemporaryTopic<ept id=\"p2\">**</ept>，以及使用这些目标的 <bpt id=\"p3\">**</bpt>QueueRequestor<ept id=\"p3\">**</ept> 和 <bpt id=\"p4\">**</bpt>TopicRequestor<ept id=\"p4\">**</ept> API。"
+    },
+    {
+      "content": "不支持事务处理会话。",
+      "pos": [
+        23704,
+        23714
+      ]
+    },
+    {
+      "content": "不支持分布式事务。",
+      "pos": [
+        23720,
+        23729
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        23734,
+        23738
+      ]
+    },
+    {
+      "content": "准备好了解详细信息？ 请访问以下链接：",
+      "pos": [
+        23740,
+        23759
+      ]
+    },
+    {
+      "content": "服务总线 AMQP 概述",
+      "pos": [
+        23764,
+        23776
+      ]
+    },
+    {
+      "content": "适用于 Windows Server 的服务总线中的 AMQP",
+      "pos": [
+        23781,
+        23812
+      ]
+    }
+  ],
+  "content": "<properties \n   pageTitle=\"服务总线 和 Java 与 AMQP 1.0 | Azure\"\n   description=\"使用 AMQP 通过 Java 使用服务总线。\"\n   services=\"service-bus\"\n   documentationCenter=\"na\"\n   authors=\"sethmanheim\"\n   manager=\"timlt\"\n   editor=\"tysonn\" /> \n<tags \n   ms.service=\"service-bus\"\n   ms.date=\"10/07/2015\"\n   wacn.date=\"01/14/2016\" />\n\n# 使用 AMQP 1.0 通过 Java 使用服务总线\n\n[AZURE.INCLUDE [service-bus-selector-amqp](../includes/service-bus-selector-amqp.md)]\n\nJava 消息服务 (JMS) 是一种标准 API，用于处理 Java 平台上面向消息的中间件。Azure 服务总线已使用 Apache Qpid 项目开发的基于 AMQP 1.0 的 JMS 客户端库进行测试。此库支持完整的 JMS 1.1 API，并可用于任何 AMQP 1.0 兼容的消息服务。在适用于 Windows Server 的服务总线（本地服务总线）中也支持此方案。有关详细信息，请参阅[适用于 Windows Server 的服务总线中的 AMQP][]。\n\n## 下载 Apache Qpid AMQP 1.0 JMS 客户端库\n\n有关下载 Apache Qpid JMS AMQP 1.0 客户端库的最新版本的信息，请访问 [http://people.apache.org/~rgodfrey/qpid-java-amqp-1-0-client-jms.html](http://people.apache.org/~rgodfrey/qpid-java-amqp-1-0-client-jms.html)。\n\n使用 Service Bus 构建和运行 JMS 应用程序时必须将以下 4 个 JAR 文件从 Apache Qpid JMS AMQP 1.0 分发存档添加到 Java CLASSPATH：\n\n-   geronimo-jms_1.1_spec-[version].jar\n\n-   qpid-amqp-1-0-client-[version].jar\n\n-   qpid-amqp-1-0-client-jms-[version].jar\n\n-   qpid-amqp-1-0-common-[version].jar\n\n## 通过 JMS 使用服务总线队列、主题和订阅\n\n### Java 命名和目录接口 (JNDI)\n\nJMS 使用 Java 命名和目录接口 (JNDI) 创建逻辑名称和物理名称之间的分隔。将使用 JNDI 解析以下两种类型的 JMS 对象：**ConnectionFactory** 和 **Destination**。JNDI 使用一个提供程序模型，你可以在其中插入不同目录服务来处理名称解析任务。Apache Qpid JMS AMQP 1.0 库附带一个使用文本文件配置的、基于属性文件的简单 JNDI 提供程序。\n\nQpid 属性文件 JNDI 提供程序是使用以下格式的属性文件配置的：\n\n```\n# servicebus.properties – sample JNDI configuration\n\n# Register a ConnectionFactory in JNDI using the form:\n# connectionfactory.[jndi_name] = [ConnectionURL]\nconnectionfactory.SBCONNECTIONFACTORY = amqps://[username]:[password]@[namespace].servicebus.chinacloudapi.cn\n\n# Register some queues in JNDI using the form\n# queue.[jndi_name] = [physical_name]\n# topic.[jndi_name] = [physical_name]\ntopic.TOPIC = topic1\nqueue.QUEUE = queue1\n```\n\n#### 配置连接工厂\n\n用于在 Qpid 属性文件 JNDI 提供程序中定义 **ConnectionFactory** 的条目的格式如下：\n\n```\nconnectionfactory.[jndi_name] = [ConnectionURL]\n```\n\n其中 `[jndi_name]` 和 `[ConnectionURL]` 具有以下含义：\n\n| Name | 含义 | | | | |\n|-----------------|--------------------------------------------------------------------------------------------------------------------------------------------|---|---|---|---|\n| `[jndi_name]` | 连接工厂的逻辑名称。通过使用 JNDI `IntialContext.lookup()` 方法在 Java 应用程序中解析此名称。 | | | | |\n| `[ConnectionURL]` | 用于向 AMQP 代理提供包含所需信息的 JMS 库的 URL。 | | | | |\n\n连接 URL 的格式如下：\n\n```\namqps://[username]:[password]@[namespace].servicebus.chinacloudapi.cn\n```\n\n其中 `[namespace]`、`[username]` 和 `[password]` 具有以下含义：\n\n| Name | 含义 | | | | |\n|---------------|--------------------------------------------------------------------------------|---|---|---|---|\n| `[namespace]` | 从 [Azure 经典门户][]获取的服务总线命名空间。 | | | | |\n| `[username]` | 从 [Azure 经典门户][]获取的服务总线颁发者名称。 | | | | |\n| `[password]` | 从 [Azure 经典门户][]获取的 URL 编码形式的服务总线颁发者密钥。 | | | | |\n\n> [AZURE.NOTE]必须手动为密码进行 URL 编码。在 [http://www.w3schools.com/tags/ref\\_urlencode.asp](http://www.w3schools.com/tags/ref_urlencode.asp) 上提供了一个有用的 URL 编码实用工具。\n\n例如，如果从门户获得的信息如下所示：\n\n| Namespace： | test.servicebus.chinacloudapi.cn |\n|--------------|----------------------------------------------|\n| 颁发者名称： | owner |\n| 颁发者密钥： | abcdefg |\n\n那么，为了定义名为 `SBCONNECTIONFACTORY` 的 **ConnectionFactory** 对象，配置字符串将如下所示：\n\n```\nconnectionfactory.SBCONNECTIONFACTORY = amqps://owner:abcdefg@test.servicebus.chinacloudapi.cn\n```\n\n#### 配置目标\n\n用于在 Qpid 属性文件 JNDI 提供程序中定义目标的条目的格式如下：\n\n```\nqueue.[jndi_name] = [physical_name]\ntopic.[jndi_name] = [physical_name]\n```\n\n其中 `[jndi_name]` 和 `[physical_name]` 具有以下含义：\n\n| Name | 含义 |\n|-------------------|------------------------------------------------------------------------------------------------------------------------------------------|\n| `[jndi_name]` | 目标的逻辑名称。通过使用 JNDI `IntialContext.lookup()` 方法在 Java 应用程序中解析此名称。 |\n| `[physical\\name]` | 应用程序在其中发送或接收消息的 Service Bus 实体的名称。 |\n\n注意以下事项：\n\n- `[physical\\name]` 值可以是服务总线队列或主题。\n- 在从 Service Bus 主题订阅中接收时，在 JNDI 中指定的物理名称应该是该主题的名称。在 JMS 应用程序代码中创建可持久订阅时提供该订阅名称。\n- 还可以将服务总线主题订阅视为一个 JMS 队列。此方法具有以下几个优点：可以针对队列和主题订阅使用同一接收者代码，并且所有地址信息（主题和订阅名称）都在属性文件中外部化。\n- 若要将服务总线主题订阅视为一个 JMS 队列，属性文件中的条目应采用以下形式：`queue.[jndi_name] = [topic_name]/Subscriptions/[subscription_name]`。|\n\n若要定义映射到名为“topic1”的服务总线主题的名为“TOPIC”的逻辑 JMS 目标，属性文件中的条目应如下所示：\n\n```\ntopic.TOPIC = topic1\n```\n\n### 使用 JMS 发送消息\n\n以下代码演示如何向服务总线主题发送消息。假设在上一部分中所述的 **servicebus.properties** 配置文件中定义了 `SBCONNECTIONFACTORY` 和 `TOPIC`。\n\n```\nHashtable<String, String> env = new Hashtable<String, String>(); \nenv.put(Context.INITIAL_CONTEXT_FACTORY, \n        \"org.apache.qpid.amqp_1_0.jms.jndi.PropertiesFileInitialContextFactory\"); \nenv.put(Context.PROVIDER_URL, \"servicebus.properties\"); \n \nInitialContext context = new InitialContext(env); \n \nConnectionFactory cf = (ConnectionFactory) context.lookup(\"SBCONNECTIONFACTORY\");\nTopic topic = (Topic) context.lookup(\"TOPIC\");\nConnection connection = cf.createConnection();\nSession session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);\nMessageProducer producer = session.createProducer(topic);\nTextMessage message = session.createTextMessage(\"This is a text string\"); \nproducer.send(message);\n```\n\n### 使用 JMS 接收消息\n\n以下代码演示如何从服务总线主题订阅接收消息。`how`假设在上一部分中所述的 **servicebus.properties** 配置文件中定义了 `SBCONNECTIONFACTORY` 和 TOPIC。它还假定订阅名称是 `subscription1`。\n\n```\nHashtable<String, String> env = new Hashtable<String, String>(); \nenv.put(Context.INITIAL_CONTEXT_FACTORY, \n        \"org.apache.qpid.amqp_1_0.jms.jndi.PropertiesFileInitialContextFactory\"); \nenv.put(Context.PROVIDER_URL, \"servicebus.properties\"); \n \nInitialContext context = new InitialContext(env);\n\nConnectionFactory cf = (ConnectionFactory) context.lookup(\"SBCONNECTIONFACTORY\");\nTopic topic = (Topic) context.lookup(\"TOPIC\");\nConnection connection = cf.createConnection();\nSession session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);\nTopicSubscriber subscriber = session.createDurableSubscriber(topic, \"subscription1\");\nconnection.start();\nMessage message = messageConsumer.receive();\n```\n\n### 用于构建可靠的应用程序的准则\n\nJMS 规范定义了应如何编写 API 方法和应用程序代码的异常约定来处理此类异常。下面是有关异常处理需要注意的其他一些要点：\n\n-   使用 **connection.setExceptionListener** 向 JMS 连接注册 **ExceptionListener**。这允许以异步方式向客户端通知问题。此通知对于仅使用消息的连接特别重要，因为客户端没有其他方法可以获知其连接已失败。如果底层 AMQP 连接、会话或链接有问题，将调用 **ExceptionListener**。在此情况下，应用程序应从零开始重新创建 **JMS Connection**、**Session**、**MessageProducer** 和 **MessageConsumer** 对象。\n\n-   若要验证是否已从 **MessageProducer** 将一条消息成功发送到服务总线实体，请确保已为应用程序配置 **qpid.sync\\_publish** 系统属性集。可以通过在启动应用程序时在命令行上设置 **-Dqpid.sync\\_publish=true** Java VM 选项启动程序来完成此操作。设置此选项可将库配置为不从发送调用返回，直到收到该消息已被服务总线接受的确认为止。如果在发送操作期间出现问题，则将引发 **JMSException**。有两个可能的原因：\n    1. 如果问题是由于服务总线拒绝所发送的特定消息所致，则将引发 **MessageRejectedException** 异常。此错误是暂时的，或者由于消息出现某些问题所致。建议的操作过程是进行多次尝试，以便使用一些后退逻辑重试该操作。如果问题仍然存在，则应使用本地记录的错误放弃该消息。在这种情况下，无需重新创建 **JMS Connection**、**Session** 或 **MessageProducer** 对象。 \n    2. 如果问题是由于服务总线关闭 AMQP 链接所致，则将引发 **InvalidDestinationException** 异常。这可能是由于暂时性问题或由于消息实体被删除所致。在这两种情况中的任一情况下，均应重新创建 **JMS Connection**、**Session** 和 **MessageProducer** 对象。如果错误条件是暂时的，则此操作最终将会成功。如果实体已被删除，则失败将是永久的。\n\n## 在 .NET 和 JMS 之间进行消息传递\n\n### 消息正文\n\nJMS 定义了五种不同的消息类型：**BytesMessage**、**MapMessage**、**ObjectMessage**、**StreamMessage** 和 **TextMessage**。服务总线 .NET API 具有单一消息类型 [BrokeredMessage][]。\n\n#### JMS 到服务总线 .NET API\n\n以下各节演示如何通过 .NET 使用每种 JMS 消息类型的消息。尚未包括 **ObjectMessage** 示例，因为 **ObjectMessage** 的正文包含使用 Java 编程语言的可序列化对象，而这是 .NET 应用程序所无法解释的。\n\n##### BytesMessage\n\n以下代码演示如何通过服务总线 .NET API 使用 **BytesMessage** 对象的正文。\n\n```\nStream stream = message.GetBody<Stream>();\nint streamLength = (int)stream.Length;\n\nbyte[] byteArray = new byte[streamLength];\nstream.Read(byteArray, 0, streamLength);\n\nConsole.WriteLine(\"Length = \" + streamLength);\nfor (int i = 0; i < stream.Length; i++)\n{\n  Console.Write(\"[\" + (sbyte) byteArray[i] + \"]\");\n}\n```\n\n##### MapMessage\n\n以下代码演示如何通过服务总线 .NET API 使用 **MapMessage** 对象的正文。此代码循环访问映射的元素，并显示每个元素的名称和值。\n\n```\nDictionary<String, Object> dictionary = message.GetBody<Dictionary<String, Object>>();\n\nforeach (String mapItemName in dictionary.Keys)\n{\n  Object mapItemValue = null;\n  if (dictionary.TryGetValue(mapItemName, out mapItemValue))\n  {\n    Console.WriteLine(mapItemName + \":\" + mapItemValue);\n  }\n}\n```\n\n##### StreamMessage\n\n以下代码演示如何通过服务总线 .NET API 使用 **StreamMessage** 对象的正文。此代码将列出流中的每一项及其类型。\n\n```\nList<Object> list = message.GetBody<List<Object>>();\n\nforeach (Object item in list)\n{\n  Console.WriteLine(item + \" (\" + item.GetType() + \")\");\n}\n```\n\n##### TextMessage\n\n以下代码演示如何通过服务总线 .NET API 使用 **TextMessage** 对象的正文。此代码将显示消息的正文中包含的文本字符串。\n\n```\nConsole.WriteLine(\"Text: \" + message.GetBody<String>());\n```\n\n#### 服务总线 .NET API 到 JMS\n\n以下各节说明 .NET 应用程序如何创建在 JMS 中接收具有每种不同的 JMS 消息类型的消息。尚未包括 **ObjectMessage** 示例，因为 **ObjectMessage** 的正文包含使用 Java 编程语言的可序列化对象，而这是 .NET 应用程序所无法解释的。\n\n##### BytesMessage\n\n以下代码演示如何在 .NET 中创建由 JMS 客户端接收作为 **BytesMessage** 的 [BrokeredMessage][] 对象。\n\n```\nbyte[] bytes = { 33, 12, 45, 33, 12, 45, 33, 12, 45, 33, 12, 45 };\nmessage = new BrokeredMessage(bytes);\n```\n\n##### StreamMessage\n\n以下代码演示如何在 .NET 中创建由 JMS 客户端接收作为 **StreamMessage** 的 [BrokeredMessage][] 对象。\n\n```\nList<Object> list = new List<Object>();\nlist.Add(\"String 1\");\nlist.Add(\"String 2\");\nlist.Add(\"String 3\");\nlist.Add((double)3.14159);\nmessage = new BrokeredMessage(list);\n```\n\n##### TextMessage\n\n以下代码演示如何通过服务总线 .NET API 使用 **TextMessage** 的正文。此代码将显示消息的正文中包含的文本字符串。\n\n```\nmessage = new BrokeredMessage(\"this is a text string\");\n```\n\n### 应用程序属性\n\n####JMS 到服务总线 .NET API\n\nJMS 消息支持以下类型的应用程序属性：**boolean**、**byte**、**short**、**int**、**long**、**float**、**double** 和 **String**。以下 Java 代码显示如何使用上述每种属性类型在消息上设置属性。\n\n```\nmessage.setBooleanProperty(\"TestBoolean\", true); \nmessage.setByteProperty(\"TestByte\", (byte) 33); \nmessage.setDoubleProperty(\"TestDouble\", 3.14159D); \nmessage.setFloatProperty(\"TestFloat\", 3.13159F); \nmessage.setIntProperty(\"TestInt\", 100); \nmessage.setStringProperty(\"TestString\", \"Service Bus\");\n```\n\n在服务总线 .NET API 中，在 [BrokeredMessage][] 的 **Properties** 集合中携带消息应用程序属性。以下代码演示如何读取从 JMS 客户端收到的消息的应用程序属性。\n\n```\nif (message.Properties.Keys.Count > 0)\n{\n  foreach (string name in message.Properties.Keys)\n  {\n    Object value = message.Properties[name];\n    Console.WriteLine(name + \": \" + value + \" (\" + value.GetType() + \")\" );\n  }\n  Console.WriteLine();\n}\n```\n\n下表显示如何将 JMS 属性类型映射到 .NET 属性类型。\n\n| JMS 属性类型 | .NET 属性类型 |\n|-------------------|--------------------|\n| Byte | sbyte |\n| 整数 | int |\n| Float | float |\n| Double | double |\n| 布尔 | bool |\n| String | 字符串 |\n\n[BrokeredMessage][] 类型支持以下类型的应用程序属性：**byte**、**sbyte**、**char**、**short**、**ushort**、**int**、**uint**、**long**、**ulong**、**float**、**double**、**decimal**、**bool**、**Guid**、**string**、**Uri**、**DateTime**、**DateTimeOffset** 和 **TimeSpan**。以下 .NET 代码显示如何使用上述每种属性类型在 [BrokeredMessage][] 对象上设置属性。\n\n```\nmessage.Properties[\"TestByte\"] = (byte)128;\nmessage.Properties[\"TestSbyte\"] = (sbyte)-22;\nmessage.Properties[\"TestChar\"] = (char) 'X';\nmessage.Properties[\"TestShort\"] = (short)-12345;\nmessage.Properties[\"TestUshort\"] = (ushort)12345;\nmessage.Properties[\"TestInt\"] = (int)-100;\nmessage.Properties[\"TestUint\"] = (uint)100;\nmessage.Properties[\"TestLong\"] = (long)-12345;\nmessage.Properties[\"TestUlong\"] = (ulong)12345;\nmessage.Properties[\"TestFloat\"] = (float)3.14159;\nmessage.Properties[\"TestDouble\"] = (double)3.14159;\nmessage.Properties[\"TestDecimal\"] = (decimal)3.14159;\nmessage.Properties[\"TestBoolean\"] = true;\nmessage.Properties[\"TestGuid\"] = Guid.NewGuid();\nmessage.Properties[\"TestString\"] = \"Service Bus\";\nmessage.Properties[\"TestUri\"] = new Uri(\"http://www.bing.com\");\nmessage.Properties[\"TestDateTime\"] = DateTime.Now;\nmessage.Properties[\"TestDateTimeOffSet\"] = DateTimeOffset.Now;\nmessage.Properties[\"TestTimeSpan\"] = TimeSpan.FromMinutes(60);\n```\n\n以下 Java 代码演示如何读取从服务总线 .NET 客户端收到的消息的应用程序属性。\n\n```\nEnumeration propertyNames = message.getPropertyNames(); \nwhile (propertyNames.hasMoreElements()) \n{ \n  String name = (String) propertyNames.nextElement(); \n  Object value = message.getObjectProperty(name); \n  System.out.println(name + \": \" + value + \" (\" + value.getClass() + \")\"); \n}\n```\n\n下表显示如何将 .NET 属性类型映射到 JMS 属性类型。\n\n| .NET 属性类型 | JMS 属性类型 | 说明                                                                                                                                                                            |\n|--------------------|-------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|\n| byte               | UnsignedByte      | -                                                                                                                                                                      |\n| sbyte              | Byte              | -                                                                                                                                                                     |\n| char               | Character         | -                                                                                                                                                                     |\n| short              | Short             | -                                                                                                                                                                     |\n| ushort             | UnsignedShort     | -                                                                                                                                                                     |\n| int                | Integer           | -                                                                                                                                                                     |\n| uint               | UnsignedInteger   | -                                                                                                                                                                     |\n| long               | Long              | -                                                                                                                                                                     |\n| ulong              | UnsignedLong      | -                                                                                                                                                                     |\n| float              | Float             | -                                                                                                                                                                     |\n| double             | Double            | -                                                                                                                                                                     |\n| decimal            | BigDecimal        | -                                                                                                                                                                     |\n| bool               | Boolean           | -                                                                                                                                                                     |\n| Guid               | UUID              | -                                                                                                                                                                     |\n| string             | String            | -                                                                                                                                                                     |\n| DateTime           | Date              | -                                                                                                                                                                     |\n| DateTimeOffset     | DescribedType     | 映射到 AMQP 类型的 DateTimeOffset.UtcTicks：<type name=”datetime-offset” class=restricted source=”long”> <descriptor name=”com.microsoft:datetime-offset” /></type> |\n| TimeSpan           | DescribedType     | 映射到 AMQP 类型的 Timespan.Ticks：<type name=”timespan” class=restricted source=”long”> <descriptor name=”com.microsoft:timespan” /></type>                        |\n| Uri                | DescribedType     | 映射到 AMQP 类型的 Uri.AbsoluteUri：<type name=”uri” class=restricted source=”string”> <descriptor name=”com.microsoft:uri” /></type>                               |\n\n### 标准标头\n\n下表显示了如何使用 AMQP 1.0 映射 JMS 标准标头和 [BrokeredMessage][] 标准属性。\n\n#### JMS 到服务总线 .NET API\n\n| JMS | 服务总线 .NET | 说明                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |\n|------------------|--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|\n| JMSCorrelationID | Message.CorrelationID | -                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |\n| JMSDeliveryMode  | 当前不可用             | 服务总线仅支持持久消息；例如，DeliveryMode.PERSISTENT，而不考虑指定的内容。                                                                                                                                                                                                                                                                                                            |\n| JMSDestination   | Message.To            | -                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |\n| JMSExpiration    | Message.TimeToLive    | 转换                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |\n| JMSMessageID     | Message.MessageID     | 默认情况下，JMSMessageID 在 AMQP 消息中以二进制格式编码。收到二进制消息 ID 后，.NET 客户端库将根据字节的 unicode 值将其转换为字符串表示形式。若要将 JMS 库切换为使用字符串消息 ID，请在 JNDI ConnectionURL 的查询参数后面追加“binary-messageid=false”字符串。例如：“amqps://[username]:[password]@[namespace].servicebus.chinacloudapi.cn? binary-messageid=false”。 |\n| JMSPriority      | 当前不可用             | 服务总线不支持消息优先级。                                                                                                                                                                                                                                                                                                                                                                                                                                                              |\n| JMSRedelivered   | 当前不可用             | -                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |\n| JMSReplyTo       | 消息。ReplyTo          | -                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |\n| JMSTimestamp     | Message.EnqueuedTimeUtc        | Conversion                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |\n| JMSType          | Message.Properties[“jms-type”] | -                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |\n\n#### 服务总线 .NET API 到 JMS\n\n| 服务总线 .NET            | JMS              | 说明                     |\n|-------------------------|------------------|-------------------------|\n| ContentType             | -                  | 当前不可用              |\n| CorrelationId           | JMSCorrelationID | -                        |\n| EnqueuedTimeUtc         | JMSTimestamp     | 转换                    |\n| Label                   | 不适用            | 当前不可用                |\n| MessageId               | JMSMessageID     | -                        |\n| ReplyTo                 | JMSReplyTo       | -                        |\n| ReplyToSessionId        | 不适用            | 当前不可用                |\n| ScheduledEnqueueTimeUtc | 不适用            | 当前不可用                |\n| SessionId               | 不适用            | 当前不可用                |\n| TimeToLive              | JMSExpiration    | 转换                      |\n| To                      | JMSDestination    | -                       |\n\n## 不受支持的功能和限制\n\n通过 AMQP 1.0 将 JMS 用于服务总线时存在以下限制：\n\n-   每个会话只允许一个 **MessageProducer** 或 **MessageConsumer**。如果你需要在应用程序中创建多个 **MessageProducer** 或 **MessageConsumer** 对象，请分别为它们创建专用会话。\n\n-   当前不支持易失性主题订阅。\n\n-   不支持 **MessageSelector** 对象。\n\n-   不支持临时目标，例如 **TemporaryQueue** 或 **TemporaryTopic**，以及使用这些目标的 **QueueRequestor** 和 **TopicRequestor** API。\n\n-   不支持事务处理会话。\n\n-   不支持分布式事务。\n\n## 后续步骤\n\n准备好了解详细信息？ 请访问以下链接：\n\n- [服务总线 AMQP 概述]\n- [适用于 Windows Server 的服务总线中的 AMQP]\n\n[适用于 Windows Server 的服务总线中的 AMQP]: https://msdn.microsoft.com/zh-cn/library/dn574799.aspx\n[BrokeredMessage]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.aspx\n\n[服务总线 AMQP 概述]: /documentation/articles/service-bus-amqp-overview\n[Azure 经典门户]: http://manage.windowsazure.cn\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

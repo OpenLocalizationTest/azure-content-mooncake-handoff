@@ -1,0 +1,1125 @@
+{
+  "nodes": [
+    {
+      "content": "配置适用于 Azure 的 Oracle GoldenGate",
+      "pos": [
+        71,
+        102
+      ]
+    },
+    {
+      "content": "有关如何在 Azure 虚拟机中设置和实施 Oracle GoldenGate 以实现高可用性和灾难恢复的分步教程。",
+      "pos": [
+        117,
+        175
+      ]
+    },
+    {
+      "content": "配置适用于 Azure 的 Oracle GoldenGate",
+      "pos": [
+        329,
+        360
+      ]
+    },
+    {
+      "content": "本教程演示如何为 Azure 虚拟机环境设置 Oracle GoldenGate，以实现高可用性和灾难恢复。本教程重点介绍非 RAC Oracle 数据库的<bpt id=\"p1\">[</bpt>双向复制<ept id=\"p1\">](http://docs.oracle.com/goldengate/1212/gg-winux/GWUAD/wu_about_gg.htm)</ept>，并要求两个站点都处于活动状态。",
+      "pos": [
+        361,
+        532
+      ]
+    },
+    {
+      "pos": [
+        534,
+        807
+      ],
+      "content": "Oracle GoldenGate 支持数据分发和数据集成。它允许你通过 Oracle-Oracle 复制配置来设置数据分发和数据同步解决方案，并提供了灵活的高可用性解决方案。Oracle GoldenGate 补强了 Oracle 数据防护，它的复制功能可以实现企业范围的信息分发和零停机时间的升级与迁移。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>将 Oracle GoldenGate 与 Oracle 数据防护配合使用<ept id=\"p1\">](http://docs.oracle.com/cd/E11882_01/server.112/e17157/unplanned.htm)</ept>。"
+    },
+    {
+      "pos": [
+        809,
+        1062
+      ],
+      "content": "Oracle GoldenGate 包含以下主要组件：Extract、Data Pump、Replicat、Trails（或提取文件）、Checkpoints、Manager 和 Collector。若要在两个站点之间进行双向复制，你需要在两个站点上创建并启动所有组件。有关 Oracle GoldenGate 体系结构的详细信息，请参阅 <bpt id=\"p1\">[</bpt>Oracle GoldenGate 指南<ept id=\"p1\">](http://docs.oracle.com/goldengate/1212/gg-winux/index.html)</ept>。"
+    },
+    {
+      "pos": [
+        1064,
+        1287
+      ],
+      "content": "本教程假设你对 Oracle 数据库高可用性和灾难恢复的概念以及 <bpt id=\"p1\">[</bpt>Oracle GoldenGate<ept id=\"p1\">](http://docs.oracle.com/goldengate/1212/gg-winux/index.html)</ept> 具有理论和实践知识。有关详细信息，请参阅 <bpt id=\"p2\">[</bpt>Oracle 网站<ept id=\"p2\">](http://www.oracle.com/technetwork/database/features/availability/index.html)</ept>。"
+    },
+    {
+      "content": "此外，本教程假设你满足以下先决条件：",
+      "pos": [
+        1289,
+        1307
+      ]
+    },
+    {
+      "pos": [
+        1311,
+        1528
+      ],
+      "content": "你已经查看 <bpt id=\"p1\">[</bpt>Oracle 虚拟机映像 - 其他注意事项<ept id=\"p1\">](/documentation/articles/virtual-machines-miscellaneous-considerations-oracle-virtual-machine-images)</ept>主题中的“高可用性和灾难恢复注意事项”部分。请注意，Azure 支持独立的 Oracle 数据库实例，但目前不支持 Oracle 真正应用程序群集 (Oracle RAC)。"
+    },
+    {
+      "pos": [
+        1532,
+        1861
+      ],
+      "content": "你已从 <bpt id=\"p1\">[</bpt>Oracle 下载<ept id=\"p1\">](http://www.oracle.com/us/downloads/index.html)</ept>网站下载了 Oracle GoldenGate 软件。你已选择产品包“Oracle Fusion Middleware – Data Integration”。然后，你已选择适用于 Oracle 11g 数据库的 Oracle GoldenGate on Oracle v11.2.1 Media Pack for Microsoft Windows x64（64 位）。接下来，请下载 Oracle GoldenGate V11.2.1.0.3 for Oracle 11g 64bit on Windows 2008（64 位）。"
+    },
+    {
+      "pos": [
+        1865,
+        2213
+      ],
+      "content": "你已使用 Windows Server 上的 Oracle 企业版映像中提供的平台在 Azure 中创建了两个虚拟机 (VM)。有关信息，请参阅<bpt id=\"p1\">[</bpt>在 Azure 中创建 Oracle Database 12c 虚拟机<ept id=\"p1\">](#z3dc8d3c097cf414e9048f7a89c026f80)</ept>和 <bpt id=\"p2\">[</bpt>Azure 虚拟机<ept id=\"p2\">](/documentation/services/virtual-machines/)</ept>。确保这些虚拟机位于<bpt id=\"p3\">[</bpt>相同的云服务<ept id=\"p3\">](/documentation/articles/virtual-machines-load-balance)</ept>和相同的<bpt id=\"p4\">[</bpt>虚拟网络<ept id=\"p4\">](/documentation/services/networking/)</ept>中，以确保它们可以通过持久性专用 IP 地址相互访问。"
+    },
+    {
+      "content": "已在 Azure 管理门户中将站点 A 的虚拟机名称设置为“MachineGG1”，将站点 B 的虚拟机名称设置为“MachineGG2”。",
+      "pos": [
+        2217,
+        2287
+      ]
+    },
+    {
+      "content": "已在站点 A 和站点 B 上分别创建测试数据库“TestGG1”和“TestGG2”。",
+      "pos": [
+        2291,
+        2334
+      ]
+    },
+    {
+      "pos": [
+        2338,
+        2381
+      ],
+      "content": "以管理员组成员或 <bpt id=\"p1\">**</bpt>ORA_DBA<ept id=\"p1\">**</ept> 组成员的身份登录到 Windows 服务器。"
+    },
+    {
+      "content": "在本教程中，您将：",
+      "pos": [
+        2383,
+        2392
+      ]
+    },
+    {
+      "content": "在站点 A 和站点 B 上安装数据库",
+      "pos": [
+        2397,
+        2415
+      ]
+    },
+    {
+      "content": "执行初始数据加载",
+      "pos": [
+        2426,
+        2434
+      ]
+    },
+    {
+      "content": "准备站点 A 和站点 B 以进行数据库复制",
+      "pos": [
+        2443,
+        2464
+      ]
+    },
+    {
+      "content": "创建所有必要的对象以支持 DDL 复制",
+      "pos": [
+        2469,
+        2488
+      ]
+    },
+    {
+      "content": "在站点 A 和站点 B 上配置 GoldenGate Manager",
+      "pos": [
+        2493,
+        2527
+      ]
+    },
+    {
+      "content": "在站点 A 和站点 B 上创建 Extract Group 和 Data Pump 进程",
+      "pos": [
+        2532,
+        2576
+      ]
+    },
+    {
+      "content": "在站点 A 上创建 Extract 和 Data Pump 进程",
+      "pos": [
+        2585,
+        2617
+      ]
+    },
+    {
+      "content": "在站点 B 上创建 GoldenGate 检查点表",
+      "pos": [
+        2626,
+        2651
+      ]
+    },
+    {
+      "content": "在站点 B 上添加 REPLICAT",
+      "pos": [
+        2660,
+        2678
+      ]
+    },
+    {
+      "content": "在站点 B 上创建 Extract 和 Data Pump 进程",
+      "pos": [
+        2687,
+        2719
+      ]
+    },
+    {
+      "content": "在站点 A 上创建 GoldenGate 检查点表",
+      "pos": [
+        2728,
+        2753
+      ]
+    },
+    {
+      "content": "在站点 A 上添加 REPLICAT",
+      "pos": [
+        2762,
+        2780
+      ]
+    },
+    {
+      "content": "在站点 A 和站点 B 上添加 trandata",
+      "pos": [
+        2789,
+        2813
+      ]
+    },
+    {
+      "content": "在站点 A 上启动 Extract 和 Data Pump 进程",
+      "pos": [
+        2822,
+        2854
+      ]
+    },
+    {
+      "content": "在站点 B 上启动 Extract 和 Data Pump 进程",
+      "pos": [
+        2863,
+        2895
+      ]
+    },
+    {
+      "content": "在站点 A 上启动 REPLICAT 进程",
+      "pos": [
+        2905,
+        2926
+      ]
+    },
+    {
+      "content": "在站点 B 上启动 REPLICAT 进程",
+      "pos": [
+        2936,
+        2957
+      ]
+    },
+    {
+      "content": "验证双向复制过程",
+      "pos": [
+        2962,
+        2970
+      ]
+    },
+    {
+      "pos": [
+        2973,
+        3010
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>本教程已针对以下软件配置进行设置和测试："
+    },
+    {
+      "content": "站点 A 数据库",
+      "pos": [
+        3020,
+        3028
+      ]
+    },
+    {
+      "content": "站点 B 数据库",
+      "pos": [
+        3035,
+        3043
+      ]
+    },
+    {
+      "content": "Oracle 版本",
+      "pos": [
+        3151,
+        3160
+      ]
+    },
+    {
+      "content": "Oracle11g 版本 2 – (11.2.0.1)",
+      "pos": [
+        3165,
+        3192
+      ]
+    },
+    {
+      "content": "Oracle11g 版本 2 – (11.2.0.1)",
+      "pos": [
+        3195,
+        3222
+      ]
+    },
+    {
+      "content": "计算机名称",
+      "pos": [
+        3230,
+        3235
+      ]
+    },
+    {
+      "content": "MachineGG1",
+      "pos": [
+        3240,
+        3250
+      ]
+    },
+    {
+      "content": "MachineGG2",
+      "pos": [
+        3253,
+        3263
+      ]
+    },
+    {
+      "content": "操作系统",
+      "pos": [
+        3271,
+        3275
+      ]
+    },
+    {
+      "content": "Windows 2008 R2",
+      "pos": [
+        3280,
+        3295
+      ]
+    },
+    {
+      "content": "Windows 2008 R2",
+      "pos": [
+        3298,
+        3313
+      ]
+    },
+    {
+      "content": "Oracle SID",
+      "pos": [
+        3321,
+        3331
+      ]
+    },
+    {
+      "content": "TESTGG1",
+      "pos": [
+        3336,
+        3343
+      ]
+    },
+    {
+      "content": "TESTGG2",
+      "pos": [
+        3346,
+        3353
+      ]
+    },
+    {
+      "content": "复制架构",
+      "pos": [
+        3361,
+        3365
+      ]
+    },
+    {
+      "content": "SCOTT",
+      "pos": [
+        3370,
+        3375
+      ]
+    },
+    {
+      "content": "SCOTT",
+      "pos": [
+        3378,
+        3383
+      ]
+    },
+    {
+      "pos": [
+        3387,
+        3928
+      ],
+      "content": "对于 Oracle 数据库和 Oracle GoldenGate 的后续版本，你可能需要实施一些附加更改。有关最新的版本特定信息，请参阅 Oracle 网站上的 <bpt id=\"p1\">[</bpt>Oracle GoldenGate<ept id=\"p1\">](http://docs.oracle.com/goldengate/1212/gg-winux/index.html)</ept> 和 <bpt id=\"p2\">[</bpt>Oracle 数据库<ept id=\"p2\">](http://www.oracle.com/us/corporate/features/database-12c/index.html)</ept>文档。例如，对于 11.2.0.4 和更高版本的源数据库，DDL 捕获由日志挖掘服务器以异步方式执行，而不需要安装任何特殊的触发器、表或其他数据库对象。可以在不停止用户应用程序的情况下执行 Oracle GoldenGate 升级。当 Extract 处于集成模式并且存在版本低于 11.2.0.4 的 Oracle 11g 源数据库时，需要使用 DDL 触发器和支持对象。有关详细指导，请参阅<bpt id=\"p3\">[</bpt>安装和配置适用于 Oracle 数据库的 Oracle GoldenGate<ept id=\"p3\">](http://docs.oracle.com/goldengate/1212/gg-winux/GIORA.pdf)</ept>。"
+    },
+    {
+      "content": "1.在站点 A 和站点 B 上安装数据库",
+      "pos": [
+        3932,
+        3952
+      ]
+    },
+    {
+      "content": "本部分介绍如何在站点 A 和站点 B 上执行数据库必备组件安装。你必须在两个站点上执行本部分所述的所有步骤：站点 A 和站点 B。",
+      "pos": [
+        3953,
+        4018
+      ]
+    },
+    {
+      "content": "首先，通过管理门户与站点 A 和站点 B 建立远程桌面连接。打开 Windows 命令提示符，然后创建 Oracle GoldenGate 安装文件的主目录：",
+      "pos": [
+        4020,
+        4099
+      ]
+    },
+    {
+      "content": "然后，在此文件夹中解压缩并安装 Oracle GoldenGate 软件。完成此步骤后，可以通过执行以下命令来启动 GoldenGate 软件命令解释器 (GGSCI)：",
+      "pos": [
+        4124,
+        4209
+      ]
+    },
+    {
+      "pos": [
+        4235,
+        4363
+      ],
+      "content": "可以使用 <bpt id=\"p1\">[</bpt>GGSCI<ept id=\"p1\">](http://docs.oracle.com/goldengate/1212/gg-winux/GWUAD/wu_gettingstarted.htm)</ept> 来运行用于配置、控制和监视 Oracle GoldenGate 的多个命令。"
+    },
+    {
+      "content": "接下来，运行以下命令，以从安装包创建所有子文件夹：",
+      "pos": [
+        4365,
+        4390
+      ]
+    },
+    {
+      "content": "运行以下命令退出 GGSCI 命令提示符：",
+      "pos": [
+        4432,
+        4453
+      ]
+    },
+    {
+      "content": "然后，需要创建一个将由 Oracle GoldenGate Manager、Extract 和 Replication 进程使用的数据库用户。请注意，你可以为每个进程创建一个用户，也可以只配置一个通用用户。在本教程中，我们将创建一个名为 ggate 的用户。然后，我们将授予该用户必要的特权。请注意，你必须在站点 A 和站点 B 上执行以下操作。",
+      "pos": [
+        4485,
+        4658
+      ]
+    },
+    {
+      "pos": [
+        4660,
+        4716
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>SYSDBA<ept id=\"p1\">**</ept> 以数据库管理员特权在站点 A 和站点 B 上打开 SQL*Plus 命令窗口，例如："
+    },
+    {
+      "content": "然后运行：",
+      "pos": [
+        4751,
+        4756
+      ]
+    },
+    {
+      "content": "接下来，在站点 A 和站点 B 上的 %ORACLE_HOME%\\\\database 文件夹中找到 INITDatabaseSID.ORA 文件，并将以下数据库参数追加到 INITTEST.ora 中：",
+      "pos": [
+        5485,
+        5586
+      ]
+    },
+    {
+      "pos": [
+        5639,
+        5789
+      ],
+      "content": "有关所有 Oracle GoldenGate GGSCI 命令的完整列表，请参阅 <bpt id=\"p1\">[</bpt>Oracle GoldenGate for Windows 参考<ept id=\"p1\">](http://docs.oracle.com/goldengate/1212/gg-winux/GWURF/ggsci_commands.htm)</ept>。"
+    },
+    {
+      "content": "执行初始数据加载",
+      "pos": [
+        5795,
+        5803
+      ]
+    },
+    {
+      "pos": [
+        5805,
+        5973
+      ],
+      "content": "你可以通过以下几种方法在数据库中执行初始数据加载。例如，可以使用 <bpt id=\"p1\">[</bpt>Oracle GoldenGate Direct Load<ept id=\"p1\">](http://docs.oracle.com/goldengate/1212/gg-winux/GWUAD/wu_initsync.htm)</ept> 或普通的导出和导入实用工具，将表数据从站点 A 导出到站点 B。"
+    },
+    {
+      "content": "为了演示 Oracle GoldenGate 复制过程，本教程演示了如何使用以下命令在站点 A 和站点 B 上创建一个表。",
+      "pos": [
+        5975,
+        6036
+      ]
+    },
+    {
+      "content": "首先，请打开 SQL*Plus 命令窗口，然后运行以下命令，以在站点 A 和站点 B 数据库中创建一个库存表：",
+      "pos": [
+        6038,
+        6093
+      ]
+    },
+    {
+      "content": "接下来，将约束添加到站点 A 和站点 B 数据库上的新建表：",
+      "pos": [
+        6257,
+        6287
+      ]
+    },
+    {
+      "content": "然后，在站点 A 和站点 B 上向用户 ggate 授予对新库存表的所有特权：",
+      "pos": [
+        6374,
+        6413
+      ]
+    },
+    {
+      "content": "接下来，在新建的表上创建并启用数据库触发器 INVENTORY_CDR_TRG，以确保当用户不是 ggate 时，记录向新表中写入的所有事务。在站点 A 和站点 B 上执行此操作。",
+      "pos": [
+        6459,
+        6549
+      ]
+    },
+    {
+      "content": "2.准备站点 A 和站点 B 以进行数据库复制",
+      "pos": [
+        6839,
+        6862
+      ]
+    },
+    {
+      "content": "本部分说明如何准备站点 A 和站点 B 以进行数据库复制。必须在两个站点上执行本部分所述的所有步骤：站点 A 和站点 B。",
+      "pos": [
+        6863,
+        6924
+      ]
+    },
+    {
+      "content": "首先，通过 Azure 门户与站点 A 和站点 B 建立远程桌面连接。使用 SQL*Plus 命令窗口将数据库切换到 archivelog 模式：",
+      "pos": [
+        6926,
+        6999
+      ]
+    },
+    {
+      "pos": [
+        7123,
+        7212
+      ],
+      "content": "然后，按如下所示启用最小<bpt id=\"p1\">[</bpt>补充日志记录<ept id=\"p1\">](http://docs.oracle.com/cd/E11882_01/server.112/e22490/logminer.htm)</ept>："
+    },
+    {
+      "content": "接下来，准备好数据库，以支持 DDL（数据定义语言）复制：",
+      "pos": [
+        7280,
+        7309
+      ]
+    },
+    {
+      "content": "然后，关闭再重启数据库：",
+      "pos": [
+        7367,
+        7379
+      ]
+    },
+    {
+      "content": "3.创建所有必要的对象以支持 DDL 复制",
+      "pos": [
+        7429,
+        7450
+      ]
+    },
+    {
+      "content": "本部分列出了你需要使用哪些脚本来创建所有必要的对象以支持 DDL 复制。需要在站点 A 和站点 B 上运行本部分中指定的脚本。",
+      "pos": [
+        7451,
+        7514
+      ]
+    },
+    {
+      "pos": [
+        7516,
+        7632
+      ],
+      "content": "打开 Windows 命令提示符并导航到 Oracle GoldenGate 文件夹，例如 C:\\\\OracleGG。在站点 A 和站点 B 上以数据库管理员特权启动 SQL*Plus 命令提示符，例如，使用 <bpt id=\"p1\">**</bpt>SYSDBA<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "然后，运行以下脚本：",
+      "pos": [
+        7634,
+        7644
+      ]
+    },
+    {
+      "content": "Oracle GoldenGate 工具要求使用表级登录名来支持 DDL（数据定义语言）。正因如此，请在表级别使用 ADD TRANDATA 命令启用补充日志记录。打开 Oracle GoldenGate 命令解释器窗口，登录数据库，然后运行 ADD TRANDATA 命令：",
+      "pos": [
+        7986,
+        8124
+      ]
+    },
+    {
+      "content": "4.在站点 A 和站点 B 上配置 GoldenGate Manager",
+      "pos": [
+        8232,
+        8268
+      ]
+    },
+    {
+      "content": "Oracle GoldenGate Manager 执行许多功能，例如，启动其他 GoldenGate 进程、跟踪日志文件管理和报告。",
+      "pos": [
+        8269,
+        8336
+      ]
+    },
+    {
+      "content": "你需要在站点 A 和站点 B 上配置 Oracle GoldenGate Manager 进程。为此，请在站点 A 和站点 B 上执行以下步骤。",
+      "pos": [
+        8338,
+        8410
+      ]
+    },
+    {
+      "content": "打开 Windows 命令窗口，然后启动 Oracle GoldenGate 命令解释器：",
+      "pos": [
+        8412,
+        8457
+      ]
+    },
+    {
+      "content": "将 GGSCI 会话记录到数据库，以便可以执行影响数据库的命令：",
+      "pos": [
+        8774,
+        8806
+      ]
+    },
+    {
+      "content": "显示系统上所有 Manager、Extract 和 Replicat 进程的状态与滞后时间（如果适用）：",
+      "pos": [
+        8909,
+        8961
+      ]
+    },
+    {
+      "content": "使用 EDIT PARAMS 命令打开参数文件，然后追加以下信息：",
+      "pos": [
+        9092,
+        9125
+      ]
+    },
+    {
+      "content": "显示系统上所有 Manager、Extract 和 Replicat 进程的状态与滞后时间（如果适用）：",
+      "pos": [
+        9275,
+        9327
+      ]
+    },
+    {
+      "content": "将 GGSCI 会话记录到数据库，以便可以执行影响数据库的命令：",
+      "pos": [
+        9459,
+        9491
+      ]
+    },
+    {
+      "content": "启动管理器进程：",
+      "pos": [
+        9596,
+        9604
+      ]
+    },
+    {
+      "content": "5.在站点 A 和站点 B 上创建 Extract Group 和 Data Pump 进程",
+      "pos": [
+        9669,
+        9715
+      ]
+    },
+    {
+      "content": "在站点 A 上创建 Extract 和 Data Pump 进程",
+      "pos": [
+        9720,
+        9752
+      ]
+    },
+    {
+      "content": "需要在站点 A 和站点 B 上创建 Extract 和 Data Pump 进程。通过管理门户与站点 A 和站点 B 建立远程桌面连接。打开 GGSCI 命令解释器窗口。在站点 A 上运行以下命令：",
+      "pos": [
+        9754,
+        9853
+      ]
+    },
+    {
+      "content": "使用 EDIT PARAMS 命令打开参数文件，然后追加以下信息：",
+      "pos": [
+        10231,
+        10264
+      ]
+    },
+    {
+      "content": "GGSCI (MachineGG1) 18&gt; edit params ext1",
+      "pos": [
+        10269,
+        10308
+      ]
+    },
+    {
+      "content": "EXTRACT ext1",
+      "pos": [
+        10313,
+        10325
+      ]
+    },
+    {
+      "content": "USERID ggate, PASSWORD ggate",
+      "pos": [
+        10331,
+        10359
+      ]
+    },
+    {
+      "content": "EXTTRAIL C:\\OracleGG\\dirdat\\aa",
+      "pos": [
+        10365,
+        10395
+      ]
+    },
+    {
+      "content": "TRANLOGOPTIONS EXCLUDEUSER ggate",
+      "pos": [
+        10401,
+        10433
+      ]
+    },
+    {
+      "content": "TABLE scott.inventory,",
+      "pos": [
+        10439,
+        10461
+      ]
+    },
+    {
+      "content": "GETBEFORECOLS (",
+      "pos": [
+        10467,
+        10482
+      ]
+    },
+    {
+      "content": "ON UPDATE KEYINCLUDING (prod_category,qty_in_stock, last_dml),",
+      "pos": [
+        10488,
+        10550
+      ]
+    },
+    {
+      "content": "ON DELETE KEYINCLUDING (prod_category,qty_in_stock, last_dml));",
+      "pos": [
+        10556,
+        10619
+      ]
+    },
+    {
+      "content": "使用 EDIT PARAMS 命令打开参数文件，然后追加以下信息：",
+      "pos": [
+        10621,
+        10654
+      ]
+    },
+    {
+      "content": "在站点 B 上创建 GoldenGate 检查点表",
+      "pos": [
+        10899,
+        10924
+      ]
+    },
+    {
+      "content": "接下来，需要在站点 B 上添加一个检查点表。为此，需要打开 GoldenGate 命令解释器窗口并运行：",
+      "pos": [
+        10926,
+        10978
+      ]
+    },
+    {
+      "content": "然后，将检查点表添加到数据库，其中 ggate 是所有者：",
+      "pos": [
+        11105,
+        11134
+      ]
+    },
+    {
+      "content": "将检查点表的名称添加到目标服务器（在本步骤中为站点 B）上的 GLOBALS 文件。在站点 B 上编辑 GLOBALS 文件：",
+      "pos": [
+        11274,
+        11337
+      ]
+    },
+    {
+      "content": "然后，将 CHECKPOINTTABLE 参数追加到现有的 GLOBALS 文件：",
+      "pos": [
+        11388,
+        11429
+      ]
+    },
+    {
+      "content": "最后，请保存并关闭 GLOBALS 参数文件。",
+      "pos": [
+        11493,
+        11516
+      ]
+    },
+    {
+      "content": "在站点 B 上添加 REPLICAT",
+      "pos": [
+        11522,
+        11540
+      ]
+    },
+    {
+      "content": "本部分介绍如何在站点 B 上添加 REPLICAT 进程“REP2”。",
+      "pos": [
+        11541,
+        11576
+      ]
+    },
+    {
+      "content": "在站点 B 上使用 ADD REPLICAT 命令创建 Replicat 组：",
+      "pos": [
+        11579,
+        11618
+      ]
+    },
+    {
+      "content": "使用 EDIT PARAMS 命令打开参数文件，然后追加以下信息：",
+      "pos": [
+        11735,
+        11768
+      ]
+    },
+    {
+      "content": "在站点 B 上创建 Extract 和 Data Pump 进程",
+      "pos": [
+        12007,
+        12039
+      ]
+    },
+    {
+      "content": "本部分介绍如何在站点 B 上创建新的 Extract 进程“EXT2”和新的 Data Pump 进程“DPUMP2”：",
+      "pos": [
+        12041,
+        12101
+      ]
+    },
+    {
+      "content": "使用 EDIT PARAMS 命令打开参数文件，然后追加以下信息：",
+      "pos": [
+        12479,
+        12512
+      ]
+    },
+    {
+      "content": "使用 EDIT PARAMS 命令打开参数文件，然后追加以下信息：",
+      "pos": [
+        12863,
+        12896
+      ]
+    },
+    {
+      "content": "在站点 A 上创建 GoldenGate 检查点表",
+      "pos": [
+        13131,
+        13156
+      ]
+    },
+    {
+      "content": "打开 Oracle GoldenGate 命令解释器窗口，然后创建一个检查点表：",
+      "pos": [
+        13158,
+        13198
+      ]
+    },
+    {
+      "content": "你还需要将检查点表的名称添加到站点 A 上的 GLOBALS 文件。",
+      "pos": [
+        13438,
+        13472
+      ]
+    },
+    {
+      "content": "在站点 A 上打开 Oracle GoldenGate 命令解释器窗口，然后编辑 GLOBALS 文件：",
+      "pos": [
+        13474,
+        13526
+      ]
+    },
+    {
+      "content": "保存并关闭 GLOBALS 参数文件。",
+      "pos": [
+        13717,
+        13736
+      ]
+    },
+    {
+      "content": "在站点 A 上添加 REPLICAT",
+      "pos": [
+        13741,
+        13759
+      ]
+    },
+    {
+      "content": "本部分介绍如何在站点 A 上添加 REPLICAT 进程“REP1”。",
+      "pos": [
+        13761,
+        13796
+      ]
+    },
+    {
+      "content": "以下命令将使用某个线索的名称以及关联的 checkpointtable 创建 Replicat 组 rep1。",
+      "pos": [
+        13798,
+        13853
+      ]
+    },
+    {
+      "content": "使用 EDIT PARAMS 命令打开参数文件，然后追加以下信息：",
+      "pos": [
+        13991,
+        14024
+      ]
+    },
+    {
+      "content": "在站点 A 和站点 B 上添加 trandata",
+      "pos": [
+        14265,
+        14289
+      ]
+    },
+    {
+      "content": "使用 ADD TRANDATA 命令在表级别启用补充日志记录。打开 Oracle GoldenGate 命令解释器窗口，登录数据库，然后运行 ADD TRANDATA 命令。",
+      "pos": [
+        14291,
+        14378
+      ]
+    },
+    {
+      "content": "与 MachineGG1 建立远程桌面连接，打开 Oracle GoldenGate 命令解释器，然后运行：",
+      "pos": [
+        14380,
+        14434
+      ]
+    },
+    {
+      "content": "与 MachineGG2 建立远程桌面连接，打开 Oracle GoldenGate 命令解释器，然后运行：",
+      "pos": [
+        14894,
+        14948
+      ]
+    },
+    {
+      "content": "显示有关表级补充日志记录的状态的信息：",
+      "pos": [
+        15227,
+        15246
+      ]
+    },
+    {
+      "content": "在站点 A 和站点 B 上添加 trandata",
+      "pos": [
+        15498,
+        15522
+      ]
+    },
+    {
+      "content": "使用 ADD TRANDATA 命令在表级别启用补充日志记录。打开 Oracle GoldenGate 命令解释器窗口，登录数据库，然后运行 ADD TRANDATA 命令。",
+      "pos": [
+        15524,
+        15611
+      ]
+    },
+    {
+      "content": "与 MachineGG1 建立远程桌面连接，打开 Oracle GoldenGate 命令解释器，然后运行：",
+      "pos": [
+        15613,
+        15667
+      ]
+    },
+    {
+      "content": "与 MachineGG2 建立远程桌面连接，打开 Oracle GoldenGate 命令解释器，然后运行：",
+      "pos": [
+        16119,
+        16173
+      ]
+    },
+    {
+      "content": "在站点 A 上启动 Extract 和 Data Pump 进程",
+      "pos": [
+        16778,
+        16810
+      ]
+    },
+    {
+      "content": "在站点 A 上启动 Extract 进程 ext1：",
+      "pos": [
+        16812,
+        16838
+      ]
+    },
+    {
+      "content": "在站点 A 上启动 Data Pump 进程 dpump1：",
+      "pos": [
+        16952,
+        16982
+      ]
+    },
+    {
+      "content": "显示有关 Extract 组 ext1 的信息：GGSCI (MachineGG1) 32&gt; info extract ext1 EXTRACT EXT1 Last Started 2013-11-25 08:03 Status RUNNING Checkpoint Lag 00:00:00 (updated 00:00:02 ago) Log Read Checkpoint Oracle Redo Logs 2013-11-25 08:03:18 Seqno 6, RBA 3230720 SCN 0.1074371 (1074371)",
+      "pos": [
+        17099,
+        17370
+      ]
+    },
+    {
+      "content": "显示系统上所有 Manager、Extract 和 Replicat 进程的状态与滞后时间（如果适用）：",
+      "pos": [
+        17372,
+        17424
+      ]
+    },
+    {
+      "content": "在站点 B 上启动 Extract 和 Data Pump 进程",
+      "pos": [
+        17692,
+        17724
+      ]
+    },
+    {
+      "content": "在站点 B 上启动 Extract 进程 ext2：",
+      "pos": [
+        17726,
+        17752
+      ]
+    },
+    {
+      "content": "在站点 B 上启动 Data Pump 进程 dpump2：",
+      "pos": [
+        17866,
+        17896
+      ]
+    },
+    {
+      "content": "显示系统上所有 Manager、Extract 和 Replicat 进程的状态与滞后时间（如果适用）：",
+      "pos": [
+        18014,
+        18066
+      ]
+    },
+    {
+      "content": "在站点 A 上启动 REPLICAT 进程",
+      "pos": [
+        18340,
+        18361
+      ]
+    },
+    {
+      "content": "本部分介绍如何在站点 A 上启动 REPLICAT 进程“REP1”。",
+      "pos": [
+        18363,
+        18398
+      ]
+    },
+    {
+      "content": "在站点 A 上启动 Replicat 进程：",
+      "pos": [
+        18400,
+        18422
+      ]
+    },
+    {
+      "content": "显示 Replicat 组的状态：",
+      "pos": [
+        18538,
+        18555
+      ]
+    },
+    {
+      "content": "在站点 B 上启动 REPLICAT 进程",
+      "pos": [
+        18637,
+        18658
+      ]
+    },
+    {
+      "content": "本部分介绍如何在站点 B 上启动 REPLICAT 进程“REP2”。",
+      "pos": [
+        18660,
+        18695
+      ]
+    },
+    {
+      "content": "在站点 B 上启动 Replicat 进程：",
+      "pos": [
+        18697,
+        18719
+      ]
+    },
+    {
+      "content": "显示 Replicat 组的状态：",
+      "pos": [
+        18835,
+        18852
+      ]
+    },
+    {
+      "content": "6.验证双向复制过程",
+      "pos": [
+        18932,
+        18942
+      ]
+    },
+    {
+      "content": "若要验证 Oracle GoldenGate 配置，请在站点 A 上的数据库中插入一行。与站点 A 建立远程桌面连接。打开 SQL*Plus 命令窗口并运行：SQL&gt; select name from v$database;",
+      "pos": [
+        18944,
+        19056
+      ]
+    },
+    {
+      "content": "然后，检查该行是否已复制到站点 B。为此，请与站点 B 建立远程桌面连接。打开 SQL Plus 窗口并运行：",
+      "pos": [
+        19231,
+        19286
+      ]
+    },
+    {
+      "content": "在站点 B 上插入一条新记录：",
+      "pos": [
+        19503,
+        19518
+      ]
+    },
+    {
+      "content": "与站点 A 建立远程桌面连接，然后检查是否已发生复制：",
+      "pos": [
+        19652,
+        19679
+      ]
+    }
+  ],
+  "content": "<properties title=\"Configuring Oracle GoldenGate for Azure\" pageTitle=\"配置适用于 Azure 的 Oracle GoldenGate\" description=\"有关如何在 Azure 虚拟机中设置和实施 Oracle GoldenGate 以实现高可用性和灾难恢复的分步教程。\" services=\"virtual-machines\" authors=\"bbenz\" documentationCenter=\"\"/>\n<tags ms.service=\"virtual-machines\" ms.date=\"06/22/2015\" wacn.date=\"08/29/2015\"/>\n#配置适用于 Azure 的 Oracle GoldenGate\n本教程演示如何为 Azure 虚拟机环境设置 Oracle GoldenGate，以实现高可用性和灾难恢复。本教程重点介绍非 RAC Oracle 数据库的[双向复制](http://docs.oracle.com/goldengate/1212/gg-winux/GWUAD/wu_about_gg.htm)，并要求两个站点都处于活动状态。\n\nOracle GoldenGate 支持数据分发和数据集成。它允许你通过 Oracle-Oracle 复制配置来设置数据分发和数据同步解决方案，并提供了灵活的高可用性解决方案。Oracle GoldenGate 补强了 Oracle 数据防护，它的复制功能可以实现企业范围的信息分发和零停机时间的升级与迁移。有关详细信息，请参阅[将 Oracle GoldenGate 与 Oracle 数据防护配合使用](http://docs.oracle.com/cd/E11882_01/server.112/e17157/unplanned.htm)。\n\nOracle GoldenGate 包含以下主要组件：Extract、Data Pump、Replicat、Trails（或提取文件）、Checkpoints、Manager 和 Collector。若要在两个站点之间进行双向复制，你需要在两个站点上创建并启动所有组件。有关 Oracle GoldenGate 体系结构的详细信息，请参阅 [Oracle GoldenGate 指南](http://docs.oracle.com/goldengate/1212/gg-winux/index.html)。\n\n本教程假设你对 Oracle 数据库高可用性和灾难恢复的概念以及 [Oracle GoldenGate](http://docs.oracle.com/goldengate/1212/gg-winux/index.html) 具有理论和实践知识。有关详细信息，请参阅 [Oracle 网站](http://www.oracle.com/technetwork/database/features/availability/index.html)。\n\n此外，本教程假设你满足以下先决条件：\n\n- 你已经查看 [Oracle 虚拟机映像 - 其他注意事项](/documentation/articles/virtual-machines-miscellaneous-considerations-oracle-virtual-machine-images)主题中的“高可用性和灾难恢复注意事项”部分。请注意，Azure 支持独立的 Oracle 数据库实例，但目前不支持 Oracle 真正应用程序群集 (Oracle RAC)。\n\n- 你已从 [Oracle 下载](http://www.oracle.com/us/downloads/index.html)网站下载了 Oracle GoldenGate 软件。你已选择产品包“Oracle Fusion Middleware – Data Integration”。然后，你已选择适用于 Oracle 11g 数据库的 Oracle GoldenGate on Oracle v11.2.1 Media Pack for Microsoft Windows x64（64 位）。接下来，请下载 Oracle GoldenGate V11.2.1.0.3 for Oracle 11g 64bit on Windows 2008（64 位）。\n\n- 你已使用 Windows Server 上的 Oracle 企业版映像中提供的平台在 Azure 中创建了两个虚拟机 (VM)。有关信息，请参阅[在 Azure 中创建 Oracle Database 12c 虚拟机](#z3dc8d3c097cf414e9048f7a89c026f80)和 [Azure 虚拟机](/documentation/services/virtual-machines/)。确保这些虚拟机位于[相同的云服务](/documentation/articles/virtual-machines-load-balance)和相同的[虚拟网络](/documentation/services/networking/)中，以确保它们可以通过持久性专用 IP 地址相互访问。\n\n- 已在 Azure 管理门户中将站点 A 的虚拟机名称设置为“MachineGG1”，将站点 B 的虚拟机名称设置为“MachineGG2”。\n\n- 已在站点 A 和站点 B 上分别创建测试数据库“TestGG1”和“TestGG2”。\n\n- 以管理员组成员或 **ORA_DBA** 组成员的身份登录到 Windows 服务器。\n\n在本教程中，您将：\n\n1. 在站点 A 和站点 B 上安装数据库  \n\n    1. 执行初始数据加载\n    \n2. 准备站点 A 和站点 B 以进行数据库复制\n\n3. 创建所有必要的对象以支持 DDL 复制\n\n4. 在站点 A 和站点 B 上配置 GoldenGate Manager\n\n5. 在站点 A 和站点 B 上创建 Extract Group 和 Data Pump 进程\n\n    1. 在站点 A 上创建 Extract 和 Data Pump 进程\n\n    2. 在站点 B 上创建 GoldenGate 检查点表\n\n    3. 在站点 B 上添加 REPLICAT\n\n    4. 在站点 B 上创建 Extract 和 Data Pump 进程\n\n    5. 在站点 A 上创建 GoldenGate 检查点表\n\n    6. 在站点 A 上添加 REPLICAT\n\n    7. 在站点 A 和站点 B 上添加 trandata\n\n    8. 在站点 A 上启动 Extract 和 Data Pump 进程\n\n    9. 在站点 B 上启动 Extract 和 Data Pump 进程\n\n    10. 在站点 A 上启动 REPLICAT 进程\n\n    11. 在站点 B 上启动 REPLICAT 进程\n\n6. 验证双向复制过程\n\n>[AZURE.IMPORTANT]本教程已针对以下软件配置进行设置和测试：\n>\n>| | **站点 A 数据库** | **站点 B 数据库** |\n>|------------------------|----------------------------------|----------------------------------|\n>| **Oracle 版本** | Oracle11g 版本 2 – (11.2.0.1) | Oracle11g 版本 2 – (11.2.0.1) |\n>| **计算机名称** | MachineGG1 | MachineGG2 |\n>| **操作系统** | Windows 2008 R2 | Windows 2008 R2 |\n>| **Oracle SID** | TESTGG1 | TESTGG2 |\n>| **复制架构** | SCOTT | SCOTT |\n\n对于 Oracle 数据库和 Oracle GoldenGate 的后续版本，你可能需要实施一些附加更改。有关最新的版本特定信息，请参阅 Oracle 网站上的 [Oracle GoldenGate](http://docs.oracle.com/goldengate/1212/gg-winux/index.html) 和 [Oracle 数据库](http://www.oracle.com/us/corporate/features/database-12c/index.html)文档。例如，对于 11.2.0.4 和更高版本的源数据库，DDL 捕获由日志挖掘服务器以异步方式执行，而不需要安装任何特殊的触发器、表或其他数据库对象。可以在不停止用户应用程序的情况下执行 Oracle GoldenGate 升级。当 Extract 处于集成模式并且存在版本低于 11.2.0.4 的 Oracle 11g 源数据库时，需要使用 DDL 触发器和支持对象。有关详细指导，请参阅[安装和配置适用于 Oracle 数据库的 Oracle GoldenGate](http://docs.oracle.com/goldengate/1212/gg-winux/GIORA.pdf)。\n\n##1.在站点 A 和站点 B 上安装数据库\n本部分介绍如何在站点 A 和站点 B 上执行数据库必备组件安装。你必须在两个站点上执行本部分所述的所有步骤：站点 A 和站点 B。\n\n首先，通过管理门户与站点 A 和站点 B 建立远程桌面连接。打开 Windows 命令提示符，然后创建 Oracle GoldenGate 安装文件的主目录：\n\n    mkdir C:\\OracleGG\n\n然后，在此文件夹中解压缩并安装 Oracle GoldenGate 软件。完成此步骤后，可以通过执行以下命令来启动 GoldenGate 软件命令解释器 (GGSCI)：\n\n    C:\\OracleGG.\\ggsci\n\n可以使用 [GGSCI](http://docs.oracle.com/goldengate/1212/gg-winux/GWUAD/wu_gettingstarted.htm) 来运行用于配置、控制和监视 Oracle GoldenGate 的多个命令。\n\n接下来，运行以下命令，以从安装包创建所有子文件夹：\n\n    GGSCI (Hostname) 1> CREATE SUBDIRS\n\n运行以下命令退出 GGSCI 命令提示符：\n\n    GGSCI (Hostname) 1> EXIT\n\n然后，需要创建一个将由 Oracle GoldenGate Manager、Extract 和 Replication 进程使用的数据库用户。请注意，你可以为每个进程创建一个用户，也可以只配置一个通用用户。在本教程中，我们将创建一个名为 ggate 的用户。然后，我们将授予该用户必要的特权。请注意，你必须在站点 A 和站点 B 上执行以下操作。\n\n使用 **SYSDBA** 以数据库管理员特权在站点 A 和站点 B 上打开 SQL*Plus 命令窗口，例如：\n\n    Enter username: / as sysdba\n\n然后运行：\n\n    SQL> create tablespace ggs_data   datafile 'c:\\OracleDatabase\\oradata<DBNAME><DBNAME>ggs_data01.dbf' size 200m; \n    SQL> create user ggate identified by ggate default tablespace ggs_data  temporary tablespace temp;\n          grant connect, resource to ggate;\n          grant select any dictionary, select any table to ggate;\n          grant create table to ggate;\n          grant flashback any table to ggate;\n          grant execute on dbms_flashback to ggate;\n          grant execute on utl_file to ggate;\n          grant create any table to ggate;\n          grant insert any table to ggate;\n          grant update any table to ggate;\n          grant delete any table to ggate;\n          grant drop any table to ggate;\n\n接下来，在站点 A 和站点 B 上的 %ORACLE_HOME%\\\\database 文件夹中找到 INITDatabaseSID.ORA 文件，并将以下数据库参数追加到 INITTEST.ora 中：\n\n    UNDO_MANAGEMENT=AUTO\n    UNDO_RETENTION=86400\n\n有关所有 Oracle GoldenGate GGSCI 命令的完整列表，请参阅 [Oracle GoldenGate for Windows 参考](http://docs.oracle.com/goldengate/1212/gg-winux/GWURF/ggsci_commands.htm)。\n\n### 执行初始数据加载\n\n你可以通过以下几种方法在数据库中执行初始数据加载。例如，可以使用 [Oracle GoldenGate Direct Load](http://docs.oracle.com/goldengate/1212/gg-winux/GWUAD/wu_initsync.htm) 或普通的导出和导入实用工具，将表数据从站点 A 导出到站点 B。\n\n为了演示 Oracle GoldenGate 复制过程，本教程演示了如何使用以下命令在站点 A 和站点 B 上创建一个表。\n\n首先，请打开 SQL*Plus 命令窗口，然后运行以下命令，以在站点 A 和站点 B 数据库中创建一个库存表：\n    \n    create table scott.inventory\n    (prod_id number,\n    prod_category varchar2(20),\n    qty_in_stock number,\n    last_dml timestamp default systimestamp);\n\n接下来，将约束添加到站点 A 和站点 B 数据库上的新建表：\n\n    alter table scott.inventory add constraint pk_inventory primary key (prod_id) ;\n\n然后，在站点 A 和站点 B 上向用户 ggate 授予对新库存表的所有特权：\n\n    grant all on scott.inventory to ggate;\n\n接下来，在新建的表上创建并启用数据库触发器 INVENTORY_CDR_TRG，以确保当用户不是 ggate 时，记录向新表中写入的所有事务。在站点 A 和站点 B 上执行此操作。\n\n    CREATE OR REPLACE TRIGGER INVENTORY_CDR_TRG\n    BEFORE UPDATE\n    ON SCOTT.INVENTORY\n    REFERENCING NEW AS New OLD AS Old\n    FOR EACH ROW\n    BEGIN\n    IF SYS_CONTEXT ('USERENV', 'SESSION_USER') != 'GGATE'\n    THEN\n    :NEW.LAST_DML := SYSTIMESTAMP;\n    END IF;\n    END;\n    / \n\n\n##2.准备站点 A 和站点 B 以进行数据库复制\n本部分说明如何准备站点 A 和站点 B 以进行数据库复制。必须在两个站点上执行本部分所述的所有步骤：站点 A 和站点 B。\n\n首先，通过 Azure 门户与站点 A 和站点 B 建立远程桌面连接。使用 SQL*Plus 命令窗口将数据库切换到 archivelog 模式：\n    \n    sql>shutdown immediate \n    sql>startup mount \n    sql>alter database archivelog; \n    sql>alter database open;\n\n\n然后，按如下所示启用最小[补充日志记录](http://docs.oracle.com/cd/E11882_01/server.112/e22490/logminer.htm)：\n\n    SQL> ALTER DATABASE ADD SUPPLEMENTAL LOG DATA (ALL) COLUMNS;\n\n接下来，准备好数据库，以支持 DDL（数据定义语言）复制：\n\n    SQL> alter system set recyclebin=off scope=spfile;\n\n然后，关闭再重启数据库：\n\n    sql>shutdown immediate \n    sql>startup\n\n\n##3.创建所有必要的对象以支持 DDL 复制\n本部分列出了你需要使用哪些脚本来创建所有必要的对象以支持 DDL 复制。需要在站点 A 和站点 B 上运行本部分中指定的脚本。\n\n打开 Windows 命令提示符并导航到 Oracle GoldenGate 文件夹，例如 C:\\\\OracleGG。在站点 A 和站点 B 上以数据库管理员特权启动 SQL*Plus 命令提示符，例如，使用 **SYSDBA**。\n\n然后，运行以下脚本：\n    \n    SQL> @marker_setup.sql  \n    Enter GoldenGate schema name: ggate\n    SQL> @ddl_setup.sql  \n    Enter GoldenGate schema name: ggate\n    SQL> @role_setup.sql \n    Enter GoldenGate schema name: ggate\n    SQL> grant ggs_ggsuser_role to ggate;\n     Grant succeeded.\n     SQL> @ddl_enable\n     Trigger altered.\n     SQL> @ddl_pin ggate\n\n\nOracle GoldenGate 工具要求使用表级登录名来支持 DDL（数据定义语言）。正因如此，请在表级别使用 ADD TRANDATA 命令启用补充日志记录。打开 Oracle GoldenGate 命令解释器窗口，登录数据库，然后运行 ADD TRANDATA 命令：\n\n    GGSCI 5> DBLOGIN USERID ggate, PASSWORD ggate\n\n    GGSCI(Hostname) 6> add trandata scott.inventory\n\n##4.在站点 A 和站点 B 上配置 GoldenGate Manager\nOracle GoldenGate Manager 执行许多功能，例如，启动其他 GoldenGate 进程、跟踪日志文件管理和报告。\n\n你需要在站点 A 和站点 B 上配置 Oracle GoldenGate Manager 进程。为此，请在站点 A 和站点 B 上执行以下步骤。\n\n打开 Windows 命令窗口，然后启动 Oracle GoldenGate 命令解释器：\n\n    cd C:\\OracleGG\\\n    c:\\OracleGG>ggsci\n    Oracle GoldenGate Command Interpreter for Oracle\n    Version 11.2.1.0.3 14400833 OGGCORE_11.2.1.0.3_PLATFORMS_120823.1258\n    Windows x64 (optimized), Oracle 11g on Aug 23 2012 16:50:36\n    Copyright (C) 1995, 2012, Oracle and/or its affiliates. All rights reserved.\n\n\n将 GGSCI 会话记录到数据库，以便可以执行影响数据库的命令：\n\n    GGSCI (HostName) 1> DBLOGIN USERID ggate, PASSWORD ggate\n    Successfully logged into database.\n\n显示系统上所有 Manager、Extract 和 Replicat 进程的状态与滞后时间（如果适用）：\n\n    GGSCI (HostName) 2> info all\n    Program     Status      Group       Lag           Time Since Chkpt\n    MANAGER     STOPPED\n\n使用 EDIT PARAMS 命令打开参数文件，然后追加以下信息：\n\n    GGSCI (HostName) 3> edit params mgr\n    PORT 7809\n    USERID ggate, PASSWORD ggate\n    PURGEOLDEXTRACTS  C:\\OracleGG\\dirdat\\ex, USECHECKPOINTS\n\n显示系统上所有 Manager、Extract 和 Replicat 进程的状态与滞后时间（如果适用）：\n\n    GGSCI (HostName) 46> info all\n    Program     Status      Group       Lag           Time Since Chkpt\n    MANAGER     STOPPED\n\n将 GGSCI 会话记录到数据库，以便可以执行影响数据库的命令：\n\n    GGSCI (HostName) 47> dblogin USERID ggate, PASSWORD ggate\n\n    Successfully logged into database.\n\n启动管理器进程：\n\n    GGSCI (HostName) 48> start manager\n    Manager started.\n\n##5.在站点 A 和站点 B 上创建 Extract Group 和 Data Pump 进程\n\n###在站点 A 上创建 Extract 和 Data Pump 进程\n\n需要在站点 A 和站点 B 上创建 Extract 和 Data Pump 进程。通过管理门户与站点 A 和站点 B 建立远程桌面连接。打开 GGSCI 命令解释器窗口。在站点 A 上运行以下命令：\n\n    GGSCI (MachineGG1) 14> add extract ext1 tranlog begin now\n    EXTRACT added.\n    GGSCI (MachineGG1) 4> add exttrail C:\\OracleGG\\dirdat\\lt, extract ext1\n    EXTTRAIL added.\n    GGSCI (MachineGG1) 16> add extract dpump1 exttrailsource C:\\OracleGG\\dirdat\\aa\n    EXTRACT added.\n    GGSCI (MachineGG1) 17> add rmttrail C:\\OracleGG\\dirdat\\ab extract dpump1\n    RMTTRAIL added.\n\n使用 EDIT PARAMS 命令打开参数文件，然后追加以下信息：\n    GGSCI (MachineGG1) 18> edit params ext1\n    EXTRACT ext1\n     USERID ggate, PASSWORD ggate\n     EXTTRAIL C:\\OracleGG\\dirdat\\aa\n     TRANLOGOPTIONS EXCLUDEUSER ggate\n     TABLE scott.inventory,\n     GETBEFORECOLS (\n     ON UPDATE KEYINCLUDING (prod_category,qty_in_stock, last_dml),\n     ON DELETE KEYINCLUDING (prod_category,qty_in_stock, last_dml));\n\n使用 EDIT PARAMS 命令打开参数文件，然后追加以下信息：\n\n    GGSCI (MachineGG1) 15> edit params dpump1\n    EXTRACT dpump1\n     USERID ggate, PASSWORD ggate\n     RMTHOST ActiveGG2orcldb, MGRPORT 7809, TCPBUFSIZE 100000\n     RMTTRAIL C:\\OracleGG\\dirdat\\ab\n     PASSTHRU\n     TABLE scott.inventory;\n\n###在站点 B 上创建 GoldenGate 检查点表\n\n接下来，需要在站点 B 上添加一个检查点表。为此，需要打开 GoldenGate 命令解释器窗口并运行：\n\n    C:\\OracleGG\\ggsci\n    GGSCI (MachineGG2) 1> DBLOGIN USERID ggate, PASSWORD ggate\n    Successfully logged into database.\n\n然后，将检查点表添加到数据库，其中 ggate 是所有者：\n    \n    GGSCI (MachineGG2) 2> ADD CHECKPOINTTABLE ggate.checkpointtable\n    Successfully created checkpoint table ggate.checkpointtable.\n\n将检查点表的名称添加到目标服务器（在本步骤中为站点 B）上的 GLOBALS 文件。在站点 B 上编辑 GLOBALS 文件：\n\n    GGSCI (MachineGG2) 1> EDIT PARAMS ./GLOBALS\n\n然后，将 CHECKPOINTTABLE 参数追加到现有的 GLOBALS 文件：\n\n    GGSCHEMA ggate\n    CHECKPOINTTABLE ggate.checkpointtable\n\n最后，请保存并关闭 GLOBALS 参数文件。\n\n\n###在站点 B 上添加 REPLICAT\n本部分介绍如何在站点 B 上添加 REPLICAT 进程“REP2”。\n \n在站点 B 上使用 ADD REPLICAT 命令创建 Replicat 组：\n\n    GGSCI (MachineGG2) 37> add replicat rep2 exttrail C:\\OracleGG\\dirdatab, checkpointtable ggate.checkpointtable\n\n使用 EDIT PARAMS 命令打开参数文件，然后追加以下信息：\n\n    GGSCI (MachineGG2) 10> edit params rep2\n    REPLICAT rep2\n    ASSUMETARGETDEFS\n    USERID ggate, PASSWORD ggate\n    DISCARDFILE C:\\OracleGG\\dirdat\\discard.txt, append,megabytes 10\n    MAP scott.inventory, TARGET scott.inventory;\n\n###在站点 B 上创建 Extract 和 Data Pump 进程\n\n本部分介绍如何在站点 B 上创建新的 Extract 进程“EXT2”和新的 Data Pump 进程“DPUMP2”：\n\n    GGSCI (MachineGG2) 3> add extract ext2 tranlog begin now\n     EXTRACT added.\n    GGSCI (MachineGG2) 4> add exttrail C:\\OracleGG\\dirdat\\ac extract ext2\n     EXTTRAIL added.\n    GGSCI (MachineGG2) 5> add extract dpump2 exttrailsource C:\\OracleGG\\dirdat\\ac\n     EXTRACT added.\n    GGSCI (MachineGG2) 6> add rmttrail C:\\OracleGG\\dirdat\\ad extract dpump2\n     RMTTRAIL added.\n\n使用 EDIT PARAMS 命令打开参数文件，然后追加以下信息：\n\n    GGSCI (MachineGG2) 31> edit params ext2\n    EXTRACT ext2\n    USERID ggate, PASSWORD ggate\n    EXTTRAIL C:\\OracleGG\\dirdat\\ac\n    TRANLOGOPTIONS EXCLUDEUSER ggate\n    TABLE scott.inventory,\n    GETBEFORECOLS (\n    ON UPDATE KEYINCLUDING (prod_category,qty_in_stock, last_dml),\n    ON DELETE KEYINCLUDING (prod_category,qty_in_stock, last_dml));\n\n使用 EDIT PARAMS 命令打开参数文件，然后追加以下信息：\n\n    GGSCI (MachineGG2) 32> edit params dpump2\n    EXTRACT dpump2\n    USERID ggate, PASSWORD ggate\n    RMTHOST MachineGG1, MGRPORT 7809, TCPBUFSIZE 100000\n    RMTTRAIL C:\\OracleGG\\dirdat\\ad\n    PASSTHRU\n    TABLE scott.inventory;\n\n###在站点 A 上创建 GoldenGate 检查点表\n\n打开 Oracle GoldenGate 命令解释器窗口，然后创建一个检查点表：\n\n    GGSCI (MachineGG1) 1> DBLOGIN USERID ggate, PASSWORD ggate\n    Successfully logged into database.\n\n    GGSCI (MachineGG1) 2> ADD CHECKPOINTTABLE ggate.checkpointtable\n\n    Successfully created checkpoint table ggate.checkpointtable.\n\n你还需要将检查点表的名称添加到站点 A 上的 GLOBALS 文件。\n\n在站点 A 上打开 Oracle GoldenGate 命令解释器窗口，然后编辑 GLOBALS 文件：\n\n    GGSCI (MachineGG1) 1> EDIT PARAMS ./GLOBALS\n    Add the CHECKPOINTTABLE parameter to the existing GLOBALS file as follows:\n    GGSCHEMA ggate\n    CHECKPOINTTABLE ggate.checkpointtable\n\n保存并关闭 GLOBALS 参数文件。\n\n###在站点 A 上添加 REPLICAT\n\n本部分介绍如何在站点 A 上添加 REPLICAT 进程“REP1”。\n\n以下命令将使用某个线索的名称以及关联的 checkpointtable 创建 Replicat 组 rep1。\n\n    GGSCI (MachineGG1) 21> add replicat rep1 exttrail C:\\OracleGG\\dirdat\\ad,checkpointtable ggate.checkpointtable\n     REPLICAT added.\n\n使用 EDIT PARAMS 命令打开参数文件，然后追加以下信息：\n\n    GGSCI (MachineGG1) 10> edit params rep1\n    REPLICAT rep1\n    ASSUMETARGETDEFS\n    USERID ggate, PASSWORD ggate\n    DISCARDFILE C:\\OracleGG\\dirdat\\discard.txt, append, megabytes 10\n    MAP scott.inventory, TARGET scott.inventory;\n\n### 在站点 A 和站点 B 上添加 trandata\n\n使用 ADD TRANDATA 命令在表级别启用补充日志记录。打开 Oracle GoldenGate 命令解释器窗口，登录数据库，然后运行 ADD TRANDATA 命令。\n\n与 MachineGG1 建立远程桌面连接，打开 Oracle GoldenGate 命令解释器，然后运行：\n\n    GGSCI (MachineGG1) 11> dblogin userid ggate password ggate\n     Successfully logged into database.\n    GGSCI (MachineGG1) 12> add trandata scott.inventory cols (prod_category,qty_in_stock, last_dml)\n    GGSCI (MachineGG1) 13> info trandata scott.inventory\n    Logging of supplemental redo log data is enabled for table SCOTT.INVENTORY.\n    Columns supplementally logged for table SCOTT.INVENTORY: PROD_ID, PROD_CATEGORY, QTY_IN_STOCK, LAST_DML.\n        \n与 MachineGG2 建立远程桌面连接，打开 Oracle GoldenGate 命令解释器，然后运行：\n\n    GGSCI (MachineGG2) 18> dblogin userid ggate password ggate\n     Successfully logged into database.\n    GGSCI (MachineGG2) 14> add trandata scott.inventory cols (prod_category,qty_in_stock, last_dml)\n    Logging of supplemental redo data enabled for table SCOTT.INVENTORY.\n\n显示有关表级补充日志记录的状态的信息：\n\n    GGSCI (MachineGG2) 15> info trandata scott.inventory\n    Logging of supplemental redo log data is enabled for table SCOTT.INVENTORY.\n    Columns supplementally logged for table SCOTT.INVENTORY: PROD_ID, PROD_CATEGORY, QTY_IN_STOCK, LAST_DML.\n\n###在站点 A 和站点 B 上添加 trandata\n\n使用 ADD TRANDATA 命令在表级别启用补充日志记录。打开 Oracle GoldenGate 命令解释器窗口，登录数据库，然后运行 ADD TRANDATA 命令。\n\n与 MachineGG1 建立远程桌面连接，打开 Oracle GoldenGate 命令解释器，然后运行：\n\n    GGSCI (MachineGG1) 11> dblogin userid ggate password ggate\n     Successfully logged into database.\n    GGSCI (MachineGG1) 12> add trandata scott.inventory cols (prod_category,qty_in_stock, last_dml)\n    GGSCI (MachineGG1) 13> info trandata scott.inventory\n    Logging of supplemental redo log data is enabled for table SCOTT.INVENTORY.\n    Columns supplementally logged for table SCOTT.INVENTORY: PROD_ID, PROD_CATEGORY, QTY_IN_STOCK, LAST_DML.\n\n与 MachineGG2 建立远程桌面连接，打开 Oracle GoldenGate 命令解释器，然后运行：\n\n    GGSCI (MachineGG2) 18> dblogin userid ggate password ggate\n     Successfully logged into database.\n    GGSCI (MachineGG2) 14> add trandata scott.inventory cols (prod_category,qty_in_stock, last_dml)\n    Logging of supplemental redo data enabled for table SCOTT.INVENTORY.\n    Display information about the state of table-level supplemental logging:\n    GGSCI (MachineGG2) 15> info trandata scott.inventory\n    Logging of supplemental redo log data is enabled for table SCOTT.INVENTORY.\n    Columns supplementally logged for table SCOTT.INVENTORY: PROD_ID, PROD_CATEGORY, QTY_IN_STOCK, LAST_DML.\n\n###在站点 A 上启动 Extract 和 Data Pump 进程\n\n在站点 A 上启动 Extract 进程 ext1：\n\n    GGSCI (MachineGG1) 31> start extract ext1\n    Sending START request to MANAGER …\n    EXTRACT EXT1 starting\n\n在站点 A 上启动 Data Pump 进程 dpump1：\n\n    GGSCI (MachineGG1) 23> start extract dpump1\n    Sending START request to MANAGER …\n    EXTRACT DPUMP1 starting\n显示有关 Extract 组 ext1 的信息：GGSCI (MachineGG1) 32> info extract ext1 EXTRACT EXT1 Last Started 2013-11-25 08:03 Status RUNNING Checkpoint Lag 00:00:00 (updated 00:00:02 ago) Log Read Checkpoint Oracle Redo Logs 2013-11-25 08:03:18 Seqno 6, RBA 3230720 SCN 0.1074371 (1074371)\n\n显示系统上所有 Manager、Extract 和 Replicat 进程的状态与滞后时间（如果适用）：\n\n    GGSCI (MachineGG1) 16> info all\n    Program     Status      Group       Lag at Chkpt  Time Since Chkpt\n    \n    MANAGER     RUNNING\n    EXTRACT     RUNNING     DPUMP1      00:00:00      00:46:33\n    EXTRACT     RUNNING     EXT1        00:00:00      00:00:04\n\n###在站点 B 上启动 Extract 和 Data Pump 进程\n\n在站点 B 上启动 Extract 进程 ext2：\n\n    GGSCI (MachineGG2) 22> start extract ext2\n    Sending START request to MANAGER …\n    EXTRACT EXT2 starting\n\n在站点 B 上启动 Data Pump 进程 dpump2：\n\n    GGSCI (MachineGG2) 23> start extract dpump2\n    Sending START request to MANAGER …\n    EXTRACT DPUMP2 starting\n\n显示系统上所有 Manager、Extract 和 Replicat 进程的状态与滞后时间（如果适用）：\n\n    GGSCI (ActiveGG2orcldb) 6> info all\n    Program     Status      Group       Lag at Chkpt  Time Since Chkpt\n    \n    MANAGER     RUNNING\n    EXTRACT     RUNNING     DPUMP2      00:00:00      136:13:33\n    EXTRACT     RUNNING     EXT2        00:00:00      00:00:04\n\n### 在站点 A 上启动 REPLICAT 进程\n\n本部分介绍如何在站点 A 上启动 REPLICAT 进程“REP1”。\n\n在站点 A 上启动 Replicat 进程：\n\n    GGSCI (MachineGG1) 38> start replicat rep1\n    Sending START request to MANAGER …\n    REPLICAT REP1 starting\n\n显示 Replicat 组的状态：\n\n    GGSCI (MachineGG1) 39> status replicat rep1\n     REPLICAT REP1: RUNNING\n\n###在站点 B 上启动 REPLICAT 进程\n\n本部分介绍如何在站点 B 上启动 REPLICAT 进程“REP2”。\n\n在站点 B 上启动 Replicat 进程：\n\n    GGSCI (MachineGG2) 26> start replicat rep2\n    Sending START request to MANAGER …\n    REPLICAT REP2 starting\n\n显示 Replicat 组的状态：\n\n    GGSCI (MachineGG2) 27> status replicat rep2\n    REPLICAT REP2: RUNNING\n\n##6.验证双向复制过程\n\n若要验证 Oracle GoldenGate 配置，请在站点 A 上的数据库中插入一行。与站点 A 建立远程桌面连接。打开 SQL*Plus 命令窗口并运行：SQL> select name from v$database;\n    \n    NAME\n    ———\n    TESTGG\n    \n    SQL> insert into inventory values  (100,’TV’,100,sysdate);\n    \n    1 row created.\n    \n    SQL> commit;\n    \n    Commit complete.\n\n然后，检查该行是否已复制到站点 B。为此，请与站点 B 建立远程桌面连接。打开 SQL Plus 窗口并运行：\n\n    SQL> select name from v$database;\n    \n    NAME\n    ———\n    TESTGG\n    \n    SQL> select * from inventory;\n    \n    PROD_ID PROD_CATEGORY QTY_IN_STOCK LAST_DML\n    ———- ——————– ———— ———\n    100 TV 100 22-MAR-13\n\n在站点 B 上插入一条新记录：\n\n    SQL> insert into inventory  values  (101,’DVD’,10,sysdate);\n    1 row created.\n    \n    SQL> commit;\n    \n    Commit complete.\n\n与站点 A 建立远程桌面连接，然后检查是否已发生复制：\n\n    SQL> select * from inventory;\n    \n    PROD_ID PROD_CATEGORY QTY_IN_STOCK LAST_DML\n    ———- ——————– ———— ———\n    100 TV 100 22-MAR-13\n    101 DVD 10 22-MAR-13\n\n\n<!---HONumber=67-->"
+}

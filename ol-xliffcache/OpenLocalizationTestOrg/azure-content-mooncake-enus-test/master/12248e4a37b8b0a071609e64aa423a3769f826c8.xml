@@ -1,0 +1,201 @@
+{
+  "nodes": [
+    {
+      "content": "SQL 数据仓库中的 Group By 选项 | Azure",
+      "pos": [
+        26,
+        56
+      ]
+    },
+    {
+      "content": "有关在开发解决方案时实现 Azure SQL 数据仓库中的 Group By 选项的技巧。",
+      "pos": [
+        74,
+        119
+      ]
+    },
+    {
+      "content": "SQL 数据仓库中的 Group By 选项",
+      "pos": [
+        343,
+        365
+      ]
+    },
+    {
+      "pos": [
+        367,
+        448
+      ],
+      "content": "<bpt id=\"p1\">[</bpt><ept id=\"p1\">GROUP BY]</ept> 子句可用于将数据聚合成摘要行集。它还具有一些扩展其功能的选项，但这些选项需要经过处理，因为 Azure SQL 数据仓库不直接支持这些选项。"
+    },
+    {
+      "content": "这些选项为：",
+      "pos": [
+        450,
+        456
+      ]
+    },
+    {
+      "content": "GROUP BY with ROLLUP",
+      "pos": [
+        459,
+        479
+      ]
+    },
+    {
+      "content": "GROUPING SETS",
+      "pos": [
+        482,
+        495
+      ]
+    },
+    {
+      "content": "GROUP BY with CUBE",
+      "pos": [
+        498,
+        516
+      ]
+    },
+    {
+      "content": "Rollup 和 grouping sets 选项",
+      "pos": [
+        521,
+        546
+      ]
+    },
+    {
+      "pos": [
+        547,
+        596
+      ],
+      "content": "此处最简单的选项是改为使用 <ph id=\"ph1\">`UNION ALL`</ph> 来执行汇总，而不是依赖显式语法。结果应完全相同"
+    },
+    {
+      "pos": [
+        598,
+        631
+      ],
+      "content": "以下是使用 <ph id=\"ph1\">`ROLLUP`</ph> 选项的 Group By 语句示例："
+    },
+    {
+      "content": "我们已通过使用 ROLLUP 请求以下聚合：",
+      "pos": [
+        1009,
+        1031
+      ]
+    },
+    {
+      "content": "Country and Region",
+      "pos": [
+        1034,
+        1052
+      ]
+    },
+    {
+      "content": "Country",
+      "pos": [
+        1055,
+        1062
+      ]
+    },
+    {
+      "content": "Grand Total",
+      "pos": [
+        1065,
+        1076
+      ]
+    },
+    {
+      "pos": [
+        1078,
+        1121
+      ],
+      "content": "若要替换此语句，需要使用 <ph id=\"ph1\">`UNION ALL`</ph>；显式指定所需的聚合以返回相同的结果："
+    },
+    {
+      "content": "对于 GROUPING SETS，我们需要采用相同的主体，但只创建想要查看的聚合级别的 UNION ALL 部分",
+      "pos": [
+        1870,
+        1926
+      ]
+    },
+    {
+      "content": "Cube 选项",
+      "pos": [
+        1931,
+        1938
+      ]
+    },
+    {
+      "content": "可以使用 UNION ALL 方法创建 GROUP BY WITH CUBE。问题在于，代码可能很快就会变得庞大且失控。若要避免此情况，可以使用这种更高级的方法。",
+      "pos": [
+        1939,
+        2020
+      ]
+    },
+    {
+      "content": "使用上述示例。",
+      "pos": [
+        2022,
+        2029
+      ]
+    },
+    {
+      "content": "第一步是定义“cube”，它定义我们想要创建的所有聚合级别。请务必记下两个派生表的 CROSS JOIN。这样就会生成所有级别。剩余代码确实可以设置格式。",
+      "pos": [
+        2031,
+        2108
+      ]
+    },
+    {
+      "content": "CTAS 的结果如下所示：",
+      "pos": [
+        2908,
+        2921
+      ]
+    },
+    {
+      "content": "第二步是指定目标表用于存储临时结果：",
+      "pos": [
+        2931,
+        2949
+      ]
+    },
+    {
+      "content": "第三步是是循环访问执行聚合的列 cube。查询将为 #Cube 临时表中的每个行运行一次，并将结果存储在 #Results 临时表中",
+      "pos": [
+        3264,
+        3330
+      ]
+    },
+    {
+      "content": "最后，我们只需读取 #Results 临时表即可返回结果",
+      "pos": [
+        3954,
+        3982
+      ]
+    },
+    {
+      "content": "通过将代码拆分成不同的部分并生成循环构造，代码将更好管理和维护。",
+      "pos": [
+        4034,
+        4066
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        4072,
+        4076
+      ]
+    },
+    {
+      "pos": [
+        4077,
+        4098
+      ],
+      "content": "有关更多开发技巧，请参阅<bpt id=\"p1\">[</bpt>开发概述<ept id=\"p1\">][]</ept>。"
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"SQL 数据仓库中的 Group By 选项 | Azure\"\n   description=\"有关在开发解决方案时实现 Azure SQL 数据仓库中的 Group By 选项的技巧。\"\n   services=\"sql-data-warehouse\"\n   documentationCenter=\"NA\"\n   authors=\"jrowlandjones\"\n   manager=\"barbkess\"\n   editor=\"\"/>\n\n<tags\n   ms.service=\"sql-data-warehouse\"\n   ms.date=\"09/22/2015\"\n   wacn.date=\"01/20/2016\"/>\n\n# SQL 数据仓库中的 Group By 选项\n\n[GROUP BY] 子句可用于将数据聚合成摘要行集。它还具有一些扩展其功能的选项，但这些选项需要经过处理，因为 Azure SQL 数据仓库不直接支持这些选项。\n\n这些选项为：\n- GROUP BY with ROLLUP\n- GROUPING SETS\n- GROUP BY with CUBE\n\n## Rollup 和 grouping sets 选项\n此处最简单的选项是改为使用 `UNION ALL` 来执行汇总，而不是依赖显式语法。结果应完全相同\n\n以下是使用 `ROLLUP` 选项的 Group By 语句示例：\n\n```\nSELECT [SalesTerritoryCountry]\n,      [SalesTerritoryRegion]\n,      SUM(SalesAmount)             AS TotalSalesAmount\nFROM  dbo.factInternetSales s\nJOIN  dbo.DimSalesTerritory t       ON s.SalesTerritoryKey       = t.SalesTerritoryKey\nGROUP BY ROLLUP (\n                        [SalesTerritoryCountry]\n                ,       [SalesTerritoryRegion]\n                )\n;\n```\n\n我们已通过使用 ROLLUP 请求以下聚合：\n- Country and Region\n- Country\n- Grand Total\n\n若要替换此语句，需要使用 `UNION ALL`；显式指定所需的聚合以返回相同的结果：\n\n```\nSELECT [SalesTerritoryCountry]\n,      [SalesTerritoryRegion]\n,      SUM(SalesAmount) AS TotalSalesAmount\nFROM  dbo.factInternetSales s\nJOIN  dbo.DimSalesTerritory t     ON s.SalesTerritoryKey       = t.SalesTerritoryKey\nGROUP BY \n       [SalesTerritoryCountry]\n,      [SalesTerritoryRegion]\nUNION ALL\nSELECT [SalesTerritoryCountry]\n,      NULL\n,      SUM(SalesAmount) AS TotalSalesAmount\nFROM  dbo.factInternetSales s\nJOIN  dbo.DimSalesTerritory t     ON s.SalesTerritoryKey       = t.SalesTerritoryKey\nGROUP BY \n       [SalesTerritoryCountry]\nUNION ALL\nSELECT NULL\n,      NULL\n,      SUM(SalesAmount) AS TotalSalesAmount\nFROM  dbo.factInternetSales s\nJOIN  dbo.DimSalesTerritory t     ON s.SalesTerritoryKey       = t.SalesTerritoryKey;\n```\n\n对于 GROUPING SETS，我们需要采用相同的主体，但只创建想要查看的聚合级别的 UNION ALL 部分\n\n## Cube 选项\n可以使用 UNION ALL 方法创建 GROUP BY WITH CUBE。问题在于，代码可能很快就会变得庞大且失控。若要避免此情况，可以使用这种更高级的方法。\n\n使用上述示例。\n\n第一步是定义“cube”，它定义我们想要创建的所有聚合级别。请务必记下两个派生表的 CROSS JOIN。这样就会生成所有级别。剩余代码确实可以设置格式。\n\n```\nCREATE TABLE #Cube\nWITH \n(   DISTRIBUTION = ROUND_ROBIN\n,   LOCATION = USER_DB\n)\nAS\nWITH GrpCube AS\n(SELECT    CAST(ISNULL(Country,'NULL')+','+ISNULL(Region,'NULL') AS NVARCHAR(50)) as 'Cols'\n,          CAST(ISNULL(Country+',','')+ISNULL(Region,'') AS NVARCHAR(50))  as 'GroupBy'\n,          ROW_NUMBER() OVER (ORDER BY Country) as 'Seq'\nFROM       ( SELECT 'SalesTerritoryCountry' as Country\n             UNION ALL\n             SELECT NULL\n           ) c\nCROSS JOIN ( SELECT 'SalesTerritoryRegion' as Region\n             UNION ALL\n             SELECT NULL\n           ) r\n)\nSELECT Cols\n,      CASE WHEN SUBSTRING(GroupBy,LEN(GroupBy),1) = ',' \n            THEN SUBSTRING(GroupBy,1,LEN(GroupBy)-1) \n            ELSE GroupBy \n       END AS GroupBy  --Remove Trailing Comma\n,Seq\nFROM GrpCube;\n```\n\nCTAS 的结果如下所示：\n\n![][1]\n\n第二步是指定目标表用于存储临时结果：\n\n```\nDECLARE \n @SQL NVARCHAR(4000)\n,@Columns NVARCHAR(4000)\n,@GroupBy NVARCHAR(4000)\n,@i INT = 1\n,@nbr INT = 0\n;\nCREATE TABLE #Results\n(\n [SalesTerritoryCountry] NVARCHAR(50)\n,[SalesTerritoryRegion]  NVARCHAR(50)\n,[TotalSalesAmount]      MONEY\n)\nWITH\n(   DISTRIBUTION = ROUND_ROBIN\n,   LOCATION = USER_DB\n)\n;\n```\n\n第三步是是循环访问执行聚合的列 cube。查询将为 #Cube 临时表中的每个行运行一次，并将结果存储在 #Results 临时表中\n\n```\nSET @nbr =(SELECT MAX(Seq) FROM #Cube);\nWHILE @i<=@nbr\nBEGIN\n    SET @Columns = (SELECT Cols    FROM #Cube where seq = @i);\n    SET @GroupBy = (SELECT GroupBy FROM #Cube where seq = @i);\n    SET @SQL ='INSERT INTO #Results\n              SELECT '+@Columns+'\n              ,      SUM(SalesAmount) AS TotalSalesAmount\n              FROM  dbo.factInternetSales s\n              JOIN  dbo.DimSalesTerritory t  \n              ON s.SalesTerritoryKey = t.SalesTerritoryKey\n              '+CASE WHEN @GroupBy <>'' \n                     THEN 'GROUP BY '+@GroupBy ELSE '' END\n    EXEC sp_executesql @SQL;\n    SET @i +=1;\nEND\n```\n\n最后，我们只需读取 #Results 临时表即可返回结果\n\n```\nSELECT * \nFROM #Results\nORDER BY 1,2,3\n;\n```\n\n通过将代码拆分成不同的部分并生成循环构造，代码将更好管理和维护。\n\n\n## 后续步骤\n有关更多开发技巧，请参阅[开发概述][]。\n\n<!--Image references-->\n[1]: ./media/sql-data-warehouse-develop-group-by-options/sql-data-warehouse-develop-group-by-cube.png\n\n<!--Article references-->\n[开发概述]: /documentation/articles/sql-data-warehouse-overview-develop\n\n<!--MSDN references-->\n[GROUP BY]: https://msdn.microsoft.com/zh-cn/library/ms177673.aspx\n\n\n<!--Other Web references-->\n\n<!---HONumber=Mooncake_1207_2015-->\n"
+}

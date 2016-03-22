@@ -1,0 +1,333 @@
+{
+  "nodes": [
+    {
+      "content": "在源代码管理中存储 JavaScript 后端项目代码 | Azure 移动服务",
+      "pos": [
+        27,
+        67
+      ]
+    },
+    {
+      "content": "了解如何在您的计算机本地 Git 存储库中存储您的服务器脚本文件和模块。",
+      "pos": [
+        86,
+        122
+      ]
+    },
+    {
+      "content": "在源代码管理中存储移动服务项目代码",
+      "pos": [
+        343,
+        360
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        462,
+        468
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        471,
+        487
+      ]
+    },
+    {
+      "content": ".NET backend",
+      "pos": [
+        491,
+        503
+      ]
+    },
+    {
+      "content": "Javascript backend",
+      "pos": [
+        590,
+        608
+      ]
+    },
+    {
+      "content": "本主题向您展示了如何使用 Azure 移动服务提供的源代码管理来存储服务器脚本。脚本和其他 JavaScript 后端代码文件可从您的本地 Git 存储库提升到生产移动服务。另外，本主题还说明了如何定义可在多个脚本之间使用的共享代码，以及如何使用 package.json 文件来为您的移动服务添加 Node.js 模块。",
+      "pos": [
+        681,
+        842
+      ]
+    },
+    {
+      "pos": [
+        844,
+        878
+      ],
+      "content": "若要完成本教程，你必须事先参考<bpt id=\"p1\">[</bpt><ept id=\"p1\">移动服务入门]</ept>教程创建一个移动服务。"
+    },
+    {
+      "pos": [
+        883,
+        932
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"enable-source-control\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>在移动服务中启用源代码管理"
+    },
+    {
+      "pos": [
+        1048,
+        1088
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"clone-repo\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>安装 Git 并创建本地存储库"
+    },
+    {
+      "content": "在本地计算机上安装 Git。",
+      "pos": [
+        1093,
+        1107
+      ]
+    },
+    {
+      "pos": [
+        1114,
+        1166
+      ],
+      "content": "安装 Git 所需的步骤因操作系统的不同而异。有关操作系统特定的分发和安装指南，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">安装 Git]</ept>。"
+    },
+    {
+      "pos": [
+        1174,
+        1232
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在某些操作系统上，命令行和 GUI 版本的 Git 都可用。本文中提供的说明使用命令行版本。"
+    },
+    {
+      "pos": [
+        1237,
+        1333
+      ],
+      "content": "打开一个命令行，例如 <bpt id=\"p1\">**</bpt>GitBash<ept id=\"p1\">**</ept> (Windows) 或 <bpt id=\"p2\">**</bpt>Bash<ept id=\"p2\">**</ept> (Unix Shell)。在 OS X 系统上，可以通过 <bpt id=\"p3\">**</bpt>Terminal<ept id=\"p3\">**</ept> 应用程序访问命令行。"
+    },
+    {
+      "pos": [
+        1338,
+        1381
+      ],
+      "content": "在命令行中，切换到要在其中存储脚本的目录。例如，<ph id=\"ph1\">`cd SourceControl`</ph>。"
+    },
+    {
+      "pos": [
+        1386,
+        1451
+      ],
+      "content": "使用以下命令创建新 Git 存储库的本地副本，并将 <ph id=\"ph1\">`&lt;your_git_URL&gt;`</ph> 替换为移动服务的 Git 存储库的 URL："
+    },
+    {
+      "content": "出现提示时，请键入你在移动服务中启用源代码管理时设置的用户名和密码。身份验证成功后，你将看到类似于下面的一系列响应：",
+      "pos": [
+        1490,
+        1548
+      ]
+    },
+    {
+      "pos": [
+        1751,
+        1789
+      ],
+      "content": "浏览到你从中运行了 <ph id=\"ph1\">`git clone`</ph> 命令的目录，并留意以下目录结构："
+    },
+    {
+      "content": "4",
+      "pos": [
+        1797,
+        1798
+      ]
+    },
+    {
+      "content": "此时已创建了一个使用移动服务名称的新目录，即数据服务的本地存储库。",
+      "pos": [
+        1808,
+        1841
+      ]
+    },
+    {
+      "content": "打开 .\\\\service\\\\table 子文件夹，可以看到，它包含一个 TodoItem.json 文件，该文件是对 TodoItem 表的操作权限的 JSON 表示形式。",
+      "pos": [
+        1846,
+        1933
+      ]
+    },
+    {
+      "pos": [
+        1939,
+        2080
+      ],
+      "content": "如果在此表中定义了服务器脚本，则还会出现一个或多个名为 <ph id=\"ph1\">&lt;code&gt;</ph><ph id=\"ph2\">TodoItem.</ph><ph id=\"ph3\">_</ph><ph id=\"ph4\">&amp;lt;operation&amp;gt;</ph><ph id=\"ph5\">_</ph><ph id=\"ph6\">.js</ph><ph id=\"ph7\">&lt;/code&gt;</ph> 的文件，其中包含给定表操作的脚本。计划程序和自定义 API 脚本保留在与其名称相对应的不同文件夹中。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">源代码管理]</ept>。"
+    },
+    {
+      "content": "创建本地存储库后，您可以更改服务器脚本，以及将更改推送回到移动服务。",
+      "pos": [
+        2082,
+        2116
+      ]
+    },
+    {
+      "pos": [
+        2121,
+        2165
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"deploy-scripts\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>将更新的脚本文件部署到移动服务"
+    },
+    {
+      "content": "浏览到 .\\\\service\\\\table 子文件夹，如果 todoitem.insert.js 文件不存在，现在请创建该文件。",
+      "pos": [
+        2170,
+        2234
+      ]
+    },
+    {
+      "content": "在文本编辑器中打开新文件 todoitem.insert.js 并在其中粘贴以下代码，然后保存更改：",
+      "pos": [
+        2239,
+        2289
+      ]
+    },
+    {
+      "pos": [
+        2444,
+        2534
+      ],
+      "content": "此代码只是将插入的项写入日志。如果此文件已包含代码，则你只需在此文件中添加一些有效的 JavaScript 代码（例如，对 <ph id=\"ph1\">`console.log()`</ph> 的调用），然后保存更改。"
+    },
+    {
+      "content": "在 Git 命令提示符下，键入以下命令以开始跟踪新脚本文件：",
+      "pos": [
+        2539,
+        2569
+      ]
+    },
+    {
+      "content": "键入以下命令以提交更改：",
+      "pos": [
+        2600,
+        2612
+      ]
+    },
+    {
+      "content": "键入以下命令以将更改上载到远程存储库：",
+      "pos": [
+        2670,
+        2689
+      ]
+    },
+    {
+      "content": "您应该会看到一系列命令，指出已将提交的内容部署到移动服务。",
+      "pos": [
+        2733,
+        2762
+      ]
+    },
+    {
+      "pos": [
+        2767,
+        2867
+      ],
+      "content": "返回 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 经典门户]</ept>，单击“数据”选项卡，单击“TodoItem”表，单击“脚本”，然后选择“插入”操作。可以看到，显示的插入操作脚本与您刚刚上载到存储库的 JavaScript 代码相同。"
+    },
+    {
+      "pos": [
+        2872,
+        2919
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"use-npm\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>在服务器脚本中利用共享代码和 Node.js 模块"
+    },
+    {
+      "pos": [
+        2921,
+        3083
+      ],
+      "content": "移动服务允许你访问整个核心 Node.js 模块集，你可以通过 <bpt id=\"p1\">**</bpt>require<ept id=\"p1\">**</ept> 函数在代码中使用这些模块。移动服务还可使用不属于核心 Node.js 程序包的 Node.js 模块，您甚至可以定义自己的共享代码作为 Node.js 模块。有关创建模块的详细信息，请参阅 Node.js API 参考文档中的<bpt id=\"p2\">[</bpt><ept id=\"p2\">模块]</ept>。"
+    },
+    {
+      "pos": [
+        3085,
+        3262
+      ],
+      "content": "将 Node.js 模块添加到移动服务的建议方法为对服务的 package.json 文件添加引用。然后通过更新 package.json 文件为你的移动服务添加 <bpt id=\"p1\">[</bpt><ept id=\"p1\">node-uuid]</ept> Node.js 模块。当更新推送到 Azure 时，移动服务重新启动，模块安装完成。然后，你可以使用此模块为已插入项的 <bpt id=\"p2\">**</bpt>uuid<ept id=\"p2\">**</ept> 属性生成新的 GUID 值。"
+    },
+    {
+      "pos": [
+        3267,
+        3355
+      ],
+      "content": "导航到本地 Git 存储库的 <ph id=\"ph1\">`.\\service`</ph> 文件夹，在文本编辑器中打开 package.json 文件，然后将以下字段添加到 <bpt id=\"p1\">**</bpt>dependencies<ept id=\"p1\">**</ept> 对象："
+    },
+    {
+      "pos": [
+        3393,
+        3447
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>对 package.json 文件执行这项更新会导致推送提交内容后重新启动移动服务。"
+    },
+    {
+      "content": "现在，请浏览到 .\\\\service\\\\table 子文件夹，打开 todoitem.insert.js 文件并按如下所示修改该文件：",
+      "pos": [
+        3452,
+        3519
+      ]
+    },
+    {
+      "content": "此代码将在表中添加一个 uuid 列，并使用唯一的 GUID 标识符填充该列。",
+      "pos": [
+        3725,
+        3764
+      ]
+    },
+    {
+      "content": "像在前一部分中一样，在 Git 命令提示符下键入以下命令：",
+      "pos": [
+        3769,
+        3798
+      ]
+    },
+    {
+      "content": "这样就会添加新的文件，提交您的更改，并将新的 node-uuid 模块以及对 todoitem.insert.js 脚本所做的更改推送到您的移动服务。",
+      "pos": [
+        3915,
+        3990
+      ]
+    },
+    {
+      "pos": [
+        3996,
+        4025
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"next-steps\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>后续步骤"
+    },
+    {
+      "content": "完成本教程后，你便知道了如何在源代码管理中存储脚本。我们建议您了解有关如何使用服务器脚本和自定义 API 的详细信息：",
+      "pos": [
+        4027,
+        4086
+      ]
+    },
+    {
+      "pos": [
+        4090,
+        4140
+      ],
+      "content": "[在移动服务中使用服务器脚本]\n<br/>说明如何使用服务器脚本、作业计划程序和自定义 API。",
+      "leadings": [
+        "",
+        "  "
+      ],
+      "nodes": [
+        {
+          "content": "说明如何使用服务器脚本、作业计划程序和自定义 API。",
+          "pos": [
+            21,
+            48
+          ]
+        }
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"在源代码管理中存储 JavaScript 后端项目代码 | Azure 移动服务\"\n    description=\"了解如何在您的计算机本地 Git 存储库中存储您的服务器脚本文件和模块。\"\n    services=\"mobile-services\"\n    documentationCenter=\"\"\n    authors=\"ggailey777\"\n    manager=\"dwrede\"\n    editor=\"\"/>\n\n<tags \n    ms.service=\"mobile-services\" \n    ms.date=\"12/07/2015\"\n    wacn.date=\"01/29/2016\"/>\n\n# 在源代码管理中存储移动服务项目代码\n\n[AZURE.INCLUDE [mobile-service-note-mobile-apps](../includes/mobile-services-note-mobile-apps.md)]\n\n&nbsp;\n> [AZURE.SELECTOR]\n- [.NET backend](/documentation/articles/mobile-services-dotnet-backend-store-code-source-control)\n- [Javascript backend](/documentation/articles/mobile-services-store-scripts-source-control)\n\n本主题向您展示了如何使用 Azure 移动服务提供的源代码管理来存储服务器脚本。脚本和其他 JavaScript 后端代码文件可从您的本地 Git 存储库提升到生产移动服务。另外，本主题还说明了如何定义可在多个脚本之间使用的共享代码，以及如何使用 package.json 文件来为您的移动服务添加 Node.js 模块。\n\n若要完成本教程，你必须事先参考[移动服务入门]教程创建一个移动服务。\n\n## <a name=\"enable-source-control\"></a>在移动服务中启用源代码管理\n\n[AZURE.INCLUDE [mobile-services-enable-source-control](../includes/mobile-services-enable-source-control.md)]\n\n## <a name=\"clone-repo\"></a>安装 Git 并创建本地存储库\n\n1. 在本地计算机上安装 Git。 \n\n    安装 Git 所需的步骤因操作系统的不同而异。有关操作系统特定的分发和安装指南，请参阅[安装 Git]。\n\n    > [AZURE.NOTE]在某些操作系统上，命令行和 GUI 版本的 Git 都可用。本文中提供的说明使用命令行版本。\n\n2. 打开一个命令行，例如 **GitBash** (Windows) 或 **Bash** (Unix Shell)。在 OS X 系统上，可以通过 **Terminal** 应用程序访问命令行。\n\n3. 在命令行中，切换到要在其中存储脚本的目录。例如，`cd SourceControl`。\n\n4. 使用以下命令创建新 Git 存储库的本地副本，并将 `<your_git_URL>` 替换为移动服务的 Git 存储库的 URL：\n\n        git clone <your_git_URL>\n\n5. 出现提示时，请键入你在移动服务中启用源代码管理时设置的用户名和密码。身份验证成功后，你将看到类似于下面的一系列响应：\n\n        remote: Counting objects: 8, done.\n        remote: Compressing objects: 100% (4/4), done.\n        remote: Total 8 (delta 1), reused 0 (delta 0)\n        Unpacking objects: 100% (8/8), done.\n\n6. 浏览到你从中运行了 `git clone` 命令的目录，并留意以下目录结构：\n\n    ![4][4]\n\n    此时已创建了一个使用移动服务名称的新目录，即数据服务的本地存储库。\n\n7. 打开 .\\\\service\\\\table 子文件夹，可以看到，它包含一个 TodoItem.json 文件，该文件是对 TodoItem 表的操作权限的 JSON 表示形式。\n\n    如果在此表中定义了服务器脚本，则还会出现一个或多个名为 <code>TodoItem._&lt;operation&gt;_.js</code> 的文件，其中包含给定表操作的脚本。计划程序和自定义 API 脚本保留在与其名称相对应的不同文件夹中。有关详细信息，请参阅[源代码管理]。\n\n创建本地存储库后，您可以更改服务器脚本，以及将更改推送回到移动服务。\n\n## <a name=\"deploy-scripts\"></a>将更新的脚本文件部署到移动服务\n\n1. 浏览到 .\\\\service\\\\table 子文件夹，如果 todoitem.insert.js 文件不存在，现在请创建该文件。\n\n2. 在文本编辑器中打开新文件 todoitem.insert.js 并在其中粘贴以下代码，然后保存更改：\n\n        function insert(item, user, request) {\n            request.execute();\n            console.log(JSON.stringify(item, null, 4));\n        }\n    \n    此代码只是将插入的项写入日志。如果此文件已包含代码，则你只需在此文件中添加一些有效的 JavaScript 代码（例如，对 `console.log()` 的调用），然后保存更改。\n\n3. 在 Git 命令提示符下，键入以下命令以开始跟踪新脚本文件：\n\n        $ git add .\n    \n\n4. 键入以下命令以提交更改：\n\n        $ git commit -m \"updated the insert script\"\n\n5. 键入以下命令以将更改上载到远程存储库：\n\n        $ git push origin master\n    \n    您应该会看到一系列命令，指出已将提交的内容部署到移动服务。\n\n6. 返回 [Azure 经典门户]，单击“数据”选项卡，单击“TodoItem”表，单击“脚本”，然后选择“插入”操作。可以看到，显示的插入操作脚本与您刚刚上载到存储库的 JavaScript 代码相同。\n\n## <a name=\"use-npm\"></a>在服务器脚本中利用共享代码和 Node.js 模块\n\n移动服务允许你访问整个核心 Node.js 模块集，你可以通过 **require** 函数在代码中使用这些模块。移动服务还可使用不属于核心 Node.js 程序包的 Node.js 模块，您甚至可以定义自己的共享代码作为 Node.js 模块。有关创建模块的详细信息，请参阅 Node.js API 参考文档中的[模块]。\n\n将 Node.js 模块添加到移动服务的建议方法为对服务的 package.json 文件添加引用。然后通过更新 package.json 文件为你的移动服务添加 [node-uuid] Node.js 模块。当更新推送到 Azure 时，移动服务重新启动，模块安装完成。然后，你可以使用此模块为已插入项的 **uuid** 属性生成新的 GUID 值。\n\n2. 导航到本地 Git 存储库的 `.\\service` 文件夹，在文本编辑器中打开 package.json 文件，然后将以下字段添加到 **dependencies** 对象：\n\n        \"node-uuid\": \"~1.4.3\"\n\n    >[AZURE.NOTE]对 package.json 文件执行这项更新会导致推送提交内容后重新启动移动服务。\n\n2. 现在，请浏览到 .\\\\service\\\\table 子文件夹，打开 todoitem.insert.js 文件并按如下所示修改该文件：\n\n        function insert(item, user, request) {\n            var uuid = require('node-uuid');\n            item.uuid = uuid.v1();\n            request.execute();\n            console.log(item);\n        }\n\n    此代码将在表中添加一个 uuid 列，并使用唯一的 GUID 标识符填充该列。\n\n5. 像在前一部分中一样，在 Git 命令提示符下键入以下命令：\n\n        $ git add .\n        $ git commit -m \"added node-uuid module\"\n        $ git push origin master\n        \n    这样就会添加新的文件，提交您的更改，并将新的 node-uuid 模块以及对 todoitem.insert.js 脚本所做的更改推送到您的移动服务。\n\n##  <a name=\"next-steps\"></a>后续步骤\n\n完成本教程后，你便知道了如何在源代码管理中存储脚本。我们建议您了解有关如何使用服务器脚本和自定义 API 的详细信息：\n\n+ [在移动服务中使用服务器脚本]\n  <br/>说明如何使用服务器脚本、作业计划程序和自定义 API。\n\n<!-- Anchors. -->\n[Enable source control in your mobile service]: #enable-source-control\n[Install Git and create the local repository]: #clone-repo\n[Deploy updated script files to your mobile service]: #deploy-scripts\n[Leverage shared code and Node.js modules in your server scripts]: #use-npm\n\n<!-- Images. -->\n\n[4]: ./media/mobile-services-store-scripts-source-control/mobile-source-local-repo.png\n[5]: ./media/mobile-services-store-scripts-source-control/mobile-portal-data-tables.png\n[6]: ./media/mobile-services-store-scripts-source-control/mobile-insert-script-source-control.png\n\n<!-- URLs. -->\n[Git website]: http://git-scm.com\n[源代码管理]: http://msdn.microsoft.com/zh-cn/library/windowsazure/c25aaede-c1f0-4004-8b78-113708761643\n[安装 Git]: http://git-scm.com/book/en/Getting-Started-Installing-Git\n[移动服务入门]: /documentation/articles/mobile-services-ios-get-started\n[在移动服务中使用服务器脚本]: /documentation/articles/mobile-services-how-to-use-server-scripts\n[Azure 经典门户]: https://manage.windowsazure.cn/\n[模块]: http://nodejs.org/api/modules.html\n[node-uuid]: https://npmjs.org/package/node-uuid\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

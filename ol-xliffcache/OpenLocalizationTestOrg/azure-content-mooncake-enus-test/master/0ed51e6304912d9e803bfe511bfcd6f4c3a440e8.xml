@@ -1,0 +1,152 @@
+{
+  "nodes": [
+    {
+      "content": "用于连接到 SQL 数据库的 PHP 重试逻辑 | Azure",
+      "pos": [
+        27,
+        58
+      ]
+    },
+    {
+      "content": "演示一个示例 PHP 程序，该程序可以通过暂时性故障处理从 Windows 客户端连接到 Azure SQL 数据库，并与客户端所需的软件组件建立链接。",
+      "pos": [
+        77,
+        153
+      ]
+    },
+    {
+      "content": "使用 Windows 上的 PHP 和暂时性故障处理连接到 SQL 数据库",
+      "pos": [
+        376,
+        413
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        418,
+        434
+      ]
+    },
+    {
+      "content": "PHP",
+      "pos": [
+        438,
+        441
+      ]
+    },
+    {
+      "content": "C",
+      "pos": [
+        510,
+        511
+      ]
+    },
+    {
+      "content": "C# EntLib6",
+      "pos": [
+        584,
+        594
+      ]
+    },
+    {
+      "content": "本主题演示了如何从 Windows 运行的、以 PHP 编写的客户端应用程序连接到 Azure SQL 数据库。",
+      "pos": [
+        672,
+        728
+      ]
+    },
+    {
+      "content": "SQL 数据库",
+      "pos": [
+        882,
+        889
+      ]
+    },
+    {
+      "pos": [
+        891,
+        1031
+      ],
+      "content": "请参阅<bpt id=\"p1\">[</bpt>入门页<ept id=\"p1\">](/documentation/articles/sql-database-get-started)</ept>，以了解如何创建示例数据库。必须根据指南创建 <bpt id=\"p2\">**</bpt>AdventureWorks 数据库模板<ept id=\"p2\">**</ept>。下面所示的示例只适用于 <bpt id=\"p3\">**</bpt>AdventureWorks 架构<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "content": "步骤 1：获取连接详细信息",
+      "pos": [
+        1037,
+        1050
+      ]
+    },
+    {
+      "content": "步骤 2：连接和查询",
+      "pos": [
+        1214,
+        1224
+      ]
+    },
+    {
+      "content": "设计该演示程序的目的是在尝试连接期间发生暂时性故障时导致重试。但是，在执行查询命令期间发生暂时性故障时会导致程序丢弃连接并创建新的连接，然后重试查询命令。我们既不建议也不反对这种设计。演示程序演示了一些可供你使用的设计弹性。",
+      "pos": [
+        1226,
+        1338
+      ]
+    },
+    {
+      "content": "此代码示例的长度多半是因为捕获异常的逻辑。<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](/documentation/articles/sql-database-develop-php-simple-windows)</ept>提供了此 Program.cs 文件的简短版本。",
+      "pos": [
+        1344,
+        1458
+      ]
+    },
+    {
+      "content": "Main 方法在 Program.cs 中。调用堆栈的运行如下：",
+      "pos": [
+        1463,
+        1495
+      ]
+    },
+    {
+      "content": "Main 调用 ConnectAndQuery。",
+      "pos": [
+        1498,
+        1522
+      ]
+    },
+    {
+      "content": "ConnectAndQuery 调用 EstablishConnection。",
+      "pos": [
+        1525,
+        1564
+      ]
+    },
+    {
+      "content": "EstablishConnection 调用 IssueQueryCommand。",
+      "pos": [
+        1567,
+        1608
+      ]
+    },
+    {
+      "pos": [
+        1610,
+        1823
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>sqlsrv\\_query()<ept id=\"p1\">](http://php.net/manual/zh/function.sqlsrv-query.php)</ept> 函数可用于针对 SQL 数据库从查询中检索结果集。此函数实际上可接受任何查询和连接对象，并返回可使用 <bpt id=\"p2\">[</bpt>sqlsrv\\_fetch\\_array()<ept id=\"p2\">](http://php.net/manual/zh/function.sqlsrv-fetch-array.php)</ept> 循环访问的结果集。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        6040,
+        6044
+      ]
+    },
+    {
+      "pos": [
+        6046,
+        6152
+      ],
+      "content": "有关 PHP 安装和用法的详细信息，请参阅<bpt id=\"p1\">[</bpt>使用 PHP 访问 SQL Server 数据库<ept id=\"p1\">](http://technet.microsoft.com/zh-cn/library/cc793139.aspx)</ept>。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"用于连接到 SQL 数据库的 PHP 重试逻辑 | Azure\"\n    description=\"演示一个示例 PHP 程序，该程序可以通过暂时性故障处理从 Windows 客户端连接到 Azure SQL 数据库，并与客户端所需的软件组件建立链接。\"\n    services=\"sql-database\"\n    documentationCenter=\"\"\n    authors=\"meet-bhagdev\"\n    manager=\"jeffreyg\"\n    editor=\"\"/>\n\n\n<tags\n    ms.service=\"sql-database\"\n    ms.date=\"12/17/2015\"\n        wacn.date=\"01/15/2016\"/>\n\n\n# 使用 Windows 上的 PHP 和暂时性故障处理连接到 SQL 数据库\n\n\n> [AZURE.SELECTOR]\n- [PHP](/documentation/articles/sql-database-develop-php-retry-windows)\n- [C#](/documentation/articles/sql-database-develop-csharp-retry-windows)\n- [C# EntLib6](/documentation/articles/sql-database-develop-entlib-csharp-retry-windows)\n\n\n本主题演示了如何从 Windows 运行的、以 PHP 编写的客户端应用程序连接到 Azure SQL 数据库。\n\n\n[AZURE.INCLUDE [sql-database-develop-includes-prerequisites-php-windows](../includes/sql-database-develop-includes-prerequisites-php-windows.md)]\n\n### SQL 数据库\n\n请参阅[入门页](/documentation/articles/sql-database-get-started)，以了解如何创建示例数据库。必须根据指南创建 **AdventureWorks 数据库模板**。下面所示的示例只适用于 **AdventureWorks 架构**。\n\n\n## 步骤 1：获取连接详细信息\n\n[AZURE.INCLUDE [sql-database-include-connection-string-details-20-portalshots](../includes/sql-database-include-connection-string-details-20-portalshots.md)]\n\n## 步骤 2：连接和查询\n\n设计该演示程序的目的是在尝试连接期间发生暂时性故障时导致重试。但是，在执行查询命令期间发生暂时性故障时会导致程序丢弃连接并创建新的连接，然后重试查询命令。我们既不建议也不反对这种设计。演示程序演示了一些可供你使用的设计弹性。\n\n<br>此代码示例的长度多半是因为捕获异常的逻辑。[此处](/documentation/articles/sql-database-develop-php-simple-windows)提供了此 Program.cs 文件的简短版本。\n<br>Main 方法在 Program.cs 中。调用堆栈的运行如下：\n* Main 调用 ConnectAndQuery。\n* ConnectAndQuery 调用 EstablishConnection。\n* EstablishConnection 调用 IssueQueryCommand。\n\n[sqlsrv\\_query()](http://php.net/manual/zh/function.sqlsrv-query.php) 函数可用于针对 SQL 数据库从查询中检索结果集。此函数实际上可接受任何查询和连接对象，并返回可使用 [sqlsrv\\_fetch\\_array()](http://php.net/manual/zh/function.sqlsrv-fetch-array.php) 循环访问的结果集。\n\n    <?php\n        // Variables to tune the retry logic.  \n        $connectionTimeoutSeconds = 30;  // Default of 15 seconds is too short over the Internet, sometimes.\n        $maxCountTriesConnectAndQuery = 3;  // You can adjust the various retry count values.\n        $secondsBetweenRetries = 4;  // Simple retry strategy.\n        $errNo = 0;\n        $serverName = \"tcp:yourdatabase.database.chinacloudapi.cn,1433\";\n        $connectionOptions = array(\"Database\"=>\"AdventureWorks\",\n           \"Uid\"=>\"yourusername\", \"PWD\"=>\"yourpassword\", \"LoginTimeout\" => $connectionTimeoutSeconds);\n        $conn;\n        $errorArr = array();\n        for ($cc = 1; $cc <= $maxCountTriesConnectAndQuery; $cc++)\n        {\n            $errorArr = array();\n            $ctr = 0;\n            // [A.2] Connect, which proceeds to issue a query command.\n            $conn = sqlsrv_connect($serverName, $connectionOptions);  \n            if( $conn == true)\n            {\n                echo \"Connection was established\";\n                echo \"<br>\";\n\n                $tsql = \"SELECT [CompanyName] FROM SalesLT.Customer\";\n                $getProducts = sqlsrv_query($conn, $tsql);\n                if ($getProducts == FALSE)\n                    die(FormatErrors(sqlsrv_errors()));\n                $productCount = 0;\n                $ctr = 0;\n                while($row = sqlsrv_fetch_array($getProducts, SQLSRV_FETCH_ASSOC))\n                {   \n                    $ctr++;\n                    echo($row['CompanyName']);\n                    echo(\"<br/>\");\n                    $productCount++;\n                    if($ctr>10)\n                        break;\n                }\n                sqlsrv_free_stmt($getProducts);\n                break;\n            }\n            // Adds any the error codes from the SQL Exception to an array.\n            else {  \n                if( ($errors = sqlsrv_errors() ) != null) {\n                    foreach( $errors as $error ) {\n                        $errorArr[$ctr] = $error['code'];\n                        $ctr = $ctr + 1;\n                    }\n                }\n                $isTransientError = TRUE;\n                // [A.4] Check whether sqlExc.Number is on the whitelist of transients.\n                $isTransientError = IsTransientStatic($errorArr);\n                if ($isTransientError == TRUE)  // Is a static persistent error...\n                {\n                    echo(\"Persistent error suffered, SqlException.Number==\". $errorArr[0].\". Program Will terminate.\");\n                    echo \"<br>\";\n                    // [A.5] Either the connection attempt or the query command attempt suffered a persistent SqlException.\n                    // Break the loop, let the hopeless program end.\n                    exit(0);\n                }\n                // [A.6] The SqlException identified a transient error from an attempt to issue a query command.\n                // So let this method reloop and try again. However, we recommend that the new query\n                // attempt should start at the beginning and establish a new connection.\n                if ($cc >= $maxCountTriesConnectAndQuery)\n                {\n                    echo \"Transient errors suffered in too many retries - \" . $cc .\" Program will terminate.\";\n                    echo \"<br>\";\n                    exit(0);\n                }\n                echo(\"Transient error encountered.  SqlException.Number==\". $errorArr[0]. \" . Program might retry by itself.\");  \n                echo \"<br>\";\n                echo $cc . \" Attempts so far. Might retry.\";\n                echo \"<br>\";\n                // A very simple retry strategy, a brief pause before looping. This could be changed to exponential if you want.\n                sleep(1*$secondsBetweenRetries);\n            }\n            // [A.3] All has gone well, so let the program end.\n        }\n        function IsTransientStatic($errorArr) {\n            $arrayOfTransientErrorNumbers = array(4060, 10928, 10929, 40197, 40501, 40613);\n            $result = array_intersect($arrayOfTransientErrorNumber, $errorArr);\n            $count = count($result);\n            if($count >= 0) //change to > 0 later.\n                return TRUE;\n        }\n    ?>\n\n## 后续步骤\n\n有关 PHP 安装和用法的详细信息，请参阅[使用 PHP 访问 SQL Server 数据库](http://technet.microsoft.com/zh-cn/library/cc793139.aspx)。\n\n<!---HONumber=Mooncake_0104_2016-->\n"
+}

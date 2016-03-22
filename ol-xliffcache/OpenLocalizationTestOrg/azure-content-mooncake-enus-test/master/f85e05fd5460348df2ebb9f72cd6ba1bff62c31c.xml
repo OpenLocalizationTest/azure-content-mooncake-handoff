@@ -1,0 +1,404 @@
+{
+  "nodes": [
+    {
+      "content": "使用 Azure 门户升级到 Azure SQL 数据库 V12 | Azure",
+      "pos": [
+        28,
+        68
+      ]
+    },
+    {
+      "content": "介绍如何使用 Azure 门户升级到 Azure SQL 数据库 V12，包括如何升级 Web 和企业数据库，以及如何升级 V11 服务器并将其数据库直接迁移到弹性数据库池。",
+      "pos": [
+        88,
+        175
+      ]
+    },
+    {
+      "content": "使用 Azure 门户升级到 Azure SQL 数据库 V12",
+      "pos": [
+        398,
+        430
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        435,
+        451
+      ]
+    },
+    {
+      "content": "Azure 门户",
+      "pos": [
+        455,
+        463
+      ]
+    },
+    {
+      "content": "PowerShell",
+      "pos": [
+        528,
+        538
+      ]
+    },
+    {
+      "content": "SQL 数据库 V12 是最新版本，因此我们建议升级到 SQL 数据库 V12。",
+      "pos": [
+        606,
+        646
+      ]
+    },
+    {
+      "content": "SQL 数据库 V12 具有<bpt id=\"p1\">[</bpt>旧版所欠缺的许多优点<ept id=\"p1\">](/documentation/articles/sql-database-v12-whats-new)</ept>，包括：",
+      "pos": [
+        647,
+        729
+      ]
+    },
+    {
+      "content": "提高了与 SQL Server 的兼容性。",
+      "pos": [
+        733,
+        754
+      ]
+    },
+    {
+      "content": "经过改进的高级性能和新的性能级别。",
+      "pos": [
+        757,
+        774
+      ]
+    },
+    {
+      "pos": [
+        777,
+        837
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>弹性数据库池<ept id=\"p1\">](/documentation/articles/sql-database-elastic-pool)</ept>。"
+    },
+    {
+      "content": "本文提供有关将现有 SQL 数据库 V11 服务器和数据库升级到 SQL 数据库 V12 的指导。",
+      "pos": [
+        839,
+        888
+      ]
+    },
+    {
+      "content": "在升级到 V12 的过程中，会将所有 Web 和企业数据库升级到新的服务级别，因此本文还包含了有关升级 Web 和企业数据库的说明。",
+      "pos": [
+        890,
+        956
+      ]
+    },
+    {
+      "pos": [
+        958,
+        1400
+      ],
+      "content": "此外，与升级到单一数据库的单独性能级别（定价层）相比，迁移到<bpt id=\"p1\">[</bpt>弹性数据库池<ept id=\"p1\">](/documentation/articles/sql-database-elastic-pool)</ept>更具成本效益。池还可以简化数据库管理，因为你只需管理池的性能设置，而无需分开管理单个数据库的性能级别。如果你的数据库位于多台服务器上，请考虑将它们迁移到同一台服务器，并利用入池所带来的优势。你可以轻松地<bpt id=\"p2\">[</bpt>使用 PowerShell 将数据库从 V11 服务器自动迁移到弹性数据库池<ept id=\"p2\">](/documentation/articles/sql-database-upgrade-server)</ept>。你还可以使用该门户将 V11 数据库迁移到池中，但在门户中，你必须已经有一个可用于创建池的 V12 服务器。本文后面提供了说明，告知你如何在服务器升级后创建池，前提是你拥有<bpt id=\"p3\">[</bpt>能够利用池的数据库<ept id=\"p3\">](/documentation/articles/sql-database-elastic-pool-guidance)</ept>。"
+    },
+    {
+      "pos": [
+        1402,
+        1603
+      ],
+      "content": "请注意，数据库将保持联机，并且在整个升级操作过程中都会继续保持工作。在实际转换到新的性能级别时，数据库连接可能会暂时中断很短的一段时间，通常约 90 秒，但最长可达 5 分钟。如果你的应用程序有<bpt id=\"p1\">[</bpt>针对连接终止的暂时性故障处理机制<ept id=\"p1\">](/documentation/articles/sql-database-connect-central-recommendations)</ept>，则足以防止升级结束时连接中断。"
+    },
+    {
+      "content": "升级到 SQL 数据库 V12 的操作不可撤销。升级后，无法将服务器还原到 V11。",
+      "pos": [
+        1605,
+        1647
+      ]
+    },
+    {
+      "pos": [
+        1649,
+        1893
+      ],
+      "content": "升级到 V12 之后，<bpt id=\"p1\">[</bpt>服务层建议<ept id=\"p1\">](/documentation/articles/sql-database-service-tier-advisor)</ept>和<bpt id=\"p2\">[</bpt>弹性池建议<ept id=\"p2\">](/documentation/articles/sql-database-elastic-pool-portal/#step-2-choose-a-pricing-tier)</ept>将不会立即可用，必须等到服务有时间评估新服务器上的工作负荷之后，才可供使用。V11 服务器建议历史记录不适用于 V12 服务器，因此不会保留。"
+    },
+    {
+      "content": "准备升级",
+      "pos": [
+        1899,
+        1903
+      ]
+    },
+    {
+      "pos": [
+        1907,
+        2145
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>升级所有 Web 和企业数据库<ept id=\"p1\">**</ept>：请参阅下面的<bpt id=\"p2\">[</bpt>升级所有 Web 和企业数据库<ept id=\"p2\">](/documentation/articles/sql-database-upgrade-server-portal/#upgrade-all-web-and-business-databases)</ept>部分，或<bpt id=\"p3\">[</bpt>使用 PowerShell 来升级数据库和服务器<ept id=\"p3\">](/documentation/articles/sql-database-upgrade-server-powershell)</ept>。"
+    },
+    {
+      "pos": [
+        2148,
+        2320
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>检查和暂停异地复制<ept id=\"p1\">**</ept>：如果你的 Azure SQL 数据库已针对异地复制进行配置，则你应记录其当前配置并<bpt id=\"p2\">[</bpt>停止异地复制<ept id=\"p2\">](/documentation/articles/sql-database-geo-replication-portal/#remove-secondary-database)</ept>。升级完成后，请重新为异地复制配置数据库。"
+    },
+    {
+      "pos": [
+        2323,
+        2547
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>如果客户端在 Azure VM 上，请打开这些端口<ept id=\"p1\">**</ept>：如果客户端程序连接到 SQL 数据库 V12，而客户端运行在 Azure 虚拟机 (VM) 上，则必须打开虚拟机上的端口范围 11000-11999 和 14000-14999。有关详细信息，请参阅 <bpt id=\"p2\">[</bpt>SQL 数据库 V12 的端口<ept id=\"p2\">](/documentation/articles/sql-database-develop-direct-route-ports-adonet-v12)</ept>。"
+    },
+    {
+      "content": "开始升级",
+      "pos": [
+        2554,
+        2558
+      ]
+    },
+    {
+      "pos": [
+        2563,
+        2649
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">](http://manage.windowsazure.cn)</ept>中，通过选择“浏览全部”&gt;“SQL 服务器”并选择所需的服务器，浏览到要升级的服务器。"
+    },
+    {
+      "content": "选择“最新的 SQL 数据库更新”，然后选择“升级此服务器”。",
+      "pos": [
+        2653,
+        2684
+      ]
+    },
+    {
+      "content": "升级所有 Web 和企业数据库",
+      "pos": [
+        2690,
+        2705
+      ]
+    },
+    {
+      "content": "如果你的服务器具有任何 Web 或企业数据库，你必须对这些数据库进行升级。在升级到 SQL 数据库 V12 的过程中，需要将所有 Web 和企业数据库更新到新的服务层。",
+      "pos": [
+        2707,
+        2791
+      ]
+    },
+    {
+      "content": "为了帮助你进行升级，SQL 数据库服务会为每个数据库建议适当的服务层和性能级别（定价层）。通过分析数据库的历史使用情况，该服务建议最适合运行你的现有数据库工作负荷的层。",
+      "pos": [
+        2793,
+        2877
+      ]
+    },
+    {
+      "content": "在“升级此服务器”边栏选项卡中，选择要查看的每个数据库，并选择建议的要升级到的定价层。你始终可以浏览可用的定价层，并选择最适合你环境的定价层。",
+      "pos": [
+        2886,
+        2957
+      ]
+    },
+    {
+      "content": "单击建议的层后，你将会看到“选择你的定价层”边栏选项卡，你可以在其中选择一个层，然后单击“选择”按钮更改到该层。为每个 Web 或企业数据库选择新层。",
+      "pos": [
+        2964,
+        3039
+      ]
+    },
+    {
+      "content": "请特别注意，SQL 数据库不会锁定到任何特定的服务层或性能级别，因此当你的数据库要求发生变化时，你可以轻松地在可用服务层和性能级别之间切换。事实上，基本、标准和高级版 SQL 数据库按小时计费，在 24 小时内，你可以扩展或收缩每个数据库 4 次。",
+      "pos": [
+        3045,
+        3169
+      ]
+    },
+    {
+      "content": "在服务器上的所有数据库都符合要求后，你便可以开始升级了",
+      "pos": [
+        3174,
+        3201
+      ]
+    },
+    {
+      "content": "确认升级",
+      "pos": [
+        3206,
+        3210
+      ]
+    },
+    {
+      "pos": [
+        3215,
+        3265
+      ],
+      "content": "在服务器上的所有数据库都符合升级要求后，请<bpt id=\"p1\">**</bpt>键入服务器名称<ept id=\"p1\">**</ept>以确认要执行升级，然后单击“确定”。"
+    },
+    {
+      "content": "升级将启动并显示正在进行通知。此时将启动升级过程。根据你的特定数据库的详细信息，升级到 V12 可能需要一些时间。在此期间，服务器上的所有数据库都保持联机，但服务器和数据库管理操作会受到限制。",
+      "pos": [
+        3274,
+        3370
+      ]
+    },
+    {
+      "content": "升级操作完成后，“最新更新”边栏选项卡会显示“已启用”。",
+      "pos": [
+        3465,
+        3493
+      ]
+    },
+    {
+      "content": "将数据库移到弹性数据库池中",
+      "pos": [
+        3500,
+        3513
+      ]
+    },
+    {
+      "pos": [
+        3515,
+        3580
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>中浏览到 V12 服务器并单击“添加池”。"
+    },
+    {
+      "content": "-或-",
+      "pos": [
+        3582,
+        3585
+      ]
+    },
+    {
+      "pos": [
+        3587,
+        3765
+      ],
+      "content": "如果你看到一条消息说“单击此处以查看针对此服务器建议的弹性数据库池”，则可单击它轻松创建一个已针对你服务器的数据库优化的池。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>建议的弹性数据库池<ept id=\"p1\">](/documentation/articles/sql-database-elastic-pool-portal/#recommended-elastic-database-pools)</ept>。"
+    },
+    {
+      "pos": [
+        3772,
+        3857
+      ],
+      "content": "按照<bpt id=\"p1\">[</bpt>创建弹性数据库池<ept id=\"p1\">](/documentation/articles/sql-database-elastic-pool)</ept>这篇文章中的说明进行操作，以便完成池的创建。"
+    },
+    {
+      "content": "升级到 SQL 数据库 V12 后监视数据库",
+      "pos": [
+        3862,
+        3884
+      ]
+    },
+    {
+      "content": "升级后，建议你主动监视数据库，以确保应用程序以所需的性能运行，并根据需要优化使用方式。",
+      "pos": [
+        3887,
+        3930
+      ]
+    },
+    {
+      "pos": [
+        3932,
+        4202
+      ],
+      "content": "除了监视单个数据库之外，你还可以<bpt id=\"p1\">[</bpt>使用门户<ept id=\"p1\">](/documentation/articles/sql-database-elastic-pool-portal/#monitor-and-manage-an-elastic-database-pool)</ept>或通过 <bpt id=\"p2\">[</bpt>PowerShell<ept id=\"p2\">](/documentation/articles/sql-database-elastic-pool-powershell/#monitoring-elastic-databases-and-elastic-database-pools)</ept> 监视弹性数据库池。"
+    },
+    {
+      "pos": [
+        4205,
+        4458
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>资源消耗数据：<ept id=\"p1\">**</ept>对于基本、标准和高级数据库，可通过用户数据库中的 <bpt id=\"p2\">[</bpt>sys.dm\\_ db\\_ resource\\_stats<ept id=\"p2\">](http://msdn.microsoft.com/zh-cn/library/azure/dn800981.aspx)</ept> DMV 查看资源消耗数据。此 DMV 针对前一小时的操作，以 15 秒的粒度级提供接近实时的资源消耗信息。每个间隔的 DTU 消耗百分比将计算为 CPU、IO 和日志维度的最大消耗百分比。下面是一个用于计算过去一小时平均 DTU 消耗百分比的查询："
+    },
+    {
+      "content": "其他监视信息：",
+      "pos": [
+        4760,
+        4767
+      ]
+    },
+    {
+      "pos": [
+        4771,
+        4858
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Azure SQL 数据库的单一数据库性能指导<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/azure/dn369873.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        4861,
+        4940
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>弹性数据库池的价格和性能注意事项<ept id=\"p1\">](/documentation/articles/sql-database=elastic-pool-guidance)</ept>。"
+    },
+    {
+      "content": "使用动态管理视图监视 Azure SQL 数据库",
+      "pos": [
+        4944,
+        4968
+      ]
+    },
+    {
+      "pos": [
+        5033,
+        5166
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>警报：<ept id=\"p1\">**</ept>在 Azure 门户中设置“警报”可在升级后的数据库 DTU 消耗量接近特定的高位时接收通知。你可以针对 DTU、CPU、IO 和日志等各种性能度量值，在 Azure 门户中设置数据库警报。浏览到你的数据库，然后在“设置”边栏选项卡中选择“警报规则”。"
+    },
+    {
+      "pos": [
+        5168,
+        5321
+      ],
+      "content": "例如，你可以针对“DTU 百分比”设置电子邮件警报，以便在过去 5 分钟平均 DTU 百分比值超过 75% 时发出警报。请参阅<bpt id=\"p1\">[</bpt>接收警报通知<ept id=\"p1\">](/documentation/articles/insights-receive-alert-notifications)</ept>，以了解有关如何配置警报通知的详细信息。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        5330,
+        5334
+      ]
+    },
+    {
+      "pos": [
+        5338,
+        5445
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>查看弹性数据库池建议<ept id=\"p1\">](/documentation/articles/sql-database-elastic-pool-portal/#recommended-elastic-database-pools)</ept>。"
+    },
+    {
+      "pos": [
+        5448,
+        5533
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>创建弹性数据库池<ept id=\"p1\">](/documentation/articles/sql-database-elastic-pool-portal)</ept>，并将部分或全部数据库添加到池中。"
+    },
+    {
+      "pos": [
+        5536,
+        5600
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>更改数据库的服务层和性能级别<ept id=\"p1\">](/documentation/articles/sql-database-scale-up)</ept>。"
+    },
+    {
+      "content": "相关链接",
+      "pos": [
+        5607,
+        5611
+      ]
+    },
+    {
+      "content": "SQL 数据库 V12 的新增功能",
+      "pos": [
+        5616,
+        5633
+      ]
+    },
+    {
+      "content": "规划和准备升级到 SQL 数据库 V12",
+      "pos": [
+        5690,
+        5710
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"使用 Azure 门户升级到 Azure SQL 数据库 V12 | Azure\" \n    description=\"介绍如何使用 Azure 门户升级到 Azure SQL 数据库 V12，包括如何升级 Web 和企业数据库，以及如何升级 V11 服务器并将其数据库直接迁移到弹性数据库池。\" \n    services=\"sql-database\" \n    documentationCenter=\"\" \n    authors=\"stevestein\" \n    manager=\"jeffreyg\"\n    editor=\"\"/>\n\n<tags \n    ms.service=\"sql-database\" \n    ms.date=\"11/11/2015\" \n    wacn.date=\"01/29/2016\"/>\n\n\n# 使用 Azure 门户升级到 Azure SQL 数据库 V12\n\n\n> [AZURE.SELECTOR]\n- [Azure 门户](/documentation/articles/sql-database-upgrade-server-portal)\n- [PowerShell](/documentation/articles/sql-database-upgrade-server-powershell)\n\n\nSQL 数据库 V12 是最新版本，因此我们建议升级到 SQL 数据库 V12。\nSQL 数据库 V12 具有[旧版所欠缺的许多优点](/documentation/articles/sql-database-v12-whats-new)，包括：\n\n- 提高了与 SQL Server 的兼容性。\n- 经过改进的高级性能和新的性能级别。\n- [弹性数据库池](/documentation/articles/sql-database-elastic-pool)。\n\n本文提供有关将现有 SQL 数据库 V11 服务器和数据库升级到 SQL 数据库 V12 的指导。\n\n在升级到 V12 的过程中，会将所有 Web 和企业数据库升级到新的服务级别，因此本文还包含了有关升级 Web 和企业数据库的说明。\n\n此外，与升级到单一数据库的单独性能级别（定价层）相比，迁移到[弹性数据库池](/documentation/articles/sql-database-elastic-pool)更具成本效益。池还可以简化数据库管理，因为你只需管理池的性能设置，而无需分开管理单个数据库的性能级别。如果你的数据库位于多台服务器上，请考虑将它们迁移到同一台服务器，并利用入池所带来的优势。你可以轻松地[使用 PowerShell 将数据库从 V11 服务器自动迁移到弹性数据库池](/documentation/articles/sql-database-upgrade-server)。你还可以使用该门户将 V11 数据库迁移到池中，但在门户中，你必须已经有一个可用于创建池的 V12 服务器。本文后面提供了说明，告知你如何在服务器升级后创建池，前提是你拥有[能够利用池的数据库](/documentation/articles/sql-database-elastic-pool-guidance)。\n\n请注意，数据库将保持联机，并且在整个升级操作过程中都会继续保持工作。在实际转换到新的性能级别时，数据库连接可能会暂时中断很短的一段时间，通常约 90 秒，但最长可达 5 分钟。如果你的应用程序有[针对连接终止的暂时性故障处理机制](/documentation/articles/sql-database-connect-central-recommendations)，则足以防止升级结束时连接中断。\n\n升级到 SQL 数据库 V12 的操作不可撤销。升级后，无法将服务器还原到 V11。\n\n升级到 V12 之后，[服务层建议](/documentation/articles/sql-database-service-tier-advisor)和[弹性池建议](/documentation/articles/sql-database-elastic-pool-portal/#step-2-choose-a-pricing-tier)将不会立即可用，必须等到服务有时间评估新服务器上的工作负荷之后，才可供使用。V11 服务器建议历史记录不适用于 V12 服务器，因此不会保留。\n\n\n## 准备升级\n\n- **升级所有 Web 和企业数据库**：请参阅下面的[升级所有 Web 和企业数据库](/documentation/articles/sql-database-upgrade-server-portal/#upgrade-all-web-and-business-databases)部分，或[使用 PowerShell 来升级数据库和服务器](/documentation/articles/sql-database-upgrade-server-powershell)。\n- **检查和暂停异地复制**：如果你的 Azure SQL 数据库已针对异地复制进行配置，则你应记录其当前配置并[停止异地复制](/documentation/articles/sql-database-geo-replication-portal/#remove-secondary-database)。升级完成后，请重新为异地复制配置数据库。\n- **如果客户端在 Azure VM 上，请打开这些端口**：如果客户端程序连接到 SQL 数据库 V12，而客户端运行在 Azure 虚拟机 (VM) 上，则必须打开虚拟机上的端口范围 11000-11999 和 14000-14999。有关详细信息，请参阅 [SQL 数据库 V12 的端口](/documentation/articles/sql-database-develop-direct-route-ports-adonet-v12)。\n\n\n\n## 开始升级\n\n1. 在 [Azure 门户](http://manage.windowsazure.cn)中，通过选择“浏览全部”>“SQL 服务器”并选择所需的服务器，浏览到要升级的服务器。\n2. 选择“最新的 SQL 数据库更新”，然后选择“升级此服务器”。\n\n\n## 升级所有 Web 和企业数据库\n\n如果你的服务器具有任何 Web 或企业数据库，你必须对这些数据库进行升级。在升级到 SQL 数据库 V12 的过程中，需要将所有 Web 和企业数据库更新到新的服务层。\n\n为了帮助你进行升级，SQL 数据库服务会为每个数据库建议适当的服务层和性能级别（定价层）。通过分析数据库的历史使用情况，该服务建议最适合运行你的现有数据库工作负荷的层。\n    \n3. 在“升级此服务器”边栏选项卡中，选择要查看的每个数据库，并选择建议的要升级到的定价层。你始终可以浏览可用的定价层，并选择最适合你环境的定价层。\n\n\n\n7. 单击建议的层后，你将会看到“选择你的定价层”边栏选项卡，你可以在其中选择一个层，然后单击“选择”按钮更改到该层。为每个 Web 或企业数据库选择新层。\n\n    请特别注意，SQL 数据库不会锁定到任何特定的服务层或性能级别，因此当你的数据库要求发生变化时，你可以轻松地在可用服务层和性能级别之间切换。事实上，基本、标准和高级版 SQL 数据库按小时计费，在 24 小时内，你可以扩展或收缩每个数据库 4 次。\n\n\n\n\n在服务器上的所有数据库都符合要求后，你便可以开始升级了\n\n## 确认升级\n\n3. 在服务器上的所有数据库都符合升级要求后，请**键入服务器名称**以确认要执行升级，然后单击“确定”。 \n\n\n\n\n4. 升级将启动并显示正在进行通知。此时将启动升级过程。根据你的特定数据库的详细信息，升级到 V12 可能需要一些时间。在此期间，服务器上的所有数据库都保持联机，但服务器和数据库管理操作会受到限制。\n\n\n\n    在实际转换到新的性能级别时，数据库连接可能会暂时中断一小段时间（通常以秒计）。如果应用程序对连接终止有暂时性故障处理机制（重试逻辑），则足以防止升级结束时连接中断。\n\n5. 升级操作完成后，“最新更新”边栏选项卡会显示“已启用”。\n\n\n\n## 将数据库移到弹性数据库池中\n\n在 [Azure 门户](https://manage.windowsazure.cn)中浏览到 V12 服务器并单击“添加池”。\n\n-或-\n\n如果你看到一条消息说“单击此处以查看针对此服务器建议的弹性数据库池”，则可单击它轻松创建一个已针对你服务器的数据库优化的池。有关详细信息，请参阅[建议的弹性数据库池](/documentation/articles/sql-database-elastic-pool-portal/#recommended-elastic-database-pools)。\n\n\n   \n按照[创建弹性数据库池](/documentation/articles/sql-database-elastic-pool)这篇文章中的说明进行操作，以便完成池的创建。\n\n## 升级到 SQL 数据库 V12 后监视数据库\n\n\n升级后，建议你主动监视数据库，以确保应用程序以所需的性能运行，并根据需要优化使用方式。\n\n除了监视单个数据库之外，你还可以[使用门户](/documentation/articles/sql-database-elastic-pool-portal/#monitor-and-manage-an-elastic-database-pool)或通过 [PowerShell](/documentation/articles/sql-database-elastic-pool-powershell/#monitoring-elastic-databases-and-elastic-database-pools) 监视弹性数据库池。\n\n\n**资源消耗数据：**对于基本、标准和高级数据库，可通过用户数据库中的 [sys.dm\\_ db\\_ resource\\_stats](http://msdn.microsoft.com/zh-cn/library/azure/dn800981.aspx) DMV 查看资源消耗数据。此 DMV 针对前一小时的操作，以 15 秒的粒度级提供接近实时的资源消耗信息。每个间隔的 DTU 消耗百分比将计算为 CPU、IO 和日志维度的最大消耗百分比。下面是一个用于计算过去一小时平均 DTU 消耗百分比的查询：\n\n    SELECT end_time\n         , (SELECT Max(v)\n             FROM (VALUES (avg_cpu_percent)\n                         , (avg_data_io_percent)\n                         , (avg_log_write_percent)\n           ) AS value(v)) AS [avg_DTU_percent]\n    FROM sys.dm_db_resource_stats\n    ORDER BY end_time DESC;\n\n其他监视信息：\n\n- [Azure SQL 数据库的单一数据库性能指导](http://msdn.microsoft.com/zh-cn/library/azure/dn369873.aspx)。\n- [弹性数据库池的价格和性能注意事项](/documentation/articles/sql-database=elastic-pool-guidance)。\n- [使用动态管理视图监视 Azure SQL 数据库](/documentation/articles/sql-database-monitoring-with-dmvs)\n\n\n\n\n**警报：**在 Azure 门户中设置“警报”可在升级后的数据库 DTU 消耗量接近特定的高位时接收通知。你可以针对 DTU、CPU、IO 和日志等各种性能度量值，在 Azure 门户中设置数据库警报。浏览到你的数据库，然后在“设置”边栏选项卡中选择“警报规则”。\n\n例如，你可以针对“DTU 百分比”设置电子邮件警报，以便在过去 5 分钟平均 DTU 百分比值超过 75% 时发出警报。请参阅[接收警报通知](/documentation/articles/insights-receive-alert-notifications)，以了解有关如何配置警报通知的详细信息。\n\n\n\n\n\n## 后续步骤\n\n- [查看弹性数据库池建议](/documentation/articles/sql-database-elastic-pool-portal/#recommended-elastic-database-pools)。\n- [创建弹性数据库池](/documentation/articles/sql-database-elastic-pool-portal)，并将部分或全部数据库添加到池中。\n- [更改数据库的服务层和性能级别](/documentation/articles/sql-database-scale-up)。\n\n\n\n## 相关链接\n\n- [SQL 数据库 V12 的新增功能](/documentation/articles/sql-database-v12-whats-new)\n- [规划和准备升级到 SQL 数据库 V12](/documentation/articles/sql-database-v12-plan-prepare-upgrade)\n\n\n<!--Image references-->\n[1]: ./media/sql-database-upgrade-server-portal/latest-sql-database-update.png\n[2]: ./media/sql-database-upgrade-server-portal/upgrade-server2.png\n[3]: ./media/sql-database-upgrade-server-portal/upgrade-server3.png\n[4]: ./media/sql-database-upgrade-server-portal/online-during-upgrade.png\n[5]: ./media/sql-database-upgrade-server-portal/enabled.png\n[6]: ./media/sql-database-upgrade-server-portal/recommendations.png\n[7]: ./media/sql-database-upgrade-server-portal/new-elastic-pool.png\n\n<!---HONumber=Mooncake_0118_2016-->\n"
+}

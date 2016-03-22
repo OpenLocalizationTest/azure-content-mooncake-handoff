@@ -1,0 +1,522 @@
+{
+  "nodes": [
+    {
+      "content": "使用 Blob 存储的本地应用程序 (Java) | Azure",
+      "pos": [
+        27,
+        59
+      ]
+    },
+    {
+      "content": "了解如何创建将图像上载到 Azure 并在浏览器中显示图像的控制台应用程序。使用 Java 的代码示例。",
+      "pos": [
+        78,
+        130
+      ]
+    },
+    {
+      "content": "使用 Blob 存储的本地应用程序",
+      "pos": [
+        344,
+        361
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        366,
+        368
+      ]
+    },
+    {
+      "content": "以下示例将演示如何使用 Azure 存储空间在 Azure 中存储图像。本文中的代码是一个控制台应用程序的代码，该应用程序将一个图像上载到 Azure，然后创建用于在浏览器中显示该图像的 HTML 文件。",
+      "pos": [
+        370,
+        472
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        477,
+        481
+      ]
+    },
+    {
+      "content": "已安装 Java 开发人员工具包 (JDK) 版本1.6 或更高版本。",
+      "pos": [
+        485,
+        520
+      ]
+    },
+    {
+      "content": "已安装 Azure SDK。",
+      "pos": [
+        523,
+        537
+      ]
+    },
+    {
+      "content": "适用于 Azure Libraries for Java 的 JAR 以及任何适用的依赖项 JAR 已安装并且位于 Java 编译器使用的生成路径中。有关安装 Azure Libraries for Java 的信息，请参阅 [下载 Azure SDK for Java][]。",
+      "pos": [
+        540,
+        679
+      ]
+    },
+    {
+      "pos": [
+        682,
+        778
+      ],
+      "content": "已设置了一个 Azure 存储帐户。本文中的代码将使用存储帐户的帐户名称和帐户密钥。有关创建存储帐户的信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">如何创建存储帐户]</ept>；有关检索帐户密钥的信息，请参阅<bpt id=\"p2\">[</bpt>如何管理存储帐户<ept id=\"p2\">][]</ept>。"
+    },
+    {
+      "pos": [
+        781,
+        876
+      ],
+      "content": "您已创建存储在路径 c:\\\\myimages\\\\image1.jpg 处的已命名本地图像文件。或者，在示例中修改 <bpt id=\"p1\">**</bpt>FileInputStream<ept id=\"p1\">**</ept> 构造函数以使用其他图像路径和文件名。"
+    },
+    {
+      "content": "使用 Azure Blob 存储上载文件",
+      "pos": [
+        956,
+        976
+      ]
+    },
+    {
+      "content": "此处提供分步过程。如果你要跳过这些过程，则可在本文后面找到完整的代码。",
+      "pos": [
+        978,
+        1013
+      ]
+    },
+    {
+      "pos": [
+        1015,
+        1093
+      ],
+      "content": "在代码的开头请包括对 Azure 核心存储类、Azure Blob 客户端类、Java IO 类和 <bpt id=\"p1\">**</bpt>URISyntaxException<ept id=\"p1\">**</ept> 类的导入："
+    },
+    {
+      "pos": [
+        1247,
+        1288
+      ],
+      "content": "声明一个名为 <bpt id=\"p1\">**</bpt>StorageSample<ept id=\"p1\">**</ept> 的类，包含左大括号 <bpt id=\"p2\">**</bpt>{<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "在 StorageSample 类中，声明一个将包含<bpt id=\"p1\">**</bpt>默认终结点协议、你的存储帐户名称和存储访问密钥<ept id=\"p1\">**</ept>（在你的 Azure 存储帐户中指定）的字符串变量。将占位符值 <bpt id=\"p2\">**</bpt>your_account_name<ept id=\"p2\">**</ept> 和",
+      "pos": [
+        1324,
+        1432
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>your_account_key<ept id=\"p1\">**</ept> 分别替换为你自己的帐户名称和帐户密钥。",
+      "pos": [
+        1433,
+        1473
+      ]
+    },
+    {
+      "pos": [
+        1729,
+        1775
+      ],
+      "content": "添加对 <bpt id=\"p1\">**</bpt>main<ept id=\"p1\">**</ept> 的声明，包括 <bpt id=\"p2\">**</bpt>try<ept id=\"p2\">**</ept> 块并包括必需的左大括号 <bpt id=\"p3\">**</bpt>{<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "content": "声明以下类型的变量（说明针对的是如何在此示例中使用这些变量）：",
+      "pos": [
+        1849,
+        1880
+      ]
+    },
+    {
+      "pos": [
+        1886,
+        1956
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>CloudStorageAccount<ept id=\"p1\">**</ept>：用于通过 Azure 存储帐户名称和密钥初始化帐户对象，以及用于创建 Blob 客户端对象。"
+    },
+    {
+      "pos": [
+        1961,
+        1994
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>CloudBlobClient<ept id=\"p1\">**</ept>：用于访问 Blob 服务。"
+    },
+    {
+      "pos": [
+        1999,
+        2054
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>CloudBlobContainer<ept id=\"p1\">**</ept>：用于创建 Blob 容器、列出容器中的 Blob 以及删除容器。"
+    },
+    {
+      "pos": [
+        2059,
+        2093
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>CloudBlockBlob<ept id=\"p1\">**</ept>：用于将本地图像文件上载到容器。"
+    },
+    {
+      "pos": [
+        2233,
+        2252
+      ],
+      "content": "为 <bpt id=\"p1\">**</bpt>account<ept id=\"p1\">**</ept> 变量赋值。"
+    },
+    {
+      "pos": [
+        2321,
+        2346
+      ],
+      "content": "为 <bpt id=\"p1\">**</bpt>serviceClient<ept id=\"p1\">**</ept> 变量赋值。"
+    },
+    {
+      "pos": [
+        2402,
+        2458
+      ],
+      "content": "为 <bpt id=\"p1\">**</bpt>container<ept id=\"p1\">**</ept> 变量赋值。我们将获取对名为 <bpt id=\"p2\">**</bpt>gettingstarted<ept id=\"p2\">**</ept> 的容器的引用。"
+    },
+    {
+      "content": "创建该容器。如果该容器不存在，此方法将创建该容器（并返回 true）。如果该容器存在，则此方法将返回",
+      "pos": [
+        2574,
+        2624
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>false<ept id=\"p1\">**</ept>。createIfNotExist 的一个替代方法是 create 方法（如果该容器已存在，该方法将返回错误）。",
+      "pos": [
+        2625,
+        2690
+      ]
+    },
+    {
+      "content": "为容器设置匿名访问。",
+      "pos": [
+        2728,
+        2738
+      ]
+    },
+    {
+      "content": "获取对块 Blob 的引用，它将表示",
+      "pos": [
+        3035,
+        3053
+      ]
+    },
+    {
+      "content": "Azure 存储空间中的 Blob。",
+      "pos": [
+        3054,
+        3072
+      ]
+    },
+    {
+      "pos": [
+        3133,
+        3185
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>File<ept id=\"p1\">**</ept> 构造函数获取对你将上载的在本地创建的文件的引用。确保在运行代码之前已创建此文件。"
+    },
+    {
+      "content": "通过调用 CloudBlockBlob.upload 方法上载该本地文件。<bpt id=\"p1\">**</bpt>CloudBlockBlob.upload<ept id=\"p1\">**</ept> 方法的第一个参数为",
+      "pos": [
+        3252,
+        3324
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>FileInputStream<ept id=\"p1\">**</ept>对象，它表示将上载到 Azure 存储空间的本地文件。第二个参数是此文件的大小（以字节为单位）。",
+      "pos": [
+        3325,
+        3392
+      ]
+    },
+    {
+      "content": "调用一个名为 <bpt id=\"p1\">**</bpt>MakeHTMLPage<ept id=\"p1\">**</ept> 的帮助器函数来生成一个包含 <bpt id=\"p2\">**</bpt>&amp;lt;image&amp;gt;<ept id=\"p2\">**</ept> 元素的基本 HTML 页面，并将元素中的源设置为现在位于你的 Azure 存储帐户中的 Blob。（",
+      "pos": [
+        3472,
+        3578
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>MakeHTMLPage<ept id=\"p1\">**</ept> 的代码将在本主题后面讨论。）",
+      "pos": [
+        3579,
+        3610
+      ]
+    },
+    {
+      "content": "打印输出有关创建的 HTML 页的状态消息和信息。",
+      "pos": [
+        3642,
+        3667
+      ]
+    },
+    {
+      "pos": [
+        3811,
+        3839
+      ],
+      "content": "结束 <bpt id=\"p1\">**</bpt>try<ept id=\"p1\">**</ept> 块的方法是插入右大括号：<bpt id=\"p2\">**</bpt>}<ept id=\"p2\">**</ept>"
+    },
+    {
+      "content": "处理下列异常：",
+      "pos": [
+        3841,
+        3848
+      ]
+    },
+    {
+      "pos": [
+        3854,
+        3937
+      ],
+      "content": "**FileNotFoundException**：可由 **FileInputStream**\n或 **FileOutputStream** 构造函数引发。",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "<bpt id=\"p1\">**</bpt>FileNotFoundException<ept id=\"p1\">**</ept>：可由 <bpt id=\"p2\">**</bpt>FileInputStream<ept id=\"p2\">**</ept>",
+          "pos": [
+            0,
+            48
+          ]
+        },
+        {
+          "content": "或 <bpt id=\"p1\">**</bpt>FileOutputStream<ept id=\"p1\">**</ept> 构造函数引发。",
+          "pos": [
+            49,
+            79
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        3942,
+        3981
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>StorageException<ept id=\"p1\">**</ept>：可由 Azure 客户端存储库引发。"
+    },
+    {
+      "pos": [
+        3986,
+        4041
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>URISyntaxException<ept id=\"p1\">**</ept>：可由 <bpt id=\"p2\">**</bpt>ListBlobItem.getUri<ept id=\"p2\">**</ept> 方法引发。"
+    },
+    {
+      "pos": [
+        4046,
+        4067
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Exception<ept id=\"p1\">**</ept>：一般异常处理。"
+    },
+    {
+      "pos": [
+        4872,
+        4900
+      ],
+      "content": "结束 <bpt id=\"p1\">**</bpt>main<ept id=\"p1\">**</ept> 的方法是插入右大括号：<bpt id=\"p2\">**</bpt>}<ept id=\"p2\">**</ept>"
+    },
+    {
+      "pos": [
+        4902,
+        5155
+      ],
+      "content": "创建一个名为 <bpt id=\"p1\">**</bpt>MakeHTMLPage<ept id=\"p1\">**</ept> 的方法来创建一个基本的 HTML 页面。此方法具有一个 <bpt id=\"p2\">**</bpt>CloudBlobContainer<ept id=\"p2\">**</ept> 类型的参数，该参数将用于循环访问已上载 Blob 的列表。此方法将引发 <bpt id=\"p3\">**</bpt>FileNotFoundException<ept id=\"p3\">**</ept> 类型的异常（可由 <bpt id=\"p4\">**</bpt>FileOutputStream<ept id=\"p4\">**</ept> 构造函数引发）以及 <bpt id=\"p5\">**</bpt>URISyntaxException<ept id=\"p5\">**</ept>（可由 <bpt id=\"p6\">**</bpt>ListBlobItem.getUri<ept id=\"p6\">**</ept>.getUri 方法引发）。包括左大括号 <bpt id=\"p7\">**</bpt>{<ept id=\"p7\">**</ept>。"
+    },
+    {
+      "pos": [
+        5279,
+        5307
+      ],
+      "content": "创建一个名为 <bpt id=\"p1\">**</bpt>index.html<ept id=\"p1\">**</ept> 的本地文件。"
+    },
+    {
+      "pos": [
+        5400,
+        5468
+      ],
+      "content": "写入本地文件，添加 <bpt id=\"p1\">**</bpt>&amp;lt;html&amp;gt;<ept id=\"p1\">**</ept>、<bpt id=\"p2\">**</bpt>&amp;lt;header&amp;gt;<ept id=\"p2\">**</ept> 和 <bpt id=\"p3\">**</bpt>&amp;lt;body&amp;gt;<ept id=\"p3\">**</ept> 元素。"
+    },
+    {
+      "content": "循环访问已上载 Blob 的列表。对于 HTML 页中的每个 Blob，创建一个 <bpt id=\"p1\">**</bpt>&amp;lt;img&amp;gt;<ept id=\"p1\">**</ept> 元素，并将该元素的 <bpt id=\"p2\">**</bpt>src<ept id=\"p2\">**</ept> 属性发送到 Blob 的 URI（如同它存在于你的 Azure 存储帐户中一样）。",
+      "pos": [
+        5564,
+        5680
+      ]
+    },
+    {
+      "content": "虽然你仅在此示例中添加了一个图像，但如果添加更多图像，此代码将循环访问所有这些图像。",
+      "pos": [
+        5681,
+        5723
+      ]
+    },
+    {
+      "content": "为简单起见，此示例假定上载的每个 Blob 都是一个图像。如果你更新了图像之外的 Blob，或者更新了页面 Blob 而不是块 Blob，则请根据需要调整代码。",
+      "pos": [
+        5725,
+        5805
+      ]
+    },
+    {
+      "pos": [
+        6036,
+        6080
+      ],
+      "content": "关闭 <bpt id=\"p1\">**</bpt>&amp;lt;body&amp;gt;<ept id=\"p1\">**</ept> 元素和 <bpt id=\"p2\">**</bpt>&amp;lt;html&amp;gt;<ept id=\"p2\">**</ept> 元素。"
+    },
+    {
+      "content": "结束本地文件。",
+      "pos": [
+        6145,
+        6152
+      ]
+    },
+    {
+      "pos": [
+        6175,
+        6211
+      ],
+      "content": "结束 <bpt id=\"p1\">**</bpt>MakeHTMLPage<ept id=\"p1\">**</ept> 的方法是插入右大括号：<bpt id=\"p2\">**</bpt>}<ept id=\"p2\">**</ept>"
+    },
+    {
+      "pos": [
+        6213,
+        6250
+      ],
+      "content": "结束 <bpt id=\"p1\">**</bpt>StorageSample<ept id=\"p1\">**</ept> 的方法是插入右大括号：<bpt id=\"p2\">**</bpt>}<ept id=\"p2\">**</ept>"
+    },
+    {
+      "content": "以下是此示例的完整代码。请记得修改占位符值 <bpt id=\"p1\">**</bpt>your_account_name<ept id=\"p1\">**</ept> 和",
+      "pos": [
+        6252,
+        6297
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>your_account_key<ept id=\"p1\">**</ept>，这样才能分别使用你的帐户名和帐户密钥。",
+      "pos": [
+        6298,
+        6338
+      ]
+    },
+    {
+      "content": "除了将本地图像文件上载到 Azure 存储空间之外，此示例代码还将创建本地文件 namedindex.html，你可在浏览器中打开该文件以查看上载的图像。",
+      "pos": [
+        10660,
+        10737
+      ]
+    },
+    {
+      "content": "由于代码包含您的帐户名称和帐户密钥，因此请确保您的源代码是安全的。",
+      "pos": [
+        10739,
+        10772
+      ]
+    },
+    {
+      "pos": [
+        10777,
+        10817
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"bkmk_deletecontainer\"&gt;</ph> <ph id=\"ph2\">&lt;/a&gt;</ph>删除容器"
+    },
+    {
+      "content": "由于存储是收费的，因此你在完成本示例的试验以后，可能需要删除",
+      "pos": [
+        10819,
+        10849
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>gettingstarted<ept id=\"p1\">**</ept> 容器。若要删除容器，请使用 CloudBlobContainer.delete 方法：",
+      "pos": [
+        10850,
+        10912
+      ]
+    },
+    {
+      "content": "调用 <bpt id=\"p1\">**</bpt>CloudBlobContainer.delete<ept id=\"p1\">**</ept> 方法时，初始 <bpt id=\"p2\">**</bpt>CloudStorageAccount<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>ClodBlobClient<ept id=\"p3\">**</ept>、",
+      "pos": [
+        11010,
+        11093
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>CloudBlobContainer<ept id=\"p1\">**</ept> 对象的过程与针对",
+      "pos": [
+        11094,
+        11125
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>createIfNotExist<ept id=\"p1\">**</ept> 方法显示的过程是相同的。以下是删除名为 gettingstarted 的容器的完整示例。",
+      "pos": [
+        11126,
+        11191
+      ]
+    },
+    {
+      "pos": [
+        12714,
+        12762
+      ],
+      "content": "有关其他 Blob 存储类和方法的概述，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">如何通过 Java 使用 Blob 存储服务]</ept>。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        12767,
+        12771
+      ]
+    },
+    {
+      "content": "请访问下面的链接了解有关更复杂的存储任务的详细信息。",
+      "pos": [
+        12773,
+        12799
+      ]
+    },
+    {
+      "content": "Azure Storage SDK for Java",
+      "pos": [
+        12804,
+        12830
+      ]
+    },
+    {
+      "content": "Azure 存储客户端 SDK 参考",
+      "pos": [
+        12837,
+        12855
+      ]
+    },
+    {
+      "content": "Azure 存储 REST API",
+      "pos": [
+        12862,
+        12879
+      ]
+    },
+    {
+      "content": "Azure 存储团队博客",
+      "pos": [
+        12886,
+        12898
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"使用 Blob 存储的本地应用程序 (Java) | Azure\"\n    description=\"了解如何创建将图像上载到 Azure 并在浏览器中显示图像的控制台应用程序。使用 Java 的代码示例。\"\n    services=\"storage\"\n    documentationCenter=\"java\"\n    authors=\"rmcmurray\"\n    manager=\"wpickett\"\n    editor=\"jimbe\"/>\n\n<tags\n    ms.service=\"storage\"\n    ms.date=\"12/01/2015\" \n    wacn.date=\"01/29/2016\"/>\n\n# 使用 Blob 存储的本地应用程序\n\n## 概述\n\n以下示例将演示如何使用 Azure 存储空间在 Azure 中存储图像。本文中的代码是一个控制台应用程序的代码，该应用程序将一个图像上载到 Azure，然后创建用于在浏览器中显示该图像的 HTML 文件。\n\n## 先决条件\n\n- 已安装 Java 开发人员工具包 (JDK) 版本1.6 或更高版本。\n- 已安装 Azure SDK。\n- 适用于 Azure Libraries for Java 的 JAR 以及任何适用的依赖项 JAR 已安装并且位于 Java 编译器使用的生成路径中。有关安装 Azure Libraries for Java 的信息，请参阅 [下载 Azure SDK for Java][]。\n- 已设置了一个 Azure 存储帐户。本文中的代码将使用存储帐户的帐户名称和帐户密钥。有关创建存储帐户的信息，请参阅[如何创建存储帐户]；有关检索帐户密钥的信息，请参阅[如何管理存储帐户][]。\n- 您已创建存储在路径 c:\\\\myimages\\\\image1.jpg 处的已命名本地图像文件。或者，在示例中修改 **FileInputStream** 构造函数以使用其他图像路径和文件名。\n\n[AZURE.INCLUDE [create-account-note](../includes/create-account-note.md)]\n\n## 使用 Azure Blob 存储上载文件\n\n此处提供分步过程。如果你要跳过这些过程，则可在本文后面找到完整的代码。\n\n在代码的开头请包括对 Azure 核心存储类、Azure Blob 客户端类、Java IO 类和 **URISyntaxException** 类的导入：\n\n    import com.microsoft.azure.storage.*;\n    import com.microsoft.azure.storage.blob.*;\n    import java.io.*;\n    import java.net.URISyntaxException;\n\n声明一个名为 **StorageSample** 的类，包含左大括号 **{**。\n\n    public class StorageSample {\n\n在 StorageSample 类中，声明一个将包含**默认终结点协议、你的存储帐户名称和存储访问密钥**（在你的 Azure 存储帐户中指定）的字符串变量。将占位符值 **your_account_name** 和\n**your_account_key** 分别替换为你自己的帐户名称和帐户密钥。\n\n    public static final String storageConnectionString =\n           \"DefaultEndpointsProtocol=http;\" +\n               \"AccountName=your_account_name;\" +\n               \"AccountKey=your_account_name;\" +\n           \"EndpointSuffix=core.chinacloudapi.cn\";\n\n添加对 **main** 的声明，包括 **try** 块并包括必需的左大括号 **{**。\n\n    public static void main(String[] args)\n    {\n        try\n        {\n\n声明以下类型的变量（说明针对的是如何在此示例中使用这些变量）：\n\n-   **CloudStorageAccount**：用于通过 Azure 存储帐户名称和密钥初始化帐户对象，以及用于创建 Blob 客户端对象。\n-   **CloudBlobClient**：用于访问 Blob 服务。\n-   **CloudBlobContainer**：用于创建 Blob 容器、列出容器中的 Blob 以及删除容器。\n-   **CloudBlockBlob**：用于将本地图像文件上载到容器。\n\n<!-- -->\n\n    CloudStorageAccount account;\n    CloudBlobClient serviceClient;\n    CloudBlobContainer container;\n    CloudBlockBlob blob;\n\n为 **account** 变量赋值。\n\n    account = CloudStorageAccount.parse(storageConnectionString);\n\n为 **serviceClient** 变量赋值。\n\n    serviceClient = account.createCloudBlobClient();\n\n为 **container** 变量赋值。我们将获取对名为 **gettingstarted** 的容器的引用。\n\n    // Container name must be lower case.\n    container = serviceClient.getContainerReference(\"gettingstarted\");\n\n创建该容器。如果该容器不存在，此方法将创建该容器（并返回 true）。如果该容器存在，则此方法将返回\n**false**。createIfNotExist 的一个替代方法是 create 方法（如果该容器已存在，该方法将返回错误）。\n\n    container.createIfNotExists();\n\n为容器设置匿名访问。\n\n    // Set anonymous access on the container.\n    BlobContainerPermissions containerPermissions;\n    containerPermissions = new BlobContainerPermissions();\n    containerPermissions.setPublicAccess(BlobContainerPublicAccessType.CONTAINER);\n    container.uploadPermissions(containerPermissions);\n\n获取对块 Blob 的引用，它将表示\nAzure 存储空间中的 Blob。\n\n    blob = container.getBlockBlobReference(\"image1.jpg\");\n\n使用 **File** 构造函数获取对你将上载的在本地创建的文件的引用。确保在运行代码之前已创建此文件。\n\n    File fileReference = new File (\"c:\\\\myimages\\\\image1.jpg\");\n\n通过调用 CloudBlockBlob.upload 方法上载该本地文件。**CloudBlockBlob.upload** 方法的第一个参数为\n**FileInputStream**对象，它表示将上载到 Azure 存储空间的本地文件。第二个参数是此文件的大小（以字节为单位）。\n\n    blob.upload(new FileInputStream(fileReference), fileReference.length());\n\n调用一个名为 **MakeHTMLPage** 的帮助器函数来生成一个包含 **&lt;image&gt;** 元素的基本 HTML 页面，并将元素中的源设置为现在位于你的 Azure 存储帐户中的 Blob。（\n**MakeHTMLPage** 的代码将在本主题后面讨论。）\n\n    MakeHTMLPage(container);\n\n打印输出有关创建的 HTML 页的状态消息和信息。\n\n    System.out.println(\"Processing complete.\");\n    System.out.println(\"Open index.html to see the images stored in your storage account.\");\n\n结束 **try** 块的方法是插入右大括号：**}**\n\n处理下列异常：\n\n-   **FileNotFoundException**：可由 **FileInputStream**\n    或 **FileOutputStream** 构造函数引发。\n-   **StorageException**：可由 Azure 客户端存储库引发。\n-   **URISyntaxException**：可由 **ListBlobItem.getUri** 方法引发。\n-   **Exception**：一般异常处理。\n\n<!-- -->\n\n    catch (FileNotFoundException fileNotFoundException)\n    {\n        System.out.print(\"FileNotFoundException encountered: \");\n        System.out.println(fileNotFoundException.getMessage());\n        System.exit(-1);\n    }\n    catch (StorageException storageException)\n    {\n        System.out.print(\"StorageException encountered: \");\n        System.out.println(storageException.getMessage());\n        System.exit(-1);\n    }\n    catch (URISyntaxException uriSyntaxException)\n    {\n        System.out.print(\"URISyntaxException encountered: \");\n        System.out.println(uriSyntaxException.getMessage());\n        System.exit(-1);\n    }\n    catch (Exception e)\n    {\n        System.out.print(\"Exception encountered: \");\n        System.out.println(e.getMessage());\n        System.exit(-1);\n    }\n\n结束 **main** 的方法是插入右大括号：**}**\n\n创建一个名为 **MakeHTMLPage** 的方法来创建一个基本的 HTML 页面。此方法具有一个 **CloudBlobContainer** 类型的参数，该参数将用于循环访问已上载 Blob 的列表。此方法将引发 **FileNotFoundException** 类型的异常（可由 **FileOutputStream** 构造函数引发）以及 **URISyntaxException**（可由 **ListBlobItem.getUri**.getUri 方法引发）。包括左大括号 **{**。\n\n    public static void MakeHTMLPage(CloudBlobContainer container) throws FileNotFoundException, URISyntaxException\n    {\n\n创建一个名为 **index.html** 的本地文件。\n\n    PrintStream stream;\n    stream = new PrintStream(new FileOutputStream(\"index.html\"));\n\n写入本地文件，添加 **&lt;html&gt;**、**&lt;header&gt;** 和 **&lt;body&gt;** 元素。\n\n    stream.println(\"<html>\");\n    stream.println(\"<header/>\");\n    stream.println(\"<body>\");\n\n循环访问已上载 Blob 的列表。对于 HTML 页中的每个 Blob，创建一个 **&lt;img&gt;** 元素，并将该元素的 **src** 属性发送到 Blob 的 URI（如同它存在于你的 Azure 存储帐户中一样）。\n虽然你仅在此示例中添加了一个图像，但如果添加更多图像，此代码将循环访问所有这些图像。\n\n为简单起见，此示例假定上载的每个 Blob 都是一个图像。如果你更新了图像之外的 Blob，或者更新了页面 Blob 而不是块 Blob，则请根据需要调整代码。\n\n    // Enumerate the uploaded blobs.\n    for (ListBlobItem blobItem : container.listBlobs()) {\n    // List each blob as an <img> element in the HTML body.\n    stream.println(\"<img src='\" + blobItem.getUri() + \"'/><br/>\");\n    }\n\n关闭 **&lt;body&gt;** 元素和 **&lt;html&gt;** 元素。\n\n    stream.println(\"</body>\");\n    stream.println(\"</html>\");\n\n结束本地文件。\n\n    stream.close();\n\n结束 **MakeHTMLPage** 的方法是插入右大括号：**}**\n\n结束 **StorageSample** 的方法是插入右大括号：**}**\n\n以下是此示例的完整代码。请记得修改占位符值 **your_account_name** 和\n**your_account_key**，这样才能分别使用你的帐户名和帐户密钥。\n\n    import com.microsoft.azure.storage.*;\n    import com.microsoft.azure.storage.blob.*;\n    import java.io.*;\n    import java.net.URISyntaxException;\n\n    // Create an image, c:\\myimages\\image1.jpg, prior to running this sample.\n    // Alternatively, change the value used by the FileInputStream constructor\n    // to use a different image path and file that you have already created.\n    public class StorageSample {\n\n        public static final String storageConnectionString =\n                \"DefaultEndpointsProtocol=http;\" +\n                       \"AccountName=your_account_name;\" +\n                       \"AccountKey=your_account_name;\" +\n               \"EndpointSuffix=core.chinacloudapi.cn\";\n\n        public static void main(String[] args) \n        {\n            try\n            {\n                CloudStorageAccount account;\n                CloudBlobClient serviceClient;\n                CloudBlobContainer container;\n                CloudBlockBlob blob;\n\n                account = CloudStorageAccount.parse(storageConnectionString);\n                serviceClient = account.createCloudBlobClient();\n                // Container name must be lower case.\n                container = serviceClient.getContainerReference(\"gettingstarted\");\n                container.createIfNotExists();\n\n                // Set anonymous access on the container.\n                BlobContainerPermissions containerPermissions;\n                containerPermissions = new BlobContainerPermissions();\n                containerPermissions.setPublicAccess(BlobContainerPublicAccessType.CONTAINER);\n                container.uploadPermissions(containerPermissions);\n\n                // Upload an image file.\n                blob = container.getBlockBlobReference(\"image1.jpg\");\n\n                File fileReference = new File(\"c:\\\\myimages\\\\image1.jpg\");\n                blob.upload(new FileInputStream(fileReference), fileReference.length());\n\n                // At this point the image is uploaded.\n                // Next, create an HTML page that lists all of the uploaded images.\n                MakeHTMLPage(container);\n\n                System.out.println(\"Processing complete.\");\n                System.out.println(\"Open index.html to see the images stored in your storage account.\");\n\n            }\n            catch (FileNotFoundException fileNotFoundException)\n            {\n                System.out.print(\"FileNotFoundException encountered: \");\n                System.out.println(fileNotFoundException.getMessage());\n                System.exit(-1);\n            }\n            catch (StorageException storageException)\n            {\n                System.out.print(\"StorageException encountered: \");\n                System.out.println(storageException.getMessage());\n                System.exit(-1);\n            }\n            catch (URISyntaxException uriSyntaxException)\n            {\n                System.out.print(\"URISyntaxException encountered: \");\n                System.out.println(uriSyntaxException.getMessage());\n                System.exit(-1);\n            }\n            catch (Exception e)\n            {\n                System.out.print(\"Exception encountered: \");\n                System.out.println(e.getMessage());\n                System.exit(-1);\n            }\n        }\n\n        // Create an HTML page that can be used to display the uploaded images.\n        // This example assumes all of the blobs are for images.\n        public static void MakeHTMLPage(CloudBlobContainer container) throws FileNotFoundException, URISyntaxException\n        {\n            PrintStream stream;\n            stream = new PrintStream(new FileOutputStream(\"index.html\"));\n\n            // Create the opening <html>, <header>, and <body> elements.\n            stream.println(\"<html>\");\n            stream.println(\"<header/>\");\n            stream.println(\"<body>\");\n\n            // Enumerate the uploaded blobs.\n            for (ListBlobItem blobItem : container.listBlobs()) {\n                // List each blob as an <img> element in the HTML body.\n                stream.println(\"<img src='\" + blobItem.getUri() + \"'/><br/>\");\n            }\n\n            stream.println(\"</body>\");\n\n            // Complete the <html> element and close the file.\n            stream.println(\"</html>\");\n            stream.close();\n        }\n    }\n\n除了将本地图像文件上载到 Azure 存储空间之外，此示例代码还将创建本地文件 namedindex.html，你可在浏览器中打开该文件以查看上载的图像。\n\n由于代码包含您的帐户名称和帐户密钥，因此请确保您的源代码是安全的。\n\n## <a name=\"bkmk_deletecontainer\"> </a>删除容器\n\n由于存储是收费的，因此你在完成本示例的试验以后，可能需要删除\n**gettingstarted** 容器。若要删除容器，请使用 CloudBlobContainer.delete 方法：\n\n    container = serviceClient.getContainerReference(\"gettingstarted\");\n    container.delete();\n\n调用 **CloudBlobContainer.delete** 方法时，初始 **CloudStorageAccount**、**ClodBlobClient**、\n**CloudBlobContainer** 对象的过程与针对\n**createIfNotExist** 方法显示的过程是相同的。以下是删除名为 gettingstarted 的容器的完整示例。\n\n    import com.microsoft.windowsazure.services.core.storage.*;\n    import com.microsoft.windowsazure.services.blob.client.*;\n\n    public class DeleteContainer {\n\n        public static final String storageConnectionString =\n                \"DefaultEndpointsProtocol=http;\" +\n                   \"AccountName=your_account_name;\" +\n                   \"AccountKey=your_account_key;\" +\n           \"EndpointSuffix=core.chinacloudapi.cn\";\n\n        public static void main(String[] args)\n        {\n            try\n            {\n                CloudStorageAccount account;\n                CloudBlobClient serviceClient;\n                CloudBlobContainer container;\n\n                account = CloudStorageAccount.parse(storageConnectionString);\n                serviceClient = account.createCloudBlobClient();\n                // Container name must be lower case.\n                container = serviceClient.getContainerReference(\"gettingstarted\");\n                container.delete();\n\n                System.out.println(\"Container deleted.\");\n\n            }\n            catch (StorageException storageException)\n            {\n                System.out.print(\"StorageException encountered: \");\n                System.out.println(storageException.getMessage());\n                System.exit(-1);\n            }\n            catch (Exception e)\n            {\n                System.out.print(\"Exception encountered: \");\n                System.out.println(e.getMessage());\n                System.exit(-1);\n            }\n        }\n    }\n\n有关其他 Blob 存储类和方法的概述，请参阅[如何通过 Java 使用 Blob 存储服务]。\n\n## 后续步骤\n\n请访问下面的链接了解有关更复杂的存储任务的详细信息。\n\n- [Azure Storage SDK for Java][]\n- [Azure 存储客户端 SDK 参考][]\n- [Azure 存储 REST API][]\n- [Azure 存储团队博客][]\n\n  [Download the Azure SDK for Java]: /develop/java/\n  [如何创建存储帐户]: /documentation/articles/storage-create-storage-account#create-a-storage-account\n  [如何管理存储帐户]: \ndocumentation/articles/storage-create-storage-account#view-copy-and-regenerate-storage-access-keys\n  [如何通过 Java 使用 Blob 存储服务]: /documentation/articles/storage-java-how-to-use-blob-storage\n  [Azure Storage SDK for Java]: https://github.com/azure/azure-storage-java\n  [Azure 存储客户端 SDK 参考]: http://dl.windowsazure.com/storage/javadoc/\n  [Azure 存储团队博客]: http://blogs.msdn.com/b/windowsazurestorage/\n  [Azure 存储 REST API]: https://msdn.microsoft.com/zh-cn/library/azure/dd179355.aspx\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

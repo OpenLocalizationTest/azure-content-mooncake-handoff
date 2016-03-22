@@ -1,0 +1,439 @@
+{
+  "nodes": [
+    {
+      "content": "在通用 Windows 应用中使用脱机数据 | Microsoft Azure",
+      "pos": [
+        28,
+        67
+      ]
+    },
+    {
+      "content": "了解如何在通用 Windows 应用中使用 Azure 移动服务缓存和同步脱机数据",
+      "pos": [
+        87,
+        128
+      ]
+    },
+    {
+      "content": "在移动服务中使用脱机数据同步",
+      "pos": [
+        369,
+        383
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        485,
+        491
+      ]
+    },
+    {
+      "content": "本教程说明如何使用 Azure 移动服务向通用 Windows 应用商店应用程序添加脱机支持。脱机支持将允许您在应用程序脱机的情况下与本地数据库交互。应用程序与后端数据库联机后，将使用脱机功能同步本地更改。",
+      "pos": [
+        593,
+        696
+      ]
+    },
+    {
+      "pos": [
+        700,
+        822
+      ],
+      "content": "在本教程中，你将更新<bpt id=\"p1\">[</bpt><ept id=\"p1\">移动服务入门]</ept>教程中的通用应用项目，以支持 Azure 移动服务的脱机功能。随后，你将在断开连接的脱机情况下添加数据，将这些项目同步到联机数据库，然后登录到 <bpt id=\"p2\">[</bpt><ept id=\"p2\">Azure 经典门户]</ept>，查看在运行应用程序时对数据所做的更改。"
+    },
+    {
+      "pos": [
+        825,
+        925
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>本教程旨在帮助你更好地了解如何使用移动服务通过 Azure 在 Windows 应用商店应用程序中存储和检索数据。如果这是你第一次体验移动服务，则应先完成<bpt id=\"p1\">[</bpt><ept id=\"p1\">移动服务入门]</ept>教程。"
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        929,
+        933
+      ]
+    },
+    {
+      "content": "本教程需要的内容如下：",
+      "pos": [
+        936,
+        947
+      ]
+    },
+    {
+      "content": "在 Windows 8.1 上运行的 Visual Studio 2013。",
+      "pos": [
+        951,
+        989
+      ]
+    },
+    {
+      "pos": [
+        992,
+        1003
+      ],
+      "content": "完成<bpt id=\"p1\">[</bpt><ept id=\"p1\">移动服务入门]</ept>。"
+    },
+    {
+      "content": "Azure 移动服务 SDK 版本 1.3.0（或更高版本）",
+      "pos": [
+        1007,
+        1037
+      ]
+    },
+    {
+      "content": "Azure 移动服务 SQLite Store 版本 1.0.0（或更高版本）",
+      "pos": [
+        1069,
+        1108
+      ]
+    },
+    {
+      "content": "SQLite for Windows 8.1",
+      "pos": [
+        1133,
+        1155
+      ]
+    },
+    {
+      "pos": [
+        1196,
+        1313
+      ],
+      "content": "一个 Azure 帐户。如果你没有帐户，可以注册 Azure 试用版并取得多达 10 个免费的移动服务，即使在试用期结束之后仍可继续使用这些服务。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 试用<ept id=\"p1\">](/pricing/1rmb-trial/)</ept>。"
+    },
+    {
+      "pos": [
+        1319,
+        1365
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"enable-offline-app\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>更新应用程序以支持脱机功能"
+    },
+    {
+      "pos": [
+        1367,
+        1535
+      ],
+      "content": "当你的移动服务处于脱机情况时，可使用 Azure 移动服务脱机功能与本地数据库交互。若要在你的应用中使用这些功能，请将 <ph id=\"ph1\">`MobileServiceClient.SyncContext`</ph> 初始化到本地存储。然后，通过 <ph id=\"ph2\">`IMobileServiceSyncTable`</ph> 接口引用你的表。在本教程中，我们要将 SQLite 用于本地存储。"
+    },
+    {
+      "pos": [
+        1538,
+        1628
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>你可以跳过此部分，直接从移动服务的 GitHub 示例存储库中获取已有脱机支持的示例项目。启用了脱机支持的示例项目位于此处：<bpt id=\"p1\">[</bpt><ept id=\"p1\">TodoList 脱机示例]</ept>。"
+    },
+    {
+      "content": "安装适用于 Windows 8.1 和 Windows Phone 8.1 的 SQLite 运行时。",
+      "pos": [
+        1633,
+        1684
+      ]
+    },
+    {
+      "pos": [
+        1693,
+        1741
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Windows 8.1 运行时：<ept id=\"p1\">**</ept>安装 <bpt id=\"p2\">[</bpt><ept id=\"p2\">SQLite for Windows 8.1]</ept>。"
+    },
+    {
+      "pos": [
+        1748,
+        1804
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Windows Phone 8.1：<ept id=\"p1\">**</ept>安装 <bpt id=\"p2\">[</bpt><ept id=\"p2\">SQLite for Windows Phone 8.1]</ept>。"
+    },
+    {
+      "pos": [
+        1811,
+        1964
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果你使用的是 Internet Explorer，则单击用于安装 SQLite 的链接可能会提示你下载 .zip 文件形式的 .vsix。使用 .vsix 扩展名而不是 .zip 将文件保存到硬盘上的某一位置。在 Windows 资源管理器中双击 .vsix 文件以运行安装程序。"
+    },
+    {
+      "pos": [
+        1969,
+        2104
+      ],
+      "content": "在 Visual Studio 中，打开在<bpt id=\"p1\">[</bpt><ept id=\"p1\">移动服务入门]</ept>教程中完成的项目。安装适用于 Windows 8.1 运行时和 Windows Phone 8.1 项目的 <bpt id=\"p2\">**</bpt>WindowsAzure.MobileServices.SQLiteStore<ept id=\"p2\">**</ept> NuGet 包。"
+    },
+    {
+      "pos": [
+        2112,
+        2258
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Windows 8.1：<ept id=\"p1\">**</ept>在解决方案资源管理器中，右键单击 Windows 8.1 项目，然后单击“管理 Nuget 包”以运行 NuGet 包管理器。搜索 <bpt id=\"p2\">**</bpt>SQLiteStore<ept id=\"p2\">**</ept> 以安装 <ph id=\"ph1\">`WindowsAzure.MobileServices.SQLiteStore`</ph> 包。"
+    },
+    {
+      "pos": [
+        2265,
+        2411
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Windows Phone 8.1：<ept id=\"p1\">**</ept>右键单击 Windows Phone 8.1 项目，然后单击“管理 Nuget 包”以运行 NuGet 包管理器。搜索 <bpt id=\"p2\">**</bpt>SQLiteStore<ept id=\"p2\">**</ept> 以安装 <ph id=\"ph1\">`WindowsAzure.MobileServices.SQLiteStore`</ph> 包。"
+    },
+    {
+      "pos": [
+        2418,
+        2470
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果安装过程中创建了对较旧版本的 SQLite 的引用，可以直接删除该重复引用。"
+    },
+    {
+      "content": "在解决方案资源管理器中，右键单击适用于 Windows 8.1 运行时和 Windows Phone 8.1 平台项目的“引用”，并确保存在对位于“扩展”部分的 SQLite 的引用。",
+      "pos": [
+        2487,
+        2579
+      ]
+    },
+    {
+      "content": "Windows 8.1 运行时",
+      "pos": [
+        2605,
+        2620
+      ]
+    },
+    {
+      "content": "Windows Phone 8.1",
+      "pos": [
+        2649,
+        2666
+      ]
+    },
+    {
+      "content": "SQLite 运行时要求你将所生成的项目的处理器体系结构更改为“x86”、“x64”或“ARM”。不支持“任何 CPU”。在解决方案资源管理器中，单击顶部的“解决方案”，然后将处理器体系结构下拉框更改为要测试的受支持设置之一。",
+      "pos": [
+        2673,
+        2786
+      ]
+    },
+    {
+      "content": "在解决方案资源管理器中，在共享项目中打开 MainPage.cs 文件。使用文件顶部的语句取消注释以下内容：",
+      "pos": [
+        2804,
+        2858
+      ]
+    },
+    {
+      "pos": [
+        3028,
+        3117
+      ],
+      "content": "在 MainPage.cs 中，注释 <ph id=\"ph1\">`todoTable`</ph> 的定义，取消注释以下调用 <ph id=\"ph2\">`MobileServicesClient.GetSyncTable()`</ph> 的行上的定义："
+    },
+    {
+      "pos": [
+        3346,
+        3478
+      ],
+      "content": "在 MainPage.cs 中，在标记为 <ph id=\"ph1\">`Offline sync`</ph> 的区域中取消注释方法 <ph id=\"ph2\">`InitLocalStoreAsync`</ph> 和 <ph id=\"ph3\">`SyncAsync`</ph>。方法 <ph id=\"ph4\">`InitLocalStoreAsync`</ph> 使用 SQLite 存储初始化客户端同步上下文。"
+    },
+    {
+      "pos": [
+        4071,
+        4129
+      ],
+      "content": "在 <ph id=\"ph1\">`OnNavigatedTo`</ph> 事件处理程序中，取消注释对 <ph id=\"ph2\">`InitLocalStoreAsync`</ph> 的调用："
+    },
+    {
+      "pos": [
+        4325,
+        4421
+      ],
+      "content": "在方法 <ph id=\"ph1\">`InsertTodoItem`</ph>、<ph id=\"ph2\">`UpdateCheckedTodoItem`</ph> 和 <ph id=\"ph3\">`ButtonRefresh_Click`</ph> 中取消注释对 <ph id=\"ph4\">`SyncAsync`</ph> 的 3 次调用："
+    },
+    {
+      "pos": [
+        5198,
+        5224
+      ],
+      "content": "在 <ph id=\"ph1\">`SyncAsync`</ph> 方法中添加异常处理程序："
+    },
+    {
+      "pos": [
+        6260,
+        6473
+      ],
+      "content": "在此示例中，我们将检索远程 <ph id=\"ph1\">`todoTable`</ph> 中的所有记录，但也可以通过传递查询来筛选记录。<ph id=\"ph2\">`PullAsync`</ph> 的第一个参数是用于增量同步的查询 ID；增量同步使用 <ph id=\"ph3\">`UpdatedAt`</ph> 时间戳以仅获取自上次同步以来修改的记录。查询 ID 应对于你的应用程序中的每个逻辑查询都是唯一的描述性字符串。若选择不要增量同步，请传递 <ph id=\"ph4\">`null`</ph> 作为查询 ID。此命令会检索每个请求的操作，这是可能效率低下上的所有记录。"
+    },
+    {
+      "pos": [
+        6480,
+        6595
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>* 若要从设备本地存储中删除已在移动设备数据库中删除的记录，应启用“<bpt id=\"p1\">[</bpt><ept id=\"p1\">软删除]</ept>”。否则，你的应用程序应定期调用 <ph id=\"ph2\">`IMobileServiceSyncTable.PurgeAsync()`</ph> 以清除本地存储。"
+    },
+    {
+      "pos": [
+        6601,
+        6730
+      ],
+      "content": "请注意，推送和请求操作可能会发生 <ph id=\"ph1\">`MobileServicePushFailedException`</ph>。由于拉取操作会内部执行推送来确保所有表及所有关系都一致，因此也可能发生该调用。下一篇教程<bpt id=\"p1\">[</bpt><ept id=\"p1\">使用移动服务脱机支持处理冲突]</ept>说明了如何处理这些同步相关的异常。"
+    },
+    {
+      "pos": [
+        6736,
+        6818
+      ],
+      "content": "在 Visual Studio 中，按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 键重新生成并运行应用程序。应用程序的行为将与其脱机同步更改前相同，因为它对插入、更新和刷新操作执行了同步操作。"
+    },
+    {
+      "pos": [
+        6823,
+        6860
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"update-sync\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>更新应用程序的同步行为"
+    },
+    {
+      "content": "在本部分中，你将修改应用，使其不对插入和更新操作同步，而仅在按“刷新”按钮时同步。然后，将中断与移动服务以模拟脱机情况下的应用程序连接。在添加数据项时，数据项将保存在本地存储区中，而不同步到移动服务。",
+      "pos": [
+        6862,
+        6962
+      ]
+    },
+    {
+      "pos": [
+        6967,
+        7058
+      ],
+      "content": "打开共享项目中的 MainPage.cs。编辑方法 <ph id=\"ph1\">`InsertTodoItem`</ph> 和 <ph id=\"ph2\">`UpdateCheckedTodoItem`</ph> 以注释掉对 <ph id=\"ph3\">`SyncAsync`</ph> 的调用。"
+    },
+    {
+      "pos": [
+        7063,
+        7137
+      ],
+      "content": "编辑共享项目中的 App.xaml.cs。注释掉 <bpt id=\"p1\">**</bpt>MobileServiceClient<ept id=\"p1\">**</ept> 的初始化并添加使用无效移动服务 URL 的以下行："
+    },
+    {
+      "pos": [
+        7320,
+        7384
+      ],
+      "content": "在 <ph id=\"ph1\">`InitLocalStoreAsync()`</ph> 中，注释掉对 <ph id=\"ph2\">`SyncAsync()`</ph> 的调用，使应用不在启动时执行同步。"
+    },
+    {
+      "pos": [
+        7389,
+        7516
+      ],
+      "content": "按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 生成并运行应用。输入一些新的 todo 项目，然后为每个项目单击“保存”。新的 Todo 项目在推送到移动服务之前，只存在于本地存储中。客户端应用程序的行为就像它已连接到支持所有创建、读取、更新、删除 (CRUD) 操作的移动服务一样。"
+    },
+    {
+      "content": "关闭应用程序并重新启动它，以验证你创建的新项目是否已永久保存到本地存储中。",
+      "pos": [
+        7521,
+        7558
+      ]
+    },
+    {
+      "pos": [
+        7563,
+        7610
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"update-online-app\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>更新应用程序以重新连接移动服务"
+    },
+    {
+      "content": "在本节中，你会将应用程序重新连接到移动服务。这模拟的是通过移动服务从脱机状态转为联机状态的应用程序。当您按“刷新”按钮时，数据将同步到您的移动服务。",
+      "pos": [
+        7612,
+        7686
+      ]
+    },
+    {
+      "pos": [
+        7691,
+        7768
+      ],
+      "content": "打开共享项目中的 App.xaml.cs。取消注释之前的 <ph id=\"ph1\">`MobileServiceClient`</ph> 初始化，重新添加正确的移动服务 URL 和应用密钥。"
+    },
+    {
+      "pos": [
+        7773,
+        7875
+      ],
+      "content": "按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 键重新生成并运行应用。请注意，数据看上去与脱机情况下相同，即使应用程序现已连接到移动服务。这是因为此应用程序始终使用指向本地存储区的 <ph id=\"ph1\">`IMobileServiceSyncTable`</ph>。"
+    },
+    {
+      "pos": [
+        7880,
+        7960
+      ],
+      "content": "登录到 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 经典门户]</ept>，查看你的移动服务数据库。如果你的服务将 JavaScript 后端用于移动服务，则可以通过移动服务的“数据”选项卡来游览数据。"
+    },
+    {
+      "content": "如果将 .NET 后端用于移动服务，请在 Visual Studio 中，转到“服务器资源管理器”-&gt;“Azure”-&gt;“SQL 数据库”。右键单击数据库并选择“在 SQL Server 对象资源管理器中打开”。",
+      "pos": [
+        7966,
+        8072
+      ]
+    },
+    {
+      "content": "请注意，数据尚未在数据库和本地存储之间进行同步。",
+      "pos": [
+        8078,
+        8102
+      ]
+    },
+    {
+      "pos": [
+        8119,
+        8200
+      ],
+      "content": "在应用中，按“刷新”按钮。这将导致应用调用 <ph id=\"ph1\">`PushAsync`</ph> 和 <ph id=\"ph2\">`PullAsync`</ph>。此推送操作会将本地存储项发送到移动服务，然后从移动服务检索新数据。"
+    },
+    {
+      "pos": [
+        8206,
+        8318
+      ],
+      "content": "推送操作从 <ph id=\"ph1\">`MobileServiceClient.SyncContext`</ph> 而非 <ph id=\"ph2\">`IMobileServicesSyncTable`</ph> 执行，并将更改推送到与该同步上下文关联的所有表中。这是为了应对表之间存在关系的情况。"
+    },
+    {
+      "content": "在应用程序中，单击要在本地存储区中完成的几个项旁边的复选框。",
+      "pos": [
+        8335,
+        8365
+      ]
+    },
+    {
+      "pos": [
+        8382,
+        8509
+      ],
+      "content": "再次按“刷新”按钮，这将导致调用 <ph id=\"ph1\">`SyncAsync`</ph>。<ph id=\"ph2\">`SyncAsync`</ph> 同时调用推送和拉取，但在本例中，我们可能已删除了对 <ph id=\"ph3\">`PushAsync`</ph> 的调用。这是因为“拉取时始终先执行推送操作”。这是为了确保本地存储中的所有表以及关系都保持一致。"
+    },
+    {
+      "content": "摘要",
+      "pos": [
+        8529,
+        8531
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        8649,
+        8653
+      ]
+    },
+    {
+      "content": "使用移动服务脱机支持处理冲突",
+      "pos": [
+        8658,
+        8672
+      ]
+    },
+    {
+      "content": "使用移动服务中的软删除",
+      "pos": [
+        8678,
+        8689
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"在通用 Windows 应用中使用脱机数据 | Microsoft Azure\" \n    description=\"了解如何在通用 Windows 应用中使用 Azure 移动服务缓存和同步脱机数据\" \n    documentationCenter=\"mobile-services\" \n    authors=\"lindydonna\" \n    manager=\"dwrede\" \n    editor=\"\" \n    services=\"mobile-services\"/>\n\n<tags \n    ms.service=\"mobile-services\" \n    ms.date=\"02/11/2016\"\n    wacn.date=\"03/21/2016\"/>\n\n# 在移动服务中使用脱机数据同步\n\n[AZURE.INCLUDE [mobile-service-note-mobile-apps](../includes/mobile-services-note-mobile-apps.md)]\n\n&nbsp;\n[AZURE.INCLUDE [mobile-services-selector-offline](../includes/mobile-services-selector-offline.md)]\n\n本教程说明如何使用 Azure 移动服务向通用 Windows 应用商店应用程序添加脱机支持。脱机支持将允许您在应用程序脱机的情况下与本地数据库交互。应用程序与后端数据库联机后，将使用脱机功能同步本地更改。\n\n\n\n在本教程中，你将更新[移动服务入门]教程中的通用应用项目，以支持 Azure 移动服务的脱机功能。随后，你将在断开连接的脱机情况下添加数据，将这些项目同步到联机数据库，然后登录到 [Azure 经典门户]，查看在运行应用程序时对数据所做的更改。\n\n>[AZURE.NOTE]本教程旨在帮助你更好地了解如何使用移动服务通过 Azure 在 Windows 应用商店应用程序中存储和检索数据。如果这是你第一次体验移动服务，则应先完成[移动服务入门]教程。\n\n##先决条件 \n\n本教程需要的内容如下：\n\n* 在 Windows 8.1 上运行的 Visual Studio 2013。\n* 完成[移动服务入门]。\n* [Azure 移动服务 SDK 版本 1.3.0（或更高版本）][Mobile Services SDK Nuget]\n* [Azure 移动服务 SQLite Store 版本 1.0.0（或更高版本）][SQLite store nuget]\n* [SQLite for Windows 8.1](http://www.sqlite.org/download.html)\n* 一个 Azure 帐户。如果你没有帐户，可以注册 Azure 试用版并取得多达 10 个免费的移动服务，即使在试用期结束之后仍可继续使用这些服务。有关详细信息，请参阅 [Azure 试用](/pricing/1rmb-trial/)。 \n\n## <a name=\"enable-offline-app\"></a>更新应用程序以支持脱机功能\n\n当你的移动服务处于脱机情况时，可使用 Azure 移动服务脱机功能与本地数据库交互。若要在你的应用中使用这些功能，请将 `MobileServiceClient.SyncContext` 初始化到本地存储。然后，通过 `IMobileServiceSyncTable` 接口引用你的表。在本教程中，我们要将 SQLite 用于本地存储。\n\n>[AZURE.NOTE]你可以跳过此部分，直接从移动服务的 GitHub 示例存储库中获取已有脱机支持的示例项目。启用了脱机支持的示例项目位于此处：[TodoList 脱机示例]。\n\n1. 安装适用于 Windows 8.1 和 Windows Phone 8.1 的 SQLite 运行时。 \n\n    * **Windows 8.1 运行时：**安装 [SQLite for Windows 8.1]。\n    * **Windows Phone 8.1：**安装 [SQLite for Windows Phone 8.1]。\n\n    >[AZURE.NOTE]如果你使用的是 Internet Explorer，则单击用于安装 SQLite 的链接可能会提示你下载 .zip 文件形式的 .vsix。使用 .vsix 扩展名而不是 .zip 将文件保存到硬盘上的某一位置。在 Windows 资源管理器中双击 .vsix 文件以运行安装程序。\n\n2. 在 Visual Studio 中，打开在[移动服务入门]教程中完成的项目。安装适用于 Windows 8.1 运行时和 Windows Phone 8.1 项目的 **WindowsAzure.MobileServices.SQLiteStore** NuGet 包。\n\n    * **Windows 8.1：**在解决方案资源管理器中，右键单击 Windows 8.1 项目，然后单击“管理 Nuget 包”以运行 NuGet 包管理器。搜索 **SQLiteStore** 以安装 `WindowsAzure.MobileServices.SQLiteStore` 包。\n    * **Windows Phone 8.1：**右键单击 Windows Phone 8.1 项目，然后单击“管理 Nuget 包”以运行 NuGet 包管理器。搜索 **SQLiteStore** 以安装 `WindowsAzure.MobileServices.SQLiteStore` 包。\n\n    >[AZURE.NOTE]如果安装过程中创建了对较旧版本的 SQLite 的引用，可以直接删除该重复引用。\n\n    ![][2]\n\n3. 在解决方案资源管理器中，右键单击适用于 Windows 8.1 运行时和 Windows Phone 8.1 平台项目的“引用”，并确保存在对位于“扩展”部分的 SQLite 的引用。\n\n    ![][1] </br>\n\n    **Windows 8.1 运行时**\n\n    ![][11] </br>\n\n    **Windows Phone 8.1**\n\n4. SQLite 运行时要求你将所生成的项目的处理器体系结构更改为“x86”、“x64”或“ARM”。不支持“任何 CPU”。在解决方案资源管理器中，单击顶部的“解决方案”，然后将处理器体系结构下拉框更改为要测试的受支持设置之一。\n\n    ![][13]\n\n5. 在解决方案资源管理器中，在共享项目中打开 MainPage.cs 文件。使用文件顶部的语句取消注释以下内容：\n\n        using Microsoft.WindowsAzure.MobileServices.SQLiteStore;  // offline sync\n        using Microsoft.WindowsAzure.MobileServices.Sync;         // offline sync\n\n6. 在 MainPage.cs 中，注释 `todoTable` 的定义，取消注释以下调用 `MobileServicesClient.GetSyncTable()` 的行上的定义：\n\n        //private IMobileServiceTable<TodoItem> todoTable = App.MobileService.GetTable<TodoItem>();\n        private IMobileServiceSyncTable<TodoItem> todoTable = App.MobileService.GetSyncTable<TodoItem>(); // offline sync\n\n\n7. 在 MainPage.cs 中，在标记为 `Offline sync` 的区域中取消注释方法 `InitLocalStoreAsync` 和 `SyncAsync`。方法 `InitLocalStoreAsync` 使用 SQLite 存储初始化客户端同步上下文。\n\n        private async Task InitLocalStoreAsync()\n        {\n            if (!App.MobileService.SyncContext.IsInitialized)\n            {\n                var store = new MobileServiceSQLiteStore(\"localstore.db\");\n                store.DefineTable<TodoItem>();\n                await App.MobileService.SyncContext.InitializeAsync(store);\n            }\n\n            await SyncAsync();\n        }\n\n        private async Task SyncAsync()\n        {\n            await App.MobileService.SyncContext.PushAsync();\n            await todoTable.PullAsync(\"todoItems\", todoTable.CreateQuery());\n        }\n\n8. 在 `OnNavigatedTo` 事件处理程序中，取消注释对 `InitLocalStoreAsync` 的调用：\n\n        protected override async void OnNavigatedTo(NavigationEventArgs e)\n        {\n            await InitLocalStoreAsync(); // offline sync\n            await RefreshTodoItems();\n        }\n\n9. 在方法 `InsertTodoItem`、`UpdateCheckedTodoItem` 和 `ButtonRefresh_Click` 中取消注释对 `SyncAsync` 的 3 次调用：\n\n        private async Task InsertTodoItem(TodoItem todoItem)\n        {\n            await todoTable.InsertAsync(todoItem);\n            items.Add(todoItem);\n\n            await SyncAsync(); // offline sync\n        }\n\n        private async Task UpdateCheckedTodoItem(TodoItem item)\n        {\n            await todoTable.UpdateAsync(item);\n            items.Remove(item);\n            ListItems.Focus(Windows.UI.Xaml.FocusState.Unfocused);\n\n            await SyncAsync(); // offline sync\n        }\n\n        private async void ButtonRefresh_Click(object sender, RoutedEventArgs e)\n        {\n            ButtonRefresh.IsEnabled = false;\n\n            await SyncAsync(); // offline sync\n            await RefreshTodoItems();\n\n            ButtonRefresh.IsEnabled = true;\n        }\n\n10. 在 `SyncAsync` 方法中添加异常处理程序：\n\n        private async Task SyncAsync()\n        {\n            String errorString = null;\n\n            try\n            {\n                await App.MobileService.SyncContext.PushAsync();\n                await todoTable.PullAsync(\"todoItems\", todoTable.CreateQuery()); // first param is query ID, used for incremental sync\n            }\n\n            catch (MobileServicePushFailedException ex)\n            {\n                errorString = \"Push failed because of sync errors: \" +\n                  ex.PushResult.Errors.Count + \" errors, message: \" + ex.Message;\n            }\n            catch (Exception ex)\n            {\n                errorString = \"Pull failed: \" + ex.Message +\n                  \"\\n\\nIf you are still in an offline scenario, \" +\n                  \"you can try your Pull again when connected with your Mobile Serice.\";\n            }\n\n            if (errorString != null)\n            {\n                MessageDialog d = new MessageDialog(errorString);\n                await d.ShowAsync();\n            }\n        }\n\n    在此示例中，我们将检索远程 `todoTable` 中的所有记录，但也可以通过传递查询来筛选记录。`PullAsync` 的第一个参数是用于增量同步的查询 ID；增量同步使用 `UpdatedAt` 时间戳以仅获取自上次同步以来修改的记录。查询 ID 应对于你的应用程序中的每个逻辑查询都是唯一的描述性字符串。若选择不要增量同步，请传递 `null` 作为查询 ID。此命令会检索每个请求的操作，这是可能效率低下上的所有记录。\n\n    >[AZURE.NOTE]* 若要从设备本地存储中删除已在移动设备数据库中删除的记录，应启用“[软删除]”。否则，你的应用程序应定期调用 `IMobileServiceSyncTable.PurgeAsync()` 以清除本地存储。\n\n    请注意，推送和请求操作可能会发生 `MobileServicePushFailedException`。由于拉取操作会内部执行推送来确保所有表及所有关系都一致，因此也可能发生该调用。下一篇教程[使用移动服务脱机支持处理冲突]说明了如何处理这些同步相关的异常。\n\n11. 在 Visual Studio 中，按 **F5** 键重新生成并运行应用程序。应用程序的行为将与其脱机同步更改前相同，因为它对插入、更新和刷新操作执行了同步操作。\n\n## <a name=\"update-sync\"></a>更新应用程序的同步行为\n\n在本部分中，你将修改应用，使其不对插入和更新操作同步，而仅在按“刷新”按钮时同步。然后，将中断与移动服务以模拟脱机情况下的应用程序连接。在添加数据项时，数据项将保存在本地存储区中，而不同步到移动服务。\n\n1. 打开共享项目中的 MainPage.cs。编辑方法 `InsertTodoItem` 和 `UpdateCheckedTodoItem` 以注释掉对 `SyncAsync` 的调用。\n\n2. 编辑共享项目中的 App.xaml.cs。注释掉 **MobileServiceClient** 的初始化并添加使用无效移动服务 URL 的以下行：\n\n         public static MobileServiceClient MobileService = new MobileServiceClient(\n            \"https://your-mobile-service.azure-mobile.xxx/\",\n            \"AppKey\"\n        );\n\n3. 在 `InitLocalStoreAsync()` 中，注释掉对 `SyncAsync()` 的调用，使应用不在启动时执行同步。\n\n4. 按 **F5** 生成并运行应用。输入一些新的 todo 项目，然后为每个项目单击“保存”。新的 Todo 项目在推送到移动服务之前，只存在于本地存储中。客户端应用程序的行为就像它已连接到支持所有创建、读取、更新、删除 (CRUD) 操作的移动服务一样。\n\n5. 关闭应用程序并重新启动它，以验证你创建的新项目是否已永久保存到本地存储中。\n\n## <a name=\"update-online-app\"></a>更新应用程序以重新连接移动服务\n\n在本节中，你会将应用程序重新连接到移动服务。这模拟的是通过移动服务从脱机状态转为联机状态的应用程序。当您按“刷新”按钮时，数据将同步到您的移动服务。\n\n1. 打开共享项目中的 App.xaml.cs。取消注释之前的 `MobileServiceClient` 初始化，重新添加正确的移动服务 URL 和应用密钥。\n\n2. 按 **F5** 键重新生成并运行应用。请注意，数据看上去与脱机情况下相同，即使应用程序现已连接到移动服务。这是因为此应用程序始终使用指向本地存储区的 `IMobileServiceSyncTable`。\n\n3. 登录到 [Azure 经典门户]，查看你的移动服务数据库。如果你的服务将 JavaScript 后端用于移动服务，则可以通过移动服务的“数据”选项卡来游览数据。\n\n    如果将 .NET 后端用于移动服务，请在 Visual Studio 中，转到“服务器资源管理器”->“Azure”->“SQL 数据库”。右键单击数据库并选择“在 SQL Server 对象资源管理器中打开”。\n\n    请注意，数据尚未在数据库和本地存储之间进行同步。\n\n    ![][6]\n\n4. 在应用中，按“刷新”按钮。这将导致应用调用 `PushAsync` 和 `PullAsync`。此推送操作会将本地存储项发送到移动服务，然后从移动服务检索新数据。\n\n    推送操作从 `MobileServiceClient.SyncContext` 而非 `IMobileServicesSyncTable` 执行，并将更改推送到与该同步上下文关联的所有表中。这是为了应对表之间存在关系的情况。\n\n    ![][7]\n\n5. 在应用程序中，单击要在本地存储区中完成的几个项旁边的复选框。\n\n    ![][8]\n\n6. 再次按“刷新”按钮，这将导致调用 `SyncAsync`。`SyncAsync` 同时调用推送和拉取，但在本例中，我们可能已删除了对 `PushAsync` 的调用。这是因为“拉取时始终先执行推送操作”。这是为了确保本地存储中的所有表以及关系都保持一致。\n\n    ![][10]\n  \n\n##摘要\n\n[AZURE.INCLUDE [mobile-services-offline-summary-csharp](../includes/mobile-services-offline-summary-csharp.md)]\n\n## 后续步骤\n\n* [使用移动服务脱机支持处理冲突]\n\n* [使用移动服务中的软删除](/documentation/articles/mobile-services-using-soft-delete)\n\n<!-- Anchors. -->\n[Update the app to support offline features]: #enable-offline-app\n[Update the sync behavior of the app]: #update-sync\n[Update the app to reconnect your mobile service]: #update-online-app\n[Next Steps]: #next-steps\n\n<!-- Images -->\n[1]: ./media/mobile-services-windows-store-dotnet-get-started-offline-data/mobile-services-add-reference-sqlite-dialog.png\n[2]: ./media/mobile-services-windows-store-dotnet-get-started-offline-data/mobile-services-sqlitestore-nuget.png\n[6]: ./media/mobile-services-windows-store-dotnet-get-started-offline-data/mobile-data-browse.png\n[7]: ./media/mobile-services-windows-store-dotnet-get-started-offline-data/mobile-data-browse2.png\n[8]: ./media/mobile-services-windows-store-dotnet-get-started-offline-data/mobile-services-online-app-run2.png\n[10]: ./media/mobile-services-windows-store-dotnet-get-started-offline-data/mobile-data-browse3.png\n[11]: ./media/mobile-services-windows-store-dotnet-get-started-offline-data/mobile-services-add-wp81-reference-sqlite-dialog.png\n[12]: ./media/mobile-services-windows-store-dotnet-get-started-offline-data/new-synchandler-class.png\n[13]: ./media/mobile-services-windows-store-dotnet-get-started-offline-data/cpu-architecture.png\n\n\n<!-- URLs. -->\n[使用移动服务脱机支持处理冲突]: /documentation/articles/mobile-services-windows-store-dotnet-handling-conflicts-offline-data\n[TodoList 脱机示例]: http://go.microsoft.com/fwlink/?LinkId=394777\n[Get started with Mobile Services]: /documentation/articles/mobile-services-javascript-backend-windows-store-dotnet-get-started/#create-new-service\n[Getting Started]: /documentation/articles/mobile-services-dotnet-backend-windows-phone-get-started\n[移动服务入门]: /documentation/articles/mobile-services-windows-store-get-started\n[SQLite for Windows 8.1]: http://go.microsoft.com/fwlink/?LinkId=394776\n[SQLite for Windows Phone 8.1]: http://go.microsoft.com/fwlink/?LinkId=397953\n[软删除]: /documentation/articles/mobile-services-using-soft-delete\n\n\n\n[Mobile Services SDK Nuget]: http://www.nuget.org/packages/WindowsAzure.MobileServices/1.3.0\n[SQLite store nuget]: http://www.nuget.org/packages/WindowsAzure.MobileServices.SQLiteStore/1.0.0\n[Azure 经典门户]: https://manage.windowsazure.cn\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

@@ -1,0 +1,797 @@
+{
+  "nodes": [
+    {
+      "content": "使用脚本操作在 Hadoop 群集上安装 Solr | Azure",
+      "pos": [
+        28,
+        61
+      ]
+    },
+    {
+      "content": "了解如何使用 Solr 自定义 HDInsight 群集。你将使用脚本操作配置选项来通过脚本安装 Solr。",
+      "pos": [
+        81,
+        135
+      ]
+    },
+    {
+      "content": "在 HDInsight Hadoop 群集上安装并使用 Solr",
+      "pos": [
+        354,
+        386
+      ]
+    },
+    {
+      "content": "了解如何使用 Solr 通过脚本操作来自定义基于 Windows 的 HDInsight 群集，以及如何使用 R 来搜索数据。",
+      "pos": [
+        389,
+        452
+      ]
+    },
+    {
+      "content": "你可以使用<bpt id=\"p1\">*</bpt>脚本操作<ept id=\"p1\">*</ept>，在 Azure HDInsight 的任何一种群集（Hadoop、Storm、HBase）上安装 Solr。用于在 HDInsight 群集上安装 Solr 的示例脚本可通过 <bpt id=\"p2\">[</bpt>https://hdiconfigactions.blob.core.windows.net/solrconfigactionv01/solr-installer-v01.ps1<ept id=\"p2\">](https://hdiconfigactions.blob.core.windows.net/solrconfigactionv01/solr-installer-v01.ps1)</ept> 上的只读 Azure 存储 Blob 获得。",
+      "pos": [
+        453,
+        758
+      ]
+    },
+    {
+      "pos": [
+        760,
+        891
+      ],
+      "content": "示例脚本仅适用于 HDInsight 群集版本 3.1。有关 HDInsight 群集版本的详细信息，请参阅 <bpt id=\"p1\">[</bpt>HDInsight 群集版本<ept id=\"p1\">](/documentation/articles/hdinsight-component-versioning-v1)</ept>。"
+    },
+    {
+      "content": "本主题中使用的示例脚本将使用特定配置创建基于 Windows 的 Solr 群集。如果你要使用不同集合、分片、架构、副本等配置 Solr 群集，则必须相应地修改脚本和 Solr 二进制文件。",
+      "pos": [
+        893,
+        988
+      ]
+    },
+    {
+      "content": "相关文章",
+      "pos": [
+        992,
+        996
+      ]
+    },
+    {
+      "pos": [
+        1003,
+        1112
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>在 HDInsight 中创建 Hadoop 群集<ept id=\"p1\">](/documentation/articles/hdinsight-provision-clusters-v1)</ept>：有关如何创建 HDInsight 群集的一般信息"
+    },
+    {
+      "pos": [
+        1116,
+        1201
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>使用脚本操作自定义 HDInsight 群集<ept id=\"p1\">][hdinsight-cluster-customize]</ept>：有关如何使用脚本操作自定义 HDInsight 群集的一般信息"
+    },
+    {
+      "content": "针对 HDInsight 开发脚本操作脚本",
+      "pos": [
+        1206,
+        1227
+      ]
+    },
+    {
+      "content": "什么是 Solr？",
+      "pos": [
+        1312,
+        1321
+      ]
+    },
+    {
+      "pos": [
+        1322,
+        1488
+      ],
+      "content": "<ph id=\"ph1\">&lt;a href=\"http://lucene.apache.org/solr/features.html\" target=\"_blank\"&gt;</ph>Apache Solr<ph id=\"ph2\">&lt;/a&gt;</ph> 是一种企业搜索平台，用于对数据实现功能强大的全文搜索。虽然 Hadoop 可用于存储和管理大量数据，但是，Apache Solr 提供了快速检索数据的搜索功能。"
+    },
+    {
+      "content": "如何安装 Solr？",
+      "pos": [
+        1493,
+        1503
+      ]
+    },
+    {
+      "pos": [
+        1505,
+        1778
+      ],
+      "content": "用于在 HDInsight 群集上安装 Solr 的示例脚本可通过 <bpt id=\"p1\">[</bpt>https://hdiconfigactions.blob.core.windows.net/solrconfigactionv01/solr-installer-v01.ps1<ept id=\"p1\">](https://hdiconfigactions.blob.core.windows.net/solrconfigactionv01/solr-installer-v01.ps1)</ept> 上的只读 Azure 存储 Blob 获得。本部分说明了如何在通过 Azure 管理门户预配群集时使用示例脚本。"
+    },
+    {
+      "content": "在 HDInsight 群集上安装 Solr",
+      "pos": [
+        1783,
+        1805
+      ]
+    },
+    {
+      "pos": [
+        1869,
+        1985
+      ],
+      "content": "根据<bpt id=\"p1\">[</bpt>在 HDInsight 中创建 Hadoop 群集<ept id=\"p1\">](/documentation/articles/hdinsight-provision-clusters-v1#portal)</ept>中的说明，使用“自定义创建”选项开始创建群集。"
+    },
+    {
+      "content": "在向导的“脚本操作”页上，单击“添加脚本操作”，以提供有关脚本操作的详细信息，如下所示：",
+      "pos": [
+        1990,
+        2034
+      ]
+    },
+    {
+      "content": "使用脚本操作自定义群集",
+      "pos": [
+        2042,
+        2053
+      ]
+    },
+    {
+      "pos": [
+        2147,
+        2700
+      ],
+      "content": "<table border='1'>\n     <tr><th>属性</th><th>值</th></tr>\n     <tr><td>Name</td>\n         <td>指定脚本操作的名称。例如 <b>Install Solr</b>。</td></tr>\n     <tr><td>脚本 URI</td>\n         <td>指定调用以自定义群集的脚本的统一资源标识符 (URI)。例如 <i>https://hdiconfigactions.blob.core.windows.net/solrconfigactionv01/solr-installer-v01.ps1</i></td></tr>\n     <tr><td>节点类型</td>\n         <td>指定在其上运行自定义脚本的节点。你可以选择“所有节点”、“仅限头节点”或“仅限从节点”<b></b><b></b><b></b>。\n     <tr><td>Parameters</td>\n         <td>根据脚本的需要，指定参数。用于安装 Solr 的脚本不需要任何参数，因此，你可以将此项保留为空。</td></tr>\n </table>",
+      "leadings": [
+        "",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   "
+      ],
+      "nodes": [
+        {
+          "content": "属性",
+          "pos": [
+            32,
+            34
+          ]
+        },
+        {
+          "content": "值",
+          "pos": [
+            43,
+            44
+          ]
+        },
+        {
+          "content": "Name",
+          "pos": [
+            68,
+            72
+          ]
+        },
+        {
+          "content": "指定脚本操作的名称。例如 <ph id=\"ph1\">&lt;b&gt;</ph>Install Solr<ph id=\"ph2\">&lt;/b&gt;</ph>。",
+          "pos": [
+            91,
+            124
+          ]
+        },
+        {
+          "content": "脚本 URI",
+          "pos": [
+            148,
+            154
+          ]
+        },
+        {
+          "content": "指定调用以自定义群集的脚本的统一资源标识符 (URI)。例如 <ph id=\"ph1\">&lt;i&gt;</ph>https://hdiconfigactions.blob.core.windows.net/solrconfigactionv01/solr-installer-v01.ps1<ph id=\"ph2\">&lt;/i&gt;</ph>",
+          "pos": [
+            173,
+            300
+          ]
+        },
+        {
+          "content": "节点类型",
+          "pos": [
+            324,
+            328
+          ]
+        },
+        {
+          "content": "指定在其上运行自定义脚本的节点。你可以选择“所有节点”、“仅限头节点”或“仅限从节点”<ph id=\"ph1\">&lt;b&gt;</ph><ph id=\"ph2\">&lt;/b&gt;</ph><ph id=\"ph3\">&lt;b&gt;</ph><ph id=\"ph4\">&lt;/b&gt;</ph><ph id=\"ph5\">&lt;b&gt;</ph><ph id=\"ph6\">&lt;/b&gt;</ph>。",
+          "pos": [
+            347,
+            412
+          ]
+        },
+        {
+          "content": "Parameters",
+          "pos": [
+            426,
+            436
+          ]
+        },
+        {
+          "content": "根据脚本的需要，指定参数。用于安装 Solr 的脚本不需要任何参数，因此，你可以将此项保留为空。",
+          "pos": [
+            455,
+            503
+          ]
+        }
+      ]
+    },
+    {
+      "content": "你可以添加多个脚本操作，以在群集上安装多个组件。在添加了脚本后，单击复选标记以开始创建群集。",
+      "pos": [
+        2706,
+        2752
+      ]
+    },
+    {
+      "content": "你还可以通过 Azure PowerShell 或 the HDInsight .NET SDK 使用脚本在 HDInsight 上安装 Solr。本主题后面将提供有关这些过程的说明。",
+      "pos": [
+        2754,
+        2846
+      ]
+    },
+    {
+      "content": "使用 Solr",
+      "pos": [
+        2875,
+        2882
+      ]
+    },
+    {
+      "content": "你必须从使用一些数据文件为 Solr 编制索引开始。然后，可以使用 Solr 对索引数据运行搜索查询。执行以下步骤，以在 HDInsight 群集中使用 Solr：",
+      "pos": [
+        2884,
+        2966
+      ]
+    },
+    {
+      "pos": [
+        2971,
+        3205
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>使用远程桌面协议 (RDP) 远程连接到安装有 Solr 的 HDInsight 群集<ept id=\"p1\">**</ept>。在 Azure 管理门户中，对你创建的安装有 Solr 的群集启用远程桌面，然后远程连接到该群集。有关说明，请参阅<ph id=\"ph1\">&lt;a href=\"/documentation/articles/hdinsight-administer-use-management-portal-v1/#rdp\" target=\"_blank\"&gt;</ph>使用 RDP 连接到 HDInsight 群集<ph id=\"ph2\">&lt;/a&gt;</ph>。"
+    },
+    {
+      "pos": [
+        3210,
+        3382
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>通过上载数据文件为 Solr 编制索引<ept id=\"p1\">**</ept>。在为 Solr 编制索引时，你应将可能需要搜索的文档放置在其中。若要为 Solr 编制索引，请使用 RDP 远程连接到群集，导航到桌面，打开 Hadoop 命令行，然后导航到 <bpt id=\"p2\">**</bpt>C:\\\\apps\\\\dist\\\\solr-4.7.2\\\\example\\\\exampledocs<ept id=\"p2\">**</ept>。运行以下命令："
+    },
+    {
+      "content": "你将会在控制台上看到以下输出：",
+      "pos": [
+        3441,
+        3456
+      ]
+    },
+    {
+      "pos": [
+        3660,
+        3760
+      ],
+      "content": "post.jar 实用程序通过以下两个示例文档为 Solr 编制索引：<bpt id=\"p1\">**</bpt>solr.xml<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>monitor.xml<ept id=\"p2\">**</ept>。post.jar 实用程序和示例文档是随 Solr 安装一起提供的。"
+    },
+    {
+      "pos": [
+        3765,
+        3982
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>使用 Solr 仪表板在索引文档中搜索<ept id=\"p1\">**</ept>。在连接到 HDInsight 群集的 RDP 会话中，打开 Internet Explorer，然后启动位于 <bpt id=\"p2\">**</bpt>http://headnodehost:8983/solr/#/<ept id=\"p2\">**</ept> 的 Solr 仪表板。在左窗格的<bpt id=\"p3\">**</bpt>“核心选择器”<ept id=\"p3\">**</ept>下拉列表中，选择<bpt id=\"p4\">**</bpt>“collection1”<ept id=\"p4\">**</ept>，然后在其中单击<bpt id=\"p5\">**</bpt>“查询”<ept id=\"p5\">**</ept>。作为示例，若要在 Solr 中选择并返回所有文档，请提供以下值："
+    },
+    {
+      "pos": [
+        3990,
+        4067
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>q<ept id=\"p1\">**</ept> 文本框中，输入 <bpt id=\"p2\">***</bpt>:<ept id=\"p2\">***</ept>。此时将返回所有已在 Solr 中编制索引的文档。如果你要在文档中搜索特定字符串，则可以在此处输入该字符串。"
+    },
+    {
+      "pos": [
+        4075,
+        4123
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>wt<ept id=\"p1\">**</ept> 文本框中，选择输出格式。默认值为 <bpt id=\"p2\">**</bpt>json<ept id=\"p2\">**</ept>。单击<bpt id=\"p3\">**</bpt>“执行查询”<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "content": "使用脚本操作自定义群集",
+      "pos": [
+        4135,
+        4146
+      ]
+    },
+    {
+      "content": "输出返回两个我们用于为 Solr 编制索引的文档。输出如下所示：",
+      "pos": [
+        4246,
+        4278
+      ]
+    },
+    {
+      "pos": [
+        6465,
+        6580
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>建议：将索引数据从 Solr 备份到与 HDInsight 群集关联的 Azure Blob 存储<ept id=\"p1\">**</ept>。作为一种很好的做法，你应该将索引数据从 Solr 群集节点备份到 Azure Blob 存储上。执行以下步骤来完成此操作："
+    },
+    {
+      "content": "在 RDP 会话中，打开 Internet Explorer，然后指向以下 URL：",
+      "pos": [
+        6589,
+        6631
+      ]
+    },
+    {
+      "content": "你应该看到如下所示的响应：",
+      "pos": [
+        6708,
+        6721
+      ]
+    },
+    {
+      "pos": [
+        7019,
+        7201
+      ],
+      "content": "在远程会话中，导航到 {SOLR\\_HOME}{Collection}\\\\data。对于通过示例脚本创建的群集，该目录应该是 <bpt id=\"p1\">**</bpt>C:\\\\apps\\\\dist\\\\solr-4.7.2\\\\example\\\\solr\\\\collection1\\\\data<ept id=\"p1\">**</ept>。在此位置，你应该会看到使用类似于 <bpt id=\"p2\">*</bpt><bpt id=\"p3\">*</bpt>snapshot.<ept id=\"p3\">*</ept>timestamp<ept id=\"p2\">*</ept>** 的名称创建的快照文件夹。"
+    },
+    {
+      "content": "压缩快照文件夹，并将其上载到 Azure Blob 存储。从 Hadoop 命令行，通过使用以下命令导航到快照文件夹所在的位置：",
+      "pos": [
+        7214,
+        7278
+      ]
+    },
+    {
+      "content": "此命令会将快照复制到与群集关联的默认存储帐户中容器下方的 /example/data/。",
+      "pos": [
+        7367,
+        7411
+      ]
+    },
+    {
+      "content": "使用 Azure PowerShell 安装 Solr",
+      "pos": [
+        7440,
+        7467
+      ]
+    },
+    {
+      "pos": [
+        7469,
+        7768
+      ],
+      "content": "在本部分中，我们使用 <bpt id=\"p1\">**</bpt><ph id=\"ph1\">&lt;a href = \"http://msdn.microsoft.com/zh-cn/library/dn858088.aspx\" target=\"_blank\"&gt;</ph>Add-AzureHDInsightScriptAction<ph id=\"ph2\">&lt;/a&gt;</ph><ept id=\"p1\">**</ept> cmdlet 通过脚本操作来调用脚本，以自定义群集。在继续前，确保你已安装并配置 Azure PowerShell。有关配置工作站以运行 HDInsight Windows Powershell cmdlet 的信息，请参阅<bpt id=\"p2\">[</bpt>安装和配置 Azure PowerShell<ept id=\"p2\">][powershell-install-configure]</ept>。"
+    },
+    {
+      "content": "执行以下步骤：",
+      "pos": [
+        7770,
+        7777
+      ]
+    },
+    {
+      "content": "打开 Azure PowerShell 窗口，并声明以下变量：",
+      "pos": [
+        7782,
+        7813
+      ]
+    },
+    {
+      "content": "指定配置值，例如群集中的节点，以及要使用的默认存储。",
+      "pos": [
+        8603,
+        8629
+      ]
+    },
+    {
+      "pos": [
+        9073,
+        9150
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>Add-AzureHDInsightScriptAction<ept id=\"p1\">**</ept> cmdlet 将脚本操作添加到群集配置中。稍后，在创建群集时，将执行脚本操作。"
+    },
+    {
+      "pos": [
+        9440,
+        9489
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Add-AzureHDInsightScriptAction<ept id=\"p1\">**</ept> cmdlet 采用以下参数："
+    },
+    {
+      "content": "参数",
+      "pos": [
+        9757,
+        9759
+      ]
+    },
+    {
+      "content": "定义",
+      "pos": [
+        9917,
+        9919
+      ]
+    },
+    {
+      "content": "Config",
+      "pos": [
+        10055,
+        10061
+      ]
+    },
+    {
+      "content": "脚本操作信息添加到的配置对象。",
+      "pos": [
+        10206,
+        10221
+      ]
+    },
+    {
+      "content": "Name",
+      "pos": [
+        10357,
+        10361
+      ]
+    },
+    {
+      "content": "脚本操作的名称。",
+      "pos": [
+        10487,
+        10495
+      ]
+    },
+    {
+      "content": "ClusterRoleCollection",
+      "pos": [
+        10631,
+        10652
+      ]
+    },
+    {
+      "content": "在其上运行自定义脚本的节点。有效值是 HeadNode（在头节点上安装）或 DataNode（在所有数据节点上安装）。你可以使用任一值或两个值。",
+      "pos": [
+        10778,
+        10850
+      ]
+    },
+    {
+      "content": "Uri",
+      "pos": [
+        10986,
+        10989
+      ]
+    },
+    {
+      "content": "执行的脚本的 URI。",
+      "pos": [
+        11115,
+        11126
+      ]
+    },
+    {
+      "content": "Parameters",
+      "pos": [
+        11262,
+        11272
+      ]
+    },
+    {
+      "content": "脚本所需的参数。本主题中使用的示例脚本不需要任何参数，因此，你在上述代码段中看不到此参数。",
+      "pos": [
+        11398,
+        11443
+      ]
+    },
+    {
+      "content": "最后，开始设置安装有 Solr 的自定义群集。",
+      "pos": [
+        11472,
+        11495
+      ]
+    },
+    {
+      "content": "出现提示时，请输入群集的凭据。创建群集可能需要几分钟时间。",
+      "pos": [
+        11669,
+        11698
+      ]
+    },
+    {
+      "content": "使用 .NET SDK 安装 Solr",
+      "pos": [
+        11728,
+        11747
+      ]
+    },
+    {
+      "content": "HDInsight .NET SDK 提供 .NET 客户端库，可简化从 .NET 应用程序使用 HDInsight 的操作。本部分提供有关如何使用 SDK 中的脚本操作设置安装有 Solr 的群集的说明。必须执行以下过程：",
+      "pos": [
+        11749,
+        11861
+      ]
+    },
+    {
+      "content": "安装 HDInsight .NET SDK",
+      "pos": [
+        11865,
+        11886
+      ]
+    },
+    {
+      "content": "创建自签名证书",
+      "pos": [
+        11889,
+        11896
+      ]
+    },
+    {
+      "content": "创建控制台应用程序",
+      "pos": [
+        11899,
+        11908
+      ]
+    },
+    {
+      "content": "运行应用程序",
+      "pos": [
+        11911,
+        11917
+      ]
+    },
+    {
+      "content": "安装 HDInsight .NET SDK",
+      "pos": [
+        11922,
+        11943
+      ]
+    },
+    {
+      "pos": [
+        11947,
+        12046
+      ],
+      "content": "你可以从 <bpt id=\"p1\">[</bpt>NuGet<ept id=\"p1\">](http://nuget.codeplex.com/wikipage?title=Getting%20Started)</ept> 安装该 SDK 的最新发行版。下一过程中将显示说明。"
+    },
+    {
+      "content": "创建自签名证书",
+      "pos": [
+        12050,
+        12057
+      ]
+    },
+    {
+      "pos": [
+        12061,
+        12192
+      ],
+      "content": "创建自签名证书，将其安装到工作站上，然后将其上传到你的 Azure 订阅。有关说明，请参阅<bpt id=\"p1\">[</bpt>创建自签名证书<ept id=\"p1\">](/documentation/articles/hdinsight-administer-use-management-portal-v1#cert)</ept>。"
+    },
+    {
+      "content": "创建 Visual Studio 应用程序",
+      "pos": [
+        12197,
+        12218
+      ]
+    },
+    {
+      "content": "打开 Visual Studio 2013。",
+      "pos": [
+        12225,
+        12247
+      ]
+    },
+    {
+      "content": "在“文件”菜单中，单击“新建”，然后单击“项目”。",
+      "pos": [
+        12252,
+        12277
+      ]
+    },
+    {
+      "content": "在“新建项目”中，键入或选择以下值：",
+      "pos": [
+        12282,
+        12300
+      ]
+    },
+    {
+      "content": "属性",
+      "pos": [
+        12572,
+        12574
+      ]
+    },
+    {
+      "content": "值",
+      "pos": [
+        12731,
+        12732
+      ]
+    },
+    {
+      "content": "类别",
+      "pos": [
+        12868,
+        12870
+      ]
+    },
+    {
+      "content": "模板/Visual C#/Windows",
+      "pos": [
+        13015,
+        13035
+      ]
+    },
+    {
+      "content": "模板",
+      "pos": [
+        13171,
+        13173
+      ]
+    },
+    {
+      "content": "控制台应用程序",
+      "pos": [
+        13299,
+        13306
+      ]
+    },
+    {
+      "content": "Name",
+      "pos": [
+        13442,
+        13446
+      ]
+    },
+    {
+      "content": "CreateSolrCluster",
+      "pos": [
+        13572,
+        13589
+      ]
+    },
+    {
+      "content": "单击“确定”以创建该项目。",
+      "pos": [
+        13613,
+        13626
+      ]
+    },
+    {
+      "content": "在“工具”菜单中，单击“Nuget Package Manager”，然后单击“Package Manager Console”。",
+      "pos": [
+        13631,
+        13696
+      ]
+    },
+    {
+      "content": "在控制台中运行下列命令以安装程序包：",
+      "pos": [
+        13701,
+        13719
+      ]
+    },
+    {
+      "content": "此命令将从当前 Visual Studio 项目添加 .NET 库以及对这些库的引用。",
+      "pos": [
+        13794,
+        13837
+      ]
+    },
+    {
+      "pos": [
+        13847,
+        13884
+      ],
+      "content": "在“解决方案资源管理器”中，双击 <bpt id=\"p1\">**</bpt>Program.cs<ept id=\"p1\">**</ept> 将其打开。"
+    },
+    {
+      "content": "将下列 using 语句添加到文件顶部：",
+      "pos": [
+        13889,
+        13909
+      ]
+    },
+    {
+      "content": "在 Main() 函数中，复制并粘贴以下代码，然后提供变量值：",
+      "pos": [
+        14195,
+        14226
+      ]
+    },
+    {
+      "pos": [
+        15878,
+        16061
+      ],
+      "content": "将以下代码追加到 Main() 函数，以使用 <bpt id=\"p1\">[</bpt>ScriptAction<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/microsoft.windowsazure.management.hdinsight.clusterprovisioning.data.scriptaction.aspx)</ept> 类调用自定义脚本来安装 Solr。"
+    },
+    {
+      "content": "最后，创建群集。",
+      "pos": [
+        16591,
+        16599
+      ]
+    },
+    {
+      "content": "将更改保存到应用程序并构建解决方案。",
+      "pos": [
+        16649,
+        16667
+      ]
+    },
+    {
+      "content": "运行应用程序",
+      "pos": [
+        16671,
+        16677
+      ]
+    },
+    {
+      "content": "打开 Windows PowerShell 或 Azure PowerShell 控制台，导航到保存 Visual Studio 项目的位置，再导航到项目中的 \\\\bin\\\\debug 目录，然后运行以下命令：",
+      "pos": [
+        16681,
+        16786
+      ]
+    },
+    {
+      "content": "提供群集名称，并按 ENTER 预配安装有 Solr 的群集。",
+      "pos": [
+        16828,
+        16859
+      ]
+    },
+    {
+      "content": "另请参阅",
+      "pos": [
+        16865,
+        16869
+      ]
+    },
+    {
+      "pos": [
+        16873,
+        16982
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>在 HDInsight 中创建 Hadoop 群集<ept id=\"p1\">](/documentation/articles/hdinsight-provision-clusters-v1)</ept>：有关如何创建 HDInsight 群集的一般信息"
+    },
+    {
+      "pos": [
+        16985,
+        17070
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>使用脚本操作自定义 HDInsight 群集<ept id=\"p1\">][hdinsight-cluster-customize]</ept>：有关如何使用脚本操作自定义 HDInsight 群集的一般信息"
+    },
+    {
+      "content": "为 HDInsight 开发脚本操作脚本",
+      "pos": [
+        17074,
+        17094
+      ]
+    },
+    {
+      "pos": [
+        17155,
+        17214
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>在 HDInsight 群集上安装 R<ept id=\"p1\">][hdinsight-install-r]</ept>：有关如何安装 R 的脚本操作示例"
+    },
+    {
+      "pos": [
+        17217,
+        17325
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>在 HDInsight 群集上安装 Giraph<ept id=\"p1\">](/documentation/articles/hdinsight-hadoop-giraph-install-v1)</ept>：有关如何安装 Giraph 的脚本操作示例"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"使用脚本操作在 Hadoop 群集上安装 Solr | Azure\" \n    description=\"了解如何使用 Solr 自定义 HDInsight 群集。你将使用脚本操作配置选项来通过脚本安装 Solr。\" \n    services=\"hdinsight\" \n    documentationCenter=\"\" \n    authors=\"nitinme\" \n    manager=\"paulettm\" \n    editor=\"cgronlun\"/>\n\n<tags\n    ms.service=\"hdinsight\"\n    ms.date=\"10/02/2015\"\n    wacn.date=\"01/15/2016\"/>\n\n# 在 HDInsight Hadoop 群集上安装并使用 Solr\n\n\n了解如何使用 Solr 通过脚本操作来自定义基于 Windows 的 HDInsight 群集，以及如何使用 R 来搜索数据。\n你可以使用*脚本操作*，在 Azure HDInsight 的任何一种群集（Hadoop、Storm、HBase）上安装 Solr。用于在 HDInsight 群集上安装 Solr 的示例脚本可通过 [https://hdiconfigactions.blob.core.windows.net/solrconfigactionv01/solr-installer-v01.ps1](https://hdiconfigactions.blob.core.windows.net/solrconfigactionv01/solr-installer-v01.ps1) 上的只读 Azure 存储 Blob 获得。\n\n示例脚本仅适用于 HDInsight 群集版本 3.1。有关 HDInsight 群集版本的详细信息，请参阅 [HDInsight 群集版本](/documentation/articles/hdinsight-component-versioning-v1)。\n\n本主题中使用的示例脚本将使用特定配置创建基于 Windows 的 Solr 群集。如果你要使用不同集合、分片、架构、副本等配置 Solr 群集，则必须相应地修改脚本和 Solr 二进制文件。\n\n**相关文章** \n\n- [在 HDInsight 中创建 Hadoop 群集](/documentation/articles/hdinsight-provision-clusters-v1)：有关如何创建 HDInsight 群集的一般信息 \n- [使用脚本操作自定义 HDInsight 群集][hdinsight-cluster-customize]：有关如何使用脚本操作自定义 HDInsight 群集的一般信息 \n- [针对 HDInsight 开发脚本操作脚本](/documentation/articles/hdinsight-hadoop-script-actions)\n<a name=\"whatis\"></a> \n## 什么是 Solr？\n<a href=\"http://lucene.apache.org/solr/features.html\" target=\"_blank\">Apache Solr</a> 是一种企业搜索平台，用于对数据实现功能强大的全文搜索。虽然 Hadoop 可用于存储和管理大量数据，但是，Apache Solr 提供了快速检索数据的搜索功能。\n\n## 如何安装 Solr？\n\n用于在 HDInsight 群集上安装 Solr 的示例脚本可通过 [https://hdiconfigactions.blob.core.windows.net/solrconfigactionv01/solr-installer-v01.ps1](https://hdiconfigactions.blob.core.windows.net/solrconfigactionv01/solr-installer-v01.ps1) 上的只读 Azure 存储 Blob 获得。本部分说明了如何在通过 Azure 管理门户预配群集时使用示例脚本。 \n* [在 HDInsight 群集上安装 Solr](/documentation/articles/hdinsight-hadoop-solr-install-v1)\n\n1. 根据[在 HDInsight 中创建 Hadoop 群集](/documentation/articles/hdinsight-provision-clusters-v1#portal)中的说明，使用“自定义创建”选项开始创建群集。 \n2. 在向导的“脚本操作”页上，单击“添加脚本操作”，以提供有关脚本操作的详细信息，如下所示：\n\n    ![使用脚本操作自定义群集](./media/hdinsight-hadoop-solr-install-v1/hdi-script-action-solr.png \"使用脚本操作自定义群集\")\n    \n    <table border='1'>\n        <tr><th>属性</th><th>值</th></tr>\n        <tr><td>Name</td>\n            <td>指定脚本操作的名称。例如 <b>Install Solr</b>。</td></tr>\n        <tr><td>脚本 URI</td>\n            <td>指定调用以自定义群集的脚本的统一资源标识符 (URI)。例如 <i>https://hdiconfigactions.blob.core.windows.net/solrconfigactionv01/solr-installer-v01.ps1</i></td></tr>\n        <tr><td>节点类型</td>\n            <td>指定在其上运行自定义脚本的节点。你可以选择“所有节点”、“仅限头节点”或“仅限从节点”<b></b><b></b><b></b>。\n        <tr><td>Parameters</td>\n            <td>根据脚本的需要，指定参数。用于安装 Solr 的脚本不需要任何参数，因此，你可以将此项保留为空。</td></tr>\n    </table>\n\n    你可以添加多个脚本操作，以在群集上安装多个组件。在添加了脚本后，单击复选标记以开始创建群集。\n\n你还可以通过 Azure PowerShell 或 the HDInsight .NET SDK 使用脚本在 HDInsight 上安装 Solr。本主题后面将提供有关这些过程的说明。\n\n<a name=\"usesolr\"></a> \n## 使用 Solr\n\n你必须从使用一些数据文件为 Solr 编制索引开始。然后，可以使用 Solr 对索引数据运行搜索查询。执行以下步骤，以在 HDInsight 群集中使用 Solr：\n\n1. **使用远程桌面协议 (RDP) 远程连接到安装有 Solr 的 HDInsight 群集**。在 Azure 管理门户中，对你创建的安装有 Solr 的群集启用远程桌面，然后远程连接到该群集。有关说明，请参阅<a href=\"/documentation/articles/hdinsight-administer-use-management-portal-v1/#rdp\" target=\"_blank\">使用 RDP 连接到 HDInsight 群集</a>。\n\n2. **通过上载数据文件为 Solr 编制索引**。在为 Solr 编制索引时，你应将可能需要搜索的文档放置在其中。若要为 Solr 编制索引，请使用 RDP 远程连接到群集，导航到桌面，打开 Hadoop 命令行，然后导航到 **C:\\\\apps\\\\dist\\\\solr-4.7.2\\\\example\\\\exampledocs**。运行以下命令：\n    \n        java -jar post.jar solr.xml monitor.xml\n\n    你将会在控制台上看到以下输出：\n\n        POSTing file solr.xml\n        POSTing file monitor.xml\n        2 files indexed.\n        COMMITting Solr index changes to http://localhost:8983/solr/update..\n        Time spent: 0:00:01.624\n\n    post.jar 实用程序通过以下两个示例文档为 Solr 编制索引：**solr.xml** 和 **monitor.xml**。post.jar 实用程序和示例文档是随 Solr 安装一起提供的。\n\n3. **使用 Solr 仪表板在索引文档中搜索**。在连接到 HDInsight 群集的 RDP 会话中，打开 Internet Explorer，然后启动位于 **http://headnodehost:8983/solr/#/** 的 Solr 仪表板。在左窗格的**“核心选择器”**下拉列表中，选择**“collection1”**，然后在其中单击**“查询”**。作为示例，若要在 Solr 中选择并返回所有文档，请提供以下值：\n    1. 在 **q** 文本框中，输入 ***:***。此时将返回所有已在 Solr 中编制索引的文档。如果你要在文档中搜索特定字符串，则可以在此处输入该字符串。\n    2. 在 **wt** 文本框中，选择输出格式。默认值为 **json**。单击**“执行查询”**。\n\n        ![使用脚本操作自定义群集](./media/hdinsight-hadoop-solr-install-v1/hdi-solr-dashboard-query.png \"在 Solr 仪表板上运行查询\")\n    \n    输出返回两个我们用于为 Solr 编制索引的文档。输出如下所示：\n\n            \"response\": {\n                \"numFound\": 2,\n                \"start\": 0,\n                \"maxScore\": 1,\n                \"docs\": [\n                  {\n                    \"id\": \"SOLR1000\",\n                    \"name\": \"Solr, the Enterprise Search Server\",\n                    \"manu\": \"Apache Software Foundation\",\n                    \"cat\": [\n                      \"software\",\n                      \"search\"\n                    ],\n                    \"features\": [\n                      \"Advanced Full-Text Search Capabilities using Lucene\",\n                      \"Optimized for High Volume Web Traffic\",\n                      \"Standards Based Open Interfaces - XML and HTTP\",\n                      \"Comprehensive HTML Administration Interfaces\",\n                      \"Scalability - Efficient Replication to other Solr Search Servers\",\n                      \"Flexible and Adaptable with XML configuration and Schema\",\n                      \"Good unicode support: héllo (hello with an accent over the e)\"\n                    ],\n                    \"price\": 0,\n                    \"price_c\": \"0,USD\",\n                    \"popularity\": 10,\n                    \"inStock\": true,\n                    \"incubationdate_dt\": \"2006-01-17T00:00:00Z\",\n                    \"_version_\": 1486960636996878300\n                  },\n                  {\n                    \"id\": \"3007WFP\",\n                    \"name\": \"Dell Widescreen UltraSharp 3007WFP\",\n                    \"manu\": \"Dell, Inc.\",\n                    \"manu_id_s\": \"dell\",\n                    \"cat\": [\n                      \"electronics and computer1\"\n                    ],\n                    \"features\": [\n                      \"30\" TFT active matrix LCD, 2560 x 1600, .25mm dot pitch, 700:1 contrast\"\n                    ],\n                    \"includes\": \"USB cable\",\n                    \"weight\": 401.6,\n                    \"price\": 2199,\n                    \"price_c\": \"2199,USD\",\n                    \"popularity\": 6,\n                    \"inStock\": true,\n                    \"store\": \"43.17614,-90.57341\",\n                    \"_version_\": 1486960637584081000\n                  }\n                ]\n              }\n   \n\n4. **建议：将索引数据从 Solr 备份到与 HDInsight 群集关联的 Azure Blob 存储**。作为一种很好的做法，你应该将索引数据从 Solr 群集节点备份到 Azure Blob 存储上。执行以下步骤来完成此操作：\n\n    1. 在 RDP 会话中，打开 Internet Explorer，然后指向以下 URL：\n\n            http://localhost:8983/solr/replication?command=backup\n\n        你应该看到如下所示的响应：\n\n            <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n            <response>\n              <lst name=\"responseHeader\">\n                <int name=\"status\">0</int>\n                <int name=\"QTime\">9</int>\n              </lst>\n              <str name=\"status\">OK</str>\n            </response>\n\n    2. 在远程会话中，导航到 {SOLR\\_HOME}{Collection}\\\\data。对于通过示例脚本创建的群集，该目录应该是 **C:\\\\apps\\\\dist\\\\solr-4.7.2\\\\example\\\\solr\\\\collection1\\\\data**。在此位置，你应该会看到使用类似于 **snapshot.*timestamp*** 的名称创建的快照文件夹。\n    \n    3. 压缩快照文件夹，并将其上载到 Azure Blob 存储。从 Hadoop 命令行，通过使用以下命令导航到快照文件夹所在的位置：\n\n              hadoop fs -CopyFromLocal snapshot._timestamp_.zip /example/data\n\n        此命令会将快照复制到与群集关联的默认存储帐户中容器下方的 /example/data/。\n\n<a name=\"usingPS\"></a> \n## 使用 Azure PowerShell 安装 Solr\n\n在本部分中，我们使用 **<a href = \"http://msdn.microsoft.com/zh-cn/library/dn858088.aspx\" target=\"_blank\">Add-AzureHDInsightScriptAction</a>** cmdlet 通过脚本操作来调用脚本，以自定义群集。在继续前，确保你已安装并配置 Azure PowerShell。有关配置工作站以运行 HDInsight Windows Powershell cmdlet 的信息，请参阅[安装和配置 Azure PowerShell][powershell-install-configure]。\n\n执行以下步骤：\n\n1. 打开 Azure PowerShell 窗口，并声明以下变量：\n\n        # PROVIDE VALUES FOR THESE VARIABLES\n        $subscriptionName = \"<SubscriptionName>\"        # Name of the Azure subscription\n        $clusterName = \"<HDInsightClusterName>\"         # HDInsight cluster name\n        $storageAccountName = \"<StorageAccountName>\"    # Azure Storage account that hosts the default container\n        $storageAccountKey = \"<StorageAccountKey>\"      # Key for the Storage account\n        $containerName = $clusterName\n        $location = \"<MicrosoftDataCenter>\"             # Location of the HDInsight cluster. It must be in the same data center as the Storage account.\n        $clusterNodes = <ClusterSizeInNumbers>          # Number of nodes in the HDInsight cluster\n        $version = \"<HDInsightClusterVersion>\"          # For example, \"3.1\"\n    \n2. 指定配置值，例如群集中的节点，以及要使用的默认存储。\n\n        # Specify the configuration options\n        Select-AzureSubscription $subscriptionName\n        $config = New-AzureHDInsightClusterConfig -ClusterSizeInNodes $clusterNodes\n        $config.DefaultStorageAccount.StorageAccountName=\"$storageAccountName.blob.core.chinacloudapi.cn\"\n        $config.DefaultStorageAccount.StorageAccountKey=$storageAccountKey\n        $config.DefaultStorageAccount.StorageContainerName=$containerName\n    \n3. 使用 **Add-AzureHDInsightScriptAction** cmdlet 将脚本操作添加到群集配置中。稍后，在创建群集时，将执行脚本操作。\n\n        # Add the script action to the cluster configuration\n        $config = Add-AzureHDInsightScriptAction -Config $config -Name \"Install Solr\" -ClusterRoleCollection HeadNode,DataNode -Uri https://hdiconfigactions.blob.core.windows.net/solrconfigactionv01/solr-installer-v01.ps1\n\n    **Add-AzureHDInsightScriptAction** cmdlet 采用以下参数：\n\n    <table style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse;\">\n<tr>\n<th style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; width:90px; padding-left:5px; padding-right:5px;\">参数</th>\n<th style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; width:550px; padding-left:5px; padding-right:5px;\">定义</th></tr>\n<tr>\n<td style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; padding-left:5px;\">Config</td>\n<td style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; padding-left:5px; padding-right:5px;\">脚本操作信息添加到的配置对象。</td></tr>\n<tr>\n<td style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; padding-left:5px;\">Name</td>\n<td style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; padding-left:5px;\">脚本操作的名称。</td></tr>\n<tr>\n<td style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; padding-left:5px;\">ClusterRoleCollection</td>\n<td style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; padding-left:5px;\">在其上运行自定义脚本的节点。有效值是 HeadNode（在头节点上安装）或 DataNode（在所有数据节点上安装）。你可以使用任一值或两个值。</td></tr>\n<tr>\n<td style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; padding-left:5px;\">Uri</td>\n<td style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; padding-left:5px;\">执行的脚本的 URI。</td></tr>\n<tr>\n<td style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; padding-left:5px;\">Parameters</td>\n<td style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; padding-left:5px;\">脚本所需的参数。本主题中使用的示例脚本不需要任何参数，因此，你在上述代码段中看不到此参数。\n</td></tr>\n</table>\n    \n4. 最后，开始设置安装有 Solr 的自定义群集。\n    \n        # Start provisioning a cluster with Solr installed\n        New-AzureHDInsightCluster -Config $config -Name $clusterName -Location $location -Version $version \n\n出现提示时，请输入群集的凭据。创建群集可能需要几分钟时间。\n\n<a name=\"usingSDK\"></a> \n## 使用 .NET SDK 安装 Solr\n\nHDInsight .NET SDK 提供 .NET 客户端库，可简化从 .NET 应用程序使用 HDInsight 的操作。本部分提供有关如何使用 SDK 中的脚本操作设置安装有 Solr 的群集的说明。必须执行以下过程：\n\n- 安装 HDInsight .NET SDK\n- 创建自签名证书\n- 创建控制台应用程序\n- 运行应用程序\n\n\n**安装 HDInsight .NET SDK**\n\n你可以从 [NuGet](http://nuget.codeplex.com/wikipage?title=Getting%20Started) 安装该 SDK 的最新发行版。下一过程中将显示说明。\n\n**创建自签名证书**\n\n创建自签名证书，将其安装到工作站上，然后将其上传到你的 Azure 订阅。有关说明，请参阅[创建自签名证书](/documentation/articles/hdinsight-administer-use-management-portal-v1#cert)。\n\n\n**创建 Visual Studio 应用程序**\n\n1. 打开 Visual Studio 2013。\n\n2. 在“文件”菜单中，单击“新建”，然后单击“项目”。\n\n3. 在“新建项目”中，键入或选择以下值：\n    \n    <table style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse;\">\n<tr>\n<th style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; width:90px; padding-left:5px; padding-right:5px;\">属性</th>\n<th style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; width:90px; padding-left:5px; padding-right:5px;\">值</th></tr>\n<tr>\n<td style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; padding-left:5px;\">类别</td>\n<td style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; padding-left:5px; padding-right:5px;\">模板/Visual C#/Windows</td></tr>\n<tr>\n<td style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; padding-left:5px;\">模板</td>\n<td style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; padding-left:5px;\">控制台应用程序</td></tr>\n<tr>\n<td style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; padding-left:5px;\">Name</td>\n<td style=\"border-color: #c6c6c6; border-width: 2px; border-style: solid; border-collapse: collapse; padding-left:5px;\">CreateSolrCluster</td></tr>\n</table>\n\n4. 单击“确定”以创建该项目。\n\n5. 在“工具”菜单中，单击“Nuget Package Manager”，然后单击“Package Manager Console”。\n\n6. 在控制台中运行下列命令以安装程序包：\n\n        Install-Package Microsoft.WindowsAzure.Management.HDInsight\n\n    此命令将从当前 Visual Studio 项目添加 .NET 库以及对这些库的引用。\n\n    \n7. 在“解决方案资源管理器”中，双击 **Program.cs** 将其打开。\n\n8. 将下列 using 语句添加到文件顶部：\n\n        using System.Security.Cryptography.X509Certificates;\n        using Microsoft.WindowsAzure.Management.HDInsight;\n        using Microsoft.WindowsAzure.Management.HDInsight.ClusterProvisioning;\n        using Microsoft.WindowsAzure.Management.HDInsight.Framework.Logging;\n    \n9. 在 Main() 函数中，复制并粘贴以下代码，然后提供变量值：\n        \n        var clusterName = args[0];\n\n        // Provide values for the variables\n        string thumbprint = \"<CertificateThumbprint>\";  \n        string subscriptionId = \"<AzureSubscriptionID>\";\n        string location = \"<MicrosoftDataCenterLocation>\";\n        string storageaccountname = \"<AzureStorageAccountName>.blob.core.chinacloudapi.cn\";\n        string storageaccountkey = \"<AzureStorageAccountKey>\";\n        string username = \"<HDInsightUsername>\";\n        string password = \"<HDInsightUserPassword>\";\n        int clustersize = <NumberOfNodesInTheCluster>;\n\n        // Provide the certificate thumbprint to retrieve the certificate from the certificate store \n        X509Store store = new X509Store();\n        store.Open(OpenFlags.ReadOnly);\n        X509Certificate2 cert = store.Certificates.Cast<X509Certificate2>().First(item => item.Thumbprint == thumbprint);\n\n        // Create an HDInsight client object\n        HDInsightCertificateCredential creds = new HDInsightCertificateCredential(new Guid(subscriptionId), cert);\n        var client = HDInsightClient.Connect(creds);\n        client.IgnoreSslErrors = true;\n        \n        // Provide the cluster information\n        var clusterInfo = new ClusterCreateParameters()\n        {\n            Name = clusterName,\n            Location = location,\n            DefaultStorageAccountName = storageaccountname,\n            DefaultStorageAccountKey = storageaccountkey,\n            DefaultStorageContainer = clusterName,\n            UserName = username,\n            Password = password,\n            ClusterSizeInNodes = clustersize,\n            Version = \"3.1\"\n        };        \n\n10. 将以下代码追加到 Main() 函数，以使用 [ScriptAction](http://msdn.microsoft.com/zh-cn/library/microsoft.windowsazure.management.hdinsight.clusterprovisioning.data.scriptaction.aspx) 类调用自定义脚本来安装 Solr。\n\n        // Add the script action to install Solr\n        clusterInfo.ConfigActions.Add(new ScriptAction(\n          \"Install Solr\", // Name of the config action\n          new ClusterNodeType[] { ClusterNodeType.HeadNode, ClusterNodeType.DataNode }, // List of nodes to install Solr on\n          new Uri(\"https://hdiconfigactions.blob.core.windows.net/solrconfigactionv01/solr-installer-v01.ps1\"), // Location of the script to install Solr\n          null //Because the script used does not require any parameters\n        ));\n\n11. 最后，创建群集。\n\n        client.CreateCluster(clusterInfo);\n\n11. 将更改保存到应用程序并构建解决方案。\n\n**运行应用程序**\n\n打开 Windows PowerShell 或 Azure PowerShell 控制台，导航到保存 Visual Studio 项目的位置，再导航到项目中的 \\\\bin\\\\debug 目录，然后运行以下命令：\n\n    .\\CreateSolrCluster <cluster-name>\n\n提供群集名称，并按 ENTER 预配安装有 Solr 的群集。\n\n\n## 另请参阅\n\n- [在 HDInsight 中创建 Hadoop 群集](/documentation/articles/hdinsight-provision-clusters-v1)：有关如何创建 HDInsight 群集的一般信息\n- [使用脚本操作自定义 HDInsight 群集][hdinsight-cluster-customize]：有关如何使用脚本操作自定义 HDInsight 群集的一般信息\n- [为 HDInsight 开发脚本操作脚本](/documentation/articles/hdinsight-hadoop-script-actions)\n- [在 HDInsight 群集上安装 R][hdinsight-install-r]：有关如何安装 R 的脚本操作示例\n- [在 HDInsight 群集上安装 Giraph](/documentation/articles/hdinsight-hadoop-giraph-install-v1)：有关如何安装 Giraph 的脚本操作示例\n\n\n\n\n[powershell-install-configure]: /documentation/articles/powershell-install-configure\n[hdinsight-provision]: /documentation/articles/hdinsight-provision-clusters-v1\n[hdinsight-install-r]: /documentation/articles/hdinsight-hadoop-r-scripts\n[hdinsight-cluster-customize]: /documentation/articles/hdinsight-hadoop-customize-cluster-v1\n\n<!---HONumber=79-->"
+}

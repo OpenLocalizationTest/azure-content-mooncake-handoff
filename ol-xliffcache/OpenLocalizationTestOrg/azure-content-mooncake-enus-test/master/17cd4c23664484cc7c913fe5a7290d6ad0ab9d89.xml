@@ -1,0 +1,614 @@
+{
+  "nodes": [
+    {
+      "content": "创建、启动或删除应用程序网关 | Azure",
+      "pos": [
+        27,
+        49
+      ]
+    },
+    {
+      "content": "此页提供有关创建、配置、启动和删除 Azure 应用程序网关的说明",
+      "pos": [
+        67,
+        100
+      ]
+    },
+    {
+      "content": "创建、启动或删除应用程序网关",
+      "pos": [
+        323,
+        337
+      ]
+    },
+    {
+      "content": "应用程序网关是第 7 层负载平衡器。它在不同服务器之间提供故障转移和性能路由 HTTP 请求，而不管它们是在云中还是本地。应用程序网关具有以下应用程序传递功能：HTTP 负载平衡、基于 Cookie 的会话相关性和 SSL 卸载。",
+      "pos": [
+        339,
+        454
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        458,
+        474
+      ]
+    },
+    {
+      "content": "Azure Classic PowerShell",
+      "pos": [
+        478,
+        502
+      ]
+    },
+    {
+      "content": "Azure 资源管理器 PowerShell",
+      "pos": [
+        567,
+        589
+      ]
+    },
+    {
+      "content": "Azure 资源管理器模板",
+      "pos": [
+        658,
+        671
+      ]
+    },
+    {
+      "content": "本文将指导你完成创建、配置、启动和删除应用程序网关的步骤。",
+      "pos": [
+        754,
+        783
+      ]
+    },
+    {
+      "pos": [
+        787,
+        1089
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>在使用 Azure 资源之前，请务必了解 Azure 当前使用两种部署模型：资源管理器部署模型和经典部署模型。在使用任何 Azure 资源之前，请确保你了解<bpt id=\"p1\">[</bpt>部署模型和工具<ept id=\"p1\">](/documentation/articles/azure-classic-rm)</ept>。可以通过单击本文顶部的选项卡来查看不同工具的文档。本文档将说明使用 Azure 经典部署创建应用程序网关的方式。若要使用资源管理器版本，请转到<bpt id=\"p2\">[</bpt>使用资源管理器创建应用程序网关部署<ept id=\"p2\">](/documentation/articles/application-gateway-create-gateway-arm)</ept>。"
+    },
+    {
+      "content": "开始之前",
+      "pos": [
+        1098,
+        1102
+      ]
+    },
+    {
+      "pos": [
+        1107,
+        1207
+      ],
+      "content": "使用 Web 平台安装程序安装最新版本的 Azure PowerShell cmdlet。可以从<bpt id=\"p1\">[</bpt>下载页面<ept id=\"p1\">](/downloads/)</ept>的“Windows PowerShell”部分下载并安装最新版本。"
+    },
+    {
+      "content": "请确认你已创建包含有效子网、可正常运行的虚拟网络。请确保没有虚拟机或云部署正在使用子网。应用程序网关必须单独位于虚拟网络子网中。",
+      "pos": [
+        1211,
+        1275
+      ]
+    },
+    {
+      "content": "要配置为使用应用程序网关的服务器必须存在，或者在虚拟网络中为其创建终结点，或者为其分配公共 IP/VIP。",
+      "pos": [
+        1279,
+        1332
+      ]
+    },
+    {
+      "content": "创建应用程序网关需要什么？",
+      "pos": [
+        1337,
+        1350
+      ]
+    },
+    {
+      "pos": [
+        1353,
+        1437
+      ],
+      "content": "当你使用 <bpt id=\"p1\">**</bpt>New-AzureApplicationGateway<ept id=\"p1\">**</ept> 命令创建应用程序网关时，暂时不需要设置任何配置，但必须使用 XML 或配置对象设置新建的资源。"
+    },
+    {
+      "content": "有效值为：",
+      "pos": [
+        1440,
+        1445
+      ]
+    },
+    {
+      "pos": [
+        1449,
+        1507
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>后端服务器池：<ept id=\"p1\">**</ept>后端服务器的 IP 地址列表。列出的 IP 地址应属于虚拟网络子网，或者是公共 IP/VIP。"
+    },
+    {
+      "pos": [
+        1510,
+        1579
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>后端服务器池设置：<ept id=\"p1\">**</ept>每个池都有一些设置，例如端口、协议和基于 Cookie 的关联性。这些设置绑定到池，并会应用到池中的所有服务器。"
+    },
+    {
+      "pos": [
+        1582,
+        1635
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>前端端口：<ept id=\"p1\">**</ept>此端口是应用程序网关上打开的公共端口。客户流量将抵达此端口，然后重定向到后端服务器之一。"
+    },
+    {
+      "pos": [
+        1638,
+        1703
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>侦听器：<ept id=\"p1\">**</ept>侦听器具有前端端口、协议（Http 或 Https，区分大小写）和 SSL 证书名称（如果要配置 SSL 卸载）。"
+    },
+    {
+      "pos": [
+        1706,
+        1786
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>规则：<ept id=\"p1\">**</ept>规则将会绑定侦听器和后端服务器池，并定义当流量抵达特定侦听器时应定向到的后端服务器池。目前仅支持<bpt id=\"p2\">*</bpt>基本<ept id=\"p2\">*</ept>规则。<bpt id=\"p3\">*</bpt>基本<ept id=\"p3\">*</ept>规则是一种轮循负载分发模式。"
+    },
+    {
+      "content": "创建新的应用程序网关",
+      "pos": [
+        1793,
+        1803
+      ]
+    },
+    {
+      "content": "若要创建应用程序网关，你必须按以下顺序执行步骤：",
+      "pos": [
+        1805,
+        1829
+      ]
+    },
+    {
+      "content": "创建应用程序网关资源。",
+      "pos": [
+        1834,
+        1845
+      ]
+    },
+    {
+      "content": "创建配置 XML 文件或配置对象。",
+      "pos": [
+        1849,
+        1866
+      ]
+    },
+    {
+      "content": "将配置提交到新建的应用程序网关资源。",
+      "pos": [
+        1870,
+        1888
+      ]
+    },
+    {
+      "content": "创建应用程序网关资源",
+      "pos": [
+        1894,
+        1904
+      ]
+    },
+    {
+      "pos": [
+        1906,
+        2001
+      ],
+      "content": "若要创建网关，请使用 <ph id=\"ph1\">`New-AzureApplicationGateway`</ph> cmdlet，并将值替换为你自己的值。请注意，此时不会开始计收网关的费用。计费将在后面已成功启动网关时开始。"
+    },
+    {
+      "content": "以下示例将使用名为“testvnet1”的虚拟网络和名为“subnet-1”的子网创建新的应用程序网关：",
+      "pos": [
+        2003,
+        2055
+      ]
+    },
+    {
+      "pos": [
+        2545,
+        2597
+      ],
+      "content": "<bpt id=\"p1\">*</bpt>Description<ept id=\"p1\">*</ept>、<bpt id=\"p2\">*</bpt>InstanceCount<ept id=\"p2\">*</ept> 和 <bpt id=\"p3\">*</bpt>GatewaySize<ept id=\"p3\">*</ept> 是可选参数。"
+    },
+    {
+      "pos": [
+        2600,
+        2658
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>若要验证<ept id=\"p1\">**</ept>是否已创建网关，可以使用 <ph id=\"ph1\">`Get-AzureApplicationGateway`</ph> cmdlet。"
+    },
+    {
+      "pos": [
+        2946,
+        3044
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph><bpt id=\"p1\">*</bpt>InstanceCount<ept id=\"p1\">*</ept> 的默认值为 2，最大值为 10。<bpt id=\"p2\">*</bpt>GatewaySize<ept id=\"p2\">*</ept> 的默认值为 Medium。你可以选择 Small、Medium 或 Large。"
+    },
+    {
+      "pos": [
+        3048,
+        3100
+      ],
+      "content": "<bpt id=\"p1\">*</bpt>Vip<ept id=\"p1\">*</ept> 和 <bpt id=\"p2\">*</bpt>DnsName<ept id=\"p2\">*</ept> 显示为空白，因为网关尚未启动。这些值将在网关进入运行状态后立即创建。"
+    },
+    {
+      "content": "配置应用程序网关",
+      "pos": [
+        3105,
+        3113
+      ]
+    },
+    {
+      "content": "可以使用 XML 或配置对象配置应用程序网关。",
+      "pos": [
+        3115,
+        3138
+      ]
+    },
+    {
+      "content": "使用 XML 配置应用程序网关",
+      "pos": [
+        3143,
+        3158
+      ]
+    },
+    {
+      "content": "在以下示例中，你将使用 XML 文件来配置所有应用程序网关设置，并将这些设置提交到应用程序网关资源。",
+      "pos": [
+        3160,
+        3210
+      ]
+    },
+    {
+      "content": "步骤 1",
+      "pos": [
+        3216,
+        3220
+      ]
+    },
+    {
+      "content": "将以下文本复制到记事本中。",
+      "pos": [
+        3224,
+        3237
+      ]
+    },
+    {
+      "content": "编辑配置项的括号之间的值。使用扩展名 .xml 保存文件",
+      "pos": [
+        5192,
+        5220
+      ]
+    },
+    {
+      "pos": [
+        5223,
+        5263
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>协议项 Http 或 Https 区分大小写。"
+    },
+    {
+      "content": "以下示例演示如何使用配置文件设置应用程序网关负载平衡公共端口 80 上的 Http 流量，并将网络流量发送到 2 个 IP 地址之间的后端端口 80。",
+      "pos": [
+        5265,
+        5340
+      ]
+    },
+    {
+      "content": "步骤 2",
+      "pos": [
+        7071,
+        7075
+      ]
+    },
+    {
+      "pos": [
+        7077,
+        7152
+      ],
+      "content": "接下来，你将设置应用程序网关。将 <ph id=\"ph1\">`Set-AzureApplicationGatewayConfig`</ph> cmdlet 与配置 XML 文件配合使用。"
+    },
+    {
+      "content": "使用配置对象配置应用程序网关",
+      "pos": [
+        7646,
+        7660
+      ]
+    },
+    {
+      "pos": [
+        7662,
+        7780
+      ],
+      "content": "以下示例演示如何使用配置对象配置应用程序网关。必须单独配置所有的配置项，然后将其添加到应用程序网关配置对象。创建配置对象之后，使用 <ph id=\"ph1\">`Set-AzureApplicationGateway`</ph> 命令将配置提交到前面创建的应用程序网关资源。"
+    },
+    {
+      "pos": [
+        7783,
+        7945
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在为每个配置对象分配值之前，需要声明 PowerShell 用于存储的对象类型。在其中创建单个项的第一行定义了要使用哪个 Microsoft.WindowsAzure.Commands.ServiceManagement.Network.ApplicationGateway.Model(对象名称)。"
+    },
+    {
+      "content": "步骤 1",
+      "pos": [
+        7951,
+        7955
+      ]
+    },
+    {
+      "content": "创建每个配置项。",
+      "pos": [
+        7957,
+        7965
+      ]
+    },
+    {
+      "content": "按以下示例中所示创建前端 IP。",
+      "pos": [
+        7967,
+        7983
+      ]
+    },
+    {
+      "content": "按以下示例中所示创建前端端口。",
+      "pos": [
+        8234,
+        8249
+      ]
+    },
+    {
+      "content": "创建后端服务器池",
+      "pos": [
+        8436,
+        8444
+      ]
+    },
+    {
+      "content": "按以下示例中所示定义要添加到后端服务器池的 IP 地址。",
+      "pos": [
+        8447,
+        8475
+      ]
+    },
+    {
+      "content": "使用 $server 对象将值添加到后端池对象 ($pool)。",
+      "pos": [
+        8695,
+        8727
+      ]
+    },
+    {
+      "content": "创建后端服务器池设置",
+      "pos": [
+        8940,
+        8950
+      ]
+    },
+    {
+      "content": "创建侦听器",
+      "pos": [
+        9252,
+        9257
+      ]
+    },
+    {
+      "content": "创建规则",
+      "pos": [
+        9593,
+        9597
+      ]
+    },
+    {
+      "content": "步骤 2",
+      "pos": [
+        9945,
+        9949
+      ]
+    },
+    {
+      "content": "将每个配置项分配给应用程序网关配置对象 ($appgwconfig)：",
+      "pos": [
+        9951,
+        9986
+      ]
+    },
+    {
+      "content": "将前端 IP 添加到配置",
+      "pos": [
+        9988,
+        10000
+      ]
+    },
+    {
+      "content": "将前端端口添加到配置",
+      "pos": [
+        10421,
+        10431
+      ]
+    },
+    {
+      "content": "将后端服务器池添加到配置",
+      "pos": [
+        10666,
+        10678
+      ]
+    },
+    {
+      "content": "将后端池设置添加到配置",
+      "pos": [
+        10934,
+        10945
+      ]
+    },
+    {
+      "content": "将侦听器添加到配置",
+      "pos": [
+        11211,
+        11220
+      ]
+    },
+    {
+      "content": "将规则添加到配置",
+      "pos": [
+        11460,
+        11468
+      ]
+    },
+    {
+      "content": "步骤 3",
+      "pos": [
+        11735,
+        11739
+      ]
+    },
+    {
+      "pos": [
+        11741,
+        11797
+      ],
+      "content": "使用 <ph id=\"ph1\">`Set-AzureApplicationGatewayConfig`</ph> 将配置对象提交到应用程序网关资源。"
+    },
+    {
+      "content": "启动网关",
+      "pos": [
+        11878,
+        11882
+      ]
+    },
+    {
+      "pos": [
+        11884,
+        11961
+      ],
+      "content": "配置网关后，使用 <ph id=\"ph1\">`Start-AzureApplicationGateway`</ph> cmdlet 来启动网关。成功启动网关后，将开始计收应用程序网关的费用。"
+    },
+    {
+      "pos": [
+        11966,
+        12039
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph><ph id=\"ph2\">`Start-AzureApplicationGateway`</ph> cmdlet 最多可能需要 15 到 20 分钟才能完成。"
+    },
+    {
+      "content": "验证网关状态",
+      "pos": [
+        12488,
+        12494
+      ]
+    },
+    {
+      "pos": [
+        12496,
+        12631
+      ],
+      "content": "使用 <ph id=\"ph1\">`Get-AzureApplicationGateway`</ph> cmdlet 检查网关状态。如果前一步骤中的 <bpt id=\"p1\">*</bpt>Start-AzureApplicationGateway<ept id=\"p1\">*</ept> 成功，则 State 应为 <bpt id=\"p2\">*</bpt>Running<ept id=\"p2\">*</ept>，Vip 和 DnsName 应包含有效的条目。"
+    },
+    {
+      "pos": [
+        12633,
+        12713
+      ],
+      "content": "以下示例演示了一个正常运行并已准备好将流量定向到 <ph id=\"ph1\">`http://&lt;generated-dns-name&gt;.chinacloudapp.cn`</ph> 的应用程序网关。"
+    },
+    {
+      "content": "删除应用程序网关",
+      "pos": [
+        13219,
+        13227
+      ]
+    },
+    {
+      "content": "若要删除应用程序网关，请执行以下操作：",
+      "pos": [
+        13229,
+        13248
+      ]
+    },
+    {
+      "pos": [
+        13253,
+        13300
+      ],
+      "content": "使用 <ph id=\"ph1\">`Stop-AzureApplicationGateway`</ph> cmdlet 停止该网关。"
+    },
+    {
+      "pos": [
+        13304,
+        13353
+      ],
+      "content": "使用 <ph id=\"ph1\">`Remove-AzureApplicationGateway`</ph> cmdlet 删除该网关。"
+    },
+    {
+      "pos": [
+        13357,
+        13408
+      ],
+      "content": "使用 <ph id=\"ph1\">`Get-AzureApplicationGateway`</ph> cmdlet 验证是否已删除该网关。"
+    },
+    {
+      "pos": [
+        13410,
+        13466
+      ],
+      "content": "以下示例在第一行显示 <ph id=\"ph1\">`Stop-AzureApplicationGateway`</ph> cmdlet，接着显示输出。"
+    },
+    {
+      "pos": [
+        13911,
+        13975
+      ],
+      "content": "应用程序网关进入停止状态后，请使用 <ph id=\"ph1\">`Remove-AzureApplicationGateway`</ph> cmdlet 删除该服务。"
+    },
+    {
+      "pos": [
+        14425,
+        14488
+      ],
+      "content": "若要验证是否已删除服务，可以使用 <ph id=\"ph1\">`Get-AzureApplicationGateway`</ph> cmdlet。此步骤不是必需的。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        14709,
+        14713
+      ]
+    },
+    {
+      "pos": [
+        14715,
+        14802
+      ],
+      "content": "如果你要配置 SSL 卸载，请参阅<bpt id=\"p1\">[</bpt>配置应用程序网关以进行 SSL 卸载<ept id=\"p1\">](/documentation/articles/application-gateway-ssl)</ept>。"
+    },
+    {
+      "pos": [
+        14804,
+        14910
+      ],
+      "content": "如果你想要将应用程序网关配置为与 ILB 配合使用，请参阅<bpt id=\"p1\">[</bpt>创建具有内部负载平衡器 (ILB) 的应用程序网关<ept id=\"p1\">](/documentation/articles/application-gateway-ilb)</ept>。"
+    },
+    {
+      "content": "如需负载平衡选项的其他常规信息，请参阅：",
+      "pos": [
+        14912,
+        14932
+      ]
+    },
+    {
+      "content": "Azure 流量管理器",
+      "pos": [
+        15008,
+        15019
+      ]
+    }
+  ],
+  "content": "<properties \n   pageTitle=\"创建、启动或删除应用程序网关 | Azure\"\n   description=\"此页提供有关创建、配置、启动和删除 Azure 应用程序网关的说明\"\n   documentationCenter=\"na\"\n   services=\"application-gateway\"\n   authors=\"joaoma\"\n   manager=\"jdial\"\n   editor=\"tysonn\"/>\n<tags \n   ms.service=\"application-gateway\" \n   ms.date=\"11/10/2015\"\n   wacn.date=\"01/05/2016\"/>\n\n# 创建、启动或删除应用程序网关\n\n应用程序网关是第 7 层负载平衡器。它在不同服务器之间提供故障转移和性能路由 HTTP 请求，而不管它们是在云中还是本地。应用程序网关具有以下应用程序传递功能：HTTP 负载平衡、基于 Cookie 的会话相关性和 SSL 卸载。\n\n> [AZURE.SELECTOR]\n- [Azure Classic PowerShell](/documentation/articles/application-gateway-create-gateway)\n- [Azure 资源管理器 PowerShell](/documentation/articles/application-gateway-create-gateway-arm)\n- [Azure 资源管理器模板](/documentation/articles/application-gateway-create-gateway-arm-template)\n\n\n<BR>\n\n本文将指导你完成创建、配置、启动和删除应用程序网关的步骤。\n\n\n>[AZURE.IMPORTANT]在使用 Azure 资源之前，请务必了解 Azure 当前使用两种部署模型：资源管理器部署模型和经典部署模型。在使用任何 Azure 资源之前，请确保你了解[部署模型和工具](/documentation/articles/azure-classic-rm)。可以通过单击本文顶部的选项卡来查看不同工具的文档。本文档将说明使用 Azure 经典部署创建应用程序网关的方式。若要使用资源管理器版本，请转到[使用资源管理器创建应用程序网关部署](/documentation/articles/application-gateway-create-gateway-arm)。\n\n\n\n\n\n## 开始之前\n\n1. 使用 Web 平台安装程序安装最新版本的 Azure PowerShell cmdlet。可以从[下载页面](/downloads/)的“Windows PowerShell”部分下载并安装最新版本。\n2. 请确认你已创建包含有效子网、可正常运行的虚拟网络。请确保没有虚拟机或云部署正在使用子网。应用程序网关必须单独位于虚拟网络子网中。\n3. 要配置为使用应用程序网关的服务器必须存在，或者在虚拟网络中为其创建终结点，或者为其分配公共 IP/VIP。\n\n## 创建应用程序网关需要什么？\n\n\n当你使用 **New-AzureApplicationGateway** 命令创建应用程序网关时，暂时不需要设置任何配置，但必须使用 XML 或配置对象设置新建的资源。\n\n\n有效值为：\n\n- **后端服务器池：**后端服务器的 IP 地址列表。列出的 IP 地址应属于虚拟网络子网，或者是公共 IP/VIP。\n- **后端服务器池设置：**每个池都有一些设置，例如端口、协议和基于 Cookie 的关联性。这些设置绑定到池，并会应用到池中的所有服务器。\n- **前端端口：**此端口是应用程序网关上打开的公共端口。客户流量将抵达此端口，然后重定向到后端服务器之一。\n- **侦听器：**侦听器具有前端端口、协议（Http 或 Https，区分大小写）和 SSL 证书名称（如果要配置 SSL 卸载）。\n- **规则：**规则将会绑定侦听器和后端服务器池，并定义当流量抵达特定侦听器时应定向到的后端服务器池。目前仅支持*基本*规则。*基本*规则是一种轮循负载分发模式。\n\n\n\n## 创建新的应用程序网关\n\n若要创建应用程序网关，你必须按以下顺序执行步骤：\n\n1. 创建应用程序网关资源。\n2. 创建配置 XML 文件或配置对象。\n3. 将配置提交到新建的应用程序网关资源。\n\n### 创建应用程序网关资源\n\n若要创建网关，请使用 `New-AzureApplicationGateway` cmdlet，并将值替换为你自己的值。请注意，此时不会开始计收网关的费用。计费将在后面已成功启动网关时开始。\n\n以下示例将使用名为“testvnet1”的虚拟网络和名为“subnet-1”的子网创建新的应用程序网关：\n\n\n    PS C:\\> New-AzureApplicationGateway -Name AppGwTest -VnetName testvnet1 -Subnets @(\"Subnet-1\")\n\n    VERBOSE: 4:31:35 PM - Begin Operation: New-AzureApplicationGateway\n    VERBOSE: 4:32:37 PM - Completed Operation: New-AzureApplicationGateway\n    Name       HTTP Status Code     Operation ID                             Error\n    ----       ----------------     ------------                             ----\n    Successful OK                   55ef0460-825d-2981-ad20-b9a8af41b399\n\n\n *Description*、*InstanceCount* 和 *GatewaySize* 是可选参数。\n\n\n**若要验证**是否已创建网关，可以使用 `Get-AzureApplicationGateway` cmdlet。\n\n\n\n\n    PS C:\\> Get-AzureApplicationGateway AppGwTest\n    Name          : AppGwTest\n    Description   :\n    VnetName      : testvnet1\n    Subnets       : {Subnet-1}\n    InstanceCount : 2\n    GatewaySize   : Medium\n    State         : Stopped\n    VirtualIPs    : {}\n    DnsName       :\n\n>[AZURE.NOTE]*InstanceCount* 的默认值为 2，最大值为 10。*GatewaySize* 的默认值为 Medium。你可以选择 Small、Medium 或 Large。\n\n\n *Vip* 和 *DnsName* 显示为空白，因为网关尚未启动。这些值将在网关进入运行状态后立即创建。\n\n## 配置应用程序网关\n\n可以使用 XML 或配置对象配置应用程序网关。\n\n## 使用 XML 配置应用程序网关\n\n在以下示例中，你将使用 XML 文件来配置所有应用程序网关设置，并将这些设置提交到应用程序网关资源。\n\n### 步骤 1  \n\n将以下文本复制到记事本中。\n\n    <?xml version=\"1.0\" encoding=\"utf-8\"?>\n    <ApplicationGatewayConfiguration xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://schemas.microsoft.com/windowsazure\">\n        <FrontendPorts>\n            <FrontendPort>\n                <Name>(name-of-your-frontend-port)</Name>\n                <Port>(port number)</Port>\n            </FrontendPort>\n        </FrontendPorts>\n        <BackendAddressPools>\n            <BackendAddressPool>\n                <Name>(name-of-your-backend-pool)</Name>\n                <IPAddresses>\n                    <IPAddress>(your-IP-address-for-backend-pool)</IPAddress>\n                    <IPAddress>(your-second-IP-address-for-backend-pool)</IPAddress>\n                </IPAddresses>\n            </BackendAddressPool>\n        </BackendAddressPools>\n        <BackendHttpSettingsList>\n            <BackendHttpSettings>\n                <Name>(backend-setting-name-to-configure-rule)</Name>\n                <Port>80</Port>\n                <Protocol>[Http|Https]</Protocol>\n                <CookieBasedAffinity>Enabled</CookieBasedAffinity>\n            </BackendHttpSettings>\n        </BackendHttpSettingsList>\n        <HttpListeners>\n            <HttpListener>\n                <Name>(name-of-the-listener)</Name>\n                <FrontendPort>(name-of-your-frontend-port)</FrontendPort>\n                <Protocol>[Http|Https]</Protocol>\n            </HttpListener>\n        </HttpListeners>\n        <HttpLoadBalancingRules>\n            <HttpLoadBalancingRule>\n                <Name>(name-of-load-balancing-rule)</Name>\n                <Type>basic</Type>\n                <BackendHttpSettings>(backend-setting-name-to-configure-rule)</BackendHttpSettings>\n                <Listener>(name-of-the-listener)</Listener>\n                <BackendAddressPool>(name-of-your-backend-pool)</BackendAddressPool>\n            </HttpLoadBalancingRule>\n        </HttpLoadBalancingRules>\n    </ApplicationGatewayConfiguration>\n\n编辑配置项的括号之间的值。使用扩展名 .xml 保存文件\n\n>[AZURE.IMPORTANT]协议项 Http 或 Https 区分大小写。\n\n以下示例演示如何使用配置文件设置应用程序网关负载平衡公共端口 80 上的 Http 流量，并将网络流量发送到 2 个 IP 地址之间的后端端口 80。\n\n    <?xml version=\"1.0\" encoding=\"utf-8\"?>\n    <ApplicationGatewayConfiguration xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://schemas.microsoft.com/windowsazure\">\n        <FrontendPorts>\n            <FrontendPort>\n                <Name>FrontendPort1</Name>\n                <Port>80</Port>\n            </FrontendPort>\n        </FrontendPorts>\n        <BackendAddressPools>\n            <BackendAddressPool>\n                <Name>BackendPool1</Name>\n                <IPAddresses>\n                    <IPAddress>10.0.0.1</IPAddress>\n                    <IPAddress>10.0.0.2</IPAddress>\n                </IPAddresses>\n            </BackendAddressPool>\n        </BackendAddressPools>\n        <BackendHttpSettingsList>\n            <BackendHttpSettings>\n                <Name>BackendSetting1</Name>\n                <Port>80</Port>\n                <Protocol>Http</Protocol>\n                <CookieBasedAffinity>Enabled</CookieBasedAffinity>\n            </BackendHttpSettings>\n        </BackendHttpSettingsList>\n        <HttpListeners>\n            <HttpListener>\n                <Name>HTTPListener1</Name>\n                <FrontendPort>FrontendPort1</FrontendPort>\n                <Protocol>Http</Protocol>\n            </HttpListener>\n        </HttpListeners>\n        <HttpLoadBalancingRules>\n            <HttpLoadBalancingRule>\n                <Name>HttpLBRule1</Name>\n                <Type>basic</Type>\n                <BackendHttpSettings>BackendSetting1</BackendHttpSettings>\n                <Listener>HTTPListener1</Listener>\n                <BackendAddressPool>BackendPool1</BackendAddressPool>\n            </HttpLoadBalancingRule>\n        </HttpLoadBalancingRules>\n    </ApplicationGatewayConfiguration>\n\n\n\n\n\n### 步骤 2\n\n接下来，你将设置应用程序网关。将 `Set-AzureApplicationGatewayConfig` cmdlet 与配置 XML 文件配合使用。\n\n\n    PS C:\\> Set-AzureApplicationGatewayConfig -Name AppGwTest -ConfigFile \"D:\\config.xml\"\n\n    VERBOSE: 7:54:59 PM - Begin Operation: Set-AzureApplicationGatewayConfig\n    VERBOSE: 7:55:32 PM - Completed Operation: Set-AzureApplicationGatewayConfig\n    Name       HTTP Status Code     Operation ID                             Error\n    ----       ----------------     ------------                             ----\n    Successful OK                   9b995a09-66fe-2944-8b67-9bb04fcccb9d\n\n## 使用配置对象配置应用程序网关\n\n以下示例演示如何使用配置对象配置应用程序网关。必须单独配置所有的配置项，然后将其添加到应用程序网关配置对象。创建配置对象之后，使用 `Set-AzureApplicationGateway` 命令将配置提交到前面创建的应用程序网关资源。\n\n>[AZURE.NOTE]在为每个配置对象分配值之前，需要声明 PowerShell 用于存储的对象类型。在其中创建单个项的第一行定义了要使用哪个 Microsoft.WindowsAzure.Commands.ServiceManagement.Network.ApplicationGateway.Model(对象名称)。\n\n### 步骤 1\n\n创建每个配置项。\n\n按以下示例中所示创建前端 IP。\n\n    PS C:\\> $fip = New-Object Microsoft.WindowsAzure.Commands.ServiceManagement.Network.ApplicationGateway.Model.FrontendIPConfiguration\n    PS C:\\> $fip.Name = \"fip1\"\n    PS C:\\> $fip.Type = \"Private\"\n    PS C:\\> $fip.StaticIPAddress = \"10.0.0.5\"\n\n按以下示例中所示创建前端端口。\n\n    PS C:\\> $fep = New-Object Microsoft.WindowsAzure.Commands.ServiceManagement.Network.ApplicationGateway.Model.FrontendPort\n    PS C:\\> $fep.Name = \"fep1\"\n    PS C:\\> $fep.Port = 80\n\n创建后端服务器池\n\n 按以下示例中所示定义要添加到后端服务器池的 IP 地址。\n\n\n    PS C:\\> $servers = New-Object Microsoft.WindowsAzure.Commands.ServiceManagement.Network.ApplicationGateway.Model.BackendServerCollection\n    PS C:\\> $servers.Add(\"10.0.0.1\")\n    PS C:\\> $servers.Add(\"10.0.0.2\")\n\n 使用 $server 对象将值添加到后端池对象 ($pool)。\n\n    PS C:\\> $pool = New-Object Microsoft.WindowsAzure.Commands.ServiceManagement.Network.ApplicationGateway.Model.BackendAddressPool\n    PS C:\\> $pool.BackendServers = $servers\n    PS C:\\> $pool.Name = \"pool1\"\n\n创建后端服务器池设置\n\n    PS C:\\> $setting = New-Object Microsoft.WindowsAzure.Commands.ServiceManagement.Network.ApplicationGateway.Model.BackendHttpSettings\n    PS C:\\> $setting.Name = \"setting1\"\n    PS C:\\> $setting.CookieBasedAffinity = \"enabled\"\n    PS C:\\> $setting.Port = 80\n    PS C:\\> $setting.Protocol = \"http\"\n\n创建侦听器\n\n    PS C:\\> $listener = New-Object Microsoft.WindowsAzure.Commands.ServiceManagement.Network.ApplicationGateway.Model.HttpListener\n    PS C:\\> $listener.Name = \"listener1\"\n    PS C:\\> $listener.FrontendPort = \"fep1\"\n    PS C:\\> $listener.FrontendIP = \"fip1\"\n    PS C:\\> $listener.Protocol = \"http\"\n    PS C:\\> $listener.SslCert = \"\"\n\n创建规则\n\n    PS C:\\> $rule = New-Object Microsoft.WindowsAzure.Commands.ServiceManagement.Network.ApplicationGateway.Model.HttpLoadBalancingRule\n    PS C:\\> $rule.Name = \"rule1\"\n    PS C:\\> $rule.Type = \"basic\"\n    PS C:\\> $rule.BackendHttpSettings = \"setting1\"\n    PS C:\\> $rule.Listener = \"listener1\"\n    PS C:\\> $rule.BackendAddressPool = \"pool1\"\n\n### 步骤 2\n\n将每个配置项分配给应用程序网关配置对象 ($appgwconfig)：\n\n将前端 IP 添加到配置\n\n    PS C:\\> $appgwconfig = New-Object Microsoft.WindowsAzure.Commands.ServiceManagement.Network.ApplicationGateway.Model.ApplicationGatewayConfiguration\n    PS C:\\> $appgwconfig.FrontendIPConfigurations = New-Object \"System.Collections.Generic.List[Microsoft.WindowsAzure.Commands.ServiceManagement.Network.ApplicationGateway.Model.FrontendIPConfiguration]\"\n    PS C:\\> $appgwconfig.FrontendIPConfigurations.Add($fip)\n\n将前端端口添加到配置\n\n    PS C:\\> $appgwconfig.FrontendPorts = New-Object \"System.Collections.Generic.List[Microsoft.WindowsAzure.Commands.ServiceManagement.Network.ApplicationGateway.Model.FrontendPort]\"\n    PS C:\\> $appgwconfig.FrontendPorts.Add($fep)\n\n将后端服务器池添加到配置\n\n    PS C:\\> $appgwconfig.BackendAddressPools = New-Object \"System.Collections.Generic.List[Microsoft.WindowsAzure.Commands.ServiceManagement.Network.ApplicationGateway.Model.BackendAddressPool]\"\n    PS C:\\> $appgwconfig.BackendAddressPools.Add($pool)  \n\n将后端池设置添加到配置\n\n    PS C:\\> $appgwconfig.BackendHttpSettingsList = New-Object \"System.Collections.Generic.List[Microsoft.WindowsAzure.Commands.ServiceManagement.Network.ApplicationGateway.Model.BackendHttpSettings]\"\n    PS C:\\> $appgwconfig.BackendHttpSettingsList.Add($setting)\n\n将侦听器添加到配置\n\n    PS C:\\> $appgwconfig.HttpListeners = New-Object \"System.Collections.Generic.List[Microsoft.WindowsAzure.Commands.ServiceManagement.Network.ApplicationGateway.Model.HttpListener]\"\n    PS C:\\> $appgwconfig.HttpListeners.Add($listener)\n\n将规则添加到配置\n\n    PS C:\\> $appgwconfig.HttpLoadBalancingRules = New-Object \"System.Collections.Generic.List[Microsoft.WindowsAzure.Commands.ServiceManagement.Network.ApplicationGateway.Model.HttpLoadBalancingRule]\"\n    PS C:\\> $appgwconfig.HttpLoadBalancingRules.Add($rule)\n\n### 步骤 3\n\n使用 `Set-AzureApplicationGatewayConfig` 将配置对象提交到应用程序网关资源。\n\n    Set-AzureApplicationGatewayConfig -Name AppGwTest -Config $appgwconfig\n\n## 启动网关\n\n配置网关后，使用 `Start-AzureApplicationGateway` cmdlet 来启动网关。成功启动网关后，将开始计收应用程序网关的费用。\n\n\n> [AZURE.NOTE]`Start-AzureApplicationGateway` cmdlet 最多可能需要 15 到 20 分钟才能完成。\n\n\n\n    PS C:\\> Start-AzureApplicationGateway AppGwTest\n\n    VERBOSE: 7:59:16 PM - Begin Operation: Start-AzureApplicationGateway\n    VERBOSE: 8:05:52 PM - Completed Operation: Start-AzureApplicationGateway\n    Name       HTTP Status Code     Operation ID                             Error\n    ----       ----------------     ------------                             ----\n    Successful OK                   fc592db8-4c58-2c8e-9a1d-1c97880f0b9b\n\n## 验证网关状态\n\n使用 `Get-AzureApplicationGateway` cmdlet 检查网关状态。如果前一步骤中的 *Start-AzureApplicationGateway* 成功，则 State 应为 *Running*，Vip 和 DnsName 应包含有效的条目。\n\n以下示例演示了一个正常运行并已准备好将流量定向到 `http://<generated-dns-name>.chinacloudapp.cn` 的应用程序网关。\n\n    PS C:\\> Get-AzureApplicationGateway AppGwTest\n\n    VERBOSE: 8:09:28 PM - Begin Operation: Get-AzureApplicationGateway\n    VERBOSE: 8:09:30 PM - Completed Operation: Get-AzureApplicationGateway\n    Name          : AppGwTest\n    Description   :\n    VnetName      : testvnet1\n    Subnets       : {Subnet-1}\n    InstanceCount : 2\n    GatewaySize   : Medium\n    State         : Running\n    Vip           : 138.91.170.26\n    DnsName       : appgw-1b8402e8-3e0d-428d-b661-289c16c82101.chinacloudapp.cn\n\n\n## 删除应用程序网关\n\n若要删除应用程序网关，请执行以下操作：\n\n1. 使用 `Stop-AzureApplicationGateway` cmdlet 停止该网关。\n2. 使用 `Remove-AzureApplicationGateway` cmdlet 删除该网关。\n3. 使用 `Get-AzureApplicationGateway` cmdlet 验证是否已删除该网关。\n\n以下示例在第一行显示 `Stop-AzureApplicationGateway` cmdlet，接着显示输出。\n\n    PS C:\\> Stop-AzureApplicationGateway AppGwTest \n\n    VERBOSE: 9:49:34 PM - Begin Operation: Stop-AzureApplicationGateway \n    VERBOSE: 10:10:06 PM - Completed Operation: Stop-AzureApplicationGateway\n    Name       HTTP Status Code     Operation ID                             Error \n    ----       ----------------     ------------                             ----\n    Successful OK                   ce6c6c95-77b4-2118-9d65-e29defadffb8\n\n应用程序网关进入停止状态后，请使用 `Remove-AzureApplicationGateway` cmdlet 删除该服务。\n\n\n    PS C:\\> Remove-AzureApplicationGateway AppGwTest\n\n    VERBOSE: 10:49:34 PM - Begin Operation: Remove-AzureApplicationGateway\n    VERBOSE: 10:50:36 PM - Completed Operation: Remove-AzureApplicationGateway\n    Name       HTTP Status Code     Operation ID                             Error\n    ----       ----------------     ------------                             ----\n    Successful OK                   055f3a96-8681-2094-a304-8d9a11ad8301\n\n若要验证是否已删除服务，可以使用 `Get-AzureApplicationGateway` cmdlet。此步骤不是必需的。\n\n\n    PS C:\\> Get-AzureApplicationGateway AppGwTest\n\n    VERBOSE: 10:52:46 PM - Begin Operation: Get-AzureApplicationGateway\n\n    Get-AzureApplicationGateway : ResourceNotFound: The gateway does not exist.\n    .....\n\n## 后续步骤\n\n如果你要配置 SSL 卸载，请参阅[配置应用程序网关以进行 SSL 卸载](/documentation/articles/application-gateway-ssl)。\n\n如果你想要将应用程序网关配置为与 ILB 配合使用，请参阅[创建具有内部负载平衡器 (ILB) 的应用程序网关](/documentation/articles/application-gateway-ilb)。\n\n如需负载平衡选项的其他常规信息，请参阅：\n\n<!--- [Azure Load Balancer](/documentation/services/load-balancer/)-->\n- [Azure 流量管理器](/documentation/services/traffic-manager)\n\n<!---HONumber=Mooncake_1221_2015-->\n"
+}

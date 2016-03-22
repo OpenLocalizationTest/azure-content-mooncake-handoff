@@ -1,0 +1,306 @@
+{
+  "nodes": [
+    {
+      "content": "使用现有的 SQL 数据库和移动服务 .NET 后端生成服务 | Azure",
+      "pos": [
+        28,
+        66
+      ]
+    },
+    {
+      "content": "了解如何将现有的云或本地 SQL 数据库与基于 .NET 的移动服务结合使用",
+      "pos": [
+        86,
+        124
+      ]
+    },
+    {
+      "content": "使用现有的 SQL 数据库和移动服务 .NET 后端生成服务",
+      "pos": [
+        359,
+        389
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        491,
+        497
+      ]
+    },
+    {
+      "content": "移动服务 .NET 后端可方便你利用现有的资产来生成移动服务。（在本地或云中）使用可能已被其他应用程序使用的现有 SQL 数据库让现有数据可供移动客户端使用是特别有趣的方案之一。在此情况下，数据库模型（或<bpt id=\"p1\">*</bpt>架构<ept id=\"p1\">*</ept>）必须保持不变才能使现有方案继续工作。",
+      "pos": [
+        498,
+        623
+      ]
+    },
+    {
+      "content": "探索现有的数据库模型",
+      "pos": [
+        657,
+        667
+      ]
+    },
+    {
+      "pos": [
+        669,
+        883
+      ],
+      "content": "在本教程中，我们将使用以你的移动服务创建的数据库，但不使用创建的默认模型。我们将手动创建任意模型，以代表你可能具有的现有应用程序。有关如何改为连接到本地数据库的完整详细信息，请查看<bpt id=\"p1\">[</bpt>使用混合连接从 Azure 移动服务连接到本地 SQL Server<ept id=\"p1\">](/documentation/articles/mobile-services-dotnet-backend-hybrid-connections-get-started)</ept>。"
+    },
+    {
+      "pos": [
+        888,
+        1053
+      ],
+      "content": "首先，请在 <bpt id=\"p1\">**</bpt>Visual Studio 2013 Update 2<ept id=\"p1\">**</ept> 中创建移动服务服务器项目，或使用可在 <bpt id=\"p2\">[</bpt>Azure 经典门户<ept id=\"p2\">](http://manage.windowsazure.cn)</ept>中从服务的“移动服务”选项卡下载的快速入门项目。对于本教程，我们假设你的服务器项目名称为 <bpt id=\"p3\">**</bpt>ShoppingService<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "pos": [
+        1058,
+        1164
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>Models<ept id=\"p1\">**</ept> 文件夹中创建 <bpt id=\"p2\">**</bpt>Customer.cs<ept id=\"p2\">**</ept> 文件，并使用以下实现。需要将 <bpt id=\"p3\">**</bpt>System.ComponentModel.DataAnnotations<ept id=\"p3\">**</ept> 的程序集引用添加到项目中。"
+    },
+    {
+      "pos": [
+        1602,
+        1646
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>Models<ept id=\"p1\">**</ept> 文件夹中创建 <bpt id=\"p2\">**</bpt>Order.cs<ept id=\"p2\">**</ept> 文件，并使用以下实现："
+    },
+    {
+      "pos": [
+        2188,
+        2266
+      ],
+      "content": "你将会注意到，这两个类存在某种<bpt id=\"p1\">*</bpt>关系<ept id=\"p1\">*</ept>：每个<bpt id=\"p2\">**</bpt>订单<ept id=\"p2\">**</ept>与一个<bpt id=\"p3\">**</bpt>客户<ept id=\"p3\">**</ept>关联，而一个<bpt id=\"p4\">**</bpt>客户<ept id=\"p4\">**</ept>可与多个<bpt id=\"p5\">**</bpt>订单<ept id=\"p5\">**</ept>关联。互有关系在现有数据模型中很常见。"
+    },
+    {
+      "pos": [
+        2271,
+        2327
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>Models<ept id=\"p1\">**</ept> 文件夹中创建 <bpt id=\"p2\">**</bpt>ExistingContext.cs<ept id=\"p2\">**</ept> 文件，并按如下所示实现它："
+    },
+    {
+      "content": "上述结构很接近你可能已用于现有应用程序的现有 Entity Framework 模型。请注意，在此阶段，模型无法以任何方式识别移动服务。",
+      "pos": [
+        2767,
+        2835
+      ]
+    },
+    {
+      "content": "为移动服务创建数据传输对象 (DTO)",
+      "pos": [
+        2860,
+        2879
+      ]
+    },
+    {
+      "content": "你想要在移动服务中使用的数据模型可能很复杂；其中可能包含数百个具有各种关系的实体。在生成移动应用程序时，我们通常会简化数据模型并消除关系（或手动处理关系），以尽可能减少在应用程序与服务之间来回发送的负载。在本部分中，我们将创建一组简化的对象（称为“数据传输对象”，缩写为“DTO”），并将其映射到你在数据库中拥有的数据，但仅包含移动应用程序所需的最少属性集。",
+      "pos": [
+        2881,
+        3060
+      ]
+    },
+    {
+      "pos": [
+        3065,
+        3128
+      ],
+      "content": "在服务项目的 <bpt id=\"p1\">**</bpt>DataObjects<ept id=\"p1\">**</ept> 文件夹中创建 <bpt id=\"p2\">**</bpt>MobileCustomer.cs<ept id=\"p2\">**</ept> 文件，并使用以下实现："
+    },
+    {
+      "pos": [
+        3385,
+        3693
+      ],
+      "content": "请注意，此类与模型中的 <bpt id=\"p1\">**</bpt>Customer<ept id=\"p1\">**</ept> 类相类似，差别在于 <bpt id=\"p2\">**</bpt>Order<ept id=\"p2\">**</ept> 的关系属性已删除。若要使对象正常使用移动服务脱机同步，需要使用一组<bpt id=\"p3\">*</bpt>系统属性<ept id=\"p3\">*</ept>来进行乐观并发，因此你会发现，DTO 继承自包含这些属性的 <bpt id=\"p4\">[</bpt><bpt id=\"p5\">**</bpt>EntityData<ept id=\"p5\">**</ept><ept id=\"p4\">](http://msdn.microsoft.com/library/microsoft.windowsazure.mobile.service.entitydata.aspx)</ept>。原始模型中的基于 int 的 <bpt id=\"p6\">**</bpt>CustomerId<ept id=\"p6\">**</ept> 属性将替换为 <bpt id=\"p7\">**</bpt>EntityData<ept id=\"p7\">**</ept> 中基于字符串的 <bpt id=\"p8\">**</bpt>Id<ept id=\"p8\">**</ept> 属性，这将是移动服务使用的 <bpt id=\"p9\">**</bpt>Id<ept id=\"p9\">**</ept>。"
+    },
+    {
+      "pos": [
+        3698,
+        3750
+      ],
+      "content": "在服务项目的 <bpt id=\"p1\">**</bpt>DataObjects<ept id=\"p1\">**</ept> 文件夹中创建 <bpt id=\"p2\">**</bpt>MobileOrder.cs<ept id=\"p2\">**</ept> 文件。"
+    },
+    {
+      "pos": [
+        4486,
+        4603
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Customer<ept id=\"p1\">**</ept> 关系属性已替换为 <bpt id=\"p2\">**</bpt>Customer<ept id=\"p2\">**</ept> 名称，以及可用来为客户端上的关系手动建模的 <bpt id=\"p3\">**</bpt>MobileCustomerId<ept id=\"p3\">**</ept> 属性。现在你可以忽略 <bpt id=\"p4\">**</bpt>CustomerId<ept id=\"p4\">**</ept> 属性，以后才会使用此属性。"
+    },
+    {
+      "pos": [
+        4608,
+        4793
+      ],
+      "content": "你可能会发现，在 <bpt id=\"p1\">**</bpt>EntityData<ept id=\"p1\">**</ept> 基类上添加系统属性后，DTO 的属性数目比模型类型还多。显然，需要一个位置来存储这些属性，因此我们将在原始数据库中额外添加一些列。虽然这样会更改数据库，但并不会中断现有的应用程序，因为这些更改只是附加的（将新的列添加到架构）。为此，请将以下语句添加到 <bpt id=\"p2\">**</bpt>Customer.cs<ept id=\"p2\">**</ept> 和 <bpt id=\"p3\">**</bpt>Order.cs<ept id=\"p3\">**</ept> 的顶部："
+    },
+    {
+      "content": "然后，将这些附加属性添加到每个类：",
+      "pos": [
+        4945,
+        4962
+      ]
+    },
+    {
+      "pos": [
+        5641,
+        5743
+      ],
+      "content": "刚刚添加的系统属性具有某些会在数据库操作期间明确发生的内置行为（例如，自动更新创建/更新时间）。若要启用这些行为，我们需要更改 <bpt id=\"p1\">**</bpt>ExistingContext.cs<ept id=\"p1\">**</ept>。在该文件的顶部，添加以下代码："
+    },
+    {
+      "pos": [
+        5905,
+        6051
+      ],
+      "content": "然后，在 <bpt id=\"p1\">**</bpt>ExistingContext<ept id=\"p1\">**</ept> 的正文中，重写 <bpt id=\"p2\">[</bpt><bpt id=\"p3\">**</bpt>OnModelCreating<ept id=\"p3\">**</ept><ept id=\"p2\">](http://msdn.microsoft.com/zh-cn/library/system.data.entity.dbcontext.onmodelcreating.aspx)</ept>："
+    },
+    {
+      "pos": [
+        6448,
+        6608
+      ],
+      "content": "让我们在数据库中填充一些示例数据。打开文件 <bpt id=\"p1\">**</bpt>WebApiConfig.cs<ept id=\"p1\">**</ept>。创建新的 <bpt id=\"p2\">[</bpt><bpt id=\"p3\">**</bpt>IDatabaseInitializer<ept id=\"p3\">**</ept><ept id=\"p2\">](http://msdn.microsoft.com/zh-cn/library/gg696323.aspx)</ept>，并按如下所示在 <bpt id=\"p4\">**</bpt>Register<ept id=\"p4\">**</ept> 方法中对它进行配置。"
+    },
+    {
+      "content": "在 DTO 与模型之间创建映射",
+      "pos": [
+        8871,
+        8886
+      ]
+    },
+    {
+      "pos": [
+        8888,
+        9057
+      ],
+      "content": "现在我们已有模型类型 <bpt id=\"p1\">**</bpt>Customer<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>Order<ept id=\"p2\">**</ept> 以及 DTO <bpt id=\"p3\">**</bpt>MobileCustomer<ept id=\"p3\">**</ept> 和 <bpt id=\"p4\">**</bpt>MobileOrder<ept id=\"p4\">**</ept>，但我们需要指示后端自动在两者之间转换。此时，移动服务依赖于 <bpt id=\"p5\">[</bpt><bpt id=\"p6\">**</bpt>AutoMapper<ept id=\"p6\">**</ept><ept id=\"p5\">](http://automapper.org/)</ept>，这是已在项目中引用的对象关系映射器。"
+    },
+    {
+      "pos": [
+        9062,
+        9094
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>WebApiConfig.cs<ept id=\"p1\">**</ept> 的顶部添加以下代码："
+    },
+    {
+      "pos": [
+        9169,
+        9223
+      ],
+      "content": "若要定义映射，请将以下代码添加到 <bpt id=\"p1\">**</bpt>WebApiConfig<ept id=\"p1\">**</ept> 类的 <bpt id=\"p2\">**</bpt>Register<ept id=\"p2\">**</ept> 方法中。"
+    },
+    {
+      "pos": [
+        9686,
+        9863
+      ],
+      "content": "AutoMapper 此时会将对象互相映射。将匹配所有具有相应名称的属性，例如，<bpt id=\"p1\">**</bpt>MobileOrder.CustomerId<ept id=\"p1\">**</ept> 将会自动映射到 <bpt id=\"p2\">**</bpt>Order.CustomerId<ept id=\"p2\">**</ept>。可按如下所示配置自定义映射，其中，我们将 <bpt id=\"p3\">**</bpt>MobileCustomerName<ept id=\"p3\">**</ept> 属性映射到 <bpt id=\"p4\">**</bpt>Customer<ept id=\"p4\">**</ept> 关系属性的 <bpt id=\"p5\">**</bpt>Name<ept id=\"p5\">**</ept> 属性。"
+    },
+    {
+      "content": "实现特定于域的逻辑",
+      "pos": [
+        9897,
+        9906
+      ]
+    },
+    {
+      "pos": [
+        9908,
+        10142
+      ],
+      "content": "下一步是实现 <bpt id=\"p1\">[</bpt><bpt id=\"p2\">**</bpt>MappedEntityDomainManager<ept id=\"p2\">**</ept><ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/dn643300.aspx)</ept>，它用作映射的数据存储与要从客户端提供 HTTP 流量的控制器之间的抽象层。我们可以在下一个部分中完全以 DTO 的形式编写控制器，而在此处添加的 <bpt id=\"p3\">**</bpt>MappedEntityDomainManager<ept id=\"p3\">**</ept> 将会处理与原始数据存储之间的通信，同时让我们有地方可以实现其任何特定逻辑。"
+    },
+    {
+      "pos": [
+        10147,
+        10213
+      ],
+      "content": "将 <bpt id=\"p1\">**</bpt>MobileCustomerDomainManager.cs<ept id=\"p1\">**</ept> 添加到项目的 <bpt id=\"p2\">**</bpt>Models<ept id=\"p2\">**</ept> 文件夹。粘贴以下实现："
+    },
+    {
+      "pos": [
+        13877,
+        13930
+      ],
+      "content": "此类的重要部分是 <bpt id=\"p1\">**</bpt>GetKey<ept id=\"p1\">**</ept> 方法，将在该方法中指示如何在原始数据模型中查找对象的 ID 属性。"
+    },
+    {
+      "pos": [
+        13935,
+        13991
+      ],
+      "content": "将 <bpt id=\"p1\">**</bpt>MobileOrderDomainManager.cs<ept id=\"p1\">**</ept> 添加到项目的 <bpt id=\"p2\">**</bpt>Models<ept id=\"p2\">**</ept> 文件夹："
+    },
+    {
+      "pos": [
+        18442,
+        18877
+      ],
+      "content": "在此情况下，<bpt id=\"p1\">**</bpt>InsertAsync<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>UpdateAsync<ept id=\"p2\">**</ept> 方法是很值得了解的；我们会在其中强制执行每个 <bpt id=\"p3\">**</bpt>Order<ept id=\"p3\">**</ept> 都需要有一个有效相关 <bpt id=\"p4\">**</bpt>Customer<ept id=\"p4\">**</ept> 的关系。在 <bpt id=\"p5\">**</bpt>InsertAsync<ept id=\"p5\">**</ept> 中，你会看到我们填充 <bpt id=\"p6\">**</bpt>MobileOrder.CustomerId<ept id=\"p6\">**</ept> 属性，此属性映射到 <bpt id=\"p7\">**</bpt>Order.CustomerId<ept id=\"p7\">**</ept> 属性。可以通过查找具有匹配 <bpt id=\"p8\">**</bpt>MobileOrder.MobileCustomerId<ept id=\"p8\">**</ept> 的 <bpt id=\"p9\">**</bpt>Customer<ept id=\"p9\">**</ept> 来获取该值。这是因为，默认情况下，客户端只能识别 <bpt id=\"p10\">**</bpt>Customer<ept id=\"p10\">**</ept> 的移动服务 ID (<bpt id=\"p11\">**</bpt>MobileOrder.MobileCustomerId<ept id=\"p11\">**</ept>)，而此 ID 与将外键 (<bpt id=\"p12\">**</bpt>MobileOrder.CustomerId<ept id=\"p12\">**</ept>) 从 <bpt id=\"p13\">**</bpt>Order<ept id=\"p13\">**</ept> 设为 <bpt id=\"p14\">**</bpt>Customer<ept id=\"p14\">**</ept> 所需的实际主键不同。此 ID 仅在服务内部使用，以提高插入操作的速度。"
+    },
+    {
+      "content": "现在我们已可创建控制器，以向客户端公开 DTO。",
+      "pos": [
+        18879,
+        18903
+      ]
+    },
+    {
+      "content": "使用 DTO 实现 TableController",
+      "pos": [
+        18934,
+        18959
+      ]
+    },
+    {
+      "pos": [
+        18964,
+        19023
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>Controllers<ept id=\"p1\">**</ept> 文件夹中添加文件 <bpt id=\"p2\">**</bpt>MobileCustomerController.cs<ept id=\"p2\">**</ept>："
+    },
+    {
+      "content": "你将会注意到，其中已使用 AuthorizeLevel 属性来限制对控制器上的插入/更新/删除操作的公共访问。对于这种情况，客户列表是只读的，但我们将允许创建新订单，并将其与现有客户关联。",
+      "pos": [
+        20924,
+        21018
+      ]
+    },
+    {
+      "pos": [
+        21023,
+        21079
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>Controllers<ept id=\"p1\">**</ept> 文件夹中添加文件 <bpt id=\"p2\">**</bpt>MobileOrderController.cs<ept id=\"p2\">**</ept>："
+    },
+    {
+      "pos": [
+        22901,
+        22944
+      ],
+      "content": "现在，你可以运行服务。按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept>，然后使用内置于帮助页中的测试客户端来修改数据。"
+    },
+    {
+      "pos": [
+        22946,
+        23114
+      ],
+      "content": "请注意，这两个控制器实现独占使用 <bpt id=\"p1\">**</bpt>MobileCustomer<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>MobileOrder<ept id=\"p2\">**</ept>，且不区分基础模型。这些 DTO 已序列化为 JSON，并可用来与所有平台上的移动服务客户端 SDK 交换数据。例如，如果生成 Windows 应用商店应用程序，则相应的客户端类型将如下所示。该类型将与其他客户端平台上的类型相似。"
+    },
+    {
+      "content": "接下来，你可以生成客户端应用程序以访问服务。",
+      "pos": [
+        23671,
+        23693
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"使用现有的 SQL 数据库和移动服务 .NET 后端生成服务 | Azure\" \n    description=\"了解如何将现有的云或本地 SQL 数据库与基于 .NET 的移动服务结合使用\" \n    services=\"mobile-services\" \n    documentationCenter=\"\" \n    authors=\"ggailey777\" \n    manager=\"dwrede\" \n    editor=\"mollybos\"/>\n\n<tags \n    ms.service=\"mobile-services\" \n    ms.date=\"11/09/2015\"\n    wacn.date=\"01/29/2016\"/>\n\n\n# 使用现有的 SQL 数据库和移动服务 .NET 后端生成服务\n\n[AZURE.INCLUDE [mobile-service-note-mobile-apps](../includes/mobile-services-note-mobile-apps.md)]\n\n&nbsp;\n移动服务 .NET 后端可方便你利用现有的资产来生成移动服务。（在本地或云中）使用可能已被其他应用程序使用的现有 SQL 数据库让现有数据可供移动客户端使用是特别有趣的方案之一。在此情况下，数据库模型（或*架构*）必须保持不变才能使现有方案继续工作。\n\n<a name=\"ExistingModel\"></a>\n## 探索现有的数据库模型\n\n在本教程中，我们将使用以你的移动服务创建的数据库，但不使用创建的默认模型。我们将手动创建任意模型，以代表你可能具有的现有应用程序。有关如何改为连接到本地数据库的完整详细信息，请查看[使用混合连接从 Azure 移动服务连接到本地 SQL Server](/documentation/articles/mobile-services-dotnet-backend-hybrid-connections-get-started)。\n\n1. 首先，请在 **Visual Studio 2013 Update 2** 中创建移动服务服务器项目，或使用可在 [Azure 经典门户](http://manage.windowsazure.cn)中从服务的“移动服务”选项卡下载的快速入门项目。对于本教程，我们假设你的服务器项目名称为 **ShoppingService**。\n\n2. 在 **Models** 文件夹中创建 **Customer.cs** 文件，并使用以下实现。需要将 **System.ComponentModel.DataAnnotations** 的程序集引用添加到项目中。\n\n        using System.Collections.Generic;\n        using System.ComponentModel.DataAnnotations;\n\n        namespace ShoppingService.Models\n        {\n            public class Customer\n            {\n                [Key]\n                public int CustomerId { get; set; }\n                \n                public string Name { get; set; }\n\n                public virtual ICollection<Order> Orders { get; set; }\n\n            }\n        }\n\n3. 在 **Models** 文件夹中创建 **Order.cs** 文件，并使用以下实现：\n    \n        using System.ComponentModel.DataAnnotations;\n\n        namespace ShoppingService.Models\n        {\n            public class Order\n            {\n                [Key]\n                public int OrderId { get; set; }\n\n                public string Item { get; set; }\n\n                public int Quantity { get; set; }\n\n                public bool Completed { get; set; }\n\n                public int CustomerId { get; set; }\n              \n                public virtual Customer Customer { get; set; }\n\n            }\n        }\n\n    你将会注意到，这两个类存在某种*关系*：每个**订单**与一个**客户**关联，而一个**客户**可与多个**订单**关联。互有关系在现有数据模型中很常见。\n\n4. 在 **Models** 文件夹中创建 **ExistingContext.cs** 文件，并按如下所示实现它：\n\n        using System.Data.Entity;\n\n        namespace ShoppingService.Models\n        {\n            public class ExistingContext : DbContext\n            {\n                public ExistingContext()\n                    : base(\"Name=MS_TableConnectionString\")\n                {\n                }\n\n                public DbSet<Customer> Customers { get; set; }\n\n                public DbSet<Order> Orders { get; set; }\n\n            }\n        }\n\n上述结构很接近你可能已用于现有应用程序的现有 Entity Framework 模型。请注意，在此阶段，模型无法以任何方式识别移动服务。\n\n<a name=\"DTOs\"></a>\n## 为移动服务创建数据传输对象 (DTO)\n\n你想要在移动服务中使用的数据模型可能很复杂；其中可能包含数百个具有各种关系的实体。在生成移动应用程序时，我们通常会简化数据模型并消除关系（或手动处理关系），以尽可能减少在应用程序与服务之间来回发送的负载。在本部分中，我们将创建一组简化的对象（称为“数据传输对象”，缩写为“DTO”），并将其映射到你在数据库中拥有的数据，但仅包含移动应用程序所需的最少属性集。\n\n1. 在服务项目的 **DataObjects** 文件夹中创建 **MobileCustomer.cs** 文件，并使用以下实现：\n\n        using Microsoft.WindowsAzure.Mobile.Service;\n\n        namespace ShoppingService.DataObjects\n        {\n            public class MobileCustomer : EntityData\n            {\n                public string Name { get; set; }\n            }\n        }\n\n    请注意，此类与模型中的 **Customer** 类相类似，差别在于 **Order** 的关系属性已删除。若要使对象正常使用移动服务脱机同步，需要使用一组*系统属性*来进行乐观并发，因此你会发现，DTO 继承自包含这些属性的 [**EntityData**](http://msdn.microsoft.com/library/microsoft.windowsazure.mobile.service.entitydata.aspx)。原始模型中的基于 int 的 **CustomerId** 属性将替换为 **EntityData** 中基于字符串的 **Id** 属性，这将是移动服务使用的 **Id**。\n\n2. 在服务项目的 **DataObjects** 文件夹中创建 **MobileOrder.cs** 文件。\n\n        using Microsoft.WindowsAzure.Mobile.Service;\n        using Newtonsoft.Json;\n        using System.ComponentModel.DataAnnotations;\n        using System.ComponentModel.DataAnnotations.Schema;\n\n        namespace ShoppingService.DataObjects\n        {\n            public class MobileOrder : EntityData\n            {\n                public string Item { get; set; }\n\n                public int Quantity { get; set; }\n\n                public bool Completed { get; set; }\n\n                [NotMapped]\n                public int CustomerId { get; set; }\n\n                [Required]\n                public string MobileCustomerId { get; set; }\n\n                public string MobileCustomerName { get; set; }\n            }\n        }\n\n    **Customer** 关系属性已替换为 **Customer** 名称，以及可用来为客户端上的关系手动建模的 **MobileCustomerId** 属性。现在你可以忽略 **CustomerId** 属性，以后才会使用此属性。\n\n3. 你可能会发现，在 **EntityData** 基类上添加系统属性后，DTO 的属性数目比模型类型还多。显然，需要一个位置来存储这些属性，因此我们将在原始数据库中额外添加一些列。虽然这样会更改数据库，但并不会中断现有的应用程序，因为这些更改只是附加的（将新的列添加到架构）。为此，请将以下语句添加到 **Customer.cs** 和 **Order.cs** 的顶部：\n    \n        using System.ComponentModel.DataAnnotations.Schema;\n        using Microsoft.WindowsAzure.Mobile.Service.Tables;\n        using System;\n\n4. 然后，将这些附加属性添加到每个类：\n\n        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]\n        [Index]\n        [TableColumn(TableColumnType.CreatedAt)]\n        public DateTimeOffset? CreatedAt { get; set; }\n\n        [TableColumn(TableColumnType.Deleted)]\n        public bool Deleted { get; set; }\n\n        [Index]\n        [TableColumn(TableColumnType.Id)]\n        [MaxLength(36)]\n        public string Id { get; set; }\n\n        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]\n        [TableColumn(TableColumnType.UpdatedAt)]\n        public DateTimeOffset? UpdatedAt { get; set; }\n\n        [TableColumn(TableColumnType.Version)]\n        [Timestamp]\n        public byte[] Version { get; set; }\n\n5. 刚刚添加的系统属性具有某些会在数据库操作期间明确发生的内置行为（例如，自动更新创建/更新时间）。若要启用这些行为，我们需要更改 **ExistingContext.cs**。在该文件的顶部，添加以下代码：\n    \n        using System.Data.Entity.ModelConfiguration.Conventions;\n        using Microsoft.WindowsAzure.Mobile.Service.Tables;\n        using System.Linq;\n\n6. 然后，在 **ExistingContext** 的正文中，重写 [**OnModelCreating**](http://msdn.microsoft.com/zh-cn/library/system.data.entity.dbcontext.onmodelcreating.aspx)：\n\n        protected override void OnModelCreating(DbModelBuilder modelBuilder)\n        {\n            modelBuilder.Conventions.Add(\n                new AttributeToColumnAnnotationConvention<TableColumnAttribute, string>(\n                    \"ServiceTableColumn\", (property, attributes) => attributes.Single().ColumnType.ToString()));\n\n            base.OnModelCreating(modelBuilder);\n        } \n\n7. 让我们在数据库中填充一些示例数据。打开文件 **WebApiConfig.cs**。创建新的 [**IDatabaseInitializer**](http://msdn.microsoft.com/zh-cn/library/gg696323.aspx)，并按如下所示在 **Register** 方法中对它进行配置。\n\n        using Microsoft.WindowsAzure.Mobile.Service;\n        using ShoppingService.Models;\n        using System;\n        using System.Collections.Generic;\n        using System.Collections.ObjectModel;\n        using System.Data.Entity;\n        using System.Web.Http;\n\n        namespace ShoppingService\n        {\n            public static class WebApiConfig\n            {\n                public static void Register()\n                {\n                    ConfigOptions options = new ConfigOptions();\n\n                    HttpConfiguration config = ServiceConfig.Initialize(new ConfigBuilder(options));\n\n                    Database.SetInitializer(new ExistingInitializer());\n                }\n            }\n\n            public class ExistingInitializer : ClearDatabaseSchemaIfModelChanges<ExistingContext>\n            {\n                protected override void Seed(ExistingContext context)\n                {\n                    List<Order> orders = new List<Order>\n                    {\n                        new Order { OrderId = 10, Item = \"Guitars\", Quantity = 2, Id = Guid.NewGuid().ToString()},\n                        new Order { OrderId = 20, Item = \"Drums\", Quantity = 10, Id = Guid.NewGuid().ToString()},\n                        new Order { OrderId = 30, Item = \"Tambourines\", Quantity = 20, Id = Guid.NewGuid().ToString() }\n                    };\n\n                    List<Customer> customers = new List<Customer>\n                    {\n                        new Customer { CustomerId = 1, Name = \"John\", Orders = new Collection<Order> { \n                            orders[0]}, Id = Guid.NewGuid().ToString()},\n                        new Customer { CustomerId = 2, Name = \"Paul\", Orders = new Collection<Order> { \n                            orders[1]}, Id = Guid.NewGuid().ToString()},\n                        new Customer { CustomerId = 3, Name = \"Ringo\", Orders = new Collection<Order> { \n                            orders[2]}, Id = Guid.NewGuid().ToString()},\n                    };\n\n                    foreach (Customer c in customers)\n                    {\n                        context.Customers.Add(c);\n                    }\n\n                    base.Seed(context);\n                }\n            }\n        }\n\n<a name=\"Mapping\"></a>\n## 在 DTO 与模型之间创建映射\n\n现在我们已有模型类型 **Customer** 和 **Order** 以及 DTO **MobileCustomer** 和 **MobileOrder**，但我们需要指示后端自动在两者之间转换。此时，移动服务依赖于 [**AutoMapper**](http://automapper.org/)，这是已在项目中引用的对象关系映射器。\n\n1. 在 **WebApiConfig.cs** 的顶部添加以下代码：\n\n        using AutoMapper;\n        using ShoppingService.DataObjects;\n\n2. 若要定义映射，请将以下代码添加到 **WebApiConfig** 类的 **Register** 方法中。\n\n        Mapper.Initialize(cfg =>\n        {\n            cfg.CreateMap<MobileOrder, Order>();\n            cfg.CreateMap<MobileCustomer, Customer>();\n            cfg.CreateMap<Order, MobileOrder>()\n                .ForMember(dst => dst.MobileCustomerId, map => map.MapFrom(x => x.Customer.Id))\n                .ForMember(dst => dst.MobileCustomerName, map => map.MapFrom(x => x.Customer.Name));\n            cfg.CreateMap<Customer, MobileCustomer>();\n\n        });\n\nAutoMapper 此时会将对象互相映射。将匹配所有具有相应名称的属性，例如，**MobileOrder.CustomerId** 将会自动映射到 **Order.CustomerId**。可按如下所示配置自定义映射，其中，我们将 **MobileCustomerName** 属性映射到 **Customer** 关系属性的 **Name** 属性。\n\n<a name=\"DomainManager\"></a>\n## 实现特定于域的逻辑\n\n下一步是实现 [**MappedEntityDomainManager**](http://msdn.microsoft.com/zh-cn/library/dn643300.aspx)，它用作映射的数据存储与要从客户端提供 HTTP 流量的控制器之间的抽象层。我们可以在下一个部分中完全以 DTO 的形式编写控制器，而在此处添加的 **MappedEntityDomainManager** 将会处理与原始数据存储之间的通信，同时让我们有地方可以实现其任何特定逻辑。\n\n1. 将 **MobileCustomerDomainManager.cs** 添加到项目的 **Models** 文件夹。粘贴以下实现：\n\n        using AutoMapper;\n        using Microsoft.WindowsAzure.Mobile.Service;\n        using ShoppingService.DataObjects;\n        using System.Data.Entity;\n        using System.Linq;\n        using System.Net.Http;\n        using System.Threading.Tasks;\n        using System.Web.Http;\n        using System.Web.Http.OData;\n\n        namespace ShoppingService.Models\n        {\n            public class MobileCustomerDomainManager : MappedEntityDomainManager<MobileCustomer, Customer>\n            {\n                private ExistingContext context;\n\n                public MobileCustomerDomainManager(ExistingContext context, HttpRequestMessage request, ApiServices services)\n                    : base(context, request, services)\n                {\n                    Request = request;\n                    this.context = context;\n                }\n\n                public static int GetKey(string mobileCustomerId, DbSet<Customer> customers, HttpRequestMessage request)\n                {\n                    int customerId = customers\n                       .Where(c => c.Id == mobileCustomerId)\n                       .Select(c => c.CustomerId)\n                       .FirstOrDefault();\n\n                    if (customerId == 0)\n                    {\n                        throw new HttpResponseException(request.CreateNotFoundResponse());\n                    }\n                    return customerId;\n                }\n\n                protected override T GetKey<T>(string mobileCustomerId)\n                {\n                    return (T)(object)GetKey(mobileCustomerId, this.context.Customers, this.Request);\n                }\n                \n                public override SingleResult<MobileCustomer> Lookup(string mobileCustomerId)\n                {\n                    int customerId = GetKey<int>(mobileCustomerId);\n                    return LookupEntity(c => c.CustomerId == customerId);\n                }\n\n                public override async Task<MobileCustomer> InsertAsync(MobileCustomer mobileCustomer)\n                {\n                    return await base.InsertAsync(mobileCustomer);\n                }\n\n                public override async Task<MobileCustomer> UpdateAsync(string mobileCustomerId, Delta<MobileCustomer> patch)\n                {\n                    int customerId = GetKey<int>(mobileCustomerId);\n\n                    Customer existingCustomer = await this.Context.Set<Customer>().FindAsync(customerId);\n                    if (existingCustomer == null)\n                    {\n                        throw new HttpResponseException(this.Request.CreateNotFoundResponse());\n                    }\n\n                    MobileCustomer existingCustomerDTO = Mapper.Map<Customer, MobileCustomer>(existingCustomer);\n                    patch.Patch(existingCustomerDTO);\n                    Mapper.Map<MobileCustomer, Customer>(existingCustomerDTO, existingCustomer);\n\n                    await this.SubmitChangesAsync();\n\n                    MobileCustomer updatedCustomerDTO = Mapper.Map<Customer, MobileCustomer>(existingCustomer);\n\n                    return updatedCustomerDTO;\n                }\n\n                public override async Task<MobileCustomer> ReplaceAsync(string mobileCustomerId, MobileCustomer mobileCustomer)\n                {\n                    return await base.ReplaceAsync(mobileCustomerId, mobileCustomer);\n                }\n\n                public override async Task<bool> DeleteAsync(string mobileCustomerId)\n                {\n                    int customerId = GetKey<int>(mobileCustomerId);\n                    return await DeleteItemAsync(customerId);\n                }\n            }\n        }\n\n    此类的重要部分是 **GetKey** 方法，将在该方法中指示如何在原始数据模型中查找对象的 ID 属性。\n\n2. 将 **MobileOrderDomainManager.cs** 添加到项目的 **Models** 文件夹：\n\n        using AutoMapper;\n        using Microsoft.WindowsAzure.Mobile.Service;\n        using ShoppingService.DataObjects;\n        using System.Linq;\n        using System.Net.Http;\n        using System.Threading.Tasks;\n        using System.Web.Http;\n        using System.Web.Http.OData;\n\n        namespace ShoppingService.Models\n        {\n            public class MobileOrderDomainManager : MappedEntityDomainManager<MobileOrder, Order>\n            {\n                private ExistingContext context;\n\n                public MobileOrderDomainManager(ExistingContext context, HttpRequestMessage request, ApiServices services)\n                    : base(context, request, services)\n                {\n                    Request = request;\n                    this.context = context;\n                }\n\n                protected override T GetKey<T>(string mobileOrderId)\n                {\n                    int orderId = this.context.Orders\n                        .Where(o => o.Id == mobileOrderId)\n                        .Select(o => o.OrderId)\n                        .FirstOrDefault();\n\n                    if (orderId == 0)\n                    {\n                        throw new HttpResponseException(this.Request.CreateNotFoundResponse());\n                    }\n                    return (T)(object)orderId;\n                }\n\n                public override SingleResult<MobileOrder> Lookup(string mobileOrderId)\n                {\n                    int orderId = GetKey<int>(mobileOrderId);\n                    return LookupEntity(o => o.OrderId == orderId);\n                }\n\n                private async Task<Customer> VerifyMobileCustomer(string mobileCustomerId, string mobileCustomerName)\n                {\n                    int customerId = MobileCustomerDomainManager.GetKey(mobileCustomerId, this.context.Customers, this.Request);\n                    Customer customer = await this.context.Customers.FindAsync(customerId);\n                    if (customer == null)\n                    {\n                        throw new HttpResponseException(Request.CreateBadRequestResponse(\"Customer with name '{0}' was not found\", mobileCustomerName));\n                    }\n                    return customer;\n                }\n\n                public override async Task<MobileOrder> InsertAsync(MobileOrder mobileOrder)\n                {\n                    Customer customer = await VerifyMobileCustomer(mobileOrder.MobileCustomerId, mobileOrder.MobileCustomerName);\n                    mobileOrder.CustomerId = customer.CustomerId;\n                    return await base.InsertAsync(mobileOrder);\n                }\n\n                public override async Task<MobileOrder> UpdateAsync(string mobileOrderId, Delta<MobileOrder> patch)\n                {\n                    Customer customer = await VerifyMobileCustomer(patch.GetEntity().MobileCustomerId, patch.GetEntity().MobileCustomerName);\n\n                    int orderId = GetKey<int>(mobileOrderId);\n\n                    Order existingOrder = await this.Context.Set<Order>().FindAsync(orderId);\n                    if (existingOrder == null)\n                    {\n                        throw new HttpResponseException(this.Request.CreateNotFoundResponse());\n                    }\n\n                    MobileOrder existingOrderDTO = Mapper.Map<Order, MobileOrder>(existingOrder);\n                    patch.Patch(existingOrderDTO);\n                    Mapper.Map<MobileOrder, Order>(existingOrderDTO, existingOrder);\n\n                    // This is required to map the right Id for the customer\n                    existingOrder.CustomerId = customer.CustomerId;\n\n                    await this.SubmitChangesAsync();\n\n                    MobileOrder updatedOrderDTO = Mapper.Map<Order, MobileOrder>(existingOrder);\n\n                    return updatedOrderDTO;\n                }\n\n                public override async Task<MobileOrder> ReplaceAsync(string mobileOrderId, MobileOrder mobileOrder)\n                {\n                    await VerifyMobileCustomer(mobileOrder.MobileCustomerId, mobileOrder.MobileCustomerName);\n\n                    return await base.ReplaceAsync(mobileOrderId, mobileOrder);\n                }\n\n                public override Task<bool> DeleteAsync(string mobileOrderId)\n                {\n                    int orderId = GetKey<int>(mobileOrderId);\n                    return DeleteItemAsync(orderId);\n                }\n            }\n        }\n\n    在此情况下，**InsertAsync** 和 **UpdateAsync** 方法是很值得了解的；我们会在其中强制执行每个 **Order** 都需要有一个有效相关 **Customer** 的关系。在 **InsertAsync** 中，你会看到我们填充 **MobileOrder.CustomerId** 属性，此属性映射到 **Order.CustomerId** 属性。可以通过查找具有匹配 **MobileOrder.MobileCustomerId** 的 **Customer** 来获取该值。这是因为，默认情况下，客户端只能识别 **Customer** 的移动服务 ID (**MobileOrder.MobileCustomerId**)，而此 ID 与将外键 (**MobileOrder.CustomerId**) 从 **Order** 设为 **Customer** 所需的实际主键不同。此 ID 仅在服务内部使用，以提高插入操作的速度。\n\n现在我们已可创建控制器，以向客户端公开 DTO。\n\n<a name=\"Controller\"></a>\n## 使用 DTO 实现 TableController\n\n1. 在 **Controllers** 文件夹中添加文件 **MobileCustomerController.cs**：\n\n        using Microsoft.WindowsAzure.Mobile.Service;\n        using Microsoft.WindowsAzure.Mobile.Service.Security;\n        using ShoppingService.DataObjects;\n        using ShoppingService.Models;\n        using System.Linq;\n        using System.Threading.Tasks;\n        using System.Web.Http;\n        using System.Web.Http.Controllers;\n        using System.Web.Http.OData;\n\n        namespace ShoppingService.Controllers\n        {\n            public class MobileCustomerController : TableController<MobileCustomer>\n            {\n                protected override void Initialize(HttpControllerContext controllerContext)\n                {\n                    base.Initialize(controllerContext);\n                    var context = new ExistingContext();\n                    DomainManager = new MobileCustomerDomainManager(context, Request, Services);\n                }\n\n                public IQueryable<MobileCustomer> GetAllMobileCustomers()\n                {\n                    return Query();\n                }\n\n                public SingleResult<MobileCustomer> GetMobileCustomer(string id)\n                {\n                    return Lookup(id);\n                }\n\n                [AuthorizeLevel(AuthorizationLevel.Admin)]\n                protected override Task<MobileCustomer> PatchAsync(string id, Delta<MobileCustomer> patch)\n                {\n                    return base.UpdateAsync(id, patch);\n                }\n\n                [AuthorizeLevel(AuthorizationLevel.Admin)]\n                protected override Task<MobileCustomer> PostAsync(MobileCustomer item)\n                {\n                    return base.InsertAsync(item);\n                }\n\n                [AuthorizeLevel(AuthorizationLevel.Admin)]\n                protected override Task DeleteAsync(string id)\n                {\n                    return base.DeleteAsync(id);\n                }\n            }\n        }\n\n    你将会注意到，其中已使用 AuthorizeLevel 属性来限制对控制器上的插入/更新/删除操作的公共访问。对于这种情况，客户列表是只读的，但我们将允许创建新订单，并将其与现有客户关联。\n\n2. 在 **Controllers** 文件夹中添加文件 **MobileOrderController.cs**：\n\n        using Microsoft.WindowsAzure.Mobile.Service;\n        using ShoppingService.DataObjects;\n        using ShoppingService.Models;\n        using System.Linq;\n        using System.Threading.Tasks;\n        using System.Web.Http;\n        using System.Web.Http.Controllers;\n        using System.Web.Http.Description;\n        using System.Web.Http.OData;\n\n        namespace ShoppingService.Controllers\n        {\n            public class MobileOrderController : TableController<MobileOrder>\n            {\n                protected override void Initialize(HttpControllerContext controllerContext)\n                {\n                    base.Initialize(controllerContext);\n                    ExistingContext context = new ExistingContext();\n                    DomainManager = new MobileOrderDomainManager(context, Request, Services);\n                }\n\n                public IQueryable<MobileOrder> GetAllMobileOrders()\n                {\n                    return Query();\n                }\n\n                public SingleResult<MobileOrder> GetMobileOrder(string id)\n                {\n                    return Lookup(id);\n                }\n\n                public Task<MobileOrder> PatchMobileOrder(string id, Delta<MobileOrder> patch)\n                {\n                    return UpdateAsync(id, patch);\n                }\n\n                [ResponseType(typeof(MobileOrder))]\n                public async Task<IHttpActionResult> PostMobileOrder(MobileOrder item)\n                {\n                    MobileOrder current = await InsertAsync(item);\n                    return CreatedAtRoute(\"Tables\", new { id = current.Id }, current);\n                }\n\n                public Task DeleteMobileOrder(string id)\n                {\n                    return DeleteAsync(id);\n                }\n            }\n        }\n\n3. 现在，你可以运行服务。按 **F5**，然后使用内置于帮助页中的测试客户端来修改数据。\n\n请注意，这两个控制器实现独占使用 **MobileCustomer** 和 **MobileOrder**，且不区分基础模型。这些 DTO 已序列化为 JSON，并可用来与所有平台上的移动服务客户端 SDK 交换数据。例如，如果生成 Windows 应用商店应用程序，则相应的客户端类型将如下所示。该类型将与其他客户端平台上的类型相似。\n\n    using Microsoft.WindowsAzure.MobileServices;\n    using System;\n\n    namespace ShoppingClient\n    {\n        public class MobileCustomer\n        {\n            public string Id { get; set; }\n\n            public string Name { get; set; }\n\n            [CreatedAt]\n            public DateTimeOffset? CreatedAt { get; set; }\n\n            [UpdatedAt]\n            public DateTimeOffset? UpdatedAt { get; set; }\n\n            public bool Deleted { get; set; }\n            \n            [Version]\n            public string Version { get; set; }\n\n        }\n\n    }\n\n接下来，你可以生成客户端应用程序以访问服务。\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

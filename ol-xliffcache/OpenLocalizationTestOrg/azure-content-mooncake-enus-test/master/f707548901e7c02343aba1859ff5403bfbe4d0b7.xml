@@ -1,0 +1,131 @@
+{
+  "nodes": [
+    {
+      "content": "多分片查询 |Azure",
+      "pos": [
+        28,
+        40
+      ]
+    },
+    {
+      "content": "使用弹性数据库客户端库运行跨分片查询。",
+      "pos": [
+        60,
+        79
+      ]
+    },
+    {
+      "content": "多分片查询",
+      "pos": [
+        299,
+        304
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        309,
+        311
+      ]
+    },
+    {
+      "pos": [
+        313,
+        545
+      ],
+      "content": "你可以使用<bpt id=\"p1\">[</bpt>弹性数据库工具<ept id=\"p1\">](/documentation/articles/sql-database-elastic-scale-introduction)</ept>创建分片数据库解决方案。<bpt id=\"p2\">**</bpt>多分片查询<ept id=\"p2\">**</ept>用于诸如数据收集/报告等需要跨多个分片运行查询的任务。（相比之下，<bpt id=\"p3\">[</bpt>数据相关的路由<ept id=\"p3\">](/documentation/articles/sql-database-elastic-scale-data-dependent-routing)</ept>会在单个分片上执行所有操作。）"
+    },
+    {
+      "pos": [
+        547,
+        786
+      ],
+      "content": "你可以使用<bpt id=\"p1\">[</bpt>弹性数据库客户端库<ept id=\"p1\">](/documentation/articles/sql-database-elastic-database-client-library)</ept>管理分片。该库包括名为 <bpt id=\"p2\">**</bpt>Microsoft.Azure.SqlDatabase.ElasticScale.Query<ept id=\"p2\">**</ept> 的命名空间，你可以通过该空间使用单个查询和结果来查询多个分片。它提供对分片集合进行查询抽象的功能。它还提供了备用执行策略，尤其是部分结果，以处理在对多个分片进行查询时所出现的故障。"
+    },
+    {
+      "pos": [
+        788,
+        1122
+      ],
+      "content": "多分片查询的主要入口点是 <bpt id=\"p1\">**</bpt>MultiShardConnection<ept id=\"p1\">**</ept> 类。与使用数据相关路由一样，该 API 遵循 ****<bpt id=\"p2\">[</bpt>System.Data.SqlClient<ept id=\"p2\">](http://msdn.microsoft.com/zh-cn/library/System.Data.SqlClient(v=vs.110).aspx)</ept>** 类和方法的熟悉体验。在 <bpt id=\"p3\">**</bpt>SqlClient<ept id=\"p3\">**</ept> 库中，第一步是创建 <bpt id=\"p4\">**</bpt>SqlConnection<ept id=\"p4\">**</ept>，然后创建 <bpt id=\"p5\">**</bpt>SqlCommand<ept id=\"p5\">**</ept> 以用于连接，再通过某个 <bpt id=\"p6\">**</bpt>Execute<ept id=\"p6\">**</ept> 方法执行命令。最后，<bpt id=\"p7\">**</bpt>SqlDataReader<ept id=\"p7\">**</ept> 将循环访问从命令执行返回的结果集。多分片查询 API 方面的体验遵循以下步骤："
+    },
+    {
+      "pos": [
+        1127,
+        1155
+      ],
+      "content": "创建 <bpt id=\"p1\">**</bpt>MultiShardConnection<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        1159,
+        1211
+      ],
+      "content": "为 <bpt id=\"p1\">**</bpt>MultiShardConnection<ept id=\"p1\">**</ept> 创建 <bpt id=\"p2\">**</bpt>MultiShardCommand<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "执行命令。",
+      "pos": [
+        1215,
+        1220
+      ]
+    },
+    {
+      "pos": [
+        1224,
+        1257
+      ],
+      "content": "通过 <bpt id=\"p1\">**</bpt>MultiShardDataReader<ept id=\"p1\">**</ept> 使用结果。"
+    },
+    {
+      "pos": [
+        1260,
+        1465
+      ],
+      "content": "主要区别在于多分片连接的构建。其中 <bpt id=\"p1\">**</bpt>SqlConnection<ept id=\"p1\">**</ept> 在单一数据库上进行操作，而 <bpt id=\"p2\">**</bpt>MultiShardConnection<ept id=\"p2\">**</ept> 将<bpt id=\"p3\">***</bpt>分片集合<ept id=\"p3\">***</ept>用作其输入。用户可以填充分片映射中的分片集合。然后，使用 <bpt id=\"p4\">**</bpt>UNION ALL<ept id=\"p4\">**</ept> 语义组成一个总体结果在分片集合上执行查询。或者，也可以在命令上使用 <bpt id=\"p5\">**</bpt>ExecutionOptions<ept id=\"p5\">**</ept> 属性，以将行所源自的分片的名称添加到输出。"
+    },
+    {
+      "content": "示例",
+      "pos": [
+        1470,
+        1472
+      ]
+    },
+    {
+      "pos": [
+        1474,
+        1524
+      ],
+      "content": "以下代码使用给定的 <bpt id=\"p1\">**</bpt>ShardMap<ept id=\"p1\">**</ept>（名为<bpt id=\"p2\">*</bpt>myShardMap<ept id=\"p2\">*</ept>）来演示多分片查询的用法。"
+    },
+    {
+      "pos": [
+        2523,
+        2706
+      ],
+      "content": "请注意对 <bpt id=\"p1\">**</bpt>myShardMap.GetShards()<ept id=\"p1\">**</ept> 的调用。通过此方法可从分片映射中检索所有分片，还可轻松在该分片映射中的所有分片之间运行查询。对通过调用 <bpt id=\"p2\">**</bpt>myShardMap.GetShards()<ept id=\"p2\">**</ept> 返回的集合执行 LINQ 查询，以进一步优化用于多分片查询的分片集合。多分片查询中的当前功能已随部分结果策略一起被设计为供数十至数百种分片使用。"
+    },
+    {
+      "content": "多分片查询目前存在的一个限制是，缺少对需要查询的分片和 shardlet 进行验证。尽管数据相关路由会在查询时验证给定的分片是否为分片映射的一部分，但多分片查询不会执行此检查。这可能会导致多分片查询在已从分片映射中删除的分片上运行。",
+      "pos": [
+        2708,
+        2824
+      ]
+    },
+    {
+      "content": "多分片查询和拆分/合并操作",
+      "pos": [
+        2829,
+        2842
+      ]
+    },
+    {
+      "pos": [
+        2844,
+        3080
+      ],
+      "content": "多分片查询不会验证查询的分片上的 shardlet 是否参与了正在进行的拆分/合并操作。（请参阅<bpt id=\"p1\">[</bpt>使用弹性数据库拆分/合并工具进行缩放<ept id=\"p1\">](/documentation/articles/sql-database-elastic-scale-overview-split-and-merge)</ept>。） 这可能会导致不一致问题，即为同一多分片查询中的多个分片显示同一 shardlet 中的行。请注意这些限制并在执行多分片查询时，考虑关闭正在进行的合拆分操作以及对分片映射的更改。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"多分片查询 |Azure\" \n    description=\"使用弹性数据库客户端库运行跨分片查询。\" \n    services=\"sql-database\" \n    documentationCenter=\"\" \n    manager=\"jeffreyg\" \n    authors=\"torsteng\" \n    editor=\"\"/>\n\n<tags \n    ms.service=\"sql-database\"\n    ms.date=\"11/04/2015\" \n    wacn.date=\"01/05/2016\"/>\n\n# 多分片查询\n\n## 概述\n\n你可以使用[弹性数据库工具](/documentation/articles/sql-database-elastic-scale-introduction)创建分片数据库解决方案。**多分片查询**用于诸如数据收集/报告等需要跨多个分片运行查询的任务。（相比之下，[数据相关的路由](/documentation/articles/sql-database-elastic-scale-data-dependent-routing)会在单个分片上执行所有操作。）\n\n你可以使用[弹性数据库客户端库](/documentation/articles/sql-database-elastic-database-client-library)管理分片。该库包括名为 **Microsoft.Azure.SqlDatabase.ElasticScale.Query** 的命名空间，你可以通过该空间使用单个查询和结果来查询多个分片。它提供对分片集合进行查询抽象的功能。它还提供了备用执行策略，尤其是部分结果，以处理在对多个分片进行查询时所出现的故障。\n\n多分片查询的主要入口点是 **MultiShardConnection** 类。与使用数据相关路由一样，该 API 遵循 ****[System.Data.SqlClient](http://msdn.microsoft.com/zh-cn/library/System.Data.SqlClient(v=vs.110).aspx)** 类和方法的熟悉体验。在 **SqlClient** 库中，第一步是创建 **SqlConnection**，然后创建 **SqlCommand** 以用于连接，再通过某个 **Execute** 方法执行命令。最后，**SqlDataReader** 将循环访问从命令执行返回的结果集。多分片查询 API 方面的体验遵循以下步骤：\n\n1. 创建 **MultiShardConnection**。\n2. 为 **MultiShardConnection** 创建 **MultiShardCommand**。\n3. 执行命令。\n4. 通过 **MultiShardDataReader** 使用结果。 \n\n主要区别在于多分片连接的构建。其中 **SqlConnection** 在单一数据库上进行操作，而 **MultiShardConnection** 将***分片集合***用作其输入。用户可以填充分片映射中的分片集合。然后，使用 **UNION ALL** 语义组成一个总体结果在分片集合上执行查询。或者，也可以在命令上使用 **ExecutionOptions** 属性，以将行所源自的分片的名称添加到输出。\n\n## 示例\n\n以下代码使用给定的 **ShardMap**（名为*myShardMap*）来演示多分片查询的用法。\n\n    using (MultiShardConnection conn = new MultiShardConnection( \n                                        myShardMap.GetShards(), \n                                        myShardConnectionString) \n          ) \n    { \n    using (MultiShardCommand cmd = conn.CreateCommand())\n           { \n            cmd.CommandText = \"SELECT c1, c2, c3 FROM ShardedTable\"; \n            cmd.CommandType = CommandType.Text; \n            cmd.ExecutionOptions = MultiShardExecutionOptions.IncludeShardNameColumn; \n            cmd.ExecutionPolicy = MultiShardExecutionPolicy.PartialResults; \n\n            using (MultiShardDataReader sdr = cmd.ExecuteReader()) \n                { \n                    while (sdr.Read())\n                        { \n                            var c1Field = sdr.GetString(0); \n                            var c2Field = sdr.GetFieldValue<int>(1); \n                            var c3Field = sdr.GetFieldValue<Int64>(2);\n                        } \n                } \n           } \n    } \n \n\n请注意对 **myShardMap.GetShards()** 的调用。通过此方法可从分片映射中检索所有分片，还可轻松在该分片映射中的所有分片之间运行查询。对通过调用 **myShardMap.GetShards()** 返回的集合执行 LINQ 查询，以进一步优化用于多分片查询的分片集合。多分片查询中的当前功能已随部分结果策略一起被设计为供数十至数百种分片使用。\n\n多分片查询目前存在的一个限制是，缺少对需要查询的分片和 shardlet 进行验证。尽管数据相关路由会在查询时验证给定的分片是否为分片映射的一部分，但多分片查询不会执行此检查。这可能会导致多分片查询在已从分片映射中删除的分片上运行。\n\n## 多分片查询和拆分/合并操作\n\n多分片查询不会验证查询的分片上的 shardlet 是否参与了正在进行的拆分/合并操作。（请参阅[使用弹性数据库拆分/合并工具进行缩放](/documentation/articles/sql-database-elastic-scale-overview-split-and-merge)。） 这可能会导致不一致问题，即为同一多分片查询中的多个分片显示同一 shardlet 中的行。请注意这些限制并在执行多分片查询时，考虑关闭正在进行的合拆分操作以及对分片映射的更改。\n\n[AZURE.INCLUDE [elastic-scale-include](../includes/elastic-scale-include.md)]\n \n\n<!---HONumber=Mooncake_1221_2015-->\n"
+}

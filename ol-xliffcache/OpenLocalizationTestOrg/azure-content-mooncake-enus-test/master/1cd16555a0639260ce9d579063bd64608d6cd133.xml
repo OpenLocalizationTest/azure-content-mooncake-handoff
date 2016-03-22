@@ -1,0 +1,950 @@
+{
+  "nodes": [
+    {
+      "content": "使用移动服务托管客户端库 (Windows | Xamarin) | Azure",
+      "pos": [
+        27,
+        67
+      ]
+    },
+    {
+      "content": "了解如何在 Windows 和 Xamarin 应用中使用 Azure 移动服务的 .NET 客户端。",
+      "pos": [
+        86,
+        137
+      ]
+    },
+    {
+      "content": "如何使用 Azure 移动服务的托管客户端库",
+      "pos": [
+        357,
+        379
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        481,
+        487
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        605,
+        607
+      ]
+    },
+    {
+      "pos": [
+        610,
+        819
+      ],
+      "content": "本指南说明如何在 Windows 应用和 Xamarin 应用中使用 Azure 移动服务的托管客户端库执行常见方案。所述的任务包括查询数据、插入、更新和删除数据、对用户进行身份验证和处理错误。如果你是第一次使用移动服务，最好先完成<bpt id=\"p1\">[</bpt>移动服务快速入门<ept id=\"p1\">](/documentation/articles/mobile-services-dotnet-backend-xamarin-ios-get-started)</ept>教程。"
+    },
+    {
+      "pos": [
+        908,
+        935
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"setup\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>安装与先决条件"
+    },
+    {
+      "pos": [
+        937,
+        1078
+      ],
+      "content": "假设你已创建一个移动服务和一个表。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>创建表<ept id=\"p1\">](http://go.microsoft.com/fwlink/?LinkId=298592)</ept>。在本主题使用的代码中，表的名称为 <ph id=\"ph1\">`TodoItem`</ph>，其中包含以下列：<ph id=\"ph2\">`Id`</ph>、<ph id=\"ph3\">`Text`</ph> 和 <ph id=\"ph4\">`Complete`</ph>。"
+    },
+    {
+      "content": "相应的类型化客户端 .NET 类型如下：",
+      "pos": [
+        1080,
+        1100
+      ]
+    },
+    {
+      "pos": [
+        1363,
+        1523
+      ],
+      "content": "请注意，<bpt id=\"p1\">[</bpt>JsonPropertyAttribute<ept id=\"p1\">](http://www.newtonsoft.com/json/help/html/Properties_T_Newtonsoft_Json_JsonPropertyAttribute.htm)</ept> 用于定义客户端类型与表之间 PropertyName 映射之间的映射。"
+    },
+    {
+      "pos": [
+        1525,
+        1688
+      ],
+      "content": "在 JavaScript 后端移动服务中启用动态架构后，Azure 移动服务将基于 insert 或 update 请求中的对象自动生成新列。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>动态架构<ept id=\"p1\">](http://go.microsoft.com/fwlink/?LinkId=296271)</ept>。在 .NET 后端移动服务中，表在项目的数据模型中定义。"
+    },
+    {
+      "pos": [
+        1692,
+        1731
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"create-client\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何创建移动服务客户端"
+    },
+    {
+      "pos": [
+        1733,
+        1775
+      ],
+      "content": "以下代码将创建用于访问移动服务的 <ph id=\"ph1\">`MobileServiceClient`</ph> 对象。"
+    },
+    {
+      "pos": [
+        1879,
+        1972
+      ],
+      "content": "在上面的代码中，请将 <ph id=\"ph1\">`AppUrl`</ph> 和 <ph id=\"ph2\">`AppKey`</ph> 依次替换为移动服务 URL 和应用程序密钥。在 Azure 经典门户中选择你的移动服务，然后单击“仪表板”即可获取这两个值。"
+    },
+    {
+      "pos": [
+        1975,
+        2127
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>应用程序密钥用于针对移动服务筛选出随机请求，将随应用程序一起分发。由于此密钥未加密，因此不能被认为是安全的。为确保安全访问你的移动服务数据，你必须改为在允许用户访问前对用户进行身份验证。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何：对用户进行身份验证<ept id=\"p1\">](#authentication)</ept>。"
+    },
+    {
+      "pos": [
+        2131,
+        2166
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"instantiating\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何创建表引用"
+    },
+    {
+      "pos": [
+        2168,
+        2340
+      ],
+      "content": "访问或修改移动服务表中数据的所有代码都将对 <ph id=\"ph1\">`MobileServiceTable`</ph> 对象调用函数。通过对 <ph id=\"ph2\">`MobileServiceClient`</ph> 的实例调用 <bpt id=\"p1\">[</bpt>GetTable<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/jj554275.aspx)</ept> 方法可以获取对表的引用，如下所示："
+    },
+    {
+      "pos": [
+        2426,
+        2470
+      ],
+      "content": "这是类型化的序列化模型；请参阅下面有关<bpt id=\"p1\">[</bpt>非类型化序列化模型<ept id=\"p1\">](#untyped)</ept>的介绍。"
+    },
+    {
+      "pos": [
+        2474,
+        2508
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"querying\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何从移动服务查询数据"
+    },
+    {
+      "content": "本部分介绍如何向包含以下功能的移动服务发出查询：",
+      "pos": [
+        2510,
+        2534
+      ]
+    },
+    {
+      "content": "筛选返回的数据",
+      "pos": [
+        2539,
+        2546
+      ]
+    },
+    {
+      "content": "为返回的数据排序",
+      "pos": [
+        2551,
+        2559
+      ]
+    },
+    {
+      "content": "在页中返回数据",
+      "pos": [
+        2564,
+        2571
+      ]
+    },
+    {
+      "content": "选择特定的列",
+      "pos": [
+        2576,
+        2582
+      ]
+    },
+    {
+      "content": "按 ID 查找数据",
+      "pos": [
+        2587,
+        2596
+      ]
+    },
+    {
+      "pos": [
+        2600,
+        2704
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>将强制使用服务器驱动的页大小来防止返回所有行。这可以防止对大型数据集发出的默认请求对服务造成负面影响。若要返回 50 个以上的行，请根据<bpt id=\"p1\">[</bpt><ept id=\"p1\">在页中返回数据]</ept>所述使用 <ph id=\"ph2\">`Take`</ph> 方法。"
+    },
+    {
+      "pos": [
+        2710,
+        2743
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"filtering\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何筛选返回的数据"
+    },
+    {
+      "pos": [
+        2745,
+        2858
+      ],
+      "content": "以下代码演示了如何通过在查询中包含 <ph id=\"ph1\">`Where`</ph> 子句来筛选数据。该代码将返回 <ph id=\"ph2\">`Complete`</ph> 属性等于 <ph id=\"ph3\">`false`</ph> 的 <ph id=\"ph4\">`todoTable`</ph> 中的所有项。<ph id=\"ph5\">`Where`</ph> 函数针对该表将一个行筛选谓词应用到查询。"
+    },
+    {
+      "pos": [
+        3069,
+        3153
+      ],
+      "content": "可以使用消息检查软件（例如浏览器开发人员工具或 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Fiddler]</ept>）来查看发送到移动服务的请求的 URI。从下面的请求 URI 中，可以看出我们正在修改查询字符串本身："
+    },
+    {
+      "content": "在服务器端，此请求通常会粗略地转换成以下 SQL 查询：",
+      "pos": [
+        3217,
+        3245
+      ]
+    },
+    {
+      "pos": [
+        3313,
+        3349
+      ],
+      "content": "传递给 <ph id=\"ph1\">`Where`</ph> 方法的函数可以包含任意数目的条件。例如，以下行："
+    },
+    {
+      "content": "将粗略地转换为（针对前面显示的同一请求）",
+      "pos": [
+        3580,
+        3600
+      ]
+    },
+    {
+      "pos": [
+        3702,
+        3762
+      ],
+      "content": "上述 <ph id=\"ph1\">`where`</ph> 语句将查找 <ph id=\"ph2\">`Complete`</ph> 状态设置为 false 且 <ph id=\"ph3\">`Text`</ph> 不为 null 的项。"
+    },
+    {
+      "content": "我们也可以使用多个行编写该代码：",
+      "pos": [
+        3764,
+        3780
+      ]
+    },
+    {
+      "content": "这两种方法是等效的，可以换用。前一个选项（在一个查询中连接多个谓词）更为精简，也是我们推荐的方法。",
+      "pos": [
+        3952,
+        4001
+      ]
+    },
+    {
+      "pos": [
+        4003,
+        4234
+      ],
+      "content": "<ph id=\"ph1\">`where`</ph> 子句支持可转换成移动服务 OData 子集的操作，其中包括关系运算符（==、!=、&lt;、&lt;=、&gt;、&gt;=）、数学运算符（+、-、/、*、%）、数字精度（Math.Floor、Math.Ceiling）、字符串函数（Length、Substring、Replace、IndexOf、StartsWith、EndsWith）、日期属性（Year、Month、Day、Hour、Minute、Second）、对象的访问属性，以及组合了上述所有操作的表达式。"
+    },
+    {
+      "pos": [
+        4240,
+        4272
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"sorting\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何为返回的数据排序"
+    },
+    {
+      "pos": [
+        4274,
+        4377
+      ],
+      "content": "以下代码演示了如何通过在查询中包含 <ph id=\"ph1\">`OrderBy`</ph> 或 <ph id=\"ph2\">`OrderByDescending`</ph> 函数来为数据排序。该代码将返回 <ph id=\"ph3\">`todoTable`</ph> 中的项，这些项已按 <ph id=\"ph4\">`Text`</ph> 字段的升序排序。"
+    },
+    {
+      "pos": [
+        4830,
+        4860
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"paging\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何在页中返回数据"
+    },
+    {
+      "pos": [
+        4862,
+        4970
+      ],
+      "content": "默认情况下，服务器只返回前 50 行。你可以通过调用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Take]</ept> 方法来增加返回的行数。将 <ph id=\"ph1\">`Take`</ph> 与 <bpt id=\"p2\">[</bpt><ept id=\"p2\">Skip]</ept> 方法一起使用可以请求查询返回的总数据集的特定“页”。执行以下查询后，将返回表中的前三个项。"
+    },
+    {
+      "content": "以下经过修改的查询将跳过前三个结果，返回其后的三个结果。实际上这是数据的第二“页”，其页大小为三个项。",
+      "pos": [
+        5174,
+        5225
+      ]
+    },
+    {
+      "pos": [
+        5485,
+        5564
+      ],
+      "content": "你还可以使用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">IncludeTotalCount]</ept> 方法来确保查询获取应该返回的<ph id=\"ph1\">&lt;i&gt;</ph>所有<ph id=\"ph2\">&lt;/i&gt;</ph>记录的总计数，并忽略指定的任何 take 分页/限制子句："
+    },
+    {
+      "pos": [
+        5606,
+        5692
+      ],
+      "content": "这是将硬编码分页值传递给 <ph id=\"ph1\">`Take`</ph> 和 <ph id=\"ph2\">`Skip`</ph> 方法的简化方案。在实际应用中，你可以对页导航控件或类似的 UI 使用类似于上面的查询，让用户导航到上一页和下一页。"
+    },
+    {
+      "content": ".NET 后端移动服务的分页注意事项",
+      "pos": [
+        5698,
+        5716
+      ]
+    },
+    {
+      "pos": [
+        5718,
+        5913
+      ],
+      "content": "若要重写 .NET 后端移动服务中的 50 行限制，你还必须将 <bpt id=\"p1\">[</bpt>EnableQueryAttribute<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/system.web.http.odata.enablequeryattribute.aspx)</ept> 应用到公共 GET 方法，并指定分页行为。将以下语句应用到该方法后，最大返回行数将设置为 1000："
+    },
+    {
+      "pos": [
+        5952,
+        5984
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"selecting\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何选择特定的列"
+    },
+    {
+      "pos": [
+        5986,
+        6061
+      ],
+      "content": "你可以通过在查询中添加 <ph id=\"ph1\">`Select`</ph> 子句来指定要包含在结果中的属性集。例如，以下代码演示了如何做到只选择一个字段，以及如何选择并格式化多个字段："
+    },
+    {
+      "content": "到目前为止所述的所有函数都是加性函数，我们可以不断地调用它们，每次调用都能进一步影响查询。再提供一个示例：",
+      "pos": [
+        6590,
+        6643
+      ]
+    },
+    {
+      "pos": [
+        6940,
+        6976
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"lookingup\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：按 ID 查找数据"
+    },
+    {
+      "pos": [
+        6978,
+        7017
+      ],
+      "content": "使用 <ph id=\"ph1\">`LookupAsync`</ph> 函数可以查找数据库中具有特定 ID 的对象。"
+    },
+    {
+      "pos": [
+        7202,
+        7238
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"inserting\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何在移动服务中插入数据"
+    },
+    {
+      "pos": [
+        7242,
+        7367
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果你想要对某个类型执行插入、查找、删除或更新操作，则需要创建一个名为 <bpt id=\"p1\">**</bpt>Id<ept id=\"p1\">**</ept> 的成员。正因如此，示例类 <bpt id=\"p2\">**</bpt>TodoItem<ept id=\"p2\">**</ept> 包含了一个名为 <bpt id=\"p3\">**</bpt>Id<ept id=\"p3\">**</ept> 的成员。更新和删除操作中始终必须存在一个有效的 ID 值。"
+    },
+    {
+      "content": "以下代码演示了如何在表中插入新行。参数包含要作为 .NET 对象插入的数据。",
+      "pos": [
+        7369,
+        7407
+      ]
+    },
+    {
+      "pos": [
+        7453,
+        7560
+      ],
+      "content": "如果在传递给 <ph id=\"ph1\">`todoTable.InsertAsync`</ph> 调用的 <ph id=\"ph2\">`todoItem`</ph> 中未包含唯一的自定义 ID 值，则服务器将会生成一个 ID 值，并在返回到客户端的 <ph id=\"ph3\">`todoItem`</ph> 对象中设置该值。"
+    },
+    {
+      "content": "若要插入非类型化数据，你可以按如下所示利用 Json.NET。",
+      "pos": [
+        7562,
+        7593
+      ]
+    },
+    {
+      "content": "以下示例使用电子邮件地址作为唯一的字符串 ID。",
+      "pos": [
+        7742,
+        7766
+      ]
+    },
+    {
+      "content": "使用 ID 值",
+      "pos": [
+        7964,
+        7971
+      ]
+    },
+    {
+      "pos": [
+        7973,
+        8038
+      ],
+      "content": "移动服务支持为表的 <bpt id=\"p1\">**</bpt>ID<ept id=\"p1\">**</ept> 列使用唯一的自定义字符串值。这样，应用程序便可为 ID 使用自定义值（如电子邮件地址或用户名）。"
+    },
+    {
+      "content": "字符串 ID 可提供以下优势：",
+      "pos": [
+        8040,
+        8055
+      ]
+    },
+    {
+      "content": "无需往返访问数据库即可生成 ID。",
+      "pos": [
+        8059,
+        8076
+      ]
+    },
+    {
+      "content": "更方便地合并不同表或数据库中的记录。",
+      "pos": [
+        8079,
+        8097
+      ]
+    },
+    {
+      "content": "ID 值能够更好地与应用程序的逻辑相集成。",
+      "pos": [
+        8100,
+        8121
+      ]
+    },
+    {
+      "pos": [
+        8123,
+        8358
+      ],
+      "content": "如果插入的记录中未设置字符串 ID 值，移动服务将为 ID 生成唯一值。你可以在客户端上或在 .NET 移动后端服务中，使用 <ph id=\"ph1\">`Guid.NewGuid()`</ph> 方法生成自己的 ID 值。若要了解有关在 JavaScript 后端移动服务中生成 GUID 的详细信息，请参阅<bpt id=\"p1\">[</bpt>如何：生成唯一的 ID 值<ept id=\"p1\">](/documentation/articles/mobile-services-how-to-use-server-scripts/#generate-guids)</ept>。"
+    },
+    {
+      "pos": [
+        8360,
+        8578
+      ],
+      "content": "也可以为表使用整数 ID。若要使用整数 ID，必须结合 <ph id=\"ph1\">`--integerId`</ph> 选项使用 <ph id=\"ph2\">`mobile table create`</ph> 命令创建表。应在适用于 Azure 的命令行界面 (CLI) 中使用此命令。有关使用 CLI 的详细信息，请参阅<bpt id=\"p1\">[</bpt>用于管理移动服务表的 CLI<ept id=\"p1\">](/documentation/articles/virtual-machines-command-line-tools/#Mobile_Tables)</ept>。"
+    },
+    {
+      "pos": [
+        8582,
+        8619
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"modifying\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：在移动服务中修改数据"
+    },
+    {
+      "content": "以下代码演示了如何使用新的信息更新具有相同 ID 的现有实例。参数包含要作为 .NET 对象更新的数据。",
+      "pos": [
+        8621,
+        8673
+      ]
+    },
+    {
+      "pos": [
+        8720,
+        8821
+      ],
+      "content": "若要插入非类型化数据，你可以按此方式利用 Json.NET。请注意，在执行更新时，必须指定 ID，移动服务将凭此 ID 来识别要更新的实例。可以从 <ph id=\"ph1\">`InsertAsync`</ph> 调用的结果中获取该 ID。"
+    },
+    {
+      "pos": [
+        9028,
+        9098
+      ],
+      "content": "如果你尝试更新某个项但未提供“ID”值，则服务无法识别要更新的实例，从而导致移动服务 SDK 引发 <ph id=\"ph1\">`ArgumentException`</ph>。"
+    },
+    {
+      "pos": [
+        9103,
+        9138
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"deleting\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何在移动服务中删除数据"
+    },
+    {
+      "pos": [
+        9140,
+        9185
+      ],
+      "content": "以下代码演示了如何删除现有实例。该实例由 <ph id=\"ph1\">`todoItem`</ph> 中设置的“Id”字段标识。"
+    },
+    {
+      "pos": [
+        9231,
+        9410
+      ],
+      "content": "若要删除非类型化数据，你可以按此方式利用 Json.NET。请注意，在执行删除请求时，必须指定 ID，移动服务将凭此 ID 来识别要删除的实例。删除请求只需要 ID；其他属性将不会传递给服务，如果传递了任何属性，服务会将其忽略。<ph id=\"ph1\">`DeleteAsync`</ph> 调用的结果通常也是 <ph id=\"ph2\">`null`</ph>。可以从 <ph id=\"ph3\">`InsertAsync`</ph> 调用的结果中获取要传入的 ID。"
+    },
+    {
+      "pos": [
+        9536,
+        9706
+      ],
+      "content": "如果你尝试删除某个项但尚未设置“Id”字段，则服务无法识别要删除的实例，因此你会收到服务发出的 <ph id=\"ph1\">`MobileServiceInvalidOperationException`</ph>。同样，如果你尝试删除某个非类型化项但尚未设置“Id”字段，则也会收到服务发出的 <ph id=\"ph2\">`MobileServiceInvalidOperationException`</ph>。"
+    },
+    {
+      "pos": [
+        9710,
+        9748
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"#custom-api\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：调用自定义 API"
+    },
+    {
+      "pos": [
+        9750,
+        9987
+      ],
+      "content": "自定义 API 可让你定义自定义终结点，这些终结点将会公开不映射到插入、更新、删除或读取操作的服务器功能。使用自定义 API 能够以更大的力度控制消息传送，包括读取和设置 HTTP 消息标头，以及定义除 JSON 以外的消息正文格式。有关如何在移动服务中创建自定义 API 的示例，请参阅<bpt id=\"p1\">[</bpt>如何：定义自定义 API 终结点<ept id=\"p1\">](/documentation/articles/mobile-services-dotnet-backend-define-custom-api)</ept>。"
+    },
+    {
+      "pos": [
+        9989,
+        10081
+      ],
+      "content": "通过在客户端上调用某一个 <bpt id=\"p1\">[</bpt><ept id=\"p1\">InvokeApiAsync]</ept> 方法重载来调用自定义 API。例如，以下代码行向移动服务上的 <bpt id=\"p2\">**</bpt>completeAll<ept id=\"p2\">**</ept> API 发送 POST 请求："
+    },
+    {
+      "pos": [
+        10227,
+        10398
+      ],
+      "content": "请注意，这种类型化方法调用要求定义 <bpt id=\"p1\">**</bpt>MarkAllResult<ept id=\"p1\">**</ept> 返回类型。支持类型化和非类型化的方法。这几乎是最小的示例，因为它是类型化方法，不发送任何负载，没有查询参数，而且不改变请求标头。有关更现实可行的示例和对 <bpt id=\"p2\">[</bpt><ept id=\"p2\">InvokeApiAsync]</ept> 更完整的介绍，请参阅 <bpt id=\"p3\">[</bpt><ept id=\"p3\">Azure 移动服务客户端 SDK 中的自定义 API]</ept>。"
+    },
+    {
+      "content": "如何：注册推送通知",
+      "pos": [
+        10402,
+        10411
+      ]
+    },
+    {
+      "content": "移动服务客户端可让你向 Azure 通知中心注册推送通知。注册时，你将获得从平台特定的推送通知服务 (PNS) 获取的句柄。然后你就可以在创建注册时提供此值以及任何标记。以下代码将用于推送通知的 Windows 应用注册到 Windows 通知服务 (WNS)：",
+      "pos": [
+        10413,
+        10544
+      ]
+    },
+    {
+      "pos": [
+        11054,
+        11204
+      ],
+      "content": "请注意，在此示例中，注册包含两个标记。有关 Windows 应用的详细信息，请参阅<bpt id=\"p1\">[</bpt>向应用添加推送通知<ept id=\"p1\">](/documentation/articles/mobile-services-dotnet-backend-windows-universal-dotnet-get-started-push)</ept>"
+    },
+    {
+      "pos": [
+        11206,
+        11574
+      ],
+      "content": "Xamarin 应用需要一些额外的代码才能将 iOS 或 Android 应用上运行的 Xamarin 应用分别注册到 Apple Push Notification 服务 (APNS) 和 Google Cloud Messaging (GCM) 服务。有关详细信息，请参阅<bpt id=\"p1\">**</bpt>向应用添加推送通知<ept id=\"p1\">**</ept> (<bpt id=\"p2\">[</bpt>Xamarin.iOS<ept id=\"p2\">](/documentation/articles/partner-xamarin-mobile-services-ios-get-started-push/#add-push)</ept> | <bpt id=\"p3\">[</bpt>Xamarin.Android<ept id=\"p3\">](/documentation/articles/partner-xamarin-mobile-services-android-get-started-push/#add-push)</ept>)。"
+    },
+    {
+      "pos": [
+        11577,
+        11805
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>当你需要发送通知给特定的已注册用户时，必须在注册之前要求身份验证，然后验证是否已授权该用户注册特定标记。例如，必须检查以确保用户注册的标记不是其他人的用户 ID。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>向经过身份验证的用户发送推送通知<ept id=\"p1\">](/documentation/articles/mobile-services-dotnet-backend-windows-store-dotnet-push-notifications-app-users)</ept>。"
+    },
+    {
+      "pos": [
+        11809,
+        11864
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"pull-notifications\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：在 Windows 应用中使用定期通知"
+    },
+    {
+      "pos": [
+        11866,
+        12124
+      ],
+      "content": "Windows 支持使用定期通知（提取通知）更新动态磁贴。启用定期通知后，Windows 将定期访问自定义 API 终结点以更新开始菜单上的应用磁贴。若要使用定期通知，必须<bpt id=\"p1\">[</bpt>定义一个自定义 API<ept id=\"p1\">](mobile-services-javascript-backend-define-custom-api.md)</ept>，以便使用磁贴特定的格式返回 XML 数据。有关详细信息，请参阅<bpt id=\"p2\">[</bpt>定期通知<ept id=\"p2\">](https://msdn.microsoft.com/library/windows/apps/hh761461.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        12126,
+        12165
+      ],
+      "content": "以下示例将启用定期通知，以便从 <bpt id=\"p1\">*</bpt>tiles<ept id=\"p1\">*</ept> 自定义终结点请求磁贴模板数据："
+    },
+    {
+      "pos": [
+        12358,
+        12513
+      ],
+      "content": "选择与你的数据更新频率最匹配的 <bpt id=\"p1\">[</bpt>PeriodicUpdateRecurrance<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/windows/apps/windows.ui.notifications.periodicupdaterecurrence.aspx)</ept> 值。"
+    },
+    {
+      "pos": [
+        12517,
+        12562
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"optimisticconcurrency\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：使用乐观并发"
+    },
+    {
+      "content": "在某些情况下，两个或两个以上客户端可能会同时将更改写入同一项目。如果没有任何冲突检测，则最后一次写入会覆盖任何以前的更新，即使这并不是所需要的结果。乐观并发控制假定每个事务均可以提交，因此不使用任何资源锁定。提交事务之前，乐观并发控制将验证是否没有其他事务修改了数据。如果数据已修改，则将回滚正在提交的事务。",
+      "pos": [
+        12564,
+        12718
+      ]
+    },
+    {
+      "pos": [
+        12720,
+        13050
+      ],
+      "content": "移动服务通过使用 <ph id=\"ph1\">`__version`</ph> 系统属性列（该列是为移动服务创建的每个表定义的）跟踪对每个项的更改来支持乐观并发控制。每次更新某个记录时，移动服务都将该记录的 <ph id=\"ph2\">`__version`</ph> 属性设置为新值。在每次执行更新请求期间，会将该请求包含的记录的 <ph id=\"ph3\">`__version`</ph> 属性与服务器上的记录的同一属性进行比较。如果随请求传递的版本与服务器不匹配，则移动服务 .NET 客户端库将引发 <ph id=\"ph4\">`MobileServicePreconditionFailedException&lt;T&gt;`</ph>。该异常中提供的类型就是包含记录服务器版本的服务器中的记录。然后，应用程序可以借助此信息来确定是否要使用服务器中正确的 <ph id=\"ph5\">`__version`</ph> 值再次执行更新请求以提交更改。"
+    },
+    {
+      "pos": [
+        13052,
+        13105
+      ],
+      "content": "为了启用乐观并发，应用程序将在表类中为 <ph id=\"ph1\">`__version`</ph> 系统属性定义一个列。以下定义就是一个示例。"
+    },
+    {
+      "pos": [
+        13516,
+        13582
+      ],
+      "content": "使用非类型化表的应用程序通过在表的 <ph id=\"ph1\">`SystemProperties`</ph> 中设置 <ph id=\"ph2\">`Version`</ph> 标志来启用乐观并发，如下所示。"
+    },
+    {
+      "pos": [
+        13719,
+        13791
+      ],
+      "content": "以下代码演示了如何解决检测到的写入冲突。若要提交解决方法，必须在 <ph id=\"ph1\">`UpdateAsync()`</ph> 调用中包含正确的 <ph id=\"ph2\">`__version`</ph> 值。"
+    },
+    {
+      "pos": [
+        15766,
+        15797
+      ],
+      "content": "有关使用移动服务乐观并发的更完整示例，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">乐观并发教程]</ept>。"
+    },
+    {
+      "pos": [
+        15802,
+        15850
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"binding\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：将移动服务数据绑定到 Windows 用户界面"
+    },
+    {
+      "pos": [
+        15852,
+        15995
+      ],
+      "content": "本部分说明如何使用 Windows 应用中的 UI 元素显示返回的数据对象。若要查询 <ph id=\"ph1\">`todoTable`</ph> 中的不完整项并在极简单的列表中显示这些项，可以运行以下示例代码，以使用查询绑定列表源。使用 <ph id=\"ph2\">`MobileServiceCollection`</ph> 可以创建移动服务感知型绑定集合。"
+    },
+    {
+      "pos": [
+        16416,
+        16717
+      ],
+      "content": "托管运行时中的某些控件支持名为 <bpt id=\"p1\">[</bpt>ISupportIncrementalLoading<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/windows/apps/Hh701916)</ept> 的接口。当用户滚动浏览时，此接口允许控件请求更多的数据。系统通过 <ph id=\"ph1\">`MobileServiceIncrementalLoadingCollection`</ph>（可自动处理来自控件的调用）为这个适用于通用 Windows 8.1 应用的接口提供内置支持。若要在 Windows 应用中使用 <ph id=\"ph2\">`MobileServiceIncrementalLoadingCollection`</ph>，请执行以下代码："
+    },
+    {
+      "pos": [
+        16998,
+        17162
+      ],
+      "content": "若要在 Windows Phone 8 和“Silverlight”应用上使用新的集合，请在 <ph id=\"ph1\">`IMobileServiceTableQuery&lt;T&gt;`</ph> 和 <ph id=\"ph2\">`IMobileServiceTable&lt;T&gt;`</ph> 上使用 <ph id=\"ph3\">`ToCollection`</ph> 扩展方法。若要实际加载数据，请调用 <ph id=\"ph4\">`LoadMoreItemsAsync()`</ph>。"
+    },
+    {
+      "pos": [
+        17329,
+        17619
+      ],
+      "content": "当你使用通过调用 <ph id=\"ph1\">`ToCollectionAsync`</ph> 或 <ph id=\"ph2\">`ToCollection`</ph> 创建的集合时，可以获取可绑定到 UI 控件的集合。此集合支持分页，也就是说，控件可以要求该集合“加载更多项”，而该集合也确实会这样做。这样看来，无需执行任何用户代码，控件就能启动工作流。但是，由于集合要从网络加载数据，因此可以预料到这种加载有时会失败。若要处理这种故障，你可以重写 <ph id=\"ph3\">`MobileServiceIncrementalLoadingCollection`</ph> 中的 <ph id=\"ph4\">`OnException`</ph> 方法，以处理调用控件执行的 <ph id=\"ph5\">`LoadMoreItemsAsync`</ph> 后发生的异常。"
+    },
+    {
+      "pos": [
+        17621,
+        17713
+      ],
+      "content": "最后，假设你的表包含许多字段，但你只想在控件中显示其中的某些字段。在这种情况下，你可以参考上面“<bpt id=\"p1\">[</bpt>选择特定的列<ept id=\"p1\">](#selecting)</ept>”部分中的指导，选择要在 UI 中显示的特定列。"
+    },
+    {
+      "pos": [
+        17717,
+        17757
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"authentication\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何对用户进行身份验证"
+    },
+    {
+      "pos": [
+        17759,
+        17954
+      ],
+      "content": "移动服务支持使用各种外部标识提供者对应用程序用户进行身份验证和授权，这些提供者包括：Facebook、Google、Microsoft 帐户、Twitter 和 Active Directory。你可以在表中设置权限，以便将特定操作的访问权限限制给已经过身份验证的用户。你还可以在服务器脚本中使用已经过身份验证的用户的标识来实施授权规则。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">向应用程序添加身份验证]</ept>教程。"
+    },
+    {
+      "pos": [
+        17956,
+        18061
+      ],
+      "content": "支持两种身份验证流：<bpt id=\"p1\">_</bpt>服务器流<ept id=\"p1\">_</ept>和<bpt id=\"p2\">_</bpt>客户端流<ept id=\"p2\">_</ept>。服务器流依赖于提供者的 Web 身份验证界面，因此可提供最简便的身份验证体验。客户端流依赖于提供者和设备特定的 SDK，因此允许与设备特定的功能进行更深入的集成。"
+    },
+    {
+      "content": "服务器流",
+      "pos": [
+        18066,
+        18070
+      ]
+    },
+    {
+      "content": "若要让移动服务管理 Windows 应用中的身份验证过程，必须将你的应用注册到标识提供者。然后，需要在移动服务中配置提供者提供的应用程序 ID 和机密。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">向应用程序添加身份验证]</ept>教程。",
+      "pos": [
+        18071,
+        18173
+      ]
+    },
+    {
+      "pos": [
+        18175,
+        18280
+      ],
+      "content": "注册标识提供者后，只需结合提供者的 <bpt id=\"p1\">[</bpt><ept id=\"p1\">MobileServiceAuthenticationProvider]</ept> 值调用 <bpt id=\"p2\">[</bpt><ept id=\"p2\">LoginAsync 方法]</ept>。例如，以下代码将使用 Facebook 启动服务器流登录。"
+    },
+    {
+      "pos": [
+        19014,
+        19092
+      ],
+      "content": "如果使用的标识提供商不是 Facebook，请将上述 <bpt id=\"p1\">[</bpt><ept id=\"p1\">MobileServiceAuthenticationProvider]</ept> 的值更改为你的提供商的值。"
+    },
+    {
+      "pos": [
+        19094,
+        19338
+      ],
+      "content": "在此情况下，移动服务将通过以下方式管理 OAuth 2.0 身份验证流：显示选定提供者的登录页，并在用户成功使用标识提供者登录后生成移动服务身份验证令牌。<bpt id=\"p1\">[</bpt><ept id=\"p1\">LoginAsync 方法]</ept>将返回 <bpt id=\"p2\">[</bpt><ept id=\"p2\">MobileServiceUser]</ept>，该类将提供已经过身份验证的用户的 <bpt id=\"p3\">[</bpt><ept id=\"p3\">userId]</ept>，以及 JSON Web 令牌 (JWT) 形式的 <bpt id=\"p4\">[</bpt><ept id=\"p4\">MobileServiceAuthenticationToken]</ept>。你可以缓存此令牌，并在它过期之前重复使用。有关详细信息，请参阅<bpt id=\"p5\">[</bpt><ept id=\"p5\">缓存身份验证令牌]</ept>。"
+    },
+    {
+      "content": "客户端流",
+      "pos": [
+        19343,
+        19347
+      ]
+    },
+    {
+      "content": "你的应用程序还能够独立联系标识提供者，然后将返回的令牌提供给移动服务以进行身份验证。使用此客户端流可为用户提供单一登录体验，或者从标识提供者中检索其他用户数据。",
+      "pos": [
+        19349,
+        19429
+      ]
+    },
+    {
+      "content": "单一登录使用来自 Facebook 或 Google 的令牌",
+      "pos": [
+        19435,
+        19465
+      ]
+    },
+    {
+      "content": "你可以根据以下代码段中所示，为 Facebook 或 Google 使用这种最简单形式的客户端流。",
+      "pos": [
+        19467,
+        19516
+      ]
+    },
+    {
+      "content": "单一登录将 Microsoft 帐户与 Live SDK 配合使用",
+      "pos": [
+        20628,
+        20661
+      ]
+    },
+    {
+      "pos": [
+        20663,
+        20946
+      ],
+      "content": "若要对用户进行身份验证，必须在 Microsoft 帐户开发人员中心注册你的应用程序。然后，必须将此注册连接到你的移动服务。完成<bpt id=\"p1\">[</bpt>注册应用以使用 Microsoft 帐户登录<ept id=\"p1\">](/documentation/articles/mobile-services-how-to-register-microsoft-authentication)</ept>中的步骤，以创建 Microsoft 帐户注册并将注册连接到你的移动服务。如果你同时拥有 Windows 应用商店和 Windows Phone 8/Silverlight 版本的应用，请先注册 Windows 应用商店版本。"
+    },
+    {
+      "content": "下面的代码使用 Live SDK 进行身份验证，并使用返回的令牌来登录到你的移动服务。",
+      "pos": [
+        20948,
+        20991
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a name=\"caching\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>缓存身份验证令牌",
+      "pos": [
+        23203,
+        23233
+      ]
+    },
+    {
+      "content": "在某些情况下，完成首次用户身份验证后，可以避免调用 login 方法。你可以使用适用于 Windows 应用商店应用程序的 <bpt id=\"p1\">[</bpt><ept id=\"p1\">PasswordVault]</ept> 来缓存当前用户首次登录时使用的标识，以后每次该用户登录时，系统都会检查缓存中是否存在该用户标识。如果缓存为空，则用户仍然需要完成整个登录过程。",
+      "pos": [
+        23234,
+        23383
+      ]
+    },
+    {
+      "pos": [
+        24282,
+        24349
+      ],
+      "content": "对于 Windows Phone 应用程序，可以使用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">ProtectedData]</ept> 类加密和缓存数据，并在隔离的存储中存储敏感信息。"
+    },
+    {
+      "pos": [
+        24353,
+        24381
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"errors\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：处理错误"
+    },
+    {
+      "content": "在移动服务中，你可能会遇到各种形式的错误，并且可以通过多种方式来验证和解决这些错误。",
+      "pos": [
+        24383,
+        24425
+      ]
+    },
+    {
+      "content": "例如，你可以在移动服务中注册服务器脚本，然后使用这些脚本对所要插入和更新的数据执行各种操作，包括验证和数据修改。你可以按如下所示定义并注册一个用于验证和修改数据的服务器脚本：",
+      "pos": [
+        24427,
+        24514
+      ]
+    },
+    {
+      "content": "此服务器端脚本将验证发送到移动服务的字符串数据长度，并拒绝过长（在本例中为 10 个字符以上）的字符串。",
+      "pos": [
+        24759,
+        24811
+      ]
+    },
+    {
+      "content": "由于移动服务能够在服务器端验证数据和发送错误响应，因此你可以更新你的 .NET 应用程序，使其能够处理验证后生成的错误响应。",
+      "pos": [
+        24813,
+        24875
+      ]
+    },
+    {
+      "pos": [
+        25353,
+        25385
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"untyped\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何处理非类型化数据"
+    },
+    {
+      "content": ".NET 客户端在设计上支持强类型化方案。但有时，松散类型化的体验可为用户带来方便；例如，在处理采用开放架构的对象时，可能就需要这种体验。可按如下所示启用这种方案。在查询中，先指定 LINQ 语句并使用有线格式。",
+      "pos": [
+        25387,
+        25493
+      ]
+    },
+    {
+      "pos": [
+        25745,
+        25841
+      ],
+      "content": "此时，你将获取一些可以像属性包一样使用的 JSON 值。有关 JToken 和 Json.NET 的详细信息，请参阅 <bpt id=\"p1\">[</bpt>Json.NET<ept id=\"p1\">](http://json.codeplex.com/)</ept>"
+    },
+    {
+      "pos": [
+        25845,
+        25881
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"unit-testing\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何：设计单元测试"
+    },
+    {
+      "pos": [
+        25883,
+        26003
+      ],
+      "content": "<ph id=\"ph1\">`MobileServiceClient.GetTable`</ph> 返回的值和查询是接口。这使它们可轻松“模拟”用于测试目的，以便创建一个实现测试逻辑的 <ph id=\"ph2\">`MyMockTable : IMobileServiceTable&lt;TodoItem&gt;`</ph>。"
+    },
+    {
+      "pos": [
+        26007,
+        26041
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"customizing\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何自定义客户端"
+    },
+    {
+      "content": "本部分说明你可以使用哪些方法来自定义请求标头，以及自定义响应中的 JSON 对象序列化。",
+      "pos": [
+        26043,
+        26087
+      ]
+    },
+    {
+      "pos": [
+        26093,
+        26124
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"headers\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何自定义请求标头"
+    },
+    {
+      "content": "若要支持特定的应用程序方案，你可能需要自定义与移动服务之间的通信。例如，你可能需要将一个自定义标头添加到每个传出请求，甚至要更改响应状态代码。可以通过提供自定义 DelegatingHandler 来实现此目的，如以下示例中所示：",
+      "pos": [
+        26126,
+        26241
+      ]
+    },
+    {
+      "pos": [
+        27217,
+        27296
+      ],
+      "content": "此代码在请求中添加新的 <bpt id=\"p1\">**</bpt>x-my-header<ept id=\"p1\">**</ept> 标头，并强行将响应代码设为不可用。在实际方案中，你会根据应用程序所需的某种自定义逻辑来设置响应状态码。"
+    },
+    {
+      "pos": [
+        27302,
+        27338
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"serialization\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何自定义序列化"
+    },
+    {
+      "pos": [
+        27340,
+        27708
+      ],
+      "content": "移动服务客户端库使用 Json.NET 在客户端上将 JSON 响应转换为 .NET 对象。你可以在消息中设置此序列化在 .NET 类型与 JSON 之间的行为。<bpt id=\"p1\">[</bpt>MobileServiceClient<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/microsoft.windowsazure.mobileservices.mobileserviceclient.aspx)</ept> 类公开 <bpt id=\"p2\">[</bpt>JsonSerializerSettings<ept id=\"p2\">](http://james.newtonking.com/projects/json/help/?topic=html/T_Newtonsoft_Json_JsonSerializerSettings.htm)</ept> 类型的 <ph id=\"ph1\">`SerializerSettings`</ph> 属性"
+    },
+    {
+      "content": "使用此属性可以设置许多 Json.NET 属性中的一个，如下所示：",
+      "pos": [
+        27710,
+        27743
+      ]
+    },
+    {
+      "content": "此属性在序列化期间将所有属性转换为小写。",
+      "pos": [
+        27915,
+        27935
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"使用移动服务托管客户端库 (Windows | Xamarin) | Azure\"\n    description=\"了解如何在 Windows 和 Xamarin 应用中使用 Azure 移动服务的 .NET 客户端。\"\n    services=\"mobile-services\"\n    documentationCenter=\"\"\n    authors=\"ggailey777\"\n    manager=\"dwrede\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"mobile-services\"\n    ms.date=\"11/02/2015\" \n    wacn.date=\"01/29/2016\"/>\n\n# 如何使用 Azure 移动服务的托管客户端库\n\n[AZURE.INCLUDE [mobile-service-note-mobile-apps](../includes/mobile-services-note-mobile-apps.md)]\n\n&nbsp;\n[AZURE.INCLUDE [mobile-services-selector-client-library](../includes/mobile-services-selector-client-library.md)]\n\n##概述 \n\n本指南说明如何在 Windows 应用和 Xamarin 应用中使用 Azure 移动服务的托管客户端库执行常见方案。所述的任务包括查询数据、插入、更新和删除数据、对用户进行身份验证和处理错误。如果你是第一次使用移动服务，最好先完成[移动服务快速入门](/documentation/articles/mobile-services-dotnet-backend-xamarin-ios-get-started)教程。\n\n[AZURE.INCLUDE [mobile-services-concepts](../includes/mobile-services-concepts.md)]\n\n##<a name=\"setup\"></a>安装与先决条件\n\n假设你已创建一个移动服务和一个表。有关详细信息，请参阅[创建表](http://go.microsoft.com/fwlink/?LinkId=298592)。在本主题使用的代码中，表的名称为 `TodoItem`，其中包含以下列：`Id`、`Text` 和 `Complete`。\n\n相应的类型化客户端 .NET 类型如下：\n\n\n    public class TodoItem\n    {\n        public string Id { get; set; }\n\n        [JsonProperty(PropertyName = \"text\")]\n        public string Text { get; set; }\n\n        [JsonProperty(PropertyName = \"complete\")]\n        public bool Complete { get; set; }\n    }\n\n请注意，[JsonPropertyAttribute](http://www.newtonsoft.com/json/help/html/Properties_T_Newtonsoft_Json_JsonPropertyAttribute.htm) 用于定义客户端类型与表之间 PropertyName 映射之间的映射。\n\n在 JavaScript 后端移动服务中启用动态架构后，Azure 移动服务将基于 insert 或 update 请求中的对象自动生成新列。有关详细信息，请参阅[动态架构](http://go.microsoft.com/fwlink/?LinkId=296271)。在 .NET 后端移动服务中，表在项目的数据模型中定义。\n\n##<a name=\"create-client\"></a>如何创建移动服务客户端\n\n以下代码将创建用于访问移动服务的 `MobileServiceClient` 对象。\n\n\n    MobileServiceClient client = new MobileServiceClient(\n        \"AppUrl\",\n        \"AppKey\"\n    );\n\n在上面的代码中，请将 `AppUrl` 和 `AppKey` 依次替换为移动服务 URL 和应用程序密钥。在 Azure 经典门户中选择你的移动服务，然后单击“仪表板”即可获取这两个值。\n\n>[AZURE.IMPORTANT]应用程序密钥用于针对移动服务筛选出随机请求，将随应用程序一起分发。由于此密钥未加密，因此不能被认为是安全的。为确保安全访问你的移动服务数据，你必须改为在允许用户访问前对用户进行身份验证。有关详细信息，请参阅[如何：对用户进行身份验证](#authentication)。\n\n##<a name=\"instantiating\"></a>如何创建表引用\n\n访问或修改移动服务表中数据的所有代码都将对 `MobileServiceTable` 对象调用函数。通过对 `MobileServiceClient` 的实例调用 [GetTable](https://msdn.microsoft.com/zh-cn/library/azure/jj554275.aspx) 方法可以获取对表的引用，如下所示：\n\n    IMobileServiceTable<TodoItem> todoTable =\n        client.GetTable<TodoItem>();\n\n这是类型化的序列化模型；请参阅下面有关[非类型化序列化模型](#untyped)的介绍。\n\n##<a name=\"querying\"></a>如何从移动服务查询数据\n\n本部分介绍如何向包含以下功能的移动服务发出查询：\n\n- [筛选返回的数据]\n- [为返回的数据排序]\n- [在页中返回数据]\n- [选择特定的列]\n- [按 ID 查找数据]\n\n>[AZURE.NOTE]将强制使用服务器驱动的页大小来防止返回所有行。这可以防止对大型数据集发出的默认请求对服务造成负面影响。若要返回 50 个以上的行，请根据[在页中返回数据]所述使用 `Take` 方法。\n\n### <a name=\"filtering\"></a>如何筛选返回的数据\n\n以下代码演示了如何通过在查询中包含 `Where` 子句来筛选数据。该代码将返回 `Complete` 属性等于 `false` 的 `todoTable` 中的所有项。`Where` 函数针对该表将一个行筛选谓词应用到查询。\n\n    // This query filters out completed TodoItems and\n    // items without a timestamp.\n    List<TodoItem> items = await todoTable\n       .Where(todoItem => todoItem.Complete == false)\n       .ToListAsync();\n\n可以使用消息检查软件（例如浏览器开发人员工具或 [Fiddler]）来查看发送到移动服务的请求的 URI。从下面的请求 URI 中，可以看出我们正在修改查询字符串本身：\n\n    GET /tables/todoitem?$filter=(complete+eq+false) HTTP/1.1\n在服务器端，此请求通常会粗略地转换成以下 SQL 查询：\n\n    SELECT *\n    FROM TodoItem\n    WHERE ISNULL(complete, 0) = 0\n\n传递给 `Where` 方法的函数可以包含任意数目的条件。例如，以下行：\n\n    // This query filters out completed TodoItems where Text isn't null\n    List<TodoItem> items = await todoTable\n       .Where(todoItem => todoItem.Complete == false\n           && todoItem.Text != null)\n       .ToListAsync();\n\n将粗略地转换为（针对前面显示的同一请求）\n\n    SELECT *\n    FROM TodoItem\n    WHERE ISNULL(complete, 0) = 0\n          AND ISNULL(text, 0) = 0\n\n上述 `where` 语句将查找 `Complete` 状态设置为 false 且 `Text` 不为 null 的项。\n\n我们也可以使用多个行编写该代码：\n\n    List<TodoItem> items = await todoTable\n       .Where(todoItem => todoItem.Complete == false)\n       .Where(todoItem => todoItem.Text != null)\n       .ToListAsync();\n\n这两种方法是等效的，可以换用。前一个选项（在一个查询中连接多个谓词）更为精简，也是我们推荐的方法。\n\n`where` 子句支持可转换成移动服务 OData 子集的操作，其中包括关系运算符（==、!=、<、<=、>、>=）、数学运算符（+、-、/、*、%）、数字精度（Math.Floor、Math.Ceiling）、字符串函数（Length、Substring、Replace、IndexOf、StartsWith、EndsWith）、日期属性（Year、Month、Day、Hour、Minute、Second）、对象的访问属性，以及组合了上述所有操作的表达式。\n\n### <a name=\"sorting\"></a>如何为返回的数据排序\n\n以下代码演示了如何通过在查询中包含 `OrderBy` 或 `OrderByDescending` 函数来为数据排序。该代码将返回 `todoTable` 中的项，这些项已按 `Text` 字段的升序排序。\n\n    // Sort items in ascending order by Text field\n    MobileServiceTableQuery<TodoItem> query = todoTable\n                    .OrderBy(todoItem => todoItem.Text)\n    List<TodoItem> items = await query.ToListAsync();\n\n    // Sort items in descending order by Text field\n    MobileServiceTableQuery<TodoItem> query = todoTable\n                    .OrderByDescending(todoItem => todoItem.Text)\n    List<TodoItem> items = await query.ToListAsync();\n\n### <a name=\"paging\"></a>如何在页中返回数据\n\n默认情况下，服务器只返回前 50 行。你可以通过调用 [Take] 方法来增加返回的行数。将 `Take` 与 [Skip] 方法一起使用可以请求查询返回的总数据集的特定“页”。执行以下查询后，将返回表中的前三个项。\n\n    // Define a filtered query that returns the top 3 items.\n    MobileServiceTableQuery<TodoItem> query = todoTable\n                    .Take(3);\n    List<TodoItem> items = await query.ToListAsync();\n\n以下经过修改的查询将跳过前三个结果，返回其后的三个结果。实际上这是数据的第二“页”，其页大小为三个项。\n\n    // Define a filtered query that skips the top 3 items and returns the next 3 items.\n    MobileServiceTableQuery<TodoItem> query = todoTable\n                    .Skip(3)\n                    .Take(3);\n    List<TodoItem> items = await query.ToListAsync();\n\n你还可以使用 [IncludeTotalCount] 方法来确保查询获取应该返回的<i>所有</i>记录的总计数，并忽略指定的任何 take 分页/限制子句：\n\n    query = query.IncludeTotalCount();\n\n这是将硬编码分页值传递给 `Take` 和 `Skip` 方法的简化方案。在实际应用中，你可以对页导航控件或类似的 UI 使用类似于上面的查询，让用户导航到上一页和下一页。\n\n####.NET 后端移动服务的分页注意事项\n\n若要重写 .NET 后端移动服务中的 50 行限制，你还必须将 [EnableQueryAttribute](https://msdn.microsoft.com/zh-cn/library/system.web.http.odata.enablequeryattribute.aspx) 应用到公共 GET 方法，并指定分页行为。将以下语句应用到该方法后，最大返回行数将设置为 1000：\n\n    [EnableQuery(MaxTop=1000)]\n\n\n### <a name=\"selecting\"></a>如何选择特定的列\n\n你可以通过在查询中添加 `Select` 子句来指定要包含在结果中的属性集。例如，以下代码演示了如何做到只选择一个字段，以及如何选择并格式化多个字段：\n\n    // Select one field -- just the Text\n    MobileServiceTableQuery<TodoItem> query = todoTable\n                    .Select(todoItem => todoItem.Text);\n    List<string> items = await query.ToListAsync();\n\n    // Select multiple fields -- both Complete and Text info\n    MobileServiceTableQuery<TodoItem> query = todoTable\n                    .Select(todoItem => string.Format(\"{0} -- {1}\", todoItem.Text.PadRight(30), todoItem.Complete ? \"Now complete!\" : \"Incomplete!\"));\n    List<string> items = await query.ToListAsync();\n\n到目前为止所述的所有函数都是加性函数，我们可以不断地调用它们，每次调用都能进一步影响查询。再提供一个示例：\n\n    MobileServiceTableQuery<TodoItem> query = todoTable\n                    .Where(todoItem => todoItem.Complete == false)\n                    .Select(todoItem => todoItem.Text)\n                    .Skip(3).\n                    .Take(3);\n    List<string> items = await query.ToListAsync();\n\n### <a name=\"lookingup\"></a>如何：按 ID 查找数据\n\n使用 `LookupAsync` 函数可以查找数据库中具有特定 ID 的对象。\n\n    // This query filters out the item with the ID of 37BBF396-11F0-4B39-85C8-B319C729AF6D\n    TodoItem item = await todoTable.LookupAsync(\"37BBF396-11F0-4B39-85C8-B319C729AF6D\");\n\n##<a name=\"inserting\"></a>如何在移动服务中插入数据\n\n> [AZURE.NOTE]如果你想要对某个类型执行插入、查找、删除或更新操作，则需要创建一个名为 **Id** 的成员。正因如此，示例类 **TodoItem** 包含了一个名为 **Id** 的成员。更新和删除操作中始终必须存在一个有效的 ID 值。\n\n以下代码演示了如何在表中插入新行。参数包含要作为 .NET 对象插入的数据。\n\n    await todoTable.InsertAsync(todoItem);\n\n如果在传递给 `todoTable.InsertAsync` 调用的 `todoItem` 中未包含唯一的自定义 ID 值，则服务器将会生成一个 ID 值，并在返回到客户端的 `todoItem` 对象中设置该值。\n\n若要插入非类型化数据，你可以按如下所示利用 Json.NET。\n\n    JObject jo = new JObject();\n    jo.Add(\"Text\", \"Hello World\");\n    jo.Add(\"Complete\", false);\n    var inserted = await table.InsertAsync(jo);\n\n以下示例使用电子邮件地址作为唯一的字符串 ID。\n\n    JObject jo = new JObject();\n    jo.Add(\"id\", \"myemail@emaildomain.com\");\n    jo.Add(\"Text\", \"Hello World\");\n    jo.Add(\"Complete\", false);\n    var inserted = await table.InsertAsync(jo);\n\n\n###使用 ID 值\n\n移动服务支持为表的 **ID** 列使用唯一的自定义字符串值。这样，应用程序便可为 ID 使用自定义值（如电子邮件地址或用户名）。\n\n字符串 ID 可提供以下优势：\n\n+ 无需往返访问数据库即可生成 ID。\n+ 更方便地合并不同表或数据库中的记录。\n+ ID 值能够更好地与应用程序的逻辑相集成。\n\n如果插入的记录中未设置字符串 ID 值，移动服务将为 ID 生成唯一值。你可以在客户端上或在 .NET 移动后端服务中，使用 `Guid.NewGuid()` 方法生成自己的 ID 值。若要了解有关在 JavaScript 后端移动服务中生成 GUID 的详细信息，请参阅[如何：生成唯一的 ID 值](/documentation/articles/mobile-services-how-to-use-server-scripts/#generate-guids)。\n\n也可以为表使用整数 ID。若要使用整数 ID，必须结合 `--integerId` 选项使用 `mobile table create` 命令创建表。应在适用于 Azure 的命令行界面 (CLI) 中使用此命令。有关使用 CLI 的详细信息，请参阅[用于管理移动服务表的 CLI](/documentation/articles/virtual-machines-command-line-tools/#Mobile_Tables)。\n\n##<a name=\"modifying\"></a>如何：在移动服务中修改数据\n\n以下代码演示了如何使用新的信息更新具有相同 ID 的现有实例。参数包含要作为 .NET 对象更新的数据。\n\n    await todoTable.UpdateAsync(todoItem);\n\n\n若要插入非类型化数据，你可以按此方式利用 Json.NET。请注意，在执行更新时，必须指定 ID，移动服务将凭此 ID 来识别要更新的实例。可以从 `InsertAsync` 调用的结果中获取该 ID。\n\n    JObject jo = new JObject();\n    jo.Add(\"Id\", \"37BBF396-11F0-4B39-85C8-B319C729AF6D\");\n    jo.Add(\"Text\", \"Hello World\");\n    jo.Add(\"Complete\", false);\n    var inserted = await table.UpdateAsync(jo);\n\n如果你尝试更新某个项但未提供“ID”值，则服务无法识别要更新的实例，从而导致移动服务 SDK 引发 `ArgumentException`。\n\n\n##<a name=\"deleting\"></a>如何在移动服务中删除数据\n\n以下代码演示了如何删除现有实例。该实例由 `todoItem` 中设置的“Id”字段标识。\n\n    await todoTable.DeleteAsync(todoItem);\n\n若要删除非类型化数据，你可以按此方式利用 Json.NET。请注意，在执行删除请求时，必须指定 ID，移动服务将凭此 ID 来识别要删除的实例。删除请求只需要 ID；其他属性将不会传递给服务，如果传递了任何属性，服务会将其忽略。`DeleteAsync` 调用的结果通常也是 `null`。可以从 `InsertAsync` 调用的结果中获取要传入的 ID。\n\n    JObject jo = new JObject();\n    jo.Add(\"Id\", \"37BBF396-11F0-4B39-85C8-B319C729AF6D\");\n    await table.DeleteAsync(jo);\n\n如果你尝试删除某个项但尚未设置“Id”字段，则服务无法识别要删除的实例，因此你会收到服务发出的 `MobileServiceInvalidOperationException`。同样，如果你尝试删除某个非类型化项但尚未设置“Id”字段，则也会收到服务发出的 `MobileServiceInvalidOperationException`。\n\n##<a name=\"#custom-api\"></a>如何：调用自定义 API\n\n自定义 API 可让你定义自定义终结点，这些终结点将会公开不映射到插入、更新、删除或读取操作的服务器功能。使用自定义 API 能够以更大的力度控制消息传送，包括读取和设置 HTTP 消息标头，以及定义除 JSON 以外的消息正文格式。有关如何在移动服务中创建自定义 API 的示例，请参阅[如何：定义自定义 API 终结点](/documentation/articles/mobile-services-dotnet-backend-define-custom-api)。\n\n通过在客户端上调用某一个 [InvokeApiAsync] 方法重载来调用自定义 API。例如，以下代码行向移动服务上的 **completeAll** API 发送 POST 请求：\n\n    var result = await App.MobileService\n        .InvokeApiAsync<MarkAllResult>(\"completeAll\",\n        System.Net.Http.HttpMethod.Post, null);\n\n请注意，这种类型化方法调用要求定义 **MarkAllResult** 返回类型。支持类型化和非类型化的方法。这几乎是最小的示例，因为它是类型化方法，不发送任何负载，没有查询参数，而且不改变请求标头。有关更现实可行的示例和对 [InvokeApiAsync] 更完整的介绍，请参阅 [Azure 移动服务客户端 SDK 中的自定义 API]。\n\n##如何：注册推送通知\n\n移动服务客户端可让你向 Azure 通知中心注册推送通知。注册时，你将获得从平台特定的推送通知服务 (PNS) 获取的句柄。然后你就可以在创建注册时提供此值以及任何标记。以下代码将用于推送通知的 Windows 应用注册到 Windows 通知服务 (WNS)：\n\n        private async void InitNotificationsAsync()\n        {\n            // Request a push notification channel.\n            var channel =\n                await PushNotificationChannelManager\n                    .CreatePushNotificationChannelForApplicationAsync();\n\n            // Register for notifications using the new channel and a tag collection.\n            var tags = new List<string>{ \"mytag1\", \"mytag2\"};\n            await MobileService.GetPush().RegisterNativeAsync(channel.Uri, tags);\n        }\n\n请注意，在此示例中，注册包含两个标记。有关 Windows 应用的详细信息，请参阅[向应用添加推送通知](/documentation/articles/mobile-services-dotnet-backend-windows-universal-dotnet-get-started-push)\n\nXamarin 应用需要一些额外的代码才能将 iOS 或 Android 应用上运行的 Xamarin 应用分别注册到 Apple Push Notification 服务 (APNS) 和 Google Cloud Messaging (GCM) 服务。有关详细信息，请参阅**向应用添加推送通知** ([Xamarin.iOS](/documentation/articles/partner-xamarin-mobile-services-ios-get-started-push/#add-push) | [Xamarin.Android](/documentation/articles/partner-xamarin-mobile-services-android-get-started-push/#add-push))。\n\n>[AZURE.NOTE]当你需要发送通知给特定的已注册用户时，必须在注册之前要求身份验证，然后验证是否已授权该用户注册特定标记。例如，必须检查以确保用户注册的标记不是其他人的用户 ID。有关详细信息，请参阅[向经过身份验证的用户发送推送通知](/documentation/articles/mobile-services-dotnet-backend-windows-store-dotnet-push-notifications-app-users)。\n\n##<a name=\"pull-notifications\"></a>如何：在 Windows 应用中使用定期通知\n\nWindows 支持使用定期通知（提取通知）更新动态磁贴。启用定期通知后，Windows 将定期访问自定义 API 终结点以更新开始菜单上的应用磁贴。若要使用定期通知，必须[定义一个自定义 API](mobile-services-javascript-backend-define-custom-api.md)，以便使用磁贴特定的格式返回 XML 数据。有关详细信息，请参阅[定期通知](https://msdn.microsoft.com/library/windows/apps/hh761461.aspx)。\n\n以下示例将启用定期通知，以便从 *tiles* 自定义终结点请求磁贴模板数据：\n\n    TileUpdateManager.CreateTileUpdaterForApplication().StartPeriodicUpdate(\n        new System.Uri(MobileService.ApplicationUri, \"/api/tiles\"),\n        PeriodicUpdateRecurrence.Hour\n    );\n\n选择与你的数据更新频率最匹配的 [PeriodicUpdateRecurrance](https://msdn.microsoft.com/zh-cn/library/windows/apps/windows.ui.notifications.periodicupdaterecurrence.aspx) 值。\n\n##<a name=\"optimisticconcurrency\"></a>如何：使用乐观并发\n\n在某些情况下，两个或两个以上客户端可能会同时将更改写入同一项目。如果没有任何冲突检测，则最后一次写入会覆盖任何以前的更新，即使这并不是所需要的结果。乐观并发控制假定每个事务均可以提交，因此不使用任何资源锁定。提交事务之前，乐观并发控制将验证是否没有其他事务修改了数据。如果数据已修改，则将回滚正在提交的事务。\n\n移动服务通过使用 `__version` 系统属性列（该列是为移动服务创建的每个表定义的）跟踪对每个项的更改来支持乐观并发控制。每次更新某个记录时，移动服务都将该记录的 `__version` 属性设置为新值。在每次执行更新请求期间，会将该请求包含的记录的 `__version` 属性与服务器上的记录的同一属性进行比较。如果随请求传递的版本与服务器不匹配，则移动服务 .NET 客户端库将引发 `MobileServicePreconditionFailedException<T>`。该异常中提供的类型就是包含记录服务器版本的服务器中的记录。然后，应用程序可以借助此信息来确定是否要使用服务器中正确的 `__version` 值再次执行更新请求以提交更改。\n\n为了启用乐观并发，应用程序将在表类中为 `__version` 系统属性定义一个列。以下定义就是一个示例。\n\n    public class TodoItem\n    {\n        public string Id { get; set; }\n\n        [JsonProperty(PropertyName = \"text\")]\n        public string Text { get; set; }\n\n        [JsonProperty(PropertyName = \"complete\")]\n        public bool Complete { get; set; }\n\n        // *** Enable Optimistic Concurrency *** //\n        [JsonProperty(PropertyName = \"__version\")]\n        public byte[] Version { set; get; }\n    }\n\n\n使用非类型化表的应用程序通过在表的 `SystemProperties` 中设置 `Version` 标志来启用乐观并发，如下所示。\n\n    //Enable optimistic concurrency by retrieving __version\n    todoTable.SystemProperties |= MobileServiceSystemProperties.Version;\n\n\n以下代码演示了如何解决检测到的写入冲突。若要提交解决方法，必须在 `UpdateAsync()` 调用中包含正确的 `__version` 值。\n\n    private async void UpdateToDoItem(TodoItem item)\n    {\n        MobileServicePreconditionFailedException<TodoItem> exception = null;\n\n        try\n        {\n            //update at the remote table\n            await todoTable.UpdateAsync(item);\n        }\n        catch (MobileServicePreconditionFailedException<TodoItem> writeException)\n        {\n            exception = writeException;\n        }\n\n        if (exception != null)\n        {\n            // Conflict detected, the item has changed since the last query\n            // Resolve the conflict between the local and server item\n            await ResolveConflict(item, exception.Item);\n        }\n    }\n\n\n    private async Task ResolveConflict(TodoItem localItem, TodoItem serverItem)\n    {\n        //Ask user to choose the resoltion between versions\n        MessageDialog msgDialog = new MessageDialog(String.Format(\"Server Text: \"{0}\" \\nLocal Text: \"{1}\"\\n\",\n                                                    serverItem.Text, localItem.Text),\n                                                    \"CONFLICT DETECTED - Select a resolution:\");\n\n        UICommand localBtn = new UICommand(\"Commit Local Text\");\n        UICommand ServerBtn = new UICommand(\"Leave Server Text\");\n        msgDialog.Commands.Add(localBtn);\n        msgDialog.Commands.Add(ServerBtn);\n\n        localBtn.Invoked = async (IUICommand command) =>\n        {\n            // To resolve the conflict, update the version of the\n            // item being committed. Otherwise, you will keep\n            // catching a MobileServicePreConditionFailedException.\n            localItem.Version = serverItem.Version;\n\n            // Updating recursively here just in case another\n            // change happened while the user was making a decision\n            UpdateToDoItem(localItem);\n        };\n\n        ServerBtn.Invoked = async (IUICommand command) =>\n        {\n            RefreshTodoItems();\n        };\n\n        await msgDialog.ShowAsync();\n    }\n\n\n有关使用移动服务乐观并发的更完整示例，请参阅[乐观并发教程]。\n\n\n##<a name=\"binding\"></a>如何：将移动服务数据绑定到 Windows 用户界面\n\n本部分说明如何使用 Windows 应用中的 UI 元素显示返回的数据对象。若要查询 `todoTable` 中的不完整项并在极简单的列表中显示这些项，可以运行以下示例代码，以使用查询绑定列表源。使用 `MobileServiceCollection` 可以创建移动服务感知型绑定集合。\n\n    // This query filters out completed TodoItems.\n    MobileServiceCollection<TodoItem, TodoItem> items = await todoTable\n        .Where(todoItem => todoItem.Complete == false)\n        .ToCollectionAsync();\n\n    // itemsControl is an IEnumerable that could be bound to a UI list control\n    IEnumerable itemsControl  = items;\n\n    // Bind this to a ListBox\n    ListBox lb = new ListBox();\n    lb.ItemsSource = items;\n\n托管运行时中的某些控件支持名为 [ISupportIncrementalLoading](http://msdn.microsoft.com/zh-cn/library/windows/apps/Hh701916) 的接口。当用户滚动浏览时，此接口允许控件请求更多的数据。系统通过 `MobileServiceIncrementalLoadingCollection`（可自动处理来自控件的调用）为这个适用于通用 Windows 8.1 应用的接口提供内置支持。若要在 Windows 应用中使用 `MobileServiceIncrementalLoadingCollection`，请执行以下代码：\n\n            MobileServiceIncrementalLoadingCollection<TodoItem,TodoItem> items;\n        items =  todoTable.Where(todoItem => todoItem.Complete == false)\n                    .ToIncrementalLoadingCollection();\n\n        ListBox lb = new ListBox();\n        lb.ItemsSource = items;\n\n\n若要在 Windows Phone 8 和“Silverlight”应用上使用新的集合，请在 `IMobileServiceTableQuery<T>` 和 `IMobileServiceTable<T>` 上使用 `ToCollection` 扩展方法。若要实际加载数据，请调用 `LoadMoreItemsAsync()`。\n\n    MobileServiceCollection<TodoItem, TodoItem> items = todoTable.Where(todoItem => todoItem.Complete==false).ToCollection();\n    await items.LoadMoreItemsAsync();\n\n当你使用通过调用 `ToCollectionAsync` 或 `ToCollection` 创建的集合时，可以获取可绑定到 UI 控件的集合。此集合支持分页，也就是说，控件可以要求该集合“加载更多项”，而该集合也确实会这样做。这样看来，无需执行任何用户代码，控件就能启动工作流。但是，由于集合要从网络加载数据，因此可以预料到这种加载有时会失败。若要处理这种故障，你可以重写 `MobileServiceIncrementalLoadingCollection` 中的 `OnException` 方法，以处理调用控件执行的 `LoadMoreItemsAsync` 后发生的异常。\n\n最后，假设你的表包含许多字段，但你只想在控件中显示其中的某些字段。在这种情况下，你可以参考上面“[选择特定的列](#selecting)”部分中的指导，选择要在 UI 中显示的特定列。\n\n##<a name=\"authentication\"></a>如何对用户进行身份验证\n\n移动服务支持使用各种外部标识提供者对应用程序用户进行身份验证和授权，这些提供者包括：Facebook、Google、Microsoft 帐户、Twitter 和 Active Directory。你可以在表中设置权限，以便将特定操作的访问权限限制给已经过身份验证的用户。你还可以在服务器脚本中使用已经过身份验证的用户的标识来实施授权规则。有关详细信息，请参阅[向应用程序添加身份验证]教程。\n\n支持两种身份验证流：_服务器流_和_客户端流_。服务器流依赖于提供者的 Web 身份验证界面，因此可提供最简便的身份验证体验。客户端流依赖于提供者和设备特定的 SDK，因此允许与设备特定的功能进行更深入的集成。\n\n###服务器流\n若要让移动服务管理 Windows 应用中的身份验证过程，必须将你的应用注册到标识提供者。然后，需要在移动服务中配置提供者提供的应用程序 ID 和机密。有关详细信息，请参阅[向应用程序添加身份验证]教程。\n\n注册标识提供者后，只需结合提供者的 [MobileServiceAuthenticationProvider] 值调用 [LoginAsync 方法]。例如，以下代码将使用 Facebook 启动服务器流登录。\n\n    private MobileServiceUser user;\n    private async System.Threading.Tasks.Task Authenticate()\n    {\n        while (user == null)\n        {\n            string message;\n            try\n            {\n                user = await client\n                    .LoginAsync(MobileServiceAuthenticationProvider.Facebook);\n                message =\n                    string.Format(\"You are now logged in - {0}\", user.UserId);\n            }\n            catch (InvalidOperationException)\n            {\n                message = \"You must log in. Login Required\";\n            }\n\n            var dialog = new MessageDialog(message);\n            dialog.Commands.Add(new UICommand(\"OK\"));\n            await dialog.ShowAsync();\n        }\n    }\n\n如果使用的标识提供商不是 Facebook，请将上述 [MobileServiceAuthenticationProvider] 的值更改为你的提供商的值。\n\n在此情况下，移动服务将通过以下方式管理 OAuth 2.0 身份验证流：显示选定提供者的登录页，并在用户成功使用标识提供者登录后生成移动服务身份验证令牌。[LoginAsync 方法]将返回 [MobileServiceUser]，该类将提供已经过身份验证的用户的 [userId]，以及 JSON Web 令牌 (JWT) 形式的 [MobileServiceAuthenticationToken]。你可以缓存此令牌，并在它过期之前重复使用。有关详细信息，请参阅[缓存身份验证令牌]。\n\n###客户端流\n\n你的应用程序还能够独立联系标识提供者，然后将返回的令牌提供给移动服务以进行身份验证。使用此客户端流可为用户提供单一登录体验，或者从标识提供者中检索其他用户数据。\n\n####单一登录使用来自 Facebook 或 Google 的令牌\n\n你可以根据以下代码段中所示，为 Facebook 或 Google 使用这种最简单形式的客户端流。\n\n    var token = new JObject();\n    // Replace access_token_value with actual value of your access token obtained\n    // using the Facebook or Google SDK.\n    token.Add(\"access_token\", \"access_token_value\");\n\n    private MobileServiceUser user;\n    private async System.Threading.Tasks.Task Authenticate()\n    {\n        while (user == null)\n        {\n            string message;\n            try\n            {\n                // Change MobileServiceAuthenticationProvider.Facebook\n                // to MobileServiceAuthenticationProvider.Google if using Google auth.\n                user = await client\n                    .LoginAsync(MobileServiceAuthenticationProvider.Facebook, token);\n                message =\n                    string.Format(\"You are now logged in - {0}\", user.UserId);\n            }\n            catch (InvalidOperationException)\n            {\n                message = \"You must log in. Login Required\";\n            }\n\n            var dialog = new MessageDialog(message);\n            dialog.Commands.Add(new UICommand(\"OK\"));\n            await dialog.ShowAsync();\n        }\n    }\n\n\n####单一登录将 Microsoft 帐户与 Live SDK 配合使用\n\n若要对用户进行身份验证，必须在 Microsoft 帐户开发人员中心注册你的应用程序。然后，必须将此注册连接到你的移动服务。完成[注册应用以使用 Microsoft 帐户登录](/documentation/articles/mobile-services-how-to-register-microsoft-authentication)中的步骤，以创建 Microsoft 帐户注册并将注册连接到你的移动服务。如果你同时拥有 Windows 应用商店和 Windows Phone 8/Silverlight 版本的应用，请先注册 Windows 应用商店版本。\n\n下面的代码使用 Live SDK 进行身份验证，并使用返回的令牌来登录到你的移动服务。\n\n    private LiveConnectSession session;\n    //private static string clientId = \"<microsoft-account-client-id>\";\n    private async System.Threading.Tasks.Task AuthenticateAsync()\n    {\n\n        // Get the URL the mobile service.\n        var serviceUrl = App.MobileService.ApplicationUri.AbsoluteUri;\n\n        // Create the authentication client for Windows Store using the mobile service URL.\n        LiveAuthClient liveIdClient = new LiveAuthClient(serviceUrl);\n        //// Create the authentication client for Windows Phone using the client ID of the registration.\n        //LiveAuthClient liveIdClient = new LiveAuthClient(clientId);\n\n        while (session == null)\n        {\n            // Request the authentication token from the Live authentication service.\n            // The wl.basic scope is requested.\n            LiveLoginResult result = await liveIdClient.LoginAsync(new string[] { \"wl.basic\" });\n            if (result.Status == LiveConnectSessionStatus.Connected)\n            {\n                session = result.Session;\n\n                // Get information about the logged-in user.\n                LiveConnectClient client = new LiveConnectClient(session);\n                LiveOperationResult meResult = await client.GetAsync(\"me\");\n\n                // Use the Microsoft account auth token to sign in to Mobile Services.\n                MobileServiceUser loginResult = await App.MobileService\n                    .LoginWithMicrosoftAccountAsync(result.Session.AuthenticationToken);\n\n                // Display a personalized sign-in greeting.\n                string title = string.Format(\"Welcome {0}!\", meResult.Result[\"first_name\"]);\n                var message = string.Format(\"You are now logged in - {0}\", loginResult.UserId);\n                var dialog = new MessageDialog(message, title);\n                dialog.Commands.Add(new UICommand(\"OK\"));\n                await dialog.ShowAsync();\n            }\n            else\n            {\n                session = null;\n                var dialog = new MessageDialog(\"You must log in.\", \"Login Required\");\n                dialog.Commands.Add(new UICommand(\"OK\"));\n                await dialog.ShowAsync();\n            }\n        }\n    }\n\n\n###<a name=\"caching\"></a>缓存身份验证令牌\n在某些情况下，完成首次用户身份验证后，可以避免调用 login 方法。你可以使用适用于 Windows 应用商店应用程序的 [PasswordVault] 来缓存当前用户首次登录时使用的标识，以后每次该用户登录时，系统都会检查缓存中是否存在该用户标识。如果缓存为空，则用户仍然需要完成整个登录过程。\n\n    // After logging in\n    PasswordVault vault = new PasswordVault();\n    vault.Add(new PasswordCredential(\"Facebook\", user.UserId, user.MobileServiceAuthenticationToken));\n\n    // Log in\n    var creds = vault.FindAllByResource(\"Facebook\").FirstOrDefault();\n    if (creds != null)\n    {\n        user = new MobileServiceUser(creds.UserName);\n        user.MobileServiceAuthenticationToken = vault.Retrieve(\"Facebook\", creds.UserName).Password;\n    }\n    else\n    {\n        // Regular login flow\n        user = new MobileServiceuser( await client\n            .LoginAsync(MobileServiceAuthenticationProvider.Facebook, token);\n        var token = new JObject();\n        // Replace access_token_value with actual value of your access token\n        token.Add(\"access_token\", \"access_token_value\");\n    }\n\n     // Log out\n    client.Logout();\n    vault.Remove(vault.Retrieve(\"Facebook\", user.UserId));\n\n\n对于 Windows Phone 应用程序，可以使用 [ProtectedData] 类加密和缓存数据，并在隔离的存储中存储敏感信息。\n\n##<a name=\"errors\"></a>如何：处理错误\n\n在移动服务中，你可能会遇到各种形式的错误，并且可以通过多种方式来验证和解决这些错误。\n\n例如，你可以在移动服务中注册服务器脚本，然后使用这些脚本对所要插入和更新的数据执行各种操作，包括验证和数据修改。你可以按如下所示定义并注册一个用于验证和修改数据的服务器脚本：\n\n    function insert(item, user, request)\n    {\n       if (item.text.length > 10) {\n          request.respond(statusCodes.BAD_REQUEST, { error: \"Text cannot exceed 10 characters\" });\n       } else {\n          request.execute();\n       }\n    }\n\n此服务器端脚本将验证发送到移动服务的字符串数据长度，并拒绝过长（在本例中为 10 个字符以上）的字符串。\n\n由于移动服务能够在服务器端验证数据和发送错误响应，因此你可以更新你的 .NET 应用程序，使其能够处理验证后生成的错误响应。\n\n    private async void InsertTodoItem(TodoItem todoItem)\n    {\n        // This code inserts a new TodoItem into the database. When the operation completes\n        // and Mobile Services has assigned an Id, the item is added to the CollectionView\n        try\n        {\n            await todoTable.InsertAsync(todoItem);\n            items.Add(todoItem);\n        }\n        catch (MobileServiceInvalidOperationException e)\n        {\n            // Handle error\n        }\n    }\n\n##<a name=\"untyped\"></a>如何处理非类型化数据\n\n.NET 客户端在设计上支持强类型化方案。但有时，松散类型化的体验可为用户带来方便；例如，在处理采用开放架构的对象时，可能就需要这种体验。可按如下所示启用这种方案。在查询中，先指定 LINQ 语句并使用有线格式。\n\n    // Get an untyped table reference\n    IMobileServiceTable untypedTodoTable = client.GetTable(\"TodoItem\");\n\n    // Lookup untyped data using OData\n    JToken untypedItems = await untypedTodoTable.ReadAsync(\"$filter=complete eq 0&$orderby=text\");\n\n此时，你将获取一些可以像属性包一样使用的 JSON 值。有关 JToken 和 Json.NET 的详细信息，请参阅 [Json.NET](http://json.codeplex.com/)\n\n##<a name=\"unit-testing\"></a>如何：设计单元测试\n\n`MobileServiceClient.GetTable` 返回的值和查询是接口。这使它们可轻松“模拟”用于测试目的，以便创建一个实现测试逻辑的 `MyMockTable : IMobileServiceTable<TodoItem>`。\n\n##<a name=\"customizing\"></a>如何自定义客户端\n\n本部分说明你可以使用哪些方法来自定义请求标头，以及自定义响应中的 JSON 对象序列化。\n\n### <a name=\"headers\"></a>如何自定义请求标头\n\n若要支持特定的应用程序方案，你可能需要自定义与移动服务之间的通信。例如，你可能需要将一个自定义标头添加到每个传出请求，甚至要更改响应状态代码。可以通过提供自定义 DelegatingHandler 来实现此目的，如以下示例中所示：\n\n    public async Task CallClientWithHandler()\n    {\n        MobileServiceClient client = new MobileServiceClient(\n            \"AppUrl\",\n            \"AppKey\" ,\n            new MyHandler()\n            );\n        IMobileServiceTable<TodoItem> todoTable = client.GetTable<TodoItem>();\n        var newItem = new TodoItem { Text = \"Hello world\", Complete = false };\n        await table.InsertAsync(newItem);\n    }\n\n    public class MyHandler : DelegatingHandler\n    {\n        protected override async Task<HttpResponseMessage> \n            SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)\n        {\n            // Add a custom header to the request.\n            request.Headers.Add(\"x-my-header\", \"my value\");\n            var response = await base.SendAsync(request, cancellationToken);\n            // Set a differnt response status code.\n            response.StatusCode = HttpStatusCode.ServiceUnavailable;\n            return response;\n        }\n    }\n\n此代码在请求中添加新的 **x-my-header** 标头，并强行将响应代码设为不可用。在实际方案中，你会根据应用程序所需的某种自定义逻辑来设置响应状态码。\n\n### <a name=\"serialization\"></a>如何自定义序列化\n\n移动服务客户端库使用 Json.NET 在客户端上将 JSON 响应转换为 .NET 对象。你可以在消息中设置此序列化在 .NET 类型与 JSON 之间的行为。[MobileServiceClient](http://msdn.microsoft.com/zh-cn/library/microsoft.windowsazure.mobileservices.mobileserviceclient.aspx) 类公开 [JsonSerializerSettings](http://james.newtonking.com/projects/json/help/?topic=html/T_Newtonsoft_Json_JsonSerializerSettings.htm) 类型的 `SerializerSettings` 属性\n\n使用此属性可以设置许多 Json.NET 属性中的一个，如下所示：\n\n    var settings = new JsonSerializerSettings();\n    settings.ContractResolver = new CamelCasePropertyNamesContractResolver();\n    client.SerializerSettings = settings;\n\n此属性在序列化期间将所有属性转换为小写。\n\n<!-- Anchors. -->\n[What is Mobile Services]: #what-is\n[Concepts]: #concepts\n[How to: Create the Mobile Services client]: #create-client\n[How to: Create a table reference]: #instantiating\n[How to: Query data from a mobile service]: #querying\n[筛选返回的数据]: #filtering\n[为返回的数据排序]: #sorting\n[在页中返回数据]: #paging\n[选择特定的列]: #selecting\n[按 ID 查找数据]: #lookingup\n[How to: Bind data to user interface in a mobile service]: #binding\n[How to: Insert data into a mobile service]: #inserting\n[How to: Modify data in a mobile service]: #modifying\n[How to: Delete data in a mobile service]: #deleting\n[How to: Use Optimistic Concurrency]: #optimisticconcurrency\n[How to: Authenticate users]: #authentication\n[How to: Handle errors]: #errors\n[How to: Design unit tests]: #unit-testing\n[How to: Query data from a mobile service]: #querying\n[How to: Customize the client]: #customizing\n[How to: Work with untyped data]: #untyped\n[Customize request headers]: #headers\n[Customize serialization]: #serialization\n[Next steps]: #nextsteps\n[缓存身份验证令牌]: #caching\n[How to: Call a custom API]: #custom-api\n\n<!-- Images. -->\n\n\n\n<!-- URLs. -->\n[向应用程序添加身份验证]: /documentation/articles/mobile-services-dotnet-backend-windows-universal-dotnet-get-started-users\n[PasswordVault]: http://msdn.microsoft.com/zh-cn/library/windows/apps/windows.security.credentials.passwordvault.aspx\n[ProtectedData]: http://msdn.microsoft.com/zh-cn/library/system.security.cryptography.protecteddata%28VS.95%29.aspx\n[LoginAsync 方法]: http://msdn.microsoft.com/zh-cn/library/windowsazure/microsoft.windowsazure.mobileservices.mobileserviceclientextensions.loginasync.aspx\n[MobileServiceAuthenticationProvider]: http://msdn.microsoft.com/zh-cn/library/windowsazure/microsoft.windowsazure.mobileservices.mobileserviceauthenticationprovider.aspx\n[MobileServiceUser]: http://msdn.microsoft.com/zh-cn/library/windowsazure/microsoft.windowsazure.mobileservices.mobileserviceuser.aspx\n[UserID]: http://msdn.microsoft.com/zh-cn/library/windowsazure/microsoft.windowsazure.mobileservices.mobileserviceuser.userid.aspx\n[MobileServiceAuthenticationToken]: http://msdn.microsoft.com/zh-cn/library/windowsazure/microsoft.windowsazure.mobileservices.mobileserviceuser.mobileserviceauthenticationtoken.aspx\n[ASCII control codes C0 and C1]: http://en.wikipedia.org/wiki/Data_link_escape_character#C1_set\n[CLI to manage Mobile Services tables]: /documentation/articles/virtual-machines-command-line-tools/#Commands_to_manage_mobile_services\n[乐观并发教程]: /documentation/articles/mobile-services-windows-store-dotnet-handle-database-conflicts\n[MobileServiceClient]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.windowsazure.mobileservices.mobileserviceclient.aspx\n\n[IncludeTotalCount]: http://msdn.microsoft.com/zh-cn/library/windowsazure/dn250560.aspx\n[Skip]: http://msdn.microsoft.com/zh-cn/library/windowsazure/dn250573.aspx\n[Take]: http://msdn.microsoft.com/zh-cn/library/windowsazure/dn250574.aspx\n[Fiddler]: http://www.telerik.com/fiddler\n[Azure 移动服务客户端 SDK 中的自定义 API]: http://blogs.msdn.com/b/carlosfigueira/archive/2013/06/19/custom-api-in-azure-mobile-services-client-sdks.aspx\n[InvokeApiAsync]: http://msdn.microsoft.com/zh-cn/library/azure/microsoft.windowsazure.mobileservices.mobileserviceclient.invokeapiasync.aspx\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

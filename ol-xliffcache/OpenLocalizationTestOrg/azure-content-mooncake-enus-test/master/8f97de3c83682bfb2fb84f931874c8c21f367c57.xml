@@ -1,0 +1,96 @@
+{
+  "nodes": [
+    {
+      "content": "在 MainPage.xaml.cs 文件中，添加或取消注释以下 using 语句：",
+      "pos": [
+        4,
+        46
+      ]
+    },
+    {
+      "content": "将 TodoItem 类定义替换为以下代码：",
+      "pos": [
+        106,
+        128
+      ]
+    },
+    {
+      "pos": [
+        475,
+        532
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>JsonPropertyAttribute<ept id=\"p1\">**</ept> 用于定义客户端类型中的属性名称与基础数据表中的列名之间的映射。"
+    },
+    {
+      "pos": [
+        539,
+        611
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在通用 Windows 应用项目中，在共享的 DataModel 文件夹中的单独代码文件内定义了 TodoItem 类。"
+    },
+    {
+      "pos": [
+        616,
+        749
+      ],
+      "content": "在 MainPage.xaml.cs 中，注释掉或删除用于定义现有项集合的行，然后取消注释或添加以下行，将 <bpt id=\"p1\">_</bpt>&amp;lt;yourClient&amp;gt;<ept id=\"p1\">_</ept> 替换为将项目连接到移动服务时添加到 App.xaml.cs 文件的 <ph id=\"ph1\">`MobileServiceClient`</ph>字段："
+    },
+    {
+      "content": "此代码将创建一个移动服务感知型绑定集合 (items) 和数据库表 (todoTable) 的代理类。",
+      "pos": [
+        944,
+        995
+      ]
+    },
+    {
+      "pos": [
+        1001,
+        1087
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>InsertTodoItem<ept id=\"p1\">**</ept> 方法中，删除设置 <bpt id=\"p2\">**</bpt>TodoItem.Id<ept id=\"p2\">**</ept> 属性的代码行，为该方法添加 <bpt id=\"p3\">**</bpt>async<ept id=\"p3\">**</ept> 修饰符，然后取消注释以下代码行："
+    },
+    {
+      "content": "此代码在表中插入一个新项。",
+      "pos": [
+        1142,
+        1155
+      ]
+    },
+    {
+      "pos": [
+        1161,
+        1194
+      ],
+      "content": "将 <bpt id=\"p1\">**</bpt>RefreshTodoItems<ept id=\"p1\">**</ept> 方法替换为以下代码："
+    },
+    {
+      "pos": [
+        1931,
+        2018
+      ],
+      "content": "这将设置到  <ph id=\"ph1\">`todoTable`</ph> 中项集合的绑定，其中包含从移动服务返回的所有 <bpt id=\"p1\">**</bpt>TodoItem<ept id=\"p1\">**</ept> 对象。如果执行该查询时发生问题，将生成一个消息框来显示这些错误。"
+    },
+    {
+      "pos": [
+        2024,
+        2089
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>UpdateCheckedTodoItem<ept id=\"p1\">**</ept> 方法中，为该方法添加 <bpt id=\"p2\">**</bpt>async<ept id=\"p2\">**</ept> 修饰符，然后取消注释以下代码行："
+    },
+    {
+      "content": "这会将项更新发送给移动服务。",
+      "pos": [
+        2140,
+        2154
+      ]
+    },
+    {
+      "content": "既然此应用已更新从而将移动服务用于后端存储，就可以针对移动服务测试该应用。",
+      "pos": [
+        2157,
+        2194
+      ]
+    }
+  ],
+  "content": "\n1. 在 MainPage.xaml.cs 文件中，添加或取消注释以下 using 语句： \n\n        using Microsoft.WindowsAzure.MobileServices;\n\n2. 将 TodoItem 类定义替换为以下代码： \n\n        public class TodoItem\n        {\n            public string Id { get; set; }\n    \n            [Newtonsoft.Json.JsonProperty(PropertyName = \"text\")]  \n            public string Text { get; set; }\n    \n            [Newtonsoft.Json.JsonProperty(PropertyName = \"complete\")]  \n            public bool Complete { get; set; }\n        }\n    \n    **JsonPropertyAttribute** 用于定义客户端类型中的属性名称与基础数据表中的列名之间的映射。\n\n    >[AZURE.NOTE]在通用 Windows 应用项目中，在共享的 DataModel 文件夹中的单独代码文件内定义了 TodoItem 类。\n\n3. 在 MainPage.xaml.cs 中，注释掉或删除用于定义现有项集合的行，然后取消注释或添加以下行，将 _&lt;yourClient&gt;_ 替换为将项目连接到移动服务时添加到 App.xaml.cs 文件的 `MobileServiceClient`字段： \n\n        private MobileServiceCollection<TodoItem, TodoItem> items;\n        private IMobileServiceTable<TodoItem> todoTable = \n            App.<yourClient>.GetTable<TodoItem>();\n          \n    此代码将创建一个移动服务感知型绑定集合 (items) 和数据库表 (todoTable) 的代理类。 \n\n4. 在 **InsertTodoItem** 方法中，删除设置 **TodoItem.Id** 属性的代码行，为该方法添加 **async** 修饰符，然后取消注释以下代码行：\n\n        await todoTable.InsertAsync(todoItem);\n\n\n    此代码在表中插入一个新项。 \n\n5. 将 **RefreshTodoItems** 方法替换为以下代码： \n\n        private async void RefreshTodoItems()\n        {\n            MobileServiceInvalidOperationException exception = null;\n            try\n            {\n                // Query that returns all items.   \n                items = await todoTable.ToCollectionAsync();             \n            }\n            catch (MobileServiceInvalidOperationException e)\n            {\n                exception = e;\n            }\n            if (exception != null)\n            {\n                await new MessageDialog(exception.Message, \"Error loading items\").ShowAsync();\n            }\n            else\n            {\n                ListItems.ItemsSource = items;\n                this.ButtonSave.IsEnabled = true;\n            }    \n        }\n\n    这将设置到  `todoTable` 中项集合的绑定，其中包含从移动服务返回的所有 **TodoItem** 对象。如果执行该查询时发生问题，将生成一个消息框来显示这些错误。 \n\n6. 在 **UpdateCheckedTodoItem** 方法中，为该方法添加 **async** 修饰符，然后取消注释以下代码行： \n\n        await todoTable.UpdateAsync(item);\n\n    这会将项更新发送给移动服务。 \n\n既然此应用已更新从而将移动服务用于后端存储，就可以针对移动服务测试该应用。\n\n<!---HONumber=71-->"
+}

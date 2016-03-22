@@ -1,0 +1,341 @@
+{
+  "nodes": [
+    {
+      "content": "在 Web 应用中使用 ReportViewer | Azure",
+      "pos": [
+        28,
+        60
+      ]
+    },
+    {
+      "content": "本主题介绍如何使用 Visual Studio ReportViewer 控件构建 Azure Web 应用，该控件用于显示存储在 Azure 虚拟机上的报表。",
+      "pos": [
+        79,
+        159
+      ]
+    },
+    {
+      "content": "在 Azure 中托管的 Web 应用中使用 ReportViewer",
+      "pos": [
+        426,
+        461
+      ]
+    },
+    {
+      "pos": [
+        463,
+        557
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]资源管理器模型。"
+    },
+    {
+      "content": "你可以使用 Visual Studio ReportViewer 控件构建 Azure Web 应用，该控件用于显示存储在 Azure 虚拟机上的报表。ReportViewer 控件位于使用 ASP.NET Web 应用模板生成的 Web 应用中。",
+      "pos": [
+        560,
+        684
+      ]
+    },
+    {
+      "pos": [
+        687,
+        746
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>ASP.NET MVC Web 应用程序模板不支持 ReportViewer 控件。"
+    },
+    {
+      "content": "若要将 ReportViewer 整合到你的 Azure Web 应用，需要完成以下任务。",
+      "pos": [
+        748,
+        793
+      ]
+    },
+    {
+      "pos": [
+        797,
+        810
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>添加<ept id=\"p1\">**</ept>程序集到部署包"
+    },
+    {
+      "pos": [
+        814,
+        827
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>配置<ept id=\"p1\">**</ept>身份验证和授权"
+    },
+    {
+      "pos": [
+        831,
+        861
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>发布<ept id=\"p1\">**</ept> ASP.NET Web 应用程序到 Azure"
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        866,
+        870
+      ]
+    },
+    {
+      "pos": [
+        872,
+        1013
+      ],
+      "content": "查看 <bpt id=\"p1\">[</bpt>Azure 虚拟机中的 SQL Server Business Intelligence<ept id=\"p1\">](/documentation/articles/virtual-machines-sql-server-business-intelligence)</ept> 中的“常规建议和最佳实践”部分。"
+    },
+    {
+      "pos": [
+        1016,
+        1249
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>ReportViewer 控件随 Visual Studio Standard Edition 或更高版本提供。如果你使用的是 Web Developer Express Edition，则必须安装 <bpt id=\"p1\">[</bpt>MICROSOFT REPORT VIEWER 2012 RUNTIME<ept id=\"p1\">](https://www.microsoft.com/download/details.aspx?id=35747)</ept> 才能使用 ReportViewer 运行时功能。"
+    },
+    {
+      "content": "在 Azure 中不支持在本地处理模式下配置的 ReportViewer。",
+      "pos": [
+        1254,
+        1291
+      ]
+    },
+    {
+      "content": "将程序集添加到部署包",
+      "pos": [
+        1297,
+        1307
+      ]
+    },
+    {
+      "content": "当在本地托管 ASP.NET 应用程序时，在 Visual Studio 安装过程中 ReportViewer 程序集通常直接安装在 IIS 服务器的全局程序集缓存 (GAC) 中，可以由应用程序直接访问。但是，当在云中托管 ASP.NET 应用程序时，Azure 不允许将任何内容安装到 GAC 中，因此你必须确保 ReportViewer 程序集在本地可供你的应用程序使用。你可以通过在你的项目中添加它们的引用并将它们配置为以本地方式复制来实现此操作。",
+      "pos": [
+        1309,
+        1537
+      ]
+    },
+    {
+      "content": "在远程处理模式下，ReportViewer 控件使用以下程序集：",
+      "pos": [
+        1539,
+        1571
+      ]
+    },
+    {
+      "pos": [
+        1575,
+        1713
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Microsoft.ReportViewer.WebForms.dll<ept id=\"p1\">**</ept>：包含 ReportViewer 代码，你需要在页面中使用 ReportViewer。当你将 ReportViewer 控件拖到项目中的一个 ASP.NET 页时，此程序集的引用将被添加到该项目中。"
+    },
+    {
+      "pos": [
+        1717,
+        1795
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Microsoft.ReportViewer.Common.dll<ept id=\"p1\">**</ept>：包含 ReportViewer 控件在运行时使用的类。它不会自动添加到你的项目。"
+    },
+    {
+      "content": "添加对 Microsoft.ReportViewer.Common 的引用",
+      "pos": [
+        1801,
+        1838
+      ]
+    },
+    {
+      "content": "右键单击你的项目的“引用”节点，然后选择“添加引用”、在.NET 选项卡中选择程序集并单击“确定”。",
+      "pos": [
+        1842,
+        1892
+      ]
+    },
+    {
+      "content": "使程序集可由 ASP.NET 应用程序从本地访问",
+      "pos": [
+        1898,
+        1922
+      ]
+    },
+    {
+      "pos": [
+        1927,
+        2001
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>References<ept id=\"p1\">**</ept> 文件夹中，单击 Microsoft.ReportViewer.Common 程序集，使其属性显示在“属性”窗格中。"
+    },
+    {
+      "content": "在属性窗格中，将“复制本地”设置为 True。",
+      "pos": [
+        2006,
+        2029
+      ]
+    },
+    {
+      "content": "为 Microsoft.ReportViewer.WebForms 重复步骤 1 和 2。",
+      "pos": [
+        2034,
+        2079
+      ]
+    },
+    {
+      "content": "获取 ReportViewer 语言包",
+      "pos": [
+        2085,
+        2104
+      ]
+    },
+    {
+      "pos": [
+        2109,
+        2237
+      ],
+      "content": "安装 <bpt id=\"p1\">[</bpt>Microsoft Download Center<ept id=\"p1\">](http://go.microsoft.com/fwlink/?LinkId=317386)</ept> 中的适当 Microsoft Report Viewer 2012 Runtime 可再发行组件包。"
+    },
+    {
+      "content": "从下拉列表中选择语言，页面将重定向到相应的下载中心页面。",
+      "pos": [
+        2242,
+        2270
+      ]
+    },
+    {
+      "content": "单击“下载”以开始下载 ReportViewerLP.exe。",
+      "pos": [
+        2275,
+        2306
+      ]
+    },
+    {
+      "content": "下载 ReportViewerLP.exe 后，单击“运行”立即安装，或单击“保存”将其保存到你的计算机。如果你单击“保存”，请记住保存该文件所在的文件夹的名称。",
+      "pos": [
+        2311,
+        2392
+      ]
+    },
+    {
+      "content": "找到保存该文件的文件夹。右键单击 ReportViewerLP.exe，单击“以管理员身份运行”，然后单击“是”。",
+      "pos": [
+        2397,
+        2454
+      ]
+    },
+    {
+      "pos": [
+        2459,
+        2612
+      ],
+      "content": "在运行 ReportViewerLP.exe 之后, 你将看到 c:\\\\windows\\\\assembly 具有资源文件 <bpt id=\"p1\">**</bpt>Microsoft.ReportViewer.Webforms.Resources<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>Microsoft.ReportViewer.Common.Resources<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "为本地化 ReportViewer 控件进行配置",
+      "pos": [
+        2618,
+        2642
+      ]
+    },
+    {
+      "content": "按照上面的指定说明下载并安装 Microsoft Report Viewer 2012 Runtime 可再发行组件包。",
+      "pos": [
+        2647,
+        2707
+      ]
+    },
+    {
+      "content": "在项目中创建",
+      "pos": [
+        2712,
+        2718
+      ]
+    },
+    {
+      "content": "文件夹并将关联的资源程序集文件复制到该位置。要复制的资源程序集文件为：<bpt id=\"p1\">**</bpt>Microsoft.ReportViewer.Webforms.Resources.dll<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>Microsoft.ReportViewer.Common.Resources.dll<ept id=\"p2\">**</ept>。选择资源程序集文件，并在属性窗格中将“复制到输出目录”设置为“<bpt id=\"p3\">**</bpt>始终复制<ept id=\"p3\">**</ept>”。",
+      "pos": [
+        2730,
+        2906
+      ]
+    },
+    {
+      "pos": [
+        2911,
+        3064
+      ],
+      "content": "为 Web 项目设置“区域性和 UI区域性”。有关如何为 ASP.NET 网页设置“区域性和 UI 区域性”的详细信息，请参阅<bpt id=\"p1\">[</bpt>如何：为 ASP.NET 网页全球化设置区域性和 UI 区域性<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/bz9tc508.aspx)</ept>。"
+    },
+    {
+      "content": "配置身份验证和授权",
+      "pos": [
+        3069,
+        3078
+      ]
+    },
+    {
+      "pos": [
+        3080,
+        3266
+      ],
+      "content": "ReportViewer 需要使用正确的凭据向报表服务器进行身份验证，并且凭据必须经报表服务器授权才能访问所需的报表。有关身份验证的信息，请查看白皮书 <bpt id=\"p1\">[</bpt>Reporting Services 报表查看器控件和基于 Azure 虚拟机的报表服务器<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/dn753698.aspx)</ept>。"
+    },
+    {
+      "content": "发布 ASP.NET Web 应用程序到 Azure",
+      "pos": [
+        3271,
+        3297
+      ]
+    },
+    {
+      "pos": [
+        3299,
+        3415
+      ],
+      "content": "有关将 ASP.NET Web 应用程序发布到 Azure 的说明，请参阅 <bpt id=\"p1\">[</bpt>Web Apps 和 ASP.NET 入门<ept id=\"p1\">](/documentation/articles/web-sites-dotnet-get-started)</ept>。"
+    },
+    {
+      "pos": [
+        3418,
+        3522
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>如果在解决方案资源管理器中的快捷菜单中未显示添加Azure 部署项目或添加 Azure 云服务项目命令，你可能需要将该项目的目标框架更改为 .NET Framework 4。"
+    },
+    {
+      "content": "两个命令提供基本相同的功能。其中一个命令将显示在快捷菜单中，这取决于已安装的 Azure SDK 版本。",
+      "pos": [
+        3527,
+        3579
+      ]
+    },
+    {
+      "content": "资源",
+      "pos": [
+        3584,
+        3586
+      ]
+    },
+    {
+      "content": "Microsoft 报表",
+      "pos": [
+        3589,
+        3601
+      ]
+    },
+    {
+      "content": "Azure 虚拟机中的 SQL Server Business Intelligence",
+      "pos": [
+        3661,
+        3705
+      ]
+    },
+    {
+      "content": "使用 PowerShell 创建运行本机模式报表服务器的 Azure VM",
+      "pos": [
+        3784,
+        3821
+      ]
+    },
+    {
+      "content": "Reporting Services 报表查看器控件和基于 Azure 虚拟机的报表服务器",
+      "pos": [
+        3922,
+        3967
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"在 Web 应用中使用 ReportViewer | Azure\"\n    description=\"本主题介绍如何使用 Visual Studio ReportViewer 控件构建 Azure Web 应用，该控件用于显示存储在 Azure 虚拟机上的报表。\"\n    services=\"virtual-machines\"\n    documentationCenter=\"na\"\n    authors=\"rothja\"\n    manager=\"jeffreyg\"\n    editor=\"monicar\" \n    tags=\"azure-service-management\" />\n<tags \n    ms.service=\"virtual-machines\"\n    ms.date=\"12/11/2015\"\n    wacn.date=\"01/14/2016\" />\n\n# 在 Azure 中托管的 Web 应用中使用 ReportViewer\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]资源管理器模型。\n\n\n你可以使用 Visual Studio ReportViewer 控件构建 Azure Web 应用，该控件用于显示存储在 Azure 虚拟机上的报表。ReportViewer 控件位于使用 ASP.NET Web 应用模板生成的 Web 应用中。\n\n>[AZURE.IMPORTANT]ASP.NET MVC Web 应用程序模板不支持 ReportViewer 控件。\n\n若要将 ReportViewer 整合到你的 Azure Web 应用，需要完成以下任务。\n\n- **添加**程序集到部署包\n\n- **配置**身份验证和授权\n\n- **发布** ASP.NET Web 应用程序到 Azure\n\n## 先决条件\n\n查看 [Azure 虚拟机中的 SQL Server Business Intelligence](/documentation/articles/virtual-machines-sql-server-business-intelligence) 中的“常规建议和最佳实践”部分。\n\n>[AZURE.NOTE]ReportViewer 控件随 Visual Studio Standard Edition 或更高版本提供。如果你使用的是 Web Developer Express Edition，则必须安装 [MICROSOFT REPORT VIEWER 2012 RUNTIME](https://www.microsoft.com/download/details.aspx?id=35747) 才能使用 ReportViewer 运行时功能。\n><p>在 Azure 中不支持在本地处理模式下配置的 ReportViewer。\n\n\n## 将程序集添加到部署包\n\n当在本地托管 ASP.NET 应用程序时，在 Visual Studio 安装过程中 ReportViewer 程序集通常直接安装在 IIS 服务器的全局程序集缓存 (GAC) 中，可以由应用程序直接访问。但是，当在云中托管 ASP.NET 应用程序时，Azure 不允许将任何内容安装到 GAC 中，因此你必须确保 ReportViewer 程序集在本地可供你的应用程序使用。你可以通过在你的项目中添加它们的引用并将它们配置为以本地方式复制来实现此操作。\n\n在远程处理模式下，ReportViewer 控件使用以下程序集：\n\n- **Microsoft.ReportViewer.WebForms.dll**：包含 ReportViewer 代码，你需要在页面中使用 ReportViewer。当你将 ReportViewer 控件拖到项目中的一个 ASP.NET 页时，此程序集的引用将被添加到该项目中。\n\n- **Microsoft.ReportViewer.Common.dll**：包含 ReportViewer 控件在运行时使用的类。它不会自动添加到你的项目。\n\n### 添加对 Microsoft.ReportViewer.Common 的引用\n\n- 右键单击你的项目的“引用”节点，然后选择“添加引用”、在.NET 选项卡中选择程序集并单击“确定”。\n\n### 使程序集可由 ASP.NET 应用程序从本地访问\n\n1. 在 **References** 文件夹中，单击 Microsoft.ReportViewer.Common 程序集，使其属性显示在“属性”窗格中。\n\n1. 在属性窗格中，将“复制本地”设置为 True。\n\n1. 为 Microsoft.ReportViewer.WebForms 重复步骤 1 和 2。\n\n### 获取 ReportViewer 语言包\n\n1. 安装 [Microsoft Download Center](http://go.microsoft.com/fwlink/?LinkId=317386) 中的适当 Microsoft Report Viewer 2012 Runtime 可再发行组件包。\n\n1. 从下拉列表中选择语言，页面将重定向到相应的下载中心页面。\n\n1. 单击“下载”以开始下载 ReportViewerLP.exe。\n\n1. 下载 ReportViewerLP.exe 后，单击“运行”立即安装，或单击“保存”将其保存到你的计算机。如果你单击“保存”，请记住保存该文件所在的文件夹的名称。\n\n1. 找到保存该文件的文件夹。右键单击 ReportViewerLP.exe，单击“以管理员身份运行”，然后单击“是”。\n\n1. 在运行 ReportViewerLP.exe 之后, 你将看到 c:\\\\windows\\\\assembly 具有资源文件 **Microsoft.ReportViewer.Webforms.Resources** 和 **Microsoft.ReportViewer.Common.Resources**。\n\n### 为本地化 ReportViewer 控件进行配置\n\n1. 按照上面的指定说明下载并安装 Microsoft Report Viewer 2012 Runtime 可再发行组件包。\n\n1. 在项目中创建 <language> 文件夹并将关联的资源程序集文件复制到该位置。要复制的资源程序集文件为：**Microsoft.ReportViewer.Webforms.Resources.dll** 和 **Microsoft.ReportViewer.Common.Resources.dll**。选择资源程序集文件，并在属性窗格中将“复制到输出目录”设置为“**始终复制**”。\n\n1. 为 Web 项目设置“区域性和 UI区域性”。有关如何为 ASP.NET 网页设置“区域性和 UI 区域性”的详细信息，请参阅[如何：为 ASP.NET 网页全球化设置区域性和 UI 区域性](https://msdn.microsoft.com/zh-cn/library/bz9tc508.aspx)。\n\n## 配置身份验证和授权\n\nReportViewer 需要使用正确的凭据向报表服务器进行身份验证，并且凭据必须经报表服务器授权才能访问所需的报表。有关身份验证的信息，请查看白皮书 [Reporting Services 报表查看器控件和基于 Azure 虚拟机的报表服务器](https://msdn.microsoft.com/zh-cn/library/azure/dn753698.aspx)。\n\n## 发布 ASP.NET Web 应用程序到 Azure\n\n有关将 ASP.NET Web 应用程序发布到 Azure 的说明，请参阅 [Web Apps 和 ASP.NET 入门](/documentation/articles/web-sites-dotnet-get-started)。\n\n>[AZURE.IMPORTANT]如果在解决方案资源管理器中的快捷菜单中未显示添加Azure 部署项目或添加 Azure 云服务项目命令，你可能需要将该项目的目标框架更改为 .NET Framework 4。\n><p>两个命令提供基本相同的功能。其中一个命令将显示在快捷菜单中，这取决于已安装的 Azure SDK 版本。\n\n## 资源\n\n[Microsoft 报表](https://msdn.microsoft.com/zh-cn/library/bb885185.aspx)\n\n[Azure 虚拟机中的 SQL Server Business Intelligence](/documentation/articles/virtual-machines-sql-server-business-intelligence)\n\n[使用 PowerShell 创建运行本机模式报表服务器的 Azure VM](/documentation/articles/virtual-machines-sql-server-create-native-mode-report-server-powershell)\n\n[Reporting Services 报表查看器控件和基于 Azure 虚拟机的报表服务器](http://download.microsoft.com/download/2/2/0/220DE2F1-8AB3-474D-8F8B-C998F7C56B5D/Reporting%20Services%20report%20viewer%20control%20and%20Azure%20VM%20based%20report%20servers.docx)\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

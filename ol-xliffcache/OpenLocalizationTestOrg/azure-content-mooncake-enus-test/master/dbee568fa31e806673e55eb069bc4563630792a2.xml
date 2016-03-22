@@ -1,0 +1,1027 @@
+{
+  "nodes": [
+    {
+      "content": "创作 Azure 资源管理器模板",
+      "pos": [
+        26,
+        42
+      ]
+    },
+    {
+      "content": "使用声明性 JSON 语法创建 Azure 资源管理器模板，以将应用程序部署到 Azure。",
+      "pos": [
+        60,
+        106
+      ]
+    },
+    {
+      "content": "创作 Azure 资源管理器模板",
+      "pos": [
+        333,
+        349
+      ]
+    },
+    {
+      "content": "Azure 应用程序通常需要多种资源的组合（例如数据库服务器、数据库或 Web 应用）来达到所需的目标。你无需单独部署和管理每个资源，而可以创建一个 Azure 资源管理器模板，以单个协调操作为应用程序部署和设置所有资源。在模板中，定义应用程序所需的资源，并指定部署参数以针对不同的环境输入值。模板中包含可用于构造部署值的 JSON 和表达式。",
+      "pos": [
+        351,
+        523
+      ]
+    },
+    {
+      "pos": [
+        525,
+        623
+      ],
+      "content": "本主题介绍了该模板的部分。对于实际的架构，请参阅 <bpt id=\"p1\">[</bpt>Azure 资源管理器架构<ept id=\"p1\">](https://github.com/Azure/azure-resource-manager-schemas)</ept>。"
+    },
+    {
+      "content": "您必须将您的模版大小限制为 1 MB 以内，每个参数文件大小限制为 64 KB 以内。已完成对迭代资源定义和变量值和参数值的扩展后，1 MB 的限制将适用于该模板的最终状态。",
+      "pos": [
+        625,
+        712
+      ]
+    },
+    {
+      "content": "模板格式",
+      "pos": [
+        717,
+        721
+      ]
+    },
+    {
+      "content": "以下示例演示了构成模板基本结构的各个节。",
+      "pos": [
+        723,
+        743
+      ]
+    },
+    {
+      "content": "元素名称",
+      "pos": [
+        991,
+        995
+      ]
+    },
+    {
+      "content": "必选",
+      "pos": [
+        998,
+        1000
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        1003,
+        1005
+      ]
+    },
+    {
+      "content": "$schema",
+      "pos": [
+        1050,
+        1057
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        1060,
+        1061
+      ]
+    },
+    {
+      "content": "描述模板语言版本的 JSON 架构文件所在的位置。",
+      "pos": [
+        1064,
+        1089
+      ]
+    },
+    {
+      "content": "contentVersion",
+      "pos": [
+        1092,
+        1106
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        1109,
+        1110
+      ]
+    },
+    {
+      "content": "模板的版本（例如 1.0.0.0）。使用模板部署资源时，此值可用于确保使用正确的模板。",
+      "pos": [
+        1113,
+        1156
+      ]
+    },
+    {
+      "content": "参数",
+      "pos": [
+        1159,
+        1161
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        1164,
+        1165
+      ]
+    },
+    {
+      "content": "执行部署以自定义资源部署时提供的值。",
+      "pos": [
+        1168,
+        1186
+      ]
+    },
+    {
+      "content": "variables",
+      "pos": [
+        1189,
+        1198
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        1201,
+        1202
+      ]
+    },
+    {
+      "content": "在模板中用作 JSON 片段以简化模板语言表达式的值。",
+      "pos": [
+        1205,
+        1232
+      ]
+    },
+    {
+      "content": "资源",
+      "pos": [
+        1235,
+        1237
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        1240,
+        1241
+      ]
+    },
+    {
+      "content": "已在资源组中部署或更新的服务类型。",
+      "pos": [
+        1244,
+        1261
+      ]
+    },
+    {
+      "content": "outputs",
+      "pos": [
+        1264,
+        1271
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        1274,
+        1275
+      ]
+    },
+    {
+      "content": "部署后返回的值。",
+      "pos": [
+        1278,
+        1286
+      ]
+    },
+    {
+      "content": "本主题稍后将更详细地介绍模板的各个节。现在，我们将回顾构成模板的某些语法。",
+      "pos": [
+        1288,
+        1325
+      ]
+    },
+    {
+      "content": "表达式和函数",
+      "pos": [
+        1330,
+        1336
+      ]
+    },
+    {
+      "content": "模板的基本语法为 JSON；但是，表达式和函数扩展了模板中提供的 JSON，使你能够创建严格意义上不是文本值的值。表达式括在方括号（[ 和 ]）中，并在部署模板时进行求值。表达式可以出现在 JSON 字符串值中的任何位置，并始终返回另一个 JSON 值。如果需要使用以方括号 [ 开头的文本字符串，则必须使用两个方括号 [[。",
+      "pos": [
+        1338,
+        1501
+      ]
+    },
+    {
+      "pos": [
+        1503,
+        1615
+      ],
+      "content": "通常，你会将表达式与函数一起使用，以执行用于配置部署的操作。如同在 JavaScript 中一样，函数调用的格式为 <bpt id=\"p1\">**</bpt>functionName(arg1,arg2,arg3)<ept id=\"p1\">**</ept>。使用点和 [index] 运算符引用属性。"
+    },
+    {
+      "content": "以下示例演示如何在构造值时使用一些函数：",
+      "pos": [
+        1617,
+        1637
+      ]
+    },
+    {
+      "pos": [
+        1904,
+        1997
+      ],
+      "content": "有关模板函数的完整列表，请参阅 <bpt id=\"p1\">[</bpt>Azure 资源管理器模板函数<ept id=\"p1\">](/documentation/articles/resource-group-template-functions)</ept>。"
+    },
+    {
+      "content": "Parameters",
+      "pos": [
+        2003,
+        2013
+      ]
+    },
+    {
+      "content": "在模板的参数部分中，您可以指定用户在部署资源时能够输入的值。你可以在整个模板中使用这些参数值，来为部署的资源设置值。在模板的其他节中，只能使用 parameters 节中声明的参数。",
+      "pos": [
+        2015,
+        2106
+      ]
+    },
+    {
+      "content": "在 parameters 节中，不能使用一个参数值来构造另一个参数值。这种类型的操作通常在 variables 节中发生。",
+      "pos": [
+        2108,
+        2169
+      ]
+    },
+    {
+      "content": "使用以下结构定义参数：",
+      "pos": [
+        2171,
+        2182
+      ]
+    },
+    {
+      "content": "元素名称",
+      "pos": [
+        2849,
+        2853
+      ]
+    },
+    {
+      "content": "必选",
+      "pos": [
+        2856,
+        2858
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        2861,
+        2863
+      ]
+    },
+    {
+      "content": "parameterName",
+      "pos": [
+        2908,
+        2921
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        2924,
+        2925
+      ]
+    },
+    {
+      "content": "参数的名称。必须是有效的 JavaScript 标识符。",
+      "pos": [
+        2928,
+        2956
+      ]
+    },
+    {
+      "content": "type",
+      "pos": [
+        2959,
+        2963
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        2966,
+        2967
+      ]
+    },
+    {
+      "content": "参数值的类型。请参阅以下允许类型的列表。",
+      "pos": [
+        2970,
+        2990
+      ]
+    },
+    {
+      "content": "defaultValue",
+      "pos": [
+        2993,
+        3005
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        3008,
+        3009
+      ]
+    },
+    {
+      "content": "参数的默认值，如果没有为参数提供任何值。",
+      "pos": [
+        3012,
+        3032
+      ]
+    },
+    {
+      "content": "allowedValues",
+      "pos": [
+        3035,
+        3048
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        3051,
+        3052
+      ]
+    },
+    {
+      "content": "用来确保提供正确值的参数的允许值数组。",
+      "pos": [
+        3055,
+        3074
+      ]
+    },
+    {
+      "content": "minValue",
+      "pos": [
+        3077,
+        3085
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        3088,
+        3089
+      ]
+    },
+    {
+      "content": "int 类型参数的最小值，此值是包容性的。",
+      "pos": [
+        3092,
+        3113
+      ]
+    },
+    {
+      "content": "maxValue",
+      "pos": [
+        3116,
+        3124
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        3127,
+        3128
+      ]
+    },
+    {
+      "content": "int 类型参数的最大值，此值是包容性的。",
+      "pos": [
+        3131,
+        3152
+      ]
+    },
+    {
+      "content": "minLength",
+      "pos": [
+        3155,
+        3164
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        3167,
+        3168
+      ]
+    },
+    {
+      "content": "string、secureString 和 array 类型参数的最小长度，此值是包容性的。",
+      "pos": [
+        3171,
+        3217
+      ]
+    },
+    {
+      "content": "maxLength",
+      "pos": [
+        3220,
+        3229
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        3232,
+        3233
+      ]
+    },
+    {
+      "content": "string、secureString 和 array 类型参数的最大长度，此值是包容性的。",
+      "pos": [
+        3236,
+        3282
+      ]
+    },
+    {
+      "content": "description",
+      "pos": [
+        3285,
+        3296
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        3299,
+        3300
+      ]
+    },
+    {
+      "content": "通过门户自定义模板界面向模板用户显示的参数描述。",
+      "pos": [
+        3303,
+        3327
+      ]
+    },
+    {
+      "content": "允许的类型和值是：",
+      "pos": [
+        3329,
+        3338
+      ]
+    },
+    {
+      "content": "字符串或 secureString - 任何有效的 JSON 字符串",
+      "pos": [
+        3342,
+        3376
+      ]
+    },
+    {
+      "content": "int - 任何有效的 JSON 整数",
+      "pos": [
+        3379,
+        3398
+      ]
+    },
+    {
+      "content": "布尔值 - 任何有效的 JSON 布尔值",
+      "pos": [
+        3401,
+        3421
+      ]
+    },
+    {
+      "content": "对象或 secureObject - 任何有效的 JSON 对象",
+      "pos": [
+        3424,
+        3456
+      ]
+    },
+    {
+      "content": "数组 - 任何有效的 JSON 数组",
+      "pos": [
+        3459,
+        3477
+      ]
+    },
+    {
+      "content": "若要将某个参数指定为可选，请将其 defaultValue 指定为空字符串。",
+      "pos": [
+        3479,
+        3517
+      ]
+    },
+    {
+      "pos": [
+        3520,
+        3604
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>所有密码、密钥和其他机密信息应使用 <bpt id=\"p1\">**</bpt>secureString<ept id=\"p1\">**</ept> 类型。部署资源后，无法读取使用 secureString 类型的模板参数。"
+    },
+    {
+      "content": "以下示例演示如何定义参数：",
+      "pos": [
+        3606,
+        3619
+      ]
+    },
+    {
+      "content": "变量",
+      "pos": [
+        4339,
+        4341
+      ]
+    },
+    {
+      "content": "在变量部分中，可构造用于简化模板语言表达式的值。通常，这些变量基于通过参数提供的值。",
+      "pos": [
+        4343,
+        4385
+      ]
+    },
+    {
+      "content": "使用以下结构定义变量：",
+      "pos": [
+        4387,
+        4398
+      ]
+    },
+    {
+      "content": "以下示例演示如何定义从两个参数值构造出的变量：",
+      "pos": [
+        4552,
+        4575
+      ]
+    },
+    {
+      "content": "下一个示例演示一个属于复杂的 JSON 类型的变量，以及从其他变量构造出的变量：",
+      "pos": [
+        4860,
+        4900
+      ]
+    },
+    {
+      "content": "资源",
+      "pos": [
+        5608,
+        5610
+      ]
+    },
+    {
+      "content": "在 resources 节，可以定义部署或更新的资源。",
+      "pos": [
+        5612,
+        5639
+      ]
+    },
+    {
+      "content": "使用以下结构定义资源：",
+      "pos": [
+        5641,
+        5652
+      ]
+    },
+    {
+      "content": "元素名称",
+      "pos": [
+        6234,
+        6238
+      ]
+    },
+    {
+      "content": "必选",
+      "pos": [
+        6241,
+        6243
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        6246,
+        6248
+      ]
+    },
+    {
+      "content": "apiVersion",
+      "pos": [
+        6303,
+        6313
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        6316,
+        6317
+      ]
+    },
+    {
+      "pos": [
+        6320,
+        6424
+      ],
+      "content": "支持该资源的 API 版本。有关资源的可用版本和架构，请参阅 <bpt id=\"p1\">[</bpt>Azure 资源管理器架构<ept id=\"p1\">](https://github.com/Azure/azure-resource-manager-schemas)</ept>。"
+    },
+    {
+      "content": "type",
+      "pos": [
+        6427,
+        6431
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        6434,
+        6435
+      ]
+    },
+    {
+      "content": "资源的类型。此值是资源提供程序的命名空间以及资源提供程序支持的资源类型的组合。",
+      "pos": [
+        6438,
+        6477
+      ]
+    },
+    {
+      "content": "name",
+      "pos": [
+        6480,
+        6484
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        6487,
+        6488
+      ]
+    },
+    {
+      "content": "资源的名称。该名称必须遵循 RFC3986 中定义的 URI 构成部分限制。",
+      "pos": [
+        6491,
+        6529
+      ]
+    },
+    {
+      "content": "location",
+      "pos": [
+        6532,
+        6540
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        6543,
+        6544
+      ]
+    },
+    {
+      "content": "提供的资源支持的地理位置。",
+      "pos": [
+        6547,
+        6560
+      ]
+    },
+    {
+      "content": "标记",
+      "pos": [
+        6563,
+        6565
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        6568,
+        6569
+      ]
+    },
+    {
+      "content": "与资源关联的标记。",
+      "pos": [
+        6572,
+        6581
+      ]
+    },
+    {
+      "content": "注释",
+      "pos": [
+        6584,
+        6586
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        6589,
+        6590
+      ]
+    },
+    {
+      "content": "用于描述模板中资源的注释",
+      "pos": [
+        6593,
+        6605
+      ]
+    },
+    {
+      "content": "dependsOn",
+      "pos": [
+        6608,
+        6617
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        6620,
+        6621
+      ]
+    },
+    {
+      "content": "正在定义的资源所依赖的资源。将会评估资源之间的依赖关系，并按资源的依赖顺序来部署资源。如果资源不相互依赖，则会尝试并行部署资源。该值可以是资源名称或资源唯一标识符的逗号分隔列表。",
+      "pos": [
+        6624,
+        6713
+      ]
+    },
+    {
+      "content": "properties",
+      "pos": [
+        6716,
+        6726
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        6729,
+        6730
+      ]
+    },
+    {
+      "content": "特定于资源的配置设置。",
+      "pos": [
+        6733,
+        6744
+      ]
+    },
+    {
+      "content": "资源",
+      "pos": [
+        6747,
+        6749
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        6752,
+        6753
+      ]
+    },
+    {
+      "content": "依赖于所定义的资源的子资源。",
+      "pos": [
+        6756,
+        6770
+      ]
+    },
+    {
+      "pos": [
+        6772,
+        6831
+      ],
+      "content": "如果资源名称不是唯一的，你可以使用 <bpt id=\"p1\">**</bpt>resourceId<ept id=\"p1\">**</ept> 帮助器函数（下面将会介绍）获取任何资源的唯一标识符。"
+    },
+    {
+      "pos": [
+        6833,
+        7001
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>properties<ept id=\"p1\">**</ept> 元素的值与你在创建资源时，在 REST API 操作（PUT 方法）的请求正文中提供的值完全相同。请参阅 <bpt id=\"p2\">[</bpt>Azure 参考<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/mt420159.aspx)</ept>，了解可对你要部署的资源执行的 REST API 操作。"
+    },
+    {
+      "pos": [
+        7003,
+        7099
+      ],
+      "content": "以下示例演示了 <bpt id=\"p1\">**</bpt>Microsoft.Web/serverfarms<ept id=\"p1\">**</ept> 资源，以及一个包含嵌套 <bpt id=\"p2\">**</bpt>Extensions<ept id=\"p2\">**</ept> 资源的 <bpt id=\"p3\">**</bpt>Microsoft.Web/sites<ept id=\"p3\">**</ept> 资源："
+    },
+    {
+      "content": "Outputs",
+      "pos": [
+        8713,
+        8720
+      ]
+    },
+    {
+      "content": "在 Outputs 节中，可以指定从部署返回的值。例如，可能会返回用于访问已部署资源的 URI。",
+      "pos": [
+        8722,
+        8770
+      ]
+    },
+    {
+      "content": "以下示例演示了输出定义的结构：",
+      "pos": [
+        8772,
+        8787
+      ]
+    },
+    {
+      "content": "元素名称",
+      "pos": [
+        8941,
+        8945
+      ]
+    },
+    {
+      "content": "必选",
+      "pos": [
+        8948,
+        8950
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        8953,
+        8955
+      ]
+    },
+    {
+      "content": "outputName",
+      "pos": [
+        9000,
+        9010
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        9013,
+        9014
+      ]
+    },
+    {
+      "content": "输出值的名称。必须是有效的 JavaScript 标识符。",
+      "pos": [
+        9017,
+        9046
+      ]
+    },
+    {
+      "content": "type",
+      "pos": [
+        9049,
+        9053
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        9056,
+        9057
+      ]
+    },
+    {
+      "content": "输出值的类型。输出值支持的类型与模板输入参数相同。",
+      "pos": [
+        9060,
+        9085
+      ]
+    },
+    {
+      "content": "value",
+      "pos": [
+        9088,
+        9093
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        9096,
+        9097
+      ]
+    },
+    {
+      "content": "要评估并作为输出值返回的模板语言表达式。",
+      "pos": [
+        9100,
+        9120
+      ]
+    },
+    {
+      "content": "以下示例演示了 Outputs 节中返回的值。",
+      "pos": [
+        9123,
+        9146
+      ]
+    },
+    {
+      "content": "更高级方案。",
+      "pos": [
+        9355,
+        9361
+      ]
+    },
+    {
+      "content": "本主题提供了有关模板的简介。但是，你的方案可能需要更高级的任务。",
+      "pos": [
+        9362,
+        9394
+      ]
+    },
+    {
+      "pos": [
+        9396,
+        9518
+      ],
+      "content": "你可能需要将两个模板合并在一起，或者在父模板中使用子模板。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>将链接的模板与 Azure 资源管理器配合使用<ept id=\"p1\">](/documentation/articles/resource-group-linked-templates)</ept>。"
+    },
+    {
+      "pos": [
+        9520,
+        9622
+      ],
+      "content": "若要在创建资源类型时迭代指定的次数，请参阅<bpt id=\"p1\">[</bpt>在 Azure 资源管理器中创建多个资源实例<ept id=\"p1\">](/documentation/articles/resource-group-create-multiple)</ept>。"
+    },
+    {
+      "pos": [
+        9624,
+        9766
+      ],
+      "content": "你可能需要使用不同资源组中的资源。使用跨多个资源组共享的存储帐户或虚拟网络时，这很常见。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>resourceId 函数<ept id=\"p1\">](/documentation/articles/resource-group-template-functions/#resourceid)</ept>。"
+    },
+    {
+      "content": "完整的模板",
+      "pos": [
+        9771,
+        9776
+      ]
+    },
+    {
+      "content": "以下模板将部署一个 Web 应用，并使用 .zip 文件中的代码设置该应用程序。",
+      "pos": [
+        9777,
+        9817
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        12332,
+        12336
+      ]
+    },
+    {
+      "pos": [
+        12339,
+        12441
+      ],
+      "content": "有关你可以使用的来自模板中的函数的详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 资源管理器模板函数<ept id=\"p1\">](/documentation/articles/resource-group-template-functions)</ept>"
+    },
+    {
+      "pos": [
+        12444,
+        12542
+      ],
+      "content": "若要查看如何部署已创建的模板，请参阅<bpt id=\"p1\">[</bpt>使用 Azure 资源管理器模板部署应用程序<ept id=\"p1\">](/documentation/articles/resource-group-template-deploy)</ept>"
+    },
+    {
+      "pos": [
+        12545,
+        12630
+      ],
+      "content": "若要查看可用架构，请参阅 <bpt id=\"p1\">[</bpt>Azure 资源管理器架构<ept id=\"p1\">](https://github.com/Azure/azure-resource-manager-schemas)</ept>"
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"创作 Azure 资源管理器模板\"\n   description=\"使用声明性 JSON 语法创建 Azure 资源管理器模板，以将应用程序部署到 Azure。\"\n   services=\"azure-resource-manager\"\n   documentationCenter=\"na\"\n   authors=\"tfitzmac\"\n   manager=\"wpickett\"\n   editor=\"\"/>\n\n<tags\n   ms.service=\"azure-resource-manager\"\n   ms.date=\"11/13/2015\"\n   wacn.date=\"01/21/2016\"/>\n\n# 创作 Azure 资源管理器模板\n\nAzure 应用程序通常需要多种资源的组合（例如数据库服务器、数据库或 Web 应用）来达到所需的目标。你无需单独部署和管理每个资源，而可以创建一个 Azure 资源管理器模板，以单个协调操作为应用程序部署和设置所有资源。在模板中，定义应用程序所需的资源，并指定部署参数以针对不同的环境输入值。模板中包含可用于构造部署值的 JSON 和表达式。\n\n本主题介绍了该模板的部分。对于实际的架构，请参阅 [Azure 资源管理器架构](https://github.com/Azure/azure-resource-manager-schemas)。\n\n您必须将您的模版大小限制为 1 MB 以内，每个参数文件大小限制为 64 KB 以内。已完成对迭代资源定义和变量值和参数值的扩展后，1 MB 的限制将适用于该模板的最终状态。\n\n## 模板格式\n\n以下示例演示了构成模板基本结构的各个节。\n\n    {\n       \"$schema\": \"http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#\",\n       \"contentVersion\": \"\",\n       \"parameters\": {  },\n       \"variables\": {  },\n       \"resources\": [  ],\n       \"outputs\": {  }\n    }\n\n| 元素名称 | 必选 | 说明\n| :------------: | :------: | :----------\n| $schema | 是 | 描述模板语言版本的 JSON 架构文件所在的位置。\n| contentVersion | 是 | 模板的版本（例如 1.0.0.0）。使用模板部署资源时，此值可用于确保使用正确的模板。\n| 参数 | 否 | 执行部署以自定义资源部署时提供的值。\n| variables | 否 | 在模板中用作 JSON 片段以简化模板语言表达式的值。\n| 资源 | 是 | 已在资源组中部署或更新的服务类型。\n| outputs | 否 | 部署后返回的值。\n\n本主题稍后将更详细地介绍模板的各个节。现在，我们将回顾构成模板的某些语法。\n\n## 表达式和函数\n\n模板的基本语法为 JSON；但是，表达式和函数扩展了模板中提供的 JSON，使你能够创建严格意义上不是文本值的值。表达式括在方括号（[ 和 ]）中，并在部署模板时进行求值。表达式可以出现在 JSON 字符串值中的任何位置，并始终返回另一个 JSON 值。如果需要使用以方括号 [ 开头的文本字符串，则必须使用两个方括号 [[。\n\n通常，你会将表达式与函数一起使用，以执行用于配置部署的操作。如同在 JavaScript 中一样，函数调用的格式为 **functionName(arg1,arg2,arg3)**。使用点和 [index] 运算符引用属性。\n\n以下示例演示如何在构造值时使用一些函数：\n \n    \"variables\": {\n       \"location\": \"[resourceGroup().location]\",\n       \"usernameAndPassword\": \"[concat('parameters('username'), ':', parameters('password'))]\",\n       \"authorizationHeader\": \"[concat('Basic ', base64(variables('usernameAndPassword')))]\"\n    }\n\n有关模板函数的完整列表，请参阅 [Azure 资源管理器模板函数](/documentation/articles/resource-group-template-functions)。\n\n\n## Parameters\n\n在模板的参数部分中，您可以指定用户在部署资源时能够输入的值。你可以在整个模板中使用这些参数值，来为部署的资源设置值。在模板的其他节中，只能使用 parameters 节中声明的参数。\n\n在 parameters 节中，不能使用一个参数值来构造另一个参数值。这种类型的操作通常在 variables 节中发生。\n\n使用以下结构定义参数：\n\n    \"parameters\": {\n       \"<parameterName>\" : {\n         \"type\" : \"<type-of-parameter-value>\",\n         \"defaultValue\": \"<optional-default-value-of-parameter>\",\n         \"allowedValues\": [ \"<optional-array-of-allowed-values>\" ],\n         \"minValue\": <optional-minimum-value-for-int-parameters>,\n         \"maxValue\": <optional-maximum-value-for-int-parameters>,\n         \"minLength\": <optional-minimum-length-for-string-secureString-array-parameters>,\n         \"maxLength\": <optional-maximum-length-for-string-secureString-array-parameters>,\n         \"metadata\": {\n             \"description\": \"<optional-description-of-the parameter>\" \n         }\n       }\n    }\n\n| 元素名称 | 必选 | 说明\n| :------------: | :------: | :----------\n| parameterName | 是 | 参数的名称。必须是有效的 JavaScript 标识符。\n| type | 是 | 参数值的类型。请参阅以下允许类型的列表。\n| defaultValue | 否 | 参数的默认值，如果没有为参数提供任何值。\n| allowedValues | 否 | 用来确保提供正确值的参数的允许值数组。\n| minValue | 否 | int 类型参数的最小值，此值是包容性的。\n| maxValue | 否 | int 类型参数的最大值，此值是包容性的。\n| minLength | 否 | string、secureString 和 array 类型参数的最小长度，此值是包容性的。\n| maxLength | 否 | string、secureString 和 array 类型参数的最大长度，此值是包容性的。\n| description | 否 | 通过门户自定义模板界面向模板用户显示的参数描述。\n\n允许的类型和值是：\n\n- 字符串或 secureString - 任何有效的 JSON 字符串\n- int - 任何有效的 JSON 整数\n- 布尔值 - 任何有效的 JSON 布尔值\n- 对象或 secureObject - 任何有效的 JSON 对象\n- 数组 - 任何有效的 JSON 数组\n\n若要将某个参数指定为可选，请将其 defaultValue 指定为空字符串。\n\n>[AZURE.NOTE]所有密码、密钥和其他机密信息应使用 **secureString** 类型。部署资源后，无法读取使用 secureString 类型的模板参数。\n\n以下示例演示如何定义参数：\n\n    \"parameters\": {\n       \"siteName\": {\n          \"type\": \"string\",\n          \"minLength\": 2,\n          \"maxLength\": 60\n       },\n       \"siteLocation\": {\n          \"type\": \"string\",\n          \"minLength\": 2\n       },\n       \"hostingPlanName\": {\n          \"type\": \"string\"\n       },  \n       \"hostingPlanSku\": {\n          \"type\": \"string\",\n          \"allowedValues\": [\n            \"Free\",\n            \"Shared\",\n            \"Basic\",\n            \"Standard\",\n            \"Premium\"\n          ],\n          \"defaultValue\": \"Free\"\n       },\n       \"instancesCount\": {\n          \"type\": \"int\",\n          \"maxValue\": 10\n       },\n       \"numberOfWorkers\": {\n          \"type\": \"int\",\n          \"minValue\": 1\n       }\n    }\n\n## 变量\n\n在变量部分中，可构造用于简化模板语言表达式的值。通常，这些变量基于通过参数提供的值。\n\n使用以下结构定义变量：\n\n    \"variables\": {\n       \"<variable-name>\": \"<variable-value>\",\n       \"<variable-name>\": { \n           <variable-complex-type-value> \n       }\n    }\n\n以下示例演示如何定义从两个参数值构造出的变量：\n\n    \"parameters\": {\n       \"username\": {\n         \"type\": \"string\"\n       },\n       \"password\": {\n         \"type\": \"secureString\"\n       }\n     },\n     \"variables\": {\n       \"connectionString\": \"[concat('Name=', parameters('username'), ';Password=', parameters('password'))]\"\n    }\n\n下一个示例演示一个属于复杂的 JSON 类型的变量，以及从其他变量构造出的变量：\n\n    \"parameters\": {\n       \"environmentName\": {\n         \"type\": \"string\",\n         \"allowedValues\": [\n           \"test\",\n           \"prod\"\n         ]\n       }\n    },\n    \"variables\": {\n       \"environmentSettings\": {\n         \"test\": {\n           \"instancesSize\": \"Small\",\n           \"instancesCount\": 1\n         },\n         \"prod\": {\n           \"instancesSize\": \"Large\",\n           \"instancesCount\": 4\n         }\n       },\n       \"currentEnvironmentSettings\": \"[variables('environmentSettings')[parameters('environmentName')]]\",\n       \"instancesSize\": \"[variables('currentEnvironmentSettings').instancesSize\",\n       \"instancesCount\": \"[variables('currentEnvironmentSettings').instancesCount\"\n    }\n\n## 资源\n\n在 resources 节，可以定义部署或更新的资源。\n\n使用以下结构定义资源：\n\n    \"resources\": [\n       {\n         \"apiVersion\": \"<api-version-of-resource>\",\n         \"type\": \"<resource-provider-namespace/resource-type-name>\",\n         \"name\": \"<name-of-the-resource>\",\n         \"location\": \"<location-of-resource>\",\n         \"tags\": \"<name-value-pairs-for-resource-tagging>\",\n         \"comments\": \"<your-reference-notes>\",\n         \"dependsOn\": [\n           \"<array-of-related-resource-names>\"\n         ],\n         \"properties\": \"<settings-for-the-resource>\",\n         \"resources\": [\n           \"<array-of-dependent-resources>\"\n         ]\n       }\n    ]\n\n| 元素名称 | 必选 | 说明\n| :----------------------: | :------: | :----------\n| apiVersion | 是 | 支持该资源的 API 版本。有关资源的可用版本和架构，请参阅 [Azure 资源管理器架构](https://github.com/Azure/azure-resource-manager-schemas)。\n| type | 是 | 资源的类型。此值是资源提供程序的命名空间以及资源提供程序支持的资源类型的组合。\n| name | 是 | 资源的名称。该名称必须遵循 RFC3986 中定义的 URI 构成部分限制。\n| location | 否 | 提供的资源支持的地理位置。\n| 标记 | 否 | 与资源关联的标记。\n| 注释 | 否 | 用于描述模板中资源的注释\n| dependsOn | 否 | 正在定义的资源所依赖的资源。将会评估资源之间的依赖关系，并按资源的依赖顺序来部署资源。如果资源不相互依赖，则会尝试并行部署资源。该值可以是资源名称或资源唯一标识符的逗号分隔列表。\n| properties | 否 | 特定于资源的配置设置。\n| 资源 | 否 | 依赖于所定义的资源的子资源。\n\n如果资源名称不是唯一的，你可以使用 **resourceId** 帮助器函数（下面将会介绍）获取任何资源的唯一标识符。\n\n**properties** 元素的值与你在创建资源时，在 REST API 操作（PUT 方法）的请求正文中提供的值完全相同。请参阅 [Azure 参考](https://msdn.microsoft.com/zh-cn/library/azure/mt420159.aspx)，了解可对你要部署的资源执行的 REST API 操作。\n\n以下示例演示了 **Microsoft.Web/serverfarms** 资源，以及一个包含嵌套 **Extensions** 资源的 **Microsoft.Web/sites** 资源：\n\n    \"resources\": [\n        {\n          \"apiVersion\": \"2014-06-01\",\n          \"type\": \"Microsoft.Web/serverfarms\",\n          \"name\": \"[parameters('hostingPlanName')]\",\n          \"location\": \"[resourceGroup().location]\",\n          \"properties\": {\n              \"name\": \"[parameters('hostingPlanName')]\",\n              \"sku\": \"[parameters('hostingPlanSku')]\",\n              \"workerSize\": \"0\",\n              \"numberOfWorkers\": 1\n          }\n        },\n        {\n          \"apiVersion\": \"2014-06-01\",\n          \"type\": \"Microsoft.Web/sites\",\n          \"name\": \"[parameters('siteName')]\",\n          \"location\": \"[resourceGroup().location]\",\n          \"tags\": {\n              \"environment\": \"test\",\n              \"team\": \"ARM\"\n          },\n          \"dependsOn\": [\n              \"[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]\"\n          ],\n          \"properties\": {\n              \"name\": \"[parameters('siteName')]\",\n              \"serverFarm\": \"[parameters('hostingPlanName')]\"\n          },\n          \"resources\": [\n              {\n                  \"apiVersion\": \"2014-06-01\",\n                  \"type\": \"Extensions\",\n                  \"name\": \"MSDeploy\",\n                  \"properties\": {\n                    \"packageUri\": \"https://auxmktplceprod.blob.core.chinacloudapi.cn/packages/StarterSite-modified.zip\",\n                    \"dbType\": \"None\",\n                    \"connectionString\": \"\",\n                    \"setParameters\": {\n                      \"Application Path\": \"[parameters('siteName')]\"\n                    }\n                  }\n              }\n          ]\n        }\n    ]\n\n\n## Outputs\n\n在 Outputs 节中，可以指定从部署返回的值。例如，可能会返回用于访问已部署资源的 URI。\n\n以下示例演示了输出定义的结构：\n\n    \"outputs\": {\n       \"<outputName>\" : {\n         \"type\" : \"<type-of-output-value>\",\n         \"value\": \"<output-value-expression>\",\n       }\n    }\n\n| 元素名称 | 必选 | 说明\n| :------------: | :------: | :----------\n| outputName | 是 | 输出值的名称。必须是有效的 JavaScript 标识符。\n| type | 是 | 输出值的类型。输出值支持的类型与模板输入参数相同。\n| value | 是 | 要评估并作为输出值返回的模板语言表达式。\n\n\n以下示例演示了 Outputs 节中返回的值。\n\n    \"outputs\": {\n       \"siteUri\" : {\n         \"type\" : \"string\",\n         \"value\": \"[concat('http://',reference(resourceId('Microsoft.Web/sites', parameters('siteName'))).hostNames[0])]\"\n       }\n    }\n\n## 更高级方案。\n本主题提供了有关模板的简介。但是，你的方案可能需要更高级的任务。\n\n你可能需要将两个模板合并在一起，或者在父模板中使用子模板。有关详细信息，请参阅[将链接的模板与 Azure 资源管理器配合使用](/documentation/articles/resource-group-linked-templates)。\n\n若要在创建资源类型时迭代指定的次数，请参阅[在 Azure 资源管理器中创建多个资源实例](/documentation/articles/resource-group-create-multiple)。\n\n你可能需要使用不同资源组中的资源。使用跨多个资源组共享的存储帐户或虚拟网络时，这很常见。有关详细信息，请参阅 [resourceId 函数](/documentation/articles/resource-group-template-functions/#resourceid)。\n\n## 完整的模板\n以下模板将部署一个 Web 应用，并使用 .zip 文件中的代码设置该应用程序。\n\n    {\n       \"$schema\": \"http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#\",\n       \"contentVersion\": \"1.0.0.0\",\n       \"parameters\": {\n         \"siteName\": {\n           \"type\": \"string\"\n         },\n         \"hostingPlanName\": {\n           \"type\": \"string\"\n         },\n         \"hostingPlanSku\": {\n           \"type\": \"string\",\n           \"allowedValues\": [\n             \"Free\",\n             \"Shared\",\n             \"Basic\",\n             \"Standard\",\n             \"Premium\"\n           ],\n           \"defaultValue\": \"Free\"\n         }\n       },\n       \"resources\": [\n         {\n           \"apiVersion\": \"2014-06-01\",\n           \"type\": \"Microsoft.Web/serverfarms\",\n           \"name\": \"[parameters('hostingPlanName')]\",\n           \"location\": \"[resourceGroup().location]\",\n           \"properties\": {\n             \"name\": \"[parameters('hostingPlanName')]\",\n             \"sku\": \"[parameters('hostingPlanSku')]\",\n             \"workerSize\": \"0\",\n             \"numberOfWorkers\": 1\n           }\n         },\n         {\n           \"apiVersion\": \"2014-06-01\",\n           \"type\": \"Microsoft.Web/sites\",\n           \"name\": \"[parameters('siteName')]\",\n           \"location\": \"[resourceGroup().location]\",\n           \"tags\": {\n             \"environment\": \"test\",\n             \"team\": \"ARM\"\n           },\n           \"dependsOn\": [\n             \"[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]\"\n           ],\n           \"properties\": {\n             \"name\": \"[parameters('siteName')]\",\n             \"serverFarm\": \"[parameters('hostingPlanName')]\"\n           },\n           \"resources\": [\n             {\n               \"apiVersion\": \"2014-06-01\",\n               \"type\": \"Extensions\",\n               \"name\": \"MSDeploy\",\n               \"dependsOn\": [\n                 \"[resourceId('Microsoft.Web/sites', parameters('siteName'))]\"\n               ],\n               \"properties\": {\n                 \"packageUri\": \"https://auxmktplceprod.blob.core.chinacloudapi.cn/packages/StarterSite-modified.zip\",\n                 \"dbType\": \"None\",\n                 \"connectionString\": \"\",\n                 \"setParameters\": {\n                   \"Application Path\": \"[parameters('siteName')]\"\n                 }\n               }\n             }\n           ]\n         }\n       ],\n       \"outputs\": {\n         \"siteUri\": {\n           \"type\": \"string\",\n           \"value\": \"[concat('http://',reference(resourceId('Microsoft.Web/sites', parameters('siteName'))).hostNames[0])]\"\n         }\n       }\n    }\n\n## 后续步骤\n- 有关你可以使用的来自模板中的函数的详细信息，请参阅 [Azure 资源管理器模板函数](/documentation/articles/resource-group-template-functions)\n- 若要查看如何部署已创建的模板，请参阅[使用 Azure 资源管理器模板部署应用程序](/documentation/articles/resource-group-template-deploy)\n- 若要查看可用架构，请参阅 [Azure 资源管理器架构](https://github.com/Azure/azure-resource-manager-schemas)\n\n<!---HONumber=Mooncake_1221_2015-->"
+}

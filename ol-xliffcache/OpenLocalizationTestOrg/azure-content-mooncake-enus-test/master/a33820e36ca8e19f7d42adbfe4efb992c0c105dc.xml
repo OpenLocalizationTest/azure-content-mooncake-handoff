@@ -1,0 +1,502 @@
+{
+  "nodes": [
+    {
+      "content": "开始使用 blob 存储和 Visual Studio 连接服务（WebJob 项目）| Azure",
+      "pos": [
+        27,
+        77
+      ]
+    },
+    {
+      "content": "在使用 Visual Studio 连接服务连接到 Azure 存储后，如何开始使用 WebJob 项目中的 Blob 存储",
+      "pos": [
+        96,
+        158
+      ]
+    },
+    {
+      "content": "开始使用 Azure Blob 存储和 Visual Studio 连接服务（WebJob 项目）",
+      "pos": [
+        359,
+        408
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        413,
+        415
+      ]
+    },
+    {
+      "pos": [
+        417,
+        667
+      ],
+      "content": "本文章提供 C# 代码示例，用于演示如何在创建或更新 Azure blob 后触发进程。这些代码示例使用 <bpt id=\"p1\">[</bpt>WebJobs SDK<ept id=\"p1\">](/documentation/articles/websites-dotnet-webjobs-sdk)</ept> 版本 1.x。当你使用 Visual Studio“添加连接服务”对话框将存储帐户添加到 WebJob 项目中时，会安装相应的 Azure 存储 NuGet 包，相应的.NET 引用会添加到项目中，并会在 App.config 文件中更新存储帐户的连接字符串。"
+    },
+    {
+      "content": "如何在创建或更新 Blob 后触发函数",
+      "pos": [
+        674,
+        693
+      ]
+    },
+    {
+      "pos": [
+        695,
+        724
+      ],
+      "content": "本部分说明如何使用 <bpt id=\"p1\">**</bpt>BlobTrigger<ept id=\"p1\">**</ept> 属性。"
+    },
+    {
+      "pos": [
+        727,
+        992
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>WebJobs SDK 会扫描日志文件，以观察新的或更改的 blob。此过程非常缓慢；创建 blob 之后数分钟或更长时间内可能仍不会触发函数。如果你的应用程序需要立即处理 blob，推荐的方法是在创建该 blob 时创建队列消息，并在处理该 blob 的函数上使用 <bpt id=\"p2\">[</bpt>QueueTrigger<ept id=\"p2\">](/documentation/articles/websites-dotnet-webjobs-sdk-storage-queues-how-to#trigger)</ept> 属性（而非 <bpt id=\"p3\">**</bpt>BlobTrigger<ept id=\"p3\">**</ept> 属性）。"
+    },
+    {
+      "content": "Blob 名称和扩展名的单个占位符",
+      "pos": [
+        998,
+        1015
+      ]
+    },
+    {
+      "pos": [
+        1019,
+        1055
+      ],
+      "content": "以下代码示例将<bpt id=\"p1\">*</bpt>输入<ept id=\"p1\">*</ept>容器中显示的文本 blob 复制到<bpt id=\"p2\">*</bpt>输出<ept id=\"p2\">*</ept>容器中："
+    },
+    {
+      "pos": [
+        1257,
+        1369
+      ],
+      "content": "属性构造函数采用指定容器名称的字符串参数和 Blob 名称的占位符。在此示例中，如果在<bpt id=\"p1\">*</bpt>输入<ept id=\"p1\">*</ept>容器中创建了名为 <bpt id=\"p2\">*</bpt>Blob1.txt<ept id=\"p2\">*</ept> 的 blob，则该函数将在<bpt id=\"p3\">*</bpt>输出<ept id=\"p3\">*</ept>容器中创建名为 <bpt id=\"p4\">*</bpt>Blob1.txt<ept id=\"p4\">*</ept> 的 blob。"
+    },
+    {
+      "content": "你可以指定包含 Blob 名称占位符的名称模式，如以下代码示例中所示：",
+      "pos": [
+        1371,
+        1406
+      ]
+    },
+    {
+      "pos": [
+        1622,
+        1715
+      ],
+      "content": "此代码只会复制名称以“original-”开头的 Blob。例如，将<bpt id=\"p1\">*</bpt>输入<ept id=\"p1\">*</ept>容器中的 <bpt id=\"p2\">*</bpt>original-Blob1.txt<ept id=\"p2\">*</ept> 复制到<bpt id=\"p3\">*</bpt>输出<ept id=\"p3\">*</ept>容器中的 <bpt id=\"p4\">*</bpt>copy-Blob1.txt<ept id=\"p4\">*</ept>。"
+    },
+    {
+      "pos": [
+        1717,
+        1787
+      ],
+      "content": "如果你需要指定的名称中包含大括号的 Blob 名称的名称模式，增加大括号。例如，如果你想要在<bpt id=\"p1\">*</bpt>映像<ept id=\"p1\">*</ept>容器中查找具有以下类似名称的 blob："
+    },
+    {
+      "content": "为模式使用以下代码：",
+      "pos": [
+        1823,
+        1833
+      ]
+    },
+    {
+      "pos": [
+        1871,
+        1903
+      ],
+      "content": "在示例中，<bpt id=\"p1\">*</bpt>名称<ept id=\"p1\">*</ept>占位符值将为 <bpt id=\"p2\">*</bpt>soundfile.mp3<ept id=\"p2\">*</ept>。"
+    },
+    {
+      "content": "单独的 Blob 名称和扩展名占位符",
+      "pos": [
+        1909,
+        1927
+      ]
+    },
+    {
+      "pos": [
+        1929,
+        2020
+      ],
+      "content": "以下代码示例在将<bpt id=\"p1\">*</bpt>输入<ept id=\"p1\">*</ept>容器中显示的 blob 复制到<bpt id=\"p2\">*</bpt>输出<ept id=\"p2\">*</ept>容器中时更改文件扩展名。该代码将记录<bpt id=\"p3\">*</bpt>输入<ept id=\"p3\">*</ept> blob 的扩展名，并将<bpt id=\"p4\">*</bpt>输出<ept id=\"p4\">*</ept> blob 的扩展名设置为 <bpt id=\"p5\">*</bpt>.txt<ept id=\"p5\">*</ept>。"
+    },
+    {
+      "pos": [
+        2430,
+        2462
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"types\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 可绑定到 blob 的类型"
+    },
+    {
+      "pos": [
+        2464,
+        2492
+      ],
+      "content": "可对以下类型使用 <bpt id=\"p1\">**</bpt>BlobTrigger<ept id=\"p1\">**</ept> 属性："
+    },
+    {
+      "content": "string",
+      "pos": [
+        2498,
+        2504
+      ]
+    },
+    {
+      "content": "TextReader",
+      "pos": [
+        2511,
+        2521
+      ]
+    },
+    {
+      "content": "Stream",
+      "pos": [
+        2528,
+        2534
+      ]
+    },
+    {
+      "content": "ICloudBlob",
+      "pos": [
+        2541,
+        2551
+      ]
+    },
+    {
+      "content": "CloudBlockBlob",
+      "pos": [
+        2558,
+        2572
+      ]
+    },
+    {
+      "content": "CloudPageBlob",
+      "pos": [
+        2579,
+        2592
+      ]
+    },
+    {
+      "pos": [
+        2597,
+        2639
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>ICloudBlobStreamBinder<ept id=\"p1\">](#icbsb)</ept> 反序列化的其他类型"
+    },
+    {
+      "pos": [
+        2641,
+        2701
+      ],
+      "content": "如果你想要直接使用 Azure 存储帐户，则还可以向方法签名添加 <bpt id=\"p1\">**</bpt>CloudStorageAccount<ept id=\"p1\">**</ept> 参数。"
+    },
+    {
+      "pos": [
+        2706,
+        2746
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"string\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 通过绑定到字符串获取文本 blob 内容"
+    },
+    {
+      "pos": [
+        2748,
+        2885
+      ],
+      "content": "如果需要文本 blob，可将 <bpt id=\"p1\">**</bpt>BlobTrigger<ept id=\"p1\">**</ept> 应用到 <bpt id=\"p2\">**</bpt>string<ept id=\"p2\">**</ept> 参数。以下代码示例将文本 blob 绑定到名为 <bpt id=\"p3\">**</bpt>logMessage<ept id=\"p3\">**</ept> 的 <bpt id=\"p4\">**</bpt>string<ept id=\"p4\">**</ept> 参数。函数使用该参数将 Blob 的内容写入 WebJobs SDK 仪表板。"
+    },
+    {
+      "pos": [
+        3193,
+        3251
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"icbsb\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 使用 ICloudBlobStreamBinder 获取序列化 blob 内容"
+    },
+    {
+      "pos": [
+        3253,
+        3343
+      ],
+      "content": "以下代码示例使用实现 <bpt id=\"p1\">**</bpt>ICloudBlobStreamBinder<ept id=\"p1\">**</ept> 的类来启用 <bpt id=\"p2\">**</bpt>BlobTrigger<ept id=\"p2\">**</ept> 属性，将 blob 绑定到 <bpt id=\"p3\">**</bpt>WebImage<ept id=\"p3\">**</ept> 类型。"
+    },
+    {
+      "pos": [
+        4053,
+        4129
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>WebImage<ept id=\"p1\">**</ept> 绑定代码在 <bpt id=\"p2\">**</bpt>WebImageBinder<ept id=\"p2\">**</ept> 类中提供，该类派生自 <bpt id=\"p3\">**</bpt>ICloudBlobStreamBinder<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "pos": [
+        4766,
+        4797
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"poison\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 如何处理有害 blob"
+    },
+    {
+      "pos": [
+        4799,
+        4985
+      ],
+      "content": "当 <bpt id=\"p1\">**</bpt>BlobTrigger<ept id=\"p1\">**</ept> 函数失败时，如果失败是暂时性错误导致的，则 SDK 会再次调用该函数。如果失败是由 Blob 的内容导致的，则该函数每次尝试处理 Blob 时都会失败。默认情况下，对于给定的 Blob，SDK 调用一个函数最多 5 次。如果第五次尝试失败，SDK 会将消息添加到名为 <bpt id=\"p2\">*</bpt>webjobs-blobtrigger-poison<ept id=\"p2\">*</ept> 的队列中。"
+    },
+    {
+      "pos": [
+        4987,
+        5129
+      ],
+      "content": "最大尝试次数可配置。将使用相同的 <bpt id=\"p1\">[</bpt>MaxDequeueCount<ept id=\"p1\">](/documentation/articles/websites-dotnet-webjobs-sdk-storage-queues-how-to#configqueue)</ept> 设置处理有害 blob 和有害队列消息。"
+    },
+    {
+      "content": "有害 Blob 的队列消息是包含以下属性的 JSON 对象：",
+      "pos": [
+        5131,
+        5161
+      ]
+    },
+    {
+      "pos": [
+        5165,
+        5254
+      ],
+      "content": "FunctionId（格式为 <bpt id=\"p1\">*</bpt>{WebJob name}<ept id=\"p1\">*</ept>.Functions.<bpt id=\"p2\">*</bpt>{Function name}<ept id=\"p2\">*</ept>，例如 WebJob1.Functions.CopyBlob）"
+    },
+    {
+      "content": "BlobType（\"BlockBlob\" 或 \"PageBlob\"）",
+      "pos": [
+        5257,
+        5291
+      ]
+    },
+    {
+      "content": "ContainerName",
+      "pos": [
+        5294,
+        5307
+      ]
+    },
+    {
+      "content": "BlobName",
+      "pos": [
+        5310,
+        5318
+      ]
+    },
+    {
+      "content": "ETag（blob 版本标识符，例如：\"0x8D1DC6E70A277EF\"）",
+      "pos": [
+        5321,
+        5360
+      ]
+    },
+    {
+      "pos": [
+        5362,
+        5468
+      ],
+      "content": "在下面的代码示例中，<bpt id=\"p1\">**</bpt>CopyBlob<ept id=\"p1\">**</ept> 函数的代码导致它每次调用时都失败。SDK 进行最大重试次数的调用之后，有害 blob 队列中会创建消息，该消息通过 <bpt id=\"p2\">**</bpt>LogPoisonBlob<ept id=\"p2\">**</ept> 函数进行处理。"
+    },
+    {
+      "pos": [
+        6264,
+        6311
+      ],
+      "content": "SDK 自动反序列化 JSON 消息。下面是 <bpt id=\"p1\">**</bpt>PoisonBlobMessage<ept id=\"p1\">**</ept> 类："
+    },
+    {
+      "pos": [
+        6625,
+        6655
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"polling\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> Blob 轮询算法"
+    },
+    {
+      "pos": [
+        6657,
+        6774
+      ],
+      "content": "启动应用程序时，WebJobs SDK 将扫描 <bpt id=\"p1\">**</bpt>BlobTrigger<ept id=\"p1\">**</ept> 属性指定的所有容器。在大型存储帐户中，此扫描可能需要一些时间，因此在查找新 blob 和执行 <bpt id=\"p2\">**</bpt>BlobTrigger<ept id=\"p2\">**</ept> 函数之前，可能需要一段时间。"
+    },
+    {
+      "pos": [
+        6776,
+        6906
+      ],
+      "content": "若要在应用程序启动后检测新的或已更改的 Blob，SDK 会定期读取从 Blob 存储日志。blob 日志将进行缓冲，仅每隔 10 分钟左右获取物理写入，因此创建或更新 blob 后可能存在很长的延迟，然后才会执行对应的 <bpt id=\"p1\">**</bpt>BlobTrigger<ept id=\"p1\">**</ept> 函数。"
+    },
+    {
+      "pos": [
+        6908,
+        7132
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>Blob<ept id=\"p1\">**</ept> 属性创建的 blob 出现异常。当 WebJobs SDK 创建新 blob 时，会立即将新的 blob 传递给任何匹配的 <bpt id=\"p2\">**</bpt>BlobTrigger<ept id=\"p2\">**</ept> 函数。因此，如果建立了 Blob 输入和输出的链接，则 SDK 可以高效地处理它们。但是，如果你想要对通过其他方式创建或更新的 blob 降低运行 blob 处理功能的延迟时间，我们建议使用 <bpt id=\"p3\">**</bpt>QueueTrigger<ept id=\"p3\">**</ept>（而不是 <bpt id=\"p4\">**</bpt>BlobTrigger<ept id=\"p4\">**</ept>）。"
+    },
+    {
+      "pos": [
+        7138,
+        7167
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"receipts\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> Blob 回执"
+    },
+    {
+      "pos": [
+        7169,
+        7267
+      ],
+      "content": "WebJobs SDK 确保没有为相同的新 blob 或更新 blob 多次调用 <bpt id=\"p1\">**</bpt>BlobTrigger<ept id=\"p1\">**</ept> 函数。为此，它会维护 <bpt id=\"p2\">*</bpt>blob 回执<ept id=\"p2\">*</ept>，以确定是否已处理给定的 blob 版本。"
+    },
+    {
+      "pos": [
+        7269,
+        7364
+      ],
+      "content": "Blob 回执在 AzureWebJobsStorage 连接字符串指定的 Azure 存储帐户中名为 <bpt id=\"p1\">*</bpt>azure-webjobs-hosts<ept id=\"p1\">*</ept> 的容器内存储。Blob 回执包含以下信息："
+    },
+    {
+      "pos": [
+        7368,
+        7459
+      ],
+      "content": "为 blob 调用的函数（\"<bpt id=\"p1\">*</bpt>{WebJob name}<ept id=\"p1\">*</ept>.Functions.<bpt id=\"p2\">*</bpt>{Function name}<ept id=\"p2\">*</ept>\"，例如 \"WebJob1.Functions.CopyBlob\"）"
+    },
+    {
+      "content": "容器名称",
+      "pos": [
+        7462,
+        7466
+      ]
+    },
+    {
+      "content": "Blob 类型（\"BlockBlob\" 或 \"PageBlob\"）",
+      "pos": [
+        7469,
+        7502
+      ]
+    },
+    {
+      "content": "Blob 名称",
+      "pos": [
+        7505,
+        7512
+      ]
+    },
+    {
+      "content": "ETag（blob 版本标识符，例如：\"0x8D1DC6E70A277EF\"）",
+      "pos": [
+        7515,
+        7554
+      ]
+    },
+    {
+      "pos": [
+        7556,
+        7626
+      ],
+      "content": "如果您想要强制重新处理某个 blob，则可以从 <bpt id=\"p1\">*</bpt>azure-webjobs-hosts<ept id=\"p1\">*</ept> 容器中手动删除该 blob 的 blob 回执。"
+    },
+    {
+      "pos": [
+        7631,
+        7662
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"queues\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 队列文章涵盖的相关主题"
+    },
+    {
+      "pos": [
+        7664,
+        7831
+      ],
+      "content": "有关如何处理队列消息触发的 blob 处理，或者不特定于 blob 处理的 WebJobs SDK 方案的信息，请参阅<bpt id=\"p1\">[</bpt>如何通过 WebJobs SDK 使用 Azure 队列存储<ept id=\"p1\">](/documentation/articles/websites-dotnet-webjobs-sdk-storage-queues-how-to)</ept>。"
+    },
+    {
+      "content": "该文章涵盖的相关主题包括：",
+      "pos": [
+        7833,
+        7846
+      ]
+    },
+    {
+      "content": "异步函数",
+      "pos": [
+        7850,
+        7854
+      ]
+    },
+    {
+      "content": "多个实例",
+      "pos": [
+        7857,
+        7861
+      ]
+    },
+    {
+      "content": "正常关闭",
+      "pos": [
+        7864,
+        7868
+      ]
+    },
+    {
+      "content": "在函数正文中使用 WebJobs SDK 属性",
+      "pos": [
+        7871,
+        7894
+      ]
+    },
+    {
+      "content": "在代码中设置 SDK 连接字符串。",
+      "pos": [
+        7897,
+        7914
+      ]
+    },
+    {
+      "content": "在代码中设置 WebJobs SDK 构造函数参数的值",
+      "pos": [
+        7917,
+        7944
+      ]
+    },
+    {
+      "pos": [
+        7947,
+        7986
+      ],
+      "content": "配置 <bpt id=\"p1\">**</bpt>MaxDequeueCount<ept id=\"p1\">**</ept>，以便进行有害 blob 的处理。"
+    },
+    {
+      "content": "手动触发函数",
+      "pos": [
+        7989,
+        7995
+      ]
+    },
+    {
+      "content": "写入日志",
+      "pos": [
+        7998,
+        8002
+      ]
+    },
+    {
+      "pos": [
+        8007,
+        8033
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"nextsteps\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>后续步骤"
+    },
+    {
+      "pos": [
+        8035,
+        8191
+      ],
+      "content": "本文提供了代码示例，演示如何处理用于操作 Azure blob 的常见方案。有关如何使用 Azure WebJobs 和 WebJobs SDK 的详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure WebJobs 推荐资源<ept id=\"p1\">](/documentation/articles/websites-webjobs-resources)</ept>。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"开始使用 blob 存储和 Visual Studio 连接服务（WebJob 项目）| Azure\"\n    description=\"在使用 Visual Studio 连接服务连接到 Azure 存储后，如何开始使用 WebJob 项目中的 Blob 存储\"\n    services=\"storage\"\n    documentationCenter=\"\"\n    authors=\"TomArcher\"\n    manager=\"douge\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"storage\"\n    ms.date=\"12/16/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n# 开始使用 Azure Blob 存储和 Visual Studio 连接服务（WebJob 项目）\n\n## 概述\n\n本文章提供 C# 代码示例，用于演示如何在创建或更新 Azure blob 后触发进程。这些代码示例使用 [WebJobs SDK](/documentation/articles/websites-dotnet-webjobs-sdk) 版本 1.x。当你使用 Visual Studio“添加连接服务”对话框将存储帐户添加到 WebJob 项目中时，会安装相应的 Azure 存储 NuGet 包，相应的.NET 引用会添加到项目中，并会在 App.config 文件中更新存储帐户的连接字符串。\n\n\n\n## 如何在创建或更新 Blob 后触发函数\n\n本部分说明如何使用 **BlobTrigger** 属性。\n\n **注意：**WebJobs SDK 会扫描日志文件，以观察新的或更改的 blob。此过程非常缓慢；创建 blob 之后数分钟或更长时间内可能仍不会触发函数。如果你的应用程序需要立即处理 blob，推荐的方法是在创建该 blob 时创建队列消息，并在处理该 blob 的函数上使用 [QueueTrigger](/documentation/articles/websites-dotnet-webjobs-sdk-storage-queues-how-to#trigger) 属性（而非 **BlobTrigger** 属性）。\n\n### Blob 名称和扩展名的单个占位符  \n\n以下代码示例将*输入*容器中显示的文本 blob 复制到*输出*容器中：\n\n        public static void CopyBlob([BlobTrigger(\"input/{name}\")] TextReader input,\n            [Blob(\"output/{name}\")] out string output)\n        {\n            output = input.ReadToEnd();\n        }\n\n属性构造函数采用指定容器名称的字符串参数和 Blob 名称的占位符。在此示例中，如果在*输入*容器中创建了名为 *Blob1.txt* 的 blob，则该函数将在*输出*容器中创建名为 *Blob1.txt* 的 blob。\n\n你可以指定包含 Blob 名称占位符的名称模式，如以下代码示例中所示：\n\n        public static void CopyBlob([BlobTrigger(\"input/original-{name}\")] TextReader input,\n            [Blob(\"output/copy-{name}\")] out string output)\n        {\n            output = input.ReadToEnd();\n        }\n\n此代码只会复制名称以“original-”开头的 Blob。例如，将*输入*容器中的 *original-Blob1.txt* 复制到*输出*容器中的 *copy-Blob1.txt*。\n\n如果你需要指定的名称中包含大括号的 Blob 名称的名称模式，增加大括号。例如，如果你想要在*映像*容器中查找具有以下类似名称的 blob：\n\n        {20140101}-soundfile.mp3\n\n为模式使用以下代码：\n\n        images/{{20140101}}-{name}\n\n在示例中，*名称*占位符值将为 *soundfile.mp3*。\n\n### 单独的 Blob 名称和扩展名占位符\n\n以下代码示例在将*输入*容器中显示的 blob 复制到*输出*容器中时更改文件扩展名。该代码将记录*输入* blob 的扩展名，并将*输出* blob 的扩展名设置为 *.txt*。\n\n        public static void CopyBlobToTxtFile([BlobTrigger(\"input/{name}.{ext}\")] TextReader input,\n            [Blob(\"output/{name}.txt\")] out string output,\n            string name,\n            string ext,\n            TextWriter logger)\n        {\n            logger.WriteLine(\"Blob name:\" + name);\n            logger.WriteLine(\"Blob extension:\" + ext);\n            output = input.ReadToEnd();\n        }\n\n## <a id=\"types\"></a> 可绑定到 blob 的类型\n\n可对以下类型使用 **BlobTrigger** 属性：\n\n* **string**\n* **TextReader**\n* **Stream**\n* **ICloudBlob**\n* **CloudBlockBlob**\n* **CloudPageBlob**\n* [ICloudBlobStreamBinder](#icbsb) 反序列化的其他类型\n\n如果你想要直接使用 Azure 存储帐户，则还可以向方法签名添加 **CloudStorageAccount** 参数。\n\n## <a id=\"string\"></a> 通过绑定到字符串获取文本 blob 内容\n\n如果需要文本 blob，可将 **BlobTrigger** 应用到 **string** 参数。以下代码示例将文本 blob 绑定到名为 **logMessage** 的 **string** 参数。函数使用该参数将 Blob 的内容写入 WebJobs SDK 仪表板。\n\n        public static void WriteLog([BlobTrigger(\"input/{name}\")] string logMessage,\n            string name,\n            TextWriter logger)\n        {\n             logger.WriteLine(\"Blob name: {0}\", name);\n             logger.WriteLine(\"Content:\");\n             logger.WriteLine(logMessage);\n        }\n\n## <a id=\"icbsb\"></a> 使用 ICloudBlobStreamBinder 获取序列化 blob 内容\n\n以下代码示例使用实现 **ICloudBlobStreamBinder** 的类来启用 **BlobTrigger** 属性，将 blob 绑定到 **WebImage** 类型。\n\n        public static void WaterMark(\n            [BlobTrigger(\"images3/{name}\")] WebImage input,\n            [Blob(\"images3-watermarked/{name}\")] out WebImage output)\n        {\n            output = input.AddTextWatermark(\"WebJobs SDK\",\n                horizontalAlign: \"Center\", verticalAlign: \"Middle\",\n                fontSize: 48, opacity: 50);\n        }\n        public static void Resize(\n            [BlobTrigger(\"images3-watermarked/{name}\")] WebImage input,\n            [Blob(\"images3-resized/{name}\")] out WebImage output)\n        {\n            var width = 180;\n            var height = Convert.ToInt32(input.Height * 180 / input.Width);\n            output = input.Resize(width, height);\n        }\n\n**WebImage** 绑定代码在 **WebImageBinder** 类中提供，该类派生自 **ICloudBlobStreamBinder**。\n\n        public class WebImageBinder : ICloudBlobStreamBinder<WebImage>\n        {\n            public Task<WebImage> ReadFromStreamAsync(Stream input,\n                System.Threading.CancellationToken cancellationToken)\n            {\n                return Task.FromResult<WebImage>(new WebImage(input));\n            }\n            public Task WriteToStreamAsync(WebImage value, Stream output,\n                System.Threading.CancellationToken cancellationToken)\n            {\n                var bytes = value.GetBytes();\n                return output.WriteAsync(bytes, 0, bytes.Length, cancellationToken);\n            }\n        }\n\n## <a id=\"poison\"></a> 如何处理有害 blob\n\n当 **BlobTrigger** 函数失败时，如果失败是暂时性错误导致的，则 SDK 会再次调用该函数。如果失败是由 Blob 的内容导致的，则该函数每次尝试处理 Blob 时都会失败。默认情况下，对于给定的 Blob，SDK 调用一个函数最多 5 次。如果第五次尝试失败，SDK 会将消息添加到名为 *webjobs-blobtrigger-poison* 的队列中。\n\n最大尝试次数可配置。将使用相同的 [MaxDequeueCount](/documentation/articles/websites-dotnet-webjobs-sdk-storage-queues-how-to#configqueue) 设置处理有害 blob 和有害队列消息。\n\n有害 Blob 的队列消息是包含以下属性的 JSON 对象：\n\n* FunctionId（格式为 *{WebJob name}*.Functions.*{Function name}*，例如 WebJob1.Functions.CopyBlob）\n* BlobType（\"BlockBlob\" 或 \"PageBlob\"）\n* ContainerName\n* BlobName\n* ETag（blob 版本标识符，例如：\"0x8D1DC6E70A277EF\"）\n\n在下面的代码示例中，**CopyBlob** 函数的代码导致它每次调用时都失败。SDK 进行最大重试次数的调用之后，有害 blob 队列中会创建消息，该消息通过 **LogPoisonBlob** 函数进行处理。\n\n        public static void CopyBlob([BlobTrigger(\"input/{name}\")] TextReader input,\n            [Blob(\"textblobs/output-{name}\")] out string output)\n        {\n            throw new Exception(\"Exception for testing poison blob handling\");\n            output = input.ReadToEnd();\n        }\n\n        public static void LogPoisonBlob(\n        [QueueTrigger(\"webjobs-blobtrigger-poison\")] PoisonBlobMessage message,\n            TextWriter logger)\n        {\n            logger.WriteLine(\"FunctionId: {0}\", message.FunctionId);\n            logger.WriteLine(\"BlobType: {0}\", message.BlobType);\n            logger.WriteLine(\"ContainerName: {0}\", message.ContainerName);\n            logger.WriteLine(\"BlobName: {0}\", message.BlobName);\n            logger.WriteLine(\"ETag: {0}\", message.ETag);\n        }\n\nSDK 自动反序列化 JSON 消息。下面是 **PoisonBlobMessage** 类：\n\n        public class PoisonBlobMessage\n        {\n            public string FunctionId { get; set; }\n            public string BlobType { get; set; }\n            public string ContainerName { get; set; }\n            public string BlobName { get; set; }\n            public string ETag { get; set; }\n        }\n\n### <a id=\"polling\"></a> Blob 轮询算法\n\n启动应用程序时，WebJobs SDK 将扫描 **BlobTrigger** 属性指定的所有容器。在大型存储帐户中，此扫描可能需要一些时间，因此在查找新 blob 和执行 **BlobTrigger** 函数之前，可能需要一段时间。\n\n若要在应用程序启动后检测新的或已更改的 Blob，SDK 会定期读取从 Blob 存储日志。blob 日志将进行缓冲，仅每隔 10 分钟左右获取物理写入，因此创建或更新 blob 后可能存在很长的延迟，然后才会执行对应的 **BlobTrigger** 函数。\n\n使用 **Blob** 属性创建的 blob 出现异常。当 WebJobs SDK 创建新 blob 时，会立即将新的 blob 传递给任何匹配的 **BlobTrigger** 函数。因此，如果建立了 Blob 输入和输出的链接，则 SDK 可以高效地处理它们。但是，如果你想要对通过其他方式创建或更新的 blob 降低运行 blob 处理功能的延迟时间，我们建议使用 **QueueTrigger**（而不是 **BlobTrigger**）。\n\n### <a id=\"receipts\"></a> Blob 回执\n\nWebJobs SDK 确保没有为相同的新 blob 或更新 blob 多次调用 **BlobTrigger** 函数。为此，它会维护 *blob 回执*，以确定是否已处理给定的 blob 版本。\n\nBlob 回执在 AzureWebJobsStorage 连接字符串指定的 Azure 存储帐户中名为 *azure-webjobs-hosts* 的容器内存储。Blob 回执包含以下信息：\n\n* 为 blob 调用的函数（\"*{WebJob name}*.Functions.*{Function name}*\"，例如 \"WebJob1.Functions.CopyBlob\"）\n* 容器名称\n* Blob 类型（\"BlockBlob\" 或 \"PageBlob\"）\n* Blob 名称\n* ETag（blob 版本标识符，例如：\"0x8D1DC6E70A277EF\"）\n\n如果您想要强制重新处理某个 blob，则可以从 *azure-webjobs-hosts* 容器中手动删除该 blob 的 blob 回执。\n\n## <a id=\"queues\"></a> 队列文章涵盖的相关主题\n\n有关如何处理队列消息触发的 blob 处理，或者不特定于 blob 处理的 WebJobs SDK 方案的信息，请参阅[如何通过 WebJobs SDK 使用 Azure 队列存储](/documentation/articles/websites-dotnet-webjobs-sdk-storage-queues-how-to)。\n\n该文章涵盖的相关主题包括：\n\n* 异步函数\n* 多个实例\n* 正常关闭\n* 在函数正文中使用 WebJobs SDK 属性\n* 在代码中设置 SDK 连接字符串。\n* 在代码中设置 WebJobs SDK 构造函数参数的值\n* 配置 **MaxDequeueCount**，以便进行有害 blob 的处理。\n* 手动触发函数\n* 写入日志\n\n## <a id=\"nextsteps\"></a>后续步骤\n\n本文提供了代码示例，演示如何处理用于操作 Azure blob 的常见方案。有关如何使用 Azure WebJobs 和 WebJobs SDK 的详细信息，请参阅 [Azure WebJobs 推荐资源](/documentation/articles/websites-webjobs-resources)。\n \n\n<!---HONumber=Mooncake_0104_2016-->"
+}

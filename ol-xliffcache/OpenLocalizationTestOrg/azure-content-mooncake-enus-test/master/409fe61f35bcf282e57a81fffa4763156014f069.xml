@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "pos": [
+        5,
+        75
+      ],
+      "content": "登录到 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">](https://manage.windowsazure.cn/)</ept>，单击“移动服务”，然后选择你的移动服务。"
+    },
+    {
+      "content": "单击“API”选项卡，然后单击“创建”。这将显示“创建新的自定义 API”对话框。",
+      "pos": [
+        80,
+        121
+      ]
+    },
+    {
+      "pos": [
+        126,
+        169
+      ],
+      "content": "在“API 名称”中键入 <bpt id=\"p1\">_</bpt>completeall<ept id=\"p1\">_</ept>，然后单击勾选按钮创建新 API。"
+    },
+    {
+      "pos": [
+        177,
+        267
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.TIP]</ph> 使用默认权限和应用密钥的任何人都可以调用自定义 API。但是，应用程序密钥不被视为安全的凭据，因为无法安全地分发或存储它。请考虑仅限经过身份验证的用户访问。"
+    },
+    {
+      "pos": [
+        272,
+        299
+      ],
+      "content": "在 API 表中单击 <bpt id=\"p1\">**</bpt>completeall<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        304,
+        464
+      ],
+      "content": "单击“脚本”选项卡、将现有代码替换为以下代码，然后单击“保存”。这段代码使用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">mssql 对象]</ept> 来直接访问 <bpt id=\"p2\">**</bpt>todoitem<ept id=\"p2\">**</ept> 表，以在所有项上设置 <ph id=\"ph1\">`complete`</ph> 标志。由于使用了 <bpt id=\"p3\">**</bpt>exports.post<ept id=\"p3\">**</ept> 函数，客户端发送 POST 请求以执行操作。已更改行的数量将以整数值形式返回至客户端。"
+    },
+    {
+      "pos": [
+        964,
+        1221
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 提供给自定义 API 函数的 <bpt id=\"p1\">[</bpt>request<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554218.aspx)</ept> 和 <bpt id=\"p2\">[</bpt>response<ept id=\"p2\">](http://msdn.microsoft.com/zh-cn/library/windowsazure/dn303373.aspx)</ept> 对象由 <bpt id=\"p3\">[</bpt>Express.js 库<ept id=\"p3\">](http://go.microsoft.com/fwlink/p/?LinkId=309046)</ept>实现。"
+    }
+  ],
+  "content": "\n\n1. 登录到 [Azure 经典门户](https://manage.windowsazure.cn/)，单击“移动服务”，然后选择你的移动服务。\n\n2. 单击“API”选项卡，然后单击“创建”。这将显示“创建新的自定义 API”对话框。\n\n3. 在“API 名称”中键入 _completeall_，然后单击勾选按钮创建新 API。\n\n    > [AZURE.TIP] 使用默认权限和应用密钥的任何人都可以调用自定义 API。但是，应用程序密钥不被视为安全的凭据，因为无法安全地分发或存储它。请考虑仅限经过身份验证的用户访问。\n\n4. 在 API 表中单击 **completeall**。\n\n5. 单击“脚本”选项卡、将现有代码替换为以下代码，然后单击“保存”。这段代码使用 [mssql 对象] 来直接访问 **todoitem** 表，以在所有项上设置 `complete` 标志。由于使用了 **exports.post** 函数，客户端发送 POST 请求以执行操作。已更改行的数量将以整数值形式返回至客户端。\n\n\n        exports.post = function(request, response) {\n            var mssql = request.service.mssql;\n            var sql = \"UPDATE todoitem SET complete = 1 \" + \n                \"WHERE complete = 0; SELECT @@ROWCOUNT as count\";\n            mssql.query(sql, {\n                success: function(results) {            \n                    if(results.length == 1)                         \n                        response.send(200, results[0]);         \n                }\n            })\n        };\n\n\n> [AZURE.NOTE] 提供给自定义 API 函数的 [request](http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554218.aspx) 和 [response](http://msdn.microsoft.com/zh-cn/library/windowsazure/dn303373.aspx) 对象由 [Express.js 库](http://go.microsoft.com/fwlink/p/?LinkId=309046)实现。\n\n<!-- Anchors. -->\n\n<!-- Images. -->\n\n<!-- URLs. -->\n\n[mssql 对象]: http://msdn.microsoft.com/zh-cn/library/windowsazure/jj554212.aspx\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

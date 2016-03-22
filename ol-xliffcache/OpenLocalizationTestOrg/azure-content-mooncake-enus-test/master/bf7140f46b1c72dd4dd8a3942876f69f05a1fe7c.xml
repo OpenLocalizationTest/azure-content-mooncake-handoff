@@ -1,0 +1,670 @@
+{
+  "nodes": [
+    {
+      "content": "使用 Azure 资源管理器模板创建应用程序网关 | Azure",
+      "pos": [
+        28,
+        60
+      ]
+    },
+    {
+      "content": "本页提供有关使用 Azure 资源管理器模板创建 Azure 应用程序网关的说明",
+      "pos": [
+        78,
+        118
+      ]
+    },
+    {
+      "content": "使用 ARM 模板创建应用程序网关",
+      "pos": [
+        341,
+        358
+      ]
+    },
+    {
+      "content": "应用程序网关是第 7 层负载平衡器。它在不同服务器之间提供故障转移和性能路由 HTTP 请求，而不管它们是在云中还是本地。应用程序网关具有以下应用程序传递功能：HTTP 负载平衡、基于 Cookie 的会话相关性和 SSL 卸载。",
+      "pos": [
+        360,
+        475
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        479,
+        495
+      ]
+    },
+    {
+      "content": "Azure Classic PowerShell",
+      "pos": [
+        499,
+        523
+      ]
+    },
+    {
+      "content": "Azure 资源管理器 PowerShell",
+      "pos": [
+        588,
+        610
+      ]
+    },
+    {
+      "content": "Azure 资源管理器模板",
+      "pos": [
+        679,
+        692
+      ]
+    },
+    {
+      "content": "你将了解如何从 GitHub 下载并修改现有 ARM 模板，以及如何通过 GitHub、PowerShell 和 Azure CLI 部署该模板。",
+      "pos": [
+        774,
+        847
+      ]
+    },
+    {
+      "content": "如果你只是直接从 GitHub 部署 ARM 模板，而不进行任何更改，请跳到“从 github 部署模板”。",
+      "pos": [
+        849,
+        903
+      ]
+    },
+    {
+      "pos": [
+        907,
+        1212
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>在使用 Azure 资源之前，请务必了解 Azure 当前使用两种部署模型：资源管理器部署模型和经典部署模型。在使用任何 Azure 资源之前，请确保你了解<bpt id=\"p1\">[</bpt>部署模型和工具<ept id=\"p1\">](/documentation/articles/azure-classic-rm)</ept>。可以通过单击本文顶部的选项卡来查看不同工具的文档。本文档将说明使用 Azure 资源管理器创建应用程序网关的方式。若要使用经典版本，请转到<bpt id=\"p2\">[</bpt>使用 PowerShell 创建应用程序网关经典部署<ept id=\"p2\">](/documentation/articles/application-gateway-create-gateway)</ept>。"
+    },
+    {
+      "content": "方案",
+      "pos": [
+        1220,
+        1222
+      ]
+    },
+    {
+      "content": "在此方案中，你将创建：",
+      "pos": [
+        1224,
+        1235
+      ]
+    },
+    {
+      "content": "包含 2 个实例的应用程序网关；",
+      "pos": [
+        1239,
+        1255
+      ]
+    },
+    {
+      "content": "名为 VirtualNetwork1 且包含 10.0.0.0/16 保留 CIDR 块的 Vnet；",
+      "pos": [
+        1258,
+        1309
+      ]
+    },
+    {
+      "content": "名为 Appgatewaysubnet 且使用 10.0.0.0/28 作为其 CIDR 块的子网；",
+      "pos": [
+        1312,
+        1362
+      ]
+    },
+    {
+      "content": "安装程序 2 先前已针对想要用于为流量进行负载平衡的 Web 服务器设置后端 IP。在此模板示例中，所用的后端 IP 将是 10.0.1.10 和 10.0.1.11",
+      "pos": [
+        1365,
+        1448
+      ]
+    },
+    {
+      "pos": [
+        1451,
+        1522
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>这是适用于此模板的参数。你可以更改规则、侦听程序，以及打开 azuredeploy.json 以自定义模板的 SSL。"
+    },
+    {
+      "content": "arm-scenario",
+      "pos": [
+        1528,
+        1540
+      ]
+    },
+    {
+      "content": "下载并了解 ARM 模板",
+      "pos": [
+        1622,
+        1634
+      ]
+    },
+    {
+      "content": "可以从 github 下载用于创建 VNet 和两个子网的现有 ARM 模板，进行任何所需的更改，然后重用该模板。为此，请执行以下步骤。",
+      "pos": [
+        1636,
+        1704
+      ]
+    },
+    {
+      "content": "导航到 https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/101-create-application-gateway/。",
+      "pos": [
+        1709,
+        1819
+      ]
+    },
+    {
+      "pos": [
+        1823,
+        1860
+      ],
+      "content": "单击 <bpt id=\"p1\">**</bpt>azuredeploy.json<ept id=\"p1\">**</ept>，然后单击 <bpt id=\"p2\">**</bpt>RAW<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "将该文件保存到你计算机上的本地文件夹。",
+      "pos": [
+        1864,
+        1883
+      ]
+    },
+    {
+      "content": "如果你熟悉 ARM 模板，则跳到步骤 7。",
+      "pos": [
+        1887,
+        1908
+      ]
+    },
+    {
+      "pos": [
+        1912,
+        1979
+      ],
+      "content": "打开刚保存的文件，并查看 <bpt id=\"p1\">**</bpt>parameters<ept id=\"p1\">**</ept> 下第 5 行中的内容。ARM 模板参数提供了在部署过程中可以填充的值的占位符。"
+    },
+    {
+      "content": "参数",
+      "pos": [
+        1987,
+        1989
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        1992,
+        1994
+      ]
+    },
+    {
+      "content": "位置",
+      "pos": [
+        2019,
+        2021
+      ]
+    },
+    {
+      "content": "将创建应用程序网关的 Azure 区域",
+      "pos": [
+        2026,
+        2045
+      ]
+    },
+    {
+      "content": "VirtualNetwork1",
+      "pos": [
+        2056,
+        2071
+      ]
+    },
+    {
+      "content": "新 VNet 的名称",
+      "pos": [
+        2076,
+        2086
+      ]
+    },
+    {
+      "content": "addressPrefix",
+      "pos": [
+        2097,
+        2110
+      ]
+    },
+    {
+      "content": "VNet 的地址空间，采用 CIDR 格式",
+      "pos": [
+        2115,
+        2136
+      ]
+    },
+    {
+      "content": "ApplicationGatewaysubnet",
+      "pos": [
+        2147,
+        2171
+      ]
+    },
+    {
+      "content": "应用程序网关子网的名称",
+      "pos": [
+        2176,
+        2187
+      ]
+    },
+    {
+      "content": "subnetPrefix",
+      "pos": [
+        2198,
+        2210
+      ]
+    },
+    {
+      "content": "应用程序网关子网的 CIDR 块",
+      "pos": [
+        2215,
+        2231
+      ]
+    },
+    {
+      "content": "skuname",
+      "pos": [
+        2242,
+        2249
+      ]
+    },
+    {
+      "content": "SKU 实例大小",
+      "pos": [
+        2254,
+        2262
+      ]
+    },
+    {
+      "content": "容量",
+      "pos": [
+        2273,
+        2275
+      ]
+    },
+    {
+      "content": "实例数",
+      "pos": [
+        2280,
+        2283
+      ]
+    },
+    {
+      "content": "backendaddress1",
+      "pos": [
+        2294,
+        2309
+      ]
+    },
+    {
+      "content": "第一个 Web 服务器的 IP 地址",
+      "pos": [
+        2314,
+        2332
+      ]
+    },
+    {
+      "content": "backendaddress2",
+      "pos": [
+        2343,
+        2358
+      ]
+    },
+    {
+      "content": "第二个 Web 服务器的 IP 地址",
+      "pos": [
+        2363,
+        2381
+      ]
+    },
+    {
+      "pos": [
+        2386,
+        2455
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>在 github 中维护的 ARM 模板可能随着时间的推移发生变化。请确保在使用该模板之前对其进行检查。"
+    },
+    {
+      "pos": [
+        2464,
+        2493
+      ],
+      "content": "查看 <bpt id=\"p1\">**</bpt>resources<ept id=\"p1\">**</ept> 下的内容，并注意以下项："
+    },
+    {
+      "pos": [
+        2501,
+        2578
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>type<ept id=\"p1\">**</ept>。模板创建的资源的类型。在本例中为 <bpt id=\"p2\">**</bpt>Microsoft.Network/applicationGateways<ept id=\"p2\">**</ept>，表示应用程序网关。"
+    },
+    {
+      "pos": [
+        2585,
+        2678
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>name<ept id=\"p1\">**</ept>。资源的名称。请注意使用 <bpt id=\"p2\">**</bpt>[parameters('applicationGatewayName')]<ept id=\"p2\">**</ept>，这意味着在部署过程中将由用户或参数文件作为输入提供该名称。"
+    },
+    {
+      "pos": [
+        2685,
+        2739
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>properties<ept id=\"p1\">**</ept>。资源的属性列表。此模板在应用程序网关创建期间，使用虚拟网络与公共 IP 地址。"
+    },
+    {
+      "content": "导航回 https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/101-create-application-gateway/azuredeploy.json。",
+      "pos": [
+        2744,
+        2870
+      ]
+    },
+    {
+      "pos": [
+        2874,
+        2922
+      ],
+      "content": "单击 <bpt id=\"p1\">**</bpt>azuredeploy-paremeters.json<ept id=\"p1\">**</ept>，然后单击 <bpt id=\"p2\">**</bpt>RAW<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "将该文件保存到你计算机上的本地文件夹。",
+      "pos": [
+        2926,
+        2945
+      ]
+    },
+    {
+      "content": "打开刚保存的文件并编辑参数的值。使用以下值来部署本方案中所述的应用程序网关。",
+      "pos": [
+        2950,
+        2988
+      ]
+    },
+    {
+      "pos": [
+        3592,
+        3673
+      ],
+      "content": "保存该文件。你可以使用联机 json 验证工具（例如 <bpt id=\"p1\">[</bpt>JSlint.com<ept id=\"p1\">](http://www.jslint.com/)</ept>）来测试 Json 模板和参数模板。"
+    },
+    {
+      "content": "使用 PowerShell 部署 ARM 模板",
+      "pos": [
+        3679,
+        3702
+      ]
+    },
+    {
+      "pos": [
+        3707,
+        3848
+      ],
+      "content": "如果你从未使用过 Azure PowerShell，请参阅<bpt id=\"p1\">[</bpt>如何安装和配置 Azure PowerShell<ept id=\"p1\">](/documentation/articles/powershell-install-configure)</ept>，并始终按照说明进行操作，以登录到 Azure 并选择你的订阅。"
+    },
+    {
+      "pos": [
+        3852,
+        3923
+      ],
+      "content": "在 Azure PowerShell 提示符下运行 <bpt id=\"p1\">**</bpt>Switch-AzureMode<ept id=\"p1\">**</ept> cmdlet 以切换到资源管理器模式，如下所示。"
+    },
+    {
+      "content": "预期输出：",
+      "pos": [
+        3976,
+        3981
+      ]
+    },
+    {
+      "pos": [
+        4085,
+        4158
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.WARNING]</ph>Switch-AzureMode cmdlet 将在不久后弃用。如果弃用，所有资源管理器 cmdlet 都将重命名。"
+    },
+    {
+      "pos": [
+        4167,
+        4255
+      ],
+      "content": "如果需要，请使用 <ph id=\"ph1\">`New-AzureResourceGroup`</ph> cmdlet 创建新的资源组。在以下示例中，将在美国东部位置创建名为 AppgatewayRG 的新资源组："
+    },
+    {
+      "content": "运行 New-AzureResourceGroupDeployment cmdlet 以使用你在前面下载并修改的模板和参数文件部署新 VNet。",
+      "pos": [
+        4811,
+        4883
+      ]
+    },
+    {
+      "content": "该命令行将生成以下输出：",
+      "pos": [
+        5099,
+        5111
+      ]
+    },
+    {
+      "content": "使用 Azure CLI 部署 ARM 模板",
+      "pos": [
+        6081,
+        6103
+      ]
+    },
+    {
+      "content": "若要使用 Azure CLI 部署下载的 ARM 模板，请执行以下步骤。",
+      "pos": [
+        6105,
+        6141
+      ]
+    },
+    {
+      "pos": [
+        6146,
+        6256
+      ],
+      "content": "如果你从未使用过 Azure CLI，请参阅<bpt id=\"p1\">[</bpt>安装和配置 Azure CLI<ept id=\"p1\">](/documentation/articles/xplat-cli-install)</ept>，并按照说明进行操作，直到选择 Azure 帐户和订阅。"
+    },
+    {
+      "pos": [
+        6260,
+        6304
+      ],
+      "content": "运行 <bpt id=\"p1\">**</bpt>azure config mode<ept id=\"p1\">**</ept> 命令以切换到资源管理器模式，如下所示。"
+    },
+    {
+      "content": "下面是上述命令的预期输出：",
+      "pos": [
+        6337,
+        6350
+      ]
+    },
+    {
+      "pos": [
+        6388,
+        6540
+      ],
+      "content": "如有必要，请运行 <bpt id=\"p1\">**</bpt>azure group create<ept id=\"p1\">**</ept> 以创建新资源组，如下所示。请注意命令的输出。在输出后显示的列表说明了所用的参数。有关资源组的详细信息，请访问 <bpt id=\"p2\">[</bpt>Azure 资源管理器概述<ept id=\"p2\">](/documentation/articles/resource-group-overview)</ept>。"
+    },
+    {
+      "pos": [
+        6596,
+        6643
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-n（或 --name）<ept id=\"p1\">**</ept>。新资源组的名称。在本方案中为 <bpt id=\"p2\">*</bpt>appgatewayRG<ept id=\"p2\">*</ept>。"
+    },
+    {
+      "pos": [
+        6645,
+        6703
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-l（或 --location）<ept id=\"p1\">**</ept>。将在其中创建新资源组的 Azure 区域。在本方案中为 <bpt id=\"p2\">*</bpt>Eastus<ept id=\"p2\">*</ept>。"
+    },
+    {
+      "pos": [
+        6708,
+        6799
+      ],
+      "content": "运行 <bpt id=\"p1\">**</bpt>azure group deployment create<ept id=\"p1\">**</ept> cmdlet 以使用你在前面下载并修改的模板和参数文件部署新 VNet。在输出后显示的列表说明了所用的参数。"
+    },
+    {
+      "content": "下面是上述命令的预期输出：",
+      "pos": [
+        6949,
+        6962
+      ]
+    },
+    {
+      "pos": [
+        8200,
+        8248
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-g（或 --resource-group）<ept id=\"p1\">**</ept>。将在其中创建新 VNet 的资源组的名称。"
+    },
+    {
+      "pos": [
+        8250,
+        8288
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-f（或 --template-file）<ept id=\"p1\">**</ept>。ARM 模板文件的路径。"
+    },
+    {
+      "pos": [
+        8290,
+        8330
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-e（或 --parameters-file）<ept id=\"p1\">**</ept>。ARM 参数文件的路径。"
+    },
+    {
+      "content": "通过使用单击部署来部署 ARM 模板",
+      "pos": [
+        8335,
+        8353
+      ]
+    },
+    {
+      "content": "“单击部署”是另一种使用 ARM 模板的方式。这是将模板与 Azure 门户配合使用的简便方法。",
+      "pos": [
+        8355,
+        8403
+      ]
+    },
+    {
+      "content": "步骤 1",
+      "pos": [
+        8410,
+        8414
+      ]
+    },
+    {
+      "pos": [
+        8416,
+        8513
+      ],
+      "content": "使用<bpt id=\"p1\">[</bpt>“单击部署应用程序网关”<ept id=\"p1\">](/documentation/templates/101-application-gateway-public-ip/)</ept>链接将重定向到应用程序网关的门户模板页。"
+    },
+    {
+      "content": "步骤 2",
+      "pos": [
+        8520,
+        8524
+      ]
+    },
+    {
+      "content": "单击“部署到 Azure”。",
+      "pos": [
+        8527,
+        8541
+      ]
+    },
+    {
+      "content": "步骤 3",
+      "pos": [
+        8548,
+        8552
+      ]
+    },
+    {
+      "content": "在门户上填写部署模板的参数，然后单击“确定”",
+      "pos": [
+        8554,
+        8576
+      ]
+    },
+    {
+      "content": "步骤 4",
+      "pos": [
+        8583,
+        8587
+      ]
+    },
+    {
+      "content": "选择“法律条款”，然后单击“购买”",
+      "pos": [
+        8589,
+        8606
+      ]
+    },
+    {
+      "content": "步骤 5",
+      "pos": [
+        8612,
+        8616
+      ]
+    },
+    {
+      "content": "在“自定义部署”边栏选项卡上，单击“创建”。",
+      "pos": [
+        8618,
+        8640
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        8648,
+        8652
+      ]
+    },
+    {
+      "pos": [
+        8654,
+        8741
+      ],
+      "content": "如果你要配置 SSL 卸载，请参阅<bpt id=\"p1\">[</bpt>配置应用程序网关以进行 SSL 卸载<ept id=\"p1\">](/documentation/articles/application-gateway-ssl)</ept>。"
+    },
+    {
+      "pos": [
+        8743,
+        8849
+      ],
+      "content": "如果你想要将应用程序网关配置为与 ILB 配合使用，请参阅<bpt id=\"p1\">[</bpt>创建具有内部负载平衡器 (ILB) 的应用程序网关<ept id=\"p1\">](/documentation/articles/application-gateway-ilb)</ept>。"
+    },
+    {
+      "content": "如需负载平衡选项的其他常规信息，请参阅：",
+      "pos": [
+        8851,
+        8871
+      ]
+    },
+    {
+      "content": "Azure 负载平衡器",
+      "pos": [
+        8876,
+        8887
+      ]
+    },
+    {
+      "content": "Azure 流量管理器",
+      "pos": [
+        8932,
+        8943
+      ]
+    }
+  ],
+  "content": "\n<properties \n   pageTitle=\"使用 Azure 资源管理器模板创建应用程序网关 | Azure\"\n   description=\"本页提供有关使用 Azure 资源管理器模板创建 Azure 应用程序网关的说明\"\n   documentationCenter=\"na\"\n   services=\"application-gateway\"\n   authors=\"joaoma\"\n   manager=\"jdial\"\n   editor=\"tysonn\"/>\n<tags \n   ms.service=\"application-gateway\"\n   ms.date=\"11/10/2015\"\n   wacn.date=\"01/05/2016\"/>\n\n\n# 使用 ARM 模板创建应用程序网关\n\n应用程序网关是第 7 层负载平衡器。它在不同服务器之间提供故障转移和性能路由 HTTP 请求，而不管它们是在云中还是本地。应用程序网关具有以下应用程序传递功能：HTTP 负载平衡、基于 Cookie 的会话相关性和 SSL 卸载。\n\n> [AZURE.SELECTOR]\n- [Azure Classic PowerShell](/documentation/articles/application-gateway-create-gateway)\n- [Azure 资源管理器 PowerShell](/documentation/articles/application-gateway-create-gateway-arm)\n- [Azure 资源管理器模板](/documentation/articles/application-gateway-create-gateway-arm-template)\n\n<BR>\n\n你将了解如何从 GitHub 下载并修改现有 ARM 模板，以及如何通过 GitHub、PowerShell 和 Azure CLI 部署该模板。\n\n如果你只是直接从 GitHub 部署 ARM 模板，而不进行任何更改，请跳到“从 github 部署模板”。\n\n\n>[AZURE.IMPORTANT]在使用 Azure 资源之前，请务必了解 Azure 当前使用两种部署模型：资源管理器部署模型和经典部署模型。在使用任何 Azure 资源之前，请确保你了解[部署模型和工具](/documentation/articles/azure-classic-rm)。可以通过单击本文顶部的选项卡来查看不同工具的文档。本文档将说明使用 Azure 资源管理器创建应用程序网关的方式。若要使用经典版本，请转到[使用 PowerShell 创建应用程序网关经典部署](/documentation/articles/application-gateway-create-gateway)。\n\n\n\n\n## 方案\n\n在此方案中，你将创建：\n\n- 包含 2 个实例的应用程序网关；\n- 名为 VirtualNetwork1 且包含 10.0.0.0/16 保留 CIDR 块的 Vnet；\n- 名为 Appgatewaysubnet 且使用 10.0.0.0/28 作为其 CIDR 块的子网；\n- 安装程序 2 先前已针对想要用于为流量进行负载平衡的 Web 服务器设置后端 IP。在此模板示例中，所用的后端 IP 将是 10.0.1.10 和 10.0.1.11\n\n>[AZURE.NOTE]这是适用于此模板的参数。你可以更改规则、侦听程序，以及打开 azuredeploy.json 以自定义模板的 SSL。\n\n\n\n![arm-scenario](./media/application-gateway-create-gateway-arm-template/scenario-arm.png)\n\n\n\n## 下载并了解 ARM 模板\n\n可以从 github 下载用于创建 VNet 和两个子网的现有 ARM 模板，进行任何所需的更改，然后重用该模板。为此，请执行以下步骤。\n\n1. 导航到 https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/101-create-application-gateway/。\n2. 单击 **azuredeploy.json**，然后单击 **RAW**。\n3. 将该文件保存到你计算机上的本地文件夹。\n4. 如果你熟悉 ARM 模板，则跳到步骤 7。\n5. 打开刚保存的文件，并查看 **parameters** 下第 5 行中的内容。ARM 模板参数提供了在部署过程中可以填充的值的占位符。\n\n    | 参数 | 说明 |\n    |---|---|\n    | **位置** | 将创建应用程序网关的 Azure 区域 |\n    | **VirtualNetwork1** | 新 VNet 的名称 |\n    | **addressPrefix** | VNet 的地址空间，采用 CIDR 格式 |\n    | **ApplicationGatewaysubnet** | 应用程序网关子网的名称 |\n    | **subnetPrefix** | 应用程序网关子网的 CIDR 块 |\n    | **skuname** | SKU 实例大小 |\n    | **容量** | 实例数 |\n    | **backendaddress1** | 第一个 Web 服务器的 IP 地址 |\n    | **backendaddress2** | 第二个 Web 服务器的 IP 地址|\n\n\n>[AZURE.IMPORTANT]在 github 中维护的 ARM 模板可能随着时间的推移发生变化。请确保在使用该模板之前对其进行检查。\n    \n6. 查看 **resources** 下的内容，并注意以下项：\n\n    - **type**。模板创建的资源的类型。在本例中为 **Microsoft.Network/applicationGateways**，表示应用程序网关。\n    - **name**。资源的名称。请注意使用 **[parameters('applicationGatewayName')]**，这意味着在部署过程中将由用户或参数文件作为输入提供该名称。\n    - **properties**。资源的属性列表。此模板在应用程序网关创建期间，使用虚拟网络与公共 IP 地址。\n\n7. 导航回 https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/101-create-application-gateway/azuredeploy.json。\n8. 单击 **azuredeploy-paremeters.json**，然后单击 **RAW**。\n9. 将该文件保存到你计算机上的本地文件夹。\n10. 打开刚保存的文件并编辑参数的值。使用以下值来部署本方案中所述的应用程序网关。\n\n        {\n          \"$schema\": \"http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#\",\n        {\n        \"location\" : {\n        \"value\" : \"China North\"\n        },\n        \"addressPrefix\": {\n        \"value\": \"10.0.0.0/16\"\n        },\n        \"subnetPrefix\": {\n        \"value\": \"10.0.0.0/24\"\n        },\n        \"skuName\": {\n        \"value\": \"Standard_Small\"\n        },\n        \"capacity\": {\n        \"value\": 2\n        },\n        \"backendIpAddress1\": {\n        \"value\": \"10.0.1.10\"\n        },\n        \"backendIpAddress2\": {\n        \"value\": \"10.0.1.11\"\n        }\n        }\n\n11. 保存该文件。你可以使用联机 json 验证工具（例如 [JSlint.com](http://www.jslint.com/)）来测试 Json 模板和参数模板。\n \n## 使用 PowerShell 部署 ARM 模板\n\n1. 如果你从未使用过 Azure PowerShell，请参阅[如何安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure)，并始终按照说明进行操作，以登录到 Azure 并选择你的订阅。\n2. 在 Azure PowerShell 提示符下运行 **Switch-AzureMode** cmdlet 以切换到资源管理器模式，如下所示。\n\n        Switch-AzureMode AzureResourceManager\n    \n预期输出：\n\n        WARNING: The Switch-AzureMode cmdlet is deprecated and will be removed in a future release.\n\n>[AZURE.WARNING]Switch-AzureMode cmdlet 将在不久后弃用。如果弃用，所有资源管理器 cmdlet 都将重命名。\n    \n3. 如果需要，请使用 `New-AzureResourceGroup` cmdlet 创建新的资源组。在以下示例中，将在美国东部位置创建名为 AppgatewayRG 的新资源组：\n\n        PS C:\\> New-AzureResourceGroup -Name AppgatewayRG -Location \"East US\"\n        VERBOSE: 5:38:49 PM - Created resource group 'AppgatewayRG' in location 'eastus'\n\n\n        ResourceGroupName : AppgatewayRG\n        Location          : eastus\n        ProvisioningState : Succeeded\n        Tags              :\n        Permissions       :\n                     Actions  NotActions\n                     =======  ==========\n                      *\n\n        ResourceId        : /subscriptions/################################/resourceGroups/AppgatewayRG\n\n4. 运行 New-AzureResourceGroupDeployment cmdlet 以使用你在前面下载并修改的模板和参数文件部署新 VNet。\n\n        New-AzureResourceGroupDeployment -Name TestAppgatewayDeployment -ResourceGroupName AppgatewayRG `\n           -TemplateFile C:\\ARM\\azuredeploy.json -TemplateParameterFile C:\\ARM\\azuredeploy-parameters.json\n\n该命令行将生成以下输出：\n\n        DeploymentName    : testappgatewaydeployment\n        ResourceGroupName : appgatewayRG\n        ProvisioningState : Succeeded\n        Timestamp         : 9/19/2015 1:49:41 AM\n        Mode              : Incremental\n        TemplateLink      :\n        Parameters        :\n                   Name             Type                       Value\n                   ===============  =========================  ==========\n                   location         String                     East US\n                   addressPrefix    String                     10.0.0.0/16\n                   subnetPrefix     String                     10.0.0.0/24\n                   skuName          String                     Standard_Small\n                   capacity         Int                        2\n                   backendIpAddress1  String                     10.0.1.10\n                   backendIpAddress2  String                     10.0.1.11\n\n        Outputs           :\n\n\n## 使用 Azure CLI 部署 ARM 模板\n\n若要使用 Azure CLI 部署下载的 ARM 模板，请执行以下步骤。\n\n1. 如果你从未使用过 Azure CLI，请参阅[安装和配置 Azure CLI](/documentation/articles/xplat-cli-install)，并按照说明进行操作，直到选择 Azure 帐户和订阅。\n2. 运行 **azure config mode** 命令以切换到资源管理器模式，如下所示。\n\n        azure config mode arm\n\n下面是上述命令的预期输出：\n\n        info:   New mode is arm\n\n3. 如有必要，请运行 **azure group create** 以创建新资源组，如下所示。请注意命令的输出。在输出后显示的列表说明了所用的参数。有关资源组的详细信息，请访问 [Azure 资源管理器概述](/documentation/articles/resource-group-overview)。\n\n        azure group create -n appgatewayRG -l eastus\n\n**-n（或 --name）**。新资源组的名称。在本方案中为 *appgatewayRG*。\n\n**-l（或 --location）**。将在其中创建新资源组的 Azure 区域。在本方案中为 *Eastus*。\n\n4. 运行 **azure group deployment create** cmdlet 以使用你在前面下载并修改的模板和参数文件部署新 VNet。在输出后显示的列表说明了所用的参数。\n\n        azure group deployment create -g appgatewayRG -n TestAppgatewayDeployment -f C:\\ARM\\azuredeploy.json -e C:\\ARM\\azuredeploy-parameters.json\n\n下面是上述命令的预期输出：\n\n        azure group deployment create -g appgatewayRG -n TestAppgatewayDeployment -f C:\\ARM\\azuredeploy.json -e C:\\ARM\\azuredeploy-parameters.json\n        info:    Executing command group deployment create\n        + Initializing template configurations and parameters\n        + Creating a deployment\n        info:    Created template deployment \"TestAppgatewayDeployment\"\n        + Waiting for deployment to complete\n        data:    DeploymentName     : TestAppgatewayDeployment\n        data:    ResourceGroupName  : appgatewayRG\n        data:    ProvisioningState  : Succeeded\n        data:    Timestamp          : 2015-09-21T20:50:27.5129912Z\n        data:    Mode               : Incremental\n        data:    Name               Type    Value\n        data:    -----------------  ------  --------------\n        data:    location           String  East US\n        data:    addressPrefix      String  10.0.0.0/16\n        data:    subnetPrefix       String  10.0.0.0/24 \n        data:    skuName            String  Standard_Small\n        data:    capacity           Int     2\n        data:    backendIpAddress1  String  10.0.1.10\n        data:    backendIpAddress2  String  10.0.1.11\n        info:    group deployment create command OK\n\n**-g（或 --resource-group）**。将在其中创建新 VNet 的资源组的名称。\n\n**-f（或 --template-file）**。ARM 模板文件的路径。\n\n**-e（或 --parameters-file）**。ARM 参数文件的路径。\n\n## 通过使用单击部署来部署 ARM 模板\n\n“单击部署”是另一种使用 ARM 模板的方式。这是将模板与 Azure 门户配合使用的简便方法。\n\n\n### 步骤 1 \n使用[“单击部署应用程序网关”](/documentation/templates/101-application-gateway-public-ip/)链接将重定向到应用程序网关的门户模板页。\n\n\n### 步骤 2 \n\n单击“部署到 Azure”。\n\n\n### 步骤 3\n\n在门户上填写部署模板的参数，然后单击“确定”\n\n\n### 步骤 4\n\n选择“法律条款”，然后单击“购买”\n\n### 步骤 5\n\n在“自定义部署”边栏选项卡上，单击“创建”。\n\n\n \n## 后续步骤\n\n如果你要配置 SSL 卸载，请参阅[配置应用程序网关以进行 SSL 卸载](/documentation/articles/application-gateway-ssl)。\n\n如果你想要将应用程序网关配置为与 ILB 配合使用，请参阅[创建具有内部负载平衡器 (ILB) 的应用程序网关](/documentation/articles/application-gateway-ilb)。\n\n如需负载平衡选项的其他常规信息，请参阅：\n\n- [Azure 负载平衡器](/documentation/services/load-balancer/)\n- [Azure 流量管理器](/documentation/services/traffic-manager/)\n\n<!---HONumber=Mooncake_1221_2015-->\n"
+}

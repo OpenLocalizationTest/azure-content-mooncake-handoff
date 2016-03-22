@@ -1,0 +1,593 @@
+{
+  "nodes": [
+    {
+      "content": "服务总线中转消息传送 .NET 教程 | Azure",
+      "pos": [
+        27,
+        53
+      ]
+    },
+    {
+      "content": "中转消息传送 .NET 教程。",
+      "pos": [
+        71,
+        86
+      ]
+    },
+    {
+      "content": "服务总线中转消息传送 .NET 教程",
+      "pos": [
+        299,
+        317
+      ]
+    },
+    {
+      "content": "Azure 服务总线提供两个综合性消息传送解决方案：一是通过在云中运行的集中“中继”服务，它支持各种不同的传输协议和 Web 服务标准（包括 SOAP、WS-* 和 REST）。客户端不需要与本地服务建立直接连接，也不需要了解服务所在的位置，并且本地服务无需在防火墙上打开任何入站端口。",
+      "pos": [
+        319,
+        462
+      ]
+    },
+    {
+      "content": "第二个消息传送解决方案启用了“中转”消息传送功能。可将它们视为异步或分离式消息传送功能，支持使用服务总线消息传送基础结构的发布-订阅、临时分离和负载平衡方案。分离式通信具有很多优点；例如，客户端和服务器可以根据需要进行连接并以异步方式执行其操作。",
+      "pos": [
+        464,
+        587
+      ]
+    },
+    {
+      "pos": [
+        589,
+        812
+      ],
+      "content": "本教程旨在提供有关队列的概述和实践经验，队列是服务总线中转消息传送的一个核心组件。完成本教程中的一系列主题后，你将获得一个应用程序，它能填充消息列表、创建队列和向队列发送消息。最后，该应用程序从队列接收消息并将其显示出来，然后清理其资源并退出。有关介绍如何构建使用“中继”消息传送功能的应用程序的相应教程，请参阅<bpt id=\"p1\">[</bpt>服务总线中继消息传送教程<ept id=\"p1\">](/documentation/articles/service-bus-relay-tutorial)</ept>。"
+    },
+    {
+      "content": "简介和先决条件",
+      "pos": [
+        817,
+        824
+      ]
+    },
+    {
+      "pos": [
+        826,
+        1015
+      ],
+      "content": "队列为一个或多个竞争使用方提供“先入先出 (FIFO)”消息传递方式。FIFO 表示接收方通常按照消息排队的临时顺序来接收并处理消息，并且每条消息将仅由一个消息使用方接收并处理。使用队列的主要优点是实现应用程序组件的<bpt id=\"p1\">*</bpt>暂时分离<ept id=\"p1\">*</ept>：换而言之，创建方和使用方无需同时发送和接收消息，因为消息被持久存储在队列中。相关的优点是<bpt id=\"p2\">*</bpt>负载分级<ept id=\"p2\">*</ept>，它允许创建方和使用方以不同速率发送和接收消息。"
+    },
+    {
+      "content": "以下是开始本教程之前应遵循的一些管理步骤和前提步骤。首先是创建服务命名空间，并获取共享的访问签名 (SAS) 密钥。服务命名空间为每个通过服务总线公开的应用程序提供应用程序边界。创建服务命名空间时，系统将自动生成 SAS 密钥。服务命名空间与 SAS 密钥的组合提供了一个凭据，服务总线可用其验证应用程序访问权限。",
+      "pos": [
+        1017,
+        1174
+      ]
+    },
+    {
+      "content": "创建服务命名空间并获取 SAS 密钥",
+      "pos": [
+        1180,
+        1198
+      ]
+    },
+    {
+      "pos": [
+        1203,
+        1306
+      ],
+      "content": "若要创建服务命名空间，请遵循<bpt id=\"p1\">[</bpt>如何：创建或修改服务总线服务命名空间<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/hh690931.aspx)</ept>中概述的步骤。"
+    },
+    {
+      "pos": [
+        1311,
+        1351
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">][]</ept>的主窗口中，单击在上一步中创建的命名空间的名称。"
+    },
+    {
+      "pos": [
+        1356,
+        1367
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“配置”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        1372,
+        1458
+      ],
+      "content": "在“共享访问签名生成器”部分中，记下与 <bpt id=\"p1\">**</bpt>RootManagerSharedAccessKey<ept id=\"p1\">**</ept> 策略关联的主密钥，或将其复制到剪贴板。你将在本教程的后面部分使用此值。"
+    },
+    {
+      "pos": [
+        1460,
+        1707
+      ],
+      "content": "下一步是创建一个 Visual Studio 项目并编写两个帮助程序函数，用于将以逗号分隔的消息列表加载到强类型的 <bpt id=\"p1\">[</bpt>BrokeredMessage<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.aspx)</ept> .NET <bpt id=\"p2\">[</bpt>List<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/6sh2ey19.aspx)</ept> 对象。"
+    },
+    {
+      "content": "创建 Visual Studio 项目",
+      "pos": [
+        1713,
+        1732
+      ]
+    },
+    {
+      "content": "在“开始”菜单中右键单击 Visual Studio，以便以管理员身份启动该程序，然后单击“以管理员身份运行”。",
+      "pos": [
+        1737,
+        1793
+      ]
+    },
+    {
+      "pos": [
+        1798,
+        1954
+      ],
+      "content": "创建新的控制台应用程序项目。单击“文件”菜单并选择“新建”，然后单击“项目”。在“新建项目”对话框中，选择“Visual C#”（如果不显示“Visual C#”，则在“其他语言”下方查看），单击“控制台应用程序”模板，然后将其命名为 <bpt id=\"p1\">**</bpt>QueueSample<ept id=\"p1\">**</ept>。使用默认“位置”。单击“确定”以创建该项目。"
+    },
+    {
+      "content": "使用 NuGet 包管理器将服务总线库添加到你的项目：",
+      "pos": [
+        1959,
+        1986
+      ]
+    },
+    {
+      "content": "在解决方案资源管理器中，右键单击项目文件夹，然后单击“管理 NuGet 包”。",
+      "pos": [
+        1994,
+        2033
+      ]
+    },
+    {
+      "content": "在“管理 Nuget 包”对话框中，在线搜索“服务总线”并单击“安装”。",
+      "pos": [
+        2041,
+        2077
+      ]
+    },
+    {
+      "pos": [
+        2087,
+        2204
+      ],
+      "content": "在解决方案资源管理器中，双击 Program.cs 文件以在 Visual Studio 编辑器中将其打开。将命名空间名称从其默认名称 <ph id=\"ph1\">`QueueSample`</ph> 更改为 <ph id=\"ph2\">`Microsoft.ServiceBus.Samples`</ph>。"
+    },
+    {
+      "pos": [
+        2275,
+        2298
+      ],
+      "content": "修改 <ph id=\"ph1\">`using`</ph> 语句，如以下代码中所示。"
+    },
+    {
+      "content": "创建一个名为 Data.csv 的文本文件，并将以下逗号分隔文本中的内容复制到其中。",
+      "pos": [
+        2490,
+        2532
+      ]
+    },
+    {
+      "content": "保存并关闭该 Data.csv 文件，并记住保存位置。",
+      "pos": [
+        3283,
+        3310
+      ]
+    },
+    {
+      "pos": [
+        3315,
+        3376
+      ],
+      "content": "在解决方案资源管理器中，右键单击项目的名称（此示例中为 <bpt id=\"p1\">**</bpt>QueueSample<ept id=\"p1\">**</ept>），并依次单击“添加”和“现有项”。"
+    },
+    {
+      "pos": [
+        3381,
+        3448
+      ],
+      "content": "浏览到你在步骤 6 中创建的 Data.csv 文件。单击该文件，然后单击“添加”。确保选择了文件类型列表中的“所有文件”(<bpt id=\"p1\">*</bpt>.<ept id=\"p1\">*</ept>)。"
+    },
+    {
+      "content": "创建用于解析消息列表的函数",
+      "pos": [
+        3454,
+        3467
+      ]
+    },
+    {
+      "pos": [
+        3472,
+        3703
+      ],
+      "content": "在 <ph id=\"ph1\">`Main()`</ph> 方法之前，声明两个变量，用于包含 Data.csv 中的消息列表：其中之一为 <bpt id=\"p1\">**</bpt>DataTable<ept id=\"p1\">**</ept> 类型。另一个应为 List 对象类型，强类型化为 <bpt id=\"p2\">[</bpt>BrokeredMessage<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.aspx)</ept>。后者是中转消息列表，本教程中的后续步骤将用到它。"
+    },
+    {
+      "pos": [
+        3922,
+        4101
+      ],
+      "content": "在 <ph id=\"ph1\">`Main()`</ph> 之外，定义 <ph id=\"ph2\">`ParseCSV()`</ph> 方法，用于解析 Data.csv 中的消息列表并将消息加载到 <bpt id=\"p1\">[</bpt>DataTable<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/system.data.datatable.aspx)</ept> 表，如下所示。该方法将返回 <bpt id=\"p2\">**</bpt>DataTable<ept id=\"p2\">**</ept> 对象。"
+    },
+    {
+      "pos": [
+        5029,
+        5076
+      ],
+      "content": "在 <ph id=\"ph1\">`Main()`</ph> 方法中，添加一条用于调用 <ph id=\"ph2\">`ParseCSVFile()`</ph> 方法的语句："
+    },
+    {
+      "content": "创建用于加载消息列表的函数",
+      "pos": [
+        5227,
+        5240
+      ]
+    },
+    {
+      "pos": [
+        5245,
+        5378
+      ],
+      "content": "在 <ph id=\"ph1\">`Main()`</ph> 之外，定义 <ph id=\"ph2\">`GenerateMessages()`</ph> 方法，用于接收 <ph id=\"ph3\">`ParseCSVFile()`</ph> 返回的 <bpt id=\"p1\">**</bpt>DataTable<ept id=\"p1\">**</ept> 对象，并将该表加载到强类型化的中转消息列表中。该方法随后返回 <bpt id=\"p2\">**</bpt>List<ept id=\"p2\">**</ept> 对象，如下面的示例所示。"
+    },
+    {
+      "pos": [
+        6030,
+        6130
+      ],
+      "content": "在 <ph id=\"ph1\">`Main()`</ph> 中，在调用 <ph id=\"ph2\">`ParseCSVFile()`</ph> 后立即添加一条语句，从而以 <ph id=\"ph3\">`ParseCSVFile()`</ph> 的返回值作为参数调用 <ph id=\"ph4\">`GenerateMessages()`</ph> 方法："
+    },
+    {
+      "content": "获取用户凭据",
+      "pos": [
+        6324,
+        6330
+      ]
+    },
+    {
+      "content": "首先创建三个全局字符串变量，用于保存这些值。在以前的变量声明之后直接声明这些变量，例如：",
+      "pos": [
+        6335,
+        6379
+      ]
+    },
+    {
+      "pos": [
+        6804,
+        6859
+      ],
+      "content": "接下来，创建一个函数，用于接受并存储服务命名空间和 SAS 密钥。在 <ph id=\"ph1\">`Main()`</ph> 之外添加此方法。例如："
+    },
+    {
+      "pos": [
+        7208,
+        7284
+      ],
+      "content": "在 <ph id=\"ph1\">`Main()`</ph> 中，在调用 <ph id=\"ph2\">`GenerateMessages()`</ph> 之下直接添加一条语句以调用 <ph id=\"ph3\">`CollectUserInput()`</ph> 方法："
+    },
+    {
+      "content": "生成解决方案",
+      "pos": [
+        7545,
+        7551
+      ]
+    },
+    {
+      "content": "在 Visual Studio 的“生成”菜单中，单击“生成解决方案”或按 F6 以确认到目前为止工作的准确性。",
+      "pos": [
+        7553,
+        7609
+      ]
+    },
+    {
+      "content": "创建管理凭据",
+      "pos": [
+        7611,
+        7617
+      ]
+    },
+    {
+      "content": "这是服务总线消息传送功能教程中的第二步。在此步骤中，你可以定义将用于创建共享访问签名 (SAS) 凭据（用于授权应用程序）的管理操作。",
+      "pos": [
+        7619,
+        7686
+      ]
+    },
+    {
+      "content": "创建管理凭据",
+      "pos": [
+        7691,
+        7697
+      ]
+    },
+    {
+      "content": "在此步骤中，你可以定义将用于创建共享访问签名 (SAS) 凭据（用于授权应用程序）的管理操作。",
+      "pos": [
+        7699,
+        7746
+      ]
+    },
+    {
+      "pos": [
+        7751,
+        7824
+      ],
+      "content": "为清楚起见，本教程将所有队列操作置于单独的方法中。在 <ph id=\"ph1\">`Program`</ph> 类中的 <ph id=\"ph2\">`Main()`</ph> 方法之下创建 <ph id=\"ph3\">`Queue()`</ph> 方法。例如："
+    },
+    {
+      "pos": [
+        7943,
+        8139
+      ],
+      "content": "下一步是使用 <bpt id=\"p1\">[</bpt>TokenProvider<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.tokenprovider.aspx)</ept> 对象创建 SAS 凭据。此创建方法用于接受在 <ph id=\"ph1\">`CollectUserInput()`</ph> 方法中获取的 SAS 密钥名称和值。将以下代码添加到 <ph id=\"ph2\">`Queue()`</ph> 方法中："
+    },
+    {
+      "content": "创建命名空间管理器",
+      "pos": [
+        8353,
+        8362
+      ]
+    },
+    {
+      "content": "创建新的命名空间管理对象，以包含在在上一步中获得的命名空间名称和管理凭据的 URI 作为参数。直接在上一步中添加的代码之下添加以下代码：",
+      "pos": [
+        8367,
+        8435
+      ]
+    },
+    {
+      "content": "示例",
+      "pos": [
+        8613,
+        8615
+      ]
+    },
+    {
+      "content": "此时，你的代码应如下所示：",
+      "pos": [
+        8617,
+        8630
+      ]
+    },
+    {
+      "content": "在下一步中，你可以创建要向其发送消息的队列。",
+      "pos": [
+        11368,
+        11390
+      ]
+    },
+    {
+      "content": "将消息发送到队列",
+      "pos": [
+        11395,
+        11403
+      ]
+    },
+    {
+      "content": "在此步骤中，你将创建一个队列，然后将中转消息列表中包含的消息发送到该队列。",
+      "pos": [
+        11405,
+        11442
+      ]
+    },
+    {
+      "content": "创建队列并向队列发送消息",
+      "pos": [
+        11448,
+        11460
+      ]
+    },
+    {
+      "pos": [
+        11465,
+        11512
+      ],
+      "content": "首先创建队列。例如，将其命名为 <ph id=\"ph1\">`myQueue`</ph>，并在上一步中添加的管理操作后面直接声明它："
+    },
+    {
+      "pos": [
+        11629,
+        11698
+      ],
+      "content": "在 <ph id=\"ph1\">`Queue()`</ph> 方法中，使用新创建的服务总线 URI 作为参数创建一个消息工厂对象。在上一步中添加的管理操作后面直接添加以下代码："
+    },
+    {
+      "pos": [
+        11867,
+        12013
+      ],
+      "content": "接下来，使用 <bpt id=\"p1\">[</bpt>QueueClient<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.queueclient.aspx)</ept> 类创建队列对象。在最后一步中添加的代码后直接添加以下代码："
+    },
+    {
+      "pos": [
+        12116,
+        12199
+      ],
+      "content": "然后添加以下代码，用于循环遍历你之前创建的中转消息列表，并将其中每条消息发送到队列。在上一步中的 <ph id=\"ph1\">`CreateQueueClient()`</ph> 声明后直接添加以下代码："
+    },
+    {
+      "content": "从队列接收消息",
+      "pos": [
+        12601,
+        12608
+      ]
+    },
+    {
+      "content": "在此步骤中，你将从上一步中创建的队列获取消息列表。",
+      "pos": [
+        12610,
+        12635
+      ]
+    },
+    {
+      "content": "创建接收器并从队列接收消息",
+      "pos": [
+        12641,
+        12654
+      ]
+    },
+    {
+      "pos": [
+        12656,
+        12838
+      ],
+      "content": "在 <ph id=\"ph1\">`Queue()`</ph> 方法中，使用 <bpt id=\"p1\">[</bpt>Microsoft.ServiceBus.Messaging.QueueClient.Receive<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/hh322678.aspx)</ept> 方法循环访问队列和接收消息，并将每条消息输出到控制台。在上一步中添加的代码之下直接添加以下代码："
+    },
+    {
+      "pos": [
+        13348,
+        13368
+      ],
+      "content": "结束 <ph id=\"ph1\">`Queue()`</ph> 方法并清理资源"
+    },
+    {
+      "content": "在前面的代码之下直接添加以下代码，以清理消息工厂和队列资源：",
+      "pos": [
+        13370,
+        13400
+      ]
+    },
+    {
+      "pos": [
+        13526,
+        13541
+      ],
+      "content": "调用 <ph id=\"ph1\">`Queue()`</ph> 方法"
+    },
+    {
+      "pos": [
+        13543,
+        13605
+      ],
+      "content": "最后一步是添加用于从 <ph id=\"ph1\">`Main()`</ph> 调用 <ph id=\"ph2\">`Queue()`</ph> 方法的代码。在 Main() 的末尾添加以下突出显示的行："
+    },
+    {
+      "content": "示例",
+      "pos": [
+        13908,
+        13910
+      ]
+    },
+    {
+      "pos": [
+        13912,
+        13944
+      ],
+      "content": "下面的代码包含完整的 <bpt id=\"p1\">**</bpt>QueueSample<ept id=\"p1\">**</ept> 应用程序。"
+    },
+    {
+      "content": "生成并运行 QueueSample 应用程序",
+      "pos": [
+        17985,
+        18007
+      ]
+    },
+    {
+      "pos": [
+        18009,
+        18046
+      ],
+      "content": "完成上述步骤后，即可生成并运行 <bpt id=\"p1\">**</bpt>QueueSample<ept id=\"p1\">**</ept> 应用程序。"
+    },
+    {
+      "content": "生成 QueueSample 应用程序",
+      "pos": [
+        18052,
+        18071
+      ]
+    },
+    {
+      "content": "在 Visual Studio 中的“生成”菜单上，单击“生成解决方案”，或按 F6。如果遇到错误，请验证你的代码是否正确以上一步末尾提供的完整示例为基础。",
+      "pos": [
+        18073,
+        18151
+      ]
+    },
+    {
+      "content": "运行 QueueSample 应用程序",
+      "pos": [
+        18157,
+        18176
+      ]
+    },
+    {
+      "pos": [
+        18181,
+        18263
+      ],
+      "content": "运行该应用程序之前，必须确保已创建服务命名空间并已获得 SAS 密钥，如<bpt id=\"p1\">[</bpt>简介和先决条件<ept id=\"p1\">](#introduction-and-prerequisites)</ept>中所述。"
+    },
+    {
+      "pos": [
+        18268,
+        18292
+      ],
+      "content": "打开浏览器并转到 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">][]</ept>。"
+    },
+    {
+      "content": "单击左侧树中的“服务总线”。",
+      "pos": [
+        18297,
+        18311
+      ]
+    },
+    {
+      "content": "单击要使用的命名空间的名称。在页面底部，单击“连接信息”。记下包含 SAS 密钥的连接字符串或将其复制到剪贴板。",
+      "pos": [
+        18316,
+        18372
+      ]
+    },
+    {
+      "content": "在 Visual Studio 中的“调试”菜单中，单击“启动调试”，或按 F5。出现提示时，输入服务命名空间的名称，以及在上一步中获取的密钥。",
+      "pos": [
+        18377,
+        18449
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        18454,
+        18458
+      ]
+    },
+    {
+      "pos": [
+        18460,
+        18624
+      ],
+      "content": "本教程介绍了如何使用服务总线中转消息传送功能构建服务总线客户端应用程序和服务。有关使用服务总线<bpt id=\"p1\">[</bpt>中继消息传送<ept id=\"p1\">](service-bus-messaging-overview.md/#Relayed-messaging)</ept>的类似教程，请参阅<bpt id=\"p2\">[</bpt>服务总线中继消息传送教程<ept id=\"p2\">](service-bus-relay-tutorial.md)</ept>。"
+    },
+    {
+      "pos": [
+        18626,
+        18678
+      ],
+      "content": "若要了解有关<bpt id=\"p1\">[</bpt>服务总线<ept id=\"p1\">](/home/features/messaging)</ept>的详细信息，请参阅以下主题。"
+    },
+    {
+      "content": "服务总线消息传送概述",
+      "pos": [
+        18683,
+        18693
+      ]
+    },
+    {
+      "content": "服务总线基础知识",
+      "pos": [
+        18754,
+        18762
+      ]
+    },
+    {
+      "content": "服务总线体系结构",
+      "pos": [
+        18834,
+        18842
+      ]
+    }
+  ],
+  "content": "<properties \n   pageTitle=\"服务总线中转消息传送 .NET 教程 | Azure\"\n   description=\"中转消息传送 .NET 教程。\"\n   services=\"service-bus\"\n   documentationCenter=\"na\"\n   authors=\"sethmanheim\"\n   manager=\"timlt\"\n   editor=\"tysonn\" />\n<tags \n   ms.service=\"service-bus\"\n   ms.date=\"09/14/2015\"\n   wacn.date=\"01/14/2016\" />\n\n# 服务总线中转消息传送 .NET 教程\n\nAzure 服务总线提供两个综合性消息传送解决方案：一是通过在云中运行的集中“中继”服务，它支持各种不同的传输协议和 Web 服务标准（包括 SOAP、WS-* 和 REST）。客户端不需要与本地服务建立直接连接，也不需要了解服务所在的位置，并且本地服务无需在防火墙上打开任何入站端口。\n\n第二个消息传送解决方案启用了“中转”消息传送功能。可将它们视为异步或分离式消息传送功能，支持使用服务总线消息传送基础结构的发布-订阅、临时分离和负载平衡方案。分离式通信具有很多优点；例如，客户端和服务器可以根据需要进行连接并以异步方式执行其操作。\n\n本教程旨在提供有关队列的概述和实践经验，队列是服务总线中转消息传送的一个核心组件。完成本教程中的一系列主题后，你将获得一个应用程序，它能填充消息列表、创建队列和向队列发送消息。最后，该应用程序从队列接收消息并将其显示出来，然后清理其资源并退出。有关介绍如何构建使用“中继”消息传送功能的应用程序的相应教程，请参阅[服务总线中继消息传送教程](/documentation/articles/service-bus-relay-tutorial)。\n\n## 简介和先决条件\n\n队列为一个或多个竞争使用方提供“先入先出 (FIFO)”消息传递方式。FIFO 表示接收方通常按照消息排队的临时顺序来接收并处理消息，并且每条消息将仅由一个消息使用方接收并处理。使用队列的主要优点是实现应用程序组件的*暂时分离*：换而言之，创建方和使用方无需同时发送和接收消息，因为消息被持久存储在队列中。相关的优点是*负载分级*，它允许创建方和使用方以不同速率发送和接收消息。\n\n以下是开始本教程之前应遵循的一些管理步骤和前提步骤。首先是创建服务命名空间，并获取共享的访问签名 (SAS) 密钥。服务命名空间为每个通过服务总线公开的应用程序提供应用程序边界。创建服务命名空间时，系统将自动生成 SAS 密钥。服务命名空间与 SAS 密钥的组合提供了一个凭据，服务总线可用其验证应用程序访问权限。\n\n### 创建服务命名空间并获取 SAS 密钥\n\n1. 若要创建服务命名空间，请遵循[如何：创建或修改服务总线服务命名空间](https://msdn.microsoft.com/zh-cn/library/azure/hh690931.aspx)中概述的步骤。\n\n1. 在 [Azure 经典门户][]的主窗口中，单击在上一步中创建的命名空间的名称。\n\n3. 单击**“配置”**。\n\n4. 在“共享访问签名生成器”部分中，记下与 **RootManagerSharedAccessKey** 策略关联的主密钥，或将其复制到剪贴板。你将在本教程的后面部分使用此值。\n\n下一步是创建一个 Visual Studio 项目并编写两个帮助程序函数，用于将以逗号分隔的消息列表加载到强类型的 [BrokeredMessage](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.aspx) .NET [List](https://msdn.microsoft.com/zh-cn/library/6sh2ey19.aspx) 对象。\n\n### 创建 Visual Studio 项目\n\n1. 在“开始”菜单中右键单击 Visual Studio，以便以管理员身份启动该程序，然后单击“以管理员身份运行”。\n\n2. 创建新的控制台应用程序项目。单击“文件”菜单并选择“新建”，然后单击“项目”。在“新建项目”对话框中，选择“Visual C#”（如果不显示“Visual C#”，则在“其他语言”下方查看），单击“控制台应用程序”模板，然后将其命名为 **QueueSample**。使用默认“位置”。单击“确定”以创建该项目。\n\n3. 使用 NuGet 包管理器将服务总线库添加到你的项目：\n    1. 在解决方案资源管理器中，右键单击项目文件夹，然后单击“管理 NuGet 包”。\n    2. 在“管理 Nuget 包”对话框中，在线搜索“服务总线”并单击“安装”。<br />\n1. 在解决方案资源管理器中，双击 Program.cs 文件以在 Visual Studio 编辑器中将其打开。将命名空间名称从其默认名称 `QueueSample` 更改为 `Microsoft.ServiceBus.Samples`。\n\n    ```\n    Microsoft.ServiceBus.Samples\n    {\n        …\n    ```\n\n2. 修改 `using` 语句，如以下代码中所示。\n\n    ```\n    using System;\n    using System.Collections.Generic;\n    using System.Data;\n    using System.IO;\n    using System.Threading;\n    using Microsoft.ServiceBus.Messaging;\n    ```\n\n3. 创建一个名为 Data.csv 的文本文件，并将以下逗号分隔文本中的内容复制到其中。\n\n    ```\n    IssueID,IssueTitle,CustomerID,CategoryID,SupportPackage,Priority,Severity,Resolved\n    1,Package lost,1,1,Basic,5,1,FALSE\n    2,Package damaged,1,1,Basic,5,1,FALSE\n    3,Product defective,1,2,Premium,5,2,FALSE\n    4,Product damaged,2,2,Premium,5,2,FALSE\n    5,Package lost,2,2,Basic,5,2,TRUE\n    6,Package lost,3,2,Basic,5,2,FALSE\n    7,Package damaged,3,7,Premium,5,3,FALSE\n    8,Product defective,3,2,Premium,5,3,FALSE\n    9,Product damaged,4,6,Premium,5,3,TRUE\n    10,Package lost,4,8,Basic,5,3,FALSE\n    11,Package damaged,5,4,Basic,5,4,FALSE\n    12,Product defective,5,4,Basic,5,4,FALSE\n    13,Package lost,6,8,Basic,5,4,FALSE\n    14,Package damaged,6,7,Premium,5,5,FALSE\n    15,Product defective,6,2,Premium,5,5,FALSE\n    ```\n\n    保存并关闭该 Data.csv 文件，并记住保存位置。\n\n4. 在解决方案资源管理器中，右键单击项目的名称（此示例中为 **QueueSample**），并依次单击“添加”和“现有项”。\n\n5. 浏览到你在步骤 6 中创建的 Data.csv 文件。单击该文件，然后单击“添加”。确保选择了文件类型列表中的“所有文件”(*.*)。\n\n### 创建用于解析消息列表的函数\n\n1. 在 `Main()` 方法之前，声明两个变量，用于包含 Data.csv 中的消息列表：其中之一为 **DataTable** 类型。另一个应为 List 对象类型，强类型化为 [BrokeredMessage](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.aspx)。后者是中转消息列表，本教程中的后续步骤将用到它。\n\n    ```\n    namespace Microsoft.ServiceBus.Samples\n    {\n        publicclass Program\n        {\n    \n            privatestatic DataTable issues;\n            privatestatic List<BrokeredMessage> MessageList;\n    ```\n\n2. 在 `Main()` 之外，定义 `ParseCSV()` 方法，用于解析 Data.csv 中的消息列表并将消息加载到 [DataTable](https://msdn.microsoft.com/zh-cn/library/azure/system.data.datatable.aspx) 表，如下所示。该方法将返回 **DataTable** 对象。\n\n    ```\n    static DataTable ParseCSVFile()\n    {\n        DataTable tableIssues = new DataTable(\"Issues\");\n        string path = @\"..\\..\\data.csv\";\n        try\n        {\n            using (StreamReader readFile = new StreamReader(path))\n            {\n                string line;\n                string[] row;\n    \n                // create the columns\n                line = readFile.ReadLine();\n                foreach (string columnTitle in line.Split(','))\n                {\n                    tableIssues.Columns.Add(columnTitle);\n                }\n    \n                while ((line = readFile.ReadLine()) != null)\n                {\n                    row = line.Split(',');\n                    tableIssues.Rows.Add(row);\n                }\n            }\n        }\n        catch (Exception e)\n        {\n            Console.WriteLine(\"Error:\" + e.ToString());\n        }\n    \n        return tableIssues;\n    }\n    ```\n\n3. 在 `Main()` 方法中，添加一条用于调用 `ParseCSVFile()` 方法的语句：\n\n    ```\n    public static void Main(string[] args)\n    {\n    \n        // Populate test data\n        issues = ParseCSVFile();\n    \n    }\n    ```\n\n### 创建用于加载消息列表的函数\n\n1. 在 `Main()` 之外，定义 `GenerateMessages()` 方法，用于接收 `ParseCSVFile()` 返回的 **DataTable** 对象，并将该表加载到强类型化的中转消息列表中。该方法随后返回 **List** 对象，如下面的示例所示。 \n\n    ```\n    static List<BrokeredMessage> GenerateMessages(DataTable issues)\n    {\n        // Instantiate the brokered list object\n        List<BrokeredMessage> result = new List<BrokeredMessage>();\n    \n        // Iterate through the table and create a brokered message for each row\n        foreach (DataRow item in issues.Rows)\n        {\n            BrokeredMessage message = new BrokeredMessage();\n            foreach (DataColumn property in issues.Columns)\n            {\n                message.Properties.Add(property.ColumnName, item[property]);\n            }\n            result.Add(message);\n        }\n        return result;\n    }\n    ```\n\n2. 在 `Main()` 中，在调用 `ParseCSVFile()` 后立即添加一条语句，从而以 `ParseCSVFile()` 的返回值作为参数调用 `GenerateMessages()` 方法：\n\n    ```\n    public static void Main(string[] args)\n    {\n    \n        // Populate test data\n        issues = ParseCSVFile();\n        MessageList = GenerateMessages(issues);\n    }\n    ```\n\n### 获取用户凭据\n\n1. 首先创建三个全局字符串变量，用于保存这些值。在以前的变量声明之后直接声明这些变量，例如：\n\n    ```\n    namespace Microsoft.ServiceBus.Samples\n    {\n        publicclass Program\n        {\n    \n            privatestatic DataTable issues;\n            privatestatic List<BrokeredMessage> MessageList; \n            // Add these variablesprivatestaticstring ServiceNamespace;\n            privatestaticstring sasKeyName = \"RootManageSharedAccessKey\";\n            privatestaticstring sasKeyValue;\n            …\n    ```\n\n2. 接下来，创建一个函数，用于接受并存储服务命名空间和 SAS 密钥。在 `Main()` 之外添加此方法。例如：\n\n    ```\n    static void CollectUserInput()\n    {\n        // User service namespace\n        Console.Write(\"Please enter the service namespace to use: \");\n        ServiceNamespace = Console.ReadLine();\n    \n        // Issuer key\n        Console.Write(\"Please enter the SAS key to use: \");\n        sasKeyValue = Console.ReadLine();\n    }\n    ```\n\n3. 在 `Main()` 中，在调用 `GenerateMessages()` 之下直接添加一条语句以调用 `CollectUserInput()` 方法：\n\n    ```\n    public static void Main(string[] args)\n    {\n    \n        // Populate test data\n        issues = ParseCSVFile();\n        MessageList = GenerateMessages(issues);\n        \n        // Collect user input\n        CollectUserInput();\n    }\n    ```\n\n### 生成解决方案\n\n在 Visual Studio 的“生成”菜单中，单击“生成解决方案”或按 F6 以确认到目前为止工作的准确性。\n\n创建管理凭据\n\n这是服务总线消息传送功能教程中的第二步。在此步骤中，你可以定义将用于创建共享访问签名 (SAS) 凭据（用于授权应用程序）的管理操作。\n\n## 创建管理凭据\n\n在此步骤中，你可以定义将用于创建共享访问签名 (SAS) 凭据（用于授权应用程序）的管理操作。\n\n1. 为清楚起见，本教程将所有队列操作置于单独的方法中。在 `Program` 类中的 `Main()` 方法之下创建 `Queue()` 方法。例如：\n \n    ```\n    public static void Main(string[] args)\n    {\n    …\n    }\n    staticvoid Queue()\n    {\n    }\n    ```\n\n2. 下一步是使用 [TokenProvider](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.tokenprovider.aspx) 对象创建 SAS 凭据。此创建方法用于接受在 `CollectUserInput()` 方法中获取的 SAS 密钥名称和值。将以下代码添加到 `Queue()` 方法中：\n\n    ```\n    staticvoid Queue()\n    {\n        // Create management credentials\n        TokenProvider credentials = TokenProvider.CreateSharedAccessSignatureTokenProvider(sasKeyName,sasKeyValue);\n    }\n    ```\n### 创建命名空间管理器\n\n1. 创建新的命名空间管理对象，以包含在在上一步中获得的命名空间名称和管理凭据的 URI 作为参数。直接在上一步中添加的代码之下添加以下代码：\n    \n    ```\n    NamespaceManager namespaceClient = new NamespaceManager(ServiceBusEnvironment.CreateServiceUri(\"sb\", <namespaceName>, string.Empty), credentials);\n    ```\n\n### 示例\n\n此时，你的代码应如下所示：\n\n```\nusing System;\nusing System.Collections.Generic;\nusing System.Data;\nusing System.IO;\nusing System.Threading;\nusing Microsoft.ServiceBus.Messaging;\n\nnamespace Microsoft.ServiceBus.Samples\n{\n  class Program\n  {\n    private static DataTable issues;\n    private static List<BrokeredMessage> MessageList;\n    private static string ServiceNamespace;\n    private static string sasKeyName = \"RootManageSharedAccessKey\";\n    private static string sasKeyValue;\n\n    static void Main(string[] args)\n    {\n      // Populate test data\n      issues = ParseCSVFile();\n      MessageList = GenerateMessages(issues);\n\n      // Collect user input\n      CollectUserInput();\n\n      // Add this call\n      Queue();\n    }\n\n    static void Queue()\n    {\n      // Create management credentials\n      TokenProvider credentials = TokenProvider.CreateSharedAccessSignatureTokenProvider(sasKeyName, sasKeyValue);\n      NamespaceManager namespaceClient = new NamespaceManager(ServiceBusEnvironment.CreateServiceUri(\"sb\", ServiceNamespace, string.Empty), credentials);\n    }\n\n    static DataTable ParseCSVFile()\n    {\n      DataTable tableIssues = new DataTable(\"Issues\");\n      string path = @\"..\\..\\data.csv\";\n      try\n      {\n        using (StreamReader readFile = new StreamReader(path))\n        {\n          string line;\n          string[] row;\n\n          // create the columns\n          line = readFile.ReadLine();\n          foreach (string columnTitle in line.Split(','))\n          {\n            tableIssues.Columns.Add(columnTitle);\n          }\n\n          while ((line = readFile.ReadLine()) != null)\n          {\n            row = line.Split(',');\n            tableIssues.Rows.Add(row);\n          }\n        }\n      }\n      catch (Exception e)\n      {\n        Console.WriteLine(\"Error:\" + e.ToString());\n      }\n\n      return tableIssues;\n    }\n\n    static List<BrokeredMessage> GenerateMessages(DataTable issues)\n    {\n      // Instantiate the brokered list object\n      List<BrokeredMessage> result = new List<BrokeredMessage>();\n\n      // Iterate through the table and create a brokered message for each row\n      foreach (DataRow item in issues.Rows)\n      {\n        BrokeredMessage message = new BrokeredMessage();\n        foreach (DataColumn property in issues.Columns)\n        {\n          message.Properties.Add(property.ColumnName, item[property]);\n        }\n        result.Add(message);\n      }\n      return result;\n    }\n\n    static void CollectUserInput()\n    {\n      // User service namespace\n      Console.Write(\"Please enter the service namespace to use: \");\n      ServiceNamespace = Console.ReadLine();\n\n      // Issuer key\n      Console.Write(\"Please enter the issuer key to use: \");\n      sasKeyValue = Console.ReadLine();\n    }\n  }\n}\n```\n\n在下一步中，你可以创建要向其发送消息的队列。\n\n## 将消息发送到队列\n\n在此步骤中，你将创建一个队列，然后将中转消息列表中包含的消息发送到该队列。\n\n### 创建队列并向队列发送消息\n\n1. 首先创建队列。例如，将其命名为 `myQueue`，并在上一步中添加的管理操作后面直接声明它：\n\n    ```\n    QueueDescription myQueue;\n    myQueue = namespaceClient.CreateQueue(\"IssueTrackingQueue\");\n    ```\n\n2. 在 `Queue()` 方法中，使用新创建的服务总线 URI 作为参数创建一个消息工厂对象。在上一步中添加的管理操作后面直接添加以下代码：\n\n    ```\n    MessagingFactory factory = MessagingFactory.Create(ServiceBusEnvironment.CreateServiceUri(\"sb\", ServiceNamespace, string.Empty), credentials);\n    ```\n\n3. 接下来，使用 [QueueClient](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.queueclient.aspx) 类创建队列对象。在最后一步中添加的代码后直接添加以下代码：\n\n    ```\n    QueueClient myQueueClient = factory.CreateQueueClient(\"IssueTrackingQueue\");\n    ```\n\n4. 然后添加以下代码，用于循环遍历你之前创建的中转消息列表，并将其中每条消息发送到队列。在上一步中的 `CreateQueueClient()` 声明后直接添加以下代码：\n    \n    ```\n    // Send messages\n    Console.WriteLine(\"Now sending messages to the queue.\");\n    for (int count = 0; count < 6; count++)\n    {\n        var issue = MessageList[count];\n        issue.Label = issue.Properties[\"IssueTitle\"].ToString();\n        myQueueClient.Send(issue);\n        Console.WriteLine(string.Format(\"Message sent: {0}, {1}\", issue.Label, issue.MessageId));\n    }\n    ```\n\n## 从队列接收消息\n\n在此步骤中，你将从上一步中创建的队列获取消息列表。\n\n### 创建接收器并从队列接收消息\n\n在 `Queue()` 方法中，使用 [Microsoft.ServiceBus.Messaging.QueueClient.Receive](https://msdn.microsoft.com/zh-cn/library/azure/hh322678.aspx) 方法循环访问队列和接收消息，并将每条消息输出到控制台。在上一步中添加的代码之下直接添加以下代码：\n\n    ```\n    Console.WriteLine(\"Now receiving messages from Queue.\");\n    BrokeredMessage message;\n    while ((message = myQueueClient.Receive(new TimeSpan(hours: 0, minutes: 1, seconds: 5))) != null)\n        {\n            Console.WriteLine(string.Format(\"Message received: {0}, {1}, {2}\", message.SequenceNumber, message.Label, message.MessageId));\n            message.Complete();\n    \n            Console.WriteLine(\"Processing message (sleeping...)\");\n            Thread.Sleep(1000);\n        }\n    ```\n\n### 结束 `Queue()` 方法并清理资源\n\n在前面的代码之下直接添加以下代码，以清理消息工厂和队列资源：\n\n    ```\n    factory.Close();\n    myQueueClient.Close();\n    namespaceClient.DeleteQueue(\"IssueTrackingQueue\");\n    ```\n\n### 调用 `Queue()` 方法\n\n最后一步是添加用于从 `Main()` 调用 `Queue()` 方法的代码。在 Main() 的末尾添加以下突出显示的行：\n    \n    ```\n    public static void Main(string[] args)\n    {\n        // Collect user input\n        CollectUserInput();\n    \n        // Populate test data\n        issues = ParseCSVFile();\n        MessageList = GenerateMessages(issues);\n    \n        // Add this call\n        Queue();\n    }\n    ```\n\n### 示例\n\n下面的代码包含完整的 **QueueSample** 应用程序。\n\n```\nusing System;\nusing System.Collections.Generic;\nusing System.Data;\nusing System.IO;\nusing System.Threading;\nusing Microsoft.ServiceBus.Messaging;\n\nnamespace Microsoft.ServiceBus.Samples\n{\n  class Program\n  {\n    private static DataTable issues;\n    private static List<BrokeredMessage> MessageList;\n    private static string ServiceNamespace;\n    private static string sasKeyName = \"RootManageSharedAccessKey\";\n    private static string sasKeyValue;\n\n    static void Main(string[] args)\n    {\n      // Populate test data\n      issues = ParseCSVFile();\n      MessageList = GenerateMessages(issues);\n\n      // Collect user input\n      CollectUserInput();\n\n      // Add this call\n      Queue();\n    }\n\n    static void Queue()\n    {\n      // Create management credentials\n      TokenProvider credentials = TokenProvider.CreateSharedAccessSignatureTokenProvider(sasKeyName, sasKeyValue);\n      NamespaceManager namespaceClient = new NamespaceManager(ServiceBusEnvironment.CreateServiceUri(\"sb\", ServiceNamespace, string.Empty), credentials);\n\n      QueueDescription myQueue;\n      myQueue = namespaceClient.CreateQueue(\"IssueTrackingQueue\");\n\n      MessagingFactory factory = MessagingFactory.Create(ServiceBusEnvironment.CreateServiceUri(\"sb\", ServiceNamespace, string.Empty), credentials);\n      QueueClient myQueueClient = factory.CreateQueueClient(\"IssueTrackingQueue\");\n\n      // Send messages\n      Console.WriteLine(\"Now sending messages to the Queue.\");\n      for (int count = 0; count < 6; count++)\n      {\n        var issue = MessageList[count];\n        issue.Label = issue.Properties[\"IssueTitle\"].ToString();\n        myQueueClient.Send(issue);\n        Console.WriteLine(string.Format(\"Message sent: {0}, {1}\", issue.Label, issue.MessageId));\n      }\n\n      Console.WriteLine(\"Now receiving messages from Queue.\");\n      BrokeredMessage message;\n      while ((message = myQueueClient.Receive(new TimeSpan(hours: 0, minutes: 1, seconds: 5))) != null)\n      {\n        Console.WriteLine(string.Format(\"Message received: {0}, {1}, {2}\", message.SequenceNumber, message.Label, message.MessageId));\n        message.Complete();\n\n        Console.WriteLine(\"Processing message (sleeping...)\");\n        Thread.Sleep(1000);\n      }\n\n      factory.Close();\n      myQueueClient.Close();\n      namespaceClient.DeleteQueue(\"IssueTrackingQueue\");\n    }\n\n    static DataTable ParseCSVFile()\n    {\n      DataTable tableIssues = new DataTable(\"Issues\");\n      string path = @\"..\\..\\data.csv\";\n      try\n      {\n        using (StreamReader readFile = new StreamReader(path))\n        {\n          string line;\n          string[] row;\n\n          // create the columns\n          line = readFile.ReadLine();\n          foreach (string columnTitle in line.Split(','))\n          {\n            tableIssues.Columns.Add(columnTitle);\n          }\n\n          while ((line = readFile.ReadLine()) != null)\n          {\n            row = line.Split(',');\n            tableIssues.Rows.Add(row);\n          }\n        }\n      }\n      catch (Exception e)\n      {\n        Console.WriteLine(\"Error:\" + e.ToString());\n      }\n\n      return tableIssues;\n    }\n\n    static List<BrokeredMessage> GenerateMessages(DataTable issues)\n    {\n      // Instantiate the brokered list object\n      List<BrokeredMessage> result = new List<BrokeredMessage>();\n\n      // Iterate through the table and create a brokered message for each row\n      foreach (DataRow item in issues.Rows)\n      {\n        BrokeredMessage message = new BrokeredMessage();\n        foreach (DataColumn property in issues.Columns)\n        {\n          message.Properties.Add(property.ColumnName, item[property]);\n        }\n        result.Add(message);\n      }\n      return result;\n    }\n\n    static void CollectUserInput()\n    {\n      // User service namespace\n      Console.Write(\"Please enter the service namespace to use: \");\n      ServiceNamespace = Console.ReadLine();\n\n      // Issuer key\n      Console.Write(\"Please enter the issuer key to use: \");\n      sasKeyValue = Console.ReadLine();\n    }\n  }\n}\n```\n\n## 生成并运行 QueueSample 应用程序\n\n完成上述步骤后，即可生成并运行 **QueueSample** 应用程序。\n\n### 生成 QueueSample 应用程序\n\n在 Visual Studio 中的“生成”菜单上，单击“生成解决方案”，或按 F6。如果遇到错误，请验证你的代码是否正确以上一步末尾提供的完整示例为基础。\n\n### 运行 QueueSample 应用程序\n\n1. 运行该应用程序之前，必须确保已创建服务命名空间并已获得 SAS 密钥，如[简介和先决条件](#introduction-and-prerequisites)中所述。\n\n1. 打开浏览器并转到 [Azure 经典门户][]。\n\n3. 单击左侧树中的“服务总线”。\n\n4. 单击要使用的命名空间的名称。在页面底部，单击“连接信息”。记下包含 SAS 密钥的连接字符串或将其复制到剪贴板。\n\n5. 在 Visual Studio 中的“调试”菜单中，单击“启动调试”，或按 F5。出现提示时，输入服务命名空间的名称，以及在上一步中获取的密钥。\n\n## 后续步骤\n\n本教程介绍了如何使用服务总线中转消息传送功能构建服务总线客户端应用程序和服务。有关使用服务总线[中继消息传送](service-bus-messaging-overview.md/#Relayed-messaging)的类似教程，请参阅[服务总线中继消息传送教程](service-bus-relay-tutorial.md)。\n\n若要了解有关[服务总线](/home/features/messaging)的详细信息，请参阅以下主题。\n\n- [服务总线消息传送概述](/documentation/articles/service-bus-messaging-overview)\n- [服务总线基础知识](/documentation/articles/service-bus-fundamentals-hybrid-solutions)\n- [服务总线体系结构](/documentation/articles/service-bus-architecture)\n\n[Azure 经典门户]: http://manage.windowsazure.cn\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

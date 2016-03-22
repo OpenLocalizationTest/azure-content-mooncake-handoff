@@ -1,0 +1,572 @@
+{
+  "nodes": [
+    {
+      "content": "移动服务中的脱机数据同步入门 (iOS) | Azure",
+      "pos": [
+        27,
+        55
+      ]
+    },
+    {
+      "content": "了解如何在 iOS 应用程序中使用 Azure 移动服务缓存和同步脱机数据",
+      "pos": [
+        74,
+        111
+      ]
+    },
+    {
+      "content": "移动服务中的脱机数据同步入门",
+      "pos": [
+        332,
+        346
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        448,
+        454
+      ]
+    },
+    {
+      "content": "借助脱机同步，即使在没有网络连接的情况下，你也可以查看、添加或修改移动应用中的数据。在本程中，你将了解应用如何在本地脱机数据库中自动存储更改，并在重新联机时同步这些更改。",
+      "pos": [
+        556,
+        641
+      ]
+    },
+    {
+      "content": "脱机同步具有几个优点：",
+      "pos": [
+        643,
+        654
+      ]
+    },
+    {
+      "content": "通过在设备上本地缓存服务器数据来提高应用响应能力",
+      "pos": [
+        658,
+        682
+      ]
+    },
+    {
+      "content": "使应用可灵活应对间歇性网络连接",
+      "pos": [
+        685,
+        700
+      ]
+    },
+    {
+      "content": "即使连接状态很差或者根本没有连接，也能让你创建和修改数据",
+      "pos": [
+        703,
+        731
+      ]
+    },
+    {
+      "content": "跨多个设备同步数据",
+      "pos": [
+        734,
+        743
+      ]
+    },
+    {
+      "content": "在两个设备修改同一条记录时检测冲突",
+      "pos": [
+        746,
+        763
+      ]
+    },
+    {
+      "pos": [
+        767,
+        959
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 若要完成本教程，你需要一个 Azure 帐户。如果你没有帐户，可以注册 Azure 试用版并获取<bpt id=\"p1\">[</bpt>免费的移动服务，即使在试用期结束之后仍可继续使用这些服务<ept id=\"p1\">](/home/features/mobile-services/#price)</ept>。有关详细信息，请参阅 [Azure 试用](/pricing/1rmb-trial/ target=\"\\_blank\")。"
+    },
+    {
+      "pos": [
+        961,
+        1024
+      ],
+      "content": "本教程是在<bpt id=\"p1\">[</bpt><ept id=\"p1\">移动服务快速入门教程]</ept>的基础之上制作的，所以必须先完成该教程。首先，让我们回顾“快速入门”中与脱机同步相关的代码。"
+    },
+    {
+      "pos": [
+        1030,
+        1066
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"review-sync\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>回顾移动服务同步代码"
+    },
+    {
+      "pos": [
+        1068,
+        1179
+      ],
+      "content": "Azure 移动服务脱机同步允许最终用户在无法访问网络时与本地数据库交互。若要在应用中使用这些功能，你可以初始化 <ph id=\"ph1\">`MSClient`</ph> 的同步上下文，并引用本机存储。然后，通过 <ph id=\"ph2\">`MSSyncTable`</ph> 接口引用你的表。"
+    },
+    {
+      "pos": [
+        1183,
+        1311
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>QSTodoService.m<ept id=\"p1\">**</ept> 中，请注意成员 <ph id=\"ph1\">`syncTable`</ph> 的类型是 <ph id=\"ph2\">`MSSyncTable`</ph>。脱机同步使用此类型而不是 <ph id=\"ph3\">`MSTable`</ph>。使用同步表时，所有操作将会转到本地存储，而且只会与具有显式推送和提取操作的远程服务同步。"
+    },
+    {
+      "pos": [
+        1386,
+        1456
+      ],
+      "content": "若要获取对同步表的引用，请使用 <ph id=\"ph1\">`syncTableWithName`</ph> 方法。若要删除脱机同步功能，请改用 <ph id=\"ph2\">`tableWithName`</ph>。"
+    },
+    {
+      "pos": [
+        1460,
+        1525
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>QSTodoService.m<ept id=\"p1\">**</ept> 中，执行表操作之前，本地存储将在 <ph id=\"ph1\">`QSTodoService.init`</ph> 中初始化："
+    },
+    {
+      "pos": [
+        1743,
+        1822
+      ],
+      "content": "这会使用 <ph id=\"ph1\">`MSCoreDataStore`</ph> 接口创建本地存储。你可以通过实现 <ph id=\"ph2\">`MSSyncContextDataSource`</ph> 协议来提供不同的本地存储。"
+    },
+    {
+      "pos": [
+        1824,
+        1937
+      ],
+      "content": "<ph id=\"ph1\">`initWithDelegate`</ph> 的第一个参数指定冲突处理程序，但由于我们已传递 <ph id=\"ph2\">`nil`</ph>，因此默认的冲突处理程序将在发生任何冲突时失败。有关如何实现自定义冲突处理程序的详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">使用移动服务脱机支持处理冲突]</ept>。"
+    },
+    {
+      "pos": [
+        1941,
+        2180
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>QSTodoService.m<ept id=\"p1\">**</ept> 中，<ph id=\"ph1\">`syncData`</ph> 先推送新的更改，然后调用 <ph id=\"ph2\">`pullData`</ph> 从远程服务获取数据。在 <ph id=\"ph3\">`syncData`</ph> 中，我们先对同步上下文调用 <ph id=\"ph4\">`pushWithCompletion`</ph>。此方法是 <ph id=\"ph5\">`MSSyncContext`</ph> 的成员，而不是异步表本身，因为它会将更改推送到所有表。只有以某种方式在本地上修改过的记录（通过创建、更新或删除操作）才会发送到服务器。在 <ph id=\"ph6\">`syncData`</ph> 结束时，调用帮助器 <ph id=\"ph7\">`pullData`</ph>。"
+    },
+    {
+      "content": "在此示例中，推送操作并非绝对必要。如果同步上下文中正在进行推送操作的表存在待定的更改，则提取始终会先发出推送。但是，如果你有多个同步表，请显式调用推送，使表之间保持一致。",
+      "pos": [
+        2182,
+        2267
+      ]
+    },
+    {
+      "pos": [
+        2598,
+        2780
+      ],
+      "content": "接下来，在 <bpt id=\"p1\">**</bpt>QSTodoService.m<ept id=\"p1\">**</ept> 中，<ph id=\"ph1\">`pullData`</ph> 将获取与查询匹配的新数据。<ph id=\"ph2\">`pullData`</ph> 将调用 <ph id=\"ph3\">`MSSyncTable.pullWithQuery`</ph> 以检索远程数据，并将数据存储在本地。<ph id=\"ph4\">`pullWithQuery`</ph> 也允许你指定查询以筛选你要检索的记录。在此示例中，查询只会检索远程 <ph id=\"ph5\">`TodoItem`</ph> 表中的所有记录。"
+    },
+    {
+      "pos": [
+        2782,
+        2970
+      ],
+      "content": "<ph id=\"ph1\">`pullWithQuery`</ph> 的第二个参数是<bpt id=\"p1\">_</bpt>增量同步<ept id=\"p1\">_</ept>的查询 ID。增量同步只会使用记录的 <ph id=\"ph2\">`UpdatedAt`</ph> 时间戳（在本地存储中称为 <ph id=\"ph3\">`ms_updatedAt`</ph>）检索自上次同步以来修改的记录。对于应用中的每个逻辑查询而言，查询 ID 是唯一的描述性字符串。若选择不要增量同步，请传递 <ph id=\"ph4\">`nil`</ph> 作为查询 ID。这会降低效率，因为它会检索每个推送操作的所有记录。"
+    },
+    {
+      "pos": [
+        3632,
+        3737
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 若要从设备本地存储区中删除已在移动设备数据库中删除的记录，应启用“<bpt id=\"p1\">[</bpt><ept id=\"p1\">软删除]</ept>”。否则，你的应用程序应定期调用 <ph id=\"ph2\">`MSSyncTable.purgeWithQuery`</ph> 以清除本地存储。"
+    },
+    {
+      "pos": [
+        3742,
+        3921
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>QSTodoService.m<ept id=\"p1\">**</ept> 中，<ph id=\"ph1\">`addItem`</ph> 和 <ph id=\"ph2\">`completeItem`</ph> 方法会在修改数据后调用 <ph id=\"ph3\">`syncData`</ph>。在 <bpt id=\"p2\">**</bpt>QSTodoListViewController.m<ept id=\"p2\">**</ept> 中，<ph id=\"ph4\">`refresh`</ph> 方法也会调用 <ph id=\"ph5\">`syncData`</ph>，使 UI 在每次刷新和启动时（<ph id=\"ph6\">`init`</ph> 调用 <ph id=\"ph7\">`refresh`</ph>）显示最新数据。"
+    },
+    {
+      "pos": [
+        3923,
+        3979
+      ],
+      "content": "因为每当你修改数据时，应用就会调用 <ph id=\"ph1\">`syncData`</ph>，所以无论你何时在应用中编辑数据，应用都会假设你已联机。"
+    },
+    {
+      "pos": [
+        3985,
+        4024
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"review-core-data\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>了解核心数据模型"
+    },
+    {
+      "content": "在使用核心数据脱机存储时，你需要在数据模型中定义特定的表和字段。示例应用已包含具有正确格式的数据模型。在本部分中，我们会逐步介绍这些表及其用法。",
+      "pos": [
+        4026,
+        4098
+      ]
+    },
+    {
+      "pos": [
+        4102,
+        4170
+      ],
+      "content": "打开 <bpt id=\"p1\">**</bpt>QSDataModel.xcdatamodeld<ept id=\"p1\">**</ept>。已定义了四个表，其中三个由 SDK 使用，一个供 todo 项本身使用："
+    },
+    {
+      "pos": [
+        4412,
+        4492
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>移动服务 SDK 会保留以“<bpt id=\"p1\">**</bpt><ph id=\"ph2\">`ms_`</ph><ept id=\"p1\">**</ept>”开头的列名称。请不要在系统列以外的项中使用此前缀。否则，列名称会在使用远程服务时被修改。"
+    },
+    {
+      "content": "使用脱机同步功能时，必须先定义系统表，如下所示。",
+      "pos": [
+        4496,
+        4520
+      ]
+    },
+    {
+      "content": "系统表",
+      "pos": [
+        4530,
+        4533
+      ]
+    },
+    {
+      "content": "MS\\_TableOperations",
+      "pos": [
+        4544,
+        4563
+      ]
+    },
+    {
+      "content": "属性",
+      "pos": [
+        4571,
+        4573
+      ]
+    },
+    {
+      "content": "类型",
+      "pos": [
+        4576,
+        4578
+      ]
+    },
+    {
+      "content": "ID（必需）",
+      "pos": [
+        4623,
+        4629
+      ]
+    },
+    {
+      "content": "64 位整数",
+      "pos": [
+        4632,
+        4638
+      ]
+    },
+    {
+      "content": "itemId",
+      "pos": [
+        4647,
+        4653
+      ]
+    },
+    {
+      "content": "字符串",
+      "pos": [
+        4656,
+        4659
+      ]
+    },
+    {
+      "content": "properties",
+      "pos": [
+        4668,
+        4678
+      ]
+    },
+    {
+      "content": "二进制数据",
+      "pos": [
+        4681,
+        4686
+      ]
+    },
+    {
+      "content": "table",
+      "pos": [
+        4695,
+        4700
+      ]
+    },
+    {
+      "content": "String",
+      "pos": [
+        4703,
+        4709
+      ]
+    },
+    {
+      "content": "tableKind",
+      "pos": [
+        4718,
+        4727
+      ]
+    },
+    {
+      "content": "16 位整数",
+      "pos": [
+        4730,
+        4736
+      ]
+    },
+    {
+      "content": "MS\\_TableOperationErrors",
+      "pos": [
+        4749,
+        4773
+      ]
+    },
+    {
+      "content": "属性",
+      "pos": [
+        4781,
+        4783
+      ]
+    },
+    {
+      "content": "类型",
+      "pos": [
+        4786,
+        4788
+      ]
+    },
+    {
+      "content": "ID（必需）",
+      "pos": [
+        4833,
+        4839
+      ]
+    },
+    {
+      "content": "字符串",
+      "pos": [
+        4842,
+        4845
+      ]
+    },
+    {
+      "content": "operationId",
+      "pos": [
+        4854,
+        4865
+      ]
+    },
+    {
+      "content": "64 位整数",
+      "pos": [
+        4868,
+        4874
+      ]
+    },
+    {
+      "content": "属性",
+      "pos": [
+        4883,
+        4885
+      ]
+    },
+    {
+      "content": "二进制数据",
+      "pos": [
+        4888,
+        4893
+      ]
+    },
+    {
+      "content": "tableKind",
+      "pos": [
+        4902,
+        4911
+      ]
+    },
+    {
+      "content": "16 位整数",
+      "pos": [
+        4914,
+        4920
+      ]
+    },
+    {
+      "content": "MS\\_TableConfig",
+      "pos": [
+        4933,
+        4948
+      ]
+    },
+    {
+      "pos": [
+        5520,
+        5554
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"setup-sync\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>更改应用的同步行为"
+    },
+    {
+      "content": "在本部分中，你将要修改应用，使其不会在应用启动时或插入及更新项时同步，而只会在执行刷新手势时同步。",
+      "pos": [
+        5556,
+        5605
+      ]
+    },
+    {
+      "pos": [
+        5609,
+        5721
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>QSTodoListViewController.m<ept id=\"p1\">**</ept> 中，更改 <ph id=\"ph1\">`viewDidLoad`</ph> 以删除方法末尾的 <ph id=\"ph2\">`[self refresh]`</ph> 调用。现在，数据不会在应用启动时与服务器进行同步，而只会储存在本地。"
+    },
+    {
+      "pos": [
+        5725,
+        5804
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>QSTodoService.m<ept id=\"p1\">**</ept> 中修改 <ph id=\"ph1\">`addItem`</ph>，使其不会在插入项后同步。删除 <ph id=\"ph2\">`self syncData`</ph> 块并将它替换为以下内容："
+    },
+    {
+      "pos": [
+        5927,
+        6007
+      ],
+      "content": "同样地，再次在 <bpt id=\"p1\">**</bpt>QSTodoService.m<ept id=\"p1\">**</ept> 中的 <ph id=\"ph1\">`completeItem`</ph> 内，删除 <ph id=\"ph2\">`self syncData`</ph> 的块并将它替换为以下内容："
+    },
+    {
+      "pos": [
+        6140,
+        6169
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"test-app\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>测试应用程序"
+    },
+    {
+      "content": "在本部分中，你将在模拟器中关闭 Wi-Fi 以创建脱机方案。在添加数据项时，数据项将保存在本地核心数据存储中，而不同步到移动服务。",
+      "pos": [
+        6171,
+        6236
+      ]
+    },
+    {
+      "content": "在 Mac 上关闭 Internet 连接。只是在 iOS 模拟器中关闭 WiFi 可能不起作用，因为模拟器仍可以使用 Mac 主机的 Internet 连接，因此只是关闭了计算机本身的 Internet。这会模拟脱机方案。",
+      "pos": [
+        6241,
+        6353
+      ]
+    },
+    {
+      "content": "添加一些 todo 项或完成某些项。退出模拟器（或强行关闭应用），然后重新启动。验证你的更改是否已保存。请注意，数据项仍会显示，因为它们都保留在本地核心数据存储中。",
+      "pos": [
+        6358,
+        6440
+      ]
+    },
+    {
+      "pos": [
+        6445,
+        6480
+      ],
+      "content": "查看远程 TodoItem 表的内容。验证新项是否<bpt id=\"p1\">_</bpt>未<ept id=\"p1\">_</ept>同步到服务器。"
+    },
+    {
+      "pos": [
+        6487,
+        6582
+      ],
+      "content": "对于 JavaScript 后端，请转到 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">](http://manage.windowsazure.cn)</ept>，然后单击“数据”选项卡查看 <ph id=\"ph1\">`TodoItem`</ph> 表的内容。"
+    },
+    {
+      "content": "对于 .NET 后端，请使用 SQL 工具（如 SQL Server Management Studio）或 REST 客户端（如 Fiddler 或 Postman）查看表内容。",
+      "pos": [
+        6588,
+        6678
+      ]
+    },
+    {
+      "content": "在 iOS 模拟器中打开 Wi-Fi。接下来，通过拉下项列表来执行刷新手势。你将看到旋转进度条和“正在同步...”文字。",
+      "pos": [
+        6683,
+        6743
+      ]
+    },
+    {
+      "content": "再次查看 TodoItem 数据。新的和更改的 TodoItem 现在应会出现。",
+      "pos": [
+        6748,
+        6788
+      ]
+    },
+    {
+      "content": "摘要",
+      "pos": [
+        6794,
+        6796
+      ]
+    },
+    {
+      "pos": [
+        6798,
+        6892
+      ],
+      "content": "为了支持移动服务的脱机功能，你使用了 <ph id=\"ph1\">`MSSyncTable`</ph> 接口，并使用本地存储初始化了 <ph id=\"ph2\">`MSClient.syncContext`</ph>。在这种情况下，本地存储是基于核心数据的数据库。"
+    },
+    {
+      "pos": [
+        6894,
+        6994
+      ],
+      "content": "使用核心数据本地存储时，你使用<bpt id=\"p1\">[</bpt>正确的系统属性<ept id=\"p1\">][Review the Core Data model]</ept>定义了多个表。移动服务的一般操作在进行时如同应用仍处于连接状态，但所有的操作都针对本地存储执行。"
+    },
+    {
+      "pos": [
+        6996,
+        7086
+      ],
+      "content": "为了与服务器同步本地存储，你使用了 <ph id=\"ph1\">`MSSyncTable.pullWithQuery`</ph> 和 <ph id=\"ph2\">`MSClient.syncContext.pushWithCompletion`</ph>："
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        7728,
+        7732
+      ]
+    },
+    {
+      "content": "使用移动服务脱机支持处理冲突",
+      "pos": [
+        7737,
+        7751
+      ]
+    },
+    {
+      "content": "使用移动服务中的软删除",
+      "pos": [
+        7757,
+        7768
+      ]
+    },
+    {
+      "content": "其他资源",
+      "pos": [
+        7788,
+        7792
+      ]
+    },
+    {
+      "content": "云覆盖：Azure 移动服务中的脱机同步",
+      "pos": [
+        7797,
+        7817
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"移动服务中的脱机数据同步入门 (iOS) | Azure\"\n    description=\"了解如何在 iOS 应用程序中使用 Azure 移动服务缓存和同步脱机数据\"\n    documentationCenter=\"ios\"\n    authors=\"krisragh\"\n    manager=\"dwrede\"\n    editor=\"\"\n    services=\"mobile-services\"/>\n\n<tags\n    ms.service=\"mobile-services\"\n    ms.date=\"01/12/2016\"\n    wacn.date=\"02/26/2016\"/>\n\n#  移动服务中的脱机数据同步入门\n\n[AZURE.INCLUDE [mobile-service-note-mobile-apps](../includes/mobile-services-note-mobile-apps.md)]\n\n&nbsp;\n[AZURE.INCLUDE [mobile-services-selector-offline](../includes/mobile-services-selector-offline.md)]\n\n借助脱机同步，即使在没有网络连接的情况下，你也可以查看、添加或修改移动应用中的数据。在本程中，你将了解应用如何在本地脱机数据库中自动存储更改，并在重新联机时同步这些更改。\n\n脱机同步具有几个优点：\n\n* 通过在设备上本地缓存服务器数据来提高应用响应能力\n* 使应用可灵活应对间歇性网络连接\n* 即使连接状态很差或者根本没有连接，也能让你创建和修改数据\n* 跨多个设备同步数据\n* 在两个设备修改同一条记录时检测冲突\n\n> [AZURE.NOTE] 若要完成本教程，你需要一个 Azure 帐户。如果你没有帐户，可以注册 Azure 试用版并获取[免费的移动服务，即使在试用期结束之后仍可继续使用这些服务](/home/features/mobile-services/#price)。有关详细信息，请参阅 [Azure 试用](/pricing/1rmb-trial/ target=\"\\_blank\")。\n\n本教程是在[移动服务快速入门教程]的基础之上制作的，所以必须先完成该教程。首先，让我们回顾“快速入门”中与脱机同步相关的代码。\n\n##  <a name=\"review-sync\"></a>回顾移动服务同步代码\n\nAzure 移动服务脱机同步允许最终用户在无法访问网络时与本地数据库交互。若要在应用中使用这些功能，你可以初始化 `MSClient` 的同步上下文，并引用本机存储。然后，通过 `MSSyncTable` 接口引用你的表。\n\n* 在 **QSTodoService.m** 中，请注意成员 `syncTable` 的类型是 `MSSyncTable`。脱机同步使用此类型而不是 `MSTable`。使用同步表时，所有操作将会转到本地存储，而且只会与具有显式推送和提取操作的远程服务同步。\n\n```\n        @property (nonatomic, strong)   MSSyncTable *syncTable;\n```\n\n若要获取对同步表的引用，请使用 `syncTableWithName` 方法。若要删除脱机同步功能，请改用 `tableWithName`。\n\n* 在 **QSTodoService.m** 中，执行表操作之前，本地存储将在 `QSTodoService.init` 中初始化：\n\n```\n        MSCoreDataStore *store = [[MSCoreDataStore alloc] initWithManagedObjectContext:context];\n        self.client.syncContext = [[MSSyncContext alloc] initWithDelegate:nil dataSource:store callback:nil];\n```\n\n这会使用 `MSCoreDataStore` 接口创建本地存储。你可以通过实现 `MSSyncContextDataSource` 协议来提供不同的本地存储。\n\n`initWithDelegate` 的第一个参数指定冲突处理程序，但由于我们已传递 `nil`，因此默认的冲突处理程序将在发生任何冲突时失败。有关如何实现自定义冲突处理程序的详细信息，请参阅[使用移动服务脱机支持处理冲突]。\n\n* 在 **QSTodoService.m** 中，`syncData` 先推送新的更改，然后调用 `pullData` 从远程服务获取数据。在 `syncData` 中，我们先对同步上下文调用 `pushWithCompletion`。此方法是 `MSSyncContext` 的成员，而不是异步表本身，因为它会将更改推送到所有表。只有以某种方式在本地上修改过的记录（通过创建、更新或删除操作）才会发送到服务器。在 `syncData` 结束时，调用帮助器 `pullData`。\n\n在此示例中，推送操作并非绝对必要。如果同步上下文中正在进行推送操作的表存在待定的更改，则提取始终会先发出推送。但是，如果你有多个同步表，请显式调用推送，使表之间保持一致。\n\n```\n      -(void)syncData:(QSCompletionBlock)completion\n        {\n          // push all changes in the sync context, then pull new data\n          [self.client.syncContext pushWithCompletion:^(NSError *error) {\n              [self logErrorIfNotNil:error];\n              [self pullData:completion];\n          }];\n        }\n\n```\n\n* 接下来，在 **QSTodoService.m** 中，`pullData` 将获取与查询匹配的新数据。`pullData` 将调用 `MSSyncTable.pullWithQuery` 以检索远程数据，并将数据存储在本地。`pullWithQuery` 也允许你指定查询以筛选你要检索的记录。在此示例中，查询只会检索远程 `TodoItem` 表中的所有记录。\n\n`pullWithQuery` 的第二个参数是_增量同步_的查询 ID。增量同步只会使用记录的 `UpdatedAt` 时间戳（在本地存储中称为 `ms_updatedAt`）检索自上次同步以来修改的记录。对于应用中的每个逻辑查询而言，查询 ID 是唯一的描述性字符串。若选择不要增量同步，请传递 `nil` 作为查询 ID。这会降低效率，因为它会检索每个推送操作的所有记录。\n\n```\n      -(void)pullData:(QSCompletionBlock)completion\n        {\n          MSQuery *query = [self.syncTable query];\n\n          // Pulls data from the remote server into the local table.\n          // We're pulling all items and filtering in the view\n          // query ID is used for incremental sync\n          [self.syncTable pullWithQuery:query queryId:@\"allTodoItems\" completion:^(NSError *error) {\n              [self logErrorIfNotNil:error];\n\n              // Let the caller know that we have finished\n              if (completion != nil) {\n                  dispatch_async(dispatch_get_main_queue(), completion);\n        }\n          }];\n        }\n```\n\n\n>[AZURE.NOTE] 若要从设备本地存储区中删除已在移动设备数据库中删除的记录，应启用“[软删除]”。否则，你的应用程序应定期调用 `MSSyncTable.purgeWithQuery` 以清除本地存储。\n\n\n* 在 **QSTodoService.m** 中，`addItem` 和 `completeItem` 方法会在修改数据后调用 `syncData`。在 **QSTodoListViewController.m** 中，`refresh` 方法也会调用 `syncData`，使 UI 在每次刷新和启动时（`init` 调用 `refresh`）显示最新数据。\n\n因为每当你修改数据时，应用就会调用 `syncData`，所以无论你何时在应用中编辑数据，应用都会假设你已联机。\n\n##  <a name=\"review-core-data\"></a>了解核心数据模型\n\n在使用核心数据脱机存储时，你需要在数据模型中定义特定的表和字段。示例应用已包含具有正确格式的数据模型。在本部分中，我们会逐步介绍这些表及其用法。\n\n- 打开 **QSDataModel.xcdatamodeld**。已定义了四个表，其中三个由 SDK 使用，一个供 todo 项本身使用：\n\n      * MS\\_TableOperations：用于跟踪要与服务器同步的项\n      * MS\\_TableOperationErrors：用于跟踪脱机同步期间发生的错误\n      * MS\\_TableConfig：用于跟踪所有提取操作最后一次同步操作的上次更新时间\n      * TodoItem：用于储存 todo 项。系统列 **ms\\_createdAt**、**ms\\_updatedAt** 和 **ms\\_version** 是可选的系统属性。\n\n>[AZURE.NOTE]移动服务 SDK 会保留以“**`ms_`**”开头的列名称。请不要在系统列以外的项中使用此前缀。否则，列名称会在使用远程服务时被修改。\n\n- 使用脱机同步功能时，必须先定义系统表，如下所示。\n\n    ### 系统表\n\n    #### MS\\_TableOperations\n\n    | 属性 | 类型 |\n    |-------------- |   ------    |\n    | ID（必需） | 64 位整数 |\n    | itemId | 字符串 |\n    | properties | 二进制数据 |\n    | table | String |\n    | tableKind | 16 位整数 |\n\n    #### MS\\_TableOperationErrors\n\n    | 属性 | 类型 |\n    |-------------- | ----------  |\n    | ID（必需） | 字符串 |\n    | operationId | 64 位整数 |\n    | 属性 | 二进制数据 |\n    | tableKind | 16 位整数 |\n\n    #### MS\\_TableConfig\n\n\n    | 属性 | 类型 |\n    |-------------- | ----------  |\n    | ID（必需） | 字符串 |\n    | key | 字符串 |\n    | keyType | 64 位整数 |\n    | table | 字符串 |\n    | value | 字符串 |\n\n    ### 数据表\n\n    #### TodoItem\n\n    | 属性 | 类型 | 注意 |\n    |-------------- |  ------ | -------------------------------------------------------|\n    | ID（必需） | 字符串 | 远程存储中的主键（必需） |\n    | complete | 布尔 | todo 项字段 |\n    | text | 字符串 | todo 项字段 |\n    | ms\\_createdAt | 日期 | （可选）映射到 \\_\\_createdAt 系统属性 |\n    | ms\\_updatedAt | 日期 |（可选）映射到 \\_\\_updatedAt 系统属性 |\n    | ms\\_version | 字符串 |（可选）用于检测冲突，映射到 \\_\\_version |\n\n\n\n## <a name=\"setup-sync\"></a>更改应用的同步行为\n\n在本部分中，你将要修改应用，使其不会在应用启动时或插入及更新项时同步，而只会在执行刷新手势时同步。\n\n* 在 **QSTodoListViewController.m** 中，更改 `viewDidLoad` 以删除方法末尾的 `[self refresh]` 调用。现在，数据不会在应用启动时与服务器进行同步，而只会储存在本地。\n\n* 在 **QSTodoService.m** 中修改 `addItem`，使其不会在插入项后同步。删除 `self syncData` 块并将它替换为以下内容：\n\n```\n        if (completion != nil) {\n            dispatch_async(dispatch_get_main_queue(), completion);\n        }\n```\n\n* 同样地，再次在 **QSTodoService.m** 中的 `completeItem` 内，删除 `self syncData` 的块并将它替换为以下内容：\n\n```\n        if (completion != nil) {\n            dispatch_async(dispatch_get_main_queue(), completion);\n                }\n```\n\n##  <a name=\"test-app\"></a>测试应用程序\n\n在本部分中，你将在模拟器中关闭 Wi-Fi 以创建脱机方案。在添加数据项时，数据项将保存在本地核心数据存储中，而不同步到移动服务。\n\n1. 在 Mac 上关闭 Internet 连接。只是在 iOS 模拟器中关闭 WiFi 可能不起作用，因为模拟器仍可以使用 Mac 主机的 Internet 连接，因此只是关闭了计算机本身的 Internet。这会模拟脱机方案。\n\n2. 添加一些 todo 项或完成某些项。退出模拟器（或强行关闭应用），然后重新启动。验证你的更改是否已保存。请注意，数据项仍会显示，因为它们都保留在本地核心数据存储中。\n\n3. 查看远程 TodoItem 表的内容。验证新项是否_未_同步到服务器。\n\n   - 对于 JavaScript 后端，请转到 [Azure 经典门户](http://manage.windowsazure.cn)，然后单击“数据”选项卡查看 `TodoItem` 表的内容。\n   - 对于 .NET 后端，请使用 SQL 工具（如 SQL Server Management Studio）或 REST 客户端（如 Fiddler 或 Postman）查看表内容。\n\n4. 在 iOS 模拟器中打开 Wi-Fi。接下来，通过拉下项列表来执行刷新手势。你将看到旋转进度条和“正在同步...”文字。\n\n5. 再次查看 TodoItem 数据。新的和更改的 TodoItem 现在应会出现。\n\n##  摘要\n\n为了支持移动服务的脱机功能，你使用了 `MSSyncTable` 接口，并使用本地存储初始化了 `MSClient.syncContext`。在这种情况下，本地存储是基于核心数据的数据库。\n\n使用核心数据本地存储时，你使用[正确的系统属性][Review the Core Data model]定义了多个表。移动服务的一般操作在进行时如同应用仍处于连接状态，但所有的操作都针对本地存储执行。\n\n为了与服务器同步本地存储，你使用了 `MSSyncTable.pullWithQuery` 和 `MSClient.syncContext.pushWithCompletion`：\n\n        * To push changes to the server, you called `pushWithCompletion`. This method is in `MSSyncContext` instead of the sync table because it will push changes across all tables. Only records that are modified in some way locally (through CUD operations) are be sent to the server.\n\n        * To pull data from a table on the server to the app, you called `MSSyncTable.pullWithQuery`. A pull always issues a push first. This is to ensure all tables in the local store along with relationships remain consistent. `pullWithQuery` can also be used to filter the data that is stored on the client, by customizing the `query` parameter.\n\n##  后续步骤\n\n* [使用移动服务脱机支持处理冲突]\n\n* [使用移动服务中的软删除][Soft Delete]\n\n##  其他资源\n\n* [云覆盖：Azure 移动服务中的脱机同步]\n\n\n<!-- URLs. -->\n\n[Get the sample app]: #get-app\n[Review the Core Data model]: #review-core-data\n[Review the Mobile Services sync code]: #review-sync\n[Change the sync behavior of the app]: #setup-sync\n[Test the app]: #test-app\n\n[core-data-1]: ./media/mobile-services-ios-get-started-offline-data/core-data-1.png\n[core-data-2]: ./media/mobile-services-ios-get-started-offline-data/core-data-2.png\n[core-data-3]: ./media/mobile-services-ios-get-started-offline-data/core-data-3.png\n[defining-core-data-main-screen]: ./media/mobile-services-ios-get-started-offline-data/defining-core-data-main-screen.png\n[defining-core-data-model-editor]: ./media/mobile-services-ios-get-started-offline-data/defining-core-data-model-editor.png\n[defining-core-data-tableoperationerrors-entity]: ./media/mobile-services-ios-get-started-offline-data/defining-core-data-tableoperationerrors-entity.png\n[defining-core-data-tableoperations-entity]: ./media/mobile-services-ios-get-started-offline-data/defining-core-data-tableoperations-entity.png\n[defining-core-data-tableconfig-entity]: ./media/mobile-services-ios-get-started-offline-data/defining-core-data-tableconfig-entity.png\n[defining-core-data-todoitem-entity]: ./media/mobile-services-ios-get-started-offline-data/defining-core-data-todoitem-entity.png\n[update-framework-1]: ./media/mobile-services-ios-get-started-offline-data/update-framework-1.png\n[update-framework-2]: ./media/mobile-services-ios-get-started-offline-data/update-framework-2.png\n\n[Core Data Model Editor Help]: https://developer.apple.com/library/mac/recipes/xcode_help-core_data_modeling_tool/Articles/about_cd_modeling_tool.html\n[Creating an Outlet Connection]: https://developer.apple.com/library/mac/recipes/xcode_help-interface_builder/articles-connections_bindings/CreatingOutlet.html\n[Build a User Interface]: https://developer.apple.com/library/mac/documentation/ToolsLanguages/Conceptual/Xcode_Overview/Edit_User_Interfaces/edit_user_interface.html\n[Adding a Segue Between Scenes in a Storyboard]: https://developer.apple.com/library/ios/recipes/xcode_help-IB_storyboard/chapters/StoryboardSegue.html#//apple_ref/doc/uid/TP40014225-CH25-SW1\n[Adding a Scene to a Storyboard]: https://developer.apple.com/library/ios/recipes/xcode_help-IB_storyboard/chapters/StoryboardScene.html\n\n[Core Data]: https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/CoreData/cdProgrammingGuide.html\n[Download the preview SDK here]: http://aka.ms/Gc6fex\n[How to use the Mobile Services client library for iOS]: /documentation/articles/mobile-services-ios-how-to-use-client-library\n[Offline iOS Sample]: https://github.com/Azure/mobile-services-samples/tree/master/TodoOffline/iOS/blog20140611\n[Mobile Services sample repository on GitHub]: https://github.com/Azure/mobile-services-samples\n\n\n[Get started with Mobile Services]: /documentation/articles/mobile-services-ios-get-started\n[使用移动服务脱机支持处理冲突]: /documentation/articles/mobile-services-ios-handling-conflicts-offline-data\n[Soft Delete]: /documentation/articles/mobile-services-using-soft-delete\n[软删除]: /documentation/articles/mobile-services-using-soft-delete\n\n[云覆盖：Azure 移动服务中的脱机同步]: http://channel9.msdn.com/Shows/Cloud+Cover/Episode-155-Offline-Storage-with-Donna-Malayeri\n[Aazure Friday：Azure 移动服务中支持脱机的应用]: http://azure.microsoft.com/documentation/videos/azure-mobile-services-offline-enabled-apps-with-donna-malayeri/\n\n[移动服务快速入门教程]: /documentation/articles/mobile-services-ios-get-started\n \n\n<!---HONumber=Mooncake_0215_2016-->"
+}

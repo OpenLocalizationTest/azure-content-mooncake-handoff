@@ -1,0 +1,33 @@
+{
+  "nodes": [
+    {
+      "pos": [
+        3,
+        69
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>channels<ept id=\"p1\">**</ept> 表的 insert.js 文件中，找到以下代码行，注释掉它们或将它们从文件中删除，然后保存所做的更改。"
+    },
+    {
+      "content": "当您保存对 insert.js 文件的更改时，新版本的脚本将会上载到您的移动服务。",
+      "pos": [
+        484,
+        525
+      ]
+    },
+    {
+      "content": "在\"服务器资源管理器\"中，展开 TodoItem 表、打开 insert.js 文件并将当前的 insert 函数替换为以下代码，然后保存所做的更改：",
+      "pos": [
+        530,
+        605
+      ]
+    },
+    {
+      "content": "现在，当您插入新的 TodoItem 时，将有一个推送通知发送到所有已注册设备。",
+      "pos": [
+        1571,
+        1611
+      ]
+    }
+  ],
+  "content": "1. 在 **channels** 表的 insert.js 文件中，找到以下代码行，注释掉它们或将它们从文件中删除，然后保存所做的更改。\n\n        sendNotifications(item.channelUri);\n\n        function sendNotifications(uri) {\n            console.log(\"Uri: \", uri);\n            push.wns.sendToastText01(uri, {\n                text1: \"Sample toast from sample insert\"\n            }, {\n                success: function (pushResponse) {\n                    console.log(\"Sent push:\", pushResponse);\n                }\n            });\n        }\n        \n    当您保存对 insert.js 文件的更改时，新版本的脚本将会上载到您的移动服务。\n\n2. 在\"服务器资源管理器\"中，展开 TodoItem 表、打开 insert.js 文件并将当前的 insert 函数替换为以下代码，然后保存所做的更改： \n\n        function insert(item, user, request) {\n            request.execute({\n                success: function() {\n                    request.respond();\n                    sendNotifications();\n                }\n            });\n        \n            function sendNotifications() {\n                var channelsTable = tables.getTable('channels');\n                channelsTable.read({\n                    success: function(devices) {\n                        devices.forEach(function(device) {\n                            push.wns.sendToastText04(device.channelUri, {\n                                text1: item.text\n                            }, {\n                                success: function(pushResponse) {\n                                    console.log(\"Sent push:\", pushResponse);\n                                }\n                            });\n                        });\n                    }\n                });\n            }\n        }\n        \n    现在，当您插入新的 TodoItem 时，将有一个推送通知发送到所有已注册设备。\n"
+}

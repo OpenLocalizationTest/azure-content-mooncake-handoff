@@ -1,0 +1,187 @@
+{
+  "nodes": [
+    {
+      "content": "在 CoreOS 上开始使用 Fleet | Azure",
+      "pos": [
+        27,
+        55
+      ]
+    },
+    {
+      "content": "提供使用经典部署模型在 Azure 上创建的 CoreOS Linux 虚拟机上使用 Fleet 和 Docker 的基本示例。",
+      "pos": [
+        74,
+        138
+      ]
+    },
+    {
+      "content": "在 Azure 上的 CoreOS VM 群集上使用 Fleet 入门",
+      "pos": [
+        390,
+        425
+      ]
+    },
+    {
+      "pos": [
+        427,
+        513
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]"
+    },
+    {
+      "pos": [
+        516,
+        632
+      ],
+      "content": "本文提供两个在 <bpt id=\"p1\">[</bpt><ept id=\"p1\">CoreOS]</ept> 虚拟机的群集上使用 <bpt id=\"p2\">[</bpt>fleet<ept id=\"p2\">](https://github.com/coreos/fleet)</ept> 和 <bpt id=\"p3\">[</bpt>Docker<ept id=\"p3\">](https://www.docker.com/)</ept> 运行应用程序的快速示例。"
+    },
+    {
+      "pos": [
+        634,
+        900
+      ],
+      "content": "若要使用这些示例，需要先设置三节点 CoreOS 群集，如<bpt id=\"p1\">[</bpt><ept id=\"p1\">如何在 Azure 上使用 CoreOS]</ept> 中所述。完成该操作后，你将了解非常基本的 CoreOS 部署元素，并拥有可以工作的群集和客户端计算机。在这些示例中，我们将使用完全相同的群集名称。此外，这些示例还假定你使用本地 Linux 主机运行 <bpt id=\"p2\">**</bpt>fleetctl<ept id=\"p2\">**</ept> 命令。请参阅<bpt id=\"p3\">[</bpt>使用客户端<ept id=\"p3\">](https://coreos.com/fleet/docs/latest/using-the-client.html)</ept>，了解有关 <bpt id=\"p4\">**</bpt>fleetctl<ept id=\"p4\">**</ept> 客户端的详细信息。"
+    },
+    {
+      "pos": [
+        906,
+        953
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id='simple'&gt;</ph>示例 1：使用 Docker 的 Hello World<ph id=\"ph2\">&lt;/a&gt;</ph>"
+    },
+    {
+      "pos": [
+        955,
+        1029
+      ],
+      "content": "下面是一个在单个 Docker 容器中运行的简单“Hello World”应用程序。此应用程序使用 <bpt id=\"p1\">[</bpt><ept id=\"p1\">busybox Docker Hub 映像]</ept>。"
+    },
+    {
+      "pos": [
+        1031,
+        1130
+      ],
+      "content": "在 Linux 客户端计算机上，使用你最喜欢的文本编辑器创建以下 <bpt id=\"p1\">**</bpt>systemd<ept id=\"p1\">**</ept> 单元文件并将其命名为 <ph id=\"ph1\">`helloworld.service`</ph>。（有关语法的详细信息，请参阅<bpt id=\"p2\">[</bpt><ept id=\"p2\">单元文件]</ept>。）"
+    },
+    {
+      "pos": [
+        1586,
+        1649
+      ],
+      "content": "现在连接到 CoreOS 群集，并通过运行以下 <bpt id=\"p1\">**</bpt>fleetctl<ept id=\"p1\">**</ept> 命令启动单元。输出将显示单元已启动以及它所在的位置。"
+    },
+    {
+      "pos": [
+        1820,
+        1975
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>若要运行不带 <bpt id=\"p1\">**</bpt>--tunnel<ept id=\"p1\">**</ept> 参数的远程 <bpt id=\"p2\">**</bpt>fleetctl<ept id=\"p2\">**</ept> 命令，可以选择设置 FLEETCTL\\_TUNNEL 环境变量以通过隧道传送请求。例如：<ph id=\"ph2\">`export FLEETCTL_TUNNEL=coreos-cluster.chinacloudapp.cn:22`</ph>。"
+    },
+    {
+      "content": "你可以连接到容器，以查看服务的输出：",
+      "pos": [
+        1978,
+        1996
+      ]
+    },
+    {
+      "content": "若要清理，请停止并卸载单元。",
+      "pos": [
+        2634,
+        2648
+      ]
+    },
+    {
+      "pos": [
+        2829,
+        2871
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id='highavail'&gt;</ph>示例 2：高度可用的 nginx 服务器<ph id=\"ph2\">&lt;/a&gt;</ph>"
+    },
+    {
+      "pos": [
+        2873,
+        3037
+      ],
+      "content": "使用 CoreOS、Docker 和 <bpt id=\"p1\">**</bpt>fleet<ept id=\"p1\">**</ept> 的一个优点是很容易以高度可用的方式运行服务。在此示例中，你将部署一个由三个运行 nginx Web 服务器的相同容器组成的服务。这些容器将在群集中的三个虚拟机上运行。此示例类似于<bpt id=\"p2\">[</bpt><ept id=\"p2\">使用 fleet 启动容器]</ept>中的示例，并使用 <bpt id=\"p3\">[</bpt><ept id=\"p3\">nginx Docker Hub 映像]</ept>。"
+    },
+    {
+      "pos": [
+        3040,
+        3196
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>若要运行高度可用的 Web 服务器，需要在虚拟机（公共端口 80、专用端口 80）上配置负载平衡 HTTP 终结点。你可以在创建 CoreOS 群集后，使用 Azure 门户或 <bpt id=\"p1\">**</bpt>azure vm endpoint<ept id=\"p1\">**</ept> 命令执行此操作。有关详细信息，请参阅<bpt id=\"p2\">[</bpt><ept id=\"p2\">配置负载平衡集]</ept>。"
+    },
+    {
+      "pos": [
+        3198,
+        3335
+      ],
+      "content": "在客户端计算机上，使用你最喜欢的文本编辑器创建名为 nginx@.service 的 <bpt id=\"p1\">**</bpt>systemd<ept id=\"p1\">**</ept> 模板单元文件。你将使用这个简单的模板来启动名为 nginx@1.service、nginx@2.service 和 nginx@3.service 的三个单独实例："
+    },
+    {
+      "pos": [
+        3698,
+        3783
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph><ph id=\"ph2\">`X-Conflicts`</ph> 属性告知 CoreOS 只有此容器的一个实例可以在给定的 CoreOS 主机上运行。有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">单元文件]</ept>。"
+    },
+    {
+      "content": "现在启动 CoreOS 群集中的单元实例。你应看到这三个实例在三个不同的计算机上运行：",
+      "pos": [
+        3785,
+        3828
+      ]
+    },
+    {
+      "content": "若要访问运行其中一个单元的 Web 服务器，请向托管 CoreOS 群集的云服务发送一个简单请求。",
+      "pos": [
+        4122,
+        4171
+      ]
+    },
+    {
+      "content": "你将看到从 nginx 服务器返回的默认文本类似于：",
+      "pos": [
+        4220,
+        4246
+      ]
+    },
+    {
+      "content": "你可以尝试关闭群集中的一个或多个虚拟机，以验证 Web 服务是否继续运行。",
+      "pos": [
+        5063,
+        5100
+      ]
+    },
+    {
+      "content": "完成后，请停止并卸载单元。",
+      "pos": [
+        5102,
+        5115
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        5306,
+        5310
+      ]
+    },
+    {
+      "pos": [
+        5314,
+        5469
+      ],
+      "content": "你可以尝试使用 Azure 上的三节点 CoreOS 群集执行更多操作。通过阅读 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Tim Park 的 CoreOS 教程]</ept>、<bpt id=\"p2\">[</bpt><ept id=\"p2\">Patrick Chanezon 的 CoreOS 教程]</ept>、<bpt id=\"p3\">[</bpt><ept id=\"p3\">Docker]</ept> 文档和 <bpt id=\"p4\">[</bpt><ept id=\"p4\">CoreOS 概述]</ept>，探索如何创建更复杂的群集、使用 Docker 和创建更有趣的应用程序。"
+    },
+    {
+      "pos": [
+        5474,
+        5538
+      ],
+      "content": "请参阅 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 上的 Linux 和开源计算]</ept>，了解有关在 Azure 中的 Linux VM 上使用开源环境的详细信息。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"在 CoreOS 上开始使用 Fleet | Azure\"\n    description=\"提供使用经典部署模型在 Azure 上创建的 CoreOS Linux 虚拟机上使用 Fleet 和 Docker 的基本示例。\"\n    services=\"virtual-machines\"\n    documentationCenter=\"\"\n    authors=\"dlepow\"\n    manager=\"timlt\"\n    editor=\"\"\n    tags=\"azure-service-management\"/>\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"11/16/2015\"\n    wacn.date=\"01/29/2016\"/>\n\n# 在 Azure 上的 CoreOS VM 群集上使用 Fleet 入门\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]\n\n\n本文提供两个在 [CoreOS] 虚拟机的群集上使用 [fleet](https://github.com/coreos/fleet) 和 [Docker](https://www.docker.com/) 运行应用程序的快速示例。\n\n若要使用这些示例，需要先设置三节点 CoreOS 群集，如[如何在 Azure 上使用 CoreOS] 中所述。完成该操作后，你将了解非常基本的 CoreOS 部署元素，并拥有可以工作的群集和客户端计算机。在这些示例中，我们将使用完全相同的群集名称。此外，这些示例还假定你使用本地 Linux 主机运行 **fleetctl** 命令。请参阅[使用客户端](https://coreos.com/fleet/docs/latest/using-the-client.html)，了解有关 **fleetctl** 客户端的详细信息。\n\n\n## <a id='simple'>示例 1：使用 Docker 的 Hello World</a>\n\n下面是一个在单个 Docker 容器中运行的简单“Hello World”应用程序。此应用程序使用 [busybox Docker Hub 映像]。\n\n在 Linux 客户端计算机上，使用你最喜欢的文本编辑器创建以下 **systemd** 单元文件并将其命名为 `helloworld.service`。（有关语法的详细信息，请参阅[单元文件]。）\n\n    \n    [Unit]\n    Description=HelloWorld\n    After=docker.service\n    Requires=docker.service\n    \n    [Service]\n    \n    TimeoutStartSec=0\n    ExecStartPre=-/usr/bin/docker kill busybox1\n    ExecStartPre=-/usr/bin/docker rm busybox1\n    ExecStartPre=/usr/bin/docker pull busybox\n    ExecStart=/usr/bin/docker run --name busybox1 busybox /bin/sh -c \"while true; do echo Hello World; sleep 1; done\"\n    ExecStop=/usr/bin/docker stop busybox1\n    \n    \n\n现在连接到 CoreOS 群集，并通过运行以下 **fleetctl** 命令启动单元。输出将显示单元已启动以及它所在的位置。\n\n    \n    fleetctl --tunnel coreos-cluster.chinacloudapp.cn:22 start helloworld.service\n    \n    \n    Unit helloworld.service launched on 62f0f66e.../100.79.86.62\n    \n\n>[AZURE.NOTE]若要运行不带 **--tunnel** 参数的远程 **fleetctl** 命令，可以选择设置 FLEETCTL\\_TUNNEL 环境变量以通过隧道传送请求。例如：`export FLEETCTL_TUNNEL=coreos-cluster.chinacloudapp.cn:22`。\n\n\n你可以连接到容器，以查看服务的输出：\n\n    \n    fleetctl --tunnel coreos-cloudapp.cluster.net:22 journal helloworld.service\n    \n    Mar 04 21:29:26 node-1 docker[57876]: Hello World\n    Mar 04 21:29:27 node-1 docker[57876]: Hello World\n    Mar 04 21:29:28 node-1 docker[57876]: Hello World\n    Mar 04 21:29:29 node-1 docker[57876]: Hello World\n    Mar 04 21:29:30 node-1 docker[57876]: Hello World\n    Mar 04 21:29:31 node-1 docker[57876]: Hello World\n    Mar 04 21:29:32 node-1 docker[57876]: Hello World\n    Mar 04 21:29:33 node-1 docker[57876]: Hello World\n    Mar 04 21:29:34 node-1 docker[57876]: Hello World\n    Mar 04 21:29:35 node-1 docker[57876]: Hello World\n    \n\n若要清理，请停止并卸载单元。\n\n    \n    fleetctl --tunnel coreos-cluster.chinacloudapp.cn:22 stop helloworld.service\n    fleetctl --tunnel coreos-cluster.chinacloudapp.cn:22 unload helloworld.service\n    \n\n\n## <a id='highavail'>示例 2：高度可用的 nginx 服务器</a>\n\n使用 CoreOS、Docker 和 **fleet** 的一个优点是很容易以高度可用的方式运行服务。在此示例中，你将部署一个由三个运行 nginx Web 服务器的相同容器组成的服务。这些容器将在群集中的三个虚拟机上运行。此示例类似于[使用 fleet 启动容器]中的示例，并使用 [nginx Docker Hub 映像]。\n\n>[AZURE.IMPORTANT]若要运行高度可用的 Web 服务器，需要在虚拟机（公共端口 80、专用端口 80）上配置负载平衡 HTTP 终结点。你可以在创建 CoreOS 群集后，使用 Azure 门户或 **azure vm endpoint** 命令执行此操作。有关详细信息，请参阅[配置负载平衡集]。\n\n在客户端计算机上，使用你最喜欢的文本编辑器创建名为 nginx@.service 的 **systemd** 模板单元文件。你将使用这个简单的模板来启动名为 nginx@1.service、nginx@2.service 和 nginx@3.service 的三个单独实例：\n\n    \n    [Unit]\n    Description=High Availability Nginx\n    After=docker.service\n    Requires=docker.service\n    \n    [Service]\n    TimeoutStartSec=0\n    ExecStartPre=/usr/bin/docker pull nginx\n    ExecStart=/usr/bin/docker run --rm --name nginx1 -p 80:80 nginx\n    ExecStop=/usr/bin/docker stop nginx1\n    \n    [X-Fleet]\n    X-Conflicts=nginx@*.service\n    \n\n>[AZURE.NOTE]`X-Conflicts` 属性告知 CoreOS 只有此容器的一个实例可以在给定的 CoreOS 主机上运行。有关详细信息，请参阅[单元文件]。\n\n现在启动 CoreOS 群集中的单元实例。你应看到这三个实例在三个不同的计算机上运行：\n\n    \n    fleetctl --tunnel coreos-cluster.chinacloudapp.cn:22 start nginx@{1,2,3}.service\n    \n    unit nginx@3.service launched on 00c927e4.../100.79.62.16\n    unit nginx@1.service launched on 62f0f66e.../100.79.86.62\n    unit nginx@2.service launched on df85f2d1.../100.78.126.15\n    \n    \n若要访问运行其中一个单元的 Web 服务器，请向托管 CoreOS 群集的云服务发送一个简单请求。\n\n`curl http://coreos-cluster.chinacloudapp.cn`\n\n你将看到从 nginx 服务器返回的默认文本类似于：\n\n    \n        <!DOCTYPE html>\n        <html>\n        <head>\n        <title>Welcome to nginx!</title>\n        <style>\n            body {\n                width: 35em;\n                margin: 0 auto;\n                font-family: Tahoma, Verdana, Arial, sans-serif;\n            }\n        </style>\n        </head>\n        <body>\n        <h1>Welcome to nginx!</h1>\n        <p>If you see this page, the nginx web server is successfully installed and working. Further configuration is required.</p>\n        \n        <p>For online documentation and support please refer to\n        <a href=\"http://nginx.org/\">nginx.org</a>.<br/>\n        Commercial support is available at\n        <a href=\"http://nginx.com/\">nginx.com</a>.</p>\n        \n        <p><em>Thank you for using nginx.</em></p>\n        </body>\n        </html>\n    \n\n你可以尝试关闭群集中的一个或多个虚拟机，以验证 Web 服务是否继续运行。\n\n完成后，请停止并卸载单元。\n\n    \n    fleetctl --tunnel coreos-cluster.chinacloudapp.cn:22 stop nginx@{1,2,3}.service\n    fleetctl --tunnel coreos-cluster.chinacloudapp.cn:22 unload nginx@{1,2,3}.service\n    \n    \n\n## 后续步骤\n\n* 你可以尝试使用 Azure 上的三节点 CoreOS 群集执行更多操作。通过阅读 [Tim Park 的 CoreOS 教程]、[Patrick Chanezon 的 CoreOS 教程]、[Docker] 文档和 [CoreOS 概述]，探索如何创建更复杂的群集、使用 Docker 和创建更有趣的应用程序。\n\n\n* 请参阅 [Azure 上的 Linux 和开源计算]，了解有关在 Azure 中的 Linux VM 上使用开源环境的详细信息。\n\n<!--Link references-->\n[Azure Command-Line Interface (Azure)]: /documentation/articles/xplat-cli-install\n[CoreOS]: https://coreos.com/\n[CoreOS 概述]: https://coreos.com/using-coreos/\n[CoreOS with Azure]: https://coreos.com/docs/running-coreos/cloud-providers/azure/\n[Tim Park 的 CoreOS 教程]: https://github.com/timfpark/coreos-azure\n[Patrick Chanezon 的 CoreOS 教程]: https://github.com/chanezon/azure-linux/tree/master/coreos/cloud-init\n[Docker]: http://docker.io\n[YAML]: http://yaml.org/\n[如何在 Azure 上使用 CoreOS]: /documentation/articles/virtual-machines-linux-coreos-how-to\n[配置负载平衡集]: https://msdn.microsoft.com/zh-CN/library/azure/dn655055.aspx\n[使用 fleet 启动容器]: https://coreos.com/docs/launching-containers/launching/launching-containers-fleet/\n[单元文件]: https://coreos.com/docs/launching-containers/launching/fleet-unit-files/\n[busybox Docker Hub 映像]: https://registry.hub.docker.com/_/busybox/\n[nginx Docker Hub 映像]: https://hub.docker.com/_/nginx/\n[Azure 上的 Linux 和开源计算]: /documentation/articles/virtual-machines-linux-opensource\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

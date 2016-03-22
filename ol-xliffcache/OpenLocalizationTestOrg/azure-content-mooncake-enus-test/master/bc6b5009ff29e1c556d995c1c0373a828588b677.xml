@@ -1,0 +1,1370 @@
+{
+  "nodes": [
+    {
+      "content": "如何使用 Azure 计划程序生成复杂的计划和高级循环",
+      "pos": [
+        25,
+        52
+      ]
+    },
+    {
+      "content": "如何使用 Azure 计划程序生成复杂的计划和高级循环",
+      "pos": [
+        261,
+        288
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        295,
+        297
+      ]
+    },
+    {
+      "pos": [
+        299,
+        340
+      ],
+      "content": "Azure 计划程序作业的核心是<bpt id=\"p1\">*</bpt>计划<ept id=\"p1\">*</ept>。计划确定了计划程序何时以及如何执行作业。"
+    },
+    {
+      "pos": [
+        342,
+        433
+      ],
+      "content": "Azure 计划程序允许你为作业指定不同的一次性计划和重复性计划。<bpt id=\"p1\">*</bpt>一次性<ept id=\"p1\">*</ept>计划在指定的时间触发一次 - 实际上，它们是只执行一次的<bpt id=\"p2\">*</bpt>重复性<ept id=\"p2\">*</ept>计划。重复性计划根据预先确定的频率触发。"
+    },
+    {
+      "content": "由于具有这种灵活性，Azure 计划程序可让你支持各种业务方案：",
+      "pos": [
+        435,
+        467
+      ]
+    },
+    {
+      "content": "周期性数据清理 – 例如，每日删除 3 个月以前的所有推文",
+      "pos": [
+        473,
+        502
+      ]
+    },
+    {
+      "content": "存档 – 例如，每月向备份服务推送发票历史记录",
+      "pos": [
+        507,
+        530
+      ]
+    },
+    {
+      "content": "请求外部数据 – 例如，每隔 15 分钟从 NOAA 提取新的滑雪天气报告",
+      "pos": [
+        535,
+        572
+      ]
+    },
+    {
+      "content": "图像处理 – 例如，在每个工作日的非高峰时间，使用云计算来压缩当天上载的图像",
+      "pos": [
+        577,
+        615
+      ]
+    },
+    {
+      "pos": [
+        618,
+        855
+      ],
+      "content": "在本文中，我们将会演练你可以使用 Azure 计划程序创建的示例作业。我们将提供用于描述每个计划的 JSON 数据。如果你熟悉<bpt id=\"p1\">[</bpt>计划程序 REST API<ept id=\"p1\">](https://msdn.microsoft.com/zh-CN/library/azure/dn528946.aspx)</ept>，可以使用与此相同的 JSON 来<bpt id=\"p2\">[</bpt>创建 Azure 计划程序作业<ept id=\"p2\">](https://msdn.microsoft.com/zh-CN/library/azure/dn528937.aspx)</ept>。"
+    },
+    {
+      "content": "支持的方案",
+      "pos": [
+        860,
+        865
+      ]
+    },
+    {
+      "content": "本主题中的许多示例演示了 Azure 计划程序支持的各种方案。从广义上讲，这些示例演示了如何为多种行为模式创建计划，这些行为模式包括：",
+      "pos": [
+        867,
+        934
+      ]
+    },
+    {
+      "content": "在特定的日期和时间运行一次",
+      "pos": [
+        940,
+        953
+      ]
+    },
+    {
+      "content": "运行并重复明确的次数",
+      "pos": [
+        958,
+        968
+      ]
+    },
+    {
+      "content": "立即运行，然后重复",
+      "pos": [
+        973,
+        982
+      ]
+    },
+    {
+      "pos": [
+        988,
+        1019
+      ],
+      "content": "运行并每隔 <bpt id=\"p1\">*</bpt>n<ept id=\"p1\">*</ept> 分钟、小时、天、周、月在特定的时间开始重复"
+    },
+    {
+      "content": "运行并根据每周或每月的频率重复，不过，只会在特定的日期、特定的星期或特定的月份日次重复",
+      "pos": [
+        1024,
+        1067
+      ]
+    },
+    {
+      "content": "运行并在某个时间段中的多个时间重复 - 例如，每月的最后一个星期五和星期一，或者每天的 5:15AM 和 5:15PM",
+      "pos": [
+        1072,
+        1131
+      ]
+    },
+    {
+      "content": "日期和日期时间",
+      "pos": [
+        1136,
+        1143
+      ]
+    },
+    {
+      "pos": [
+        1145,
+        1223
+      ],
+      "content": "Azure 计划程序作业中的日期遵循 <bpt id=\"p1\">[</bpt>ISO-8601 规范<ept id=\"p1\">](http://en.wikipedia.org/wiki/ISO_8601)</ept>并只包括日期。"
+    },
+    {
+      "pos": [
+        1225,
+        1335
+      ],
+      "content": "Azure 计划程序作业中的日期时间引用遵循 <bpt id=\"p1\">[</bpt>ISO-8601 规范<ept id=\"p1\">](http://zh.wikipedia.org/wiki/ISO_8601)</ept>并包括日期和时间部分。未指定 UTC 偏差的日期时间将假定为 UTC。"
+    },
+    {
+      "content": "如何：使用 JSON 和 REST API 来创建计划",
+      "pos": [
+        1342,
+        1369
+      ]
+    },
+    {
+      "pos": [
+        1371,
+        1674
+      ],
+      "content": "若要使用本文中的 JSON 示例和 Azure 计划程序 REST API 创建简单的计划，请<bpt id=\"p1\">[</bpt>先创建一个云服务<ept id=\"p1\">](https://msdn.microsoft.com/zh-CN/library/azure/dn528943.aspx)</ept>，<bpt id=\"p2\">[</bpt>然后创建一个作业集合<ept id=\"p2\">](https://msdn.microsoft.com/zh-CN/library/azure/dn528940.aspx)</ept>，<bpt id=\"p3\">[</bpt>最后创建一个作业<ept id=\"p3\">](https://msdn.microsoft.com/zh-CN/library/azure/dn528937.aspx)</ept>。在创建作业时，可以使用类似于以下摘录内容的 JSON 指定计划和循环："
+    },
+    {
+      "content": "概述：作业架构基础知识",
+      "pos": [
+        2427,
+        2438
+      ]
+    },
+    {
+      "content": "下表提供了与作业中的循环和计划相关的主要元素的高级概述：",
+      "pos": [
+        2440,
+        2468
+      ]
+    },
+    {
+      "content": "JSON 名称",
+      "pos": [
+        2473,
+        2480
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        2485,
+        2487
+      ]
+    },
+    {
+      "content": "startTime",
+      "pos": [
+        2505,
+        2514
+      ]
+    },
+    {
+      "pos": [
+        2518,
+        2595
+      ],
+      "content": "<bpt id=\"p1\">_</bpt>startTime<ept id=\"p1\">_</ept> 是日期时间。对于简单的计划，<bpt id=\"p2\">_</bpt>startTime<ept id=\"p2\">_</ept> 是第一次循环；对于复杂的计划，一旦达到 <bpt id=\"p3\">_</bpt>startTime<ept id=\"p3\">_</ept>，作业就会启动。"
+    },
+    {
+      "content": "recurrence",
+      "pos": [
+        2601,
+        2611
+      ]
+    },
+    {
+      "pos": [
+        2615,
+        2781
+      ],
+      "content": "<bpt id=\"p1\">_</bpt>recurrence<ept id=\"p1\">_</ept> 对象指定作业的循环规则，以及执行作业时遵循的循环计划。recurrence 对象支持元素 <bpt id=\"p2\">_</bpt>frequency、interval、endTime、count<ept id=\"p2\">_</ept> 和 <bpt id=\"p3\">_</bpt>schedule<ept id=\"p3\">_</ept>。如果定义了 <bpt id=\"p4\">_</bpt>recurrence<ept id=\"p4\">_</ept>，则必须定义 <bpt id=\"p5\">_</bpt>frequency<ept id=\"p5\">_</ept>；<bpt id=\"p6\">_</bpt>recurrence<ept id=\"p6\">_</ept> 的其他元素是可选的。"
+    },
+    {
+      "content": "frequency",
+      "pos": [
+        2787,
+        2796
+      ]
+    },
+    {
+      "pos": [
+        2800,
+        2872
+      ],
+      "content": "<bpt id=\"p1\">_</bpt>frequency<ept id=\"p1\">_</ept> 表示重复作业的频率单位的频率字符串。支持的值为“minute”、“hour”、“day”、“week”或“month”。"
+    },
+    {
+      "content": "interval",
+      "pos": [
+        2878,
+        2886
+      ]
+    },
+    {
+      "pos": [
+        2890,
+        3088
+      ],
+      "content": "<bpt id=\"p1\">_</bpt>interval<ept id=\"p1\">_</ept> 是一个正整数，表示确定作业运行<bpt id=\"p2\">_</bpt>频率<ept id=\"p2\">_</ept>的间隔。例如，如果 <bpt id=\"p3\">_</bpt>interval<ept id=\"p3\">_</ept> 为 3，<bpt id=\"p4\">_</bpt>frequency<ept id=\"p4\">_</ept> 为“week”，则作业每隔 3 周重复一次。对于每月频率，Azure 计划程序支持最长 18 个月的<bpt id=\"p5\">_</bpt>间隔<ept id=\"p5\">_</ept>；对于每周频率，支持最长 78 周；对于每日频率，最长支持 548 天。对于小时和分钟频率，支持的范围为 1 &lt;= <bpt id=\"p6\">_</bpt>interval<ept id=\"p6\">_</ept> &lt;= 1000。"
+    },
+    {
+      "content": "endTime",
+      "pos": [
+        3094,
+        3101
+      ]
+    },
+    {
+      "pos": [
+        3105,
+        3233
+      ],
+      "content": "<bpt id=\"p1\">_</bpt>endTime<ept id=\"p1\">_</ept> 字符串指定一个日期时间，如果超过此日期时间，则不应执行作业。发生在过去的 <bpt id=\"p2\">_</bpt>endTime<ept id=\"p2\">_</ept> 是无效的。如果未指定 <bpt id=\"p3\">_</bpt>endTime<ept id=\"p3\">_</ept> 或 count，作业将无限期运行。不能为同一个作业同时指定 <bpt id=\"p4\">_</bpt>endTime<ept id=\"p4\">_</ept> 和 <bpt id=\"p5\">_</bpt>count<ept id=\"p5\">_</ept>。"
+    },
+    {
+      "content": "count",
+      "pos": [
+        3239,
+        3244
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">_</bpt>count<ept id=\"p1\">_</ept> 是一个正整数（大于零），指定此作业在完成之前应运行的次数。",
+      "pos": [
+        3251,
+        3288
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">_</bpt>count<ept id=\"p1\">_</ept> 表示作业在被确定为已完成之前要运行的次数。例如，对于 <bpt id=\"p2\">_</bpt>count<ept id=\"p2\">_</ept> 为 5 并且开始日期为星期一的每日执行的作业，该作业将在星期五执行后完成。如果开始时间发生在过去，则基于创建时间计算第一次执行时间。",
+      "pos": [
+        3295,
+        3404
+      ]
+    },
+    {
+      "content": "如果未指定 <bpt id=\"p1\">_</bpt>endTime<ept id=\"p1\">_</ept> 或 <bpt id=\"p2\">_</bpt>count<ept id=\"p2\">_</ept>，作业将无限期运行。不能为同一个作业同时指定 <bpt id=\"p3\">_</bpt>endTime<ept id=\"p3\">_</ept> 和 <bpt id=\"p4\">_</bpt>count<ept id=\"p4\">_</ept>。",
+      "pos": [
+        3411,
+        3479
+      ]
+    },
+    {
+      "content": "schedule",
+      "pos": [
+        3489,
+        3497
+      ]
+    },
+    {
+      "pos": [
+        3501,
+        3557
+      ],
+      "content": "指定了频率的作业将根据循环执行更改其循环。<bpt id=\"p1\">_</bpt>schedule<ept id=\"p1\">_</ept> 包含基于分钟、小时、星期、月份日次和周次的修改。"
+    },
+    {
+      "content": "概述：作业架构默认值、限制和示例",
+      "pos": [
+        3563,
+        3579
+      ]
+    },
+    {
+      "content": "在了解概述后，让我们详细讨论其中的每个元素。",
+      "pos": [
+        3581,
+        3603
+      ]
+    },
+    {
+      "content": "JSON 名称",
+      "pos": [
+        3608,
+        3615
+      ]
+    },
+    {
+      "content": "值类型",
+      "pos": [
+        3620,
+        3623
+      ]
+    },
+    {
+      "content": "必需？",
+      "pos": [
+        3628,
+        3631
+      ]
+    },
+    {
+      "content": "默认值",
+      "pos": [
+        3636,
+        3639
+      ]
+    },
+    {
+      "content": "有效值",
+      "pos": [
+        3644,
+        3647
+      ]
+    },
+    {
+      "content": "示例",
+      "pos": [
+        3652,
+        3654
+      ]
+    },
+    {
+      "content": "startTime",
+      "pos": [
+        3694,
+        3703
+      ]
+    },
+    {
+      "content": "字符串",
+      "pos": [
+        3707,
+        3710
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        3711,
+        3712
+      ]
+    },
+    {
+      "content": "无",
+      "pos": [
+        3713,
+        3714
+      ]
+    },
+    {
+      "content": "ISO-8601 日期时间",
+      "pos": [
+        3715,
+        3728
+      ]
+    },
+    {
+      "content": "recurrence",
+      "pos": [
+        3788,
+        3798
+      ]
+    },
+    {
+      "content": "对象",
+      "pos": [
+        3802,
+        3804
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        3805,
+        3806
+      ]
+    },
+    {
+      "content": "无",
+      "pos": [
+        3807,
+        3808
+      ]
+    },
+    {
+      "content": "Recurrence 对象",
+      "pos": [
+        3809,
+        3822
+      ]
+    },
+    {
+      "content": "frequency",
+      "pos": [
+        3900,
+        3909
+      ]
+    },
+    {
+      "content": "字符串",
+      "pos": [
+        3913,
+        3916
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        3917,
+        3918
+      ]
+    },
+    {
+      "content": "无",
+      "pos": [
+        3919,
+        3920
+      ]
+    },
+    {
+      "content": "\"minute\"、\"hour\"、\"day\"、\"week\"、\"month\"",
+      "pos": [
+        3921,
+        3957
+      ]
+    },
+    {
+      "content": "interval",
+      "pos": [
+        3997,
+        4005
+      ]
+    },
+    {
+      "content": "数字",
+      "pos": [
+        4009,
+        4011
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        4012,
+        4013
+      ]
+    },
+    {
+      "content": "1",
+      "pos": [
+        4014,
+        4015
+      ]
+    },
+    {
+      "content": "1 到 1000。",
+      "pos": [
+        4016,
+        4025
+      ]
+    },
+    {
+      "content": "endTime",
+      "pos": [
+        4058,
+        4065
+      ]
+    },
+    {
+      "content": "字符串",
+      "pos": [
+        4069,
+        4072
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        4073,
+        4074
+      ]
+    },
+    {
+      "content": "无",
+      "pos": [
+        4075,
+        4076
+      ]
+    },
+    {
+      "content": "代表将来某个时间的日期时间值",
+      "pos": [
+        4077,
+        4091
+      ]
+    },
+    {
+      "content": "count",
+      "pos": [
+        4150,
+        4155
+      ]
+    },
+    {
+      "content": "数字",
+      "pos": [
+        4159,
+        4161
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        4162,
+        4163
+      ]
+    },
+    {
+      "content": "无",
+      "pos": [
+        4164,
+        4165
+      ]
+    },
+    {
+      "content": "&gt;= 1",
+      "pos": [
+        4166,
+        4170
+      ]
+    },
+    {
+      "content": "schedule",
+      "pos": [
+        4200,
+        4208
+      ]
+    },
+    {
+      "content": "对象",
+      "pos": [
+        4212,
+        4214
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        4215,
+        4216
+      ]
+    },
+    {
+      "content": "无",
+      "pos": [
+        4217,
+        4218
+      ]
+    },
+    {
+      "content": "Schedule 对象",
+      "pos": [
+        4219,
+        4230
+      ]
+    },
+    {
+      "pos": [
+        4299,
+        4315
+      ],
+      "content": "深入探讨：<bpt id=\"p1\">_</bpt>startTime<ept id=\"p1\">_</ept>"
+    },
+    {
+      "pos": [
+        4317,
+        4347
+      ],
+      "content": "下表说明了 <bpt id=\"p1\">_</bpt>startTime<ept id=\"p1\">_</ept> 如何控制作业的运行方式。"
+    },
+    {
+      "content": "startTime 值",
+      "pos": [
+        4352,
+        4363
+      ]
+    },
+    {
+      "content": "无循环",
+      "pos": [
+        4368,
+        4371
+      ]
+    },
+    {
+      "content": "循环。无计划",
+      "pos": [
+        4376,
+        4382
+      ]
+    },
+    {
+      "content": "按计划循环",
+      "pos": [
+        4387,
+        4392
+      ]
+    },
+    {
+      "content": "无开始时间",
+      "pos": [
+        4417,
+        4422
+      ]
+    },
+    {
+      "content": "立即运行一次",
+      "pos": [
+        4425,
+        4431
+      ]
+    },
+    {
+      "content": "立即运行一次。在从上次执行时间进行计算后运行后续执行",
+      "pos": [
+        4432,
+        4458
+      ]
+    },
+    {
+      "content": "立即运行一次",
+      "pos": [
+        4462,
+        4468
+      ]
+    },
+    {
+      "content": "根据循环计划运行后续执行",
+      "pos": [
+        4475,
+        4487
+      ]
+    },
+    {
+      "content": "开始时间在过去",
+      "pos": [
+        4496,
+        4503
+      ]
+    },
+    {
+      "content": "立即运行一次",
+      "pos": [
+        4506,
+        4512
+      ]
+    },
+    {
+      "content": "计算开始时间后的第一个将来执行时间，并在该时间运行",
+      "pos": [
+        4516,
+        4541
+      ]
+    },
+    {
+      "content": "在从上次执行时间进行计算后运行后续执行",
+      "pos": [
+        4548,
+        4567
+      ]
+    },
+    {
+      "content": "有关进一步说明，请参阅此表后面的示例",
+      "pos": [
+        4574,
+        4592
+      ]
+    },
+    {
+      "content": "一旦达到指定的开始时间，作业就会<bpt id=\"p1\">_</bpt>立即<ept id=\"p1\">_</ept>启动。第一次循环基于从开始时间计算的计划",
+      "pos": [
+        4600,
+        4640
+      ]
+    },
+    {
+      "content": "根据循环计划运行后续执行",
+      "pos": [
+        4647,
+        4659
+      ]
+    },
+    {
+      "content": "开始时间在将来或当前",
+      "pos": [
+        4668,
+        4678
+      ]
+    },
+    {
+      "content": "在指定的开始时间运行一次",
+      "pos": [
+        4681,
+        4693
+      ]
+    },
+    {
+      "content": "在指定的开始时间运行一次",
+      "pos": [
+        4697,
+        4709
+      ]
+    },
+    {
+      "content": "在从上次执行时间进行计算后运行后续执行",
+      "pos": [
+        4716,
+        4735
+      ]
+    },
+    {
+      "content": "一旦达到指定的开始时间，作业就会<bpt id=\"p1\">_</bpt>立即<ept id=\"p1\">_</ept>启动。第一次循环基于从开始时间计算的计划",
+      "pos": [
+        4743,
+        4783
+      ]
+    },
+    {
+      "content": "根据循环计划运行后续执行",
+      "pos": [
+        4790,
+        4802
+      ]
+    },
+    {
+      "pos": [
+        4809,
+        5026
+      ],
+      "content": "让我们查看 <bpt id=\"p1\">_</bpt>startTime<ept id=\"p1\">_</ept> 在过去，并且指定了 <bpt id=\"p2\">_</bpt>recurrence<ept id=\"p2\">_</ept> 但未指定 <bpt id=\"p3\">_</bpt>schedule<ept id=\"p3\">_</ept> 的情况下会发生的情况示例。假设当前时间为 2015-04-08 13:00，<bpt id=\"p4\">_</bpt>startTime<ept id=\"p4\">_</ept> 为 2015-04-07 14:00，<bpt id=\"p5\">_</bpt>recurrence<ept id=\"p5\">_</ept> 为每隔 2 天（定义方式为 <bpt id=\"p6\">_</bpt>frequency<ept id=\"p6\">_</ept>: day，<bpt id=\"p7\">_</bpt>interval<ept id=\"p7\">_</ept>: 2）。 请注意， <bpt id=\"p8\">_</bpt>startTime<ept id=\"p8\">_</ept> 在过去，即发生在当前时间以前"
+    },
+    {
+      "pos": [
+        5028,
+        5189
+      ],
+      "content": "在这种情况下，<bpt id=\"p1\">_</bpt>第一次执行<ept id=\"p1\">_</ept>将发生在 2015-04-09 14:00。计划程序引擎将从开始时间计算执行循环。过去的所有实例将被丢弃。引擎将使用将来发生的下一个实例。在本例中，<bpt id=\"p2\">_</bpt>startTime<ept id=\"p2\">_</ept> 为 2015-04-07 2:00pm，因此，下一个实例为从该时间算起的 2 天，即 2015-04-09 2:00pm。"
+    },
+    {
+      "content": "请注意，不管 startTime 是 2015-04-05 14:00 还是 2015-04-01 14:00，第一次执行时间都是相同的。在第一次执行后，将使用计划循环计算后续执行 - 依次为 2015-04-11 2:00pm、2015-04-13 2:00pm 和 2015-04-15 2:00pm，等等。",
+      "pos": [
+        5191,
+        5347
+      ]
+    },
+    {
+      "content": "最后，如果为作业指定了计划，但未在计划中设置小时和/或分钟，则小时和分钟分别默认为第一次执行的小时和/或分钟。",
+      "pos": [
+        5349,
+        5404
+      ]
+    },
+    {
+      "pos": [
+        5409,
+        5424
+      ],
+      "content": "深入探讨：<bpt id=\"p1\">_</bpt>schedule<ept id=\"p1\">_</ept>"
+    },
+    {
+      "pos": [
+        5426,
+        5527
+      ],
+      "content": "在一方面，<bpt id=\"p1\">_</bpt>schedule<ept id=\"p1\">_</ept> 可以<bpt id=\"p2\">_</bpt>限制<ept id=\"p2\">_</ept>作业执行的次数。例如，如果定义了 \"month\" 频率的作业遵循的<bpt id=\"p3\">_</bpt>计划<ept id=\"p3\">_</ept>只会在 31 号运行，则该作业只会在包含 31号 的月份运行<ph id=\"ph1\">&lt;sup&gt;</ph><ph id=\"ph2\">&lt;/sup&gt;</ph>。"
+    },
+    {
+      "pos": [
+        5529,
+        5658
+      ],
+      "content": "另一方面，<bpt id=\"p1\">_</bpt>schedule<ept id=\"p1\">_</ept> 还可以<bpt id=\"p2\">_</bpt>增加<ept id=\"p2\">_</ept>作业执行的次数。例如，如果定义了 \"month\" 频率的作业遵循的<bpt id=\"p3\">_</bpt>计划<ept id=\"p3\">_</ept>在 1 号和 2 号运行，则该作业将在每月的 1 号 和 2号 运行，而不只是在每月运行一次<ph id=\"ph1\">&lt;sup&gt;</ph><ph id=\"ph2\">&lt;/sup&gt;</ph><ph id=\"ph3\">&lt;sup&gt;</ph><ph id=\"ph4\">&lt;/sup&gt;</ph>。"
+    },
+    {
+      "content": "如果指定了多个计划元素，则求值顺序为大到小 – 周次、月份日次、星期、小时和分钟。",
+      "pos": [
+        5660,
+        5701
+      ]
+    },
+    {
+      "pos": [
+        5703,
+        5725
+      ],
+      "content": "下表详细描述了 <bpt id=\"p1\">_</bpt>schedule<ept id=\"p1\">_</ept> 元素。"
+    },
+    {
+      "content": "JSON 名称",
+      "pos": [
+        5730,
+        5737
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        5742,
+        5744
+      ]
+    },
+    {
+      "content": "有效值",
+      "pos": [
+        5749,
+        5752
+      ]
+    },
+    {
+      "content": "minutes",
+      "pos": [
+        5776,
+        5783
+      ]
+    },
+    {
+      "content": "运行作业的小时中的分钟",
+      "pos": [
+        5786,
+        5797
+      ]
+    },
+    {
+      "content": "整数，或",
+      "pos": [
+        5806,
+        5810
+      ]
+    },
+    {
+      "content": "整数数组",
+      "pos": [
+        5819,
+        5823
+      ]
+    },
+    {
+      "content": "hours",
+      "pos": [
+        5838,
+        5843
+      ]
+    },
+    {
+      "content": "运行作业的日期中的小时",
+      "pos": [
+        5846,
+        5857
+      ]
+    },
+    {
+      "content": "整数，或",
+      "pos": [
+        5866,
+        5870
+      ]
+    },
+    {
+      "content": "整数数组",
+      "pos": [
+        5879,
+        5883
+      ]
+    },
+    {
+      "content": "weekDays",
+      "pos": [
+        5898,
+        5906
+      ]
+    },
+    {
+      "content": "运行作业的星期日期。只能配合每周频率指定。",
+      "pos": [
+        5909,
+        5930
+      ]
+    },
+    {
+      "content": "\"Monday\"、\"Tuesday\"、\"Wednesday\"、\"Thursday\"、\"Friday\"、\"Saturday\" 或 \"Sunday\"",
+      "pos": [
+        5939,
+        6011
+      ]
+    },
+    {
+      "content": "上述任意值的数组（最大数组大小为 7）",
+      "pos": [
+        6020,
+        6039
+      ]
+    },
+    {
+      "content": "不区分大小写",
+      "pos": [
+        6049,
+        6055
+      ]
+    },
+    {
+      "content": "monthlyOccurrences",
+      "pos": [
+        6060,
+        6078
+      ]
+    },
+    {
+      "content": "确定运行作业的月份日期。只能配合每月频率指定。",
+      "pos": [
+        6081,
+        6104
+      ]
+    },
+    {
+      "content": "MonthlyOccurence 对象的数组：",
+      "pos": [
+        6113,
+        6136
+      ]
+    },
+    {
+      "content": "{ \"day\": <bpt id=\"p1\">_</bpt>day<ept id=\"p1\">_</ept>,",
+      "pos": [
+        6152,
+        6167
+      ]
+    },
+    {
+      "content": "\"occurrence\": <bpt id=\"p1\">_</bpt>occurence<ept id=\"p1\">_</ept>",
+      "pos": [
+        6174,
+        6199
+      ]
+    },
+    {
+      "content": "}",
+      "pos": [
+        6205,
+        6206
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">_</bpt>day<ept id=\"p1\">_</ept> 是运行作业的星期日期，例如，{Sunday} 表示月份中的每个星期日。必需。",
+      "pos": [
+        6216,
+        6260
+      ]
+    },
+    {
+      "content": "occurrence 是月份中<bpt id=\"p1\">_</bpt>重复的日期<ept id=\"p1\">_</ept>，例如 {Sunday-1} 表示月份中的最后一个星期日。可选。",
+      "pos": [
+        6267,
+        6321
+      ]
+    },
+    {
+      "content": "monthDays",
+      "pos": [
+        6330,
+        6339
+      ]
+    },
+    {
+      "content": "运行作业的月份日期。只能配合每月频率指定。",
+      "pos": [
+        6342,
+        6363
+      ]
+    },
+    {
+      "content": "&lt;= -1 且 &gt;= -31 的任何值",
+      "pos": [
+        6372,
+        6391
+      ]
+    },
+    {
+      "content": "&gt;= 1 且 &lt;= 31 的任何值。",
+      "pos": [
+        6400,
+        6418
+      ]
+    },
+    {
+      "content": "上述值的数组",
+      "pos": [
+        6427,
+        6433
+      ]
+    },
+    {
+      "content": "示例：循环计划",
+      "pos": [
+        6449,
+        6456
+      ]
+    },
+    {
+      "content": "以下是循环计划的不同示例 – 着重于计划对象及其子元素。",
+      "pos": [
+        6458,
+        6486
+      ]
+    },
+    {
+      "pos": [
+        6488,
+        6595
+      ],
+      "content": "以下计划全都假设 <bpt id=\"p1\">_</bpt>interval<ept id=\"p1\">_</ept> 设置为 1。此外，用户必须假设正确的频率符合 <bpt id=\"p2\">_</bpt>schedule<ept id=\"p2\">_</ept> - 例如，不能使用频率 \"day\"，并且计划中不能包含 \"monthDays\" 限定。上面介绍了此类限制。"
+    },
+    {
+      "content": "示例",
+      "pos": [
+        6600,
+        6602
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        6607,
+        6609
+      ]
+    },
+    {
+      "content": "在每天的 5AM 运行。Azure 计划程序会将 \"hours\" 中的每个值与 \"minutes\" 中的每个值一一匹配，以创建运行作业的所有时间的列表。",
+      "pos": [
+        6653,
+        6729
+      ]
+    },
+    {
+      "content": "在每天的 5:15AM 运行",
+      "pos": [
+        6774,
+        6788
+      ]
+    },
+    {
+      "content": "在每天的 5:15 AM 和 5:15 PM 运行",
+      "pos": [
+        6836,
+        6861
+      ]
+    },
+    {
+      "content": "在每天的 5:15AM、5:45AM、5:15PM 和 5:45PM 运行",
+      "pos": [
+        6912,
+        6949
+      ]
+    },
+    {
+      "content": "每隔 15 分钟运行一次",
+      "pos": [
+        6990,
+        7002
+      ]
+    },
+    {
+      "pos": [
+        7091,
+        7363
+      ],
+      "content": "每隔一小时运行一次。此作业每隔一小时运行一次。分钟由 <bpt id=\"p1\">_</bpt>startTime<ept id=\"p1\">_</ept>（如果已指定）控制，如果未指定 startTime，则由创建时间控制。例如，如果开始时间或创建时间（以适用的为准）为 12:25 PM，则作业将在 00:25、01:25、02:25 ... 23:25 运行。该计划相当于为作业指定了<bpt id=\"p2\">_</bpt>频率<ept id=\"p2\">_</ept> \"hour\"、<bpt id=\"p3\">_</bpt>间隔<ept id=\"p3\">_</ept> 1 且无<bpt id=\"p4\">_</bpt>计划<ept id=\"p4\">_</ept>。差别在于，也可以配合不同的<bpt id=\"p5\">_</bpt>频率<ept id=\"p5\">_</ept>和<bpt id=\"p6\">_</bpt>间隔<ept id=\"p6\">_</ept>使用此计划来创建其他作业。例如，如果<bpt id=\"p7\">_</bpt>频率<ept id=\"p7\">_</ept>为 \"month\"，则该计划将每月运行一次，而不是像<bpt id=\"p8\">_</bpt>频率<ept id=\"p8\">_</ept>为 \"day\" 时那样每天运行一次"
+    },
+    {
+      "content": "每隔一小时整点运行。此作业也是每隔一小时运行一次，不过是在整点运行（例如 12AM、1AM、2AM，等等）。 这相当于作业频率为 \"hour\"，startTime 为零分钟，并且在频率为 \"day\" 时无计划。但是，如果频率为 \"week\" 或 \"month\"，则计划分别只会在一个星期日期或月份日期执行。",
+      "pos": [
+        7393,
+        7546
+      ]
+    },
+    {
+      "content": "在过去每隔一小时的第 15 分钟运行。以下作业将每隔一小时运行，从 00:15AM、1:15AM、2:15AM 等开始，在 10:15PM 和 11:15PM 结束。",
+      "pos": [
+        7579,
+        7662
+      ]
+    },
+    {
+      "content": "在每周星期六的 5PM 运行",
+      "pos": [
+        7717,
+        7731
+      ]
+    },
+    {
+      "content": "在每周星期一、星期三和星期五的 5PM 运行",
+      "pos": [
+        7804,
+        7826
+      ]
+    },
+    {
+      "content": "在每周星期一、星期三和星期五的 5:15PM 和 5:45PM 运行",
+      "pos": [
+        7918,
+        7952
+      ]
+    },
+    {
+      "content": "在每周星期一、星期三和星期五的 5AM 和 5PM 运行",
+      "pos": [
+        8028,
+        8056
+      ]
+    },
+    {
+      "content": "在每周星期一、星期三和星期五的 5:15AM、5:45AM、5:15PM 和 5:45PM 运行",
+      "pos": [
+        8150,
+        8198
+      ]
+    },
+    {
+      "content": "在工作日每隔 15 分钟运行一次",
+      "pos": [
+        8304,
+        8320
+      ]
+    },
+    {
+      "content": "在工作日 9AM 到 4:45PM 每隔 15 分钟运行一次",
+      "pos": [
+        8467,
+        8497
+      ]
+    },
+    {
+      "content": "在星期日的开始时间运行",
+      "pos": [
+        8537,
+        8548
+      ]
+    },
+    {
+      "content": "在星期二和星期四的开始时间运行",
+      "pos": [
+        8601,
+        8616
+      ]
+    },
+    {
+      "content": "在每个月 28 号的 6AM 运行（假设 frequency 为 month）",
+      "pos": [
+        8677,
+        8716
+      ]
+    },
+    {
+      "content": "在月份最后一天的 6AM 运行。如果你要在月份的最后一天运行作业，请使用 -1 而不是日期 28、29、30 或 31。",
+      "pos": [
+        8777,
+        8837
+      ]
+    },
+    {
+      "content": "在每月第一天和最后一天的 6AM 运行",
+      "pos": [
+        8900,
+        8919
+      ]
+    },
+    {
+      "content": "在每月第一天和最后一天的开始时间运行",
+      "pos": [
+        8955,
+        8973
+      ]
+    },
+    {
+      "content": "在每月第一天和第 14 天的开始时间运行",
+      "pos": [
+        9009,
+        9029
+      ]
+    },
+    {
+      "content": "在月份第二天的开始时间运行",
+      "pos": [
+        9062,
+        9075
+      ]
+    },
+    {
+      "content": "在每月第一个星期五的 5AM 运行",
+      "pos": [
+        9176,
+        9193
+      ]
+    },
+    {
+      "content": "在每月第一个星期五的开始时间运行",
+      "pos": [
+        9266,
+        9282
+      ]
+    },
+    {
+      "content": "在每月结束后第三个星期五的开始时间运行",
+      "pos": [
+        9356,
+        9375
+      ]
+    },
+    {
+      "content": "在每月第一个和最后一个星期五的 5:15AM 运行",
+      "pos": [
+        9508,
+        9533
+      ]
+    },
+    {
+      "content": "在每月第一个和最后一个星期五的开始时间运行",
+      "pos": [
+        9639,
+        9660
+      ]
+    },
+    {
+      "content": "在每月第五个星期五的开始时间运行。如果月份中没有第五个星期五，则不运行作业，因为该作业计划为只在第五个星期五运行。如果你想要在月份的最后一个星期五运行作业，可以考虑为循环使用 -1 而不是 5。",
+      "pos": [
+        9733,
+        9830
+      ]
+    },
+    {
+      "content": "在月份的最后一个星期五每隔 15 分钟运行一次",
+      "pos": [
+        9927,
+        9950
+      ]
+    },
+    {
+      "content": "在每月第三个星期三的 5:15AM、5:45AM、5:15PM 和 5:45PM 运行",
+      "pos": [
+        10059,
+        10102
+      ]
+    },
+    {
+      "content": "另请参阅",
+      "pos": [
+        10108,
+        10112
+      ]
+    },
+    {
+      "content": "计划程序是什么？",
+      "pos": [
+        10117,
+        10125
+      ]
+    },
+    {
+      "content": "计划程序的概念、术语和实体层次结构",
+      "pos": [
+        10172,
+        10189
+      ]
+    },
+    {
+      "content": "开始在管理门户中使用计划程序",
+      "pos": [
+        10245,
+        10259
+      ]
+    },
+    {
+      "content": "Azure 计划程序中的计划和计费",
+      "pos": [
+        10319,
+        10336
+      ]
+    },
+    {
+      "content": "计划程序 REST API 参考",
+      "pos": [
+        10391,
+        10407
+      ]
+    },
+    {
+      "content": "计划程序 PowerShell Cmdlet 参考",
+      "pos": [
+        10464,
+        10489
+      ]
+    },
+    {
+      "content": "计划程序的高可用性和可靠性",
+      "pos": [
+        10551,
+        10564
+      ]
+    },
+    {
+      "content": "计划程序的限制、默认值和错误代码",
+      "pos": [
+        10635,
+        10651
+      ]
+    },
+    {
+      "content": "计划程序出站身份验证",
+      "pos": [
+        10715,
+        10725
+      ]
+    }
+  ],
+  "content": "<properties \n pageTitle=\"如何使用 Azure 计划程序生成复杂的计划和高级循环\" \n description=\"\" \n services=\"scheduler\" \n documentationCenter=\".NET\" \n authors=\"krisragh\" \n manager=\"dwrede\" \n editor=\"\"/>\n<tags \n ms.service=\"scheduler\" \n ms.date=\"12/04/2015\" \n wacn.date=\"01/14/2016\"/>\n\n# 如何使用 Azure 计划程序生成复杂的计划和高级循环  \n\n## 概述\n\nAzure 计划程序作业的核心是*计划*。计划确定了计划程序何时以及如何执行作业。\n\nAzure 计划程序允许你为作业指定不同的一次性计划和重复性计划。*一次性*计划在指定的时间触发一次 - 实际上，它们是只执行一次的*重复性*计划。重复性计划根据预先确定的频率触发。\n\n由于具有这种灵活性，Azure 计划程序可让你支持各种业务方案：\n\n-   周期性数据清理 – 例如，每日删除 3 个月以前的所有推文\n-   存档 – 例如，每月向备份服务推送发票历史记录\n-   请求外部数据 – 例如，每隔 15 分钟从 NOAA 提取新的滑雪天气报告\n-   图像处理 – 例如，在每个工作日的非高峰时间，使用云计算来压缩当天上载的图像\n\n\n在本文中，我们将会演练你可以使用 Azure 计划程序创建的示例作业。我们将提供用于描述每个计划的 JSON 数据。如果你熟悉[计划程序 REST API](https://msdn.microsoft.com/zh-CN/library/azure/dn528946.aspx)，可以使用与此相同的 JSON 来[创建 Azure 计划程序作业](https://msdn.microsoft.com/zh-CN/library/azure/dn528937.aspx)。\n\n## 支持的方案\n\n本主题中的许多示例演示了 Azure 计划程序支持的各种方案。从广义上讲，这些示例演示了如何为多种行为模式创建计划，这些行为模式包括：\n\n-   在特定的日期和时间运行一次\n-   运行并重复明确的次数\n-   立即运行，然后重复 \n-   运行并每隔 *n* 分钟、小时、天、周、月在特定的时间开始重复\n-   运行并根据每周或每月的频率重复，不过，只会在特定的日期、特定的星期或特定的月份日次重复\n-   运行并在某个时间段中的多个时间重复 - 例如，每月的最后一个星期五和星期一，或者每天的 5:15AM 和 5:15PM\n\n## 日期和日期时间\n\nAzure 计划程序作业中的日期遵循 [ISO-8601 规范](http://en.wikipedia.org/wiki/ISO_8601)并只包括日期。\n\nAzure 计划程序作业中的日期时间引用遵循 [ISO-8601 规范](http://zh.wikipedia.org/wiki/ISO_8601)并包括日期和时间部分。未指定 UTC 偏差的日期时间将假定为 UTC。  \n\n## 如何：使用 JSON 和 REST API 来创建计划\n\n若要使用本文中的 JSON 示例和 Azure 计划程序 REST API 创建简单的计划，请[先创建一个云服务](https://msdn.microsoft.com/zh-CN/library/azure/dn528943.aspx)，[然后创建一个作业集合](https://msdn.microsoft.com/zh-CN/library/azure/dn528940.aspx)，[最后创建一个作业](https://msdn.microsoft.com/zh-CN/library/azure/dn528937.aspx)。在创建作业时，可以使用类似于以下摘录内容的 JSON 指定计划和循环：\n\n    {\n        \"startTime\": \"2012-08-04T00:00Z\", // optional\n         …\n        \"recurrence\":                     // optional\n        {\n            \"frequency\": \"week\",     // can be \"year\" \"month\" \"day\" \"week\" \"hour\" \"minute\"\n            \"interval\": 1,                // optional, how often to fire (default to 1)\n            \"schedule\":                   // optional (advanced scheduling specifics)\n            {\n                \"weekDays\": [\"monday\", \"wednesday\", \"friday\"],\n                \"hours\": [10, 22]                      \n            },\n            \"count\": 10,                  // optional (default to recur infinitely)\n            \"endTime\": \"2012-11-04\",      // optional (default to recur infinitely)\n        },\n        …\n    }\n    \n## 概述：作业架构基础知识\n\n下表提供了与作业中的循环和计划相关的主要元素的高级概述：\n\n|**JSON 名称**|**说明**|\n|:--|:--|\n|**_startTime_**|_startTime_ 是日期时间。对于简单的计划，_startTime_ 是第一次循环；对于复杂的计划，一旦达到 _startTime_，作业就会启动。|\n|**_recurrence_**|_recurrence_ 对象指定作业的循环规则，以及执行作业时遵循的循环计划。recurrence 对象支持元素 _frequency、interval、endTime、count_ 和 _schedule_。如果定义了 _recurrence_，则必须定义 _frequency_；_recurrence_ 的其他元素是可选的。|\n|**_frequency_**|_frequency_ 表示重复作业的频率单位的频率字符串。支持的值为“minute”、“hour”、“day”、“week”或“month”。|\n|**_interval_**|_interval_ 是一个正整数，表示确定作业运行_频率_的间隔。例如，如果 _interval_ 为 3，_frequency_ 为“week”，则作业每隔 3 周重复一次。对于每月频率，Azure 计划程序支持最长 18 个月的_间隔_；对于每周频率，支持最长 78 周；对于每日频率，最长支持 548 天。对于小时和分钟频率，支持的范围为 1 <= _interval_ <= 1000。|\n|**_endTime_**|_endTime_ 字符串指定一个日期时间，如果超过此日期时间，则不应执行作业。发生在过去的 _endTime_ 是无效的。如果未指定 _endTime_ 或 count，作业将无限期运行。不能为同一个作业同时指定 _endTime_ 和 _count_。|\n|**_count_**|<p>_count_ 是一个正整数（大于零），指定此作业在完成之前应运行的次数。</p><p>_count_ 表示作业在被确定为已完成之前要运行的次数。例如，对于 _count_ 为 5 并且开始日期为星期一的每日执行的作业，该作业将在星期五执行后完成。如果开始时间发生在过去，则基于创建时间计算第一次执行时间。</p><p>如果未指定 _endTime_ 或 _count_，作业将无限期运行。不能为同一个作业同时指定 _endTime_ 和 _count_。</p>|\n|**_schedule_**|指定了频率的作业将根据循环执行更改其循环。_schedule_ 包含基于分钟、小时、星期、月份日次和周次的修改。|\n\n## 概述：作业架构默认值、限制和示例\n\n在了解概述后，让我们详细讨论其中的每个元素。\n\n|**JSON 名称**|**值类型**|**必需？**|**默认值**|**有效值**|**示例**|\n|:---|:---|:---|:---|:---|:---|\n|**_startTime_**|字符串|否|无|ISO-8601 日期时间|<code>\"startTime\" :\"2013-01-09T09:30:00-08:00\"</code>|\n|**_recurrence_**|对象|否|无|Recurrence 对象|<code>\"recurrence\" : { \"frequency\" : \"monthly\", \"interval\" : 1 }</code>|\n|**_frequency_**|字符串|是|无|\"minute\"、\"hour\"、\"day\"、\"week\"、\"month\"|<code>\"frequency\" :\"hour\"</code> |\n|**_interval_**|数字|否|1|1 到 1000。|<code>\"interval\":10</code>|\n|**_endTime_**|字符串|否|无|代表将来某个时间的日期时间值|<code>\"endTime\" :\"2013-02-09T09:30:00-08:00\"</code> |\n|**_count_**|数字|否|无|>= 1 |<code>\"count\":5</code>|\n|**_schedule_**|对象|否|无|Schedule 对象|<code>\"schedule\" : { \"minute\" : [30], \"hour\" : [8,17] }</code>|\n\n## 深入探讨：_startTime_\n\n下表说明了 _startTime_ 如何控制作业的运行方式。\n\n|**startTime 值**|**无循环**|**循环。无计划**|**按计划循环**|\n|:--|:--|:--|:--|\n|**无开始时间**|立即运行一次|立即运行一次。在从上次执行时间进行计算后运行后续执行|<p>立即运行一次</p><p>根据循环计划运行后续执行</p>|\n|**开始时间在过去**|立即运行一次|<p>计算开始时间后的第一个将来执行时间，并在该时间运行</p><p>在从上次执行时间进行计算后运行后续执行</p><p>有关进一步说明，请参阅此表后面的示例</p>|<p>一旦达到指定的开始时间，作业就会_立即_启动。第一次循环基于从开始时间计算的计划</p><p>根据循环计划运行后续执行</p>|\n|**开始时间在将来或当前**|在指定的开始时间运行一次|<p>在指定的开始时间运行一次</p><p>在从上次执行时间进行计算后运行后续执行</p>|<p>一旦达到指定的开始时间，作业就会_立即_启动。第一次循环基于从开始时间计算的计划</p><p>根据循环计划运行后续执行</p>|\n\n让我们查看 _startTime_ 在过去，并且指定了 _recurrence_ 但未指定 _schedule_ 的情况下会发生的情况示例。假设当前时间为 2015-04-08 13:00，_startTime_ 为 2015-04-07 14:00，_recurrence_ 为每隔 2 天（定义方式为 _frequency_: day，_interval_: 2）。 请注意， _startTime_ 在过去，即发生在当前时间以前\n\n在这种情况下，_第一次执行_将发生在 2015-04-09 14:00。计划程序引擎将从开始时间计算执行循环。过去的所有实例将被丢弃。引擎将使用将来发生的下一个实例。在本例中，_startTime_ 为 2015-04-07 2:00pm，因此，下一个实例为从该时间算起的 2 天，即 2015-04-09 2:00pm。\n\n请注意，不管 startTime 是 2015-04-05 14:00 还是 2015-04-01 14:00，第一次执行时间都是相同的。在第一次执行后，将使用计划循环计算后续执行 - 依次为 2015-04-11 2:00pm、2015-04-13 2:00pm 和 2015-04-15 2:00pm，等等。\n\n最后，如果为作业指定了计划，但未在计划中设置小时和/或分钟，则小时和分钟分别默认为第一次执行的小时和/或分钟。\n\n## 深入探讨：_schedule_\n\n在一方面，_schedule_ 可以_限制_作业执行的次数。例如，如果定义了 \"month\" 频率的作业遵循的_计划_只会在 31 号运行，则该作业只会在包含 31号 的月份运行<sup></sup>。\n\n另一方面，_schedule_ 还可以_增加_作业执行的次数。例如，如果定义了 \"month\" 频率的作业遵循的_计划_在 1 号和 2 号运行，则该作业将在每月的 1 号 和 2号 运行，而不只是在每月运行一次<sup></sup><sup></sup>。\n\n如果指定了多个计划元素，则求值顺序为大到小 – 周次、月份日次、星期、小时和分钟。\n\n下表详细描述了 _schedule_ 元素。\n\n|**JSON 名称**|**说明**|**有效值**|\n|:---|:---|:---|\n|**minutes**|运行作业的小时中的分钟|<ul><li>整数，或</li><li>整数数组</li></ul>|\n|**hours**|运行作业的日期中的小时|<ul><li>整数，或</li><li>整数数组</li></ul>|\n|**weekDays**|运行作业的星期日期。只能配合每周频率指定。|<ul><li>\"Monday\"、\"Tuesday\"、\"Wednesday\"、\"Thursday\"、\"Friday\"、\"Saturday\" 或 \"Sunday\"</li><li>上述任意值的数组（最大数组大小为 7）</li></ul>不区分大小写|\n|**monthlyOccurrences**|确定运行作业的月份日期。只能配合每月频率指定。|<ul><li>MonthlyOccurence 对象的数组：</li></ul> <pre>{ \"day\": _day_,<br /> \"occurrence\": _occurence_<br />}</pre><p> _day_ 是运行作业的星期日期，例如，{Sunday} 表示月份中的每个星期日。必需。</p><p>occurrence 是月份中_重复的日期_，例如 {Sunday-1} 表示月份中的最后一个星期日。可选。</p>|\n|**monthDays**|运行作业的月份日期。只能配合每月频率指定。|<ul><li><= -1 且 >= -31 的任何值</li><li>>= 1 且 <= 31 的任何值。</li><li>上述值的数组</li></ul>|\n\n## 示例：循环计划\n\n以下是循环计划的不同示例 – 着重于计划对象及其子元素。\n\n以下计划全都假设 _interval_ 设置为 1。此外，用户必须假设正确的频率符合 _schedule_ - 例如，不能使用频率 \"day\"，并且计划中不能包含 \"monthDays\" 限定。上面介绍了此类限制。\n\n|**示例**|**说明**|\n|:---|:---|\n|<code>{\"hours\":[5]}</code>|在每天的 5AM 运行。Azure 计划程序会将 \"hours\" 中的每个值与 \"minutes\" 中的每个值一一匹配，以创建运行作业的所有时间的列表。|\n|<code>{\"minutes\":[15],\"hours\":[5]}</code>|在每天的 5:15AM 运行|\n|<code>{\"minutes\":[15],\"hours\":[5,17]}</code>|在每天的 5:15 AM 和 5:15 PM 运行|\n|<code>{\"minutes\":[15,45],\"hours\":[5,17]}</code>|在每天的 5:15AM、5:45AM、5:15PM 和 5:45PM 运行|\n|<code>{\"minutes\":[0,15,30,45]}</code>|每隔 15 分钟运行一次|\n|<code>{hours\":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]}</code>|每隔一小时运行一次。此作业每隔一小时运行一次。分钟由 _startTime_（如果已指定）控制，如果未指定 startTime，则由创建时间控制。例如，如果开始时间或创建时间（以适用的为准）为 12:25 PM，则作业将在 00:25、01:25、02:25 ... 23:25 运行。该计划相当于为作业指定了_频率_ \"hour\"、_间隔_ 1 且无_计划_。差别在于，也可以配合不同的_频率_和_间隔_使用此计划来创建其他作业。例如，如果_频率_为 \"month\"，则该计划将每月运行一次，而不是像_频率_为 \"day\" 时那样每天运行一次|\n|<code>{minutes:[0]}</code>|每隔一小时整点运行。此作业也是每隔一小时运行一次，不过是在整点运行（例如 12AM、1AM、2AM，等等）。 这相当于作业频率为 \"hour\"，startTime 为零分钟，并且在频率为 \"day\" 时无计划。但是，如果频率为 \"week\" 或 \"month\"，则计划分别只会在一个星期日期或月份日期执行。|\n|<code>{\"minutes\":[15]}</code>|在过去每隔一小时的第 15 分钟运行。以下作业将每隔一小时运行，从 00:15AM、1:15AM、2:15AM 等开始，在 10:15PM 和 11:15PM 结束。|\n|<code>{\"hours\":[17],\"weekDays\":[\"saturday\"]}</code>|在每周星期六的 5PM 运行|\n|<code>{hours\":[17],\"weekDays\":[\"monday\",\"wednesday\",\"friday\"]}</code>|在每周星期一、星期三和星期五的 5PM 运行|\n|<code>{\"minutes\":[15,45],\"hours\":[17],\"weekDays\":[\"monday\",\"wednesday\",\"friday\"]}</code>|在每周星期一、星期三和星期五的 5:15PM 和 5:45PM 运行|\n|<code>{\"hours\":[5,17],\"weekDays\":[\"monday\",\"wednesday\",\"friday\"]}</code>|在每周星期一、星期三和星期五的 5AM 和 5PM 运行|\n|<code>{\"minutes\":[15,45],\"hours\":[5,17],\"weekDays\":[\"monday\",\"wednesday\",\"friday\"]}</code>|在每周星期一、星期三和星期五的 5:15AM、5:45AM、5:15PM 和 5:45PM 运行|\n|<code>{\"minutes\":[0,15,30,45], \"weekDays\":[\"monday\",\"tuesday\",\"wednesday\",\"thursday\",\"friday\"]}</code>|在工作日每隔 15 分钟运行一次|\n|<code>{\"minutes\":[0,15,30,45], \"hours\": [9, 10, 11, 12, 13, 14, 15, 16] \"weekDays\":[\"monday\",\"tuesday\",\"wednesday\",\"thursday\",\"friday\"]}</code>|在工作日 9AM 到 4:45PM 每隔 15 分钟运行一次|\n|<code>{\"weekDays\":[\"sunday\"]}</code>|在星期日的开始时间运行|\n|<code>{\"weekDays\":[\"tuesday\", \"thursday\"]}</code>|在星期二和星期四的开始时间运行|\n|<code>{\"minutes\":[0],\"hours\":[6],\"monthDays\":[28]}</code>|在每个月 28 号的 6AM 运行（假设 frequency 为 month）|\n|<code>{\"minutes\":[0],\"hours\":[6],\"monthDays\":[-1]}</code>|在月份最后一天的 6AM 运行。如果你要在月份的最后一天运行作业，请使用 -1 而不是日期 28、29、30 或 31。|\n|<code>{\"minutes\":[0],\"hours\":[6],\"monthDays\":[1,-1]}</code>|在每月第一天和最后一天的 6AM 运行|\n|<code>{monthDays\":[1,-1]}</code>|在每月第一天和最后一天的开始时间运行|\n|<code>{monthDays\":[1,14]}</code>|在每月第一天和第 14 天的开始时间运行|\n|<code>{monthDays\":[2]}</code>|在月份第二天的开始时间运行|\n|<code>{\"minutes\":[0], \"hours\":[5], \"monthlyOccurrences\":[{\"day\":\"friday\",\"occurrence\":1}]}</code>|在每月第一个星期五的 5AM 运行|\n|<code>{\"monthlyOccurrences\":[{\"day\":\"friday\",\"occurrence\":1}]}</code>|在每月第一个星期五的开始时间运行|\n|<code>{\"monthlyOccurrences\":[{\"day\":\"friday\",\"occurrence\":-3}]}</code>|在每月结束后第三个星期五的开始时间运行|\n|<code>{\"minutes\":[15],\"hours\":[5],\"monthlyOccurrences\":[{\"day\":\"friday\",\"occurrence\":1},{\"day\":\"friday\",\"occurrence\":-1}]}</code>|在每月第一个和最后一个星期五的 5:15AM 运行|\n|<code>{\"monthlyOccurrences\":[{\"day\":\"friday\",\"occurrence\":1},{\"day\":\"friday\",\"occurrence\":-1}]}</code>|在每月第一个和最后一个星期五的开始时间运行|\n|<code>{\"monthlyOccurrences\":[{\"day\":\"friday\",\"occurrence\":5}]}</code>|在每月第五个星期五的开始时间运行。如果月份中没有第五个星期五，则不运行作业，因为该作业计划为只在第五个星期五运行。如果你想要在月份的最后一个星期五运行作业，可以考虑为循环使用 -1 而不是 5。|\n|<code>{\"minutes\":[0,15,30,45],\"monthlyOccurrences\":[{\"day\":\"friday\",\"occurrence\":-1}]}</code>|在月份的最后一个星期五每隔 15 分钟运行一次|\n|<code>{\"minutes\":[15,45],\"hours\":[5,17],\"monthlyOccurrences\":[{\"day\":\"wednesday\",\"occurrence\":3}]}</code>|在每月第三个星期三的 5:15AM、5:45AM、5:15PM 和 5:45PM 运行|\n\n## 另请参阅\n \n [计划程序是什么？](/documentation/articles/scheduler-intro)\n \n [计划程序的概念、术语和实体层次结构](/documentation/articles/scheduler-concepts-terms)\n \n [开始在管理门户中使用计划程序](/documentation/articles/scheduler-get-started-portal)\n \n [Azure 计划程序中的计划和计费](/documentation/articles/scheduler-plans-billing)\n \n [计划程序 REST API 参考](https://msdn.microsoft.com/zh-cn/library/dn528946)\n \n [计划程序 PowerShell Cmdlet 参考](/documentation/articles/scheduler-powershell-reference)\n \n [计划程序的高可用性和可靠性](/documentation/articles/scheduler-high-availability-reliability)\n \n [计划程序的限制、默认值和错误代码](/documentation/articles/scheduler-limits-defaults-errors)\n \n [计划程序出站身份验证](/documentation/articles/scheduler-outbound-authentication)\n \n  \n\n<!---HONumber=Mooncake_0104_2016-->"
+}

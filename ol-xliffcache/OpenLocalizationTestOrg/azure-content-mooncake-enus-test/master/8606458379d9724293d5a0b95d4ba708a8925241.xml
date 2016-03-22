@@ -1,0 +1,935 @@
+{
+  "nodes": [
+    {
+      "content": "为 Azure Web 应用配置自定义域名",
+      "pos": [
+        1,
+        22
+      ]
+    },
+    {
+      "content": "当创建 Web 应用时，Azure 会在 chinacloudsites.cn 域上提供一个友好子域，以便您的用户可以使用以下 URL 访问您的 Web 应用，如 http://&amp;lt;mysite&gt;.chinacloudsites.cn.",
+      "pos": [
+        24,
+        144
+      ]
+    },
+    {
+      "content": "但是，如果将 Web 应用配置为共享或标准模式，则可以将 Web 应用映射到您自己的域名。",
+      "pos": [
+        145,
+        190
+      ]
+    },
+    {
+      "pos": [
+        192,
+        346
+      ],
+      "content": "另外，您可以使用 Azure Traffic Manager 对您的 Web 应用的传入流量实现负载平衡。有关 Traffic Manager 如何作用于 Web 应用的详细信息，请参阅<bpt id=\"p1\">[</bpt>使用 Azure Traffic Manager 控制 Azure Web 应用流量<ept id=\"p1\">][trafficmanager]</ept>。"
+    },
+    {
+      "pos": [
+        350,
+        477
+      ],
+      "content": "[WACOM.NOTE] 本任务中的步骤要求您将 Web 应用配置为共享或标准模式，这可能会更改对您的订阅的计费量。有关详细信息，请参阅<ph id=\"ph1\">&lt;a href=\"/home/features/web-site/#price\"&gt;</ph> Web 应用定价详细信息<ph id=\"ph2\">&lt;/a&gt;</ph>。"
+    },
+    {
+      "content": "本文内容：",
+      "pos": [
+        479,
+        484
+      ]
+    },
+    {
+      "content": "了解 CNAME 和 A 记录",
+      "pos": [
+        491,
+        506
+      ]
+    },
+    {
+      "content": "将 Web 应用配置为共享或标准模式",
+      "pos": [
+        537,
+        555
+      ]
+    },
+    {
+      "content": "将 Web 应用添加到 Traffic Manager",
+      "pos": [
+        586,
+        613
+      ]
+    },
+    {
+      "content": "为自定义域添加 CNAME",
+      "pos": [
+        637,
+        650
+      ]
+    },
+    {
+      "content": "为自定义域添加 A 记录",
+      "pos": [
+        679,
+        691
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a name=\"understanding-records\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>了解 CNAME 和 A 记录",
+      "pos": [
+        722,
+        773
+      ]
+    },
+    {
+      "content": "CNAME（即别名记录）和 A 记录都允许您将域名与 Web 应用进行关联，但是，它们的工作方式不同。",
+      "pos": [
+        780,
+        831
+      ]
+    },
+    {
+      "content": "CNAME 或别名记录",
+      "pos": [
+        836,
+        847
+      ]
+    },
+    {
+      "pos": [
+        849,
+        1263
+      ],
+      "content": "CNAME 记录将  <bpt id=\"p1\">*</bpt>specific<ept id=\"p1\">*</ept> 域（例如 <bpt id=\"p2\">**</bpt>contoso.com<ept id=\"p2\">**</ept> 或 <bpt id=\"p3\">**</bpt>www.contoso.com<ept id=\"p3\">**</ept>）映射到规范域名。在这种情况下，规范域名是您的 Azure Web 应用的 <bpt id=\"p4\">**</bpt>&amp;lt;myapp&gt;.chinacloudsites.cn<ept id=\"p4\">**</ept> 域名或您的 Traffic Manager 配置文件的 <bpt id=\"p5\">**</bpt>&amp;lt;myapp&gt;.trafficmgr.com<ept id=\"p5\">**</ept> 域名。创建映射后，CNAME 将为 <bpt id=\"p6\">**</bpt>&amp;lt;myapp&gt;.chinacloudsites.cn<ept id=\"p6\">**</ept> 或 <bpt id=\"p7\">**</bpt>&amp;lt;myapp&gt;.trafficmgr.com<ept id=\"p7\">**</ept> 域名创建一个别名。CNAME 条目将自动解析为您的 <bpt id=\"p8\">**</bpt>&amp;lt;myapp&gt;.chinacloudsites.cn<ept id=\"p8\">**</ept> 或 <bpt id=\"p9\">**</bpt>&amp;lt;myapp&gt;.trafficmgr.com<ept id=\"p9\">**</ept> 域名的 IP 地址，因此，如果 Web 应用的 IP 地址发生更改，您不必采取任何操作。"
+    },
+    {
+      "pos": [
+        1267,
+        1533
+      ],
+      "content": "[WACOM.NOTE] 某些域注册机构只允许您在使用 CNAME 记录（例如 www.contoso.com）和非根名称（例如 contoso.com）时映射子域。有关 CNAME 记录的详细信息，请参阅由您的注册机构提供的文档、<ph id=\"ph1\">&lt;a href=\"http://en.wikipedia.org/wiki/CNAME_record\"&gt;</ph>关于 CNAME 记录的 Wikipedia 条目<ph id=\"ph2\">&lt;/a&gt;</ph>或 <ph id=\"ph3\">&lt;a href=\"http://tools.ietf.org/html/rfc1035\"&gt;</ph>IETF 域名 - 实现和规范<ph id=\"ph4\">&lt;/a&gt;</ph>文档。"
+    },
+    {
+      "content": "A 记录",
+      "pos": [
+        1538,
+        1542
+      ]
+    },
+    {
+      "pos": [
+        1544,
+        1842
+      ],
+      "content": "A 记录将域（例如 <bpt id=\"p1\">**</bpt>contoso.com<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>www.contoso.com<ept id=\"p2\">**</ept>）、 <bpt id=\"p3\">*</bpt>or a wildcard domain<ept id=\"p3\">*</ept>（例如 <bpt id=\"p4\">**</bpt>\\*.contoso.com<ept id=\"p4\">**</ept>）映射到 IP 地址。对于 Azure Web 应用而言，这是服务的虚拟 IP 或者您为 Web 应用购买的具体 IP 地址。与 CNAME 记录相比，A 记录的主要优势是您可以有一个使用通配符的条目，例如 <bpt id=\"p5\">**</bpt>\\*.contoso.com<ept id=\"p5\">**</ept>，它将处理多个子域（例如 <bpt id=\"p6\">**</bpt>mail.contoso.com<ept id=\"p6\">**</ept>、<bpt id=\"p7\">**</bpt>login.contoso.com<ept id=\"p7\">**</ept> 或 <bpt id=\"p8\">**</bpt>www.contoso.com<ept id=\"p8\">**</ept>）的请求。"
+    },
+    {
+      "content": "[WACOM.NOTE] 由于 A 记录映射到静态 IP 地址，因此它无法自动解析 Web 应用的 IP 地址的更改。用于 A 记录的 IP 地址是您为 Web 应用配置自定义域名设置时提供的；但是，如果您删除并重新创建了 Web 应用或者将 Web 应用模式改回了免费，则该值可能会更改。",
+      "pos": [
+        1846,
+        1991
+      ]
+    },
+    {
+      "pos": [
+        1995,
+        2112
+      ],
+      "content": "[WACOM.NOTE] A 记录不能用于使用 Traffic Manager 的负载平衡。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>使用 Azure Traffic Manager 控制 Azure Web 应用流量<ept id=\"p1\">][trafficmanager]</ept>。"
+    },
+    {
+      "content": "将 Web 应用配置为共享或标准模式",
+      "pos": [
+        2155,
+        2173
+      ]
+    },
+    {
+      "pos": [
+        2180,
+        2329
+      ],
+      "content": "在 Web 应用上设置自定义域名只适用于 Azure Web 应用的共享和标准模式。将 Web 应用从免费 Web 应用模式切换到共享或标准 Web 应用模式之前，必须先取消 Web 应用订阅已有的支出上限。有关共享和标准模式定价的详细信息，请参阅<bpt id=\"p1\">[</bpt>定价详细信息<ept id=\"p1\">][PricingDetails]</ept>。"
+    },
+    {
+      "pos": [
+        2334,
+        2357
+      ],
+      "content": "在浏览器中，打开<bpt id=\"p1\">[</bpt>管理门户<ept id=\"p1\">][portal]</ept>。"
+    },
+    {
+      "content": "在\" Web 应用\"选项卡中，单击您的 Web 应用的名称。",
+      "pos": [
+        2361,
+        2391
+      ]
+    },
+    {
+      "content": "单击\"规模\"选项卡。",
+      "pos": [
+        2420,
+        2430
+      ]
+    },
+    {
+      "content": "在\"常规\"部分中，通过单击\"共享\"设置 Web 应用模式。",
+      "pos": [
+        2464,
+        2493
+      ]
+    },
+    {
+      "content": "[WACOM.NOTE] 如果您将为此 Web 应用使用 Traffic Manager，则必须选择标准模式而非共享模式。",
+      "pos": [
+        2525,
+        2586
+      ]
+    },
+    {
+      "content": "单击\"保存\"。",
+      "pos": [
+        2591,
+        2598
+      ]
+    },
+    {
+      "content": "在系统提示您共享模式（如果您选择\"标准\"，则此处为标准模式）成本将增加时，如果您同意成本增加，则单击\"是\"。",
+      "pos": [
+        2602,
+        2656
+      ]
+    },
+    {
+      "pos": [
+        2693,
+        2768
+      ],
+      "content": "**注意**<br /> \n 如果收到\"为 Web 应用  'website name' 配置规模失败\"错误，则可使用详细信息按钮获得详细信息。",
+      "leadings": [
+        "",
+        "   "
+      ],
+      "nodes": [
+        {
+          "content": "注意",
+          "pos": [
+            2,
+            4
+          ]
+        },
+        {
+          "content": "如果收到\"为 Web 应用  'website name' 配置规模失败\"错误，则可使用详细信息按钮获得详细信息。",
+          "pos": [
+            15,
+            72
+          ]
+        }
+      ]
+    },
+    {
+      "content": "（可选）将您的 Web 应用添加到 Traffic Manager",
+      "pos": [
+        2804,
+        2837
+      ]
+    },
+    {
+      "content": "如果希望为 Web 应用使用 Traffic Manager，请执行下列步骤。",
+      "pos": [
+        2844,
+        2883
+      ]
+    },
+    {
+      "pos": [
+        2888,
+        3041
+      ],
+      "content": "如果还没有 Traffic Manager 配置文件，请根据<bpt id=\"p1\">[</bpt>使用\"快速创建\"创建 Traffic Manager 配置文件<ept id=\"p1\">][createprofile]</ept> 中的信息创建一个。记下与您的 Traffic Manager 配置文件关联的 <bpt id=\"p2\">**</bpt>.trafficmgr.com<ept id=\"p2\">**</ept> 域名。这将在后面的步骤中使用。"
+    },
+    {
+      "pos": [
+        3046,
+        3116
+      ],
+      "content": "根据<bpt id=\"p1\">[</bpt>添加或删除终结点<ept id=\"p1\">][addendpoint]</ept> 中的信息在 Traffic Manager 配置文件中将您的 Web 应用添加为终结点。"
+    },
+    {
+      "content": "[WACOM.NOTE] 如果在添加终结点时您的 Web 应用未列出，请验证是否已将其配置为标准模式。必须将 Web 应用配置为标准模式，Traffic Manager 才起作用。",
+      "pos": [
+        3124,
+        3214
+      ]
+    },
+    {
+      "content": "登录到您的 DNS 注册机构的 Web 应用，然后转至用于管理 DNS 的页面。查找 Web 应用中标签为\"域名\"、\"DNS\"或\"名称服务器管理\"的链接或区域。",
+      "pos": [
+        3219,
+        3299
+      ]
+    },
+    {
+      "content": "现在找到您可以在其中选择或输入 CNAME 记录的位置。您可能需要从下拉列表中选择记录类型，或者需要转到高级设置页面。应当查找\"CNAME\"、\"别名\"或\"子域\"字样。",
+      "pos": [
+        3304,
+        3387
+      ]
+    },
+    {
+      "pos": [
+        3392,
+        3463
+      ],
+      "content": "还必须为 CNAME 提供域或子域别名。例如，如果希望为 <bpt id=\"p1\">**</bpt>www.customdomain.com<ept id=\"p1\">**</ept> 创建别名，则输入 <bpt id=\"p2\">**</bpt>www<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "pos": [
+        3468,
+        3531
+      ],
+      "content": "还必须提供作为此 CNAME 别名的规范域名的主机名。这是您的 Web 应用的 <bpt id=\"p1\">**</bpt>.trafficmgr.com<ept id=\"p1\">**</ept> 名称。"
+    },
+    {
+      "pos": [
+        3533,
+        3619
+      ],
+      "content": "例如，以下 CNAME 记录会将 <bpt id=\"p1\">**</bpt>www.contoso.com<ept id=\"p1\">**</ept> 的全部流量都转发至 <bpt id=\"p2\">**</bpt>contoso.trafficmgr.com<ept id=\"p2\">**</ept>（ Web 应用的域名）："
+    },
+    {
+      "content": "别名/主机名/子域",
+      "pos": [
+        3724,
+        3733
+      ]
+    },
+    {
+      "content": "规范域",
+      "pos": [
+        3760,
+        3763
+      ]
+    },
+    {
+      "content": "www",
+      "pos": [
+        3793,
+        3796
+      ]
+    },
+    {
+      "content": "contoso.trafficmgr.com",
+      "pos": [
+        3806,
+        3828
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>www.contoso.com<ept id=\"p1\">**</ept> 的访问者将永远看不到真正的主机",
+      "pos": [
+        3850,
+        3885
+      ]
+    },
+    {
+      "content": "(contoso.azurewebsite.net)，因此，转发过程对最终用户不可见。",
+      "pos": [
+        3886,
+        3929
+      ]
+    },
+    {
+      "content": "[WACOM.NOTE] 如果您在为 Web 应用使用 Traffic Manager，则不需要执行下面的部分（\"为自定义域添加 CNAME\"和\"为自定义域添加 A 记录\"）中的步骤。在前面的步骤中创建的 CNAME 记录会将传入流量路由到 Traffic Manager，然后后者会将流量路由到 Web 应用终结点。",
+      "pos": [
+        3933,
+        4092
+      ]
+    },
+    {
+      "content": "为自定义域添加 CNAME",
+      "pos": [
+        4132,
+        4145
+      ]
+    },
+    {
+      "content": "若要创建 CNAME 记录，必须使用您的注册机构提供的工具在 DNS 表中为您的自定义域添加一个新条目。每个注册机构指定 CNAME 记录的方法类似但略有不同，但概念是相同的。",
+      "pos": [
+        4152,
+        4240
+      ]
+    },
+    {
+      "pos": [
+        4245,
+        4294
+      ],
+      "content": "使用下列方法之一查找分配给您的 Web 应用的 <bpt id=\"p1\">**</bpt>.azurewebsite.net<ept id=\"p1\">**</ept> 域名。"
+    },
+    {
+      "pos": [
+        4302,
+        4375
+      ],
+      "content": "登录到 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">][portal]</ept>，依次选择您的 Web 应用、\"仪表板\"，然后在\"速览\"部分中查找\" Web 应用 URL\"条目。"
+    },
+    {
+      "pos": [
+        4383,
+        4471
+      ],
+      "content": "安装和配置 <bpt id=\"p1\">[</bpt>Azure Powershell<ept id=\"p1\">](/documentation/articles/powershell-install-configure)</ept>，然后使用以下命令："
+    },
+    {
+      "pos": [
+        4541,
+        4608
+      ],
+      "content": "安装和配置 <bpt id=\"p1\">[</bpt>Azure 跨平台命令行接口<ept id=\"p1\">](/documentation/articles/xplat-cli)</ept>，然后使用以下命令："
+    },
+    {
+      "pos": [
+        4663,
+        4708
+      ],
+      "content": "保存此 <bpt id=\"p1\">**</bpt>.azurewebsite.net<ept id=\"p1\">**</ept> 名称，因为在下面的步骤中将使用该名称。"
+    },
+    {
+      "content": "登录到您的 DNS 注册机构的 Web 应用，然后转至用于管理 DNS 的页面。查找 Web 应用中标签为\"域名\"、\"DNS\"或\"名称服务器管理\"的链接或区域。",
+      "pos": [
+        4713,
+        4793
+      ]
+    },
+    {
+      "content": "现在找到您可以在其中选择或输入 CNAME 记录的位置。您可能需要从下拉列表中选择记录类型，或者需要转到高级设置页面。应当查找\"CNAME\"、\"别名\"或\"子域\"字样。",
+      "pos": [
+        4798,
+        4881
+      ]
+    },
+    {
+      "pos": [
+        4886,
+        4998
+      ],
+      "content": "还必须为 CNAME 提供域或子域别名。例如，如果希望为 <bpt id=\"p1\">**</bpt>www.customdomain.com<ept id=\"p1\">**</ept> 创建别名，则输入 <bpt id=\"p2\">**</bpt>www<ept id=\"p2\">**</ept>。如果希望为根域创建别名，它可能在注册机构的 DNS 工具中以符号\"@\"的形式列出。"
+    },
+    {
+      "pos": [
+        5003,
+        5068
+      ],
+      "content": "还必须提供作为此 CNAME 别名的规范域名的主机名。这是您的 Web 应用的 <bpt id=\"p1\">**</bpt>.azurewebsite.net<ept id=\"p1\">**</ept> 名称。"
+    },
+    {
+      "pos": [
+        5070,
+        5158
+      ],
+      "content": "例如，以下 CNAME 记录会将 <bpt id=\"p1\">**</bpt>www.contoso.com<ept id=\"p1\">**</ept> 的全部流量都转发至 <bpt id=\"p2\">**</bpt>contoso.azurewebsite.net<ept id=\"p2\">**</ept>（ Web 应用的域名）："
+    },
+    {
+      "content": "别名/主机名/子域",
+      "pos": [
+        5263,
+        5272
+      ]
+    },
+    {
+      "content": "规范域",
+      "pos": [
+        5299,
+        5302
+      ]
+    },
+    {
+      "content": "www",
+      "pos": [
+        5332,
+        5335
+      ]
+    },
+    {
+      "content": "contoso.azurewebsite.net",
+      "pos": [
+        5345,
+        5369
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>www.contoso.com<ept id=\"p1\">**</ept> 的访问者将永远看不到真正的主机",
+      "pos": [
+        5391,
+        5426
+      ]
+    },
+    {
+      "content": "(contoso.azurewebsite.net)，因此，转发过程对",
+      "pos": [
+        5427,
+        5462
+      ]
+    },
+    {
+      "content": "最终用户不可见。",
+      "pos": [
+        5463,
+        5471
+      ]
+    },
+    {
+      "pos": [
+        5475,
+        5661
+      ],
+      "content": "[WACOM.NOTE] 上述示例仅适用于 <bpt id=\"p1\">__</bpt>www<ept id=\"p1\">__</ept> 子域的流量。因为无法为 CNAME 记录使用通配符，所以必须为每个域/子域创建一个 CNAME。如果希望将子域（例如 *.contoso.com）的流量定向到您的 azurewebsite.net 地址，则可以在 DNS 设置中配置\"_<bpt id=\"p2\">_</bpt>URL 重定向<ept id=\"p2\">_</ept>\"或\"<bpt id=\"p3\">__</bpt>URL 转发<ept id=\"p3\">__</ept>\"条目，或者创建一个 A 记录。"
+    },
+    {
+      "pos": [
+        5665,
+        5842
+      ],
+      "content": "[WACOM.NOTE] CNAME 通过 DNS 系统向外传播可能需要一段时间。直到 CNAME 已传播出去，才能设置 Web 应用的 CNAME。可使用 <ph id=\"ph1\">&lt;a href=\"http://www.digwebinterface.com/\"&gt;</ph>http://www.digwebinterface.com/<ph id=\"ph2\">&lt;/a&gt;</ph> 之类的服务确认该 CNAME 是否可用。"
+    },
+    {
+      "content": "将域名添加到 Web 应用",
+      "pos": [
+        5847,
+        5860
+      ]
+    },
+    {
+      "content": "在域名的 CNAME 记录已传播后，必须将其与您的 Web 应用关联。您可以使用 Azure 跨平台命令行界面或 Azure 管理门户将 CNAME 记录定义的自定义域名添加到您的 Web 应用。",
+      "pos": [
+        5862,
+        5960
+      ]
+    },
+    {
+      "content": "使用命令行工具添加域名",
+      "pos": [
+        5964,
+        5975
+      ]
+    },
+    {
+      "pos": [
+        5979,
+        6046
+      ],
+      "content": "安装和配置 <bpt id=\"p1\">[</bpt>Azure 跨平台命令行接口<ept id=\"p1\">](/documentation/articles/xplat-cli)</ept>，然后使用以下命令："
+    },
+    {
+      "pos": [
+        6101,
+        6177
+      ],
+      "content": "例如，以下命令会将 <bpt id=\"p1\">**</bpt>www.contoso.com<ept id=\"p1\">**</ept> 的自定义域名添加到 <bpt id=\"p2\">**</bpt>contoso.azurewebsite.net<ept id=\"p2\">**</ept> Web 应用："
+    },
+    {
+      "content": "可以使用以下命令确认自定义域名是否已添加到 Web 应用：",
+      "pos": [
+        6230,
+        6259
+      ]
+    },
+    {
+      "pos": [
+        6302,
+        6350
+      ],
+      "content": "此命令返回的列表应当包含自定义域名以及默认的 <bpt id=\"p1\">**</bpt>.azurewebsite.net<ept id=\"p1\">**</ept> 条目。"
+    },
+    {
+      "content": "使用 Azure 管理门户添加域名",
+      "pos": [
+        6354,
+        6371
+      ]
+    },
+    {
+      "pos": [
+        6378,
+        6408
+      ],
+      "content": "在浏览器中，打开 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">][portal]</ept>。"
+    },
+    {
+      "content": "在\" Web 应用\"选项卡中，单击您的 Web 应用的名称、选择\"仪表板\"，然后从页面底部选择\"管理域\"。",
+      "pos": [
+        6413,
+        6466
+      ]
+    },
+    {
+      "content": "在\"域名\"文本框中，键入您已配置的域名。",
+      "pos": [
+        6491,
+        6511
+      ]
+    },
+    {
+      "content": "单击复选标记以接受该域名。",
+      "pos": [
+        6537,
+        6550
+      ]
+    },
+    {
+      "content": "在完成配置后，自定义域名将在您 Web 应用\"配置\"页的\"域名\"部分列出。",
+      "pos": [
+        6552,
+        6589
+      ]
+    },
+    {
+      "content": "为自定义域添加 A 记录",
+      "pos": [
+        6632,
+        6644
+      ]
+    },
+    {
+      "content": "若要创建 A 记录，必须首先找到您的 Web 应用的 IP 地址。然后，使用您的注册机构提供的工具在 DNS 表中为您的自定义域添加一个条目。每个注册机构指定 A 记录的方法类似但略有不同，但概念是相同的。除了创建 A 记录之外，还必须创建 Azure 用来验证 A 记录的 CNAME 记录。",
+      "pos": [
+        6651,
+        6798
+      ]
+    },
+    {
+      "pos": [
+        6803,
+        6833
+      ],
+      "content": "在浏览器中，打开 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">][portal]</ept>。"
+    },
+    {
+      "content": "在\" Web 应用\"选项卡中，单击您的 Web 应用的名称、选择\"仪表板\"，然后从屏幕底部选择\"管理域\"。",
+      "pos": [
+        6838,
+        6891
+      ]
+    },
+    {
+      "content": "在\"管理自定义域\"对话框上，找到\"在配置 A 记录时要使用的 IP 地址\"。复制 IP 地址。在创建 A 记录时将使用该地址。",
+      "pos": [
+        6916,
+        6979
+      ]
+    },
+    {
+      "pos": [
+        6984,
+        7129
+      ],
+      "content": "在\"管理自定义域\"对话框上，记下位于对话框顶部文本末尾的 awverify 域名。它应当是 <bpt id=\"p1\">**</bpt>awverify.mysite.chinacloudsites.cn<ept id=\"p1\">**</ept>，其中 <bpt id=\"p2\">**</bpt>mysite<ept id=\"p2\">**</ept> 是您的 Web 应用的名称。复制该域名，因为在创建验证用的 CNAME 记录时将使用该域名。"
+    },
+    {
+      "content": "登录到您的 DNS 注册机构的 Web 应用，然后转至用于管理 DNS 的页面。查找 Web 应用中标签为\"域名\"、\"DNS\"或\"名称服务器管理\"的链接或区域。",
+      "pos": [
+        7134,
+        7214
+      ]
+    },
+    {
+      "content": "找到您可以在其中选择或输入 A 记录和 CNAME 记录的位置。您可能需要从下拉列表中选择记录类型，或者需要转到高级设置页面。",
+      "pos": [
+        7219,
+        7282
+      ]
+    },
+    {
+      "content": "执行下列步骤以创建 A 记录：",
+      "pos": [
+        7287,
+        7302
+      ]
+    },
+    {
+      "pos": [
+        7311,
+        7502
+      ],
+      "content": "选择或输入将使用 A 记录的域或子域。例如，如果希望为 <bpt id=\"p1\">**</bpt>www.customdomain.com<ept id=\"p1\">**</ept> 创建别名，请选择 <bpt id=\"p2\">**</bpt>www<ept id=\"p2\">**</ept>。如果希望为所有子域创建通配符条目，请输入 '<bpt id=\"p3\">__</bpt>*<ept id=\"p3\">__</ept>'。这将涵盖所有子域，例如 <bpt id=\"p4\">**</bpt>mail.customdomain.com<ept id=\"p4\">**</ept>、<bpt id=\"p5\">**</bpt>login.customdomain.com<ept id=\"p5\">**</ept> 和 <bpt id=\"p6\">**</bpt>www.customdomain.com<ept id=\"p6\">**</ept>。"
+    },
+    {
+      "content": "如果希望为根域创建 A 记录，它可能在注册机构的 DNS 工具中以符号\"@\"的形式列出。",
+      "pos": [
+        7509,
+        7553
+      ]
+    },
+    {
+      "content": "在提供的字段中输入您的云服务的 IP 地址。这会将 A 记录中使用的域条目与您的云服务部署的 IP 地址相关联。",
+      "pos": [
+        7562,
+        7618
+      ]
+    },
+    {
+      "pos": [
+        7625,
+        7702
+      ],
+      "content": "例如，以下 A 记录会将 <bpt id=\"p1\">**</bpt>contoso.com<ept id=\"p1\">**</ept> 的全部流量都转发至 <bpt id=\"p2\">**</bpt>137.135.70.239<ept id=\"p2\">**</ept>（我们已部署的应用程序的 IP 地址）："
+    },
+    {
+      "pos": [
+        7709,
+        7970
+      ],
+      "content": "<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" style=\"border: 1px solid #000000;\">\n  <tr>\n  <td><strong>主机名/子域</strong></td>\n  <td><strong>IP 地址</strong></td>\n  </tr>\n  <tr>\n  <td>@</td>\n  <td>137.135.70.239</td>\n  </tr>\n  </table>",
+      "leadings": [
+        "",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   "
+      ],
+      "nodes": [
+        {
+          "content": "<ph id=\"ph1\">&lt;strong&gt;</ph>主机名/子域<ph id=\"ph2\">&lt;/strong&gt;</ph>",
+          "pos": [
+            99,
+            122
+          ]
+        },
+        {
+          "content": "<ph id=\"ph1\">&lt;strong&gt;</ph>IP 地址<ph id=\"ph2\">&lt;/strong&gt;</ph>",
+          "pos": [
+            134,
+            156
+          ]
+        },
+        {
+          "content": "@",
+          "pos": [
+            183,
+            184
+          ]
+        },
+        {
+          "content": "137.135.70.239",
+          "pos": [
+            196,
+            210
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        7977,
+        8034
+      ],
+      "content": "此示例展示了如何为根域创建 A 记录。如果希望创建一个通配符条目来涵盖所有子域，则输入 '<bpt id=\"p1\">__</bpt>*<ept id=\"p1\">__</ept>' 作为子域。"
+    },
+    {
+      "pos": [
+        8039,
+        8125
+      ],
+      "content": "接下来，创建一个别名为 <bpt id=\"p1\">**</bpt>awverify<ept id=\"p1\">**</ept> 且规范域为之前获得的 <bpt id=\"p2\">**</bpt>awverify.mysite.chinacloudsites.cn<ept id=\"p2\">**</ept> 的 CNAME 记录。"
+    },
+    {
+      "content": "[WACOM.NOTE] 虽然别名 awverify 对某些注册机构而言可能有效，但是另一些注册机构可能需要完整的别名域名 awverify.www.customdomainname.com 或 awverify.customdomainname.com。",
+      "pos": [
+        8133,
+        8261
+      ]
+    },
+    {
+      "content": "例如，以下示例将创建 Azure 可以用来验证 A 记录配置的 CNAME 记录。",
+      "pos": [
+        8267,
+        8308
+      ]
+    },
+    {
+      "pos": [
+        8314,
+        8595
+      ],
+      "content": "<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" style=\"border: 1px solid #000000;\">\n <tr>\n <td><strong>别名/主机名/子域</strong></td>\n <td><strong>规范域</strong></td>\n </tr>\n <tr>\n <td>awverify</td>\n <td>awverify.contoso.chinacloudsites.cn</td>\n </tr>\n </table>",
+      "leadings": [
+        "",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   "
+      ],
+      "nodes": [
+        {
+          "content": "<ph id=\"ph1\">&lt;strong&gt;</ph>别名/主机名/子域<ph id=\"ph2\">&lt;/strong&gt;</ph>",
+          "pos": [
+            97,
+            123
+          ]
+        },
+        {
+          "content": "<ph id=\"ph1\">&lt;strong&gt;</ph>规范域<ph id=\"ph2\">&lt;/strong&gt;</ph>",
+          "pos": [
+            134,
+            154
+          ]
+        },
+        {
+          "content": "awverify",
+          "pos": [
+            178,
+            186
+          ]
+        },
+        {
+          "content": "awverify.contoso.chinacloudsites.cn",
+          "pos": [
+            197,
+            232
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        8599,
+        8802
+      ],
+      "content": "[WACOM.NOTE] awverify CNAME 通过 DNS 系统向外传播可能需要一段时间。在 awverify CNAME 传播出去之前，您无法为 Web 应用设置 A 记录定义的自定义域名。可使用 <ph id=\"ph1\">&lt;a href=\"http://www.digwebinterface.com/\"&gt;</ph>http://www.digwebinterface.com/<ph id=\"ph2\">&lt;/a&gt;</ph> 之类的服务确认该 CNAME 是否可用。"
+    },
+    {
+      "content": "将域名添加到 Web 应用",
+      "pos": [
+        8807,
+        8820
+      ]
+    },
+    {
+      "pos": [
+        8822,
+        8941
+      ],
+      "content": "在域名的 <bpt id=\"p1\">**</bpt>awverify<ept id=\"p1\">**</ept> CNAME 记录已传播后，必须将 A 记录定义的自定义域与您的 Web 应用相关联。您可以使用 Azure 跨平台命令行界面或 Azure 管理门户将 A 记录定义的自定义域名添加到您的 Web 应用。"
+    },
+    {
+      "content": "使用命令行工具添加域名",
+      "pos": [
+        8945,
+        8956
+      ]
+    },
+    {
+      "pos": [
+        8960,
+        9027
+      ],
+      "content": "安装和配置 <bpt id=\"p1\">[</bpt>Azure 跨平台命令行接口<ept id=\"p1\">](/documentation/articles/xplat-cli)</ept>，然后使用以下命令："
+    },
+    {
+      "pos": [
+        9082,
+        9154
+      ],
+      "content": "例如，以下命令会将 <bpt id=\"p1\">**</bpt>contoso.com<ept id=\"p1\">**</ept> 的自定义域名添加到 <bpt id=\"p2\">**</bpt>contoso.azurewebsite.net<ept id=\"p2\">**</ept> Web 应用："
+    },
+    {
+      "content": "可以使用以下命令确认自定义域名是否已添加到 Web 应用：",
+      "pos": [
+        9203,
+        9232
+      ]
+    },
+    {
+      "pos": [
+        9275,
+        9323
+      ],
+      "content": "此命令返回的列表应当包含自定义域名以及默认的 <bpt id=\"p1\">**</bpt>.azurewebsite.net<ept id=\"p1\">**</ept> 条目。"
+    },
+    {
+      "content": "使用 Azure 管理门户添加域名",
+      "pos": [
+        9327,
+        9344
+      ]
+    },
+    {
+      "pos": [
+        9351,
+        9381
+      ],
+      "content": "在浏览器中，打开 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">][portal]</ept>。"
+    },
+    {
+      "content": "在\" Web 应用\"选项卡中，单击您的 Web 应用的名称、选择\"仪表板\"，然后从页面底部选择\"管理域\"。",
+      "pos": [
+        9386,
+        9439
+      ]
+    },
+    {
+      "content": "在\"域名\"文本框中，键入您已配置的域名。",
+      "pos": [
+        9464,
+        9484
+      ]
+    },
+    {
+      "content": "单击复选标记以接受该域名。",
+      "pos": [
+        9510,
+        9523
+      ]
+    },
+    {
+      "content": "在完成配置后，自定义域名将在您 Web 应用\"配置\"页的\"域名\"部分列出。",
+      "pos": [
+        9525,
+        9562
+      ]
+    },
+    {
+      "content": "[WACOM.NOTE] 在将 A 记录定义的自定义域名添加到您的 Web 应用后，可以使用您的注册机构提供的工具删除 awverify CNAME 记录。不过，如果您将来希望添加其他 A 记录，则必须重新创建 awverify 记录，然后才能将新的 A 记录定义的新域名与 Web 应用相关联。",
+      "pos": [
+        9566,
+        9714
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        9719,
+        9723
+      ]
+    },
+    {
+      "content": "如何管理 Web 应用",
+      "pos": [
+        9730,
+        9741
+      ]
+    },
+    {
+      "content": "为 Web 应用配置 SSL 证书",
+      "pos": [
+        9791,
+        9808
+      ]
+    }
+  ],
+  "content": "#为 Azure Web 应用配置自定义域名\n\n当创建 Web 应用时，Azure 会在 chinacloudsites.cn 域上提供一个友好子域，以便您的用户可以使用以下 URL 访问您的 Web 应用，如 http://&lt;mysite>.chinacloudsites.cn. 但是，如果将 Web 应用配置为共享或标准模式，则可以将 Web 应用映射到您自己的域名。\n\n另外，您可以使用 Azure Traffic Manager 对您的 Web 应用的传入流量实现负载平衡。有关 Traffic Manager 如何作用于 Web 应用的详细信息，请参阅[使用 Azure Traffic Manager 控制 Azure Web 应用流量][trafficmanager]。\n\n> [WACOM.NOTE] 本任务中的步骤要求您将 Web 应用配置为共享或标准模式，这可能会更改对您的订阅的计费量。有关详细信息，请参阅<a href=\"/home/features/web-site/#price\"> Web 应用定价详细信息</a>。\n\n本文内容：\n\n-   [了解 CNAME 和 A 记录](#understanding-records)\n-   [将 Web 应用配置为共享或标准模式](#bkmk_configsharedmode)\n-   [将 Web 应用添加到 Traffic Manager](#trafficmanager)\n-   [为自定义域添加 CNAME](#bkmk_configurecname)\n-   [为自定义域添加 A 记录](#bkmk_configurearecord)\n\n<h2><a name=\"understanding-records\"></a>了解 CNAME 和 A 记录</h2>\n\nCNAME（即别名记录）和 A 记录都允许您将域名与 Web 应用进行关联，但是，它们的工作方式不同。\n\n###CNAME 或别名记录\n\nCNAME 记录将  *specific* 域（例如 **contoso.com** 或 **www.contoso.com**）映射到规范域名。在这种情况下，规范域名是您的 Azure Web 应用的 **&lt;myapp>.chinacloudsites.cn** 域名或您的 Traffic Manager 配置文件的 **&lt;myapp>.trafficmgr.com** 域名。创建映射后，CNAME 将为 **&lt;myapp>.chinacloudsites.cn** 或 **&lt;myapp>.trafficmgr.com** 域名创建一个别名。CNAME 条目将自动解析为您的 **&lt;myapp>.chinacloudsites.cn** 或 **&lt;myapp>.trafficmgr.com** 域名的 IP 地址，因此，如果 Web 应用的 IP 地址发生更改，您不必采取任何操作。\n\n> [WACOM.NOTE] 某些域注册机构只允许您在使用 CNAME 记录（例如 www.contoso.com）和非根名称（例如 contoso.com）时映射子域。有关 CNAME 记录的详细信息，请参阅由您的注册机构提供的文档、<a href=\"http://en.wikipedia.org/wiki/CNAME_record\">关于 CNAME 记录的 Wikipedia 条目</a>或 <a href=\"http://tools.ietf.org/html/rfc1035\">IETF 域名 - 实现和规范</a>文档。\n\n###A 记录\n\nA 记录将域（例如 **contoso.com** 或 **www.contoso.com**）、 *or a wildcard domain*（例如 **\\*.contoso.com**）映射到 IP 地址。对于 Azure Web 应用而言，这是服务的虚拟 IP 或者您为 Web 应用购买的具体 IP 地址。与 CNAME 记录相比，A 记录的主要优势是您可以有一个使用通配符的条目，例如 **\\*.contoso.com**，它将处理多个子域（例如 **mail.contoso.com**、**login.contoso.com** 或 **www.contoso.com**）的请求。\n\n> [WACOM.NOTE] 由于 A 记录映射到静态 IP 地址，因此它无法自动解析 Web 应用的 IP 地址的更改。用于 A 记录的 IP 地址是您为 Web 应用配置自定义域名设置时提供的；但是，如果您删除并重新创建了 Web 应用或者将 Web 应用模式改回了免费，则该值可能会更改。\n\n> [WACOM.NOTE] A 记录不能用于使用 Traffic Manager 的负载平衡。有关详细信息，请参阅[使用 Azure Traffic Manager 控制 Azure Web 应用流量][trafficmanager]。\n \n<a name=\"bkmk_configsharedmode\"></a><h2>将 Web 应用配置为共享或标准模式</h2>\n\n在 Web 应用上设置自定义域名只适用于 Azure Web 应用的共享和标准模式。将 Web 应用从免费 Web 应用模式切换到共享或标准 Web 应用模式之前，必须先取消 Web 应用订阅已有的支出上限。有关共享和标准模式定价的详细信息，请参阅[定价详细信息][PricingDetails]。\n\n1. 在浏览器中，打开[管理门户][portal]。\n2. 在\" Web 应用\"选项卡中，单击您的 Web 应用的名称。\n\n    ![][standardmode1]\n\n3. 单击\"规模\"选项卡。\n\n    ![][standardmode2]\n\n    \n4. 在\"常规\"部分中，通过单击\"共享\"设置 Web 应用模式。\n\n    ![][standardmode3]\n\n    > [WACOM.NOTE] 如果您将为此 Web 应用使用 Traffic Manager，则必须选择标准模式而非共享模式。\n\n5. 单击\"保存\"。\n6. 在系统提示您共享模式（如果您选择\"标准\"，则此处为标准模式）成本将增加时，如果您同意成本增加，则单击\"是\"。\n\n    <!--![][standardmode4]-->\n\n    **注意**<br /> \n    如果收到\"为 Web 应用  'website name' 配置规模失败\"错误，则可使用详细信息按钮获得详细信息。 \n\n<a name=\"trafficmanager\"></a><h2>（可选）将您的 Web 应用添加到 Traffic Manager</h2>\n\n如果希望为 Web 应用使用 Traffic Manager，请执行下列步骤。\n\n1. 如果还没有 Traffic Manager 配置文件，请根据[使用\"快速创建\"创建 Traffic Manager 配置文件][createprofile] 中的信息创建一个。记下与您的 Traffic Manager 配置文件关联的 **.trafficmgr.com** 域名。这将在后面的步骤中使用。\n\n2. 根据[添加或删除终结点][addendpoint] 中的信息在 Traffic Manager 配置文件中将您的 Web 应用添加为终结点。\n\n    > [WACOM.NOTE] 如果在添加终结点时您的 Web 应用未列出，请验证是否已将其配置为标准模式。必须将 Web 应用配置为标准模式，Traffic Manager 才起作用。\n\n3. 登录到您的 DNS 注册机构的 Web 应用，然后转至用于管理 DNS 的页面。查找 Web 应用中标签为\"域名\"、\"DNS\"或\"名称服务器管理\"的链接或区域。\n\n4. 现在找到您可以在其中选择或输入 CNAME 记录的位置。您可能需要从下拉列表中选择记录类型，或者需要转到高级设置页面。应当查找\"CNAME\"、\"别名\"或\"子域\"字样。\n\n5. 还必须为 CNAME 提供域或子域别名。例如，如果希望为 **www.customdomain.com** 创建别名，则输入 **www**。\n\n5. 还必须提供作为此 CNAME 别名的规范域名的主机名。这是您的 Web 应用的 **.trafficmgr.com** 名称。\n\n例如，以下 CNAME 记录会将 **www.contoso.com** 的全部流量都转发至 **contoso.trafficmgr.com**（ Web 应用的域名）：\n\n<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" style=\"border: 1px solid #000000;\">\n<tr>\n<td><strong>别名/主机名/子域</strong></td>\n<td><strong>规范域</strong></td>\n</tr>\n<tr>\n<td>www</td>\n<td>contoso.trafficmgr.com</td>\n</tr>\n</table>\n\n**www.contoso.com** 的访问者将永远看不到真正的主机\n(contoso.azurewebsite.net)，因此，转发过程对最终用户不可见。\n\n> [WACOM.NOTE] 如果您在为 Web 应用使用 Traffic Manager，则不需要执行下面的部分（\"为自定义域添加 CNAME\"和\"为自定义域添加 A 记录\"）中的步骤。在前面的步骤中创建的 CNAME 记录会将传入流量路由到 Traffic Manager，然后后者会将流量路由到 Web 应用终结点。\n\n<a name=\"bkmk_configurecname\"></a><h2>为自定义域添加 CNAME</h2>\n\n若要创建 CNAME 记录，必须使用您的注册机构提供的工具在 DNS 表中为您的自定义域添加一个新条目。每个注册机构指定 CNAME 记录的方法类似但略有不同，但概念是相同的。\n\n1. 使用下列方法之一查找分配给您的 Web 应用的 **.azurewebsite.net** 域名。\n\n    * 登录到 [Azure 管理门户][portal]，依次选择您的 Web 应用、\"仪表板\"，然后在\"速览\"部分中查找\" Web 应用 URL\"条目。\n\n    * 安装和配置 [Azure Powershell](/documentation/articles/powershell-install-configure)，然后使用以下命令：\n\n            get-azurewebsite yoursitename | select hostnames\n\n    * 安装和配置 [Azure 跨平台命令行接口](/documentation/articles/xplat-cli)，然后使用以下命令：\n\n            azure site domain list yoursitename\n\n    保存此 **.azurewebsite.net** 名称，因为在下面的步骤中将使用该名称。\n\n3. 登录到您的 DNS 注册机构的 Web 应用，然后转至用于管理 DNS 的页面。查找 Web 应用中标签为\"域名\"、\"DNS\"或\"名称服务器管理\"的链接或区域。\n\n4. 现在找到您可以在其中选择或输入 CNAME 记录的位置。您可能需要从下拉列表中选择记录类型，或者需要转到高级设置页面。应当查找\"CNAME\"、\"别名\"或\"子域\"字样。\n\n5. 还必须为 CNAME 提供域或子域别名。例如，如果希望为 **www.customdomain.com** 创建别名，则输入 **www**。如果希望为根域创建别名，它可能在注册机构的 DNS 工具中以符号\"@\"的形式列出。\n\n5. 还必须提供作为此 CNAME 别名的规范域名的主机名。这是您的 Web 应用的 **.azurewebsite.net** 名称。\n\n例如，以下 CNAME 记录会将 **www.contoso.com** 的全部流量都转发至 **contoso.azurewebsite.net**（ Web 应用的域名）：\n\n<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" style=\"border: 1px solid #000000;\">\n<tr>\n<td><strong>别名/主机名/子域</strong></td>\n<td><strong>规范域</strong></td>\n</tr>\n<tr>\n<td>www</td>\n<td>contoso.azurewebsite.net</td>\n</tr>\n</table>\n\n**www.contoso.com** 的访问者将永远看不到真正的主机\n(contoso.azurewebsite.net)，因此，转发过程对\n最终用户不可见。\n\n> [WACOM.NOTE] 上述示例仅适用于 __www__ 子域的流量。因为无法为 CNAME 记录使用通配符，所以必须为每个域/子域创建一个 CNAME。如果希望将子域（例如 *.contoso.com）的流量定向到您的 azurewebsite.net 地址，则可以在 DNS 设置中配置\"__URL 重定向_\"或\"__URL 转发__\"条目，或者创建一个 A 记录。\n\n> [WACOM.NOTE] CNAME 通过 DNS 系统向外传播可能需要一段时间。直到 CNAME 已传播出去，才能设置 Web 应用的 CNAME。可使用 <a href=\"http://www.digwebinterface.com/\">http://www.digwebinterface.com/</a> 之类的服务确认该 CNAME 是否可用。\n\n###将域名添加到 Web 应用\n\n在域名的 CNAME 记录已传播后，必须将其与您的 Web 应用关联。您可以使用 Azure 跨平台命令行界面或 Azure 管理门户将 CNAME 记录定义的自定义域名添加到您的 Web 应用。\n\n**使用命令行工具添加域名**\n\n安装和配置 [Azure 跨平台命令行接口](/documentation/articles/xplat-cli)，然后使用以下命令：\n\n    azure site domain add customdomain yoursitename\n\n例如，以下命令会将 **www.contoso.com** 的自定义域名添加到 **contoso.azurewebsite.net** Web 应用：\n\n    azure site domain add www.contoso.com contoso\n\n可以使用以下命令确认自定义域名是否已添加到 Web 应用：\n\n    azure site domain list yoursitename\n\n此命令返回的列表应当包含自定义域名以及默认的 **.azurewebsite.net** 条目。\n\n**使用 Azure 管理门户添加域名**\n\n1. 在浏览器中，打开 [Azure 管理门户][portal]。\n\n2. 在\" Web 应用\"选项卡中，单击您的 Web 应用的名称、选择\"仪表板\"，然后从页面底部选择\"管理域\"。\n\n    ![][setcname2]\n\n6. 在\"域名\"文本框中，键入您已配置的域名。 \n\n    ![][setcname3]\n\n6. 单击复选标记以接受该域名。\n\n在完成配置后，自定义域名将在您 Web 应用\"配置\"页的\"域名\"部分列出。 \n\n<a name=\"bkmk_configurearecord\"></a><h2>为自定义域添加 A 记录</h2>\n\n若要创建 A 记录，必须首先找到您的 Web 应用的 IP 地址。然后，使用您的注册机构提供的工具在 DNS 表中为您的自定义域添加一个条目。每个注册机构指定 A 记录的方法类似但略有不同，但概念是相同的。除了创建 A 记录之外，还必须创建 Azure 用来验证 A 记录的 CNAME 记录。\n\n1. 在浏览器中，打开 [Azure 管理门户][portal]。\n\n2. 在\" Web 应用\"选项卡中，单击您的 Web 应用的名称、选择\"仪表板\"，然后从屏幕底部选择\"管理域\"。\n\n    ![][setcname2]\n\n5. 在\"管理自定义域\"对话框上，找到\"在配置 A 记录时要使用的 IP 地址\"。复制 IP 地址。在创建 A 记录时将使用该地址。\n\n5. 在\"管理自定义域\"对话框上，记下位于对话框顶部文本末尾的 awverify 域名。它应当是 **awverify.mysite.chinacloudsites.cn**，其中 **mysite** 是您的 Web 应用的名称。复制该域名，因为在创建验证用的 CNAME 记录时将使用该域名。\n\n6. 登录到您的 DNS 注册机构的 Web 应用，然后转至用于管理 DNS 的页面。查找 Web 应用中标签为\"域名\"、\"DNS\"或\"名称服务器管理\"的链接或区域。\n\n6. 找到您可以在其中选择或输入 A 记录和 CNAME 记录的位置。您可能需要从下拉列表中选择记录类型，或者需要转到高级设置页面。\n\n7. 执行下列步骤以创建 A 记录：\n\n    1. 选择或输入将使用 A 记录的域或子域。例如，如果希望为 **www.customdomain.com** 创建别名，请选择 **www**。如果希望为所有子域创建通配符条目，请输入 '__*__'。这将涵盖所有子域，例如 **mail.customdomain.com**、**login.customdomain.com** 和 **www.customdomain.com**。\n\n     如果希望为根域创建 A 记录，它可能在注册机构的 DNS 工具中以符号\"@\"的形式列出。\n\n    2. 在提供的字段中输入您的云服务的 IP 地址。这会将 A 记录中使用的域条目与您的云服务部署的 IP 地址相关联。\n\n     例如，以下 A 记录会将 **contoso.com** 的全部流量都转发至 **137.135.70.239**（我们已部署的应用程序的 IP 地址）：\n\n     <table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" style=\"border: 1px solid #000000;\">\n     <tr>\n     <td><strong>主机名/子域</strong></td>\n     <td><strong>IP 地址</strong></td>\n     </tr>\n     <tr>\n     <td>@</td>\n     <td>137.135.70.239</td>\n     </tr>\n     </table>\n\n     此示例展示了如何为根域创建 A 记录。如果希望创建一个通配符条目来涵盖所有子域，则输入 '__*__' 作为子域。\n\n7. 接下来，创建一个别名为 **awverify** 且规范域为之前获得的 **awverify.mysite.chinacloudsites.cn** 的 CNAME 记录。\n\n    > [WACOM.NOTE] 虽然别名 awverify 对某些注册机构而言可能有效，但是另一些注册机构可能需要完整的别名域名 awverify.www.customdomainname.com 或 awverify.customdomainname.com。\n\n    例如，以下示例将创建 Azure 可以用来验证 A 记录配置的 CNAME 记录。\n\n    <table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" style=\"border: 1px solid #000000;\">\n    <tr>\n    <td><strong>别名/主机名/子域</strong></td>\n    <td><strong>规范域</strong></td>\n    </tr>\n    <tr>\n    <td>awverify</td>\n    <td>awverify.contoso.chinacloudsites.cn</td>\n    </tr>\n    </table>\n\n> [WACOM.NOTE] awverify CNAME 通过 DNS 系统向外传播可能需要一段时间。在 awverify CNAME 传播出去之前，您无法为 Web 应用设置 A 记录定义的自定义域名。可使用 <a href=\"http://www.digwebinterface.com/\">http://www.digwebinterface.com/</a> 之类的服务确认该 CNAME 是否可用。\n\n###将域名添加到 Web 应用\n\n在域名的 **awverify** CNAME 记录已传播后，必须将 A 记录定义的自定义域与您的 Web 应用相关联。您可以使用 Azure 跨平台命令行界面或 Azure 管理门户将 A 记录定义的自定义域名添加到您的 Web 应用。\n\n**使用命令行工具添加域名**\n\n安装和配置 [Azure 跨平台命令行接口](/documentation/articles/xplat-cli)，然后使用以下命令：\n\n    azure site domain add customdomain yoursitename\n\n例如，以下命令会将 **contoso.com** 的自定义域名添加到 **contoso.azurewebsite.net** Web 应用：\n\n    azure site domain add contoso.com contoso\n\n可以使用以下命令确认自定义域名是否已添加到 Web 应用：\n\n    azure site domain list yoursitename\n\n此命令返回的列表应当包含自定义域名以及默认的 **.azurewebsite.net** 条目。\n\n**使用 Azure 管理门户添加域名**\n\n1. 在浏览器中，打开 [Azure 管理门户][portal]。\n\n2. 在\" Web 应用\"选项卡中，单击您的 Web 应用的名称、选择\"仪表板\"，然后从页面底部选择\"管理域\"。\n\n    ![][setcname2]\n\n6. 在\"域名\"文本框中，键入您已配置的域名。 \n\n    ![][setcname3]\n\n6. 单击复选标记以接受该域名。\n\n在完成配置后，自定义域名将在您 Web 应用\"配置\"页的\"域名\"部分列出。\n\n> [WACOM.NOTE] 在将 A 记录定义的自定义域名添加到您的 Web 应用后，可以使用您的注册机构提供的工具删除 awverify CNAME 记录。不过，如果您将来希望添加其他 A 记录，则必须重新创建 awverify 记录，然后才能将新的 A 记录定义的新域名与 Web 应用相关联。\n\n## 后续步骤\n\n-   [如何管理 Web 应用](/documentation/articles/web-sites-manage)\n\n-   [为 Web 应用配置 SSL 证书](/documentation/articles/web-sites-configure-ssl-certificate/)\n\n\n<!-- Bookmarks -->\n\n[将 Web 应用配置为共享模式]: #bkmk_configsharedmode\n[配置您的域注册机构中的 CNAME]: #bkmk_configurecname\n[在您的域注册机构上配置 CNAME 验证记录]: #bkmk_configurecname\n[为域名配置 A 记录]:#bkmk_configurearecord\n[在管理门户中设置域名]: #bkmk_setcname\n\n<!-- Links -->\n\n[PricingDetails]: /pricing/overview/\n[portal]: http://manage.windowsazure.cn\n[digweb]: http://www.digwebinterface.com/\n[cloudservicedns]: /documentation/articles/custom-dns\n[trafficmanager]: /documentation/articles/web-sites-traffic-manager/\n[addendpoint]: http://msdn.microsoft.com/zh-cn/library/azure/hh744839.aspx\n[createprofile]: http://msdn.microsoft.com/zh-cn/library/azure/dn339012.aspx\n\n<!-- images -->\n\n[setcname1]: ../media/dncmntask-cname-5.png\n\n\n<!-- images -->\n[standardmode1]: ./media/custom-dns-web-site/dncmntask-cname-1.png\n[standardmode2]: ./media/custom-dns-web-site/dncmntask-cname-2.png\n[standardmode3]: ./media/custom-dns-web-site/dncmntask-cname-3.png\n[standardmode4]: ./media/custom-dns-web-site/dncmntask-cname-4.png \n\n\n[setcname2]: ./media/custom-dns-web-site/dncmntask-cname-6.png\n[setcname3]: ./media/custom-dns-web-site/dncmntask-cname-7.png\n<!--HONumber=41-->\n"
+}

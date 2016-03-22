@@ -1,0 +1,103 @@
+{
+  "nodes": [
+    {
+      "content": "在简单的情况下，我们的令牌缓存应该有效，但是，在令牌到期或撤销时，会发生什么情况？该应用未运行时，该令牌可能会到期。这就意味着令牌缓存无效。在应用直接进行的调用或移动服务库进行的调用期间，该应用实际运行时，令牌也可能到期。结果将是 HTTP 状态码 401\"未授权\"。",
+      "pos": [
+        0,
+        134
+      ]
+    },
+    {
+      "pos": [
+        137,
+        337
+      ],
+      "content": "我们需要能够检测到期的令牌，并刷新它。为此，我们从 <bpt id=\"p1\">[</bpt>Android 客户端库<ept id=\"p1\">](http://dl.windowsazure.com/androiddocs/)</ept>使用 <bpt id=\"p2\">[</bpt>ServiceFilter<ept id=\"p2\">](http://dl.windowsazure.cn/androiddocs/com/microsoft/windowsazure/mobileservices/ServiceFilter.html)</ept>。"
+    },
+    {
+      "content": "在本节中，您将定义 ServiceFilter，它将检测 HTTP 状态码 401 响应，并触发令牌和令牌缓存的刷新。此外，在身份验证期间，此 ServiceFilter 将阻止其他出站请求，以便这些请求可以使用刷新的令牌。",
+      "pos": [
+        339,
+        451
+      ]
+    },
+    {
+      "content": "在 Eclipse 中，打开 ToDoActivity.java 文件并添加以下 import 语句：",
+      "pos": [
+        456,
+        507
+      ]
+    },
+    {
+      "pos": [
+        711,
+        738
+      ],
+      "content": "将以下成员添加到  <ph id=\"ph1\">`ToDoActivity`</ph> 类。"
+    },
+    {
+      "content": "这些将用于帮助同步用户的身份验证。我们只希望进行一次身份验证。在身份验证过程中，任何调用应等待并使用来自正在进行的身份验证的新令牌。",
+      "pos": [
+        858,
+        924
+      ]
+    },
+    {
+      "content": "在 ToDoActivity.java 文件中，将以下方法添加到 ToDoActivity 类，该类将用于在正在进行身份验证时阻止其他线程中的出站调用。",
+      "pos": [
+        929,
+        1005
+      ]
+    },
+    {
+      "content": "在 ToDoActivity.java 文件中，将以下方法添加到 ToDoActivity 类。此方法将实际触发等待，然后在身份验证完成时更新出站请求中的令牌。",
+      "pos": [
+        1905,
+        1985
+      ]
+    },
+    {
+      "pos": [
+        2736,
+        2860
+      ],
+      "content": "在 ToDoActivity.java 文件中，更新 ToDoActivity 类的  <ph id=\"ph1\">`authenticate`</ph> 方法，使它接受一个布尔型参数，以允许强制刷新令牌和令牌缓存。我们还需要在身份验证完成时，通知任何被阻止的线程以便其可以选取新令牌。"
+    },
+    {
+      "pos": [
+        4998,
+        5077
+      ],
+      "content": "在 ToDoActivity.java 文件中，在 ToDoActivity 类中，为新  <ph id=\"ph1\">`RefreshTokenCacheFilter`</ph> 类添加此代码："
+    },
+    {
+      "content": "该服务过滤器将检查每个响应以查找 HTTP 状态码 401“未授权”。如果遇到 401，将在 UI 线程上设置用于获取新令牌的新登录请求。其他调用将被阻止，直到完成该登录，或 5 次尝试都已失败。如果获得新令牌，则将使用新令牌重试触发 401 的请求，将使用新令牌重试任何被阻止的调用。",
+      "pos": [
+        9263,
+        9406
+      ]
+    },
+    {
+      "pos": [
+        9411,
+        9480
+      ],
+      "content": "在 ToDoActivity.java 文件中，在 ToDoActivity 类中，为新 <ph id=\"ph1\">`ProgressFilter`</ph> 类添加此代码："
+    },
+    {
+      "content": "此筛选器将在请求开始时显示进度条，在响应传达时隐藏进度条。",
+      "pos": [
+        11326,
+        11355
+      ]
+    },
+    {
+      "pos": [
+        11364,
+        11410
+      ],
+      "content": "在 ToDoActivity.java 文件中，更新 <ph id=\"ph1\">`onCreate`</ph> 方法，如下所示："
+    }
+  ],
+  "content": "在简单的情况下，我们的令牌缓存应该有效，但是，在令牌到期或撤销时，会发生什么情况？该应用未运行时，该令牌可能会到期。这就意味着令牌缓存无效。在应用直接进行的调用或移动服务库进行的调用期间，该应用实际运行时，令牌也可能到期。结果将是 HTTP 状态码 401\"未授权\"。 \n\n我们需要能够检测到期的令牌，并刷新它。为此，我们从 [Android 客户端库](http://dl.windowsazure.com/androiddocs/)使用 [ServiceFilter](http://dl.windowsazure.cn/androiddocs/com/microsoft/windowsazure/mobileservices/ServiceFilter.html)。\n\n在本节中，您将定义 ServiceFilter，它将检测 HTTP 状态码 401 响应，并触发令牌和令牌缓存的刷新。此外，在身份验证期间，此 ServiceFilter 将阻止其他出站请求，以便这些请求可以使用刷新的令牌。\n\n1. 在 Eclipse 中，打开 ToDoActivity.java 文件并添加以下 import 语句：\n \n        import java.util.concurrent.atomic.AtomicBoolean;\n        import java.util.concurrent.ExecutionException;\n\n        import com.microsoft.windowsazure.mobileservices.MobileServiceException;\n \n2. 将以下成员添加到  `ToDoActivity` 类。 \n\n        public boolean bAuthenticating = false;\n        public final Object mAuthenticationLock = new Object();\n\n    这些将用于帮助同步用户的身份验证。我们只希望进行一次身份验证。在身份验证过程中，任何调用应等待并使用来自正在进行的身份验证的新令牌。\n\n3. 在 ToDoActivity.java 文件中，将以下方法添加到 ToDoActivity 类，该类将用于在正在进行身份验证时阻止其他线程中的出站调用。\n\n        /**\n         * Detects if authentication is in progress and waits for it to complete. \n         * Returns true if authentication was detected as in progress. False otherwise.\n         */\n        public boolean detectAndWaitForAuthentication()\n        {\n            boolean detected = false;\n            synchronized(mAuthenticationLock)\n            {\n                do\n                {\n                    if (bAuthenticating == true)\n                        detected = true;\n                    try\n                    {\n                        mAuthenticationLock.wait(1000);\n                    }\n                    catch(InterruptedException e)\n                    {}\n                }\n                while(bAuthenticating == true);\n            }\n            if (bAuthenticating == true)\n                return true;\n            \n            return detected;\n        }\n        \n\n4. 在 ToDoActivity.java 文件中，将以下方法添加到 ToDoActivity 类。此方法将实际触发等待，然后在身份验证完成时更新出站请求中的令牌。 \n\n        \n        /**\n         * Waits for authentication to complete then adds or updates the token \n         * in the X-ZUMO-AUTH request header.\n         * \n         * @param request\n         *            The request that receives the updated token.\n         */\n        private void waitAndUpdateRequestToken(ServiceFilterRequest request)\n        {\n            MobileServiceUser user = null;\n            if (detectAndWaitForAuthentication())\n            {\n                user = mClient.getCurrentUser();\n                if (user != null)\n                {\n                    request.removeHeader(\"X-ZUMO-AUTH\");\n                    request.addHeader(\"X-ZUMO-AUTH\", user.getAuthenticationToken());\n                }\n            }\n        }\n\n\n5. 在 ToDoActivity.java 文件中，更新 ToDoActivity 类的  `authenticate` 方法，使它接受一个布尔型参数，以允许强制刷新令牌和令牌缓存。我们还需要在身份验证完成时，通知任何被阻止的线程以便其可以选取新令牌。\n\n        /**\n         * Authenticates with the desired login provider. Also caches the token. \n         * \n         * If a local token cache is detected, the token cache is used instead of an actual \n         * login unless bRefresh is set to true forcing a refresh.\n         * \n         * @param bRefreshCache\n         *            Indicates whether to force a token refresh. \n         */\n        private void authenticate(boolean bRefreshCache) {\n            \n            bAuthenticating = true;\n            \n            if (bRefreshCache || !loadUserTokenCache(mClient))\n            {\n                // New login using the provider and update the token cache.\n                mClient.login(MobileServiceAuthenticationProvider.MicrosoftAccount,\n                        new UserAuthenticationCallback() {\n                            @Override\n                            public void onCompleted(MobileServiceUser user,\n                                    Exception exception, ServiceFilterResponse response) {\n    \n                                synchronized(mAuthenticationLock)\n                                {\n                                    if (exception == null) {\n                                        cacheUserToken(mClient.getCurrentUser());\n                                        createTable();\n                                    } else {\n                                        createAndShowDialog(exception.getMessage(), \"Login Error\");\n                                    }\n                                    bAuthenticating = false;\n                                    mAuthenticationLock.notifyAll();\n                                }\n                            }\n                        });\n            }\n            else\n            {\n                // Other threads may be blocked waiting to be notified when \n                // authentication is complete.\n                synchronized(mAuthenticationLock)\n                {\n                    bAuthenticating = false;\n                    mAuthenticationLock.notifyAll();\n                }\n                createTable();\n            }\n        }   \n\n\n\n6. 在 ToDoActivity.java 文件中，在 ToDoActivity 类中，为新  `RefreshTokenCacheFilter` 类添加此代码：\n\n        /**\n        * The RefreshTokenCacheFilter class filters responses for HTTP status code 401. \n         * When 401 is encountered, the filter calls the authenticate method on the \n         * UI thread. Out going requests and retries are blocked during authentication. \n         * Once authentication is complete, the token cache is updated and \n         * any blocked request will receive the X-ZUMO-AUTH header added or updated to \n         * that request.   \n         */\n        private class RefreshTokenCacheFilter implements ServiceFilter {\n         \n            AtomicBoolean mAtomicAuthenticatingFlag = new AtomicBoolean();                     \n            \n            @Override\n            public ListenableFuture<ServiceFilterResponse> handleRequest(\n                    final ServiceFilterRequest request, \n                    final NextServiceFilterCallback nextServiceFilterCallback\n                    )\n            {\n                // In this example, if authentication is already in progress we block the request\n                // until authentication is complete to avoid unnecessary authentications as \n                // a result of HTTP status code 401. \n                // If authentication was detected, add the token to the request.\n                waitAndUpdateRequestToken(request);\n     \n                // Send the request down the filter chain\n                // retrying up to 5 times on 401 response codes.\n                ListenableFuture<ServiceFilterResponse> future = null;\n                ServiceFilterResponse response = null;\n                int responseCode = 401;\n                for (int i = 0; (i < 5 ) && (responseCode == 401); i++)\n                {\n                    future = nextServiceFilterCallback.onNext(request);\n                    try {\n                        response = future.get();\n                        responseCode = response.getStatus().getStatusCode();\n                    } catch (InterruptedException e) {\n                       e.printStackTrace();\n                    } catch (ExecutionException e) {\n                        if (e.getCause().getClass() == MobileServiceException.class)\n                        {\n                            MobileServiceException mEx = (MobileServiceException) e.getCause();\n                            responseCode = mEx.getResponse().getStatus().getStatusCode();\n                            if (responseCode == 401)\n                            {\n                                // Two simultaneous requests from independent threads could get HTTP status 401. \n                                // Protecting against that right here so multiple authentication requests are\n                                // not setup to run on the UI thread.\n                                // We only want to authenticate once. Requests should just wait and retry \n                                // with the new token.\n                                if (mAtomicAuthenticatingFlag.compareAndSet(false, true))                                                                                                      \n                                {\n                                    // Authenticate on UI thread\n                                    runOnUiThread(new Runnable() {\n                                        @Override\n                                        public void run() {\n                                            // Force a token refresh during authentication.\n                                            authenticate(true);\n                // ToDoActivity.mMainActivity.authenticate(true);\n    \n                                        }\n                                    });\n                                }\n    \n                                // Wait for authentication to complete then update the token in the request. \n                                waitAndUpdateRequestToken(request);\n                                mAtomicAuthenticatingFlag.set(false);                                                  \n                            }\n                        }\n                    }\n                }\n                return future;\n            }\n        }\n\n\n    该服务过滤器将检查每个响应以查找 HTTP 状态码 401“未授权”。如果遇到 401，将在 UI 线程上设置用于获取新令牌的新登录请求。其他调用将被阻止，直到完成该登录，或 5 次尝试都已失败。如果获得新令牌，则将使用新令牌重试触发 401 的请求，将使用新令牌重试任何被阻止的调用。\n\n7. 在 ToDoActivity.java 文件中，在 ToDoActivity 类中，为新 `ProgressFilter` 类添加此代码：\n        \n        /**\n        * The ProgressFilter class renders a progress bar on the screen during the time the App is waiting for the response of a previous request.\n        * the filter shows the progress bar on the beginning of the request, and hides it when the response arrived.\n        */\n        private class ProgressFilter implements ServiceFilter {\n            @Override\n            public ListenableFuture<ServiceFilterResponse> handleRequest(ServiceFilterRequest request, NextServiceFilterCallback nextServiceFilterCallback) {\n\n                final SettableFuture<ServiceFilterResponse> resultFuture = SettableFuture.create();\n\n                runOnUiThread(new Runnable() {\n\n                    @Override\n                    public void run() {\n                        if (mProgressBar != null) mProgressBar.setVisibility(ProgressBar.VISIBLE);\n                    }\n                });\n\n                ListenableFuture<ServiceFilterResponse> future = nextServiceFilterCallback.onNext(request);\n\n                Futures.addCallback(future, new FutureCallback<ServiceFilterResponse>() {\n                    @Override\n                    public void onFailure(Throwable e) {\n                        resultFuture.setException(e);\n                    }\n\n                    @Override\n                    public void onSuccess(ServiceFilterResponse response) {\n                        runOnUiThread(new Runnable() {\n\n                            @Override\n                            public void run() {\n                                if (mProgressBar != null) mProgressBar.setVisibility(ProgressBar.GONE);\n                            }\n                        });\n\n                        resultFuture.set(response);\n                    }\n                });\n\n                return resultFuture;\n            }\n        }\n        \n    此筛选器将在请求开始时显示进度条，在响应传达时隐藏进度条。\n    \n8. 在 ToDoActivity.java 文件中，更新 `onCreate` 方法，如下所示：\n\n        @Override\n        public void onCreate(Bundle savedInstanceState) {\n            super.onCreate(savedInstanceState);\n            \n            setContentView(R.layout.activity_to_do);\n            mProgressBar = (ProgressBar) findViewById(R.id.loadingProgressBar);\n        \n            // Initialize the progress bar\n            mProgressBar.setVisibility(ProgressBar.GONE);\n        \n            try {\n                // Create the Mobile Service Client instance, using the provided\n                // Mobile Service URL and key\n                mClient = new MobileServiceClient(\n                        \"https://<YOUR MOBILE SERVICE>.azure-mobile.cn/\",\n                        \"<YOUR MOBILE SERVICE KEY>\", this)\n                           .withFilter(new ProgressFilter())\n                           .withFilter(new RefreshTokenCacheFilter());\n            \n                // Authenticate passing false to load the current token cache if available.\n                authenticate(false);\n                    \n            } catch (MalformedURLException e) {\n                createAndShowDialog(new Exception(\"Error creating the Mobile Service. \" +\n                    \"Verify the URL\"), \"Error\");\n            }\n        }\n\n\n       在此代码中，除了 `ProgressFilter` 以外，还使用了 `RefreshTokenCacheFilter`。此外，在 `onCreate` 期间，我们想要加载令牌缓存。因此将 `false` 传递给 `authenticate` 方法。\n\n<!---HONumber=74-->"
+}

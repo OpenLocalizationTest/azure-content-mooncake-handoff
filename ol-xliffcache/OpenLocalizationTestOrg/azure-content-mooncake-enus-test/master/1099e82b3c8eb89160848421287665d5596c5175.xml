@@ -1,0 +1,312 @@
+{
+  "nodes": [
+    {
+      "content": "在 HDInsight 中将 Hadoop Hive 与 PowerShell 配合使用 | Azure",
+      "pos": [
+        26,
+        78
+      ]
+    },
+    {
+      "content": "使用 PowerShell 在 HDInsight 上的 Hadoop 中运行 Hive 查询。",
+      "pos": [
+        96,
+        144
+      ]
+    },
+    {
+      "content": "使用 PowerShell 运行 Hive 查询",
+      "pos": [
+        378,
+        402
+      ]
+    },
+    {
+      "pos": [
+        483,
+        628
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 本文档未详细描述示例中使用的 HiveQL 语句的作用。有关此示例中使用的 HiveQL 的信息，请参阅<bpt id=\"p1\">[</bpt>将 Hive 与 HDInsight 上的 Hadoop 配合使用<ept id=\"p1\">](/documentation/articles/hdinsight-use-hive)</ept>。"
+    },
+    {
+      "pos": [
+        633,
+        656
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"prereq\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>先决条件"
+    },
+    {
+      "content": "若要完成本文中的步骤，你将需要：",
+      "pos": [
+        660,
+        676
+      ]
+    },
+    {
+      "content": "Azure HDInsight（HDInsight 上的 Hadoop）群集（基于 Windows）",
+      "pos": [
+        682,
+        732
+      ]
+    },
+    {
+      "pos": [
+        738,
+        903
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>配备 Azure PowerShell 的工作站<ept id=\"p1\">**</ept>。请参阅<bpt id=\"p2\">[</bpt>安装 Azure PowerShell 1.0 和更高版本<ept id=\"p2\">](/documentation/articles/hdinsight-administer-use-powershell#install-azure-powershell-10-and-greater)</ept>。"
+    },
+    {
+      "pos": [
+        907,
+        960
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"powershell\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>使用 Azure PowerShell 运行 Hive 查询"
+    },
+    {
+      "pos": [
+        962,
+        1145
+      ],
+      "content": "Azure PowerShell 提供 <bpt id=\"p1\">*</bpt>cmdlet<ept id=\"p1\">*</ept>，可让你在 HDInsight 上远程运行 Hive 查询。从内部来讲，这是通过使用 REST 调用 HDInsight 群集上运行的 <bpt id=\"p2\">[</bpt>WebHCat<ept id=\"p2\">](https://cwiki.apache.org/confluence/display/Hive/WebHCat)</ept>（以前称为 Templeton）实现的。"
+    },
+    {
+      "content": "在远程 HDInsight 群集上运行 Hive 查询时，将使用以下 Cmdlet：",
+      "pos": [
+        1147,
+        1189
+      ]
+    },
+    {
+      "pos": [
+        1193,
+        1249
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Add-AzureAccount<ept id=\"p1\">**</ept>：在 Azure 订阅中进行 Azure PowerShell 身份验证"
+    },
+    {
+      "pos": [
+        1386,
+        1451
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>New-AzureHDInsightHiveJobDefinition<ept id=\"p1\">**</ept>：使用指定的 HiveQL 语句创建新的<bpt id=\"p2\">*</bpt>作业定义<ept id=\"p2\">*</ept>"
+    },
+    {
+      "pos": [
+        1455,
+        1528
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Start-AzureHDInsightJob<ept id=\"p1\">**</ept>：将作业定义发送到 HDInsight，启动作业，然后返回可用来检查作业状态的<bpt id=\"p2\">*</bpt>作业<ept id=\"p2\">*</ept> 对象"
+    },
+    {
+      "pos": [
+        1532,
+        1592
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Wait-AzureHDInsightJob<ept id=\"p1\">**</ept>：使用作业对象来检查作业的状态。它将一直等到作业完成或超出等待时间。"
+    },
+    {
+      "pos": [
+        1596,
+        1637
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Get-AzureHDInsightJobOutput<ept id=\"p1\">**</ept>：用于检索作业的输出"
+    },
+    {
+      "pos": [
+        1641,
+        1704
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Invoke-AzureHDInsightHiveJob<ept id=\"p1\">**</ept>：用于运行 HiveQL 语句。这将阻止查询完成，然后返回结果"
+    },
+    {
+      "pos": [
+        1708,
+        1767
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Use-AzureHDInsightCluster<ept id=\"p1\">**</ept>：设置要用于 <bpt id=\"p2\">**</bpt>Invoke-Hive<ept id=\"p2\">**</ept> 命令的当前群集"
+    },
+    {
+      "content": "以下步骤演示了如何使用这些 Cmdlet 在 HDInsight 群集上运行作业：",
+      "pos": [
+        1769,
+        1810
+      ]
+    },
+    {
+      "pos": [
+        1815,
+        1885
+      ],
+      "content": "使用编辑器将以下代码保存为 <bpt id=\"p1\">**</bpt>hivejob.ps1<ept id=\"p1\">**</ept>。必须将 <bpt id=\"p2\">**</bpt>CLUSTERNAME<ept id=\"p2\">**</ept> 替换为 HDInsight 群集的名称。"
+    },
+    {
+      "pos": [
+        3642,
+        3721
+      ],
+      "content": "打开一个新的 <bpt id=\"p1\">**</bpt>Azure PowerShell<ept id=\"p1\">**</ept> 命令提示符。将目录更改为 <bpt id=\"p2\">**</bpt>hivejob.ps1<ept id=\"p2\">**</ept> 文件的所在位置，然后使用以下命令来运行脚本："
+    },
+    {
+      "content": "脚本运行时，系统将提示你输入你的群集的 HTTPS/Admin 帐户凭据。还可能会提示你登录到 Azure 订阅。",
+      "pos": [
+        3750,
+        3807
+      ]
+    },
+    {
+      "content": "在作业完成时，它应返回如下信息：",
+      "pos": [
+        3816,
+        3832
+      ]
+    },
+    {
+      "pos": [
+        4126,
+        4197
+      ],
+      "content": "如前所述，<bpt id=\"p1\">**</bpt>Invoke-Hive<ept id=\"p1\">**</ept> 可以用来运行查询，并等待响应。使用以下命令，并将 <bpt id=\"p2\">**</bpt>CLUSTERNAME<ept id=\"p2\">**</ept> 替换为群集的名称："
+    },
+    {
+      "content": "输出将如下所示：",
+      "pos": [
+        4574,
+        4582
+      ]
+    },
+    {
+      "pos": [
+        4804,
+        4971
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 对于较长的 HiveQL 查询，你可以使用 Azure PowerShell <bpt id=\"p1\">**</bpt>Here-Strings<ept id=\"p1\">**</ept> cmdlet 或 HiveQL 脚本文件。以下代码段显示了如何使用 <bpt id=\"p2\">**</bpt>Invoke-Hive<ept id=\"p2\">**</ept> cmdlet 来运行 HiveQL 脚本文件。HiveQL 脚本文件必须上载到 wasb://。"
+    },
+    {
+      "pos": [
+        4978,
+        5243
+      ],
+      "content": "<p>`Invoke-AzureRmHDInsightHiveJob -File \"wasb://<ContainerName>@<StorageAccountName>/<Path>/query.hql\"`\n<p>有关 **Here-Strings** 的详细信息，请参阅<a href=\"http://technet.microsoft.com/zh-cn/library/ee692792.aspx\" target=\"_blank\">使用 Windows PowerShell Here-Strings</a>。",
+      "leadings": [
+        "",
+        "    > "
+      ],
+      "nodes": [
+        {
+          "content": "`Invoke-AzureRmHDInsightHiveJob -File \"wasb://",
+          "pos": [
+            3,
+            49
+          ]
+        },
+        {
+          "content": "@",
+          "pos": [
+            64,
+            65
+          ]
+        },
+        {
+          "content": "/",
+          "pos": [
+            85,
+            86
+          ]
+        },
+        {
+          "content": "/query.hql\"`",
+          "pos": [
+            92,
+            104
+          ]
+        },
+        {
+          "content": "有关 <bpt id=\"p1\">**</bpt>Here-Strings<ept id=\"p1\">**</ept> 的详细信息，请参阅<ph id=\"ph1\">&lt;a href=\"http://technet.microsoft.com/zh-cn/library/ee692792.aspx\" target=\"_blank\"&gt;</ph>使用 Windows PowerShell Here-Strings<ph id=\"ph2\">&lt;/a&gt;</ph>。",
+          "pos": [
+            108,
+            259
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        5247,
+        5279
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"troubleshooting\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>故障排除"
+    },
+    {
+      "pos": [
+        5281,
+        5369
+      ],
+      "content": "如果在作业完成时未返回任何信息，则可能表示处理期间发生错误。若要查看此作业的错误信息，请将以下内容添加到 <bpt id=\"p1\">**</bpt>hivejob.ps1<ept id=\"p1\">**</ept> 文件的末尾，保存，然后重新运行该文件。"
+    },
+    {
+      "content": "在运行作业时，这将返回写入到服务器上的 STDERR 中的信息，该信息可帮助确定该作业失败的原因。",
+      "pos": [
+        5575,
+        5624
+      ]
+    },
+    {
+      "pos": [
+        5628,
+        5650
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"summary\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>摘要"
+    },
+    {
+      "content": "如你所见，Azure PowerShell 提供了简单的方法让你在 HDInsight 群集上运行 Hive 查询，监视作业状态，以及检索输出。",
+      "pos": [
+        5652,
+        5724
+      ]
+    },
+    {
+      "pos": [
+        5728,
+        5754
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"nextsteps\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>后续步骤"
+    },
+    {
+      "content": "有关 HDInsight 中的 Hive 的一般信息：",
+      "pos": [
+        5756,
+        5783
+      ]
+    },
+    {
+      "content": "将 Hive 与 HDInsight 上的 Hadoop 配合使用",
+      "pos": [
+        5788,
+        5821
+      ]
+    },
+    {
+      "content": "有关 HDInsight 上的 Hadoop 的其他使用方法的信息：",
+      "pos": [
+        5868,
+        5902
+      ]
+    },
+    {
+      "content": "将 Pig 与 HDInsight 上的 Hadoop 配合使用",
+      "pos": [
+        5907,
+        5939
+      ]
+    },
+    {
+      "content": "将 MapReduce 与 HDInsight 上的 Hadoop 配合使用",
+      "pos": [
+        5988,
+        6026
+      ]
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"在 HDInsight 中将 Hadoop Hive 与 PowerShell 配合使用 | Azure\"\n   description=\"使用 PowerShell 在 HDInsight 上的 Hadoop 中运行 Hive 查询。\"\n   services=\"hdinsight\"\n   documentationCenter=\"\"\n   authors=\"Blackmist\"\n   manager=\"paulettm\"\n   editor=\"cgronlun\"\n    tags=\"azure-portal\"/>\n\n<tags\n    ms.service=\"hdinsight\"\n    ms.date=\"01/08/2016\"\n    wacn.date=\"02/26/2016\"/>\n\n#使用 PowerShell 运行 Hive 查询\n\n[AZURE.INCLUDE [hive-selector](../includes/hdinsight-selector-use-hive.md)]\n\n> [AZURE.NOTE] 本文档未详细描述示例中使用的 HiveQL 语句的作用。有关此示例中使用的 HiveQL 的信息，请参阅[将 Hive 与 HDInsight 上的 Hadoop 配合使用](/documentation/articles/hdinsight-use-hive)。\n\n\n**<a id=\"prereq\"></a>先决条件**\n\n若要完成本文中的步骤，你将需要：\n\n- **Azure HDInsight（HDInsight 上的 Hadoop）群集（基于 Windows）** \n- **配备 Azure PowerShell 的工作站**。请参阅[安装 Azure PowerShell 1.0 和更高版本](/documentation/articles/hdinsight-administer-use-powershell#install-azure-powershell-10-and-greater)。\n\n##<a id=\"powershell\"></a>使用 Azure PowerShell 运行 Hive 查询\n\nAzure PowerShell 提供 *cmdlet*，可让你在 HDInsight 上远程运行 Hive 查询。从内部来讲，这是通过使用 REST 调用 HDInsight 群集上运行的 [WebHCat](https://cwiki.apache.org/confluence/display/Hive/WebHCat)（以前称为 Templeton）实现的。\n\n在远程 HDInsight 群集上运行 Hive 查询时，将使用以下 Cmdlet：\n\n* **Add-AzureAccount**：在 Azure 订阅中进行 Azure PowerShell 身份验证\n\n[AZURE.INCLUDE [automation-azurechinacloud-environment-parameter](../includes/automation-azurechinacloud-environment-parameter.md)]\n\n* **New-AzureHDInsightHiveJobDefinition**：使用指定的 HiveQL 语句创建新的*作业定义*\n\n* **Start-AzureHDInsightJob**：将作业定义发送到 HDInsight，启动作业，然后返回可用来检查作业状态的*作业* 对象\n\n* **Wait-AzureHDInsightJob**：使用作业对象来检查作业的状态。它将一直等到作业完成或超出等待时间。\n\n* **Get-AzureHDInsightJobOutput**：用于检索作业的输出\n\n* **Invoke-AzureHDInsightHiveJob**：用于运行 HiveQL 语句。这将阻止查询完成，然后返回结果\n\n* **Use-AzureHDInsightCluster**：设置要用于 **Invoke-Hive** 命令的当前群集\n\n以下步骤演示了如何使用这些 Cmdlet 在 HDInsight 群集上运行作业：\n\n1. 使用编辑器将以下代码保存为 **hivejob.ps1**。必须将 **CLUSTERNAME** 替换为 HDInsight 群集的名称。\n\n        #Specify the values\n        $clusterName = \"CLUSTERNAME\"\n        $httpUsername = \"HTTPUSERNAME\"\n        $httpUserPassword  = \"HTTPUSERPASSWORD\"\n        # Login to your Azure subscription\n        # Is there an active Azure subscription?\n        $sub = Get-AzureSubscription -ErrorAction SilentlyContinue\n        if(-not($sub))\n        {\n            Add-AzureAccount -Environment AzureChinaCloud\n        }\n\n        #HiveQL\n        $queryString = \"DROP TABLE log4jLogs;\" +\n                       \"CREATE EXTERNAL TABLE log4jLogs(t1 string, t2 string, t3 string, t4 string, t5 string, t6 string, t7 string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ' ' STORED AS TEXTFILE LOCATION 'wasb:///example/data/';\" +\n                       \"SELECT * FROM log4jLogs WHERE t4 = '[ERROR]';\"\n\n        #Create an HDInsight Hive job definition\n        $hiveJobDefinition = New-AzureHDInsightHiveJobDefinition -Query $queryString \n\n        #Submit the job to the cluster\n        Write-Host \"Start the Hive job...\" -ForegroundColor Green\n\n        $passwd = ConvertTo-SecureString $httpUserPassword -AsPlainText -Force\n        $creds = New-Object System.Management.Automation.PSCredential ($httpUsername, $passwd)\n        $hiveJob = Start-AzureHDInsightJob -Cluster $clusterName -JobDefinition $hiveJobDefinition -Credential $creds\n\n\n        #Wait for the Hive job to complete\n        Write-Host \"Wait for the job to complete...\" -ForegroundColor Green\n        Wait-AzureHDInsightJob -Cluster $clusterName -JobId $hiveJob.JobId -Credential $creds\n\n        # Print the output\n        Write-Host \"Display the standard output...\" -ForegroundColor Green\n        Get-AzureHDInsightJobOutput -ClusterName $clusterName -JobId $hiveJob.JobId -StandardOutput \n\n            \n2. 打开一个新的 **Azure PowerShell** 命令提示符。将目录更改为 **hivejob.ps1** 文件的所在位置，然后使用以下命令来运行脚本：\n\n        .\\hivejob.ps1\n\n    脚本运行时，系统将提示你输入你的群集的 HTTPS/Admin 帐户凭据。还可能会提示你登录到 Azure 订阅。\n    \n7. 在作业完成时，它应返回如下信息：\n\n        Display the standard output...\n        2012-02-03      18:35:34        SampleClass0    [ERROR] incorrect       id\n        2012-02-03      18:55:54        SampleClass1    [ERROR] incorrect       id\n        2012-02-03      19:25:27        SampleClass4    [ERROR] incorrect       id\n\n4. 如前所述，**Invoke-Hive** 可以用来运行查询，并等待响应。使用以下命令，并将 **CLUSTERNAME** 替换为群集的名称：\n\n        Use-AzureHDInsightCluster CLUSTERNAME\n        Invoke-Hive -Query @\"\n        CREATE TABLE IF NOT EXISTS errorLogs (t1 string, t2 string, t3 string, t4 string, t5 string, t6 string, t7 string) STORED AS ORC;\n        INSERT OVERWRITE TABLE errorLogs SELECT t1, t2, t3, t4, t5, t6, t7 FROM log4jLogs WHERE t4 = '[ERROR]';\n        SELECT * FROM errorLogs;\n        \"@\n\n    输出将如下所示：\n\n        2012-02-03  18:35:34    SampleClass0    [ERROR] incorrect   id\n        2012-02-03  18:55:54    SampleClass1    [ERROR] incorrect   id\n        2012-02-03  19:25:27    SampleClass4    [ERROR] incorrect   id\n\n    > [AZURE.NOTE] 对于较长的 HiveQL 查询，你可以使用 Azure PowerShell **Here-Strings** cmdlet 或 HiveQL 脚本文件。以下代码段显示了如何使用 **Invoke-Hive** cmdlet 来运行 HiveQL 脚本文件。HiveQL 脚本文件必须上载到 wasb://。\n    > <p>`Invoke-AzureRmHDInsightHiveJob -File \"wasb://<ContainerName>@<StorageAccountName>/<Path>/query.hql\"`\n    > <p>有关 **Here-Strings** 的详细信息，请参阅<a href=\"http://technet.microsoft.com/zh-cn/library/ee692792.aspx\" target=\"_blank\">使用 Windows PowerShell Here-Strings</a>。\n\n##<a id=\"troubleshooting\"></a>故障排除\n\n如果在作业完成时未返回任何信息，则可能表示处理期间发生错误。若要查看此作业的错误信息，请将以下内容添加到 **hivejob.ps1** 文件的末尾，保存，然后重新运行该文件。\n\n    # Print the output of the Hive job.\n    Write-Host \"Display the standard output ...\" -ForegroundColor Green\n    Get-AzureHDInsightJobOutput -Cluster $clusterName -JobId $hiveJob.JobId -StandardError\n\n在运行作业时，这将返回写入到服务器上的 STDERR 中的信息，该信息可帮助确定该作业失败的原因。\n\n##<a id=\"summary\"></a>摘要\n\n如你所见，Azure PowerShell 提供了简单的方法让你在 HDInsight 群集上运行 Hive 查询，监视作业状态，以及检索输出。\n\n##<a id=\"nextsteps\"></a>后续步骤\n\n有关 HDInsight 中的 Hive 的一般信息：\n\n* [将 Hive 与 HDInsight 上的 Hadoop 配合使用](/documentation/articles/hdinsight-use-hive)\n\n有关 HDInsight 上的 Hadoop 的其他使用方法的信息：\n\n* [将 Pig 与 HDInsight 上的 Hadoop 配合使用](/documentation/articles/hdinsight-use-pig)\n\n* [将 MapReduce 与 HDInsight 上的 Hadoop 配合使用](/documentation/articles/hdinsight-use-mapreduce)\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

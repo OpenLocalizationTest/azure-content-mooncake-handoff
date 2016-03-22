@@ -1,0 +1,1053 @@
+{
+  "nodes": [
+    {
+      "content": "在 Azure 中创建使用 Azure Active Directory 身份验证的 .NET MVC Web 应用",
+      "pos": [
+        28,
+        86
+      ]
+    },
+    {
+      "content": "学习如何在使用 Azure Active Directory 进行身份验证的 Azure 中创建 ASP.NET MVC 业务线应用程序",
+      "pos": [
+        106,
+        174
+      ]
+    },
+    {
+      "content": "在 Azure 中创建使用 Azure Active Directory 身份验证的 .NET MVC Web 应用",
+      "pos": [
+        415,
+        473
+      ]
+    },
+    {
+      "pos": [
+        476,
+        803
+      ],
+      "content": "在本文中，你将了解如何在使用本地 <bpt id=\"p1\">[</bpt>Azure Active Directory<ept id=\"p1\">](/home/features/identity/)</ept> 作为标识提供者的 <bpt id=\"p2\">[</bpt>Azure Web 应用<ept id=\"p2\">](/documentation/services/web-sites/)</ept>中创建 ASP.NET MVC 业务线应用程序。你还将了解如何使用 <bpt id=\"p3\">[</bpt>Azure Active Directory Graph 客户端库<ept id=\"p3\">](http://blogs.msdn.com/b/aadgraphteam/archive/2014/06/02/azure-active-directory-graph-client-library-1-0-publish.aspx)</ept>查询应用程序中的目录数据。"
+    },
+    {
+      "content": "使用的 Azure Active Directory 租户可以是仅限 Azure 的目录，或者与本地 Active Directory (AD) 进行目录同步，以便为本地或远程的辅助角色创建单一登录体验。",
+      "pos": [
+        805,
+        907
+      ]
+    },
+    {
+      "pos": [
+        910,
+        1097
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>对于 Azure Web 应用，只需单击几下鼠标，就能配置针对 Azure Active Directory 租户的身份验证。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>使用 Active Directory 在 Azure 中进行身份验证<ept id=\"p1\">](/documentation/articles/web-sites-authentication-authorization)</ept>。"
+    },
+    {
+      "content": "要生成的项目",
+      "pos": [
+        1128,
+        1134
+      ]
+    },
+    {
+      "content": "你将在 Azure 中生成用于跟踪工作项并具有以下功能的简单的业务线创建-读取-更新-删除 (CRUD) 应用程序：",
+      "pos": [
+        1139,
+        1197
+      ]
+    },
+    {
+      "content": "根据 Azure Active Directory 对用户进行身份验证",
+      "pos": [
+        1201,
+        1236
+      ]
+    },
+    {
+      "content": "实现登录和注销功能",
+      "pos": [
+        1239,
+        1248
+      ]
+    },
+    {
+      "pos": [
+        1251,
+        1285
+      ],
+      "content": "使用 <ph id=\"ph1\">`[Authorize]`</ph> 授权用户执行不同的 CRUD 操作"
+    },
+    {
+      "pos": [
+        1288,
+        1412
+      ],
+      "content": "使用 <bpt id=\"p1\">[</bpt>Azure Active Directory 图形 API<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/azure/hh974476.aspx)</ept> 查询 Azure Active Directory 数据"
+    },
+    {
+      "pos": [
+        1415,
+        1602
+      ],
+      "content": "使用 <bpt id=\"p1\">[</bpt>Microsoft.Owin<ept id=\"p1\">](http://www.asp.net/aspnet/overview/owin-and-katana/an-overview-of-project-katana)</ept>（而不是 Windows Identity Foundation (WIF)），它代表了 ASP.NET 的未来发展方向，与 WIF 相比，它的身份验证和授权设置要简单得多"
+    },
+    {
+      "content": "所需的项目",
+      "pos": [
+        1632,
+        1637
+      ]
+    },
+    {
+      "content": "若要完成本教程，你需要以下项目：",
+      "pos": [
+        1709,
+        1725
+      ]
+    },
+    {
+      "content": "一个 Azure Active Directory 租户，其中的用户已分配到不同的组",
+      "pos": [
+        1729,
+        1771
+      ]
+    },
+    {
+      "content": "在 Azure Active Directory 租户上创建应用程序的权限",
+      "pos": [
+        1774,
+        1811
+      ]
+    },
+    {
+      "content": "Visual Studio 2013",
+      "pos": [
+        1814,
+        1832
+      ]
+    },
+    {
+      "pos": [
+        1835,
+        1950
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Azure SDK 2.5.1<ept id=\"p1\">](https://www.microsoft.com/web/handlers/webpi.ashx/getinstaller/VWDOrVs2013AzurePack.appids)</ept> 或更高版本"
+    },
+    {
+      "content": "将示例应用程序用作业务线模板",
+      "pos": [
+        1982,
+        1996
+      ]
+    },
+    {
+      "pos": [
+        2001,
+        2182
+      ],
+      "content": "本教程中的示例应用程序 <bpt id=\"p1\">[</bpt>WebApp-RoleClaims-DotNet<ept id=\"p1\">](https://github.com/Azure-Samples/active-directory-dotnet-webapp-roleclaims)</ept> 由 Azure Active Directory 团队创建，可用作模板来轻松创建新的业务线应用程序。该示例应用程序具有以下内置功能："
+    },
+    {
+      "pos": [
+        2186,
+        2266
+      ],
+      "content": "使用 <bpt id=\"p1\">[</bpt>OpenID Connect<ept id=\"p1\">](http://openid.net/connect/)</ept> 通过 Azure Active Directory 进行身份验证"
+    },
+    {
+      "pos": [
+        2269,
+        2344
+      ],
+      "content": "示例 <ph id=\"ph1\">`TaskTracker`</ph> 控制器演示了如何才能授权对应用程序，其中包括 <ph id=\"ph2\">`[Authorize]`</ph> 的标准用法中的特定操作的不同角色的控制器。"
+    },
+    {
+      "content": "一个多租户应用程序，其中包含可立即分配给用户和组的预定义角色。",
+      "pos": [
+        2348,
+        2379
+      ]
+    },
+    {
+      "content": "运行示例应用程序",
+      "pos": [
+        2410,
+        2418
+      ]
+    },
+    {
+      "pos": [
+        2427,
+        2550
+      ],
+      "content": "克隆或下载 <bpt id=\"p1\">[</bpt>WebApp-RoleClaims-DotNet<ept id=\"p1\">](https://github.com/Azure-Samples/active-directory-dotnet-webapp-roleclaims)</ept> 中的示例解决方案到本地目录。"
+    },
+    {
+      "pos": [
+        2556,
+        2764
+      ],
+      "content": "根据<bpt id=\"p1\">[</bpt>如何将示例作为单租户应用运行<ept id=\"p1\">](https://github.com/Azure-Samples/active-directory-dotnet-webapp-roleclaims#how-to-run-the-sample-as-a-single-tenant-app)</ept>中的说明设置 Azure Active Directory 应用程序和项目。请务必遵照所有有关将多租户应用程序转换为单租户应用程序的说明。"
+    },
+    {
+      "pos": [
+        2770,
+        2882
+      ],
+      "content": "在刚刚创建的 Azure Active Directory 应用程序的 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>视图中，单击“用户”选项卡。然后，将所需的用户分配到所需的角色。"
+    },
+    {
+      "pos": [
+        2889,
+        3134
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果除了分配到用户以外，还要将角色分配到组，则必须将你的 Azure Active Directory 租户升级到 <bpt id=\"p1\">[</bpt>Active Directory Premium<ept id=\"p1\">](/home/features/identity/#price)</ept>。在应用程序的门户 UI 中，如果你看到的是“用户”选项卡而不是“用户和组”选项卡，你可以转到 Azure Active Directory 租户的“许可证”选项卡来试用 Azure Active Directory Premium。"
+    },
+    {
+      "pos": [
+        3140,
+        3191
+      ],
+      "content": "配置完应用程序后，在 Visual Studio 中键入 <ph id=\"ph1\">`F5`</ph> 以运行 ASP.NET 应用程序。"
+    },
+    {
+      "content": "加载应用程序后，单击“登录”，并使用在 Azure 管理门户中具有管理员角色的用户身份登录。",
+      "pos": [
+        3197,
+        3243
+      ]
+    },
+    {
+      "content": "如果你已正确配置 Azure Active Directory 应用程序，并在 Web.config 中设置了相应的设置，则应会重定向到登录页。你只需使用在 Azure 管理门户中创建 Azure Active Directory 应用程序时所用的帐户登录，因为该帐户是 Azure Active Directory 应用程序的默认所有者。",
+      "pos": [
+        3249,
+        3419
+      ]
+    },
+    {
+      "content": "将示例应用程序部署到 Azure Web 应用",
+      "pos": [
+        3455,
+        3478
+      ]
+    },
+    {
+      "pos": [
+        3480,
+        3690
+      ],
+      "content": "现在，你需要将应用程序发布到 Azure 中的 Web 应用。<bpt id=\"p1\">[</bpt>README.md<ept id=\"p1\">](https://github.com/Azure-Samples/active-directory-dotnet-webapp-roleclaims/blob/master/README.md)</ept> 中已经提供了有关部署到 Azure Web 应用的说明，但这些步骤还取消了本地调试环境的配置。下面将介绍如何在保留调试配置的同时进行部署。"
+    },
+    {
+      "content": "右键单击您的项目，然后选择“发布”。",
+      "pos": [
+        3695,
+        3713
+      ]
+    },
+    {
+      "content": "单机“导入”，选择已下载的“发布配置文件”。",
+      "pos": [
+        3794,
+        3816
+      ]
+    },
+    {
+      "pos": [
+        3822,
+        3918
+      ],
+      "content": "如果还没有创建 Web 应用，可以登录 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">](https://manage.windowsazure.cn/)</ept>创建一个，然后再“仪表板”的“速览”下，下载“发布配置文件”。"
+    },
+    {
+      "pos": [
+        3923,
+        3995
+      ],
+      "content": "在“目标 URL”中，将 <bpt id=\"p1\">**</bpt>http<ept id=\"p1\">**</ept> 更改为 <bpt id=\"p2\">**</bpt>https<ept id=\"p2\">**</ept>。将整个 URL 复制到文本编辑器。稍后将要用到它。然后，单击“下一步”。"
+    },
+    {
+      "content": "清除“启用组织身份验证”复选框。",
+      "pos": [
+        4082,
+        4098
+      ]
+    },
+    {
+      "pos": [
+        4198,
+        4366
+      ],
+      "content": "展开“RoleClaimContext”并选择“执行 Code First 迁移(应用程序启动时运行)”复选框。稍后当你定义其他 Code First 数据模型时，<bpt id=\"p1\">[</bpt>Code First 迁移<ept id=\"p1\">](https://msdn.microsoft.com/data/jj591621.aspx)</ept>会帮助你在 Azure 中更新应用的数据库架构。"
+    },
+    {
+      "content": "此时请不要单击“发布”转到 Web 发布过程，而是单击“关闭”。单击“是”保存对发布配置文件所做的更改。",
+      "pos": [
+        4371,
+        4423
+      ]
+    },
+    {
+      "pos": [
+        4428,
+        4520
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>中转到你的 Azure Active Directory 租户，然后单击“应用程序”选项卡。"
+    },
+    {
+      "content": "单击页面底部的“添加”。",
+      "pos": [
+        4525,
+        4537
+      ]
+    },
+    {
+      "content": "单击“添加我的组织正在开发的应用程序”。",
+      "pos": [
+        4542,
+        4562
+      ]
+    },
+    {
+      "content": "选择“ Web 应用和/或 Web API”。",
+      "pos": [
+        4567,
+        4590
+      ]
+    },
+    {
+      "content": "为应用程序提供一个名称，然后单击“下一步”。",
+      "pos": [
+        4595,
+        4617
+      ]
+    },
+    {
+      "pos": [
+        4622,
+        4775
+      ],
+      "content": "在“应用程序属性”中，将“登录 URL”设置为你前面保存的 Web 应用URL（例如 <ph id=\"ph1\">`https://&lt;site-name&gt;.chinacloudsites.cn/`</ph>），并将“应用 ID URI”设置为 <ph id=\"ph2\">`https://&lt;aad-tenanet-name&gt;/&lt;app-name&gt;`</ph>。然后，单击“完成”。"
+    },
+    {
+      "pos": [
+        4862,
+        5016
+      ],
+      "content": "创建应用程序后，根据前面<bpt id=\"p1\">[</bpt>定义应用程序角色<ept id=\"p1\">](https://github.com/Azure-Samples/active-directory-dotnet-webapp-roleclaims#step-2-define-your-application-roles)</ept>中的说明以相同的方式更新应用程序清单。"
+    },
+    {
+      "pos": [
+        5022,
+        5134
+      ],
+      "content": "在刚刚创建的 Azure Active Directory 应用程序的 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>视图中，单击“用户”选项卡。然后，将所需的用户分配到所需的角色。"
+    },
+    {
+      "content": "单击“配置”选项卡。",
+      "pos": [
+        5139,
+        5149
+      ]
+    },
+    {
+      "content": "在“键”下，通过从下拉列表中选择“1 年”创建新键。",
+      "pos": [
+        5154,
+        5180
+      ]
+    },
+    {
+      "content": "在“Azure Active Directory”条目的“对其他应用程序的权限”下，从“委派权限”下拉列表中选择“登录和读取用户配置文件”与“读取目录数据”。",
+      "pos": [
+        5185,
+        5264
+      ]
+    },
+    {
+      "pos": [
+        5272,
+        5342
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>此处需要的确切权限取决于你的应用程序所需的功能。某些权限需要“全局管理员”角色才能设置，但本教程只需要“用户”角色。"
+    },
+    {
+      "content": "单击“保存”。",
+      "pos": [
+        5348,
+        5355
+      ]
+    },
+    {
+      "content": "你通过导航离开已保存的配置页之前，请将以下信息复制到文本编辑器中。",
+      "pos": [
+        5362,
+        5395
+      ]
+    },
+    {
+      "pos": [
+        5449,
+        6219
+      ],
+      "content": "在 Visual Studio 中，在项目中打开 **Web.Release.config**。将以下 XML 插入 `<configuration>` 标记，并将每个键的值替换为新的 Azure Active Directory 应用程序保存的信息。\n<pre class=\"prettyprint\">\n&lt;appSettings><span>&#13;</span>\n    &lt;add key=\"ida:ClientId\" value=\"<mark>[e.g. 82692da5-a86f-44c9-9d53-2f88d52b478b]</mark>\" xdt:Transform=\"SetAttributes\" xdt:Locator=\"Match(key)\" /><span>&#13;</span>\n    &lt;add key=\"ida:AppKey\" value=\"<mark>[e.g. rZJJ9bHSi/cYnYwmQFxLYDn/6EfnrnIfKoNzv9NKgbo=]</mark>\" xdt:Transform=\"SetAttributes\" xdt:Locator=\"Match(key)\" /><span>&#13;</span>\n    &lt;add key=\"ida:PostLogoutRedirectUri\" value=\"<mark>[e.g. https://mylobapp.chinacloudsites.cn/]</mark>\" xdt:Transform=\"SetAttributes\" xdt:Locator=\"Match(key)\" /><span>&#13;</span>\n&lt;/appSettings></pre>",
+      "leadings": [
+        "",
+        "    ",
+        "    ",
+        "    ",
+        "    ",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "在 Visual Studio 中，在项目中打开 <bpt id=\"p1\">**</bpt>Web.Release.config<ept id=\"p1\">**</ept>。将以下 XML 插入 <ph id=\"ph1\">`&lt;configuration&gt;`</ph> 标记，并将每个键的值替换为新的 Azure Active Directory 应用程序保存的信息。",
+          "pos": [
+            0,
+            126
+          ]
+        },
+        {
+          "content": "&amp;lt;appSettings&gt;<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            153,
+            187
+          ]
+        },
+        {
+          "content": "&amp;lt;add key=\"ida:ClientId\" value=\"",
+          "pos": [
+            192,
+            226
+          ]
+        },
+        {
+          "content": "[e.g. 82692da5-a86f-44c9-9d53-2f88d52b478b]",
+          "pos": [
+            232,
+            275
+          ]
+        },
+        {
+          "content": "\" xdt:Transform=\"SetAttributes\" xdt:Locator=\"Match(key)\" /&gt;<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            282,
+            359
+          ]
+        },
+        {
+          "content": "&amp;lt;add key=\"ida:AppKey\" value=\"",
+          "pos": [
+            364,
+            396
+          ]
+        },
+        {
+          "content": "[e.g. rZJJ9bHSi/cYnYwmQFxLYDn/6EfnrnIfKoNzv9NKgbo=]",
+          "pos": [
+            402,
+            453
+          ]
+        },
+        {
+          "content": "\" xdt:Transform=\"SetAttributes\" xdt:Locator=\"Match(key)\" /&gt;<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            460,
+            537
+          ]
+        },
+        {
+          "content": "&amp;lt;add key=\"ida:PostLogoutRedirectUri\" value=\"",
+          "pos": [
+            542,
+            589
+          ]
+        },
+        {
+          "content": "[e.g. https://mylobapp.chinacloudsites.cn/]",
+          "pos": [
+            595,
+            638
+          ]
+        },
+        {
+          "content": "\" xdt:Transform=\"SetAttributes\" xdt:Locator=\"Match(key)\" /&gt;<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            645,
+            722
+          ]
+        },
+        {
+          "content": "&amp;lt;/appSettings&gt;",
+          "pos": [
+            723,
+            740
+          ]
+        }
+      ]
+    },
+    {
+      "content": "请确保 ida:PostLogoutRedirectUri 的值以斜杠“/”结尾。",
+      "pos": [
+        6225,
+        6266
+      ]
+    },
+    {
+      "content": "右键单击您的项目，然后选择“发布”。",
+      "pos": [
+        6271,
+        6289
+      ]
+    },
+    {
+      "content": "单击“发布”以发布到 Azure Web 应用。",
+      "pos": [
+        6294,
+        6318
+      ]
+    },
+    {
+      "pos": [
+        6320,
+        6568
+      ],
+      "content": "完成此操作后，将在 Azure 管理门户中配置两个 Azure Active Directory 应用程序，一个用于 Visual Studio 中的调试环境，另一个用于 Azure 中发布的 Web 应用。在调试期间，将使用 Web.config 中的应用程序设置来使<bpt id=\"p1\">**</bpt>调试<ept id=\"p1\">**</ept>配置适用于 Azure Active Directory，发布配置（默认情况下，会发布<bpt id=\"p2\">**</bpt>版本<ept id=\"p2\">**</ept>配置）后，将上载转换的 Web.config，其中包含 Web.Release.config 中的应用程序设置更改。"
+    },
+    {
+      "content": "如果你想要附加到已发布的 Web 应用调试器（必须上载的已发布的 Web 应用中的代码的调试符号），你可以创建的调试配置对于 Azure 调试，但使用的 Azure Active Directory 设置从 Web.Release.config 自己自定义 Web.config 转换（例如 Web.AzureDebug.config）克隆。这样，你可以跨不同的环境中维护静态配置。",
+      "pos": [
+        6570,
+        6761
+      ]
+    },
+    {
+      "content": "将业务线功能添加到示例应用程序",
+      "pos": [
+        6791,
+        6806
+      ]
+    },
+    {
+      "content": "在本教程的本部分，你将学习如何基于示例应用程序生成所需的业务线功能。你将创建一个简单 CRUD 的工作项跟踪程序，类似于 TaskTracker 控制器，但使用标准的 CRUD 基架和设计模式。你还将使用包含的 Scripts\\\\AadPickerLibrary.js 从 Azure Active Directory 图形 API 丰富应用程序与数据。",
+      "pos": [
+        6808,
+        6985
+      ]
+    },
+    {
+      "pos": [
+        6991,
+        7206
+      ],
+      "content": "在 Models 文件夹中创建名为 WorkItem.cs 的新 <bpt id=\"p1\">[</bpt>Code First<ept id=\"p1\">](http://www.asp.net/mvc/overview/getting-started/getting-started-with-ef-using-mvc/creating-an-entity-framework-data-model-for-an-asp-net-mvc-application)</ept> 模型，并将代码替换为以下代码："
+    },
+    {
+      "pos": [
+        7889,
+        8129
+      ],
+      "content": "打开 DAL\\\\RoleClaimContext.cs 并添加突出显示的代码：\n<pre class=\"prettyprint\">\npublic class RoleClaimContext : DbContext<span>&#13;</span>\n{<span>&#13;</span>\n    public RoleClaimContext() : base(\"RoleClaimContext\") { }<span>&#13;</span>",
+      "leadings": [
+        "",
+        "    ",
+        "    ",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "打开 DAL\\\\RoleClaimContext.cs 并添加突出显示的代码：",
+          "pos": [
+            0,
+            39
+          ]
+        },
+        {
+          "content": "public class RoleClaimContext : DbContext<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            66,
+            125
+          ]
+        },
+        {
+          "content": "{<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            126,
+            145
+          ]
+        },
+        {
+          "content": "public RoleClaimContext() : base(\"RoleClaimContext\") { }<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            150,
+            224
+          ]
+        }
+      ]
+    },
+    {
+      "content": "}",
+      "pos": [
+        8383,
+        8384
+      ]
+    },
+    {
+      "content": "生成项目，以便能够通过 Visual Studio 中的基架逻辑访问你的新模型。",
+      "pos": [
+        8396,
+        8436
+      ]
+    },
+    {
+      "pos": [
+        8442,
+        8524
+      ],
+      "content": "将新的基架项 <ph id=\"ph1\">`WorkItemsController`</ph> 添加到 Controllers 文件夹。为此，请右键单击“控制器”，指向“添加”，然后选择“新的基架项”。"
+    },
+    {
+      "content": "选择“使用实体框架的包含视图的 MVC 5 控制器”并单击“添加”。",
+      "pos": [
+        8530,
+        8564
+      ]
+    },
+    {
+      "content": "选择刚创建的模型并单击“添加”。",
+      "pos": [
+        8570,
+        8586
+      ]
+    },
+    {
+      "content": "打开 Controllers\\\\WorkItemsController.cs",
+      "pos": [
+        8684,
+        8722
+      ]
+    },
+    {
+      "pos": [
+        8728,
+        8816
+      ],
+      "content": "将突出显示的 [Authorize] 修饰添加到下面的相应操作。\n<pre class=\"prettyprint\">\n...<span>&#13;</span>",
+      "leadings": [
+        "",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "将突出显示的 [Authorize] 修饰添加到下面的相应操作。",
+          "pos": [
+            0,
+            32
+          ]
+        },
+        {
+          "content": "...<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            59,
+            80
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        8822,
+        9031
+      ],
+      "content": "<mark>[Authorize(Roles = \"Admin, Observer, Writer, Approver\")]</mark><span>&#13;</span>\npublic class WorkItemsController : Controller<span>&#13;</span>\n{<span>&#13;</span>\n    ...<span>&#13;</span>",
+      "leadings": [
+        "",
+        "    ",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "[Authorize(Roles = \"Admin, Observer, Writer, Approver\")]",
+          "pos": [
+            6,
+            62
+          ]
+        },
+        {
+          "content": "<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            69,
+            87
+          ]
+        },
+        {
+          "content": "public class WorkItemsController : Controller<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            88,
+            151
+          ]
+        },
+        {
+          "content": "{<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            152,
+            171
+          ]
+        },
+        {
+          "content": "...<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            176,
+            197
+          ]
+        }
+      ]
+    },
+    {
+      "content": "}",
+      "pos": [
+        10325,
+        10326
+      ]
+    },
+    {
+      "pos": [
+        10340,
+        10909
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>你可能已注意到某些操作带有 <ph id=\"ph2\">&lt;code&gt;</ph><ph id=\"ph3\">[ValidateAntiForgeryToken]</ph><ph id=\"ph4\">&lt;/code&gt;</ph> 修饰。由于存在 <bpt id=\"p1\">[</bpt>Brock Allen<ept id=\"p1\">](https://twitter.com/BrockLAllen)</ept> 在 <bpt id=\"p2\">[</bpt>MVC 4、AntiForgeryToken 和声明<ept id=\"p2\">](http://brockallen.com/2012/07/08/mvc-4-antiforgerytoken-and-claims/)</ept>中所述的行为，HTTP POST 可能无法完成防伪令牌验证，因为： + Azure Active Directory 不会发送 http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider，而默认情况下防伪令牌需要此项。+ 如果 Azure Active Directory 是与 AD FS 进行同步处理的目录，则默认情况下 AD FS 信任不发送 http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider 声明，不过你可以手动将 AD FS 配置为发送此声明。你将在下一步对此进行处理。"
+    },
+    {
+      "pos": [
+        10916,
+        10996
+      ],
+      "content": "在 App\\_Start\\\\Startup.Auth.cs 中，将以下代码行添加到 <ph id=\"ph1\">`ConfigureAuth`</ph> 方法中。右键单击每个命名解析错误并修复错误。"
+    },
+    {
+      "content": "AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.NameIdentifier;",
+      "pos": [
+        11006,
+        11078
+      ]
+    },
+    {
+      "content": "在 Create() 和 Edit() 中添加以下代码，使某些变量可在后面的 JavaScript 中使用。右键单击每个命名解析错误并修复错误。",
+      "pos": [
+        11265,
+        11337
+      ]
+    },
+    {
+      "pos": [
+        11504,
+        11579
+      ],
+      "content": "<ph id=\"ph1\">`AcquireToken()`</ph> 方法尚未定义，现在请在 <ph id=\"ph2\">`WorkItemsController`</ph> 类中定义它。右键单击每个命名解析错误并修复错误。"
+    },
+    {
+      "pos": [
+        12279,
+        12580
+      ],
+      "content": "在 Views\\\\WorkItems\\\\Create.cshtml（自动搭建基架的项）中，找到 `Html.BeginForm` 帮助器方法并对其进行如下修改：\n<pre class=\"prettyprint\">@using (Html.BeginForm(<mark>\"Create\", \"WorkItems\", FormMethod.Post, new { id = \"main-form\" }</mark>))<span>&#13;</span>\n{<span>&#13;</span>\n@Html.AntiForgeryToken()<span>&#13;</span>",
+      "leadings": [
+        "",
+        "    ",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "在 Views\\\\WorkItems\\\\Create.cshtml（自动搭建基架的项）中，找到 <ph id=\"ph1\">`Html.BeginForm`</ph> 帮助器方法并对其进行如下修改：",
+          "pos": [
+            0,
+            80
+          ]
+        },
+        {
+          "content": "@using (Html.BeginForm(",
+          "pos": [
+            106,
+            129
+          ]
+        },
+        {
+          "content": "\"Create\", \"WorkItems\", FormMethod.Post, new { id = \"main-form\" }",
+          "pos": [
+            135,
+            199
+          ]
+        },
+        {
+          "content": "))<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            206,
+            226
+          ]
+        },
+        {
+          "content": "{<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            227,
+            246
+          ]
+        },
+        {
+          "content": "@Html.AntiForgeryToken()<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            247,
+            289
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        12586,
+        12814
+      ],
+      "content": "&lt;div class=\"form-horizontal\"><span>&#13;</span>\n    &lt;h4>WorkItem&lt;/h4><span>&#13;</span>\n    &lt;hr /><span>&#13;</span>\n    @Html.ValidationSummary(true, \"\", new { @class = \"text-danger\" })<span>&#13;</span>",
+      "leadings": [
+        "",
+        "    ",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "&amp;lt;div class=\"form-horizontal\"&gt;<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            0,
+            50
+          ]
+        },
+        {
+          "content": "&amp;lt;h4&gt;WorkItem&amp;lt;/h4&gt;<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            55,
+            96
+          ]
+        },
+        {
+          "content": "&amp;lt;hr /&gt;<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            101,
+            128
+          ]
+        },
+        {
+          "content": "@Html.ValidationSummary(true, \"\", new { @class = \"text-danger\" })<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            133,
+            216
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        15373,
+        15400
+      ],
+      "content": "&amp;lt;/div&gt;<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>"
+    },
+    {
+      "pos": [
+        15406,
+        15772
+      ],
+      "content": "<mark>&lt;script><span>&#13;</span>\n        // People/Group Picker Code<span>&#13;</span>\n        var maxResultsPerPage = 14;<span>&#13;</span>\n        var input = document.getElementById(\"AssignedToName\");<span>&#13;</span>\n        var token = \"@ViewData[\"token\"]\";<span>&#13;</span>\n        var tenant = \"@ViewData[\"tenant\"]\";<span>&#13;</span>",
+      "leadings": [
+        "",
+        "    ",
+        "    ",
+        "    ",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "&amp;lt;script&gt;<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            6,
+            35
+          ]
+        },
+        {
+          "content": "// People/Group Picker Code<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            44,
+            89
+          ]
+        },
+        {
+          "content": "var maxResultsPerPage = 14;<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            98,
+            143
+          ]
+        },
+        {
+          "content": "var input = document.getElementById(\"AssignedToName\");<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            152,
+            224
+          ]
+        },
+        {
+          "content": "var token = \"@ViewData[\"token\"]\";<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            233,
+            284
+          ]
+        },
+        {
+          "content": "var tenant = \"@ViewData[\"tenant\"]\";<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+          "pos": [
+            293,
+            346
+          ]
+        }
+      ]
+    },
+    {
+      "content": "&amp;lt;/script&gt;",
+      "pos": [
+        16307,
+        16319
+      ]
+    },
+    {
+      "content": "}<ph id=\"ph1\">&lt;span&gt;</ph>&amp;#13;<ph id=\"ph2\">&lt;/span&gt;</ph>",
+      "pos": [
+        16326,
+        16345
+      ]
+    },
+    {
+      "pos": [
+        16378,
+        16514
+      ],
+      "content": "在脚本中，AadPicker 对象将调用 <bpt id=\"p1\">[</bpt>Azure Active Directory 图形 API<ept id=\"p1\">](https://msdn.microsoft.com/Library/Azure/Ad/Graph/api/api-catalog)</ept> 来搜索与输入内容匹配的用户和组。"
+    },
+    {
+      "pos": [
+        16520,
+        16775
+      ],
+      "content": "打开<bpt id=\"p1\">[</bpt>包管理器控制台<ept id=\"p1\">](http://docs.nuget.org/Consume/Package-Manager-Console)</ept>并运行 <bpt id=\"p2\">**</bpt>Enable-migrations-EnableAutomaticMigrations<ept id=\"p2\">**</ept>。与你在将应用发布到 Azure 时选择的选项类似，当你在 Visual Studio 中调试应用时，此命令将帮助你在 <bpt id=\"p3\">[</bpt>LocalDB<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/hh510202.aspx)</ept> 中更新应用的数据库架构。"
+    },
+    {
+      "pos": [
+        16781,
+        16970
+      ],
+      "content": "现在，在 Visual Studio 调试器中运行应用程序，或者再次发布到 Azure Web 应用。以应用程序所有者的身份登录并导航到 <ph id=\"ph1\">`https://&lt;webappname&gt;.chinacloudsites.cn/WorkItems/Create`</ph>。现在你会发现，你可以从下拉列表中选择 Azure Active Directory 用户或组，或者键入一些内容来筛选列表。"
+    },
+    {
+      "pos": [
+        17058,
+        17178
+      ],
+      "content": "填写表单的其余部分并单击“创建”。~/WorkItems/Index 页现在将显示新建的工作项。你还会发现，在下面的屏幕截图中，我删除了 Views\\\\WorkItems\\\\Index.cshtml 中的 <ph id=\"ph1\">`AssignedToID`</ph> 列。"
+    },
+    {
+      "pos": [
+        17266,
+        17413
+      ],
+      "content": "现在，请对“编辑”视图进行类似的更改。在 Views\\\\WorkItems\\\\Edit.cshtml 中，更改与上一步中 Views\\\\WorkItems\\\\Create.cshtml 相同的 <ph id=\"ph1\">`Html.BeginForm`</ph> 帮助器方法（在上面突出显示的“Create”替换为“Edit”）。"
+    },
+    {
+      "content": "就这么简单！",
+      "pos": [
+        17415,
+        17421
+      ]
+    },
+    {
+      "content": "在 WorkItems 控制器中配置授权和不同操作的业务线功能后，你可以尝试以不同应用程序角色用户身份登录，以查看应用程序如何做出响应。",
+      "pos": [
+        17423,
+        17491
+      ]
+    },
+    {
+      "content": "其他资源",
+      "pos": [
+        17607,
+        17611
+      ]
+    },
+    {
+      "content": "通过 SSL 和 Authorize 属性保护应用程序",
+      "pos": [
+        17616,
+        17643
+      ]
+    },
+    {
+      "content": "使用 Active Directory 在 Azure 中进行身份验证",
+      "pos": [
+        17803,
+        17838
+      ]
+    },
+    {
+      "content": "在 Azure 中创建使用 AD FS 身份验证的 .NET MVC Web 应用",
+      "pos": [
+        17907,
+        17948
+      ]
+    },
+    {
+      "content": "Azure Active Directory 示例和文档",
+      "pos": [
+        18016,
+        18044
+      ]
+    },
+    {
+      "content": "Vittorio Bertocci 的博客",
+      "pos": [
+        18084,
+        18105
+      ]
+    },
+    {
+      "content": "将 VS2013 Web 项目从 WIF 迁移到 Katana",
+      "pos": [
+        18146,
+        18177
+      ]
+    },
+    {
+      "content": "Active Directory 与 Azure Active Directory 之间的相似之处",
+      "pos": [
+        18277,
+        18326
+      ]
+    },
+    {
+      "content": "使用单一登录方案进行目录同步",
+      "pos": [
+        18389,
+        18403
+      ]
+    },
+    {
+      "content": "Azure Active Directory 支持的令牌和声明类型",
+      "pos": [
+        18466,
+        18499
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"在 Azure 中创建使用 Azure Active Directory 身份验证的 .NET MVC Web 应用\" \n    description=\"学习如何在使用 Azure Active Directory 进行身份验证的 Azure 中创建 ASP.NET MVC 业务线应用程序\" \n    services=\"app-service\\web, active-directory\" \n    documentationCenter=\".net\" \n    authors=\"cephalin\" \n    manager=\"wpickett\" \n    editor=\"\"/>\n\n<tags\n    ms.service=\"web-sites\"\n    ms.date=\"12/10/2015\" \n    wacn.date=\"02/17/2016\"/>\n\n# 在 Azure 中创建使用 Azure Active Directory 身份验证的 .NET MVC Web 应用#\n\n在本文中，你将了解如何在使用本地 [Azure Active Directory](/home/features/identity/) 作为标识提供者的 [Azure Web 应用](/documentation/services/web-sites/)中创建 ASP.NET MVC 业务线应用程序。你还将了解如何使用 [Azure Active Directory Graph 客户端库](http://blogs.msdn.com/b/aadgraphteam/archive/2014/06/02/azure-active-directory-graph-client-library-1-0-publish.aspx)查询应用程序中的目录数据。\n\n使用的 Azure Active Directory 租户可以是仅限 Azure 的目录，或者与本地 Active Directory (AD) 进行目录同步，以便为本地或远程的辅助角色创建单一登录体验。\n\n>[AZURE.NOTE]对于 Azure Web 应用，只需单击几下鼠标，就能配置针对 Azure Active Directory 租户的身份验证。有关详细信息，请参阅[使用 Active Directory 在 Azure 中进行身份验证](/documentation/articles/web-sites-authentication-authorization)。\n\n<a name=\"bkmk_build\"></a>\n## 要生成的项目 ##\n\n你将在 Azure 中生成用于跟踪工作项并具有以下功能的简单的业务线创建-读取-更新-删除 (CRUD) 应用程序：\n\n- 根据 Azure Active Directory 对用户进行身份验证\n- 实现登录和注销功能\n- 使用 `[Authorize]` 授权用户执行不同的 CRUD 操作\n- 使用 [Azure Active Directory 图形 API](http://msdn.microsoft.com/zh-cn/library/azure/hh974476.aspx) 查询 Azure Active Directory 数据\n- 使用 [Microsoft.Owin](http://www.asp.net/aspnet/overview/owin-and-katana/an-overview-of-project-katana)（而不是 Windows Identity Foundation (WIF)），它代表了 ASP.NET 的未来发展方向，与 WIF 相比，它的身份验证和授权设置要简单得多\n\n<a name=\"bkmk_need\"></a>\n## 所需的项目 ##\n\n[AZURE.INCLUDE [free-trial-note](../includes/free-trial-note.md)]\n\n若要完成本教程，你需要以下项目：\n\n- 一个 Azure Active Directory 租户，其中的用户已分配到不同的组\n- 在 Azure Active Directory 租户上创建应用程序的权限\n- Visual Studio 2013\n- [Azure SDK 2.5.1](https://www.microsoft.com/web/handlers/webpi.ashx/getinstaller/VWDOrVs2013AzurePack.appids) 或更高版本\n\n<a name=\"bkmk_sample\"></a>\n## 将示例应用程序用作业务线模板 ##\n\n本教程中的示例应用程序 [WebApp-RoleClaims-DotNet](https://github.com/Azure-Samples/active-directory-dotnet-webapp-roleclaims) 由 Azure Active Directory 团队创建，可用作模板来轻松创建新的业务线应用程序。该示例应用程序具有以下内置功能：\n\n- 使用 [OpenID Connect](http://openid.net/connect/) 通过 Azure Active Directory 进行身份验证\n- 示例 `TaskTracker` 控制器演示了如何才能授权对应用程序，其中包括 `[Authorize]` 的标准用法中的特定操作的不同角色的控制器。 \n- 一个多租户应用程序，其中包含可立即分配给用户和组的预定义角色。 \n\n<a name=\"bkmk_run\" ></a>\n## 运行示例应用程序 ##\n\n1.  克隆或下载 [WebApp-RoleClaims-DotNet](https://github.com/Azure-Samples/active-directory-dotnet-webapp-roleclaims) 中的示例解决方案到本地目录。\n\n2.  根据[如何将示例作为单租户应用运行](https://github.com/Azure-Samples/active-directory-dotnet-webapp-roleclaims#how-to-run-the-sample-as-a-single-tenant-app)中的说明设置 Azure Active Directory 应用程序和项目。请务必遵照所有有关将多租户应用程序转换为单租户应用程序的说明。\n\n3.  在刚刚创建的 Azure Active Directory 应用程序的 [Azure 管理门户](https://manage.windowsazure.cn)视图中，单击“用户”选项卡。然后，将所需的用户分配到所需的角色。\n\n    >[AZURE.NOTE]如果除了分配到用户以外，还要将角色分配到组，则必须将你的 Azure Active Directory 租户升级到 [Active Directory Premium](/home/features/identity/#price)。在应用程序的门户 UI 中，如果你看到的是“用户”选项卡而不是“用户和组”选项卡，你可以转到 Azure Active Directory 租户的“许可证”选项卡来试用 Azure Active Directory Premium。\n\n3.  配置完应用程序后，在 Visual Studio 中键入 `F5` 以运行 ASP.NET 应用程序。\n\n4.  加载应用程序后，单击“登录”，并使用在 Azure 管理门户中具有管理员角色的用户身份登录。\n\n5.  如果你已正确配置 Azure Active Directory 应用程序，并在 Web.config 中设置了相应的设置，则应会重定向到登录页。你只需使用在 Azure 管理门户中创建 Azure Active Directory 应用程序时所用的帐户登录，因为该帐户是 Azure Active Directory 应用程序的默认所有者。\n    \n<a name=\"bkmk_deploy\"></a>\n## 将示例应用程序部署到 Azure Web 应用\n\n现在，你需要将应用程序发布到 Azure 中的 Web 应用。[README.md](https://github.com/Azure-Samples/active-directory-dotnet-webapp-roleclaims/blob/master/README.md) 中已经提供了有关部署到 Azure Web 应用的说明，但这些步骤还取消了本地调试环境的配置。下面将介绍如何在保留调试配置的同时进行部署。\n\n1. 右键单击您的项目，然后选择“发布”。\n\n    ![](./media/web-sites-dotnet-lob-application-azure-ad/publish-app.png)\n\n2. 单机“导入”，选择已下载的“发布配置文件”。\n\n    如果还没有创建 Web 应用，可以登录 [Azure 管理门户](https://manage.windowsazure.cn/)创建一个，然后再“仪表板”的“速览”下，下载“发布配置文件”。\n\n7. 在“目标 URL”中，将 **http** 更改为 **https**。将整个 URL 复制到文本编辑器。稍后将要用到它。然后，单击“下一步”。\n\n    ![](./media/web-sites-dotnet-lob-application-azure-ad/5-change-to-https.png)\n\n8. 清除“启用组织身份验证”复选框。\n\n    ![](./media/web-sites-dotnet-lob-application-azure-ad/6-enable-code-first-migrations.png)\n\n8. 展开“RoleClaimContext”并选择“执行 Code First 迁移(应用程序启动时运行)”复选框。稍后当你定义其他 Code First 数据模型时，[Code First 迁移](https://msdn.microsoft.com/data/jj591621.aspx)会帮助你在 Azure 中更新应用的数据库架构。\n\n9. 此时请不要单击“发布”转到 Web 发布过程，而是单击“关闭”。单击“是”保存对发布配置文件所做的更改。\n\n2. 在 [Azure 管理门户](https://manage.windowsazure.cn)中转到你的 Azure Active Directory 租户，然后单击“应用程序”选项卡。\n\n2. 单击页面底部的“添加”。\n\n2. 单击“添加我的组织正在开发的应用程序”。\n\n3. 选择“ Web 应用和/或 Web API”。\n\n4. 为应用程序提供一个名称，然后单击“下一步”。\n\n5. 在“应用程序属性”中，将“登录 URL”设置为你前面保存的 Web 应用URL（例如 `https://<site-name>.chinacloudsites.cn/`），并将“应用 ID URI”设置为 `https://<aad-tenanet-name>/<app-name>`。然后，单击“完成”。\n\n    ![](./media/web-sites-dotnet-lob-application-azure-ad/7-app-properties.png)\n\n2.  创建应用程序后，根据前面[定义应用程序角色](https://github.com/Azure-Samples/active-directory-dotnet-webapp-roleclaims#step-2-define-your-application-roles)中的说明以相同的方式更新应用程序清单。\n\n3.  在刚刚创建的 Azure Active Directory 应用程序的 [Azure 管理门户](https://manage.windowsazure.cn)视图中，单击“用户”选项卡。然后，将所需的用户分配到所需的角色。\n\n6. 单击“配置”选项卡。\n\n7. 在“键”下，通过从下拉列表中选择“1 年”创建新键。\n\n8. 在“Azure Active Directory”条目的“对其他应用程序的权限”下，从“委派权限”下拉列表中选择“登录和读取用户配置文件”与“读取目录数据”。\n\n    > [AZURE.NOTE]此处需要的确切权限取决于你的应用程序所需的功能。某些权限需要“全局管理员”角色才能设置，但本教程只需要“用户”角色。\n\n9.  单击“保存”。\n\n10.  你通过导航离开已保存的配置页之前，请将以下信息复制到文本编辑器中。\n\n    -   客户端 ID\n    -   键（如果导航离开页面时，你将不能再次看到密钥）\n\n11. 在 Visual Studio 中，在项目中打开 **Web.Release.config**。将以下 XML 插入 `<configuration>` 标记，并将每个键的值替换为新的 Azure Active Directory 应用程序保存的信息。\n    <pre class=\"prettyprint\">\n    &lt;appSettings><span>&#13;</span>\n        &lt;add key=\"ida:ClientId\" value=\"<mark>[e.g. 82692da5-a86f-44c9-9d53-2f88d52b478b]</mark>\" xdt:Transform=\"SetAttributes\" xdt:Locator=\"Match(key)\" /><span>&#13;</span>\n        &lt;add key=\"ida:AppKey\" value=\"<mark>[e.g. rZJJ9bHSi/cYnYwmQFxLYDn/6EfnrnIfKoNzv9NKgbo=]</mark>\" xdt:Transform=\"SetAttributes\" xdt:Locator=\"Match(key)\" /><span>&#13;</span>\n        &lt;add key=\"ida:PostLogoutRedirectUri\" value=\"<mark>[e.g. https://mylobapp.chinacloudsites.cn/]</mark>\" xdt:Transform=\"SetAttributes\" xdt:Locator=\"Match(key)\" /><span>&#13;</span>\n    &lt;/appSettings></pre>\n\n    请确保 ida:PostLogoutRedirectUri 的值以斜杠“/”结尾。\n\n1. 右键单击您的项目，然后选择“发布”。\n\n2. 单击“发布”以发布到 Azure Web 应用。\n\n完成此操作后，将在 Azure 管理门户中配置两个 Azure Active Directory 应用程序，一个用于 Visual Studio 中的调试环境，另一个用于 Azure 中发布的 Web 应用。在调试期间，将使用 Web.config 中的应用程序设置来使**调试**配置适用于 Azure Active Directory，发布配置（默认情况下，会发布**版本**配置）后，将上载转换的 Web.config，其中包含 Web.Release.config 中的应用程序设置更改。\n\n如果你想要附加到已发布的 Web 应用调试器（必须上载的已发布的 Web 应用中的代码的调试符号），你可以创建的调试配置对于 Azure 调试，但使用的 Azure Active Directory 设置从 Web.Release.config 自己自定义 Web.config 转换（例如 Web.AzureDebug.config）克隆。这样，你可以跨不同的环境中维护静态配置。\n\n<a name=\"bkmk_crud\"></a>\n## 将业务线功能添加到示例应用程序\n\n在本教程的本部分，你将学习如何基于示例应用程序生成所需的业务线功能。你将创建一个简单 CRUD 的工作项跟踪程序，类似于 TaskTracker 控制器，但使用标准的 CRUD 基架和设计模式。你还将使用包含的 Scripts\\\\AadPickerLibrary.js 从 Azure Active Directory 图形 API 丰富应用程序与数据。\n\n5.  在 Models 文件夹中创建名为 WorkItem.cs 的新 [Code First](http://www.asp.net/mvc/overview/getting-started/getting-started-with-ef-using-mvc/creating-an-entity-framework-data-model-for-an-asp-net-mvc-application) 模型，并将代码替换为以下代码：\n\n        using System.ComponentModel.DataAnnotations;\n        \n        namespace WebApp_RoleClaims_DotNet.Models\n        {\n            public class WorkItem\n            {\n                [Key]\n                public int ItemID { get; set; }\n                public string AssignedToID { get; set; }\n                public string AssignedToName { get; set; }\n                public string Description { get; set; }\n                public WorkItemStatus Status { get; set; }\n            }\n        \n            public enum WorkItemStatus\n            {\n                Open, \n                Investigating, \n                Resolved, \n                Closed\n            }\n        }\n\n6.  打开 DAL\\\\RoleClaimContext.cs 并添加突出显示的代码：\n    <pre class=\"prettyprint\">\n    public class RoleClaimContext : DbContext<span>&#13;</span>\n    {<span>&#13;</span>\n        public RoleClaimContext() : base(\"RoleClaimContext\") { }<span>&#13;</span>\n\n        public DbSet&lt;Task> Tasks { get; set; }<span>&#13;</span>\n        <mark>public DbSet&lt;WorkItem> WorkItems { get; set; }</mark><span>&#13;</span>\n        public DbSet&lt;TokenCacheEntry> TokenCacheEntries { get; set; }<span>&#13;</span>\n    }</pre>\n\n7.  生成项目，以便能够通过 Visual Studio 中的基架逻辑访问你的新模型。\n\n8.  将新的基架项 `WorkItemsController` 添加到 Controllers 文件夹。为此，请右键单击“控制器”，指向“添加”，然后选择“新的基架项”。\n\n9.  选择“使用实体框架的包含视图的 MVC 5 控制器”并单击“添加”。\n\n10. 选择刚创建的模型并单击“添加”。\n\n    ![](./media/web-sites-dotnet-lob-application-azure-ad/8-add-scaffolded-controller.png)\n\n9.  打开 Controllers\\\\WorkItemsController.cs\n\n11. 将突出显示的 [Authorize] 修饰添加到下面的相应操作。\n    <pre class=\"prettyprint\">\n    ...<span>&#13;</span>\n\n    <mark>[Authorize(Roles = \"Admin, Observer, Writer, Approver\")]</mark><span>&#13;</span>\n    public class WorkItemsController : Controller<span>&#13;</span>\n    {<span>&#13;</span>\n        ...<span>&#13;</span>\n\n        <mark>[Authorize(Roles = \"Admin, Writer\")]</mark><span>&#13;</span>\n        public ActionResult Create()<span>&#13;</span>\n        ...<span>&#13;</span>\n\n        <mark>[Authorize(Roles = \"Admin, Writer\")]</mark><span>&#13;</span>\n        public async Task&lt;ActionResult&gt; Create([Bind(Include = \"ItemID,AssignedToID,AssignedToName,Description,Status\")] WorkItem workItem)<span>&#13;</span>\n        ...<span>&#13;</span>\n\n        <mark>[Authorize(Roles = \"Admin, Writer\")]</mark><span>&#13;</span>\n        public async Task&lt;ActionResult&gt; Edit(int? id)<span>&#13;</span>\n        ...<span>&#13;</span>\n\n        <mark>[Authorize(Roles = \"Admin, Writer\")]</mark><span>&#13;</span>\n        public async Task&lt;ActionResult&gt; Edit([Bind(Include = \"ItemID,AssignedToID,AssignedToName,Description,Status\")] WorkItem workItem)<span>&#13;</span>\n        ...<span>&#13;</span>\n\n        <mark>[Authorize(Roles = \"Admin, Writer, Approver\")]</mark><span>&#13;</span>\n        public async Task&lt;ActionResult&gt; Delete(int? id)<span>&#13;</span>\n        ...<span>&#13;</span>\n\n        <mark>[Authorize(Roles = \"Admin, Writer, Approver\")]</mark><span>&#13;</span>\n        public async Task&lt;ActionResult&gt; DeleteConfirmed(int id)<span>&#13;</span>\n        ...<span>&#13;</span>\n    }</pre>\n\n    > [AZURE.NOTE]你可能已注意到某些操作带有 <code>[ValidateAntiForgeryToken]</code> 修饰。由于存在 [Brock Allen](https://twitter.com/BrockLAllen) 在 [MVC 4、AntiForgeryToken 和声明](http://brockallen.com/2012/07/08/mvc-4-antiforgerytoken-and-claims/)中所述的行为，HTTP POST 可能无法完成防伪令牌验证，因为： + Azure Active Directory 不会发送 http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider，而默认情况下防伪令牌需要此项。+ 如果 Azure Active Directory 是与 AD FS 进行同步处理的目录，则默认情况下 AD FS 信任不发送 http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider 声明，不过你可以手动将 AD FS 配置为发送此声明。你将在下一步对此进行处理。\n\n12.  在 App\\_Start\\\\Startup.Auth.cs 中，将以下代码行添加到 `ConfigureAuth` 方法中。右键单击每个命名解析错误并修复错误。\n\n        AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.NameIdentifier;\n    \n    `ClaimTypes.NameIdentifies` 指定 Azure Active Directory 提供的声明 `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier`。既然你已注意了授权部分（严格来讲，这并不长），你可以将时间投入到操作的实际功能。\n\n13. 在 Create() 和 Edit() 中添加以下代码，使某些变量可在后面的 JavaScript 中使用。右键单击每个命名解析错误并修复错误。\n\n        ViewData[\"token\"] = AcquireToken(ClaimsPrincipal.Current.FindFirst(Globals.ObjectIdClaimType).Value);\n        ViewData[\"tenant\"] = ConfigHelper.Tenant;\n\n13. `AcquireToken()` 方法尚未定义，现在请在 `WorkItemsController` 类中定义它。右键单击每个命名解析错误并修复错误。\n\n        static string AcquireToken(string userObjectId)\n        {\n            ClientCredential cred = new ClientCredential(ConfigHelper.ClientId, ConfigHelper.AppKey);\n            Claim tenantIdClaim = ClaimsPrincipal.Current.FindFirst(Globals.TenantIdClaimType);\n            AuthenticationContext authContext = new AuthenticationContext(String.Format(CultureInfo.InvariantCulture, ConfigHelper.AadInstance, tenantIdClaim.Value), new TokenDbCache(userObjectId));\n            AuthenticationResult result = authContext.AcquireTokenSilent(ConfigHelper.GraphResourceId, cred, new UserIdentifier(userObjectId, UserIdentifierType.UniqueId));\n            return result.AccessToken;\n        }\n        \n14. 在 Views\\\\WorkItems\\\\Create.cshtml（自动搭建基架的项）中，找到 `Html.BeginForm` 帮助器方法并对其进行如下修改：\n    <pre class=\"prettyprint\">@using (Html.BeginForm(<mark>\"Create\", \"WorkItems\", FormMethod.Post, new { id = \"main-form\" }</mark>))<span>&#13;</span>\n    {<span>&#13;</span>\n    @Html.AntiForgeryToken()<span>&#13;</span>\n\n    &lt;div class=\"form-horizontal\"><span>&#13;</span>\n        &lt;h4>WorkItem&lt;/h4><span>&#13;</span>\n        &lt;hr /><span>&#13;</span>\n        @Html.ValidationSummary(true, \"\", new { @class = \"text-danger\" })<span>&#13;</span>\n\n        &lt;div class=\"form-group\"><span>&#13;</span>\n            &lt;div class=\"col-md-10\"><span>&#13;</span>\n                @Html.EditorFor(model => model.AssignedToID, new { htmlAttributes = new { @class = \"form-control\"<mark>, @type=\"hidden\"</mark> } })<span>&#13;</span>\n                @Html.ValidationMessageFor(model => model.AssignedToID, \"\", new { @class = \"text-danger\" })<span>&#13;</span>\n            &lt;/div><span>&#13;</span>\n        &lt;/div><span>&#13;</span>\n\n        &lt;div class=\"form-group\"><span>&#13;</span>\n            @Html.LabelFor(model => model.AssignedToName, htmlAttributes: new { @class = \"control-label col-md-2\" })<span>&#13;</span>\n            &lt;div class=\"col-md-10\"><span>&#13;</span>\n                @Html.EditorFor(model => model.AssignedToName, new { htmlAttributes = new { @class = \"form-control\" } })<span>&#13;</span>\n                @Html.ValidationMessageFor(model => model.AssignedToName, \"\", new { @class = \"text-danger\" })<span>&#13;</span>\n            &lt;/div><span>&#13;</span>\n        &lt;/div><span>&#13;</span>\n\n        &lt;div class=\"form-group\"><span>&#13;</span>\n            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = \"control-label col-md-2\" })<span>&#13;</span>\n            &lt;div class=\"col-md-10\"><span>&#13;</span>\n                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = \"form-control\" } })<span>&#13;</span>\n                @Html.ValidationMessageFor(model => model.Description, \"\", new { @class = \"text-danger\" })<span>&#13;</span>\n            &lt;/div><span>&#13;</span>\n        &lt;/div><span>&#13;</span>\n\n        &lt;div class=\"form-group\"><span>&#13;</span>\n            @Html.LabelFor(model => model.Status, htmlAttributes: new { @class = \"control-label col-md-2\" })<span>&#13;</span>\n            &lt;div class=\"col-md-10\"><span>&#13;</span>\n                @Html.EnumDropDownListFor(model => model.Status, htmlAttributes: new { @class = \"form-control\" })<span>&#13;</span>\n                @Html.ValidationMessageFor(model => model.Status, \"\", new { @class = \"text-danger\" })<span>&#13;</span>\n            &lt;/div><span>&#13;</span>\n        &lt;/div><span>&#13;</span>\n\n        &lt;div class=\"form-group\"><span>&#13;</span>\n            &lt;div class=\"col-md-offset-2 col-md-10\"><span>&#13;</span>\n                &lt;input type=\"submit\" value=\"Create\" class=\"btn btn-default\" <mark>id=\"submit-button\"</mark> /><span>&#13;</span>\n            &lt;/div><span>&#13;</span>\n        &lt;/div><span>&#13;</span>\n    &lt;/div><span>&#13;</span>\n\n    <mark>&lt;script><span>&#13;</span>\n            // People/Group Picker Code<span>&#13;</span>\n            var maxResultsPerPage = 14;<span>&#13;</span>\n            var input = document.getElementById(\"AssignedToName\");<span>&#13;</span>\n            var token = \"@ViewData[\"token\"]\";<span>&#13;</span>\n            var tenant = \"@ViewData[\"tenant\"]\";<span>&#13;</span>\n\n            var picker = new AadPicker(maxResultsPerPage, input, token, tenant);<span>&#13;</span>\n\n            // Submit the selected user/group to be asssigned.<span>&#13;</span>\n            $(\"#submit-button\").click({ picker: picker }, function () {<span>&#13;</span>\n                if (!picker.Selected())<span>&#13;</span>\n                    return;<span>&#13;</span>\n                $(\"#main-form\").get()[0].elements[\"AssignedToID\"].value = picker.Selected().objectId;<span>&#13;</span>\n            });<span>&#13;</span>\n    &lt;/script></mark>}<span>&#13;</span>\n    \n        </pre>\n   \n   \n    在脚本中，AadPicker 对象将调用 [Azure Active Directory 图形 API](https://msdn.microsoft.com/Library/Azure/Ad/Graph/api/api-catalog) 来搜索与输入内容匹配的用户和组。\n\n15. 打开[包管理器控制台](http://docs.nuget.org/Consume/Package-Manager-Console)并运行 **Enable-migrations-EnableAutomaticMigrations**。与你在将应用发布到 Azure 时选择的选项类似，当你在 Visual Studio 中调试应用时，此命令将帮助你在 [LocalDB](https://msdn.microsoft.com/zh-cn/library/hh510202.aspx) 中更新应用的数据库架构。\n\n15. 现在，在 Visual Studio 调试器中运行应用程序，或者再次发布到 Azure Web 应用。以应用程序所有者的身份登录并导航到 `https://<webappname>.chinacloudsites.cn/WorkItems/Create`。现在你会发现，你可以从下拉列表中选择 Azure Active Directory 用户或组，或者键入一些内容来筛选列表。\n\n    ![](./media/web-sites-dotnet-lob-application-azure-ad/9-create-workitem.png)\n\n16. 填写表单的其余部分并单击“创建”。~/WorkItems/Index 页现在将显示新建的工作项。你还会发现，在下面的屏幕截图中，我删除了 Views\\\\WorkItems\\\\Index.cshtml 中的 `AssignedToID` 列。\n\n    ![](./media/web-sites-dotnet-lob-application-azure-ad/10-workitem-index.png)\n\n11. 现在，请对“编辑”视图进行类似的更改。在 Views\\\\WorkItems\\\\Edit.cshtml 中，更改与上一步中 Views\\\\WorkItems\\\\Create.cshtml 相同的 `Html.BeginForm` 帮助器方法（在上面突出显示的“Create”替换为“Edit”）。\n\n就这么简单！\n\n在 WorkItems 控制器中配置授权和不同操作的业务线功能后，你可以尝试以不同应用程序角色用户身份登录，以查看应用程序如何做出响应。\n\n![](./media/web-sites-dotnet-lob-application-azure-ad/11-edit-unauthorized.png)\n\n<a name=\"bkmk_resources\"></a>\n## 其他资源\n\n- [通过 SSL 和 Authorize 属性保护应用程序](/documentation/articles/web-sites-dotnet-deploy-aspnet-mvc-app-membership-oauth-sql-database#protect-the-application-with-ssl-and-the-authorize-attribute)\n- [使用 Active Directory 在 Azure 中进行身份验证](/documentation/articles/web-sites-authentication-authorization)\n- [在 Azure 中创建使用 AD FS 身份验证的 .NET MVC Web 应用](/documentation/articles/web-sites-dotnet-lob-application-adfs)\n- [Azure Active Directory 示例和文档](https://github.com/AzureADSamples)\n- [Vittorio Bertocci 的博客](http://blogs.msdn.com/b/vbertocci/)\n- [将 VS2013 Web 项目从 WIF 迁移到 Katana](http://www.cloudidentity.com/blog/2014/09/15/MIGRATE-A-VS2013-WEB-PROJECT-FROM-WIF-TO-KATANA/)\n- [Active Directory 与 Azure Active Directory 之间的相似之处](http://technet.microsoft.com/zh-cn/library/dn518177.aspx)\n- [使用单一登录方案进行目录同步](http://technet.microsoft.com/zh-cn/library/dn441213.aspx)\n- [Azure Active Directory 支持的令牌和声明类型](/documentation/articles/active-directory-token-and-claims/)\n \n\n<!---HONumber=79-->"
+}

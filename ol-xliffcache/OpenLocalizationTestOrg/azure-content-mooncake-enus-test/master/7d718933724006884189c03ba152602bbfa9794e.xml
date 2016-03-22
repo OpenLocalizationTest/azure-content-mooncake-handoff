@@ -1,0 +1,782 @@
+{
+  "nodes": [
+    {
+      "content": "准备网络映射，以便在 Azure Site Recovery 中通过 VMM 进行 Hyper-V 虚拟机保护 | Azure",
+      "pos": [
+        27,
+        90
+      ]
+    },
+    {
+      "content": "设置网络映射，以便进行从本地数据中心到 Azure 或者到辅助站点的 Hyper-V 虚拟机复制。",
+      "pos": [
+        109,
+        158
+      ]
+    },
+    {
+      "content": "准备网络映射，以便在 Azure Site Recovery 中通过 VMM 进行 Hyper-V 虚拟机保护",
+      "pos": [
+        377,
+        432
+      ]
+    },
+    {
+      "content": "Azure Site Recovery 有助于业务连续性和灾难恢复 (BCDR) 策略，因为它可以协调虚拟机和物理服务器的复制、故障转移和恢复。",
+      "pos": [
+        434,
+        506
+      ]
+    },
+    {
+      "content": "本文介绍网络映射，你可以通过网络映射来优化网络设置的配置，以便使用 Site Recovery 在两个本地数据中心之间或本地数据中心与 Azure 之间复制位于 VMM 云中的 Hyper-V 虚拟机。请注意，如果你是在没有 VMM 云的情况下复制 Hyper-V VM，或者是复制 VMware VM 或物理服务器，则本文与之不相关。",
+      "pos": [
+        508,
+        676
+      ]
+    },
+    {
+      "pos": [
+        678,
+        782
+      ],
+      "content": "阅读本文后，可在 <bpt id=\"p1\">[</bpt>Azure 恢复服务论坛<ept id=\"p1\">](https://social.msdn.microsoft.com/Forums/zh-cn/home?forum=hypervrecovmgr)</ept>上发布任何问题"
+    },
+    {
+      "content": "概述",
+      "pos": [
+        788,
+        790
+      ]
+    },
+    {
+      "content": "通过部署 Azure Site Recovery 将 Hyper-V 虚拟机复制到 Azure 或辅助数据中心时，可通过 Hyper-V 副本或 SAN 复制使用网络映射。",
+      "pos": [
+        792,
+        878
+      ]
+    },
+    {
+      "pos": [
+        882,
+        983
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>在两个本地数据中心之间复制 VMM 云中的 Hyper-V 虚拟机<ept id=\"p1\">**</ept> - 网络映射功能可以在源 VMM 服务器上的 VM 网络和目标 VMM 服务器上的 VM 网络之间进行映射，以便执行以下操作："
+    },
+    {
+      "pos": [
+        991,
+        1053
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>在故障转移后连接虚拟机<ept id=\"p1\">**</ept> - 确保在故障转移后，虚拟机会连接到适当的网络。副本虚拟机将连接到已映射到源网络的目标网络。"
+    },
+    {
+      "pos": [
+        1060,
+        1135
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>将副本虚拟机放到主机服务器上<ept id=\"p1\">**</ept> - 以最佳方式在 Hyper-V 主机服务器上放置副本虚拟机。副本虚拟机将放置在可访问映射 VM 网络的主机上。"
+    },
+    {
+      "pos": [
+        1142,
+        1192
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>无网络映射<ept id=\"p1\">**</ept> - 如果未配置网络映射，则复制的虚拟机在故障转移后将不会连接到任何 VM 网络。"
+    },
+    {
+      "pos": [
+        1196,
+        1288
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>将本地 VMM 云中的 Hyper-V 虚拟机复制到 Azure<ept id=\"p1\">**</ept> - 网络映射功能将在源 VMM 服务器上的 VM 网络与目标 Azure 网络之间进行映射，以便执行以下操作："
+    },
+    {
+      "pos": [
+        1295,
+        1356
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>在故障转移后连接虚拟机<ept id=\"p1\">**</ept> - 在同一网络上进行故障转移的所有计算机都可以彼此连接到对方，不管它们位于哪个恢复计划中。"
+    },
+    {
+      "pos": [
+        1363,
+        1412
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>网关<ept id=\"p1\">**</ept> - 如果在目标 Azure 网络上设置了网络网关，则虚拟机可以连接到其他本地虚拟机。"
+    },
+    {
+      "pos": [
+        1419,
+        1487
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>无网络映射<ept id=\"p1\">**</ept> - 如果没有配置网络映射，则只有在同一恢复计划中进行故障转移的虚拟机能够在故障转移到 Azure 后彼此连接到对方。"
+    },
+    {
+      "content": "网络映射示例",
+      "pos": [
+        1493,
+        1499
+      ]
+    },
+    {
+      "content": "可以在两个 VMM 服务器上的 VM 网络之间配置网络映射；如果两个站点由同一个服务器管理，则在可以在单个 VMM 服务器上的两个对应 VM 网络之间配置网络映射。在正确地配置映射且启用复制后，位于主位置的虚拟机将连接到网络，其位于目标位置的副本将连接到其映射网络。",
+      "pos": [
+        1501,
+        1634
+      ]
+    },
+    {
+      "content": "如果已经在 VMM 中正确地设置了网络，则当你在网络映射期间选择目标 VM 网络时，将显示使用源 VM 网络的 VMM 源云以及用于保护的目标云上的可用目标 VM 网络。",
+      "pos": [
+        1636,
+        1721
+      ]
+    },
+    {
+      "content": "以下示例演示了此机制。我们来考察一个在北京和上海具有两个位置的组织。",
+      "pos": [
+        1723,
+        1757
+      ]
+    },
+    {
+      "content": "位置",
+      "pos": [
+        1761,
+        1763
+      ]
+    },
+    {
+      "content": "VMM 服务器",
+      "pos": [
+        1770,
+        1777
+      ]
+    },
+    {
+      "content": "VM 网络",
+      "pos": [
+        1784,
+        1789
+      ]
+    },
+    {
+      "content": "映射到",
+      "pos": [
+        1796,
+        1799
+      ]
+    },
+    {
+      "content": "北京",
+      "pos": [
+        1818,
+        1820
+      ]
+    },
+    {
+      "content": "VMM-Beijing",
+      "pos": [
+        1823,
+        1834
+      ]
+    },
+    {
+      "content": "VMNetwork1-Beijing",
+      "pos": [
+        1836,
+        1854
+      ]
+    },
+    {
+      "content": "映射到 VMNetwork1-Shanghai",
+      "pos": [
+        1857,
+        1880
+      ]
+    },
+    {
+      "content": "VMNetwork2-Beijing",
+      "pos": [
+        1886,
+        1904
+      ]
+    },
+    {
+      "content": "未映射",
+      "pos": [
+        1907,
+        1910
+      ]
+    },
+    {
+      "content": "上海",
+      "pos": [
+        1911,
+        1913
+      ]
+    },
+    {
+      "content": "VMM-Shanghai",
+      "pos": [
+        1916,
+        1928
+      ]
+    },
+    {
+      "content": "VMNetwork1-Shanghai",
+      "pos": [
+        1930,
+        1949
+      ]
+    },
+    {
+      "content": "映射到 VMNetwork1-Beijing",
+      "pos": [
+        1952,
+        1974
+      ]
+    },
+    {
+      "content": "VMNetwork1-Shanghai",
+      "pos": [
+        1980,
+        1999
+      ]
+    },
+    {
+      "content": "未映射",
+      "pos": [
+        2002,
+        2005
+      ]
+    },
+    {
+      "content": "在此示例中：",
+      "pos": [
+        2007,
+        2013
+      ]
+    },
+    {
+      "content": "当为任何连接到 VMNetwork1-Beijing 的虚拟机创建副本虚拟机时，副本虚拟机将连接到 VMNetwork1-Shanghai。",
+      "pos": [
+        2017,
+        2087
+      ]
+    },
+    {
+      "content": "当为 VMNetwork2-Beijing 或 VMNetwork2-Shanghai 创建副本虚拟机时，副本虚拟机将不会连接到任何网络。",
+      "pos": [
+        2090,
+        2159
+      ]
+    },
+    {
+      "content": "这是本示例组织中 VMM 云的设置方式，以及逻辑网络与云关联的方式。",
+      "pos": [
+        2161,
+        2195
+      ]
+    },
+    {
+      "content": "云保护设置",
+      "pos": [
+        2201,
+        2206
+      ]
+    },
+    {
+      "content": "受保护的云",
+      "pos": [
+        2210,
+        2215
+      ]
+    },
+    {
+      "content": "提供保护的云",
+      "pos": [
+        2222,
+        2228
+      ]
+    },
+    {
+      "content": "逻辑网络（北京）",
+      "pos": [
+        2235,
+        2243
+      ]
+    },
+    {
+      "content": "GoldCloud1",
+      "pos": [
+        2260,
+        2270
+      ]
+    },
+    {
+      "content": "GoldCloud2",
+      "pos": [
+        2273,
+        2283
+      ]
+    },
+    {
+      "content": "SilverCloud1",
+      "pos": [
+        2286,
+        2298
+      ]
+    },
+    {
+      "content": "SilverCloud2",
+      "pos": [
+        2300,
+        2312
+      ]
+    },
+    {
+      "content": "GoldCloud2",
+      "pos": [
+        2315,
+        2325
+      ]
+    },
+    {
+      "content": "NA",
+      "pos": [
+        2331,
+        2333
+      ]
+    },
+    {
+      "content": "LogicalNetwork1-Beijing",
+      "pos": [
+        2350,
+        2373
+      ]
+    },
+    {
+      "content": "LogicalNetwork1-Shanghai",
+      "pos": [
+        2380,
+        2404
+      ]
+    },
+    {
+      "content": "SilverCloud2",
+      "pos": [
+        2409,
+        2421
+      ]
+    },
+    {
+      "content": "NA",
+      "pos": [
+        2427,
+        2429
+      ]
+    },
+    {
+      "content": "LogicalNetwork1-Beijing",
+      "pos": [
+        2446,
+        2469
+      ]
+    },
+    {
+      "content": "LogicalNetwork1-Shanghai",
+      "pos": [
+        2476,
+        2500
+      ]
+    },
+    {
+      "content": "逻辑和 VM 网络设置",
+      "pos": [
+        2510,
+        2521
+      ]
+    },
+    {
+      "content": "位置",
+      "pos": [
+        2525,
+        2527
+      ]
+    },
+    {
+      "content": "逻辑网络",
+      "pos": [
+        2534,
+        2538
+      ]
+    },
+    {
+      "content": "关联的 VM 网络",
+      "pos": [
+        2545,
+        2554
+      ]
+    },
+    {
+      "content": "北京",
+      "pos": [
+        2569,
+        2571
+      ]
+    },
+    {
+      "content": "LogicalNetwork1-Beijing",
+      "pos": [
+        2574,
+        2597
+      ]
+    },
+    {
+      "content": "VMNetwork1-Beijing",
+      "pos": [
+        2600,
+        2618
+      ]
+    },
+    {
+      "content": "上海",
+      "pos": [
+        2619,
+        2621
+      ]
+    },
+    {
+      "content": "LogicalNetwork1-Shanghai",
+      "pos": [
+        2624,
+        2648
+      ]
+    },
+    {
+      "content": "VMNetwork1-Shanghai",
+      "pos": [
+        2651,
+        2670
+      ]
+    },
+    {
+      "content": "LogicalNetwork2Shanghai",
+      "pos": [
+        2674,
+        2697
+      ]
+    },
+    {
+      "content": "VMNetwork2-Shanghai",
+      "pos": [
+        2700,
+        2719
+      ]
+    },
+    {
+      "content": "目标网络",
+      "pos": [
+        2725,
+        2729
+      ]
+    },
+    {
+      "content": "根据这些设置，当你选择目标 VM 网络时，下表显示将可用的选项。",
+      "pos": [
+        2731,
+        2763
+      ]
+    },
+    {
+      "content": "选择",
+      "pos": [
+        2767,
+        2769
+      ]
+    },
+    {
+      "content": "受保护的云",
+      "pos": [
+        2776,
+        2781
+      ]
+    },
+    {
+      "content": "提供保护的云",
+      "pos": [
+        2788,
+        2794
+      ]
+    },
+    {
+      "content": "可用目标网络",
+      "pos": [
+        2801,
+        2807
+      ]
+    },
+    {
+      "content": "VMNetwork1-Shanghai",
+      "pos": [
+        2826,
+        2845
+      ]
+    },
+    {
+      "content": "SilverCloud1",
+      "pos": [
+        2848,
+        2860
+      ]
+    },
+    {
+      "content": "SilverCloud2",
+      "pos": [
+        2863,
+        2875
+      ]
+    },
+    {
+      "content": "可用",
+      "pos": [
+        2878,
+        2880
+      ]
+    },
+    {
+      "content": "GoldCloud1",
+      "pos": [
+        2884,
+        2894
+      ]
+    },
+    {
+      "content": "GoldCloud2",
+      "pos": [
+        2897,
+        2907
+      ]
+    },
+    {
+      "content": "可用",
+      "pos": [
+        2910,
+        2912
+      ]
+    },
+    {
+      "content": "VMNetwork2-Shanghai",
+      "pos": [
+        2913,
+        2932
+      ]
+    },
+    {
+      "content": "SilverCloud1",
+      "pos": [
+        2935,
+        2947
+      ]
+    },
+    {
+      "content": "SilverCloud2",
+      "pos": [
+        2950,
+        2962
+      ]
+    },
+    {
+      "content": "不可用",
+      "pos": [
+        2965,
+        2968
+      ]
+    },
+    {
+      "content": "GoldCloud1",
+      "pos": [
+        2972,
+        2982
+      ]
+    },
+    {
+      "content": "GoldCloud2",
+      "pos": [
+        2985,
+        2995
+      ]
+    },
+    {
+      "content": "可用",
+      "pos": [
+        2998,
+        3000
+      ]
+    },
+    {
+      "content": "多个子网",
+      "pos": [
+        3007,
+        3011
+      ]
+    },
+    {
+      "content": "如果目标网络具有多个子网，并且其中一个子网与源虚拟机所在的子网同名，则在故障转移后副本虚拟机将连接到该目标子网。如果没有具有匹配名称的目标子网，则虚拟机将连接到网络中的第一个子网。",
+      "pos": [
+        3013,
+        3103
+      ]
+    },
+    {
+      "content": "故障回复",
+      "pos": [
+        3110,
+        3114
+      ]
+    },
+    {
+      "content": "若要查看在故障恢复情况下发生的情况（反向复制），我们假设 VMNetwork1-Beijing 已映射到 VMNetwork1-Shanghai，设置如下。",
+      "pos": [
+        3116,
+        3194
+      ]
+    },
+    {
+      "content": "虚拟机",
+      "pos": [
+        3199,
+        3202
+      ]
+    },
+    {
+      "content": "连接到 VM 网络",
+      "pos": [
+        3209,
+        3218
+      ]
+    },
+    {
+      "content": "VM1",
+      "pos": [
+        3229,
+        3232
+      ]
+    },
+    {
+      "content": "VMNetwork1-Network",
+      "pos": [
+        3235,
+        3253
+      ]
+    },
+    {
+      "content": "VM2（VM1 的副本）",
+      "pos": [
+        3254,
+        3266
+      ]
+    },
+    {
+      "content": "VMNetwork1-Shanghai",
+      "pos": [
+        3269,
+        3288
+      ]
+    },
+    {
+      "content": "在采用这些设置的条件下，我们看看在一些可能的方案中会发生什么情况。",
+      "pos": [
+        3290,
+        3323
+      ]
+    },
+    {
+      "content": "方案",
+      "pos": [
+        3327,
+        3329
+      ]
+    },
+    {
+      "content": "结果",
+      "pos": [
+        3336,
+        3338
+      ]
+    },
+    {
+      "content": "在故障转移后，VM-2 的网络属性没有发生任何变化。",
+      "pos": [
+        3349,
+        3375
+      ]
+    },
+    {
+      "content": "VM-1 保持连接到源网络。",
+      "pos": [
+        3378,
+        3392
+      ]
+    },
+    {
+      "content": "故障转移且断开连接后，VM-2 的网络属性已更改",
+      "pos": [
+        3393,
+        3417
+      ]
+    },
+    {
+      "content": "VM-1 已断开连接",
+      "pos": [
+        3420,
+        3430
+      ]
+    },
+    {
+      "content": "VM-2 的网络属性在故障转移后发生更改并连接到 VMNetwork2-Shanghai",
+      "pos": [
+        3431,
+        3475
+      ]
+    },
+    {
+      "content": "如果未映射 VMNetwork2-Shanghai，则 VM-1 将断开连接",
+      "pos": [
+        3478,
+        3516
+      ]
+    },
+    {
+      "content": "VMNetwork1-Shanghai 的网络映射已更改",
+      "pos": [
+        3517,
+        3545
+      ]
+    },
+    {
+      "content": "VM-1 将连接到现映射到 VMNetwork1-Shanghai 的网络",
+      "pos": [
+        3548,
+        3585
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        3591,
+        3595
+      ]
+    },
+    {
+      "pos": [
+        3597,
+        3697
+      ],
+      "content": "现在，你已经对网络映射有了更好的了解，因此可以<bpt id=\"p1\">[</bpt>开始 Site Recovery 部署<ept id=\"p1\">](/documentation/articles/site-recovery-best-practices)</ept>了。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"准备网络映射，以便在 Azure Site Recovery 中通过 VMM 进行 Hyper-V 虚拟机保护 | Azure\"\n    description=\"设置网络映射，以便进行从本地数据中心到 Azure 或者到辅助站点的 Hyper-V 虚拟机复制。\"\n    services=\"site-recovery\"\n    documentationCenter=\"\"\n    authors=\"rayne-wiselman\"\n    manager=\"jwhit\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"site-recovery\"\n    ms.date=\"12/01/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n\n# 准备网络映射，以便在 Azure Site Recovery 中通过 VMM 进行 Hyper-V 虚拟机保护\n\nAzure Site Recovery 有助于业务连续性和灾难恢复 (BCDR) 策略，因为它可以协调虚拟机和物理服务器的复制、故障转移和恢复。\n\n本文介绍网络映射，你可以通过网络映射来优化网络设置的配置，以便使用 Site Recovery 在两个本地数据中心之间或本地数据中心与 Azure 之间复制位于 VMM 云中的 Hyper-V 虚拟机。请注意，如果你是在没有 VMM 云的情况下复制 Hyper-V VM，或者是复制 VMware VM 或物理服务器，则本文与之不相关。\n\n阅读本文后，可在 [Azure 恢复服务论坛](https://social.msdn.microsoft.com/Forums/zh-cn/home?forum=hypervrecovmgr)上发布任何问题\n\n\n## 概述\n\n通过部署 Azure Site Recovery 将 Hyper-V 虚拟机复制到 Azure 或辅助数据中心时，可通过 Hyper-V 副本或 SAN 复制使用网络映射。\n\n- **在两个本地数据中心之间复制 VMM 云中的 Hyper-V 虚拟机** - 网络映射功能可以在源 VMM 服务器上的 VM 网络和目标 VMM 服务器上的 VM 网络之间进行映射，以便执行以下操作：\n\n    - **在故障转移后连接虚拟机** - 确保在故障转移后，虚拟机会连接到适当的网络。副本虚拟机将连接到已映射到源网络的目标网络。\n    - **将副本虚拟机放到主机服务器上** - 以最佳方式在 Hyper-V 主机服务器上放置副本虚拟机。副本虚拟机将放置在可访问映射 VM 网络的主机上。\n    - **无网络映射** - 如果未配置网络映射，则复制的虚拟机在故障转移后将不会连接到任何 VM 网络。\n\n- **将本地 VMM 云中的 Hyper-V 虚拟机复制到 Azure** - 网络映射功能将在源 VMM 服务器上的 VM 网络与目标 Azure 网络之间进行映射，以便执行以下操作：\n    - **在故障转移后连接虚拟机** - 在同一网络上进行故障转移的所有计算机都可以彼此连接到对方，不管它们位于哪个恢复计划中。\n    - **网关** - 如果在目标 Azure 网络上设置了网络网关，则虚拟机可以连接到其他本地虚拟机。\n    - **无网络映射** - 如果没有配置网络映射，则只有在同一恢复计划中进行故障转移的虚拟机能够在故障转移到 Azure 后彼此连接到对方。\n\n\n## 网络映射示例\n\n可以在两个 VMM 服务器上的 VM 网络之间配置网络映射；如果两个站点由同一个服务器管理，则在可以在单个 VMM 服务器上的两个对应 VM 网络之间配置网络映射。在正确地配置映射且启用复制后，位于主位置的虚拟机将连接到网络，其位于目标位置的副本将连接到其映射网络。\n\n如果已经在 VMM 中正确地设置了网络，则当你在网络映射期间选择目标 VM 网络时，将显示使用源 VM 网络的 VMM 源云以及用于保护的目标云上的可用目标 VM 网络。\n\n以下示例演示了此机制。我们来考察一个在北京和上海具有两个位置的组织。\n\n**位置** | **VMM 服务器** | **VM 网络** | **映射到**\n---|---|---|---\n北京 | VMM-Beijing| VMNetwork1-Beijing | 映射到 VMNetwork1-Shanghai\n | | VMNetwork2-Beijing | 未映射\n上海 | VMM-Shanghai| VMNetwork1-Shanghai | 映射到 VMNetwork1-Beijing\n | | VMNetwork1-Shanghai | 未映射\n\n在此示例中：\n\n- 当为任何连接到 VMNetwork1-Beijing 的虚拟机创建副本虚拟机时，副本虚拟机将连接到 VMNetwork1-Shanghai。\n- 当为 VMNetwork2-Beijing 或 VMNetwork2-Shanghai 创建副本虚拟机时，副本虚拟机将不会连接到任何网络。\n\n这是本示例组织中 VMM 云的设置方式，以及逻辑网络与云关联的方式。\n\n### 云保护设置\n\n**受保护的云** | **提供保护的云** | **逻辑网络（北京）**  \n---|---|---\nGoldCloud1 | GoldCloud2 |\nSilverCloud1| SilverCloud2 |\nGoldCloud2 | <p>NA</p><p></p> | <p>LogicalNetwork1-Beijing</p><p>LogicalNetwork1-Shanghai</p>\nSilverCloud2 | <p>NA</p><p></p> | <p>LogicalNetwork1-Beijing</p><p>LogicalNetwork1-Shanghai</p>\n\n### 逻辑和 VM 网络设置\n\n**位置** | **逻辑网络** | **关联的 VM 网络**\n---|---|---\n北京 | LogicalNetwork1-Beijing | VMNetwork1-Beijing\n上海 | LogicalNetwork1-Shanghai | VMNetwork1-Shanghai\n | LogicalNetwork2Shanghai | VMNetwork2-Shanghai\n\n### 目标网络\n\n根据这些设置，当你选择目标 VM 网络时，下表显示将可用的选项。\n\n**选择** | **受保护的云** | **提供保护的云** | **可用目标网络**\n---|---|---|---\nVMNetwork1-Shanghai | SilverCloud1 | SilverCloud2 | 可用\n | GoldCloud1 | GoldCloud2 | 可用\nVMNetwork2-Shanghai | SilverCloud1 | SilverCloud2 | 不可用\n | GoldCloud1 | GoldCloud2 | 可用\n\n\n\n## 多个子网\n\n如果目标网络具有多个子网，并且其中一个子网与源虚拟机所在的子网同名，则在故障转移后副本虚拟机将连接到该目标子网。如果没有具有匹配名称的目标子网，则虚拟机将连接到网络中的第一个子网。\n\n\n### 故障回复\n\n若要查看在故障恢复情况下发生的情况（反向复制），我们假设 VMNetwork1-Beijing 已映射到 VMNetwork1-Shanghai，设置如下。\n\n\n**虚拟机** | **连接到 VM 网络**\n---|---\nVM1 | VMNetwork1-Network\nVM2（VM1 的副本） | VMNetwork1-Shanghai\n\n在采用这些设置的条件下，我们看看在一些可能的方案中会发生什么情况。\n\n**方案** | **结果**\n---|---\n在故障转移后，VM-2 的网络属性没有发生任何变化。 | VM-1 保持连接到源网络。\n故障转移且断开连接后，VM-2 的网络属性已更改 | VM-1 已断开连接\nVM-2 的网络属性在故障转移后发生更改并连接到 VMNetwork2-Shanghai | 如果未映射 VMNetwork2-Shanghai，则 VM-1 将断开连接\nVMNetwork1-Shanghai 的网络映射已更改 | VM-1 将连接到现映射到 VMNetwork1-Shanghai 的网络\n\n\n## 后续步骤\n\n现在，你已经对网络映射有了更好的了解，因此可以[开始 Site Recovery 部署](/documentation/articles/site-recovery-best-practices)了。\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

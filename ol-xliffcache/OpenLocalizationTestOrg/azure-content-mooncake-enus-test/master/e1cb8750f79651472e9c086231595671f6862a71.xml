@@ -1,0 +1,236 @@
+{
+  "nodes": [
+    {
+      "content": "使用资源管理器锁定资源 | Azure",
+      "pos": [
+        28,
+        47
+      ]
+    },
+    {
+      "content": "通过对所有用户和角色应用限制，来防止用户更新或删除特定的资源。",
+      "pos": [
+        67,
+        98
+      ]
+    },
+    {
+      "content": "使用 Azure 资源管理器锁定资源",
+      "pos": [
+        339,
+        357
+      ]
+    },
+    {
+      "content": "作为管理员，在以下情况下，你将需要在订阅、资源组或资源上放置锁定，以防止你组织中的其他用户提交写操作或意外删除关键资源。",
+      "pos": [
+        359,
+        419
+      ]
+    },
+    {
+      "pos": [
+        421,
+        643
+      ],
+      "content": "Azure 资源管理器通过资源管理锁提供对资源限制操作的功能。锁是能够在特定范围内强制实施锁级别的策略。范围可能是订阅、资源组或资源。锁级别标识强制实施策略的类型，目前有两个值 - <bpt id=\"p1\">**</bpt>CanNotDelete<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>ReadOnly<ept id=\"p2\">**</ept>。<bpt id=\"p3\">**</bpt>CanNotDelete<ept id=\"p3\">**</ept> 表示经过授权的用户仍可以读取和修改资源，但不能删除任何受限制的资源。<bpt id=\"p4\">**</bpt>ReadOnly<ept id=\"p4\">**</ept> 表示经过授权的用户只能从资源中读取，但无法修改或删除任何受限制的资源。"
+    },
+    {
+      "pos": [
+        645,
+        812
+      ],
+      "content": "锁不同于使用基于角色的访问控制向用户分配用来执行特定操作的权限。若要了解有关用户和角色的设置权限，请参阅<bpt id=\"p1\">[</bpt>管理和审核对资源的访问权限<ept id=\"p1\">](/documentation/articles/resource-group-rbac)</ept>。与基于角色的访问控制不同，你可以使用管理锁来对所有用户和角色应用限制，并且通常只会在有限的持续时间内应用锁。"
+    },
+    {
+      "content": "常见方案",
+      "pos": [
+        817,
+        821
+      ]
+    },
+    {
+      "pos": [
+        823,
+        958
+      ],
+      "content": "一个常见方案是在您的资源组中有一些是在关闭和打开模式下使用的资源。对 VM 资源开启以给定时间间隔定期处理数据然后关闭的功能。在此方案中，您想要启用关闭 VM，但又不得删除存储帐户。在此方案中，你将使用的资源锁对存储帐户采用的锁级别为 <bpt id=\"p1\">**</bpt>CanNotDelete<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        960,
+        1122
+      ],
+      "content": "在另一个方案中，您的业务可能有一些周期，在这些周期内您不想更新到生产环境。<bpt id=\"p1\">**</bpt>ReadOnly<ept id=\"p1\">**</ept> 锁级别停止创建或更新。如果是零售公司，你可能不想在假日购物期间进行更新。如果是金融服务公司，你可能必须在特定市场时间内对部署进行相关约束。资源锁可以视情况提供一个用来锁定资源的策略。这可以仅应用到特定资源或应用到整个资源组。"
+    },
+    {
+      "content": "谁可以在组织中创建或删除锁",
+      "pos": [
+        1127,
+        1140
+      ]
+    },
+    {
+      "pos": [
+        1142,
+        1344
+      ],
+      "content": "若要创建或删除管理锁，你必须有权访问 <bpt id=\"p1\">**</bpt>Microsoft.Authorization/<ept id=\"p1\">**</ept>* 或 <bpt id=\"p2\">**</bpt>Microsoft.Authorization/locks/<ept id=\"p2\">**</ept>* 操作。在内置角色中，只有<bpt id=\"p3\">**</bpt>所有者<ept id=\"p3\">**</ept>和<bpt id=\"p4\">**</bpt>用户访问管理员<ept id=\"p4\">**</ept>有权执行这些操作。有关分配访问控制的详细信息，请参阅<bpt id=\"p5\">[</bpt>管理对资源的访问权限<ept id=\"p5\">](/documentation/articles/resource-group-rbac)</ept>。"
+    },
+    {
+      "content": "锁继承",
+      "pos": [
+        1349,
+        1352
+      ]
+    },
+    {
+      "content": "在父作用域应用锁时，所有子资源将继承同一个锁。",
+      "pos": [
+        1354,
+        1377
+      ]
+    },
+    {
+      "pos": [
+        1379,
+        1499
+      ],
+      "content": "如果你将多个锁应用于一个资源，则限制性最强的锁将具有最高优先级。例如，如果你在父级（例如资源组）应用 <bpt id=\"p1\">**</bpt>ReadOnly<ept id=\"p1\">**</ept> 并对该组中的资源应用 <bpt id=\"p2\">**</bpt>CanNotDelete<ept id=\"p2\">**</ept>，将会优先应用父级中限制性较强的锁 (ReadOnly)。"
+    },
+    {
+      "content": "在模板上创建锁",
+      "pos": [
+        1504,
+        1511
+      ]
+    },
+    {
+      "pos": [
+        1513,
+        1633
+      ],
+      "content": "以下示例演示在存储帐户上创建锁的模板。对其应用锁的存储帐户将作为参数提供，并配合 concat () 函数一起使用。结果是附有“Microsoft.Authorization”的资源名称，然后是该锁的名称（本例中为 <bpt id=\"p1\">**</bpt>myLock<ept id=\"p1\">**</ept>）。"
+    },
+    {
+      "content": "提供的类型特定于资源类型。对于存储，此类型是“Microsoft.Storage/storageaccounts/providers/locks”。",
+      "pos": [
+        1635,
+        1709
+      ]
+    },
+    {
+      "pos": [
+        1711,
+        1780
+      ],
+      "content": "使用资源的 <bpt id=\"p1\">**</bpt>level<ept id=\"p1\">**</ept> 属性设置作用域级别。因为该示例侧重帮助避免意外删除，所以该级别被设置为 <bpt id=\"p2\">**</bpt>CannotDelete<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "使用 REST API 创建锁",
+      "pos": [
+        2428,
+        2443
+      ]
+    },
+    {
+      "pos": [
+        2445,
+        2570
+      ],
+      "content": "你可以使用<bpt id=\"p1\">[</bpt>管理锁的 REST API<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/mt204563.aspx)</ept> 锁定已部署的资源。REST API 使您可以创建和删除锁，并且检索有关现有锁的信息。"
+    },
+    {
+      "content": "若要创建一个锁，请运行：",
+      "pos": [
+        2572,
+        2584
+      ]
+    },
+    {
+      "pos": [
+        2710,
+        2775
+      ],
+      "content": "作用域可能是订阅、资源组或资源。锁名称可以是您想要对该锁使用的任何称谓。对于 api 版本，请使用 <bpt id=\"p1\">**</bpt>2015-01-01<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "在请求中，包括指定锁属性的 JSON 对象。",
+      "pos": [
+        2777,
+        2799
+      ]
+    },
+    {
+      "pos": [
+        2928,
+        2969
+      ],
+      "content": "对于锁级别，指定 <bpt id=\"p1\">**</bpt>CanNotDelete<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>ReadOnly<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "pos": [
+        2971,
+        3057
+      ],
+      "content": "有关示例，请参阅<bpt id=\"p1\">[</bpt>管理锁的 REST API<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/mt204563.aspx)</ept>。"
+    },
+    {
+      "content": "使用 Azure PowerShell 创建一个锁",
+      "pos": [
+        3062,
+        3087
+      ]
+    },
+    {
+      "pos": [
+        3192,
+        3315
+      ],
+      "content": "你可以通过使用 <bpt id=\"p1\">**</bpt>New-AzureRmResourceLock<ept id=\"p1\">**</ept> 在 Azure PowerShell 中锁定已部署的资源，如下所示。通过 PowerShell，只能将 <bpt id=\"p2\">**</bpt>LockLevel<ept id=\"p2\">**</ept> 设置为 <bpt id=\"p3\">**</bpt>CanNotDelete<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "pos": [
+        3457,
+        3563
+      ],
+      "content": "Azure PowerShell 提供了其他用于使用锁的命令，如 <bpt id=\"p1\">**</bpt>Set-AzureRmResourceLock<ept id=\"p1\">**</ept> 用来更新锁，而 <bpt id=\"p2\">**</bpt>Remove-AzureRmResourceLock<ept id=\"p2\">**</ept> 用来删除锁。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        3568,
+        3572
+      ]
+    },
+    {
+      "pos": [
+        3576,
+        3715
+      ],
+      "content": "有关使用资源锁的详细信息，请参阅 <bpt id=\"p1\">[</bpt>向下锁定你的 Azure 资源<ept id=\"p1\">](http://blogs.msdn.com/b/cloud_solution_architect/archive/2015/06/18/lock-down-your-azure-resources.aspx)</ept>"
+    },
+    {
+      "pos": [
+        3718,
+        3804
+      ],
+      "content": "若要了解有关使用逻辑方式组织资源的信息，请参阅<bpt id=\"p1\">[</bpt>使用标记来组织资源<ept id=\"p1\">](/documentation/articles/resource-group-using-tags)</ept>。"
+    },
+    {
+      "pos": [
+        3807,
+        3891
+      ],
+      "content": "若要更改资源位于哪个资源组，请参阅<bpt id=\"p1\">[</bpt>将资源移到新的资源组<ept id=\"p1\">](/documentation/articles/resource-group-move-resources)</ept>"
+    },
+    {
+      "pos": [
+        3894,
+        3991
+      ],
+      "content": "你可以使用自定义策略对订阅应用限制和约定。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>使用策略来管理资源和控制访问<ept id=\"p1\">](/documentation/articles/resource-manager-policy)</ept>。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"使用资源管理器锁定资源 | Azure\" \n    description=\"通过对所有用户和角色应用限制，来防止用户更新或删除特定的资源。\" \n    services=\"azure-resource-manager\" \n    documentationCenter=\"\" \n    authors=\"tfitzmac\" \n    manager=\"wpickett\" \n    editor=\"\"/>\n\n<tags \n    ms.service=\"azure-resource-manager\" \n    ms.date=\"10/28/2015\" \n    wacn.date=\"12/31/2015\"/>\n\n# 使用 Azure 资源管理器锁定资源\n\n作为管理员，在以下情况下，你将需要在订阅、资源组或资源上放置锁定，以防止你组织中的其他用户提交写操作或意外删除关键资源。\n\nAzure 资源管理器通过资源管理锁提供对资源限制操作的功能。锁是能够在特定范围内强制实施锁级别的策略。范围可能是订阅、资源组或资源。锁级别标识强制实施策略的类型，目前有两个值 - **CanNotDelete** 和 **ReadOnly**。**CanNotDelete** 表示经过授权的用户仍可以读取和修改资源，但不能删除任何受限制的资源。**ReadOnly** 表示经过授权的用户只能从资源中读取，但无法修改或删除任何受限制的资源。\n\n锁不同于使用基于角色的访问控制向用户分配用来执行特定操作的权限。若要了解有关用户和角色的设置权限，请参阅[管理和审核对资源的访问权限](/documentation/articles/resource-group-rbac)。与基于角色的访问控制不同，你可以使用管理锁来对所有用户和角色应用限制，并且通常只会在有限的持续时间内应用锁。\n\n## 常见方案\n\n一个常见方案是在您的资源组中有一些是在关闭和打开模式下使用的资源。对 VM 资源开启以给定时间间隔定期处理数据然后关闭的功能。在此方案中，您想要启用关闭 VM，但又不得删除存储帐户。在此方案中，你将使用的资源锁对存储帐户采用的锁级别为 **CanNotDelete**。\n\n在另一个方案中，您的业务可能有一些周期，在这些周期内您不想更新到生产环境。**ReadOnly** 锁级别停止创建或更新。如果是零售公司，你可能不想在假日购物期间进行更新。如果是金融服务公司，你可能必须在特定市场时间内对部署进行相关约束。资源锁可以视情况提供一个用来锁定资源的策略。这可以仅应用到特定资源或应用到整个资源组。\n\n## 谁可以在组织中创建或删除锁\n\n若要创建或删除管理锁，你必须有权访问 **Microsoft.Authorization/*** 或 **Microsoft.Authorization/locks/*** 操作。在内置角色中，只有**所有者**和**用户访问管理员**有权执行这些操作。有关分配访问控制的详细信息，请参阅[管理对资源的访问权限](/documentation/articles/resource-group-rbac)。\n\n## 锁继承\n\n在父作用域应用锁时，所有子资源将继承同一个锁。\n\n如果你将多个锁应用于一个资源，则限制性最强的锁将具有最高优先级。例如，如果你在父级（例如资源组）应用 **ReadOnly** 并对该组中的资源应用 **CanNotDelete**，将会优先应用父级中限制性较强的锁 (ReadOnly)。\n\n## 在模板上创建锁\n\n以下示例演示在存储帐户上创建锁的模板。对其应用锁的存储帐户将作为参数提供，并配合 concat () 函数一起使用。结果是附有“Microsoft.Authorization”的资源名称，然后是该锁的名称（本例中为 **myLock**）。\n\n提供的类型特定于资源类型。对于存储，此类型是“Microsoft.Storage/storageaccounts/providers/locks”。\n\n使用资源的 **level** 属性设置作用域级别。因为该示例侧重帮助避免意外删除，所以该级别被设置为 **CannotDelete**。\n\n    {\n        \"$schema\": \"https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#\",\n        \"contentVersion\": \"1.0.0.0\",\n        \"parameters\": {\n            \"lockedResource\": {\n                \"type\": \"string\"\n            }\n        },\n        \"resources\": [\n            {\n                \"name\": \"[concat(parameters('lockedResource'), '/Microsoft.Authorization/myLock')]\",\n                \"type\": \"Microsoft.Storage/storageAccounts/providers/locks\",\n                \"apiVersion\": \"2015-01-01\",\n                \"properties\": {\n                    \"level\": \"CannotDelete\"\n                }\n            }\n        ]\n    }\n\n## 使用 REST API 创建锁\n\n你可以使用[管理锁的 REST API](https://msdn.microsoft.com/zh-cn/library/azure/mt204563.aspx) 锁定已部署的资源。REST API 使您可以创建和删除锁，并且检索有关现有锁的信息。\n\n若要创建一个锁，请运行：\n\n    PUT https://management.azure.com/{scope}/providers/Microsoft.Authorization/locks/{lock-name}?api-version={api-version}\n\n作用域可能是订阅、资源组或资源。锁名称可以是您想要对该锁使用的任何称谓。对于 api 版本，请使用 **2015-01-01**。\n\n在请求中，包括指定锁属性的 JSON 对象。\n\n    {\n        \"properties\": {\n            \"level\": {lock-level},\n            \"notes\": \"Optional text notes.\"\n        }\n    } \n\n对于锁级别，指定 **CanNotDelete** 或 **ReadOnly**。\n\n有关示例，请参阅[管理锁的 REST API](https://msdn.microsoft.com/zh-cn/library/azure/mt204563.aspx)。\n\n## 使用 Azure PowerShell 创建一个锁\n\n[AZURE.INCLUDE [powershell-preview-inline-include](../includes/powershell-preview-inline-include.md)]\n\n你可以通过使用 **New-AzureRmResourceLock** 在 Azure PowerShell 中锁定已部署的资源，如下所示。通过 PowerShell，只能将 **LockLevel** 设置为 **CanNotDelete**。\n\n    PS C:\\> New-AzureRmResourceLock -LockLevel CanNotDelete -LockName LockSite -ResourceName examplesite -ResourceType Microsoft.Web/sites\n\nAzure PowerShell 提供了其他用于使用锁的命令，如 **Set-AzureRmResourceLock** 用来更新锁，而 **Remove-AzureRmResourceLock** 用来删除锁。\n\n## 后续步骤\n\n- 有关使用资源锁的详细信息，请参阅 [向下锁定你的 Azure 资源](http://blogs.msdn.com/b/cloud_solution_architect/archive/2015/06/18/lock-down-your-azure-resources.aspx)\n- 若要了解有关使用逻辑方式组织资源的信息，请参阅[使用标记来组织资源](/documentation/articles/resource-group-using-tags)。\n- 若要更改资源位于哪个资源组，请参阅[将资源移到新的资源组](/documentation/articles/resource-group-move-resources)\n- 你可以使用自定义策略对订阅应用限制和约定。有关详细信息，请参阅[使用策略来管理资源和控制访问](/documentation/articles/resource-manager-policy)。\n\n<!---HONumber=Mooncake_1221_2015-->"
+}

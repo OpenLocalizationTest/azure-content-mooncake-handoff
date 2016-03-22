@@ -1,0 +1,1256 @@
+{
+  "nodes": [
+    {
+      "pos": [
+        1,
+        153
+      ],
+      "content": "本文介绍如何在 Azure 中配置 Web 应用的 HTTPS。其中不涉及客户端证书身份验证；有关该方面的信息，请参阅<bpt id=\"p1\">[</bpt>如何为 Web 应用配置 TLS 相互身份验证<ept id=\"p1\">](/documentation/articles/app-service-web-configure-tls-mutual-auth)</ept>。"
+    },
+    {
+      "pos": [
+        155,
+        389
+      ],
+      "content": "默认情况下，Azure 已使用 *.chinacloudsites.cn 域的通配符证书为你的应用启用 HTTP。如果不打算配置自定义域，可以直接利用默认的 HTTPS 证书。但是，就像<bpt id=\"p1\">[</bpt>所有通配符域<ept id=\"p1\">](https://casecurity.org/2014/02/26/pros-and-cons-of-single-domain-multi-domain-and-wildcard-certificates/)</ept>一样，这并不如将自定义域与自己的证书搭配使用那么安全。"
+    },
+    {
+      "pos": [
+        391,
+        483
+      ],
+      "content": "本文档的其余部分提供了有关为自定义域启用 HTTPS 的详细信息，例如 <bpt id=\"p1\">**</bpt>contoso.com<ept id=\"p1\">**</ept>、<bpt id=\"p2\">**</bpt>www.contoso.com<ept id=\"p2\">**</ept> 或 <bpt id=\"p3\">**</bpt>\\*.contoso.com<ept id=\"p3\">**</ept>"
+    },
+    {
+      "pos": [
+        487,
+        529
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"bkmk_domainname\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 为自定义域启用 SSL"
+    },
+    {
+      "pos": [
+        531,
+        660
+      ],
+      "content": "若要为自定义域启用 HTTPS（例如 <bpt id=\"p1\">**</bpt>contoso.com<ept id=\"p1\">**</ept>），你必须先<bpt id=\"p2\">[</bpt>在 Azure Web 应用中配置自定义域名<ept id=\"p2\">](/documentation/articles/web-sites-custom-domain-name)</ept>。然后，执行下列操作："
+    },
+    {
+      "content": "获取 SSL 证书",
+      "pos": [
+        666,
+        675
+      ]
+    },
+    {
+      "content": "配置标准定价层",
+      "pos": [
+        696,
+        703
+      ]
+    },
+    {
+      "content": "在应用中配置 SSL",
+      "pos": [
+        729,
+        739
+      ]
+    },
+    {
+      "pos": [
+        764,
+        796
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>对应用强制实施 SSL<ept id=\"p1\">](#bkmk_enforce)</ept>（可选）"
+    },
+    {
+      "pos": [
+        798,
+        943
+      ],
+      "content": "如果在本文中有任何需要协助的地方，你可以联系 <bpt id=\"p1\">[</bpt>MSDN Azure 和 CSDN Azure<ept id=\"p1\">](/support/forums/)</ept> 上的 Azure 专家。或者，你也可以提出 Azure 支持事件。请转到 <bpt id=\"p2\">[</bpt>Azure 支持站点<ept id=\"p2\">](/support/contact/)</ept>并单击“获取支持”。"
+    },
+    {
+      "pos": [
+        947,
+        987
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"bkmk_getcert\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 1\\.获取 SSL 证书"
+    },
+    {
+      "pos": [
+        989,
+        1316
+      ],
+      "content": "请求 SSL 证书之前，必须先确定将受证书保护的域名。这将确定必须获取的证书类型。如果你只需保护单个域名（例如 <bpt id=\"p1\">**</bpt>contoso.com<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>www.contoso.com<ept id=\"p2\">**</ept>）的安全，基本证书就足够了。如果你需要保护多个域名（例如 <bpt id=\"p3\">**</bpt>contoso.com<ept id=\"p3\">**</ept>、<bpt id=\"p4\">**</bpt>www.contoso.com<ept id=\"p4\">**</ept> 和 <bpt id=\"p5\">**</bpt>mail.contoso.com<ept id=\"p5\">**</ept>）的安全，则可以获取<bpt id=\"p6\">[</bpt>通配符证书<ept id=\"p6\">](http://en.wikipedia.org/wiki/Wildcard_certificate)</ept>或带有<bpt id=\"p7\">[</bpt>使用者备用名称<ept id=\"p7\">](http://en.wikipedia.org/wiki/SubjectAltName)</ept> (subjectAltName) 的证书。"
+    },
+    {
+      "pos": [
+        1318,
+        1550
+      ],
+      "content": "配合 Azure Web 应用使用的 SSL 证书必须由<bpt id=\"p1\">[</bpt>证书颁发机构<ept id=\"p1\">](http://en.wikipedia.org/wiki/Certificate_authority)</ept> (CA) 签名。如果你尚未获取 SSL 证书，将需要从颁发 SSL 证书的公司购买一个 SSL 证书。有关证书颁发机构的列表，请参阅 Microsoft TechNet Wiki 上的 <bpt id=\"p2\">[</bpt>Windows 和 Windows Phone 8 SSL 根证书计划（成员 CA）<ept id=\"p2\">][cas]</ept>。"
+    },
+    {
+      "content": "该证书必须满足 Azure 中的以下 SSL 证书要求：",
+      "pos": [
+        1552,
+        1580
+      ]
+    },
+    {
+      "content": "证书必须包含私钥。",
+      "pos": [
+        1584,
+        1593
+      ]
+    },
+    {
+      "content": "必须为密钥交换创建证书，并且该证书可导出到个人信息交换 (.pfx) 文件。",
+      "pos": [
+        1596,
+        1634
+      ]
+    },
+    {
+      "content": "证书的使用者名称必须与用于访问应用的域匹配。如果您需要使用此证书为多个域提供服务，则您将需要使用通配符值或指定 subjectAltName 值，如前面所述。",
+      "pos": [
+        1637,
+        1716
+      ]
+    },
+    {
+      "content": "该证书应使用至少 2048 位加密。",
+      "pos": [
+        1719,
+        1737
+      ]
+    },
+    {
+      "content": "从专用 CA 服务器颁发的证书不受 Azure Web 应用支持。",
+      "pos": [
+        1740,
+        1773
+      ]
+    },
+    {
+      "content": "若要获取可用于 Azure Web 应用的 SSL 证书，你可以将证书签名请求 (CSR) 提交到证书颁发机构，然后基于收到的证书生成 .pfx 文件。可以使用所选的工具来执行此操作。以下是获取证书的一些常见方式：",
+      "pos": [
+        1775,
+        1882
+      ]
+    },
+    {
+      "content": "使用 Certreq.exe 获取证书",
+      "pos": [
+        1887,
+        1906
+      ]
+    },
+    {
+      "content": "使用 IIS 管理器获取证书",
+      "pos": [
+        1926,
+        1940
+      ]
+    },
+    {
+      "content": "使用 OpenSSL 获取证书",
+      "pos": [
+        1959,
+        1974
+      ]
+    },
+    {
+      "content": "使用 OpenSSL 获取 SubjectAltName 证书",
+      "pos": [
+        1994,
+        2025
+      ]
+    },
+    {
+      "content": "生成自签名证书（仅用于测试）",
+      "pos": [
+        2052,
+        2066
+      ]
+    },
+    {
+      "pos": [
+        2089,
+        2269
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在遵循步骤操作时，系统将提示你输入<bpt id=\"p1\">**</bpt>公用名<ept id=\"p1\">**</ept>，例如 <ph id=\"ph2\">`www.contoso.com`</ph>。对于通配符证书，此值应为 \\*.domainname（例如，\\*.contoso.com）。如果需要同时支持通配符名称（如 *.contoso.com）和根域名（如 contoso.com），可以使用通配符 subjectAltName 证书。"
+    },
+    {
+      "content": "Azure Web 应用支持椭圆曲线加密 (ECC) 证书；不过，它们相对较新，你应该在具体步骤中使用 CA 来创建 CSR。",
+      "pos": [
+        2274,
+        2337
+      ]
+    },
+    {
+      "pos": [
+        2339,
+        2548
+      ],
+      "content": "你可能还需要获取<bpt id=\"p1\">**</bpt><bpt id=\"p2\">[</bpt>中间证书<ept id=\"p2\">](http://en.wikipedia.org/wiki/Intermediate_certificate_authorities)</ept><ept id=\"p1\">**</ept>（也称为链证书），前提是这些证书由你的 CA 使用。与“非链式证书”相比，使用中间证书被认为更安全，因此 CA 通常使用这些证书。中间证书通常作为从 CA 网站的单独下载提供。本文中的步骤提供了有关如何确保任何中间证书与上载到应用的证书合并的步骤。"
+    },
+    {
+      "pos": [
+        2553,
+        2612
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"bkmk_certreq\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 使用 Certreq.exe 获取证书（仅限 Windows）"
+    },
+    {
+      "content": "Certreq.exe 是用于创建证书请求的 Windows 实用程序。它已成为自 Windows XP/Windows Server 2000 之后基本 Windows 安装的一部分，因此应该在最新的 Windows 系统上提供它。使用以下步骤获取使用 certreq.exe 的 SSL 证书。",
+      "pos": [
+        2614,
+        2763
+      ]
+    },
+    {
+      "pos": [
+        2768,
+        2864
+      ],
+      "content": "打开“记事本”并创建包含以下内容的新文档。将 Subject 一行中的 <bpt id=\"p1\">**</bpt>mysite.com<ept id=\"p1\">**</ept> 替换为应用的自定义域名。例如，Subject =“CN=www.contoso.com”。"
+    },
+    {
+      "pos": [
+        3214,
+        3314
+      ],
+      "content": "有关上述指定的选项以及其他可用选项的详细信息，请参阅 <bpt id=\"p1\">[</bpt>Certreq 参考文档<ept id=\"p1\">](http://technet.microsoft.com/zh-cn/library/cc725793.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        3319,
+        3347
+      ],
+      "content": "将该文本文件另存为 <bpt id=\"p1\">**</bpt>myrequest.txt<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        3352,
+        3383
+      ],
+      "content": "在“开始”屏幕或“开始”菜单中，运行 <bpt id=\"p1\">**</bpt>cmd.exe<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "从命令提示符处，使用以下命令创建证书请求文件：",
+      "pos": [
+        3388,
+        3411
+      ]
+    },
+    {
+      "pos": [
+        3492,
+        3563
+      ],
+      "content": "指定在步骤 1 中创建的 <bpt id=\"p1\">**</bpt>myrequest.txt<ept id=\"p1\">**</ept> 文件的路径，以及要在创建 <bpt id=\"p2\">**</bpt>myrequest.csr<ept id=\"p2\">**</ept> 文件时使用的路径。"
+    },
+    {
+      "pos": [
+        3568,
+        3645
+      ],
+      "content": "向证书颁发机构提交 <bpt id=\"p1\">**</bpt>myrequest.csr<ept id=\"p1\">**</ept> 以获取 SSL 证书。这可能涉及上载文件，或在记事本中打开文件并将内容直接粘贴到 Web 表单中。"
+    },
+    {
+      "pos": [
+        3651,
+        3743
+      ],
+      "content": "有关证书颁发机构的列表，请参阅 Microsoft TechNet Wiki 上的 <bpt id=\"p1\">[</bpt>Windows 和 Windows Phone 8 SSL 根证书计划（成员 CA）<ept id=\"p1\">][cas]</ept>。"
+    },
+    {
+      "content": "证书颁发机构向您提供证书 (.CER) 文件后，请将此文件保存到用来生成请求的计算机，然后使用以下命令接受该请求并完成证书生成过程。",
+      "pos": [
+        3748,
+        3814
+      ]
+    },
+    {
+      "pos": [
+        3862,
+        3942
+      ],
+      "content": "在这种情况下，从证书颁发机构收到的 <bpt id=\"p1\">**</bpt>mycert.cer<ept id=\"p1\">**</ept> 证书将用于完成证书的签名。将不创建任何文件；相反，该证书将存储在 Windows 证书存储中。"
+    },
+    {
+      "content": "如果您的 CA 使用中间证书，则必须先安装这些证书，才能在后续步骤中导出证书。通常这些证书作为来自您的 CA 的单独下载提供，并且针对不同的 Web 服务器类型以几种格式提供。选择为 Microsoft IIS 提供的版本。",
+      "pos": [
+        3947,
+        4059
+      ]
+    },
+    {
+      "content": "下载证书后，在资源管理器中右键单击它，然后选择“安装证书”。使用“证书导入向导”中的默认值，然后继续选择“下一步”，直到完成导入。",
+      "pos": [
+        4065,
+        4130
+      ]
+    },
+    {
+      "pos": [
+        4135,
+        4274
+      ],
+      "content": "若要从证书存储中导出证书，请从“开始”屏幕或“开始”菜单运行 <bpt id=\"p1\">**</bpt>certmgr.msc<ept id=\"p1\">**</ept>。当“证书管理器”出现时，展开“个人”文件夹，然后选择“证书”。在“颁发给”字段中，查找具有你为其请求了一个证书的自定义域名的条目。在“颁发者”字段中，它应列出用于此证书的证书颁发机构。"
+    },
+    {
+      "content": "将证书管理器的图像插入此处",
+      "pos": [
+        4282,
+        4295
+      ]
+    },
+    {
+      "pos": [
+        4310,
+        4380
+      ],
+      "content": "右键单击该证书并选择“所有任务”，然后选择“导出”。在“证书导出向导”中，单击“下一步”，然后选择“是，导出私钥”。单击<bpt id=\"p1\">**</bpt>“下一步”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "导出私钥",
+      "pos": [
+        4388,
+        4392
+      ]
+    },
+    {
+      "pos": [
+        4409,
+        4469
+      ],
+      "content": "选择“个人信息交换 - PKCS #12”、“将所有证书包括在证书链中”和“导出所有扩展属性”。单击<bpt id=\"p1\">**</bpt>“下一步”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "包括所有证书和扩展的属性",
+      "pos": [
+        4477,
+        4489
+      ]
+    },
+    {
+      "pos": [
+        4506,
+        4536
+      ],
+      "content": "选择“密码”，然后输入并确认该密码。单击<bpt id=\"p1\">**</bpt>“下一步”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "指定密码",
+      "pos": [
+        4544,
+        4548
+      ]
+    },
+    {
+      "pos": [
+        4565,
+        4617
+      ],
+      "content": "提供将包含已导出证书的路径和文件名。文件名应使用 <bpt id=\"p1\">**</bpt>.pfx<ept id=\"p1\">**</ept> 扩展名。单击“下一步”以完成此过程。"
+    },
+    {
+      "content": "提供文件路径",
+      "pos": [
+        4625,
+        4631
+      ]
+    },
+    {
+      "content": "你现在可以将导出的 PFX 文件上载到 Azure 中的应用。",
+      "pos": [
+        4644,
+        4675
+      ]
+    },
+    {
+      "pos": [
+        4680,
+        4723
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"bkmk_openssl\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 使用 OpenSSL 获取证书"
+    },
+    {
+      "content": "通过从命令行、bash 或终端会话使用以下语句，生成私钥和证书签名请求：",
+      "pos": [
+        4728,
+        4764
+      ]
+    },
+    {
+      "content": "在系统提示后，输入适当的信息。例如：",
+      "pos": [
+        4856,
+        4874
+      ]
+    },
+    {
+      "pos": [
+        5346,
+        5421
+      ],
+      "content": "在此过程完成后，你应该有两个文件：<bpt id=\"p1\">**</bpt>myserver.key<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>server.csr<ept id=\"p2\">**</ept>。<bpt id=\"p3\">**</bpt>server.csr<ept id=\"p3\">**</ept> 包含证书签名请求。"
+    },
+    {
+      "pos": [
+        5426,
+        5543
+      ],
+      "content": "向证书颁发机构提交 CSR 以获取 SSL 证书。有关证书颁发机构的列表，请参阅 Microsoft TechNet Wiki 上的 <bpt id=\"p1\">[</bpt>Windows 和 Windows Phone 8 SSL 根证书计划（成员 CA）<ept id=\"p1\">][cas]</ept>。"
+    },
+    {
+      "pos": [
+        5548,
+        5671
+      ],
+      "content": "在你从 CA 获取了某一证书后，将其保存到名为 <bpt id=\"p1\">**</bpt>myserver.crt<ept id=\"p1\">**</ept> 的文件中。如果你的 CA 以文本格式提供了证书，只需将证书文本粘贴到 <bpt id=\"p2\">**</bpt>myserver.crt<ept id=\"p2\">**</ept> 文件中。在文本编辑器中查看时，该文件内容应该类似于以下内容："
+    },
+    {
+      "content": "保存文件。",
+      "pos": [
+        6981,
+        6986
+      ]
+    },
+    {
+      "pos": [
+        6991,
+        7095
+      ],
+      "content": "从命令行、Bash 或终端会话中，使用以下命令将 <bpt id=\"p1\">**</bpt>myserver.key<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>myserver.crt<ept id=\"p2\">**</ept> 转换为 <bpt id=\"p3\">**</bpt>myserver.pfx<ept id=\"p3\">**</ept>，这是 Azure Web 应用所要求的格式："
+    },
+    {
+      "content": "在系统提示后，输入一个密码以便保护该 .pfx 文件。",
+      "pos": [
+        7188,
+        7215
+      ]
+    },
+    {
+      "pos": [
+        7223,
+        7351
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果您的 CA 使用中间证书，则必须先安装这些证书，才能在下一步中导出证书。通常这些证书作为来自您的 CA 的单独下载提供，并且针对不同的 Web 服务器类型以几种格式提供。选择作为 PEM 文件（.pem 文件扩展名）提供的版本。"
+    },
+    {
+      "pos": [
+        7358,
+        7555
+      ],
+      "content": "<p>以下命令演示如何创建包含中间证书的 .pfx 文件，这些中间证书包含在 **intermediate-cets.pem** 文件中：\n<p>`openssl pkcs12 -chain -export -out myserver.pfx -inkey myserver.key -in myserver.crt -certfile intermediate-cets.pem`",
+      "leadings": [
+        "",
+        "    > "
+      ],
+      "nodes": [
+        {
+          "content": "以下命令演示如何创建包含中间证书的 .pfx 文件，这些中间证书包含在 <bpt id=\"p1\">**</bpt>intermediate-cets.pem<ept id=\"p1\">**</ept> 文件中：",
+          "pos": [
+            3,
+            69
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        7561,
+        7611
+      ],
+      "content": "运行此命令后，你应该具有适用于 Azure Web 应用的 <bpt id=\"p1\">**</bpt>myserver.pfx<ept id=\"p1\">**</ept> 文件。"
+    },
+    {
+      "pos": [
+        7616,
+        7657
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"bkmk_iismgr\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 使用 IIS 管理器获取证书"
+    },
+    {
+      "content": "如果你熟悉 IIS 管理器，则可以用它来生成可与 Azure Web 应用一起使用的证书。",
+      "pos": [
+        7659,
+        7704
+      ]
+    },
+    {
+      "pos": [
+        7709,
+        7791
+      ],
+      "content": "使用 IIS 管理器生成要发送给证书颁发机构的 CSR。有关生成 CSR 的详细信息，请参阅<bpt id=\"p1\">[</bpt>申请 Internet 服务器证书 (IIS 7)<ept id=\"p1\">][iiscsr]</ept>。"
+    },
+    {
+      "pos": [
+        7796,
+        7913
+      ],
+      "content": "向证书颁发机构提交 CSR 以获取 SSL 证书。有关证书颁发机构的列表，请参阅 Microsoft TechNet Wiki 上的 <bpt id=\"p1\">[</bpt>Windows 和 Windows Phone 8 SSL 根证书计划（成员 CA）<ept id=\"p1\">][cas]</ept>。"
+    },
+    {
+      "pos": [
+        7918,
+        8003
+      ],
+      "content": "使用证书颁发机构供应商提供的证书完成 CSR。有关完成 CSR 的详细信息，请参阅<bpt id=\"p1\">[</bpt>安装 Internet 服务器证书 (IIS 7)<ept id=\"p1\">][installcertiis]</ept>。"
+    },
+    {
+      "content": "如果您的 CA 使用中间证书，则必须先安装这些证书，才能在下一步中导出证书。通常这些证书作为来自您的 CA 的单独下载提供，并且针对不同的 Web 服务器类型以几种格式提供。选择为 Microsoft IIS 提供的版本。",
+      "pos": [
+        8008,
+        8119
+      ]
+    },
+    {
+      "content": "下载证书后，在资源管理器中右键单击它，然后选择“安装证书”。使用“证书导入向导”中的默认值，然后继续选择“下一步”，直到完成导入。",
+      "pos": [
+        8125,
+        8190
+      ]
+    },
+    {
+      "pos": [
+        8195,
+        8293
+      ],
+      "content": "从 IIS 管理器导出证书。有关导出证书的详细信息，请参阅<bpt id=\"p1\">[</bpt>导出服务器证书 (IIS 7)<ept id=\"p1\">][exportcertiis]</ept>。在后面的步骤中将使用导出的文件，以便上载到 Azure 来用于你的应用。"
+    },
+    {
+      "pos": [
+        8301,
+        8367
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在导出过程中，请务必选择选项“是，导出私钥”。<ph id=\"ph2\">&lt;strong&gt;</ph><ph id=\"ph3\">&lt;/strong&gt;</ph>这将在导出的证书中包括私钥。"
+    },
+    {
+      "pos": [
+        8375,
+        8445
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在导出过程中，请务必选择选项“在证书路径中包括所有证书”和“导出所有扩展属性”。这将在导出的证书中包括任何中间证书。"
+    },
+    {
+      "pos": [
+        8450,
+        8516
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"bkmk_subjectaltname\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 使用 OpenSSL 获取 SubjectAltName 证书"
+    },
+    {
+      "content": "OpenSSL 可用于创建使用 SubjectAltName 扩展以使单个证书支持多个域名的证书请求，但它需要一个配置文件。以下步骤将演示如何创建配置文件，然后使用它来请求证书。",
+      "pos": [
+        8518,
+        8607
+      ]
+    },
+    {
+      "pos": [
+        8612,
+        8657
+      ],
+      "content": "创建一个名为 <bpt id=\"p1\">__</bpt>sancert.cnf<ept id=\"p1\">__</ept> 的新文件，并且使用以下代码作为该文件的内容："
+    },
+    {
+      "content": "请注意以“subjectAltName”开头的行。将当前列出的域名替换为要支持的域名（包含公用名）。例如：",
+      "pos": [
+        9733,
+        9786
+      ]
+    },
+    {
+      "content": "您不需要更改 commonName\\_default 字段，因为系统将会在以下一个步骤中提示您输入您的公用名。",
+      "pos": [
+        9879,
+        9934
+      ]
+    },
+    {
+      "pos": [
+        9939,
+        9961
+      ],
+      "content": "保存 <bpt id=\"p1\">__</bpt>sancert.cnf<ept id=\"p1\">__</ept> 文件。"
+    },
+    {
+      "content": "通过使用 sancert.cnf 配置文件生成私钥和证书签名请求。在 bash 或终端会话中，使用以下命令：",
+      "pos": [
+        9966,
+        10020
+      ]
+    },
+    {
+      "content": "在系统提示后，输入适当的信息。例如：",
+      "pos": [
+        10132,
+        10150
+      ]
+    },
+    {
+      "pos": [
+        10427,
+        10502
+      ],
+      "content": "在此过程完成后，你应该有两个文件：<bpt id=\"p1\">**</bpt>myserver.key<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>server.csr<ept id=\"p2\">**</ept>。<bpt id=\"p3\">**</bpt>server.csr<ept id=\"p3\">**</ept> 包含证书签名请求。"
+    },
+    {
+      "pos": [
+        10507,
+        10624
+      ],
+      "content": "向证书颁发机构提交 CSR 以获取 SSL 证书。有关证书颁发机构的列表，请参阅 Microsoft TechNet Wiki 上的 <bpt id=\"p1\">[</bpt>Windows 和 Windows Phone 8 SSL 根证书计划（成员 CA）<ept id=\"p1\">][cas]</ept>。"
+    },
+    {
+      "pos": [
+        10629,
+        10752
+      ],
+      "content": "在你从 CA 获取了某一证书后，将其保存到名为 <bpt id=\"p1\">**</bpt>myserver.crt<ept id=\"p1\">**</ept> 的文件中。如果你的 CA 以文本格式提供了证书，只需将证书文本粘贴到 <bpt id=\"p2\">**</bpt>myserver.crt<ept id=\"p2\">**</ept> 文件中。在文本编辑器中查看时，该文件内容应该类似于以下内容："
+    },
+    {
+      "content": "保存文件。",
+      "pos": [
+        12062,
+        12067
+      ]
+    },
+    {
+      "pos": [
+        12072,
+        12176
+      ],
+      "content": "从命令行、Bash 或终端会话中，使用以下命令将 <bpt id=\"p1\">**</bpt>myserver.key<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>myserver.crt<ept id=\"p2\">**</ept> 转换为 <bpt id=\"p3\">**</bpt>myserver.pfx<ept id=\"p3\">**</ept>，这是 Azure Web 应用所要求的格式："
+    },
+    {
+      "content": "在系统提示后，输入一个密码以便保护该 .pfx 文件。",
+      "pos": [
+        12269,
+        12296
+      ]
+    },
+    {
+      "pos": [
+        12304,
+        12432
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果您的 CA 使用中间证书，则必须先安装这些证书，才能在下一步中导出证书。通常这些证书作为来自您的 CA 的单独下载提供，并且针对不同的 Web 服务器类型以几种格式提供。选择作为 PEM 文件（.pem 文件扩展名）提供的版本。"
+    },
+    {
+      "pos": [
+        12439,
+        12636
+      ],
+      "content": "<p>以下命令演示如何创建包含中间证书的 .pfx 文件，这些中间证书包含在 **intermediate-cets.pem** 文件中：\n<p>`openssl pkcs12 -chain -export -out myserver.pfx -inkey myserver.key -in myserver.crt -certfile intermediate-cets.pem`",
+      "leadings": [
+        "",
+        "    > "
+      ],
+      "nodes": [
+        {
+          "content": "以下命令演示如何创建包含中间证书的 .pfx 文件，这些中间证书包含在 <bpt id=\"p1\">**</bpt>intermediate-cets.pem<ept id=\"p1\">**</ept> 文件中：",
+          "pos": [
+            3,
+            69
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        12642,
+        12692
+      ],
+      "content": "运行此命令后，你应该具有适用于 Azure Web 应用的 <bpt id=\"p1\">**</bpt>myserver.pfx<ept id=\"p1\">**</ept> 文件。"
+    },
+    {
+      "pos": [
+        12697,
+        12742
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"bkmk_selfsigned\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 生成自签名证书（仅用于测试）"
+    },
+    {
+      "content": "在某些情况下，您可能想要获取证书以便进行测试，并且将从受信任的 CA 购买证书延迟到生产开始之时。自签名证书可满足此需求。自签名证书是您创建的证书，就像您是证书颁发机构一样进行签名。尽管可以使用此证书来保护某一应用，但在访问该应用时大多数浏览器都将返回错误，因为该证书不是由受信任的 CA 签名的。某些浏览器甚至可能会拒绝允许你查看该应用。",
+      "pos": [
+        12744,
+        12914
+      ]
+    },
+    {
+      "content": "使用 makecert 生成自签名证书",
+      "pos": [
+        12919,
+        12938
+      ]
+    },
+    {
+      "content": "使用 OpenSSL 生成自签名证书",
+      "pos": [
+        12961,
+        12979
+      ]
+    },
+    {
+      "pos": [
+        13003,
+        13053
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"bkmk_ssmakecert\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 使用 makecert 生成自签名证书"
+    },
+    {
+      "content": "您可以通过执行以下步骤从 Windows 系统中删除 Visual Studio 已安装的测试证书：",
+      "pos": [
+        13060,
+        13110
+      ]
+    },
+    {
+      "content": "在“开始”菜单或“开始”屏幕中，搜索“开发人员命令提示符”。最后，右键单击“开发人员命令提示符”并选择“以管理员身份运行”。",
+      "pos": [
+        13115,
+        13177
+      ]
+    },
+    {
+      "content": "如果你收到“用户帐户控制”对话框，请选择“是”以便继续。",
+      "pos": [
+        13183,
+        13211
+      ]
+    },
+    {
+      "pos": [
+        13216,
+        13277
+      ],
+      "content": "从开发人员命令提示符处，使用以下命令创建新的自签名证书。必须使用应用的 DNS 替代 <bpt id=\"p1\">**</bpt>serverdnsname<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "此命令将创建日期介于 01/01/2013 和 01/01/2014 之间的适当的证书，并且将在 CurrentUser 证书存储中存储该位置。",
+      "pos": [
+        13469,
+        13541
+      ]
+    },
+    {
+      "content": "在“开始”菜单或“开始”屏幕中，搜索“Windows PowerShell”并启动此应用程序。",
+      "pos": [
+        13546,
+        13593
+      ]
+    },
+    {
+      "content": "从 Windows PowerShell 提示处，使用以下命令导出以前创建的证书：",
+      "pos": [
+        13598,
+        13639
+      ]
+    },
+    {
+      "pos": [
+        13864,
+        13976
+      ],
+      "content": "这会将指定的密码作为安全字符串存储于 $mypwd 中，然后通过使用 <bpt id=\"p1\">**</bpt>dnsname<ept id=\"p1\">**</ept> 参数指定的 DNS 名称查找证书，并且导出到 <bpt id=\"p2\">**</bpt>filepath<ept id=\"p2\">**</ept> 参数指定的文件中。包含密码的安全字符串用于保护导出的文件。"
+    },
+    {
+      "pos": [
+        13982,
+        14029
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"bkmk_ssopenssl\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>使用 OpenSSL 生成自签名证书"
+    },
+    {
+      "pos": [
+        14039,
+        14087
+      ],
+      "content": "创建一个名为 <bpt id=\"p1\">**</bpt>serverauth.cnf<ept id=\"p1\">**</ept> 的新文档，并且使用以下代码作为该文件的内容："
+    },
+    {
+      "content": "这将指定生成可由 Azure Web 应用使用的 SSL 证书所需的配置设置。",
+      "pos": [
+        15388,
+        15427
+      ]
+    },
+    {
+      "content": "通过从命令行、bash 或终端会话使用以下语句，生成新的自签名证书：",
+      "pos": [
+        15432,
+        15466
+      ]
+    },
+    {
+      "pos": [
+        15595,
+        15638
+      ],
+      "content": "这将使用在 <bpt id=\"p1\">**</bpt>serverauth.cnf<ept id=\"p1\">**</ept> 文件中指定的配置设置创建一个新证书。"
+    },
+    {
+      "content": "若要将该证书导出到 .PFX 文件（可上载到 Azure 中的应用），请使用以下命令：",
+      "pos": [
+        15643,
+        15686
+      ]
+    },
+    {
+      "content": "在系统提示后，输入一个密码以便保护该 .pfx 文件。",
+      "pos": [
+        15779,
+        15806
+      ]
+    },
+    {
+      "pos": [
+        15812,
+        15853
+      ],
+      "content": "可使用此命令生成的 <bpt id=\"p1\">**</bpt>myserver.pfx<ept id=\"p1\">**</ept> 来出于测试目的保护你的应用。"
+    },
+    {
+      "pos": [
+        15857,
+        15900
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"bkmk_standardmode\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 2\\.配置标准定价层"
+    },
+    {
+      "pos": [
+        15902,
+        15979
+      ],
+      "content": "为自定义域启用 HTTPS 只适用于 Azure Web 应用中的<bpt id=\"p1\">**</bpt>标准<ept id=\"p1\">**</ept>层。请按照以下步骤将你的 App Service 计划切换到<bpt id=\"p2\">**</bpt>标准<ept id=\"p2\">**</ept>层。"
+    },
+    {
+      "pos": [
+        15983,
+        16137
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>将应用从<bpt id=\"p1\">**</bpt>免费<ept id=\"p1\">**</ept>层切换到<bpt id=\"p2\">**</bpt>标准<ept id=\"p2\">**</ept>层之前，你应该删除订阅已有的支出上限，否则如果你在计费周期结束之前达到你的上限，可能会出现你的应用变得不可用的风险。有关共享和<bpt id=\"p3\">**</bpt>标准<ept id=\"p3\">**</ept>层的详细信息，请参阅<bpt id=\"p4\">[</bpt>定价详细信息<ept id=\"p4\">][pricing]</ept>。1.在浏览器中，打开<bpt id=\"p5\">[</bpt>管理门户<ept id=\"p5\">][portal]</ept>。"
+    },
+    {
+      "content": "在 “Web 应用”选项卡中，单击你的 Web 应用的名称。",
+      "pos": [
+        16142,
+        16172
+      ]
+    },
+    {
+      "content": "选择 Web 应用",
+      "pos": [
+        16180,
+        16189
+      ]
+    },
+    {
+      "content": "单击“缩放”选项卡。",
+      "pos": [
+        16204,
+        16214
+      ]
+    },
+    {
+      "content": "“缩放”选项卡",
+      "pos": [
+        16222,
+        16229
+      ]
+    },
+    {
+      "content": "在“常规”部分中，通过单击“标准”设置 Web 托管计划模式。",
+      "pos": [
+        16242,
+        16273
+      ]
+    },
+    {
+      "content": "选定的标准模式",
+      "pos": [
+        16281,
+        16288
+      ]
+    },
+    {
+      "content": "单击“保存”。在系统提示后，单击“是”。",
+      "pos": [
+        16304,
+        16324
+      ]
+    },
+    {
+      "pos": [
+        16331,
+        16474
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果出现“为 Web 应用‘&amp;lt;应用名称&amp;gt;’配置缩放失败”错误，你可以使用详细信息按钮来了解详细信息。可能会出现“可用的标准实例服务器不足，无法满足此请求。”错误。如果收到此错误，请联系 <bpt id=\"p1\">[</bpt>Azure 支持人员<ept id=\"p1\">](/support/options/)</ept>。"
+    },
+    {
+      "pos": [
+        16478,
+        16524
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"bkmk_configuressl\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 3\\.在应用中配置 SSL"
+    },
+    {
+      "pos": [
+        16526,
+        16636
+      ],
+      "content": "在执行本部分中的这些步骤之前，必须将某个自定义域名与你的应用相关联。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>为 Web 应用配置自定义域名<ept id=\"p1\">][customdomain]</ept>。1.在你的浏览器中，打开 <bpt id=\"p2\">[</bpt>Azure 管理门户<ept id=\"p2\">][portal]</ept>。"
+    },
+    {
+      "content": "在 “Web 应用”选项卡中，单击站点名称，然后选择“配置”选项卡。",
+      "pos": [
+        16641,
+        16675
+      ]
+    },
+    {
+      "content": "“配置”选项卡",
+      "pos": [
+        16683,
+        16690
+      ]
+    },
+    {
+      "content": "在“证书”部分中，单击“上载证书”",
+      "pos": [
+        16707,
+        16724
+      ]
+    },
+    {
+      "content": "上载证书",
+      "pos": [
+        16732,
+        16736
+      ]
+    },
+    {
+      "pos": [
+        16754,
+        16847
+      ],
+      "content": "通过使用“上载证书”对话框，选择以前使用 IIS 管理器或 OpenSSL 创建的 .pfx 证书文件。如果有，指定用于保护 .pfx 文件的密码。最后，单击<bpt id=\"p1\">**</bpt>复选标记<ept id=\"p1\">**</ept>以上载证书。"
+    },
+    {
+      "content": "“上载证书”对话框",
+      "pos": [
+        16859,
+        16868
+      ]
+    },
+    {
+      "pos": [
+        16889,
+        16989
+      ],
+      "content": "在“配置”选项卡的“ssl 绑定”部分中，使用下拉菜单选择要使用 SSL 保护的域名，然后选择要使用的证书。你还可以选择是使用<bpt id=\"p1\">[</bpt>服务器名称指示<ept id=\"p1\">][sni]</ept> (SNI) 还是使用基于 IP 的 SSL。"
+    },
+    {
+      "content": "SSL 绑定",
+      "pos": [
+        16997,
+        17003
+      ]
+    },
+    {
+      "content": "* 基于 IP 的 SSL 通过将服务器的专用公共 IP 地址映射到域名，将证书与域名相关联。这要求与您的服务相关联的每个域名（contoso.com、fabricam.com 等）都具有专用的 IP 地址。这是将 SSL 证书与某一 Web 服务器相关联的传统方法。",
+      "pos": [
+        17018,
+        17152
+      ]
+    },
+    {
+      "pos": [
+        17160,
+        17369
+      ],
+      "content": "基于 SNI 的 SSL 是对 SSL 和<bpt id=\"p1\">[</bpt>传输层安全性<ept id=\"p1\">][tls]</ept> (TLS) 的扩展，它允许多个域共享相同的 IP 地址，并且对于每个域都有单独的安全证书。当前常用的大多数浏览器（包括 Internet Explorer、Chrome、Firefox 和 Opera）都支持 SNI，但是，较旧的浏览器可能不支持 SNI。有关 SNI 的详细信息，请参阅 Wikipedia 上的文章<bpt id=\"p2\">[</bpt>服务器名称指示<ept id=\"p2\">][sni]</ept>。"
+    },
+    {
+      "content": "单击“保存”以保存更改和启用 SSL。",
+      "pos": [
+        17374,
+        17393
+      ]
+    },
+    {
+      "pos": [
+        17397,
+        17460
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果你选择“基于 IP 的 SSL”，并且你的自定义域使用 A 记录进行配置，则必须执行以下附加步骤："
+    },
+    {
+      "content": "配置基于 IP 的 SSL 绑定后，将会向你的应用分配专用 IP 地址。你可以在应用的“仪表板”页上的“速览”部分中找到此 IP 地址。它将会作为“虚拟 IP 地址”列出：",
+      "pos": [
+        17468,
+        17554
+      ]
+    },
+    {
+      "content": "虚拟 IP 地址",
+      "pos": [
+        17569,
+        17577
+      ]
+    },
+    {
+      "content": "请注意，此 IP 地址将与以前用于配置您的域的 A 记录的虚拟 IP 地址不同。如果将您配置为使用基于 SNI 的 SSL，或未将您配置为使用 SSL，则不会为此条目列出任何地址。",
+      "pos": [
+        17636,
+        17726
+      ]
+    },
+    {
+      "content": "通过使用您的域名注册机构所提供的工具，修改您的自定义域名的 A 记录以指向上一步中的 IP 地址。",
+      "pos": [
+        17734,
+        17783
+      ]
+    },
+    {
+      "pos": [
+        17786,
+        17843
+      ],
+      "content": "此时，你应该能够使用 <ph id=\"ph1\">`HTTPS://`</ph> 而不是 <ph id=\"ph2\">`HTTP://`</ph> 访问你的应用，以便验证证书是否已正确配置。"
+    },
+    {
+      "pos": [
+        17847,
+        17891
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"bkmk_enforce\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 4\\.对应用强制实施 HTTPS"
+    },
+    {
+      "pos": [
+        17893,
+        18072
+      ],
+      "content": "Azure Web 应用<bpt id=\"p1\">*</bpt>不<ept id=\"p1\">*</ept>强制实施 HTTPS。访问者可能仍使用 HTTP 访问应用，这可能危及应用的安全。如果想为应用强制实施 HTTPS，可以使用 <bpt id=\"p2\">**</bpt>URL 重写<ept id=\"p2\">**</ept>模块。Azure Web 应用随附了 URL 重写模块，此模块可让你定义传入请求在送达应用程序之前要应用的规则。<bpt id=\"p3\">**</bpt>该模块可用于以 Azure 支持的任何编程语言编写的应用程序。<ept id=\"p3\">**</ept>"
+    },
+    {
+      "pos": [
+        18076,
+        18372
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>.NET MVC 应用程序应使用 <bpt id=\"p1\">[</bpt>RequireHttps<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/system.web.mvc.requirehttpsattribute.aspx)</ept> 筛选器而不是 URL 重写。有关使用 RequireHttps 的详细信息，请参阅<bpt id=\"p2\">[</bpt>将安全的 ASP.NET MVC 5 应用部署到 Web 应用<ept id=\"p2\">](/documentation/articles/web-sites-dotnet-deploy-aspnet-mvc-app-membership-oauth-sql-database)</ept>。"
+    },
+    {
+      "content": "有关使用其他编程语言和框架以编程方式重定向请求的信息，请参阅这些技术的文档。",
+      "pos": [
+        18378,
+        18416
+      ]
+    },
+    {
+      "pos": [
+        18418,
+        18498
+      ],
+      "content": "URL 重写规则在存储于应用程序根目录中的 <bpt id=\"p1\">**</bpt>web.config<ept id=\"p1\">**</ept> 文件内定义。以下示例包含可强制所有传入流量使用 HTTPS 的基本 URL 重写规则。"
+    },
+    {
+      "pos": [
+        18500,
+        18545
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"example\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph><bpt id=\"p1\">**</bpt>URL 重写示例 Web.Config<ept id=\"p1\">**</ept>"
+    },
+    {
+      "content": "此规则的工作方式是当用户使用 HTTP 请求某个页面时，返回 HTTP 状态码 301（永久重定向）。301 将请求重定向到访问者请求的同一个 URL，但使用 HTTPS 来替换请求的 HTTP 部分。例如，HTTP://contoso.com 将重定向到 HTTPS://contoso.com。",
+      "pos": [
+        19116,
+        19265
+      ]
+    },
+    {
+      "pos": [
+        19269,
+        19526
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果应用程序是用 <bpt id=\"p1\">**</bpt>Node.js<ept id=\"p1\">**</ept>、<bpt id=\"p2\">**</bpt>PHP<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>Python Django<ept id=\"p3\">**</ept> 或 <bpt id=\"p4\">**</bpt>Java<ept id=\"p4\">**</ept> 编写的，则它可能不包含 web.config 文件。但是，托管在 Azure Web 应用中时，<bpt id=\"p5\">**</bpt>Node.js<ept id=\"p5\">**</ept>、<bpt id=\"p6\">**</bpt>Python Django<ept id=\"p6\">**</ept> 和 <bpt id=\"p7\">**</bpt>Java<ept id=\"p7\">**</ept> 都确实会使用 web.config — Azure 在部署期间自动创建此文件，因此你永远看不到此文件。如果在应用程序中添加一个 web.config 文件，则它将覆盖 Azure 自动生成的文件。"
+    },
+    {
+      "content": ".NET",
+      "pos": [
+        19531,
+        19535
+      ]
+    },
+    {
+      "pos": [
+        19537,
+        19642
+      ],
+      "content": "对于 .NET 应用程序，请修改应用程序的 web.config 文件，并将<bpt id=\"p1\">[</bpt>示例<ept id=\"p1\">](#example)</ept>中的 <bpt id=\"p2\">**</bpt>&amp;lt;rewrite&gt;<ept id=\"p2\">**</ept> 节添加到 <bpt id=\"p3\">**</bpt>&amp;lt;system.WebServer&gt;<ept id=\"p3\">**</ept> 节。"
+    },
+    {
+      "pos": [
+        19644,
+        19745
+      ],
+      "content": "如果 web.config 文件已经包含 <bpt id=\"p1\">**</bpt>&amp;lt;rewrite&gt;<ept id=\"p1\">**</ept> 节，请将<bpt id=\"p2\">[</bpt>示例<ept id=\"p2\">](#example)</ept>中的 <bpt id=\"p3\">**</bpt>&amp;lt;rule&gt;<ept id=\"p3\">**</ept> 添加为 <bpt id=\"p4\">**</bpt>&amp;lt;rules&gt;<ept id=\"p4\">**</ept> 节中的第一个条目。"
+    },
+    {
+      "content": "PHP",
+      "pos": [
+        19750,
+        19753
+      ]
+    },
+    {
+      "pos": [
+        19755,
+        19828
+      ],
+      "content": "对于 PHP 应用程序，只需将<bpt id=\"p1\">[</bpt>示例<ept id=\"p1\">](#example)</ept>另存为应用程序根目录中的 web.config 文件，然后将应用程序重新部署到应用即可。"
+    },
+    {
+      "content": "Node.js、Python Django 和 Java",
+      "pos": [
+        19833,
+        19861
+      ]
+    },
+    {
+      "content": "如果 Node.js、Python Django 和 Java 应用程序未提供 web.config 文件，则此文件将自动创建，但因为此文件是在部署过程中创建的，因此它只存在于服务器上。自动生成的文件包含告知 Azure 如何托管应用程序的设置。",
+      "pos": [
+        19863,
+        19986
+      ]
+    },
+    {
+      "content": "若要从应用检索和修改自动生成的文件，请遵循以下步骤。",
+      "pos": [
+        19988,
+        20014
+      ]
+    },
+    {
+      "pos": [
+        20019,
+        20213
+      ],
+      "content": "使用 FTP 下载文件（请参阅<bpt id=\"p1\">[</bpt>通过 FTP 上载/下载文件和收集诊断日志<ept id=\"p1\">](http://blogs.msdn.com/b/avkashchauhan/archive/2012/06/19/windows-azure-website-uploading-downloading-files-over-ftp-and-collecting-diagnostics-logs.aspx)</ept>）。"
+    },
+    {
+      "content": "将文件添加到应用程序的根目录。",
+      "pos": [
+        20218,
+        20233
+      ]
+    },
+    {
+      "content": "使用以下信息添加重写规则。",
+      "pos": [
+        20238,
+        20251
+      ]
+    },
+    {
+      "content": "Node.js 和 Python Django",
+      "pos": [
+        20261,
+        20284
+      ]
+    },
+    {
+      "pos": [
+        20296,
+        20485
+      ],
+      "content": "为 Node.js 和 Python Django 应用程序生成的 web.config 文件已包含 <bpt id=\"p1\">**</bpt>&amp;lt;rewrite&gt;<ept id=\"p1\">**</ept> 节，其中包含应用正常运行所需的 <bpt id=\"p2\">**</bpt>&amp;lt;rule&gt;<ept id=\"p2\">**</ept> 条目。若要强制应用使用 HTTPS，请将示例中的 <bpt id=\"p3\">**</bpt>&amp;lt;rule&gt;<ept id=\"p3\">**</ept> 添加为 <bpt id=\"p4\">**</bpt>&amp;lt;rules&gt;<ept id=\"p4\">**</ept> 节中的第一个条目。这会在保留其他规则不变的情况下强制 HTTPS。"
+    },
+    {
+      "content": "Java",
+      "pos": [
+        20495,
+        20499
+      ]
+    },
+    {
+      "pos": [
+        20511,
+        20640
+      ],
+      "content": "在使用 Apache Tomcat 的 Java 应用程序中，其 web.config 文件不包含 <bpt id=\"p1\">**</bpt>&amp;lt;rewrite&gt;<ept id=\"p1\">**</ept> 节，因此必须将示例中的 <bpt id=\"p2\">**</bpt>&amp;lt;rewrite&gt;<ept id=\"p2\">**</ept> 节添加到 <bpt id=\"p3\">**</bpt>&amp;lt;system.webServer&gt;<ept id=\"p3\">**</ept> 节。"
+    },
+    {
+      "content": "将项目（包含更新的 web.config）重新部署到 Azure",
+      "pos": [
+        20645,
+        20677
+      ]
+    },
+    {
+      "content": "部署包含重写规则以实施 HTTPS 的 web.config 后，该文件应立即生效并将所有请求重定向到 HTTPS。",
+      "pos": [
+        20679,
+        20737
+      ]
+    },
+    {
+      "pos": [
+        20739,
+        20827
+      ],
+      "content": "有关 IIS URL 重写模块的详细信息，请参阅 <bpt id=\"p1\">[</bpt>URL 重写<ept id=\"p1\">](http://www.iis.net/downloads/microsoft/url-rewrite)</ept>文档。"
+    },
+    {
+      "content": "更多资源",
+      "pos": [
+        20832,
+        20836
+      ]
+    },
+    {
+      "content": "Azure 信任中心",
+      "pos": [
+        20843,
+        20853
+      ]
+    },
+    {
+      "content": "Azure Web 应用中解锁的设置选项",
+      "pos": [
+        20891,
+        20911
+      ]
+    },
+    {
+      "content": "启用诊断日志记录",
+      "pos": [
+        21009,
+        21017
+      ]
+    },
+    {
+      "content": "在 Azure 中配置 Web 应用",
+      "pos": [
+        21079,
+        21097
+      ]
+    },
+    {
+      "content": "Azure 管理门户",
+      "pos": [
+        21147,
+        21157
+      ]
+    }
+  ],
+  "content": "\n本文介绍如何在 Azure 中配置 Web 应用的 HTTPS。其中不涉及客户端证书身份验证；有关该方面的信息，请参阅[如何为 Web 应用配置 TLS 相互身份验证](/documentation/articles/app-service-web-configure-tls-mutual-auth)。\n\n默认情况下，Azure 已使用 *.chinacloudsites.cn 域的通配符证书为你的应用启用 HTTP。如果不打算配置自定义域，可以直接利用默认的 HTTPS 证书。但是，就像[所有通配符域](https://casecurity.org/2014/02/26/pros-and-cons-of-single-domain-multi-domain-and-wildcard-certificates/)一样，这并不如将自定义域与自己的证书搭配使用那么安全。\n\n本文档的其余部分提供了有关为自定义域启用 HTTPS 的详细信息，例如 **contoso.com**、**www.contoso.com** 或 **\\*.contoso.com**\n\n##<a name=\"bkmk_domainname\"></a> 为自定义域启用 SSL\n\n若要为自定义域启用 HTTPS（例如 **contoso.com**），你必须先[在 Azure Web 应用中配置自定义域名](/documentation/articles/web-sites-custom-domain-name)。然后，执行下列操作：\n\n1. [获取 SSL 证书](#bkmk_getcert)\n2. [配置标准定价层](#bkmk_standardmode)\n2. [在应用中配置 SSL](#bkmk_configuressl)\n3. [对应用强制实施 SSL](#bkmk_enforce)（可选）\n\n如果在本文中有任何需要协助的地方，你可以联系 [MSDN Azure 和 CSDN Azure](/support/forums/) 上的 Azure 专家。或者，你也可以提出 Azure 支持事件。请转到 [Azure 支持站点](/support/contact/)并单击“获取支持”。\n\n##<a name=\"bkmk_getcert\"></a> 1\\.获取 SSL 证书\n\n请求 SSL 证书之前，必须先确定将受证书保护的域名。这将确定必须获取的证书类型。如果你只需保护单个域名（例如 **contoso.com** 或 **www.contoso.com**）的安全，基本证书就足够了。如果你需要保护多个域名（例如 **contoso.com**、**www.contoso.com** 和 **mail.contoso.com**）的安全，则可以获取[通配符证书](http://en.wikipedia.org/wiki/Wildcard_certificate)或带有[使用者备用名称](http://en.wikipedia.org/wiki/SubjectAltName) (subjectAltName) 的证书。\n\n配合 Azure Web 应用使用的 SSL 证书必须由[证书颁发机构](http://en.wikipedia.org/wiki/Certificate_authority) (CA) 签名。如果你尚未获取 SSL 证书，将需要从颁发 SSL 证书的公司购买一个 SSL 证书。有关证书颁发机构的列表，请参阅 Microsoft TechNet Wiki 上的 [Windows 和 Windows Phone 8 SSL 根证书计划（成员 CA）][cas]。\n\n该证书必须满足 Azure 中的以下 SSL 证书要求：\n\n* 证书必须包含私钥。\n* 必须为密钥交换创建证书，并且该证书可导出到个人信息交换 (.pfx) 文件。\n* 证书的使用者名称必须与用于访问应用的域匹配。如果您需要使用此证书为多个域提供服务，则您将需要使用通配符值或指定 subjectAltName 值，如前面所述。\n* 该证书应使用至少 2048 位加密。\n* 从专用 CA 服务器颁发的证书不受 Azure Web 应用支持。\n\n若要获取可用于 Azure Web 应用的 SSL 证书，你可以将证书签名请求 (CSR) 提交到证书颁发机构，然后基于收到的证书生成 .pfx 文件。可以使用所选的工具来执行此操作。以下是获取证书的一些常见方式：\n\n- [使用 Certreq.exe 获取证书](#bkmk_certreq)\n- [使用 IIS 管理器获取证书](#bkmk_iismgr)\n- [使用 OpenSSL 获取证书](#bkmk_openssl)\n- [使用 OpenSSL 获取 SubjectAltName 证书](#bkmk_subjectaltname)\n- [生成自签名证书（仅用于测试）](#bkmk_selfsigned)\n\n> [AZURE.NOTE]在遵循步骤操作时，系统将提示你输入**公用名**，例如 `www.contoso.com`。对于通配符证书，此值应为 \\*.domainname（例如，\\*.contoso.com）。如果需要同时支持通配符名称（如 *.contoso.com）和根域名（如 contoso.com），可以使用通配符 subjectAltName 证书。\n><p>Azure Web 应用支持椭圆曲线加密 (ECC) 证书；不过，它们相对较新，你应该在具体步骤中使用 CA 来创建 CSR。\n\n你可能还需要获取**[中间证书](http://en.wikipedia.org/wiki/Intermediate_certificate_authorities)**（也称为链证书），前提是这些证书由你的 CA 使用。与“非链式证书”相比，使用中间证书被认为更安全，因此 CA 通常使用这些证书。中间证书通常作为从 CA 网站的单独下载提供。本文中的步骤提供了有关如何确保任何中间证书与上载到应用的证书合并的步骤。\n\n###<a name=\"bkmk_certreq\"></a> 使用 Certreq.exe 获取证书（仅限 Windows）\n\nCertreq.exe 是用于创建证书请求的 Windows 实用程序。它已成为自 Windows XP/Windows Server 2000 之后基本 Windows 安装的一部分，因此应该在最新的 Windows 系统上提供它。使用以下步骤获取使用 certreq.exe 的 SSL 证书。\n\n1. 打开“记事本”并创建包含以下内容的新文档。将 Subject 一行中的 **mysite.com** 替换为应用的自定义域名。例如，Subject =“CN=www.contoso.com”。\n\n        [NewRequest]\n        Subject = \"CN=mysite.com\"\n        Exportable = TRUE\n        KeyLength = 2048\n        KeySpec = 1\n        KeyUsage = 0xA0\n        MachineKeySet = True\n        ProviderName = \"Microsoft RSA SChannel Cryptographic Provider\"\n        ProviderType = 12\n\n        [EnhancedKeyUsageExtension]\n        OID=1.3.6.1.5.5.7.3.1\n\n    有关上述指定的选项以及其他可用选项的详细信息，请参阅 [Certreq 参考文档](http://technet.microsoft.com/zh-cn/library/cc725793.aspx)。\n\n2. 将该文本文件另存为 **myrequest.txt**。\n\n3. 在“开始”屏幕或“开始”菜单中，运行 **cmd.exe**。\n\n4. 从命令提示符处，使用以下命令创建证书请求文件：\n\n        certreq -new \\path\\to\\myrequest.txt \\path\\to\\create\\myrequest.csr\n\n    指定在步骤 1 中创建的 **myrequest.txt** 文件的路径，以及要在创建 **myrequest.csr** 文件时使用的路径。\n\n5. 向证书颁发机构提交 **myrequest.csr** 以获取 SSL 证书。这可能涉及上载文件，或在记事本中打开文件并将内容直接粘贴到 Web 表单中。\n\n    有关证书颁发机构的列表，请参阅 Microsoft TechNet Wiki 上的 [Windows 和 Windows Phone 8 SSL 根证书计划（成员 CA）][cas]。\n\n6. 证书颁发机构向您提供证书 (.CER) 文件后，请将此文件保存到用来生成请求的计算机，然后使用以下命令接受该请求并完成证书生成过程。\n\n        certreq -accept -user mycert.cer\n\n    在这种情况下，从证书颁发机构收到的 **mycert.cer** 证书将用于完成证书的签名。将不创建任何文件；相反，该证书将存储在 Windows 证书存储中。\n\n6. 如果您的 CA 使用中间证书，则必须先安装这些证书，才能在后续步骤中导出证书。通常这些证书作为来自您的 CA 的单独下载提供，并且针对不同的 Web 服务器类型以几种格式提供。选择为 Microsoft IIS 提供的版本。\n\n    下载证书后，在资源管理器中右键单击它，然后选择“安装证书”。使用“证书导入向导”中的默认值，然后继续选择“下一步”，直到完成导入。\n\n7. 若要从证书存储中导出证书，请从“开始”屏幕或“开始”菜单运行 **certmgr.msc**。当“证书管理器”出现时，展开“个人”文件夹，然后选择“证书”。在“颁发给”字段中，查找具有你为其请求了一个证书的自定义域名的条目。在“颁发者”字段中，它应列出用于此证书的证书颁发机构。\n\n    ![将证书管理器的图像插入此处][certmgr]\n\n9. 右键单击该证书并选择“所有任务”，然后选择“导出”。在“证书导出向导”中，单击“下一步”，然后选择“是，导出私钥”。单击**“下一步”**。\n\n    ![导出私钥][certwiz1]\n\n10. 选择“个人信息交换 - PKCS #12”、“将所有证书包括在证书链中”和“导出所有扩展属性”。单击**“下一步”**。\n\n    ![包括所有证书和扩展的属性][certwiz2]\n\n11. 选择“密码”，然后输入并确认该密码。单击**“下一步”**。\n\n    ![指定密码][certwiz3]\n\n12. 提供将包含已导出证书的路径和文件名。文件名应使用 **.pfx** 扩展名。单击“下一步”以完成此过程。\n\n    ![提供文件路径][certwiz4]\n\n你现在可以将导出的 PFX 文件上载到 Azure 中的应用。\n\n###<a name=\"bkmk_openssl\"></a> 使用 OpenSSL 获取证书\n\n1. 通过从命令行、bash 或终端会话使用以下语句，生成私钥和证书签名请求：\n\n        openssl req -new -nodes -keyout myserver.key -out server.csr -newkey rsa:2048\n\n2. 在系统提示后，输入适当的信息。例如：\n\n        Country Name (2 letter code)\n        State or Province Name (full name) []: Washington\n        Locality Name (eg, city) []: Redmond\n        Organization Name (eg, company) []: Microsoft\n        Organizational Unit Name (eg, section) []: Azure\n        Common Name (eg, YOUR name) []: www.microsoft.com\n        Email Address []:\n\n        Please enter the following 'extra' attributes to be sent with your certificate request\n\n        A challenge password []:\n\n    在此过程完成后，你应该有两个文件：**myserver.key** 和 **server.csr**。**server.csr** 包含证书签名请求。\n\n3. 向证书颁发机构提交 CSR 以获取 SSL 证书。有关证书颁发机构的列表，请参阅 Microsoft TechNet Wiki 上的 [Windows 和 Windows Phone 8 SSL 根证书计划（成员 CA）][cas]。\n\n4. 在你从 CA 获取了某一证书后，将其保存到名为 **myserver.crt** 的文件中。如果你的 CA 以文本格式提供了证书，只需将证书文本粘贴到 **myserver.crt** 文件中。在文本编辑器中查看时，该文件内容应该类似于以下内容：\n\n        -----BEGIN CERTIFICATE-----\n        MIIDJDCCAgwCCQCpCY4o1LBQuzANBgkqhkiG9w0BAQUFADBUMQswCQYDVQQGEwJV\n        UzELMAkGA1UECBMCV0ExEDAOBgNVBAcTB1JlZG1vbmQxEDAOBgNVBAsTB0NvbnRv\n        c28xFDASBgNVBAMTC2NvbnRvc28uY29tMB4XDTE0MDExNjE1MzIyM1oXDTE1MDEx\n        NjE1MzIyM1owVDELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAldBMRAwDgYDVQQHEwdS\n        ZWRtb25kMRAwDgYDVQQLEwdDb250b3NvMRQwEgYDVQQDEwtjb250b3NvLmNvbTCC\n        ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAN96hBX5EDgULtWkCRK7DMM3\n        enae1LT9fXqGlbA7ScFvFivGvOLEqEPD//eLGsf15OYHFOQHK1hwgyfXa9sEDPMT\n        3AsF3iWyF7FiEoR/qV6LdKjeQicJ2cXjGwf3G5vPoIaYifI5r0lhgOUqBxzaBDZ4\n        xMgCh2yv7NavI17BHlWyQo90gS2X5glYGRhzY/fGp10BeUEgIs3Se0kQfBQOFUYb\n        ktA6802lod5K0OxlQy4Oc8kfxTDf8AF2SPQ6BL7xxWrNl/Q2DuEEemjuMnLNxmeA\n        Ik2+6Z6+WdvJoRxqHhleoL8ftOpWR20ToiZXCPo+fcmLod4ejsG5qjBlztVY4qsC\n        AwEAATANBgkqhkiG9w0BAQUFAAOCAQEAVcM9AeeNFv2li69qBZLGDuK0NDHD3zhK\n        Y0nDkqucgjE2QKUuvVSPodz8qwHnKoPwnSrTn8CRjW1gFq5qWEO50dGWgyLR8Wy1\n        F69DYsEzodG+shv/G+vHJZg9QzutsJTB/Q8OoUCSnQS1PSPZP7RbvDV9b7Gx+gtg\n        7kQ55j3A5vOrpI8N9CwdPuimtu6X8Ylw9ejWZsnyy0FMeOPpK3WTkDMxwwGxkU3Y\n        lCRTzkv6vnHrlYQxyBLOSafCB1RWinN/slcWSLHADB6R+HeMiVKkFpooT+ghtii1\n        A9PdUQIhK9bdaFicXPBYZ6AgNVuGtfwyuS5V6ucm7RE6+qf+QjXNFg==\n        -----END CERTIFICATE-----\n\n    保存文件。\n\n5. 从命令行、Bash 或终端会话中，使用以下命令将 **myserver.key** 和 **myserver.crt** 转换为 **myserver.pfx**，这是 Azure Web 应用所要求的格式：\n\n        openssl pkcs12 -export -out myserver.pfx -inkey myserver.key -in myserver.crt\n\n    在系统提示后，输入一个密码以便保护该 .pfx 文件。\n\n    > [AZURE.NOTE]如果您的 CA 使用中间证书，则必须先安装这些证书，才能在下一步中导出证书。通常这些证书作为来自您的 CA 的单独下载提供，并且针对不同的 Web 服务器类型以几种格式提供。选择作为 PEM 文件（.pem 文件扩展名）提供的版本。\n    > <p>以下命令演示如何创建包含中间证书的 .pfx 文件，这些中间证书包含在 **intermediate-cets.pem** 文件中：\n    > <p>`openssl pkcs12 -chain -export -out myserver.pfx -inkey myserver.key -in myserver.crt -certfile intermediate-cets.pem`\n\n    运行此命令后，你应该具有适用于 Azure Web 应用的 **myserver.pfx** 文件。\n\n###<a name=\"bkmk_iismgr\"></a> 使用 IIS 管理器获取证书\n\n如果你熟悉 IIS 管理器，则可以用它来生成可与 Azure Web 应用一起使用的证书。\n\n1. 使用 IIS 管理器生成要发送给证书颁发机构的 CSR。有关生成 CSR 的详细信息，请参阅[申请 Internet 服务器证书 (IIS 7)][iiscsr]。\n\n2. 向证书颁发机构提交 CSR 以获取 SSL 证书。有关证书颁发机构的列表，请参阅 Microsoft TechNet Wiki 上的 [Windows 和 Windows Phone 8 SSL 根证书计划（成员 CA）][cas]。\n\n3. 使用证书颁发机构供应商提供的证书完成 CSR。有关完成 CSR 的详细信息，请参阅[安装 Internet 服务器证书 (IIS 7)][installcertiis]。\n\n4. 如果您的 CA 使用中间证书，则必须先安装这些证书，才能在下一步中导出证书。通常这些证书作为来自您的 CA 的单独下载提供，并且针对不同的 Web 服务器类型以几种格式提供。选择为 Microsoft IIS 提供的版本。\n\n    下载证书后，在资源管理器中右键单击它，然后选择“安装证书”。使用“证书导入向导”中的默认值，然后继续选择“下一步”，直到完成导入。\n\n4. 从 IIS 管理器导出证书。有关导出证书的详细信息，请参阅[导出服务器证书 (IIS 7)][exportcertiis]。在后面的步骤中将使用导出的文件，以便上载到 Azure 来用于你的应用。\n\n    > [AZURE.NOTE]在导出过程中，请务必选择选项“是，导出私钥”。<strong></strong>这将在导出的证书中包括私钥。\n\n    > [AZURE.NOTE]在导出过程中，请务必选择选项“在证书路径中包括所有证书”和“导出所有扩展属性”。这将在导出的证书中包括任何中间证书。\n\n###<a name=\"bkmk_subjectaltname\"></a> 使用 OpenSSL 获取 SubjectAltName 证书\n\nOpenSSL 可用于创建使用 SubjectAltName 扩展以使单个证书支持多个域名的证书请求，但它需要一个配置文件。以下步骤将演示如何创建配置文件，然后使用它来请求证书。\n\n1. 创建一个名为 __sancert.cnf__ 的新文件，并且使用以下代码作为该文件的内容：\n\n        # -------------- BEGIN custom sancert.cnf -----\n        HOME = .\n        oid_section = new_oids\n        [ new_oids ]\n        [ req ]\n        default_days = 730\n        distinguished_name = req_distinguished_name\n        encrypt_key = no\n        string_mask = nombstr\n        req_extensions = v3_req # Extensions to add to certificate request\n        [ req_distinguished_name ]\n        countryName = Country Name (2 letter code)\n        countryName_default =\n        stateOrProvinceName = State or Province Name (full name)\n        stateOrProvinceName_default =\n        localityName = Locality Name (eg, city)\n        localityName_default =\n        organizationalUnitName  = Organizational Unit Name (eg, section)\n        organizationalUnitName_default  =\n        commonName              = Your common name (eg, domain name)\n        commonName_default      = www.mydomain.com\n        commonName_max = 64\n        [ v3_req ]\n        subjectAltName=DNS:ftp.mydomain.com,DNS:blog.mydomain.com,DNS:*.mydomain.com\n        # -------------- END custom sancert.cnf -----\n\n    请注意以“subjectAltName”开头的行。将当前列出的域名替换为要支持的域名（包含公用名）。例如：\n\n        subjectAltName=DNS:sales.contoso.com,DNS:support.contoso.com,DNS:fabrikam.com\n\n    您不需要更改 commonName\\_default 字段，因为系统将会在以下一个步骤中提示您输入您的公用名。\n\n2. 保存 __sancert.cnf__ 文件。\n\n1. 通过使用 sancert.cnf 配置文件生成私钥和证书签名请求。在 bash 或终端会话中，使用以下命令：\n\n        openssl req -new -nodes -keyout myserver.key -out server.csr -newkey rsa:2048 -config sancert.cnf\n\n2. 在系统提示后，输入适当的信息。例如：\n\n        Country Name (2 letter code) []: US\n        State or Province Name (full name) []: Washington\n        Locality Name (eg, city) []: Redmond\n        Organizational Unit Name (eg, section) []: Azure\n        Your common name (eg, domain name) []: www.microsoft.com\n\n\n    在此过程完成后，你应该有两个文件：**myserver.key** 和 **server.csr**。**server.csr** 包含证书签名请求。\n\n3. 向证书颁发机构提交 CSR 以获取 SSL 证书。有关证书颁发机构的列表，请参阅 Microsoft TechNet Wiki 上的 [Windows 和 Windows Phone 8 SSL 根证书计划（成员 CA）][cas]。\n\n4. 在你从 CA 获取了某一证书后，将其保存到名为 **myserver.crt** 的文件中。如果你的 CA 以文本格式提供了证书，只需将证书文本粘贴到 **myserver.crt** 文件中。在文本编辑器中查看时，该文件内容应该类似于以下内容：\n\n        -----BEGIN CERTIFICATE-----\n        MIIDJDCCAgwCCQCpCY4o1LBQuzANBgkqhkiG9w0BAQUFADBUMQswCQYDVQQGEwJV\n        UzELMAkGA1UECBMCV0ExEDAOBgNVBAcTB1JlZG1vbmQxEDAOBgNVBAsTB0NvbnRv\n        c28xFDASBgNVBAMTC2NvbnRvc28uY29tMB4XDTE0MDExNjE1MzIyM1oXDTE1MDEx\n        NjE1MzIyM1owVDELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAldBMRAwDgYDVQQHEwdS\n        ZWRtb25kMRAwDgYDVQQLEwdDb250b3NvMRQwEgYDVQQDEwtjb250b3NvLmNvbTCC\n        ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAN96hBX5EDgULtWkCRK7DMM3\n        enae1LT9fXqGlbA7ScFvFivGvOLEqEPD//eLGsf15OYHFOQHK1hwgyfXa9sEDPMT\n        3AsF3iWyF7FiEoR/qV6LdKjeQicJ2cXjGwf3G5vPoIaYifI5r0lhgOUqBxzaBDZ4\n        xMgCh2yv7NavI17BHlWyQo90gS2X5glYGRhzY/fGp10BeUEgIs3Se0kQfBQOFUYb\n        ktA6802lod5K0OxlQy4Oc8kfxTDf8AF2SPQ6BL7xxWrNl/Q2DuEEemjuMnLNxmeA\n        Ik2+6Z6+WdvJoRxqHhleoL8ftOpWR20ToiZXCPo+fcmLod4ejsG5qjBlztVY4qsC\n        AwEAATANBgkqhkiG9w0BAQUFAAOCAQEAVcM9AeeNFv2li69qBZLGDuK0NDHD3zhK\n        Y0nDkqucgjE2QKUuvVSPodz8qwHnKoPwnSrTn8CRjW1gFq5qWEO50dGWgyLR8Wy1\n        F69DYsEzodG+shv/G+vHJZg9QzutsJTB/Q8OoUCSnQS1PSPZP7RbvDV9b7Gx+gtg\n        7kQ55j3A5vOrpI8N9CwdPuimtu6X8Ylw9ejWZsnyy0FMeOPpK3WTkDMxwwGxkU3Y\n        lCRTzkv6vnHrlYQxyBLOSafCB1RWinN/slcWSLHADB6R+HeMiVKkFpooT+ghtii1\n        A9PdUQIhK9bdaFicXPBYZ6AgNVuGtfwyuS5V6ucm7RE6+qf+QjXNFg==\n        -----END CERTIFICATE-----\n\n    保存文件。\n\n5. 从命令行、Bash 或终端会话中，使用以下命令将 **myserver.key** 和 **myserver.crt** 转换为 **myserver.pfx**，这是 Azure Web 应用所要求的格式：\n\n        openssl pkcs12 -export -out myserver.pfx -inkey myserver.key -in myserver.crt\n\n    在系统提示后，输入一个密码以便保护该 .pfx 文件。\n\n    > [AZURE.NOTE]如果您的 CA 使用中间证书，则必须先安装这些证书，才能在下一步中导出证书。通常这些证书作为来自您的 CA 的单独下载提供，并且针对不同的 Web 服务器类型以几种格式提供。选择作为 PEM 文件（.pem 文件扩展名）提供的版本。\n    > <p>以下命令演示如何创建包含中间证书的 .pfx 文件，这些中间证书包含在 **intermediate-cets.pem** 文件中：\n    > <p>`openssl pkcs12 -chain -export -out myserver.pfx -inkey myserver.key -in myserver.crt -certfile intermediate-cets.pem`\n\n    运行此命令后，你应该具有适用于 Azure Web 应用的 **myserver.pfx** 文件。\n\n###<a name=\"bkmk_selfsigned\"></a> 生成自签名证书（仅用于测试）\n\n在某些情况下，您可能想要获取证书以便进行测试，并且将从受信任的 CA 购买证书延迟到生产开始之时。自签名证书可满足此需求。自签名证书是您创建的证书，就像您是证书颁发机构一样进行签名。尽管可以使用此证书来保护某一应用，但在访问该应用时大多数浏览器都将返回错误，因为该证书不是由受信任的 CA 签名的。某些浏览器甚至可能会拒绝允许你查看该应用。\n\n- [使用 makecert 生成自签名证书](#bkmk_ssmakecert)\n- [使用 OpenSSL 生成自签名证书](#bkmk_ssopenssl)\n\n####<a name=\"bkmk_ssmakecert\"></a> 使用 makecert 生成自签名证书 ####\n\n您可以通过执行以下步骤从 Windows 系统中删除 Visual Studio 已安装的测试证书：\n\n1. 在“开始”菜单或“开始”屏幕中，搜索“开发人员命令提示符”。最后，右键单击“开发人员命令提示符”并选择“以管理员身份运行”。\n\n    如果你收到“用户帐户控制”对话框，请选择“是”以便继续。\n\n2. 从开发人员命令提示符处，使用以下命令创建新的自签名证书。必须使用应用的 DNS 替代 **serverdnsname**。\n\n        makecert -r -pe -b 01/01/2013 -e 01/01/2014 -eku 1.3.6.1.5.5.7.3.1 -ss My -n CN=serverdnsname -sky exchange -sp \"Microsoft RSA SChannel Cryptographic Provider\" -sy 12 -len 2048\n\n    此命令将创建日期介于 01/01/2013 和 01/01/2014 之间的适当的证书，并且将在 CurrentUser 证书存储中存储该位置。\n\n3. 在“开始”菜单或“开始”屏幕中，搜索“Windows PowerShell”并启动此应用程序。\n\n4. 从 Windows PowerShell 提示处，使用以下命令导出以前创建的证书：\n\n        $mypwd = ConvertTo-SecureString -String \"password\" -Force -AsPlainText\n        get-childitem cert:\\currentuser\\my -dnsname serverdnsname | export-pfxcertificate -filepath file-to-export-to.pfx -password $mypwd\n\n    这会将指定的密码作为安全字符串存储于 $mypwd 中，然后通过使用 **dnsname** 参数指定的 DNS 名称查找证书，并且导出到 **filepath** 参数指定的文件中。包含密码的安全字符串用于保护导出的文件。\n\n####<a name=\"bkmk_ssopenssl\"></a>使用 OpenSSL 生成自签名证书 ####\n\n1. 创建一个名为 **serverauth.cnf** 的新文档，并且使用以下代码作为该文件的内容：\n\n        [ req ]\n        default_bits           = 2048\n        default_keyfile        = privkey.pem\n        distinguished_name     = req_distinguished_name\n        attributes             = req_attributes\n        x509_extensions        = v3_ca\n\n        [ req_distinguished_name ]\n        countryName         = Country Name (2 letter code)\n        countryName_min         = 2\n        countryName_max         = 2\n        stateOrProvinceName     = State or Province Name (full name)\n        localityName            = Locality Name (eg, city)\n        0.organizationName      = Organization Name (eg, company)\n        organizationalUnitName      = Organizational Unit Name (eg, section)\n        commonName          = Common Name (eg, your app's domain name)\n        commonName_max          = 64\n        emailAddress            = Email Address\n        emailAddress_max        = 40\n\n        [ req_attributes ]\n        challengePassword       = A challenge password\n        challengePassword_min       = 4\n        challengePassword_max       = 20\n\n        [ v3_ca ]\n         subjectKeyIdentifier=hash\n         authorityKeyIdentifier=keyid:always,issuer:always\n         basicConstraints = CA:false\n         keyUsage=nonRepudiation, digitalSignature, keyEncipherment\n         extendedKeyUsage = serverAuth\n\n    这将指定生成可由 Azure Web 应用使用的 SSL 证书所需的配置设置。\n\n2. 通过从命令行、bash 或终端会话使用以下语句，生成新的自签名证书：\n\n        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout myserver.key -out myserver.crt -config serverauth.cnf\n\n    这将使用在 **serverauth.cnf** 文件中指定的配置设置创建一个新证书。\n\n3. 若要将该证书导出到 .PFX 文件（可上载到 Azure 中的应用），请使用以下命令：\n\n        openssl pkcs12 -export -out myserver.pfx -inkey myserver.key -in myserver.crt\n\n    在系统提示后，输入一个密码以便保护该 .pfx 文件。\n\n    可使用此命令生成的 **myserver.pfx** 来出于测试目的保护你的应用。\n\n##<a name=\"bkmk_standardmode\"></a> 2\\.配置标准定价层\n\n为自定义域启用 HTTPS 只适用于 Azure Web 应用中的**标准**层。请按照以下步骤将你的 App Service 计划切换到**标准**层。\n\n> [AZURE.NOTE]将应用从**免费**层切换到**标准**层之前，你应该删除订阅已有的支出上限，否则如果你在计费周期结束之前达到你的上限，可能会出现你的应用变得不可用的风险。有关共享和**标准**层的详细信息，请参阅[定价详细信息][pricing]。1.在浏览器中，打开[管理门户][portal]。\n\n2. 在 “Web 应用”选项卡中，单击你的 Web 应用的名称。\n\n    ![选择 Web 应用][website]\n\n3. 单击“缩放”选项卡。\n\n    ![“缩放”选项卡][scale]\n\n4. 在“常规”部分中，通过单击“标准”设置 Web 托管计划模式。\n\n    ![选定的标准模式][standard]\n\n5. 单击“保存”。在系统提示后，单击“是”。\n    > [AZURE.NOTE]如果出现“为 Web 应用‘&lt;应用名称&gt;’配置缩放失败”错误，你可以使用详细信息按钮来了解详细信息。可能会出现“可用的标准实例服务器不足，无法满足此请求。”错误。如果收到此错误，请联系 [Azure 支持人员](/support/options/)。\n\n##<a name=\"bkmk_configuressl\"></a> 3\\.在应用中配置 SSL\n\n在执行本部分中的这些步骤之前，必须将某个自定义域名与你的应用相关联。有关详细信息，请参阅[为 Web 应用配置自定义域名][customdomain]。1.在你的浏览器中，打开 [Azure 管理门户][portal]。\n\n2. 在 “Web 应用”选项卡中，单击站点名称，然后选择“配置”选项卡。\n\n    ![“配置”选项卡][configure]\n\n3. 在“证书”部分中，单击“上载证书”\n\n    ![上载证书][uploadcert]\n\n4. 通过使用“上载证书”对话框，选择以前使用 IIS 管理器或 OpenSSL 创建的 .pfx 证书文件。如果有，指定用于保护 .pfx 文件的密码。最后，单击**复选标记**以上载证书。\n    \n    ![“上载证书”对话框][uploadcertdlg]\n\n5. 在“配置”选项卡的“ssl 绑定”部分中，使用下拉菜单选择要使用 SSL 保护的域名，然后选择要使用的证书。你还可以选择是使用[服务器名称指示][sni] (SNI) 还是使用基于 IP 的 SSL。\n\n    ![SSL 绑定][sslbindings] * 基于 IP 的 SSL 通过将服务器的专用公共 IP 地址映射到域名，将证书与域名相关联。这要求与您的服务相关联的每个域名（contoso.com、fabricam.com 等）都具有专用的 IP 地址。这是将 SSL 证书与某一 Web 服务器相关联的传统方法。\n\n    * 基于 SNI 的 SSL 是对 SSL 和[传输层安全性][tls] (TLS) 的扩展，它允许多个域共享相同的 IP 地址，并且对于每个域都有单独的安全证书。当前常用的大多数浏览器（包括 Internet Explorer、Chrome、Firefox 和 Opera）都支持 SNI，但是，较旧的浏览器可能不支持 SNI。有关 SNI 的详细信息，请参阅 Wikipedia 上的文章[服务器名称指示][sni]。\n\n6. 单击“保存”以保存更改和启用 SSL。\n\n> [AZURE.NOTE]如果你选择“基于 IP 的 SSL”，并且你的自定义域使用 A 记录进行配置，则必须执行以下附加步骤：\n>\n> 1. 配置基于 IP 的 SSL 绑定后，将会向你的应用分配专用 IP 地址。你可以在应用的“仪表板”页上的“速览”部分中找到此 IP 地址。它将会作为“虚拟 IP 地址”列出：\n>    \n>     ![虚拟 IP 地址](./media/configure-ssl-web-site/staticip.png)\n>    \n>     请注意，此 IP 地址将与以前用于配置您的域的 A 记录的虚拟 IP 地址不同。如果将您配置为使用基于 SNI 的 SSL，或未将您配置为使用 SSL，则不会为此条目列出任何地址。\n>\n> 2. 通过使用您的域名注册机构所提供的工具，修改您的自定义域名的 A 记录以指向上一步中的 IP 地址。\n\n\n此时，你应该能够使用 `HTTPS://` 而不是 `HTTP://` 访问你的应用，以便验证证书是否已正确配置。\n\n##<a name=\"bkmk_enforce\"></a> 4\\.对应用强制实施 HTTPS\n\nAzure Web 应用*不*强制实施 HTTPS。访问者可能仍使用 HTTP 访问应用，这可能危及应用的安全。如果想为应用强制实施 HTTPS，可以使用 **URL 重写**模块。Azure Web 应用随附了 URL 重写模块，此模块可让你定义传入请求在送达应用程序之前要应用的规则。**该模块可用于以 Azure 支持的任何编程语言编写的应用程序。**\n\n> [AZURE.NOTE].NET MVC 应用程序应使用 [RequireHttps](http://msdn.microsoft.com/zh-cn/library/system.web.mvc.requirehttpsattribute.aspx) 筛选器而不是 URL 重写。有关使用 RequireHttps 的详细信息，请参阅[将安全的 ASP.NET MVC 5 应用部署到 Web 应用](/documentation/articles/web-sites-dotnet-deploy-aspnet-mvc-app-membership-oauth-sql-database)。\n> <p>有关使用其他编程语言和框架以编程方式重定向请求的信息，请参阅这些技术的文档。\n\nURL 重写规则在存储于应用程序根目录中的 **web.config** 文件内定义。以下示例包含可强制所有传入流量使用 HTTPS 的基本 URL 重写规则。\n\n<a name=\"example\"></a>**URL 重写示例 Web.Config**\n\n    <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n    <configuration>\n      <system.webServer>\n        <rewrite>\n          <rules>\n            <rule name=\"Force HTTPS\" enabled=\"true\">\n              <match url=\"(.*)\" ignoreCase=\"false\" />\n              <conditions>\n                <add input=\"{HTTPS}\" pattern=\"off\" />\n              </conditions>\n              <action type=\"Redirect\" url=\"https://{HTTP_HOST}/{R:1}\" appendQueryString=\"true\" redirectType=\"Permanent\" />\n            </rule>\n          </rules>\n        </rewrite>\n      </system.webServer>\n    </configuration>\n\n此规则的工作方式是当用户使用 HTTP 请求某个页面时，返回 HTTP 状态码 301（永久重定向）。301 将请求重定向到访问者请求的同一个 URL，但使用 HTTPS 来替换请求的 HTTP 部分。例如，HTTP://contoso.com 将重定向到 HTTPS://contoso.com。\n\n> [AZURE.NOTE]如果应用程序是用 **Node.js**、**PHP**、**Python Django** 或 **Java** 编写的，则它可能不包含 web.config 文件。但是，托管在 Azure Web 应用中时，**Node.js**、**Python Django** 和 **Java** 都确实会使用 web.config — Azure 在部署期间自动创建此文件，因此你永远看不到此文件。如果在应用程序中添加一个 web.config 文件，则它将覆盖 Azure 自动生成的文件。\n\n###.NET\n\n对于 .NET 应用程序，请修改应用程序的 web.config 文件，并将[示例](#example)中的 **&lt;rewrite>** 节添加到 **&lt;system.WebServer>** 节。\n\n如果 web.config 文件已经包含 **&lt;rewrite>** 节，请将[示例](#example)中的 **&lt;rule>** 添加为 **&lt;rules>** 节中的第一个条目。\n\n###PHP\n\n对于 PHP 应用程序，只需将[示例](#example)另存为应用程序根目录中的 web.config 文件，然后将应用程序重新部署到应用即可。\n\n###Node.js、Python Django 和 Java\n\n如果 Node.js、Python Django 和 Java 应用程序未提供 web.config 文件，则此文件将自动创建，但因为此文件是在部署过程中创建的，因此它只存在于服务器上。自动生成的文件包含告知 Azure 如何托管应用程序的设置。\n\n若要从应用检索和修改自动生成的文件，请遵循以下步骤。\n\n1. 使用 FTP 下载文件（请参阅[通过 FTP 上载/下载文件和收集诊断日志](http://blogs.msdn.com/b/avkashchauhan/archive/2012/06/19/windows-azure-website-uploading-downloading-files-over-ftp-and-collecting-diagnostics-logs.aspx)）。\n\n2. 将文件添加到应用程序的根目录。\n\n3. 使用以下信息添加重写规则。\n\n    * **Node.js 和 Python Django**\n\n        为 Node.js 和 Python Django 应用程序生成的 web.config 文件已包含 **&lt;rewrite>** 节，其中包含应用正常运行所需的 **&lt;rule>** 条目。若要强制应用使用 HTTPS，请将示例中的 **&lt;rule>** 添加为 **&lt;rules>** 节中的第一个条目。这会在保留其他规则不变的情况下强制 HTTPS。\n\n    * **Java**\n\n        在使用 Apache Tomcat 的 Java 应用程序中，其 web.config 文件不包含 **&lt;rewrite>** 节，因此必须将示例中的 **&lt;rewrite>** 节添加到 **&lt;system.webServer>** 节。\n\n4. 将项目（包含更新的 web.config）重新部署到 Azure\n\n部署包含重写规则以实施 HTTPS 的 web.config 后，该文件应立即生效并将所有请求重定向到 HTTPS。\n\n有关 IIS URL 重写模块的详细信息，请参阅 [URL 重写](http://www.iis.net/downloads/microsoft/url-rewrite)文档。\n\n## 更多资源 ##\n- [Azure 信任中心](/support/trust-center/security/)\n- [Azure Web 应用中解锁的设置选项](/blog/2014/01/28/more-to-explore-configuration-options-unlocked-in-windows-azure-web-sites/)\n- [启用诊断日志记录](/documentation/articles/web-sites-enable-diagnostic-log)\n- [在 Azure 中配置 Web 应用](/documentation/articles/web-sites-configure)\n- [Azure 管理门户](https://manage.windowsazure.cn)\n\n[customdomain]: /documentation/articles/web-sites-custom-domain-name\n[iiscsr]: http://technet.microsoft.com/zh-cn/library/cc732906(WS.10).aspx\n[cas]: http://go.microsoft.com/fwlink/?LinkID=269988\n[installcertiis]: http://technet.microsoft.com/zh-cn/library/cc771816(WS.10).aspx\n[exportcertiis]: http://technet.microsoft.com/zh-cn/library/cc731386(WS.10).aspx\n[openssl]: http://www.openssl.org/\n[portal]: https://manage.windowsazure.cn/\n[tls]: http://en.wikipedia.org/wiki/Transport_Layer_Security\n[staticip]: ./media/configure-ssl-web-site/staticip.png\n[website]: ./media/configure-ssl-web-site/sslwebsite.png\n[scale]: ./media/configure-ssl-web-site/sslscale.png\n[standard]: ./media/configure-ssl-web-site/sslreserved.png\n[pricing]: /pricing/overview/\n[configure]: ./media/configure-ssl-web-site/sslconfig.png\n[uploadcert]: ./media/configure-ssl-web-site/ssluploadcert.png\n[uploadcertdlg]: ./media/configure-ssl-web-site/ssluploaddlg.png\n[sslbindings]: ./media/configure-ssl-web-site/sslbindings.png\n[sni]: http://en.wikipedia.org/wiki/Server_Name_Indication\n[certmgr]: ./media/configure-ssl-web-site/waws-certmgr.png\n[certwiz1]: ./media/configure-ssl-web-site/waws-certwiz1.png\n[certwiz2]: ./media/configure-ssl-web-site/waws-certwiz2.png\n[certwiz3]: ./media/configure-ssl-web-site/waws-certwiz3.png\n[certwiz4]: ./media/configure-ssl-web-site/waws-certwiz4.png\n\n<!---HONumber=Mooncake_1207_2015-->"
+}

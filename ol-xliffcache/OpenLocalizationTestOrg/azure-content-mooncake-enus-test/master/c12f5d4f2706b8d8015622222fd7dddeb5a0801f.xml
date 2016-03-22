@@ -1,0 +1,110 @@
+{
+  "nodes": [
+    {
+      "content": "创建队列",
+      "pos": [
+        5,
+        9
+      ]
+    },
+    {
+      "content": "利用 <bpt id=\"p1\">**</bpt>CloudQueueClient<ept id=\"p1\">**</ept> 对象，可以获取队列的引用对象。以下代码将创建 <bpt id=\"p2\">**</bpt>CloudQueueClient<ept id=\"p2\">**</ept> 对象。本主题中的所有代码都使用存储在 Azure 应用程序的服务配置中的存储连接字符串。还可采用其他方法创建 <bpt id=\"p3\">**</bpt>CloudStorageAccount<ept id=\"p3\">**</ept> 对象。请参阅 <bpt id=\"p4\">[</bpt>CloudStorageAccount<ept id=\"p4\">](http://msdn.microsoft.com/zh-cn/library/microsoft.windowsazure.cloudstorageaccount_methods.aspx \"CloudStorageAccount\")</ept> documentation for details.",
+      "pos": [
+        10,
+        331
+      ]
+    },
+    {
+      "pos": [
+        442,
+        518
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>queueClient<ept id=\"p1\">**</ept> 对象获取对要使用的队列的引用。该代码将尝试引用名为\"myqueue\"的队列。如果找不到该名称的队列，它将创建一个。"
+    },
+    {
+      "pos": [
+        726,
+        756
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>在接下来的部分中，将在代码的前面使用此代码块。"
+    },
+    {
+      "content": "在队列中插入消息",
+      "pos": [
+        763,
+        771
+      ]
+    },
+    {
+      "content": "若要将消息插入现有队列，请先创建一个新的 <bpt id=\"p1\">**</bpt>CloudQueueMessage<ept id=\"p1\">**</ept> 对象。接下来，调用 AddMessage() 方法。可从字符串（UTF-8 格式）或字节数组创建 <bpt id=\"p2\">**</bpt>CloudQueueMessage<ept id=\"p2\">**</ept> 对象。以下代码将创建队列（如果队列不存在）并插入消息  'Hello, World'。",
+      "pos": [
+        772,
+        929
+      ]
+    },
+    {
+      "content": "扫视下一条消息",
+      "pos": [
+        1088,
+        1095
+      ]
+    },
+    {
+      "content": "通过调用 PeekMessage() 方法，可以查看队列前面的消息，而不必从队列中将其删除。",
+      "pos": [
+        1096,
+        1142
+      ]
+    },
+    {
+      "content": "删除下一条消息",
+      "pos": [
+        1331,
+        1338
+      ]
+    },
+    {
+      "content": "您的代码分两步从队列中删除消息（取消对消息的排队）。",
+      "pos": [
+        1339,
+        1365
+      ]
+    },
+    {
+      "content": "调用 GetMessage() 以获取队列中的下一条消息。从 GetMessage() 返回的消息变得对从此队列读取消息的任何其他代码不可见。默认情况下，此消息将持续 30 秒不可见。",
+      "pos": [
+        1372,
+        1464
+      ]
+    },
+    {
+      "content": "若要完成从队列中删除消息，请调用 DeleteMessage()。",
+      "pos": [
+        1470,
+        1503
+      ]
+    },
+    {
+      "content": "此删除消息的两步过程可确保当您的代码因硬件或软件故障而无法处理消息时，您的其他代码实例可以获取同一消息并重试。以下代码将在处理消息后立即调用 DeleteMessage()。",
+      "pos": [
+        1506,
+        1593
+      ]
+    },
+    {
+      "content": "了解有关 Azure 存储的详细信息",
+      "pos": [
+        1825,
+        1843
+      ]
+    },
+    {
+      "content": "另请参阅<bpt id=\"p1\">[</bpt>在服务器资源管理器中浏览存储资源<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/azure/ff683677.aspx)</ept>.",
+      "pos": [
+        1884,
+        1968
+      ]
+    }
+  ],
+  "content": "#####创建队列\n利用 **CloudQueueClient** 对象，可以获取队列的引用对象。以下代码将创建 **CloudQueueClient** 对象。本主题中的所有代码都使用存储在 Azure 应用程序的服务配置中的存储连接字符串。还可采用其他方法创建 **CloudStorageAccount** 对象。请参阅 [CloudStorageAccount](http://msdn.microsoft.com/zh-cn/library/microsoft.windowsazure.cloudstorageaccount_methods.aspx \"CloudStorageAccount\") documentation for details.\n\n    // Create the queue client.\n    CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();\n\n使用 **queueClient** 对象获取对要使用的队列的引用。该代码将尝试引用名为\"myqueue\"的队列。如果找不到该名称的队列，它将创建一个。\n\n    // Get a reference to a queue named \"myqueue\".\n    CloudQueue queue = queueClient.GetQueueReference(\"myqueue\");\n\n    // If the queue isn't already there, then create it.\n    queue.CreateIfNotExists();\n\n**注意：**在接下来的部分中，将在代码的前面使用此代码块。\n\n#####在队列中插入消息\n若要将消息插入现有队列，请先创建一个新的 **CloudQueueMessage** 对象。接下来，调用 AddMessage() 方法。可从字符串（UTF-8 格式）或字节数组创建 **CloudQueueMessage** 对象。以下代码将创建队列（如果队列不存在）并插入消息  'Hello, World'。\n\n    // Create a message and add it to the queue.\n    CloudQueueMessage message = new CloudQueueMessage(\"Hello, World\");\n    queue.AddMessage(message);\n\n#####扫视下一条消息\n通过调用 PeekMessage() 方法，可以查看队列前面的消息，而不必从队列中将其删除。\n\n    // Peek at the next message in the queue.\n    CloudQueueMessage peekedMessage = queue.PeekMessage();\n\n    // Display the message.\n    Console.WriteLine(peekedMessage.AsString);\n\n#####删除下一条消息\n您的代码分两步从队列中删除消息（取消对消息的排队）。 \n\n\n1. 调用 GetMessage() 以获取队列中的下一条消息。从 GetMessage() 返回的消息变得对从此队列读取消息的任何其他代码不可见。默认情况下，此消息将持续 30 秒不可见。 \n2.  若要完成从队列中删除消息，请调用 DeleteMessage()。 \n\n此删除消息的两步过程可确保当您的代码因硬件或软件故障而无法处理消息时，您的其他代码实例可以获取同一消息并重试。以下代码将在处理消息后立即调用 DeleteMessage()。\n\n    // Get the next message in the queue.\n    CloudQueueMessage retrievedMessage = queue.GetMessage();\n\n    // Process the message in less than 30 seconds, and then delete the message.\n    queue.DeleteMessage(retrievedMessage);\n\n[了解有关 Azure 存储的详细信息](/zh-cn/documentation/services/storage)\n另请参阅[在服务器资源管理器中浏览存储资源](http://msdn.microsoft.com/zh-cn/library/azure/ff683677.aspx).<!--HONumber=41-->\n"
+}

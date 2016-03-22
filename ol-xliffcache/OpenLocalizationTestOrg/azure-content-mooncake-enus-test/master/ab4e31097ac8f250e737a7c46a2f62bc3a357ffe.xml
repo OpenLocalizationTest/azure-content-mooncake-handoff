@@ -1,0 +1,1195 @@
+{
+  "nodes": [
+    {
+      "content": "为解决暂时性连接断开而采取的措施 | Azure",
+      "pos": [
+        27,
+        51
+      ]
+    },
+    {
+      "content": "在与 Azure SQL 数据库交互时，为了排查、诊断和防止连接错误及其他暂时性故障而采取的措施。",
+      "pos": [
+        70,
+        119
+      ]
+    },
+    {
+      "content": "对 SQL 数据库的暂时性故障和连接错误进行故障排除",
+      "pos": [
+        331,
+        357
+      ]
+    },
+    {
+      "content": "本主题介绍如何防止、排查、诊断和减少客户端程序在与 Azure SQL 数据库交互时发生的连接错误和暂时性故障。",
+      "pos": [
+        360,
+        416
+      ]
+    },
+    {
+      "content": "暂时性故障",
+      "pos": [
+        481,
+        486
+      ]
+    },
+    {
+      "content": "暂时性故障是根本原因很快就能自行解决的错误。当 Azure 系统快速地将硬件资源转移到负载平衡更好的各种工作负荷时，偶尔会发生暂时性故障。在进行这种重新配置的过程中，与 Azure SQL 数据库的连接可能会断开。",
+      "pos": [
+        489,
+        596
+      ]
+    },
+    {
+      "pos": [
+        599,
+        776
+      ],
+      "content": "如果客户端程序使用 ADO.NET，系统将会引发 <bpt id=\"p1\">**</bpt>SqlException<ept id=\"p1\">**</ept>，使你的程序知道已发生暂时性故障。你可以将 <bpt id=\"p2\">**</bpt>Number<ept id=\"p2\">**</ept> 属性与 <bpt id=\"p3\">[</bpt>SQL 数据库客户端程序的错误消息<ept id=\"p3\">](/documentation/articles/sql-database-develop-error-messages)</ept>主题顶部附近的暂时性故障列表进行比较。"
+    },
+    {
+      "content": "连接与命令",
+      "pos": [
+        783,
+        788
+      ]
+    },
+    {
+      "content": "如果在尝试连接期间发生暂时性故障，应该延迟数秒后再重试连接。",
+      "pos": [
+        791,
+        821
+      ]
+    },
+    {
+      "content": "执行某个 SQL 查询命令期间发生暂时性故障时，不应该立即重试该命令。而应在一定的延迟之后建立新的连接。然后可以重试该命令。",
+      "pos": [
+        824,
+        886
+      ]
+    },
+    {
+      "content": "暂时性故障的重试逻辑",
+      "pos": [
+        975,
+        985
+      ]
+    },
+    {
+      "content": "在偶尔会遇到暂时性故障的客户端程序中包含重试逻辑可以让它变得更稳健。",
+      "pos": [
+        988,
+        1022
+      ]
+    },
+    {
+      "content": "如果你的程序通过第三方中间件与 Azure SQL 数据库通信，请咨询供应商该中间件是否包含暂时性故障的重试逻辑。",
+      "pos": [
+        1025,
+        1082
+      ]
+    },
+    {
+      "content": "重试原则",
+      "pos": [
+        1089,
+        1093
+      ]
+    },
+    {
+      "content": "如果错误是暂时性故障，则应重新尝试打开连接。",
+      "pos": [
+        1098,
+        1120
+      ]
+    },
+    {
+      "content": "不应直接重试由于暂时性故障而失败的 SQL SELECT 语句。",
+      "pos": [
+        1125,
+        1157
+      ]
+    },
+    {
+      "content": "而是建立新的连接，然后重试 SELECT。",
+      "pos": [
+        1161,
+        1182
+      ]
+    },
+    {
+      "content": "SQL UPDATE 语句由于暂时性故障而失败时，应该先建立新的连接，再重试 UPDATE。",
+      "pos": [
+        1187,
+        1233
+      ]
+    },
+    {
+      "content": "重试逻辑必须确保整个数据库事务完成，或整个事务已回滚。",
+      "pos": [
+        1237,
+        1264
+      ]
+    },
+    {
+      "content": "其他重试注意事项",
+      "pos": [
+        1272,
+        1280
+      ]
+    },
+    {
+      "content": "下班后自动启动的批处理程序以及在凌晨之前完成的批处理程序在每次重试前经过较长的时间间隔。",
+      "pos": [
+        1285,
+        1329
+      ]
+    },
+    {
+      "content": "用户界面程序应该解释用户将在长时间等待后放弃操作的倾向。",
+      "pos": [
+        1334,
+        1362
+      ]
+    },
+    {
+      "content": "但是，解决方案不得每隔几秒钟重试，因为该策略可能会使系统填满请求。",
+      "pos": [
+        1366,
+        1399
+      ]
+    },
+    {
+      "content": "增大重试间隔",
+      "pos": [
+        1406,
+        1412
+      ]
+    },
+    {
+      "content": "我们建议在第一次重试前延迟 5 秒钟。如果在少于 5 秒的延迟后重试，云服务有超载的风险。对于后续的每次重试，延迟应以指数级增大，最大值为 60 秒。",
+      "pos": [
+        1416,
+        1491
+      ]
+    },
+    {
+      "pos": [
+        1493,
+        1606
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>SQL Server 连接池 (ADO.NET)<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/8xx3tyca.aspx)</ept> 中提供了有关使用 ADO.NET 的客户端的<bpt id=\"p2\">*</bpt>阻塞期<ept id=\"p2\">*</ept>的说明。"
+    },
+    {
+      "content": "你还可能想要设置程序在自行终止之前的重试次数上限。",
+      "pos": [
+        1608,
+        1633
+      ]
+    },
+    {
+      "content": "重试逻辑代码示例",
+      "pos": [
+        1640,
+        1648
+      ]
+    },
+    {
+      "content": "以下位置提供了采用各种编程语言的重试逻辑代码示例：",
+      "pos": [
+        1651,
+        1676
+      ]
+    },
+    {
+      "content": "快速入门代码示例",
+      "pos": [
+        1681,
+        1689
+      ]
+    },
+    {
+      "content": "测试重试逻辑",
+      "pos": [
+        1833,
+        1839
+      ]
+    },
+    {
+      "content": "若要测试重试逻辑，必须模拟或生成程序仍在运行时可更正的错误。",
+      "pos": [
+        1842,
+        1872
+      ]
+    },
+    {
+      "content": "通过断开网络连接进行测试",
+      "pos": [
+        1879,
+        1891
+      ]
+    },
+    {
+      "content": "可以测试重试逻辑的方法，就是在程序运行时断中客户端计算机与网络的连接。错误将是：",
+      "pos": [
+        1894,
+        1934
+      ]
+    },
+    {
+      "pos": [
+        1937,
+        1968
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>SqlException.Number<ept id=\"p1\">**</ept> = 11001"
+    },
+    {
+      "content": "消息：“没有此类已知的主机”",
+      "pos": [
+        1971,
+        1985
+      ]
+    },
+    {
+      "content": "首次重试时，程序可以更正拼写错误，然后尝试连接。",
+      "pos": [
+        1988,
+        2012
+      ]
+    },
+    {
+      "content": "若要使此操作可行，请从网络中断开计算机的连接，再启动你的程序。然后，你的程序将识别导致它执行以下操作的运行时参数：",
+      "pos": [
+        2015,
+        2072
+      ]
+    },
+    {
+      "content": "暂时将 11001 添加到视为暂时性故障的错误列表。",
+      "pos": [
+        2076,
+        2102
+      ]
+    },
+    {
+      "content": "像往常一样尝试首次连接。",
+      "pos": [
+        2106,
+        2118
+      ]
+    },
+    {
+      "content": "在捕获该错误后，从列表中删除 11001。",
+      "pos": [
+        2122,
+        2143
+      ]
+    },
+    {
+      "content": "显示一条消息，提示用户将计算机接入网络。",
+      "pos": [
+        2147,
+        2167
+      ]
+    },
+    {
+      "pos": [
+        2171,
+        2241
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>Console.ReadLine<ept id=\"p1\">**</ept> 方法或包含“确定”按钮的对话框暂停进一步的执行。将计算机接入网络后，用户按 Enter 键。"
+    },
+    {
+      "content": "重新尝试连接，预期将会成功。",
+      "pos": [
+        2245,
+        2259
+      ]
+    },
+    {
+      "content": "通过在连接时拼错数据库名称进行测试",
+      "pos": [
+        2266,
+        2283
+      ]
+    },
+    {
+      "content": "在首次连接尝试之前，程序可以故意拼错用户名。错误将是：",
+      "pos": [
+        2286,
+        2313
+      ]
+    },
+    {
+      "pos": [
+        2316,
+        2347
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>SqlException.Number<ept id=\"p1\">**</ept> = 18456"
+    },
+    {
+      "content": "消息：“用户 'WRONG\\_MyUserName' 登录失败。”",
+      "pos": [
+        2351,
+        2384
+      ]
+    },
+    {
+      "content": "首次重试时，程序可以更正拼写错误，然后尝试连接。",
+      "pos": [
+        2387,
+        2411
+      ]
+    },
+    {
+      "content": "若要使此操作可行，你的程序可以识别导致它执行以下操作的运行时参数：",
+      "pos": [
+        2414,
+        2447
+      ]
+    },
+    {
+      "content": "暂时将 18456 添加到视为暂时性故障的错误列表。",
+      "pos": [
+        2451,
+        2477
+      ]
+    },
+    {
+      "content": "故意将“WRONG\\_”添加到用户名。",
+      "pos": [
+        2481,
+        2500
+      ]
+    },
+    {
+      "content": "在捕获该错误后，从列表中删除 18456。",
+      "pos": [
+        2504,
+        2525
+      ]
+    },
+    {
+      "content": "从用户名中删除“WRONG\\_”。",
+      "pos": [
+        2529,
+        2546
+      ]
+    },
+    {
+      "content": "重新尝试连接，预期将会成功。",
+      "pos": [
+        2550,
+        2564
+      ]
+    },
+    {
+      "content": "连接：连接字符串",
+      "pos": [
+        2653,
+        2661
+      ]
+    },
+    {
+      "pos": [
+        2664,
+        2783
+      ],
+      "content": "连接到 Azure SQL 数据库所需的连接字符串与连接到 Microsoft SQL Server 所需的字符串稍有不同。可以从 <bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">](http://manage.windowsazure.cn)</ept>复制数据库的连接字符串。"
+    },
+    {
+      "content": "连接重试的 .NET SqlConnection 参数",
+      "pos": [
+        2935,
+        2962
+      ]
+    },
+    {
+      "pos": [
+        2965,
+        3145
+      ],
+      "content": "如果客户端程序使用 .NET Framework 类 <bpt id=\"p1\">**</bpt>System.Data.SqlClient.SqlConnection<ept id=\"p1\">**</ept> 连接 Azure SQL 数据库，应使用 .NET 4.6.1 或更高版本，以便可以利用其连接重试功能。该功能的详细信息在<bpt id=\"p2\">[</bpt>此处<ept id=\"p2\">](http://go.microsoft.com/fwlink/?linkid=393996)</ept>。"
+    },
+    {
+      "pos": [
+        3288,
+        3432
+      ],
+      "content": "为 <bpt id=\"p1\">**</bpt>SqlConnection<ept id=\"p1\">**</ept> 对象生成<bpt id=\"p2\">[</bpt>连接字符串<ept id=\"p2\">](http://msdn.microsoft.com/zh-cn/library/System.Data.SqlClient.SqlConnection.connectionstring.aspx)</ept>时，应在以下参数之间协调值："
+    },
+    {
+      "pos": [
+        3436,
+        3490
+      ],
+      "content": "ConnectRetryCount &amp;nbsp;&amp;nbsp;<bpt id=\"p1\">*</bpt>（默认值为 0。范围是从 0 到 255。）<ept id=\"p1\">*</ept>"
+    },
+    {
+      "pos": [
+        3493,
+        3551
+      ],
+      "content": "ConnectRetryInterval &amp;nbsp;&amp;nbsp;<bpt id=\"p1\">*</bpt>（默认值为 1 秒。范围是从 1 到 60。）<ept id=\"p1\">*</ept>"
+    },
+    {
+      "pos": [
+        3554,
+        3605
+      ],
+      "content": "连接超时值 &amp;nbsp;&amp;nbsp;<bpt id=\"p1\">*</bpt>（默认值为 15 秒。范围是从 0 到 2147483647）<ept id=\"p1\">*</ept>"
+    },
+    {
+      "content": "具体而言，所选的值应使以下等式成立：",
+      "pos": [
+        3608,
+        3626
+      ]
+    },
+    {
+      "content": "连接超时值 = ConnectRetryCount * ConnectionRetryInterval",
+      "pos": [
+        3630,
+        3681
+      ]
+    },
+    {
+      "content": "例如，如果计数 = 3 且间隔 = 10 秒，超时值仅为 29 秒未给系统足够的时间进行其第三次也是最后一次连接重试，因为：29 &lt; 3 * 10。",
+      "pos": [
+        3683,
+        3757
+      ]
+    },
+    {
+      "content": "连接与命令",
+      "pos": [
+        3765,
+        3770
+      ]
+    },
+    {
+      "pos": [
+        3773,
+        3896
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>ConnectRetryCount<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>ConnectRetryInterval<ept id=\"p2\">**</ept> 参数使 <bpt id=\"p3\">**</bpt>SqlConnection<ept id=\"p3\">**</ept> 对象在重试连接操作时不用通知或麻烦你的程序（例如，将控制权返还给你的程序）。在以下情况下可能会进行重试："
+    },
+    {
+      "content": "mySqlConnection.Open 方法调用",
+      "pos": [
+        3900,
+        3925
+      ]
+    },
+    {
+      "content": "mySqlConnection.Execute 方法调用",
+      "pos": [
+        3928,
+        3956
+      ]
+    },
+    {
+      "pos": [
+        3958,
+        4128
+      ],
+      "content": "有个很微妙的地方。如果你正在执行<bpt id=\"p1\">*</bpt>查询<ept id=\"p1\">*</ept>时发生暂时性故障，<bpt id=\"p2\">**</bpt>SqlConnection<ept id=\"p2\">**</ept> 对象不会重试连接操作，因而肯定不会重试你的查询。但是，<bpt id=\"p3\">**</bpt>SqlConnection<ept id=\"p3\">**</ept> 在发送要执行的查询前会非常快速地检查连接。如果快速检查检测到连接问题，<bpt id=\"p4\">**</bpt>SqlConnection<ept id=\"p4\">**</ept> 会重试连接操作。如果重试成功，则会发送查询以执行。"
+    },
+    {
+      "content": "ConnectRetryCount 是否应结合应用程序重试逻辑？",
+      "pos": [
+        4136,
+        4168
+      ]
+    },
+    {
+      "pos": [
+        4170,
+        4313
+      ],
+      "content": "假设你的应用程序具有功能强大的自定义重试逻辑。它可能会重试连接操作 4 次。如果你将 <bpt id=\"p1\">**</bpt>ConnectRetryInterval<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>ConnectRetryCount<ept id=\"p2\">**</ept> = 3 添加到连接字符串，则将重试计数提高到 4 * 3 = 12 次重试。你可能未打算重试这么多次。"
+    },
+    {
+      "content": "连接：IP 地址",
+      "pos": [
+        4389,
+        4397
+      ]
+    },
+    {
+      "pos": [
+        4400,
+        4493
+      ],
+      "content": "必须将 SQL 数据库服务器配置为接受来自托管客户端程序的计算机的通信。为此，可以通过 <bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">](http://manage.windowsazure.cn)</ept>编辑防火墙设置。"
+    },
+    {
+      "content": "如果你忘记了配置 IP 地址，你的程序将失败，并显示简单的错误消息，指出所需的 IP 地址。",
+      "pos": [
+        4496,
+        4542
+      ]
+    },
+    {
+      "content": "有关详细信息，请参阅",
+      "pos": [
+        4671,
+        4681
+      ]
+    },
+    {
+      "content": "如何：在 SQL 数据库上配置防火墙设置",
+      "pos": [
+        4683,
+        4703
+      ]
+    },
+    {
+      "content": "连接：端口",
+      "pos": [
+        4835,
+        4840
+      ]
+    },
+    {
+      "content": "通常，只需确保在托管客户端程序的计算机上已打开端口 1433 进行出站通信。",
+      "pos": [
+        4843,
+        4881
+      ]
+    },
+    {
+      "content": "例如，当客户端程序托管在 Windows 计算机上时，主机上的 Windows 防火墙允许你打开端口 1433：",
+      "pos": [
+        4884,
+        4940
+      ]
+    },
+    {
+      "content": "打开“控制面板”",
+      "pos": [
+        4946,
+        4954
+      ]
+    },
+    {
+      "content": "&amp;gt;“所有控制面板项”",
+      "pos": [
+        4958,
+        4971
+      ]
+    },
+    {
+      "content": "&amp;gt;“Windows 防火墙”",
+      "pos": [
+        4975,
+        4992
+      ]
+    },
+    {
+      "content": "&amp;gt;“高级设置”",
+      "pos": [
+        4996,
+        5006
+      ]
+    },
+    {
+      "content": "&amp;gt;“出站规则”",
+      "pos": [
+        5010,
+        5020
+      ]
+    },
+    {
+      "content": "&amp;gt;“操作”",
+      "pos": [
+        5024,
+        5032
+      ]
+    },
+    {
+      "content": "&amp;gt;“新建规则”",
+      "pos": [
+        5036,
+        5046
+      ]
+    },
+    {
+      "content": "如果你的客户端程序托管在 Azure 虚拟机 (VM) 上，你应该阅读：",
+      "pos": [
+        5049,
+        5085
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">[</bpt>用于 ADO.NET 4.5 和 SQL 数据库 V12 的非 1433 端口<ept id=\"p1\">](/documentation/articles/sql-database-develop-direct-route-ports-adonet-v12)</ept>。",
+      "pos": [
+        5090,
+        5208
+      ]
+    },
+    {
+      "content": "有关配置端口和 IP 地址的背景信息，请参阅：",
+      "pos": [
+        5211,
+        5234
+      ]
+    },
+    {
+      "content": "Azure SQL 数据库防火墙",
+      "pos": [
+        5236,
+        5252
+      ]
+    },
+    {
+      "content": "连接：ADO.NET 4.6.1",
+      "pos": [
+        5387,
+        5403
+      ]
+    },
+    {
+      "pos": [
+        5406,
+        5519
+      ],
+      "content": "如果你的程序使用 <bpt id=\"p1\">**</bpt>System.Data.SqlClient.SqlConnection<ept id=\"p1\">**</ept> 等 ADO.NET 类来连接到 Azure SQL 数据库，我们建议使用 .NET Framework 4.6.1 或更高版本。"
+    },
+    {
+      "content": "ADO.NET 4.6.1：",
+      "pos": [
+        5522,
+        5536
+      ]
+    },
+    {
+      "content": "添加了对 TDS 7.4 协议的支持。这包括 4.0 所不具备的连接增强功能。",
+      "pos": [
+        5539,
+        5578
+      ]
+    },
+    {
+      "content": "支持连接池。这包括有效验证提供给程序的连接对象是否正常运行的功能。",
+      "pos": [
+        5581,
+        5614
+      ]
+    },
+    {
+      "content": "如果你要从连接池使用连接对象，我们建议，如果程序未立即使用连接，应暂时关闭连接。重新打开连接比创建新连接的开销更低。",
+      "pos": [
+        5617,
+        5675
+      ]
+    },
+    {
+      "content": "如果使用的是 ADO.NET 4.0 或更旧版本，我们建议升级到最新的 ADO.NET。",
+      "pos": [
+        5678,
+        5722
+      ]
+    },
+    {
+      "pos": [
+        5725,
+        5855
+      ],
+      "content": "从 2015年 11 月开始，你可以<bpt id=\"p1\">[</bpt>下载 ADO.NET 4.6.1<ept id=\"p1\">](http://blogs.msdn.com/b/dotnet/archive/2015/11/30/net-framework-4-6-1-is-now-available.aspx)</ept>。"
+    },
+    {
+      "content": "诊断：测试实用程序是否可以连接",
+      "pos": [
+        5956,
+        5971
+      ]
+    },
+    {
+      "content": "如果你的程序无法连接到 Azure SQL 数据库，有一个诊断选项可让你尝试使用一个实用程序来进行连接。理想的情况下，该实用程序将使用你的程序所用的同一个库进行连接。",
+      "pos": [
+        5974,
+        6057
+      ]
+    },
+    {
+      "content": "在任何 Windows 计算机上，都可以尝试使用这些实用程序：",
+      "pos": [
+        6060,
+        6091
+      ]
+    },
+    {
+      "content": "SQL Server Management Studio (ssms.exe)，它使用 ADO.NET 进行连接。",
+      "pos": [
+        6094,
+        6151
+      ]
+    },
+    {
+      "pos": [
+        6154,
+        6236
+      ],
+      "content": "sqlcmd.exe，它使用 <bpt id=\"p1\">[</bpt>ODBC<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/jj730308.aspx)</ept> 进行连接。"
+    },
+    {
+      "content": "完成连接后，测试一个简短的 SQL SELECT 查询是否可以正常工作。",
+      "pos": [
+        6239,
+        6275
+      ]
+    },
+    {
+      "content": "诊断：检查打开的端口",
+      "pos": [
+        6364,
+        6374
+      ]
+    },
+    {
+      "content": "假设你怀疑连接尝试由于端口问题而失败。在你的计算机上，可以运行报告端口配置的实用程序。",
+      "pos": [
+        6377,
+        6420
+      ]
+    },
+    {
+      "content": "在 Linux 上，以下实用程序可能很有用：",
+      "pos": [
+        6423,
+        6445
+      ]
+    },
+    {
+      "content": "netstat -nap",
+      "pos": [
+        6450,
+        6462
+      ]
+    },
+    {
+      "content": "nmap -sS -O 127.0.0.1",
+      "pos": [
+        6467,
+        6488
+      ]
+    },
+    {
+      "content": "将示例值更改为你的 IP 地址）。",
+      "pos": [
+        6493,
+        6510
+      ]
+    },
+    {
+      "pos": [
+        6513,
+        6660
+      ],
+      "content": "在 Windows 上，<bpt id=\"p1\">[</bpt>PortQry.exe<ept id=\"p1\">](http://www.microsoft.com/en-us/download/details.aspx?id=17148)</ept> 实用程序可能很有用。以下是在 Azure SQL 数据库服务器上查询端口情况，以及在便携式计算机上运行的的示例执行："
+    },
+    {
+      "content": "诊断：记录你的错误",
+      "pos": [
+        7124,
+        7133
+      ]
+    },
+    {
+      "content": "有时，诊断间歇性问题的最好方式是每隔数天或数周检测常规模式。",
+      "pos": [
+        7136,
+        7166
+      ]
+    },
+    {
+      "content": "你的客户端可以通过记录其所遇到的所有错误来帮助你进行诊断。你可以将日志条目与 Azure SQL 数据库本身内部记录的错误数据相关联。",
+      "pos": [
+        7169,
+        7236
+      ]
+    },
+    {
+      "content": "Enterprise Library 6 (EntLib60) 提供了 .NET 托管类来帮助进行日志记录：",
+      "pos": [
+        7239,
+        7293
+      ]
+    },
+    {
+      "content": "5 - 像滚圆木一样容易：使用日志记录应用程序块",
+      "pos": [
+        7297,
+        7321
+      ]
+    },
+    {
+      "content": "诊断：在系统日志中检查错误",
+      "pos": [
+        7472,
+        7485
+      ]
+    },
+    {
+      "content": "下面是在日志中查询错误和其他信息的一些 Transact-SQL SELECT 语句。",
+      "pos": [
+        7488,
+        7531
+      ]
+    },
+    {
+      "content": "日志查询",
+      "pos": [
+        7536,
+        7540
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        7543,
+        7545
+      ]
+    },
+    {
+      "content": "&amp;nbsp;&amp;nbsp;<ph id=\"ph1\">`(hour, e.end_time, GetUtcDate())`</ph>",
+      "pos": [
+        7720,
+        7766
+      ]
+    },
+    {
+      "content": "&amp;nbsp;&amp;nbsp;<ph id=\"ph1\">`e.event_type, e.end_time;`</ph>",
+      "pos": [
+        7804,
+        7843
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">[</bpt>sys.event\\_log<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/dn270018.aspx)</ept> 视图提供单个事件的相关信息，包括可能导致暂时性故障或连接失败的一些事件。",
+      "pos": [
+        7846,
+        7954
+      ]
+    },
+    {
+      "content": "理想的情况下，可以将 <bpt id=\"p1\">**</bpt>start\\_time<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>end\\_time<ept id=\"p2\">**</ept> 值与有关客户端程序何时遇到问题的信息相关联。",
+      "pos": [
+        7964,
+        8029
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>提示：<ept id=\"p1\">**</ept>必须连接到 <bpt id=\"p2\">**</bpt>master<ept id=\"p2\">**</ept> 数据库才能运行此操作。",
+      "pos": [
+        8039,
+        8074
+      ]
+    },
+    {
+      "content": "&amp;nbsp;&amp;nbsp;<ph id=\"ph1\">`(hour, c.end_time, GetUtcDate())`</ph>",
+      "pos": [
+        8208,
+        8254
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">[</bpt>sys.database\\_connection\\_stats<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/dn269986.aspx)</ept> 视图针对其他诊断提供事件类型的聚合计数。",
+      "pos": [
+        8284,
+        8393
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>提示：<ept id=\"p1\">**</ept>必须连接到 <bpt id=\"p2\">**</bpt>master<ept id=\"p2\">**</ept> 数据库才能运行此操作。",
+      "pos": [
+        8403,
+        8438
+      ]
+    },
+    {
+      "content": "诊断：在 SQL 数据库日志中搜索问题事件",
+      "pos": [
+        8447,
+        8468
+      ]
+    },
+    {
+      "pos": [
+        8471,
+        8551
+      ],
+      "content": "可以在 Azure SQL 数据库的日志中搜索有关问题事件的条目。在 <bpt id=\"p1\">**</bpt>master<ept id=\"p1\">**</ept> 数据库中尝试运行以下 Transact-SQL SELECT 语句："
+    },
+    {
+      "content": "将返回 sys.fn\\_xe\\_telemetry\\_blob\\_target\\_read\\_file 中的若干行",
+      "pos": [
+        9452,
+        9509
+      ]
+    },
+    {
+      "content": "下面是返回行的类似内容。显示的 null 值在其他行中通常不是 null。",
+      "pos": [
+        9512,
+        9549
+      ]
+    },
+    {
+      "content": "Enterprise Library 6",
+      "pos": [
+        9832,
+        9852
+      ]
+    },
+    {
+      "pos": [
+        9855,
+        10077
+      ],
+      "content": "Enterprise Library 6 (EntLib60) 是 .NET 类的框架，可帮助你实施云服务（包括 Azure SQL 数据库服务）的稳健客户端。首先，可以访问 <bpt id=\"p1\">[</bpt>Enterprise Library 6 – 2013年 4 月<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/dn169621%28v=pandp.60%29.aspx)</ept>，找到 EntLib60 可以提供帮助的每个领域的相关专题"
+    },
+    {
+      "content": "处理暂时性故障的重试逻辑是 EntLib60 可以帮助的一个领域：",
+      "pos": [
+        10080,
+        10113
+      ]
+    },
+    {
+      "content": "4 - 锲而不舍是所有成功的秘诀：使用暂时性故障处理应用程序块",
+      "pos": [
+        10117,
+        10148
+      ]
+    },
+    {
+      "content": "以下位置提供了在其重试逻辑中使用 EntLib60 的简短 C# 代码示例：",
+      "pos": [
+        10223,
+        10261
+      ]
+    },
+    {
+      "content": "代码示例：Enterprise Library 6 中用于连接到 SQL 数据库的 C# 重试逻辑",
+      "pos": [
+        10265,
+        10314
+      ]
+    },
+    {
+      "pos": [
+        10394,
+        10512
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> EntLib60 的源代码可公开<bpt id=\"p1\">[</bpt>下载<ept id=\"p1\">](http://go.microsoft.com/fwlink/p/?LinkID=290898)</ept>。Microsoft 不打算对 EntLib 做进一步的功能或维护更新。"
+    },
+    {
+      "content": "用于暂时性故障和重试的 EntLib60 类",
+      "pos": [
+        10519,
+        10541
+      ]
+    },
+    {
+      "pos": [
+        10544,
+        10652
+      ],
+      "content": "以下 EntLib60 类对重试逻辑特别有用。所有这些类都包含在 <bpt id=\"p1\">**</bpt>Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling<ept id=\"p1\">**</ept> 命名空间或其子级中："
+    },
+    {
+      "pos": [
+        10655,
+        10728
+      ],
+      "content": "在命名空间 <bpt id=\"p1\">**</bpt>Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling<ept id=\"p1\">**</ept> 中："
+    },
+    {
+      "pos": [
+        10733,
+        10750
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>RetryPolicy<ept id=\"p1\">**</ept> 类"
+    },
+    {
+      "pos": [
+        10754,
+        10774
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>ExecuteAction<ept id=\"p1\">**</ept> 方法"
+    },
+    {
+      "pos": [
+        10779,
+        10803
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>ExponentialBackoff<ept id=\"p1\">**</ept> 类"
+    },
+    {
+      "pos": [
+        10808,
+        10856
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>SqlDatabaseTransientErrorDetectionStrategy<ept id=\"p1\">**</ept> 类"
+    },
+    {
+      "pos": [
+        10861,
+        10888
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>ReliableSqlConnection<ept id=\"p1\">**</ept> 类"
+    },
+    {
+      "pos": [
+        10892,
+        10913
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>ExecuteCommand<ept id=\"p1\">**</ept> 方法"
+    },
+    {
+      "pos": [
+        10916,
+        11001
+      ],
+      "content": "在命名空间 <bpt id=\"p1\">**</bpt>Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling.TestSupport<ept id=\"p1\">**</ept> 中："
+    },
+    {
+      "pos": [
+        11005,
+        11048
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>AlwaysTransientErrorDetectionStrategy<ept id=\"p1\">**</ept> 类"
+    },
+    {
+      "pos": [
+        11052,
+        11094
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>NeverTransientErrorDetectionStrategy<ept id=\"p1\">**</ept> 类"
+    },
+    {
+      "content": "以下是 EntLib60 相关信息的链接：",
+      "pos": [
+        11097,
+        11118
+      ]
+    },
+    {
+      "pos": [
+        11122,
+        11234
+      ],
+      "content": "免费<bpt id=\"p1\">[</bpt>书籍下载：Microsoft Enterprise Library 版本 2 开发人员指南<ept id=\"p1\">](http://www.microsoft.com/en-us/download/details.aspx?id=41145)</ept>"
+    },
+    {
+      "pos": [
+        11238,
+        11360
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Enterprise Library - 暂时性故障处理应用程序块 6.0<ept id=\"p1\">](http://www.nuget.org/packages/EnterpriseLibrary.TransientFaultHandling)</ept> 的 NuGet 下载"
+    },
+    {
+      "content": "EntLib60：日志记录块",
+      "pos": [
+        11367,
+        11381
+      ]
+    },
+    {
+      "content": "日志记录块是极其灵活且可配置的解决方案，可让你：",
+      "pos": [
+        11386,
+        11410
+      ]
+    },
+    {
+      "content": "创建日志消息并将其存储在各种不同的位置。",
+      "pos": [
+        11414,
+        11434
+      ]
+    },
+    {
+      "content": "分类与筛选消息。",
+      "pos": [
+        11438,
+        11446
+      ]
+    },
+    {
+      "content": "收集有助于调试和跟踪的上下文信息，以及用于满足审核和一般日志记录要求的上下文信息。",
+      "pos": [
+        11450,
+        11491
+      ]
+    },
+    {
+      "content": "日志记录块可以从日志目标抽象化日志记录功能，使应用程序代码保持一致，无论目标日志记录存储的位置和类型为何。",
+      "pos": [
+        11496,
+        11549
+      ]
+    },
+    {
+      "content": "有关详细信息，请参阅：",
+      "pos": [
+        11552,
+        11563
+      ]
+    },
+    {
+      "content": "5 - 像滚圆木一样容易：使用日志记录应用程序块",
+      "pos": [
+        11565,
+        11589
+      ]
+    },
+    {
+      "content": "EntLib60 IsTransient 方法的源代码",
+      "pos": [
+        11669,
+        11696
+      ]
+    },
+    {
+      "pos": [
+        11699,
+        11821
+      ],
+      "content": "接下来，<bpt id=\"p1\">**</bpt>SqlDatabaseTransientErrorDetectionStrategy<ept id=\"p1\">**</ept> 类包含 <bpt id=\"p2\">**</bpt>IsTransient<ept id=\"p2\">**</ept> 方法的 C# 源代码。该源代码阐明了哪些错误被视为暂时性错误并值得重试（从 2013 年 4 月起）。"
+    },
+    {
+      "pos": [
+        11823,
+        11861
+      ],
+      "content": "为了注重易读性，我们在此副本中删除了大量的 <bpt id=\"p1\">**</bpt>//comment<ept id=\"p1\">**</ept> 行。"
+    },
+    {
+      "content": "详细信息",
+      "pos": [
+        13978,
+        13982
+      ]
+    },
+    {
+      "content": "SQL Server 连接池 (ADO.NET)",
+      "pos": [
+        13988,
+        14012
+      ]
+    },
+    {
+      "pos": [
+        14074,
+        14138
+      ],
+      "content": "<bpt id=\"p1\">*</bpt>重试<ept id=\"p1\">*</ept>是 Apache 2.0 授权的通用重试库，它以 <bpt id=\"p2\">**</bpt>Python<ept id=\"p2\">**</ept> 编写，可以简化向几乎任何程序添加重试行为的任务。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"为解决暂时性连接断开而采取的措施 | Azure\"\n    description=\"在与 Azure SQL 数据库交互时，为了排查、诊断和防止连接错误及其他暂时性故障而采取的措施。\"\n    services=\"sql-database\"\n    documentationCenter=\"\"\n    authors=\"dalechen\"\n    manager=\"msmets\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"sql-database\"\n    ms.date=\"01/06/2016\"\n    wacn.date=\"02/26/2016\"/>\n\n\n# 对 SQL 数据库的暂时性故障和连接错误进行故障排除\n\n\n本主题介绍如何防止、排查、诊断和减少客户端程序在与 Azure SQL 数据库交互时发生的连接错误和暂时性故障。\n\n\n<a id=\"i-transient-faults\" name=\"i-transient-faults\"></a>\n\n## 暂时性故障\n\n\n暂时性故障是根本原因很快就能自行解决的错误。当 Azure 系统快速地将硬件资源转移到负载平衡更好的各种工作负荷时，偶尔会发生暂时性故障。在进行这种重新配置的过程中，与 Azure SQL 数据库的连接可能会断开。\n\n\n如果客户端程序使用 ADO.NET，系统将会引发 **SqlException**，使你的程序知道已发生暂时性故障。你可以将 **Number** 属性与 [SQL 数据库客户端程序的错误消息](/documentation/articles/sql-database-develop-error-messages)主题顶部附近的暂时性故障列表进行比较。\n\n\n### 连接与命令\n\n\n如果在尝试连接期间发生暂时性故障，应该延迟数秒后再重试连接。\n\n\n执行某个 SQL 查询命令期间发生暂时性故障时，不应该立即重试该命令。而应在一定的延迟之后建立新的连接。然后可以重试该命令。\n\n\n<a id=\"j-retry-logic-transient-faults\" name=\"j-retry-logic-transient-faults\"></a>\n\n## 暂时性故障的重试逻辑\n\n\n在偶尔会遇到暂时性故障的客户端程序中包含重试逻辑可以让它变得更稳健。\n\n\n如果你的程序通过第三方中间件与 Azure SQL 数据库通信，请咨询供应商该中间件是否包含暂时性故障的重试逻辑。\n\n\n### 重试原则\n\n\n- 如果错误是暂时性故障，则应重新尝试打开连接。\n\n\n- 不应直接重试由于暂时性故障而失败的 SQL SELECT 语句。\n - 而是建立新的连接，然后重试 SELECT。\n\n\n- SQL UPDATE 语句由于暂时性故障而失败时，应该先建立新的连接，再重试 UPDATE。\n - 重试逻辑必须确保整个数据库事务完成，或整个事务已回滚。\n\n\n#### 其他重试注意事项\n\n\n- 下班后自动启动的批处理程序以及在凌晨之前完成的批处理程序在每次重试前经过较长的时间间隔。\n\n\n- 用户界面程序应该解释用户将在长时间等待后放弃操作的倾向。\n - 但是，解决方案不得每隔几秒钟重试，因为该策略可能会使系统填满请求。\n\n\n### 增大重试间隔\n\n\n\n我们建议在第一次重试前延迟 5 秒钟。如果在少于 5 秒的延迟后重试，云服务有超载的风险。对于后续的每次重试，延迟应以指数级增大，最大值为 60 秒。\n\n[SQL Server 连接池 (ADO.NET)](http://msdn.microsoft.com/zh-cn/library/8xx3tyca.aspx) 中提供了有关使用 ADO.NET 的客户端的*阻塞期*的说明。\n\n你还可能想要设置程序在自行终止之前的重试次数上限。\n\n\n### 重试逻辑代码示例\n\n\n以下位置提供了采用各种编程语言的重试逻辑代码示例：\n\n- [快速入门代码示例](/documentation/articles/sql-database-develop-quick-start-client-code-samples)\n\n\n<a id=\"k-test-retry-logic\" name=\"k-test-retry-logic\"></a>\n\n## 测试重试逻辑\n\n\n若要测试重试逻辑，必须模拟或生成程序仍在运行时可更正的错误。\n\n\n### 通过断开网络连接进行测试\n\n\n可以测试重试逻辑的方法，就是在程序运行时断中客户端计算机与网络的连接。错误将是：\n- **SqlException.Number** = 11001\n- 消息：“没有此类已知的主机”\n\n\n首次重试时，程序可以更正拼写错误，然后尝试连接。\n\n\n若要使此操作可行，请从网络中断开计算机的连接，再启动你的程序。然后，你的程序将识别导致它执行以下操作的运行时参数：\n1. 暂时将 11001 添加到视为暂时性故障的错误列表。\n2. 像往常一样尝试首次连接。\n3. 在捕获该错误后，从列表中删除 11001。\n4. 显示一条消息，提示用户将计算机接入网络。\n - 使用 **Console.ReadLine** 方法或包含“确定”按钮的对话框暂停进一步的执行。将计算机接入网络后，用户按 Enter 键。\n5. 重新尝试连接，预期将会成功。\n\n\n### 通过在连接时拼错数据库名称进行测试\n\n\n在首次连接尝试之前，程序可以故意拼错用户名。错误将是：\n- **SqlException.Number** = 18456 \n- 消息：“用户 'WRONG\\_MyUserName' 登录失败。”\n\n\n首次重试时，程序可以更正拼写错误，然后尝试连接。\n\n\n若要使此操作可行，你的程序可以识别导致它执行以下操作的运行时参数：\n1. 暂时将 18456 添加到视为暂时性故障的错误列表。\n2. 故意将“WRONG\\_”添加到用户名。\n3. 在捕获该错误后，从列表中删除 18456。\n4. 从用户名中删除“WRONG\\_”。\n5. 重新尝试连接，预期将会成功。\n\n\n<a id=\"a-connection-connection-string\" name=\"a-connection-connection-string\"></a>\n\n## 连接：连接字符串\n\n\n连接到 Azure SQL 数据库所需的连接字符串与连接到 Microsoft SQL Server 所需的字符串稍有不同。可以从 [Azure 门户](http://manage.windowsazure.cn)复制数据库的连接字符串。\n\n\n[AZURE.INCLUDE [sql-database-include-connection-string-20-portalshots](../includes/sql-database-include-connection-string-20-portalshots.md)]\n\n\n\n### 连接重试的 .NET SqlConnection 参数\n\n\n如果客户端程序使用 .NET Framework 类 **System.Data.SqlClient.SqlConnection** 连接 Azure SQL 数据库，应使用 .NET 4.6.1 或更高版本，以便可以利用其连接重试功能。该功能的详细信息在[此处](http://go.microsoft.com/fwlink/?linkid=393996)。\n\n\n<!--\n2015-11-30, FwLink 393996 points to dn632678.aspx, which links to a downloadable .docx related to SqlClient and SQL Server 2014.\n-->\n\n\n为 **SqlConnection** 对象生成[连接字符串](http://msdn.microsoft.com/zh-cn/library/System.Data.SqlClient.SqlConnection.connectionstring.aspx)时，应在以下参数之间协调值：\n\n- ConnectRetryCount &nbsp;&nbsp;*（默认值为 0。范围是从 0 到 255。）*\n- ConnectRetryInterval &nbsp;&nbsp;*（默认值为 1 秒。范围是从 1 到 60。）*\n- 连接超时值 &nbsp;&nbsp;*（默认值为 15 秒。范围是从 0 到 2147483647）*\n\n\n具体而言，所选的值应使以下等式成立：\n\n- 连接超时值 = ConnectRetryCount * ConnectionRetryInterval\n\n例如，如果计数 = 3 且间隔 = 10 秒，超时值仅为 29 秒未给系统足够的时间进行其第三次也是最后一次连接重试，因为：29 < 3 * 10。\n\n\n#### 连接与命令\n\n\n**ConnectRetryCount** 和 **ConnectRetryInterval** 参数使 **SqlConnection** 对象在重试连接操作时不用通知或麻烦你的程序（例如，将控制权返还给你的程序）。在以下情况下可能会进行重试：\n\n- mySqlConnection.Open 方法调用\n- mySqlConnection.Execute 方法调用\n\n有个很微妙的地方。如果你正在执行*查询*时发生暂时性故障，**SqlConnection** 对象不会重试连接操作，因而肯定不会重试你的查询。但是，**SqlConnection** 在发送要执行的查询前会非常快速地检查连接。如果快速检查检测到连接问题，**SqlConnection** 会重试连接操作。如果重试成功，则会发送查询以执行。\n\n\n#### ConnectRetryCount 是否应结合应用程序重试逻辑？\n\n假设你的应用程序具有功能强大的自定义重试逻辑。它可能会重试连接操作 4 次。如果你将 **ConnectRetryInterval** 和 **ConnectRetryCount** = 3 添加到连接字符串，则将重试计数提高到 4 * 3 = 12 次重试。你可能未打算重试这么多次。\n\n\n\n<a id=\"b-connection-ip-address\" name=\"b-connection-ip-address\"></a>\n\n## 连接：IP 地址\n\n\n必须将 SQL 数据库服务器配置为接受来自托管客户端程序的计算机的通信。为此，可以通过 [Azure 门户](http://manage.windowsazure.cn)编辑防火墙设置。\n\n\n如果你忘记了配置 IP 地址，你的程序将失败，并显示简单的错误消息，指出所需的 IP 地址。\n\n\n[AZURE.INCLUDE [sql-database-include-ip-address-22-v12portal](../includes/sql-database-include-ip-address-22-v12portal.md)]\n\n\n有关详细信息，请参阅\n[如何：在 SQL 数据库上配置防火墙设置](/documentation/articles/sql-database-configure-firewall-settings)\n\n\n<a id=\"c-connection-ports\" name=\"c-connection-ports\"></a>\n\n## 连接：端口\n\n\n通常，只需确保在托管客户端程序的计算机上已打开端口 1433 进行出站通信。\n\n\n例如，当客户端程序托管在 Windows 计算机上时，主机上的 Windows 防火墙允许你打开端口 1433：\n\n\n1. 打开“控制面板”\n2. &gt;“所有控制面板项”\n3. &gt;“Windows 防火墙”\n4. &gt;“高级设置”\n5. &gt;“出站规则”\n6. &gt;“操作”\n7. &gt;“新建规则”\n\n\n如果你的客户端程序托管在 Azure 虚拟机 (VM) 上，你应该阅读：<br/>[用于 ADO.NET 4.5 和 SQL 数据库 V12 的非 1433 端口](/documentation/articles/sql-database-develop-direct-route-ports-adonet-v12)。\n\n\n有关配置端口和 IP 地址的背景信息，请参阅：\n[Azure SQL 数据库防火墙](/documentation/articles/sql-database-firewall-configure)\n\n\n<a id=\"d-connection-ado-net-4-5\" name=\"d-connection-ado-net-4-5\"></a>\n\n## 连接：ADO.NET 4.6.1\n\n\n如果你的程序使用 **System.Data.SqlClient.SqlConnection** 等 ADO.NET 类来连接到 Azure SQL 数据库，我们建议使用 .NET Framework 4.6.1 或更高版本。\n\n\nADO.NET 4.6.1：\n- 添加了对 TDS 7.4 协议的支持。这包括 4.0 所不具备的连接增强功能。\n- 支持连接池。这包括有效验证提供给程序的连接对象是否正常运行的功能。\n\n\n如果你要从连接池使用连接对象，我们建议，如果程序未立即使用连接，应暂时关闭连接。重新打开连接比创建新连接的开销更低。\n\n\n如果使用的是 ADO.NET 4.0 或更旧版本，我们建议升级到最新的 ADO.NET。\n- 从 2015年 11 月开始，你可以[下载 ADO.NET 4.6.1](http://blogs.msdn.com/b/dotnet/archive/2015/11/30/net-framework-4-6-1-is-now-available.aspx)。\n\n\n<a id=\"e-diagnostics-test-utilities-connect\" name=\"e-diagnostics-test-utilities-connect\"></a>\n\n## 诊断：测试实用程序是否可以连接\n\n\n如果你的程序无法连接到 Azure SQL 数据库，有一个诊断选项可让你尝试使用一个实用程序来进行连接。理想的情况下，该实用程序将使用你的程序所用的同一个库进行连接。\n\n\n在任何 Windows 计算机上，都可以尝试使用这些实用程序：\n- SQL Server Management Studio (ssms.exe)，它使用 ADO.NET 进行连接。\n- sqlcmd.exe，它使用 [ODBC](http://msdn.microsoft.com/zh-cn/library/jj730308.aspx) 进行连接。\n\n\n完成连接后，测试一个简短的 SQL SELECT 查询是否可以正常工作。\n\n\n<a id=\"f-diagnostics-check-open-ports\" name=\"f-diagnostics-check-open-ports\"></a>\n\n## 诊断：检查打开的端口\n\n\n假设你怀疑连接尝试由于端口问题而失败。在你的计算机上，可以运行报告端口配置的实用程序。\n\n\n在 Linux 上，以下实用程序可能很有用：\n    netstat -nap\n    nmap -sS -O 127.0.0.1\n    将示例值更改为你的 IP 地址）。\n\n\n在 Windows 上，[PortQry.exe](http://www.microsoft.com/en-us/download/details.aspx?id=17148) 实用程序可能很有用。以下是在 Azure SQL 数据库服务器上查询端口情况，以及在便携式计算机上运行的的示例执行：\n \n\n    [C:\\Users\\johndoe]\n    >> portqry.exe -n johndoesvr9.database.chinacloudapi.cn -p tcp -e 1433\n    \n    Querying target system called:\n     johndoesvr9.database.chinacloudapi.cn\n    \n    Attempting to resolve name to IP address...\n    Name resolved to 23.100.117.95\n    \n    querying...\n    TCP port 1433 (ms-sql-s service): LISTENING\n    \n    [C:\\Users\\johndoe]\n    >>\n\n\n\n<a id=\"g-diagnostics-log-your-errors\" name=\"g-diagnostics-log-your-errors\"></a>\n\n## 诊断：记录你的错误\n\n\n有时，诊断间歇性问题的最好方式是每隔数天或数周检测常规模式。\n\n\n你的客户端可以通过记录其所遇到的所有错误来帮助你进行诊断。你可以将日志条目与 Azure SQL 数据库本身内部记录的错误数据相关联。\n\n\nEnterprise Library 6 (EntLib60) 提供了 .NET 托管类来帮助进行日志记录：\n- [5 - 像滚圆木一样容易：使用日志记录应用程序块](http://msdn.microsoft.com/zh-cn/library/dn440731.aspx)\n\n\n<a id=\"h-diagnostics-examine-logs-errors\" name=\"h-diagnostics-examine-logs-errors\"></a>\n\n## 诊断：在系统日志中检查错误\n\n\n下面是在日志中查询错误和其他信息的一些 Transact-SQL SELECT 语句。\n\n\n| 日志查询 | 说明 |\n| :-- | :-- |\n| `SELECT e.*`<br/>`FROM sys.event_log AS e`<br/>`WHERE e.database_name = 'myDbName'`<br/>`AND e.event_category = 'connectivity'`<br/>`AND 2 >= DateDiff`<br/>&nbsp;&nbsp;`(hour, e.end_time, GetUtcDate())`<br/>`ORDER BY e.event_category,`<br/>&nbsp;&nbsp;`e.event_type, e.end_time;` | [sys.event\\_log](http://msdn.microsoft.com/zh-cn/library/dn270018.aspx) 视图提供单个事件的相关信息，包括可能导致暂时性故障或连接失败的一些事件。<br/><br/>理想的情况下，可以将 **start\\_time** 或 **end\\_time** 值与有关客户端程序何时遇到问题的信息相关联。<br/><br/>**提示：**必须连接到 **master** 数据库才能运行此操作。 |\n| `SELECT c.*`<br/>`FROM sys.database_connection_stats AS c`<br/>`WHERE c.database_name = 'myDbName'`<br/>`AND 24 >= DateDiff`<br/>&nbsp;&nbsp;`(hour, c.end_time, GetUtcDate())`<br/>`ORDER BY c.end_time;` | [sys.database\\_connection\\_stats](http://msdn.microsoft.com/zh-cn/library/dn269986.aspx) 视图针对其他诊断提供事件类型的聚合计数。<br/><br/>**提示：**必须连接到 **master** 数据库才能运行此操作。 |\n\n\n### 诊断：在 SQL 数据库日志中搜索问题事件\n\n\n可以在 Azure SQL 数据库的日志中搜索有关问题事件的条目。在 **master** 数据库中尝试运行以下 Transact-SQL SELECT 语句：\n\n\n```\nSELECT\n   object_name\n  ,CAST(f.event_data as XML).value\n      ('(/event/@timestamp)[1]', 'datetime2')                      AS [timestamp]\n  ,CAST(f.event_data as XML).value\n      ('(/event/data[@name=\"error\"]/value)[1]', 'int')             AS [error]\n  ,CAST(f.event_data as XML).value\n      ('(/event/data[@name=\"state\"]/value)[1]', 'int')             AS [state]\n  ,CAST(f.event_data as XML).value\n      ('(/event/data[@name=\"is_success\"]/value)[1]', 'bit')        AS [is_success]\n  ,CAST(f.event_data as XML).value\n      ('(/event/data[@name=\"database_name\"]/value)[1]', 'sysname') AS [database_name]\nFROM\n  sys.fn_xe_telemetry_blob_target_read_file('el', null, null, null) AS f\nWHERE\n  object_name != 'login_event'  -- Login events are numerous.\n  and\n  '2015-06-21' < CAST(f.event_data as XML).value\n        ('(/event/@timestamp)[1]', 'datetime2')\nORDER BY\n  [timestamp] DESC\n;\n```\n\n\n#### 将返回 sys.fn\\_xe\\_telemetry\\_blob\\_target\\_read\\_file 中的若干行\n\n\n下面是返回行的类似内容。显示的 null 值在其他行中通常不是 null。\n\n\n```\nobject_name                   timestamp                    error  state  is_success  database_name\n\ndatabase_xml_deadlock_report  2015-10-16 20:28:01.0090000  NULL   NULL   NULL        AdventureWorks\n```\n\n\n<a id=\"l-enterprise-library-6\" name=\"l-enterprise-library-6\"></a>\n\n## Enterprise Library 6\n\n\nEnterprise Library 6 (EntLib60) 是 .NET 类的框架，可帮助你实施云服务（包括 Azure SQL 数据库服务）的稳健客户端。首先，可以访问 [Enterprise Library 6 – 2013年 4 月](http://msdn.microsoft.com/zh-cn/library/dn169621%28v=pandp.60%29.aspx)，找到 EntLib60 可以提供帮助的每个领域的相关专题\n\n\n处理暂时性故障的重试逻辑是 EntLib60 可以帮助的一个领域：\n- [4 - 锲而不舍是所有成功的秘诀：使用暂时性故障处理应用程序块](http://msdn.microsoft.com/zh-cn/library/dn440719%28v=pandp.60%29.aspx)\n\n\n以下位置提供了在其重试逻辑中使用 EntLib60 的简短 C# 代码示例：\n- [代码示例：Enterprise Library 6 中用于连接到 SQL 数据库的 C# 重试逻辑](/documentation/articles/sql-database-develop-entlib-csharp-retry-windows)\n\n\n> [AZURE.NOTE] EntLib60 的源代码可公开[下载](http://go.microsoft.com/fwlink/p/?LinkID=290898)。Microsoft 不打算对 EntLib 做进一步的功能或维护更新。\n\n\n### 用于暂时性故障和重试的 EntLib60 类\n\n\n以下 EntLib60 类对重试逻辑特别有用。所有这些类都包含在 **Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling** 命名空间或其子级中：\n\n*在命名空间 **Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling** 中：*\n\n- **RetryPolicy** 类\n - **ExecuteAction** 方法\n\n\n- **ExponentialBackoff** 类\n\n\n- **SqlDatabaseTransientErrorDetectionStrategy** 类\n\n\n- **ReliableSqlConnection** 类\n - **ExecuteCommand** 方法\n\n\n在命名空间 **Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling.TestSupport** 中：\n\n- **AlwaysTransientErrorDetectionStrategy** 类\n\n- **NeverTransientErrorDetectionStrategy** 类\n\n\n以下是 EntLib60 相关信息的链接：\n\n- 免费[书籍下载：Microsoft Enterprise Library 版本 2 开发人员指南](http://www.microsoft.com/en-us/download/details.aspx?id=41145)\n\n- [Enterprise Library - 暂时性故障处理应用程序块 6.0](http://www.nuget.org/packages/EnterpriseLibrary.TransientFaultHandling) 的 NuGet 下载\n\n\n### EntLib60：日志记录块\n\n\n- 日志记录块是极其灵活且可配置的解决方案，可让你：\n - 创建日志消息并将其存储在各种不同的位置。\n - 分类与筛选消息。\n - 收集有助于调试和跟踪的上下文信息，以及用于满足审核和一般日志记录要求的上下文信息。\n\n\n- 日志记录块可以从日志目标抽象化日志记录功能，使应用程序代码保持一致，无论目标日志记录存储的位置和类型为何。\n\n\n有关详细信息，请参阅：\n[5 - 像滚圆木一样容易：使用日志记录应用程序块](https://msdn.microsoft.com/zh-cn/library/dn440731%28v=pandp.60%29.aspx)\n\n\n### EntLib60 IsTransient 方法的源代码\n\n\n接下来，**SqlDatabaseTransientErrorDetectionStrategy** 类包含 **IsTransient** 方法的 C# 源代码。该源代码阐明了哪些错误被视为暂时性错误并值得重试（从 2013 年 4 月起）。\n\n为了注重易读性，我们在此副本中删除了大量的 **//comment** 行。\n\n    \n    public bool IsTransient(Exception ex)\n    {\n      if (ex != null)\n      {\n        SqlException sqlException;\n        if ((sqlException = ex as SqlException) != null)\n        {\n          // Enumerate through all errors found in the exception.\n          foreach (SqlError err in sqlException.Errors)\n          {\n            switch (err.Number)\n            {\n                // SQL Error Code: 40501\n                // The service is currently busy. Retry the request after 10 seconds.\n                // Code: (reason code to be decoded).\n              case ThrottlingCondition.ThrottlingErrorNumber:\n                // Decode the reason code from the error message to\n                // determine the grounds for throttling.\n                var condition = ThrottlingCondition.FromError(err);\n    \n                // Attach the decoded values as additional attributes to\n                // the original SQL exception.\n                sqlException.Data[condition.ThrottlingMode.GetType().Name] =\n                  condition.ThrottlingMode.ToString();\n                sqlException.Data[condition.GetType().Name] = condition;\n    \n                return true;\n    \n              case 10928:\n              case 10929:\n              case 10053:\n              case 10054:\n              case 10060:\n              case 40197:\n              case 40540:\n              case 40613:\n              case 40143:\n              case 233:\n              case 64:\n                // DBNETLIB Error Code: 20\n                // The instance of SQL Server you attempted to connect to\n                // does not support encryption.\n              case (int)ProcessNetLibErrorCode.EncryptionNotSupported:\n                return true;\n            }\n          }\n        }\n        else if (ex is TimeoutException)\n        {\n          return true;\n        }\n        else\n        {\n          EntityException entityException;\n          if ((entityException = ex as EntityException) != null)\n          {\n            return this.IsTransient(entityException.InnerException);\n          }\n        }\n      }\n    \n      return false;\n    }\n\n\n\n## 详细信息\n\n\n- [SQL Server 连接池 (ADO.NET)](http://msdn.microsoft.com/zh-cn/library/8xx3tyca.aspx)\n\n\n- [*重试*是 Apache 2.0 授权的通用重试库，它以 **Python** 编写，可以简化向几乎任何程序添加重试行为的任务。](https://pypi.python.org/pypi/retrying)\n\n<!---HONumber=Mooncake_0215_2016-->\n"
+}

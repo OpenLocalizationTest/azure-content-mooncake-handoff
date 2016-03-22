@@ -1,0 +1,887 @@
+{
+  "nodes": [
+    {
+      "content": "使用 Azure 管理门户可创建通道，以执行从单比特率到多比特率流的实时编码",
+      "pos": [
+        28,
+        66
+      ]
+    },
+    {
+      "content": "本教程将指导你使用 Azure 管理门户完成创建通道的步骤，该通道接收单比特率实时流，并将其编码为多比特率流。",
+      "pos": [
+        86,
+        141
+      ]
+    },
+    {
+      "content": "使用 Azure 管理门户可创建通道，以执行从单比特率到多比特率流的实时编码",
+      "pos": [
+        368,
+        406
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        410,
+        426
+      ]
+    },
+    {
+      "content": "门户",
+      "pos": [
+        430,
+        432
+      ]
+    },
+    {
+      "content": ".NET",
+      "pos": [
+        522,
+        526
+      ]
+    },
+    {
+      "content": "REST API",
+      "pos": [
+        616,
+        624
+      ]
+    },
+    {
+      "pos": [
+        689,
+        735
+      ],
+      "content": "本教程将指导你完成创建<bpt id=\"p1\">**</bpt>频道<ept id=\"p1\">**</ept>的步骤，该频道接收单比特率实时流，并将其编码为多比特率流。"
+    },
+    {
+      "pos": [
+        738,
+        881
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如需与能够进行实时编码的频道相关的更多概念信息，请参阅 <bpt id=\"p1\">[</bpt>使用执行从单比特率到多比特率流的实时编码的频道<ept id=\"p1\">](/documentation/articles/media-services-manage-live-encoder-enabled-channels)</ept>。"
+    },
+    {
+      "content": "常见的实时流方案",
+      "pos": [
+        885,
+        893
+      ]
+    },
+    {
+      "content": "以下是在创建常见的实时流应用程序时涉及的常规步骤。",
+      "pos": [
+        895,
+        920
+      ]
+    },
+    {
+      "pos": [
+        923,
+        1010
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 目前，实时事件的最大建议持续时间为 8 小时。如果你需要运行一个需要更长时间的频道，请通过 WindowsAzure.cn 联系 amslived。"
+    },
+    {
+      "pos": [
+        1015,
+        1217
+      ],
+      "content": "将视频摄像机连接到计算机。启动并配置可以通过以下协议之一输出单比特率流的本地实时编码器：RTMP、平滑流式处理或 RTP (MPEG-TS)。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 媒体服务 RTMP 支持和实时编码器<ept id=\"p1\">](https://azure.microsoft.com/zh-cn/blog/azure-media-services-rtmp-support-and-live-encoders/)</ept>。"
+    },
+    {
+      "content": "此步骤也可以在创建频道后执行。",
+      "pos": [
+        1227,
+        1242
+      ]
+    },
+    {
+      "content": "创建并启动频道。",
+      "pos": [
+        1247,
+        1255
+      ]
+    },
+    {
+      "content": "检索频道引入 URL。",
+      "pos": [
+        1260,
+        1271
+      ]
+    },
+    {
+      "content": "实时编码器使用引入 URL 将流发送到频道。",
+      "pos": [
+        1277,
+        1299
+      ]
+    },
+    {
+      "content": "检索频道预览 URL。",
+      "pos": [
+        1303,
+        1314
+      ]
+    },
+    {
+      "content": "使用此 URL 来验证频道是否正常接收实时流。",
+      "pos": [
+        1321,
+        1344
+      ]
+    },
+    {
+      "content": "创建节目（这同时还会创建一个资源）。",
+      "pos": [
+        1349,
+        1367
+      ]
+    },
+    {
+      "content": "发布节目（这将为关联的资源创建按需定位符）。",
+      "pos": [
+        1371,
+        1393
+      ]
+    },
+    {
+      "content": "确保你要从中以流形式传输内容的流式传输终结点上至少有一个流式传输保留单元。",
+      "pos": [
+        1401,
+        1438
+      ]
+    },
+    {
+      "content": "在准备好开始流式传输和存档时，启动节目。",
+      "pos": [
+        1442,
+        1462
+      ]
+    },
+    {
+      "content": "（可选）可以向实时编码器发信号，以启动广告。将广告插入到输出流中。",
+      "pos": [
+        1466,
+        1499
+      ]
+    },
+    {
+      "content": "在要停止对事件进行流式传输和存档时，停止节目。",
+      "pos": [
+        1503,
+        1526
+      ]
+    },
+    {
+      "content": "删除节目（并选择性地删除资产）。",
+      "pos": [
+        1530,
+        1546
+      ]
+    },
+    {
+      "content": "本教程的内容",
+      "pos": [
+        1553,
+        1559
+      ]
+    },
+    {
+      "content": "在本教程中，将使用 Azure 管理门户完成以下任务：",
+      "pos": [
+        1561,
+        1588
+      ]
+    },
+    {
+      "content": "配置流式处理终结点。",
+      "pos": [
+        1594,
+        1604
+      ]
+    },
+    {
+      "content": "创建能够执行实时编码的频道。",
+      "pos": [
+        1609,
+        1623
+      ]
+    },
+    {
+      "content": "获取引入 URL，以便将其提供给实时编码器。实时编码器将使用此 URL 将流引入频道。",
+      "pos": [
+        1628,
+        1671
+      ]
+    },
+    {
+      "content": "创建节目（和资产）",
+      "pos": [
+        1676,
+        1685
+      ]
+    },
+    {
+      "content": "发布资产并获取流 URL",
+      "pos": [
+        1690,
+        1702
+      ]
+    },
+    {
+      "content": "播放内容",
+      "pos": [
+        1709,
+        1713
+      ]
+    },
+    {
+      "content": "清理",
+      "pos": [
+        1719,
+        1721
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        1725,
+        1729
+      ]
+    },
+    {
+      "content": "以下是完成本教程所需具备的条件。",
+      "pos": [
+        1730,
+        1746
+      ]
+    },
+    {
+      "pos": [
+        1750,
+        1846
+      ],
+      "content": "若要完成本教程，你需要一个 Azure 帐户。如果你没有帐户，可以创建一个试用帐户，只需几分钟即可完成。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 试用<ept id=\"p1\">](/pricing/1rmb-trial/)</ept>。"
+    },
+    {
+      "pos": [
+        1849,
+        1934
+      ],
+      "content": "一个媒体服务帐户。若要创建媒体服务帐户，请参阅<bpt id=\"p1\">[</bpt>创建帐户<ept id=\"p1\">](/documentation/articles/media-services-create-account)</ept>。"
+    },
+    {
+      "content": "可以发送单比特率实时流的摄像头和编码器。",
+      "pos": [
+        1937,
+        1957
+      ]
+    },
+    {
+      "content": "使用门户配置流式处理终结点",
+      "pos": [
+        1961,
+        1974
+      ]
+    },
+    {
+      "content": "使用 Azure 媒体服务时最常见的方案之一是将自适应比特率流传送至你的客户端。通过自适应比特率流，客户端可以在视频显示时，根据当前网络带宽、CPU 利用率和其他因素，切换至较高或较低的比特率流。媒体服务支持以下自适应比特率流式处理技术：HTTP 实时流式处理 (HLS)、平滑流式处理、MPEG DASH 和 HDS（仅适用于 Adobe PrimeTime/Access 许可证持有人）。",
+      "pos": [
+        1976,
+        2172
+      ]
+    },
+    {
+      "content": "使用实时流时，本地实时编码器（在本例中为 Wirecast）会将多比特率实时流引入你的通道。当用户请求流时，媒体服务会使用动态打包将源流重新打包成自适应比特率流（HLS、DASH 或平滑流）。",
+      "pos": [
+        2174,
+        2270
+      ]
+    },
+    {
+      "pos": [
+        2272,
+        2318
+      ],
+      "content": "若要利用动态打包，你需要获取计划从中传送内容的<bpt id=\"p1\">**</bpt>流式处理终结点<ept id=\"p1\">**</ept>的至少一个流式处理单元。"
+    },
+    {
+      "content": "若要更改流式处理保留单元数，请执行以下操作：",
+      "pos": [
+        2320,
+        2342
+      ]
+    },
+    {
+      "pos": [
+        2347,
+        2417
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">](https://manage.windowsazure.cn/)</ept>中单击“媒体服务”。然后，单击媒体服务的名称。"
+    },
+    {
+      "content": "选择“流式处理终结点”页。然后，单击要修改的流式处理终结点。",
+      "pos": [
+        2422,
+        2452
+      ]
+    },
+    {
+      "pos": [
+        2457,
+        2495
+      ],
+      "content": "若要指定流式处理单元数，请选择“缩放”选项卡并移动<bpt id=\"p1\">**</bpt>“保留容量”<ept id=\"p1\">**</ept>滑块。"
+    },
+    {
+      "content": "“缩放”页",
+      "pos": [
+        2503,
+        2508
+      ]
+    },
+    {
+      "content": "按“保存”按钮保存更改。",
+      "pos": [
+        2615,
+        2627
+      ]
+    },
+    {
+      "content": "分配所有新的单元大约需要 20 分钟才能完成。",
+      "pos": [
+        2633,
+        2656
+      ]
+    },
+    {
+      "pos": [
+        2669,
+        2721
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 当前，将流式处理单位的任何正值设置回“无”可将流式处理功能禁用最多 1 小时。"
+    },
+    {
+      "pos": [
+        2734,
+        2822
+      ],
+      "content": "为 24 小时期间指定的最大单位数将用于计算成本。有关定价详细信息，请参阅<bpt id=\"p1\">[</bpt>媒体服务定价详细信息<ept id=\"p1\">](/home/features/media-services/#price)</ept>。"
+    },
+    {
+      "pos": [
+        2828,
+        2861
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"create-a-channel\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>创建频道"
+    },
+    {
+      "pos": [
+        2867,
+        2936
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">](http://manage.windowsazure.cn/)</ept>中，单击“媒体服务”，然后单击媒体服务帐户名。"
+    },
+    {
+      "content": "选择“频道”页。",
+      "pos": [
+        2941,
+        2949
+      ]
+    },
+    {
+      "content": "选择“添加+”以添加新频道。",
+      "pos": [
+        2954,
+        2968
+      ]
+    },
+    {
+      "pos": [
+        2970,
+        3158
+      ],
+      "content": "选择<bpt id=\"p1\">**</bpt>“标准”<ept id=\"p1\">**</ept>编码类型。此类型指定要创建能够进行实时编码的频道。这意味着传入单比特率流将发送到频道，并使用指定的实时编码器设置编码为多比特率流。有关详细信息，请参阅<bpt id=\"p2\">[</bpt>使用执行从单比特率到多比特率流的实时编码的频道<ept id=\"p2\">](/documentation/articles/media-services-manage-live-encoder-enabled-channels)</ept>。"
+    },
+    {
+      "content": "standard0",
+      "pos": [
+        3162,
+        3171
+      ]
+    },
+    {
+      "pos": [
+        3185,
+        3211
+      ],
+      "content": "对于<bpt id=\"p1\">**</bpt>“标准”<ept id=\"p1\">**</ept>编码类型，有效引入协议选项包括："
+    },
+    {
+      "content": "单比特率分片 MP4（平滑流）",
+      "pos": [
+        3215,
+        3230
+      ]
+    },
+    {
+      "content": "单比特率 RTMP",
+      "pos": [
+        3233,
+        3242
+      ]
+    },
+    {
+      "content": "RTP (MPEG-TS)：RTP 上的 MPEG-2 传输流。",
+      "pos": [
+        3245,
+        3277
+      ]
+    },
+    {
+      "pos": [
+        3279,
+        3397
+      ],
+      "content": "有关每个协议的详细说明，请参阅<bpt id=\"p1\">[</bpt>使用执行从单比特率到多比特率流的实时编码的频道<ept id=\"p1\">](/documentation/articles/media-services-manage-live-encoder-enabled-channels)</ept>。"
+    },
+    {
+      "content": "standard1",
+      "pos": [
+        3401,
+        3410
+      ]
+    },
+    {
+      "content": "当频道或其关联的节目正在运行时，无法更改输入协议。如果你需要不同的协议，应当针对每个输入协议创建单独的频道。",
+      "pos": [
+        3424,
+        3478
+      ]
+    },
+    {
+      "pos": [
+        3480,
+        3568
+      ],
+      "content": "在<bpt id=\"p1\">**</bpt>“广告配置”<ept id=\"p1\">**</ept>页上，可以指定 Ad 标记信号源。使用门户时，只能选择“API”，它指示频道内的实时编码器应侦听异步 Ad 标记 API。使用门户时，只能选择“API”。"
+    },
+    {
+      "pos": [
+        3570,
+        3683
+      ],
+      "content": "有关详细信息，请参阅<bpt id=\"p1\">[</bpt>使用执行从单比特率到多比特率流的实时编码的频道<ept id=\"p1\">](/documentation/articles/media-services-manage-live-encoder-enabled-channels)</ept>。"
+    },
+    {
+      "content": "standard2",
+      "pos": [
+        3687,
+        3696
+      ]
+    },
+    {
+      "pos": [
+        3710,
+        3762
+      ],
+      "content": "在<bpt id=\"p1\">**</bpt>“编码预设”<ept id=\"p1\">**</ept>页上，可以选择系统预设。目前，唯一可以选择的系统预设是<bpt id=\"p2\">**</bpt>“默认 720p”<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "standard3",
+      "pos": [
+        3766,
+        3775
+      ]
+    },
+    {
+      "pos": [
+        3789,
+        3975
+      ],
+      "content": "在<bpt id=\"p1\">**</bpt>“创建频道”<ept id=\"p1\">**</ept>页上，可以定义允许将视频发布到此频道的 IP 地址。允许的 IP 地址可以指定为单个 IP 地址（例如 ‘10.0.0.1’）或指定为使用一个 IP 地址和 CIDR 子网掩码的 IP 范围（例如 ‘10.0.0.1/22’）或指定为使用一个 IP 地址和点分十进制子网掩码的 IP 范围（例如 ‘10.0.0.1(255.255.252.0)’）。"
+    },
+    {
+      "content": "如果未指定 IP 地址并且没有规则定义，则不会允许任何 IP 地址。若要允许任何 IP 地址，请创建一个规则并设置 0.0.0.0/0。",
+      "pos": [
+        3977,
+        4045
+      ]
+    },
+    {
+      "content": "standard4",
+      "pos": [
+        4050,
+        4059
+      ]
+    },
+    {
+      "pos": [
+        4074,
+        4123
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 目前，通道启动可能最多需要 30 分钟。频道重置可能最多需要 5 分钟。"
+    },
+    {
+      "pos": [
+        4125,
+        4173
+      ],
+      "content": "创建频道后，可以选择<bpt id=\"p1\">**</bpt>“编码器”<ept id=\"p1\">**</ept>选项卡，从中可以查看频道配置。此外，还可以管理广告和清单。"
+    },
+    {
+      "content": "standard5",
+      "pos": [
+        4177,
+        4186
+      ]
+    },
+    {
+      "pos": [
+        4200,
+        4313
+      ],
+      "content": "有关详细信息，请参阅<bpt id=\"p1\">[</bpt>使用执行从单比特率到多比特率流的实时编码的频道<ept id=\"p1\">](/documentation/articles/media-services-manage-live-encoder-enabled-channels)</ept>。"
+    },
+    {
+      "content": "获取引入 URL",
+      "pos": [
+        4318,
+        4326
+      ]
+    },
+    {
+      "content": "创建通道后，你可以获得要提供给实时编码器的引入 URL。编码器将使用这些 URL 来输入实时流。",
+      "pos": [
+        4328,
+        4376
+      ]
+    },
+    {
+      "content": "readychannel",
+      "pos": [
+        4380,
+        4392
+      ]
+    },
+    {
+      "content": "ingesturls",
+      "pos": [
+        4500,
+        4510
+      ]
+    },
+    {
+      "pos": [
+        4616,
+        4663
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"create-and-manage-a-program\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>创建和管理节目"
+    },
+    {
+      "content": "概述",
+      "pos": [
+        4668,
+        4670
+      ]
+    },
+    {
+      "content": "频道与节目相关联，使用节目，你可以控制实时流中的段的发布和存储。通道管理节目。频道和节目的关系非常类似于传统媒体，频道具有恒定的内容流，而节目的范围限定为该频道上的一些定时事件。",
+      "pos": [
+        4672,
+        4761
+      ]
+    },
+    {
+      "pos": [
+        4763,
+        4924
+      ],
+      "content": "可以通过设置<bpt id=\"p1\">**</bpt>存档窗口<ept id=\"p1\">**</ept>长度，指定你希望保留节目录制内容的小时数。此值的设置范围是最短 5 分钟，最长 25 小时。存储时间窗口长度还决定了客户端能够从当前实时位置按时间向后搜索的最长时间。超出指定时间长度后，节目也能够运行，但落在时间窗口长度后面的内容将全部被丢弃。此属性的这个值还决定了客户端清单能够增加多长时间。"
+    },
+    {
+      "content": "每个节目都与某个资产关联。若要发布节目，必须为关联的资产创建按需定位符。创建此定位符后，你可以生成提供给客户端的流 URL。",
+      "pos": [
+        4926,
+        4988
+      ]
+    },
+    {
+      "content": "一个通道最多支持三个并发运行的节目，因此你可以为同一传入流创建多个存档。这样，你便可以根据需要发布和存档事件的不同部分。例如，你的业务要求是存档 6 小时的节目，但只广播过去 10 分钟的内容。为了实现此目的，你需要创建两个同时运行的节目。一个节目设置为存档 6 小时的事件但不发布该节目。另一个节目设置为存档 10 分钟的事件，并且要发布该节目。",
+      "pos": [
+        4990,
+        5164
+      ]
+    },
+    {
+      "content": "不应当将现有节目重用于新事件。而是应当为每个事件创建并启动一个新节目，如“对实时流式传输应用程序进行编程”部分中所述。",
+      "pos": [
+        5166,
+        5225
+      ]
+    },
+    {
+      "content": "在准备好开始流式传输和存档时，启动节目。在要停止对事件进行流式传输和存档时，停止节目。",
+      "pos": [
+        5227,
+        5270
+      ]
+    },
+    {
+      "content": "若要删除存档的内容，请停止并删除节目，然后删除关联的资产。如果资产被某个节目使用，则无法将其删除，必须先删除该节目。",
+      "pos": [
+        5272,
+        5330
+      ]
+    },
+    {
+      "content": "即使你停止并删除了节目，只要你没有删除资产，用户也将能够按需将你的已存档内容作为视频进行流式传输。",
+      "pos": [
+        5332,
+        5381
+      ]
+    },
+    {
+      "content": "如果希望保留已存档的内容但不希望其可供流式传输，请删除流式传输定位符。",
+      "pos": [
+        5383,
+        5418
+      ]
+    },
+    {
+      "content": "创建/启动/停止节目",
+      "pos": [
+        5423,
+        5433
+      ]
+    },
+    {
+      "content": "将流传输到通道后，你可以通过创建资产、节目和流定位符来启动流式传输事件。这将会存档流，并使观看者可通过流式处理终结点使用该流。",
+      "pos": [
+        5435,
+        5498
+      ]
+    },
+    {
+      "content": "可通过两种方式启动该事件：",
+      "pos": [
+        5500,
+        5513
+      ]
+    },
+    {
+      "pos": [
+        5518,
+        5546
+      ],
+      "content": "在<bpt id=\"p1\">**</bpt>“频道”<ept id=\"p1\">**</ept>页上，按<bpt id=\"p2\">**</bpt>“添加”<ept id=\"p2\">**</ept>以添加新节目。"
+    },
+    {
+      "content": "指定：节目名称、资产名称、存档时段和加密选项。",
+      "pos": [
+        5552,
+        5575
+      ]
+    },
+    {
+      "content": "createprogram",
+      "pos": [
+        5587,
+        5600
+      ]
+    },
+    {
+      "pos": [
+        5714,
+        5748
+      ],
+      "content": "如果保留选中<bpt id=\"p1\">**</bpt>“立即发布此节目”<ept id=\"p1\">**</ept>，将会创建节目的发布 URL。"
+    },
+    {
+      "pos": [
+        5758,
+        5782
+      ],
+      "content": "在准备好流式传输节目时，可以按<bpt id=\"p1\">**</bpt>“开始”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "启动节目后，你可以按“播放”开始播放内容。",
+      "pos": [
+        5788,
+        5809
+      ]
+    },
+    {
+      "pos": [
+        5942,
+        5997
+      ],
+      "content": "或者，可以使用快捷方式或按<bpt id=\"p1\">**</bpt>“频道”<ept id=\"p1\">**</ept>页上的<bpt id=\"p2\">**</bpt>“开始流式传输”<ept id=\"p2\">**</ept>按钮。这将会创建资产、节目和流定位符。"
+    },
+    {
+      "content": "节目命名为 DefaultProgram，存档时段设置为 1 小时。",
+      "pos": [
+        6003,
+        6037
+      ]
+    },
+    {
+      "content": "你可以从“通道”页播放发布的节目。",
+      "pos": [
+        6043,
+        6060
+      ]
+    },
+    {
+      "content": "channelpublish",
+      "pos": [
+        6068,
+        6082
+      ]
+    },
+    {
+      "pos": [
+        6187,
+        6259
+      ],
+      "content": "如果你在<bpt id=\"p1\">**</bpt>“频道”<ept id=\"p1\">**</ept>页上单击<bpt id=\"p2\">**</bpt>“停止流式传输”<ept id=\"p2\">**</ept>，将会停止并删除默认节目。资源仍在那里，并且你可以从<bpt id=\"p3\">**</bpt>“内容”<ept id=\"p3\">**</ept>页发布或取消发布它。"
+    },
+    {
+      "pos": [
+        6261,
+        6290
+      ],
+      "content": "如果你切换到<bpt id=\"p1\">**</bpt>“内容”<ept id=\"p1\">**</ept>页，你将看到为节目创建的资源。"
+    },
+    {
+      "content": "contentasset",
+      "pos": [
+        6294,
+        6306
+      ]
+    },
+    {
+      "content": "播放内容",
+      "pos": [
+        6415,
+        6419
+      ]
+    },
+    {
+      "content": "若要为用户提供一个可用来流式传输内容的 URL，你首先需要通过创建定位符（当你使用门户发布资源时，系统已经为你创建了定位符）来“发布”资源（如上一部分中所述）。定位符提供对资产中所含文件的访问权限。",
+      "pos": [
+        6421,
+        6520
+      ]
+    },
+    {
+      "pos": [
+        6522,
+        6577
+      ],
+      "content": "根据你要用来播放内容的流式处理协议，你可能需要修改从频道\\\\节目的<bpt id=\"p1\">**</bpt>“发布 URL”<ept id=\"p1\">**</ept>链接获取的 URL。"
+    },
+    {
+      "content": "动态打包负责将实时流打包成指定的协议。",
+      "pos": [
+        6579,
+        6598
+      ]
+    },
+    {
+      "content": "默认情况下，流 URL 采用以下格式，你可以用它来播放平滑流资产：",
+      "pos": [
+        6600,
+        6633
+      ]
+    },
+    {
+      "content": "若要生成 HLS 流 URL，请将 (format=m3u8-aapl) 附加到 URL。",
+      "pos": [
+        6772,
+        6817
+      ]
+    },
+    {
+      "content": "若要生成 MPEG DASH 流 URL，请将 (format=mpd-time-csf) 追加到 URL。",
+      "pos": [
+        6974,
+        7028
+      ]
+    },
+    {
+      "pos": [
+        7188,
+        7275
+      ],
+      "content": "有关传送内容的详细信息，请参阅<bpt id=\"p1\">[</bpt>传送内容<ept id=\"p1\">](/documentation/articles/media-services-deliver-content-overview)</ept>。"
+    },
+    {
+      "pos": [
+        7277,
+        7388
+      ],
+      "content": "你可以使用 <bpt id=\"p1\">[</bpt>AMS 播放器<ept id=\"p1\">](http://amsplayer.azurewebsites.net/azuremediaplayer.html)</ept>播放平滑流，或使用 iOS 和 Android 设备播放 HLS 版本 3。"
+    },
+    {
+      "content": "清理",
+      "pos": [
+        7392,
+        7394
+      ]
+    },
+    {
+      "content": "如果你已完成流式处理事件，并想要清理先前设置的资源，请遵循以下过程。",
+      "pos": [
+        7396,
+        7430
+      ]
+    },
+    {
+      "content": "停止从编码器推送流。",
+      "pos": [
+        7434,
+        7444
+      ]
+    },
+    {
+      "content": "停止通道。停止通道后，将不会产生任何费用。当你需要重新启动它时，它将采用相同的引入 URL，因此你无需重新配置编码器。",
+      "pos": [
+        7447,
+        7506
+      ]
+    },
+    {
+      "content": "除非你想要继续以点播流形式提供实时事件的存档，否则你可以停止流式处理终结点。如果通道处于停止状态，将不会产生任何费用。",
+      "pos": [
+        7509,
+        7568
+      ]
+    },
+    {
+      "content": "注意事项",
+      "pos": [
+        7575,
+        7579
+      ]
+    },
+    {
+      "content": "目前，实时事件的最大建议持续时间为 8 小时。如果你需要运行一个需要更长时间的频道，请通过 WindowsAzure.cn 联系 amslived。",
+      "pos": [
+        7583,
+        7657
+      ]
+    },
+    {
+      "content": "确保你要从中以流形式传输内容的流式传输终结点上至少有一个流式传输保留单元。",
+      "pos": [
+        7660,
+        7697
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"使用 Azure 管理门户可创建通道，以执行从单比特率到多比特率流的实时编码\" \n    description=\"本教程将指导你使用 Azure 管理门户完成创建通道的步骤，该通道接收单比特率实时流，并将其编码为多比特率流。\" \n    services=\"media-services\" \n    documentationCenter=\"\" \n    authors=\"juliako,anilmur\" \n    manager=\"dwrede\" \n    editor=\"\"/>\n\n<tags\n    ms.service=\"media-services\"\n    ms.date=\"02/03/2016\"\n    wacn.date=\"03/21/2016\"/>\n\n\n#使用 Azure 管理门户可创建通道，以执行从单比特率到多比特率流的实时编码\n\n> [AZURE.SELECTOR]\n- [门户](/documentation/articles/media-services-portal-creating-live-encoder-enabled-channel)\n- [.NET](/documentation/articles/media-services-dotnet-creating-live-encoder-enabled-channel)\n- [REST API](https://msdn.microsoft.com/zh-cn/library/azure/dn783458.aspx)\n\n本教程将指导你完成创建**频道**的步骤，该频道接收单比特率实时流，并将其编码为多比特率流。\n\n>[AZURE.NOTE]如需与能够进行实时编码的频道相关的更多概念信息，请参阅 [使用执行从单比特率到多比特率流的实时编码的频道](/documentation/articles/media-services-manage-live-encoder-enabled-channels)。\n\n##常见的实时流方案\n\n以下是在创建常见的实时流应用程序时涉及的常规步骤。\n\n>[AZURE.NOTE] 目前，实时事件的最大建议持续时间为 8 小时。如果你需要运行一个需要更长时间的频道，请通过 WindowsAzure.cn 联系 amslived。\n\n1. 将视频摄像机连接到计算机。启动并配置可以通过以下协议之一输出单比特率流的本地实时编码器：RTMP、平滑流式处理或 RTP (MPEG-TS)。有关详细信息，请参阅 [Azure 媒体服务 RTMP 支持和实时编码器](https://azure.microsoft.com/zh-cn/blog/azure-media-services-rtmp-support-and-live-encoders/)。\n    \n    此步骤也可以在创建频道后执行。\n\n1. 创建并启动频道。\n\n1. 检索频道引入 URL。\n\n    实时编码器使用引入 URL 将流发送到频道。\n1. 检索频道预览 URL。 \n\n    使用此 URL 来验证频道是否正常接收实时流。\n\n3. 创建节目（这同时还会创建一个资源）。\n1. 发布节目（这将为关联的资源创建按需定位符）。  \n\n    确保你要从中以流形式传输内容的流式传输终结点上至少有一个流式传输保留单元。\n1. 在准备好开始流式传输和存档时，启动节目。\n2. （可选）可以向实时编码器发信号，以启动广告。将广告插入到输出流中。\n1. 在要停止对事件进行流式传输和存档时，停止节目。\n1. 删除节目（并选择性地删除资产）。   \n\n##本教程的内容\n\n在本教程中，将使用 Azure 管理门户完成以下任务：\n\n2.  配置流式处理终结点。\n3.  创建能够执行实时编码的频道。\n1.  获取引入 URL，以便将其提供给实时编码器。实时编码器将使用此 URL 将流引入频道。\n1.  创建节目（和资产）\n1.  发布资产并获取流 URL  \n1.  播放内容 \n2.  清理\n\n##先决条件\n以下是完成本教程所需具备的条件。\n\n- 若要完成本教程，你需要一个 Azure 帐户。如果你没有帐户，可以创建一个试用帐户，只需几分钟即可完成。有关详细信息，请参阅 [Azure 试用](/pricing/1rmb-trial/)。\n- 一个媒体服务帐户。若要创建媒体服务帐户，请参阅[创建帐户](/documentation/articles/media-services-create-account)。\n- 可以发送单比特率实时流的摄像头和编码器。\n\n##使用门户配置流式处理终结点\n\n使用 Azure 媒体服务时最常见的方案之一是将自适应比特率流传送至你的客户端。通过自适应比特率流，客户端可以在视频显示时，根据当前网络带宽、CPU 利用率和其他因素，切换至较高或较低的比特率流。媒体服务支持以下自适应比特率流式处理技术：HTTP 实时流式处理 (HLS)、平滑流式处理、MPEG DASH 和 HDS（仅适用于 Adobe PrimeTime/Access 许可证持有人）。\n\n使用实时流时，本地实时编码器（在本例中为 Wirecast）会将多比特率实时流引入你的通道。当用户请求流时，媒体服务会使用动态打包将源流重新打包成自适应比特率流（HLS、DASH 或平滑流）。\n\n若要利用动态打包，你需要获取计划从中传送内容的**流式处理终结点**的至少一个流式处理单元。\n\n若要更改流式处理保留单元数，请执行以下操作：\n\n1. 在 [Azure 管理门户](https://manage.windowsazure.cn/)中单击“媒体服务”。然后，单击媒体服务的名称。\n\n2. 选择“流式处理终结点”页。然后，单击要修改的流式处理终结点。\n\n3. 若要指定流式处理单元数，请选择“缩放”选项卡并移动**“保留容量”**滑块。\n\n    ![“缩放”页](./media/media-services-portal-creating-live-encoder-enabled-channel/media-services-origin-scale.png)\n\n4. 按“保存”按钮保存更改。\n\n    分配所有新的单元大约需要 20 分钟才能完成。\n\n     \n    >[AZURE.NOTE] 当前，将流式处理单位的任何正值设置回“无”可将流式处理功能禁用最多 1 小时。\n    >\n    > 为 24 小时期间指定的最大单位数将用于计算成本。有关定价详细信息，请参阅[媒体服务定价详细信息](/home/features/media-services/#price)。\n\n \n##<a id=\"create-a-channel\"></a>创建频道\n\n1.  在 [Azure 管理门户](http://manage.windowsazure.cn/)中，单击“媒体服务”，然后单击媒体服务帐户名。\n2.  选择“频道”页。\n3.  选择“添加+”以添加新频道。\n\n选择**“标准”**编码类型。此类型指定要创建能够进行实时编码的频道。这意味着传入单比特率流将发送到频道，并使用指定的实时编码器设置编码为多比特率流。有关详细信息，请参阅[使用执行从单比特率到多比特率流的实时编码的频道](/documentation/articles/media-services-manage-live-encoder-enabled-channels)。\n\n![standard0][standard0]\n\n对于**“标准”**编码类型，有效引入协议选项包括：\n\n- 单比特率分片 MP4（平滑流）\n- 单比特率 RTMP\n- RTP (MPEG-TS)：RTP 上的 MPEG-2 传输流。\n\n有关每个协议的详细说明，请参阅[使用执行从单比特率到多比特率流的实时编码的频道](/documentation/articles/media-services-manage-live-encoder-enabled-channels)。\n\n![standard1][standard1]\n\n当频道或其关联的节目正在运行时，无法更改输入协议。如果你需要不同的协议，应当针对每个输入协议创建单独的频道。\n\n在**“广告配置”**页上，可以指定 Ad 标记信号源。使用门户时，只能选择“API”，它指示频道内的实时编码器应侦听异步 Ad 标记 API。使用门户时，只能选择“API”。\n\n有关详细信息，请参阅[使用执行从单比特率到多比特率流的实时编码的频道](/documentation/articles/media-services-manage-live-encoder-enabled-channels)。\n\n![standard2][standard2]\n\n在**“编码预设”**页上，可以选择系统预设。目前，唯一可以选择的系统预设是**“默认 720p”**。\n\n![standard3][standard3]\n\n在**“创建频道”**页上，可以定义允许将视频发布到此频道的 IP 地址。允许的 IP 地址可以指定为单个 IP 地址（例如 ‘10.0.0.1’）或指定为使用一个 IP 地址和 CIDR 子网掩码的 IP 范围（例如 ‘10.0.0.1/22’）或指定为使用一个 IP 地址和点分十进制子网掩码的 IP 范围（例如 ‘10.0.0.1(255.255.252.0)’）。\n\n如果未指定 IP 地址并且没有规则定义，则不会允许任何 IP 地址。若要允许任何 IP 地址，请创建一个规则并设置 0.0.0.0/0。\n\n\n![standard4][standard4]\n\n>[AZURE.NOTE] 目前，通道启动可能最多需要 30 分钟。频道重置可能最多需要 5 分钟。\n\n创建频道后，可以选择**“编码器”**选项卡，从中可以查看频道配置。此外，还可以管理广告和清单。\n\n![standard5][standard5]\n\n有关详细信息，请参阅[使用执行从单比特率到多比特率流的实时编码的频道](/documentation/articles/media-services-manage-live-encoder-enabled-channels)。\n\n\n##获取引入 URL\n\n创建通道后，你可以获得要提供给实时编码器的引入 URL。编码器将使用这些 URL 来输入实时流。\n\n![readychannel](./media/media-services-portal-creating-live-encoder-enabled-channel/media-services-ready-channel.png)\n\n\n![ingesturls](./media/media-services-portal-creating-live-encoder-enabled-channel/media-services-ingest-urls.png)\n\n\n##<a id=\"create-and-manage-a-program\"></a>创建和管理节目\n\n###概述\n\n频道与节目相关联，使用节目，你可以控制实时流中的段的发布和存储。通道管理节目。频道和节目的关系非常类似于传统媒体，频道具有恒定的内容流，而节目的范围限定为该频道上的一些定时事件。\n\n可以通过设置**存档窗口**长度，指定你希望保留节目录制内容的小时数。此值的设置范围是最短 5 分钟，最长 25 小时。存储时间窗口长度还决定了客户端能够从当前实时位置按时间向后搜索的最长时间。超出指定时间长度后，节目也能够运行，但落在时间窗口长度后面的内容将全部被丢弃。此属性的这个值还决定了客户端清单能够增加多长时间。\n\n每个节目都与某个资产关联。若要发布节目，必须为关联的资产创建按需定位符。创建此定位符后，你可以生成提供给客户端的流 URL。\n\n一个通道最多支持三个并发运行的节目，因此你可以为同一传入流创建多个存档。这样，你便可以根据需要发布和存档事件的不同部分。例如，你的业务要求是存档 6 小时的节目，但只广播过去 10 分钟的内容。为了实现此目的，你需要创建两个同时运行的节目。一个节目设置为存档 6 小时的事件但不发布该节目。另一个节目设置为存档 10 分钟的事件，并且要发布该节目。\n\n不应当将现有节目重用于新事件。而是应当为每个事件创建并启动一个新节目，如“对实时流式传输应用程序进行编程”部分中所述。\n\n在准备好开始流式传输和存档时，启动节目。在要停止对事件进行流式传输和存档时，停止节目。\n\n若要删除存档的内容，请停止并删除节目，然后删除关联的资产。如果资产被某个节目使用，则无法将其删除，必须先删除该节目。\n\n即使你停止并删除了节目，只要你没有删除资产，用户也将能够按需将你的已存档内容作为视频进行流式传输。\n\n如果希望保留已存档的内容但不希望其可供流式传输，请删除流式传输定位符。\n\n###创建/启动/停止节目\n\n将流传输到通道后，你可以通过创建资产、节目和流定位符来启动流式传输事件。这将会存档流，并使观看者可通过流式处理终结点使用该流。\n\n可通过两种方式启动该事件：\n\n1. 在**“频道”**页上，按**“添加”**以添加新节目。\n\n    指定：节目名称、资产名称、存档时段和加密选项。\n    \n    ![createprogram](./media/media-services-portal-creating-live-encoder-enabled-channel/media-services-create-program.png)\n    \n    如果保留选中**“立即发布此节目”**，将会创建节目的发布 URL。\n    \n    在准备好流式传输节目时，可以按**“开始”**。\n\n    启动节目后，你可以按“播放”开始播放内容。\n\n\n    ![createdprogram](./media/media-services-portal-creating-live-encoder-enabled-channel/media-services-created-program.png)\n\n2. 或者，可以使用快捷方式或按**“频道”**页上的**“开始流式传输”**按钮。这将会创建资产、节目和流定位符。\n\n    节目命名为 DefaultProgram，存档时段设置为 1 小时。\n\n    你可以从“通道”页播放发布的节目。\n\n    ![channelpublish](./media/media-services-portal-creating-live-encoder-enabled-channel/media-services-channel-play.png)\n\n\n如果你在**“频道”**页上单击**“停止流式传输”**，将会停止并删除默认节目。资源仍在那里，并且你可以从**“内容”**页发布或取消发布它。\n\n如果你切换到**“内容”**页，你将看到为节目创建的资源。\n\n![contentasset](./media/media-services-portal-creating-live-encoder-enabled-channel/media-services-content-assets.png)\n\n\n##播放内容\n\n若要为用户提供一个可用来流式传输内容的 URL，你首先需要通过创建定位符（当你使用门户发布资源时，系统已经为你创建了定位符）来“发布”资源（如上一部分中所述）。定位符提供对资产中所含文件的访问权限。\n\n根据你要用来播放内容的流式处理协议，你可能需要修改从频道\\\\节目的**“发布 URL”**链接获取的 URL。\n\n动态打包负责将实时流打包成指定的协议。\n\n默认情况下，流 URL 采用以下格式，你可以用它来播放平滑流资产：\n\n    {streaming endpoint name-media services account name}.streaming.mediaservices.chinacloudapi.cn/{locator ID}/{filename}.ism/Manifest\n\n若要生成 HLS 流 URL，请将 (format=m3u8-aapl) 附加到 URL。\n\n    {streaming endpoint name-media services account name}.streaming.mediaservices.chinacloudapi.cn/{locator ID}/{filename}.ism/Manifest(format=m3u8-aapl)\n\n若要生成 MPEG DASH 流 URL，请将 (format=mpd-time-csf) 追加到 URL。\n\n    {streaming endpoint name-media services account name}.streaming.mediaservices.chinacloudapi.cn/{locator ID}/{filename}.ism/Manifest(format=mpd-time-csf)\n\n有关传送内容的详细信息，请参阅[传送内容](/documentation/articles/media-services-deliver-content-overview)。\n\n你可以使用 [AMS 播放器](http://amsplayer.azurewebsites.net/azuremediaplayer.html)播放平滑流，或使用 iOS 和 Android 设备播放 HLS 版本 3。\n\n##清理\n\n如果你已完成流式处理事件，并想要清理先前设置的资源，请遵循以下过程。\n\n- 停止从编码器推送流。\n- 停止通道。停止通道后，将不会产生任何费用。当你需要重新启动它时，它将采用相同的引入 URL，因此你无需重新配置编码器。\n- 除非你想要继续以点播流形式提供实时事件的存档，否则你可以停止流式处理终结点。如果通道处于停止状态，将不会产生任何费用。\n  \n\n##注意事项\n\n- 目前，实时事件的最大建议持续时间为 8 小时。如果你需要运行一个需要更长时间的频道，请通过 WindowsAzure.cn 联系 amslived。\n- 确保你要从中以流形式传输内容的流式传输终结点上至少有一个流式传输保留单元。\n\n\n[standard0]: ./media/media-services-portal-creating-live-encoder-enabled-channel/media-services-create-channel-standard0.png\n[standard1]: ./media/media-services-portal-creating-live-encoder-enabled-channel/media-services-create-channel-standard1.png\n[standard2]: ./media/media-services-portal-creating-live-encoder-enabled-channel/media-services-create-channel-standard2.png\n[standard3]: ./media/media-services-portal-creating-live-encoder-enabled-channel/media-services-create-channel-standard3.png\n[standard4]: ./media/media-services-portal-creating-live-encoder-enabled-channel/media-services-create-channel-standard4.png\n[standard5]: ./media/media-services-portal-creating-live-encoder-enabled-channel/media-services-create-channel-standard_encode.png\n\n<!---HONumber=Mooncake_0314_2016-->"
+}

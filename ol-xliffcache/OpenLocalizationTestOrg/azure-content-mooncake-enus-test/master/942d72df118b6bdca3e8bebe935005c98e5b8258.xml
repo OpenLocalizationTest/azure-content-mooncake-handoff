@@ -1,0 +1,89 @@
+{
+  "nodes": [
+    {
+      "content": "将消息发送到事件中心",
+      "pos": [
+        3,
+        13
+      ]
+    },
+    {
+      "content": "在本节中，您将编写用于将事件发送到事件中心的 Windows 控制台应用。",
+      "pos": [
+        14,
+        51
+      ]
+    },
+    {
+      "pos": [
+        56,
+        132
+      ],
+      "content": "在 Visual Studio 中，使用\"控制台应用程序\"项目模板创建一个新的 Visual C# 桌面应用项目。将该项目命名为 <bpt id=\"p1\">**</bpt>Sender<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "在\"解决方案资源管理器\"中，右键单击该解决方案，然后单击\"为解决方案管理 NuGet 程序包...\"。",
+      "pos": [
+        149,
+        200
+      ]
+    },
+    {
+      "content": "此时将显示\"管理 NuGet 程序包\"对话框。",
+      "pos": [
+        207,
+        230
+      ]
+    },
+    {
+      "pos": [
+        235,
+        274
+      ],
+      "content": "搜索  <ph id=\"ph1\">`Azure Service Bus`</ph>、单击\"安装\"，并接受使用条款。"
+    },
+    {
+      "pos": [
+        293,
+        403
+      ],
+      "content": "这样便会下载、安装 <ph id=\"ph1\">&lt;a href=\"https://www.nuget.org/packages/WindowsAzure.ServiceBus/\"&gt;</ph>Azure 服务总线库 NuGet 程序包<ph id=\"ph2\">&lt;/a&gt;</ph>并添加对它的引用。"
+    },
+    {
+      "pos": [
+        408,
+        446
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>Program.cs<ept id=\"p1\">**</ept> 文件顶部添加以下  <ph id=\"ph1\">`using`</ph> 语句："
+    },
+    {
+      "pos": [
+        498,
+        579
+      ],
+      "content": "将以下  <ph id=\"ph1\">`static`</ph> 字段添加到 <bpt id=\"p1\">**</bpt>Program<ept id=\"p1\">**</ept> 类，从而将值分别替换为您在上一节中创建的事件中心的名称和具有 <bpt id=\"p2\">**</bpt>send<ept id=\"p2\">**</ept> 权限的连接字符串："
+    },
+    {
+      "pos": [
+        711,
+        734
+      ],
+      "content": "将以下方法添加到 <bpt id=\"p1\">**</bpt>Program<ept id=\"p1\">**</ept> 类："
+    },
+    {
+      "content": "此方法会不断地将事件发送到事件中心，迟延为 200 毫秒。",
+      "pos": [
+        1625,
+        1654
+      ]
+    },
+    {
+      "pos": [
+        1659,
+        1682
+      ],
+      "content": "最后，在 <bpt id=\"p1\">**</bpt>Main<ept id=\"p1\">**</ept> 方法中添加以下行："
+    }
+  ],
+  "content": "## 将消息发送到事件中心\n在本节中，您将编写用于将事件发送到事件中心的 Windows 控制台应用。\n\n1. 在 Visual Studio 中，使用\"控制台应用程序\"项目模板创建一个新的 Visual C# 桌面应用项目。将该项目命名为 **Sender**。\n\n    ![][7]\n\n2. 在\"解决方案资源管理器\"中，右键单击该解决方案，然后单击\"为解决方案管理 NuGet 程序包...\"。 \n\n    此时将显示\"管理 NuGet 程序包\"对话框。\n\n3. 搜索  `Azure Service Bus`、单击\"安装\"，并接受使用条款。 \n\n    ![][8]\n\n    这样便会下载、安装 <a href=\"https://www.nuget.org/packages/WindowsAzure.ServiceBus/\">Azure 服务总线库 NuGet 程序包</a>并添加对它的引用。\n\n4. 在 **Program.cs** 文件顶部添加以下  `using` 语句：\n\n        using Microsoft.ServiceBus.Messaging;\n\n5. 将以下  `static` 字段添加到 **Program** 类，从而将值分别替换为您在上一节中创建的事件中心的名称和具有 **send** 权限的连接字符串：\n\n        static string eventHubName = \"{event hub name}\";\n        static string connectionString = \"{send connection string}\";\n\n6. 将以下方法添加到 **Program** 类：\n\n        static async Task SendingRandomMessages()\n        {\n            var eventHubClient = EventHubClient.CreateFromConnectionString(connectionString, eventHubName);\n            while (true)\n            {\n                try\n                {\n                    var message = Guid.NewGuid().ToString();\n                    Console.WriteLine(\"{0} > Sending message: {1}\", DateTime.Now.ToString(), message);\n                    await eventHubClient.SendAsync(new EventData(Encoding.UTF8.GetBytes(message)));\n                }\n                catch (Exception exception)\n                {\n                    Console.ForegroundColor = ConsoleColor.Red;\n                    Console.WriteLine(\"{0} > Exception: {1}\", DateTime.Now.ToString(), exception.Message);\n                    Console.ResetColor();\n                }\n\n                await Task.Delay(200);\n            }\n        }\n\n    此方法会不断地将事件发送到事件中心，迟延为 200 毫秒。\n\n7. 最后，在 **Main** 方法中添加以下行：\n\n        Console.WriteLine(\"Press Ctrl-C to stop the sender process\");\n        Console.WriteLine(\"Press Enter to start now\");\n        Console.ReadLine();\n        SendingRandomMessages().Wait();\n\n\n<!-- Images -->\n[7]: ./media/service-bus-event-hubs-getstarted/create-sender-csharp1.png\n[8]: ./media/service-bus-event-hubs-getstarted/create-sender-csharp2.png\n<!--HONumber=41-->\n"
+}

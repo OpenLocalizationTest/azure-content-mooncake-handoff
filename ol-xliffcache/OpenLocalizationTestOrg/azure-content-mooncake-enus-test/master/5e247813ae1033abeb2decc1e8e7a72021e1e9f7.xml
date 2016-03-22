@@ -1,0 +1,1741 @@
+{
+  "nodes": [
+    {
+      "content": "使用 Site Recovery 进行本地到本地 Hyper-V 复制的性能测试和缩放结果 | Azure",
+      "pos": [
+        27,
+        80
+      ]
+    },
+    {
+      "content": "本文介绍了使用 Azure Site Recovery 进行本地到本地复制时的性能测试。",
+      "pos": [
+        99,
+        143
+      ]
+    },
+    {
+      "content": "使用 Site Recovery 进行本地到本地 Hyper-V 复制的性能测试和缩放结果",
+      "pos": [
+        362,
+        407
+      ]
+    },
+    {
+      "content": "你可以使用 Azure Site Recovery 来协调和管理从虚拟机和物理服务器到 Azure 或辅助数据中心的复制。本文提供了我们在两个本地数据中心之间进行 Hyper-V 虚拟机复制时执行的性能测试的结果。",
+      "pos": [
+        409,
+        516
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        523,
+        525
+      ]
+    },
+    {
+      "content": "测试目标是观察在稳定状态复制期间 Azure Site Recovery 的性能如何。当虚拟机已完成初始复制并且在同步增量更改时会发生稳定状态复制。使用稳定状态对性能进行测量非常重要，因为除非发生意外中断，这是大多数虚拟机保持的状态。",
+      "pos": [
+        527,
+        644
+      ]
+    },
+    {
+      "content": "测试部署包括两个本地站点，每个站点中有一台 VMM 服务器。此测试部署是典型的总公司/分公司部署，总公司作为主站点，分公司作为辅助站点或恢复站点。",
+      "pos": [
+        647,
+        720
+      ]
+    },
+    {
+      "content": "我们的操作",
+      "pos": [
+        726,
+        731
+      ]
+    },
+    {
+      "content": "下面是我们在测试过程中执行的操作：",
+      "pos": [
+        733,
+        750
+      ]
+    },
+    {
+      "content": "使用 VMM 模板创建虚拟机。",
+      "pos": [
+        755,
+        770
+      ]
+    },
+    {
+      "content": "启动虚拟机并捕获 12 个小时内的基准性能指标。",
+      "pos": [
+        775,
+        799
+      ]
+    },
+    {
+      "content": "在主 VMM 服务器和恢复 VMM 服务器上创建云。",
+      "pos": [
+        804,
+        830
+      ]
+    },
+    {
+      "content": "在 Azure Site Recovery 中配置云保护，包括源云和恢复云的映射。",
+      "pos": [
+        835,
+        876
+      ]
+    },
+    {
+      "content": "为虚拟机启用保护并让它们完成初始复制。",
+      "pos": [
+        881,
+        900
+      ]
+    },
+    {
+      "content": "等待几个小时以便系统达到稳定状态。",
+      "pos": [
+        905,
+        922
+      ]
+    },
+    {
+      "content": "捕获 12 个小时内的性能指标，需要确保所有虚拟机在那 12 个小时内都保持在预期的复制状态。",
+      "pos": [
+        927,
+        974
+      ]
+    },
+    {
+      "content": "测量基准性能指标与复制性能指标之间的增量。",
+      "pos": [
+        979,
+        1000
+      ]
+    },
+    {
+      "content": "测试部署结果",
+      "pos": [
+        1005,
+        1011
+      ]
+    },
+    {
+      "content": "主服务器性能",
+      "pos": [
+        1017,
+        1023
+      ]
+    },
+    {
+      "content": "Hyper-V 副本以异步方式跟踪对日志文件的更改，从而最大限度地降低了主服务器上的存储开销。",
+      "pos": [
+        1027,
+        1074
+      ]
+    },
+    {
+      "content": "Hyper-V 副本利用自我维护的内存缓存最大程度地降低用于跟踪的 IOPS 开销。它将向 VHDX 进行的写入存储在内存中，并在将日志发送到恢复站点之前将它们刷新到日志文件中。如果写入数达到了预先确定的限制，也会发生磁盘刷新。",
+      "pos": [
+        1078,
+        1192
+      ]
+    },
+    {
+      "content": "下图显示了复制的稳定状态 IOPS 开销。我们可以看到由复制导致的 IOPS 开销大约为 5%，非常低。",
+      "pos": [
+        1196,
+        1248
+      ]
+    },
+    {
+      "content": "主服务器结果",
+      "pos": [
+        1252,
+        1258
+      ]
+    },
+    {
+      "content": "Hyper-V 副本利用主服务器上的内存来优化磁盘性能。如下图中所示，主群集中所有服务器上的内存开销都很低。所显示的内存开销是复制使用的内存占 Hyper-V 服务器上安装的总内存的百分比。",
+      "pos": [
+        1356,
+        1451
+      ]
+    },
+    {
+      "content": "主服务器结果",
+      "pos": [
+        1455,
+        1461
+      ]
+    },
+    {
+      "content": "Hyper-V 副本具有最小的 CPU 开销。如图中所示，复制的开销范围是 2-3%。",
+      "pos": [
+        1559,
+        1602
+      ]
+    },
+    {
+      "content": "主服务器结果",
+      "pos": [
+        1606,
+        1612
+      ]
+    },
+    {
+      "content": "辅助（恢复）服务器性能",
+      "pos": [
+        1714,
+        1725
+      ]
+    },
+    {
+      "content": "Hyper-V 副本使用恢复服务器上的少量内存来使存储操作数量最优化。图中汇总了恢复服务器上的内存使用率。所显示的内存开销是复制使用的内存占 Hyper-V 服务器上安装的总内存的百分比。",
+      "pos": [
+        1727,
+        1821
+      ]
+    },
+    {
+      "content": "辅助服务器结果",
+      "pos": [
+        1825,
+        1832
+      ]
+    },
+    {
+      "content": "恢复站点上的 I/O 操作数量是主站点上的写入操作数量的一个函数。让我们在与主站点上的总 I/O 操作量和写入操作量进行比较的情况下看一下恢复站点上的总 I/O 操作量。图中显示，恢复站点上的总 IOPS 大约是",
+      "pos": [
+        1930,
+        2036
+      ]
+    },
+    {
+      "content": "主站点上的写入 IOPS 的 1.5 倍。",
+      "pos": [
+        2040,
+        2061
+      ]
+    },
+    {
+      "content": "主站点上的总 IOPS 的 37%。",
+      "pos": [
+        2065,
+        2083
+      ]
+    },
+    {
+      "content": "辅助服务器结果",
+      "pos": [
+        2087,
+        2094
+      ]
+    },
+    {
+      "content": "辅助服务器结果",
+      "pos": [
+        2194,
+        2201
+      ]
+    },
+    {
+      "content": "复制对网络利用率的影响",
+      "pos": [
+        2303,
+        2314
+      ]
+    },
+    {
+      "content": "在现有的每秒 5 GB 带宽中，在主节点与恢复节点（启用了压缩功能）之间平均每秒使用了 275 MB 网络带宽。",
+      "pos": [
+        2316,
+        2372
+      ]
+    },
+    {
+      "content": "网络利用率结果",
+      "pos": [
+        2376,
+        2383
+      ]
+    },
+    {
+      "content": "复制对虚拟机性能的影响",
+      "pos": [
+        2485,
+        2496
+      ]
+    },
+    {
+      "content": "一个重要的注意事项是复制对在虚拟机上运行的生产工作负荷的影响。如果主站点针对复制进行了充分的设置，则不应当对工作负荷产生任何影响。Hyper-V 副本的轻量跟踪机制可以确保在虚拟机中运行的工作负荷在稳定状态复制期间不受影响。下图中对此进行了解释。",
+      "pos": [
+        2498,
+        2621
+      ]
+    },
+    {
+      "content": "此图显示了在启用复制之前和之后运行各种工作负荷的虚拟机执行的 IOPS。你可以看到两者之间没有差别。",
+      "pos": [
+        2623,
+        2673
+      ]
+    },
+    {
+      "content": "副本影响结果",
+      "pos": [
+        2677,
+        2683
+      ]
+    },
+    {
+      "content": "下图显示了在启用复制之前和之后运行各种工作负荷的虚拟机的吞吐量。你可以看到复制没有明显影响。",
+      "pos": [
+        2781,
+        2827
+      ]
+    },
+    {
+      "content": "副本影响结果",
+      "pos": [
+        2831,
+        2837
+      ]
+    },
+    {
+      "content": "结束语",
+      "pos": [
+        2939,
+        2942
+      ]
+    },
+    {
+      "pos": [
+        2944,
+        3180
+      ],
+      "content": "我们的结果清晰地表明，与 Hyper-V 副本配合使用的 Azure Site Recovery 可以针对大型群集以最小的开销很好地进行扩展。Azure Site Recovery 提供了简单的部署、复制、管理和监视。Hyper-V 副本为成功进行复制扩展提供了必要的基础结构。为规划最佳的部署，建议你下载 <bpt id=\"p1\">[</bpt>Hyper-V 副本容量规划器<ept id=\"p1\">](https://www.microsoft.com/zh-cn/download/details.aspx?id=39057)</ept>。"
+    },
+    {
+      "content": "测试环境详细信息",
+      "pos": [
+        3185,
+        3193
+      ]
+    },
+    {
+      "content": "主站点",
+      "pos": [
+        3199,
+        3202
+      ]
+    },
+    {
+      "content": "主站点具有一个群集，其中包含运行着 470 个虚拟机的五台 Hyper-V 服务器。",
+      "pos": [
+        3206,
+        3248
+      ]
+    },
+    {
+      "content": "各个虚拟机运行不同的工作负载，并且都启用了 Azure Site Recovery 保护。",
+      "pos": [
+        3252,
+        3297
+      ]
+    },
+    {
+      "content": "群集节点的存储是由一个 iSCSI SAN 提供的。型号 - Hitachi HUS130。",
+      "pos": [
+        3301,
+        3347
+      ]
+    },
+    {
+      "content": "每台群集服务器具有四个网卡 (NIC)，每个为 1 Gbps。",
+      "pos": [
+        3351,
+        3382
+      ]
+    },
+    {
+      "content": "两个网卡连接到一个 iSCSI 专用网络，另外两个网卡连接到一个外部企业网络。其中一个外部网络保留给群集通信使用。",
+      "pos": [
+        3386,
+        3443
+      ]
+    },
+    {
+      "content": "主要硬件要求",
+      "pos": [
+        3447,
+        3453
+      ]
+    },
+    {
+      "content": "服务器",
+      "pos": [
+        3552,
+        3555
+      ]
+    },
+    {
+      "content": "RAM",
+      "pos": [
+        3556,
+        3559
+      ]
+    },
+    {
+      "content": "型号",
+      "pos": [
+        3560,
+        3562
+      ]
+    },
+    {
+      "content": "处理器",
+      "pos": [
+        3563,
+        3566
+      ]
+    },
+    {
+      "content": "处理器数目",
+      "pos": [
+        3567,
+        3572
+      ]
+    },
+    {
+      "content": "NIC",
+      "pos": [
+        3573,
+        3576
+      ]
+    },
+    {
+      "content": "软件",
+      "pos": [
+        3577,
+        3579
+      ]
+    },
+    {
+      "content": "群集中的 Hyper-V 服务器：",
+      "pos": [
+        3612,
+        3629
+      ]
+    },
+    {
+      "content": "ESTLAB-HOST11",
+      "pos": [
+        3635,
+        3648
+      ]
+    },
+    {
+      "content": "ESTLAB-HOST12",
+      "pos": [
+        3654,
+        3667
+      ]
+    },
+    {
+      "content": "ESTLAB-HOST13",
+      "pos": [
+        3673,
+        3686
+      ]
+    },
+    {
+      "content": "ESTLAB-HOST14",
+      "pos": [
+        3692,
+        3705
+      ]
+    },
+    {
+      "content": "ESTLAB-HOST25",
+      "pos": [
+        3711,
+        3724
+      ]
+    },
+    {
+      "content": "128ESTLAB-HOST25 有 256 个",
+      "pos": [
+        3725,
+        3749
+      ]
+    },
+    {
+      "content": "Dell ™ PowerEdge ™ R820",
+      "pos": [
+        3750,
+        3773
+      ]
+    },
+    {
+      "content": "Intel(R) Xeon(R) CPU E5-4620 0 @ 2.20GHz",
+      "pos": [
+        3774,
+        3814
+      ]
+    },
+    {
+      "content": "4",
+      "pos": [
+        3815,
+        3816
+      ]
+    },
+    {
+      "content": "I Gbps x 4",
+      "pos": [
+        3817,
+        3827
+      ]
+    },
+    {
+      "content": "Windows Server Datacenter 2012 R2 (x64) + Hyper-V 角色",
+      "pos": [
+        3828,
+        3880
+      ]
+    },
+    {
+      "content": "VMM 服务器",
+      "pos": [
+        3883,
+        3890
+      ]
+    },
+    {
+      "content": "2",
+      "pos": [
+        3891,
+        3892
+      ]
+    },
+    {
+      "content": "2",
+      "pos": [
+        3895,
+        3896
+      ]
+    },
+    {
+      "content": "1 Gbps",
+      "pos": [
+        3897,
+        3903
+      ]
+    },
+    {
+      "content": "Windows Server Database 2012 R2 (x64) + VMM 2012 R2",
+      "pos": [
+        3904,
+        3955
+      ]
+    },
+    {
+      "content": "辅助（恢复）站点",
+      "pos": [
+        3962,
+        3970
+      ]
+    },
+    {
+      "content": "辅助站点具有一个六节点的故障转移群集。",
+      "pos": [
+        3974,
+        3993
+      ]
+    },
+    {
+      "content": "群集节点的存储是由一个 iSCSI SAN 提供的。型号 - Hitachi HUS130。",
+      "pos": [
+        3997,
+        4043
+      ]
+    },
+    {
+      "content": "主要硬件规格",
+      "pos": [
+        4047,
+        4053
+      ]
+    },
+    {
+      "content": "服务器",
+      "pos": [
+        4152,
+        4155
+      ]
+    },
+    {
+      "content": "RAM",
+      "pos": [
+        4156,
+        4159
+      ]
+    },
+    {
+      "content": "型号",
+      "pos": [
+        4160,
+        4162
+      ]
+    },
+    {
+      "content": "处理器",
+      "pos": [
+        4163,
+        4166
+      ]
+    },
+    {
+      "content": "处理器数目",
+      "pos": [
+        4167,
+        4172
+      ]
+    },
+    {
+      "content": "NIC",
+      "pos": [
+        4173,
+        4176
+      ]
+    },
+    {
+      "content": "软件",
+      "pos": [
+        4177,
+        4179
+      ]
+    },
+    {
+      "content": "群集中的 Hyper-V 服务器：",
+      "pos": [
+        4212,
+        4229
+      ]
+    },
+    {
+      "content": "ESTLAB-HOST07",
+      "pos": [
+        4235,
+        4248
+      ]
+    },
+    {
+      "content": "ESTLAB-HOST08",
+      "pos": [
+        4254,
+        4267
+      ]
+    },
+    {
+      "content": "ESTLAB-HOST09",
+      "pos": [
+        4273,
+        4286
+      ]
+    },
+    {
+      "content": "ESTLAB-HOST10",
+      "pos": [
+        4292,
+        4305
+      ]
+    },
+    {
+      "content": "96",
+      "pos": [
+        4306,
+        4308
+      ]
+    },
+    {
+      "content": "Dell ™ PowerEdge ™ R720",
+      "pos": [
+        4309,
+        4332
+      ]
+    },
+    {
+      "content": "Intel(R) Xeon(R) CPU E5-2630 0 @ 2.30GHz",
+      "pos": [
+        4333,
+        4373
+      ]
+    },
+    {
+      "content": "2",
+      "pos": [
+        4374,
+        4375
+      ]
+    },
+    {
+      "content": "I Gbps x 4",
+      "pos": [
+        4376,
+        4386
+      ]
+    },
+    {
+      "content": "Windows Server Datacenter 2012 R2 (x64) + Hyper-V 角色",
+      "pos": [
+        4387,
+        4439
+      ]
+    },
+    {
+      "content": "ESTLAB-HOST17",
+      "pos": [
+        4442,
+        4455
+      ]
+    },
+    {
+      "content": "128",
+      "pos": [
+        4456,
+        4459
+      ]
+    },
+    {
+      "content": "Dell ™ PowerEdge ™ R820",
+      "pos": [
+        4460,
+        4483
+      ]
+    },
+    {
+      "content": "Intel(R) Xeon(R) CPU E5-4620 0 @ 2.20GHz",
+      "pos": [
+        4484,
+        4524
+      ]
+    },
+    {
+      "content": "4",
+      "pos": [
+        4525,
+        4526
+      ]
+    },
+    {
+      "content": "Windows Server Datacenter 2012 R2 (x64) + Hyper-V 角色",
+      "pos": [
+        4528,
+        4580
+      ]
+    },
+    {
+      "content": "ESTLAB-HOST24",
+      "pos": [
+        4583,
+        4596
+      ]
+    },
+    {
+      "content": "256",
+      "pos": [
+        4597,
+        4600
+      ]
+    },
+    {
+      "content": "Dell ™ PowerEdge ™ R820",
+      "pos": [
+        4601,
+        4624
+      ]
+    },
+    {
+      "content": "Intel(R) Xeon(R) CPU E5-4620 0 @ 2.20GHz",
+      "pos": [
+        4625,
+        4665
+      ]
+    },
+    {
+      "content": "2",
+      "pos": [
+        4666,
+        4667
+      ]
+    },
+    {
+      "content": "Windows Server Datacenter 2012 R2 (x64) + Hyper-V 角色",
+      "pos": [
+        4669,
+        4721
+      ]
+    },
+    {
+      "content": "VMM 服务器",
+      "pos": [
+        4724,
+        4731
+      ]
+    },
+    {
+      "content": "2",
+      "pos": [
+        4732,
+        4733
+      ]
+    },
+    {
+      "content": "2",
+      "pos": [
+        4736,
+        4737
+      ]
+    },
+    {
+      "content": "1 Gbps",
+      "pos": [
+        4738,
+        4744
+      ]
+    },
+    {
+      "content": "Windows Server Database 2012 R2 (x64) + VMM 2012 R2",
+      "pos": [
+        4745,
+        4796
+      ]
+    },
+    {
+      "content": "服务器工作负载",
+      "pos": [
+        4803,
+        4810
+      ]
+    },
+    {
+      "content": "针对测试用途，我们选取了企业客户方案中常用的工作负载。",
+      "pos": [
+        4814,
+        4841
+      ]
+    },
+    {
+      "pos": [
+        4845,
+        4901
+      ],
+      "content": "我们使用 <bpt id=\"p1\">[</bpt>IOMeter<ept id=\"p1\">](http://www.iometer.org)</ept> 与表中汇总的工作负载特性进行模拟。"
+    },
+    {
+      "content": "所有 IOMeter 配置文件都设置为写入随机字节以模拟工作负载的最坏情况写入模式。",
+      "pos": [
+        4905,
+        4947
+      ]
+    },
+    {
+      "content": "工作负载",
+      "pos": [
+        4950,
+        4954
+      ]
+    },
+    {
+      "content": "I/O 大小 (KB)",
+      "pos": [
+        4955,
+        4966
+      ]
+    },
+    {
+      "content": "访问百分比",
+      "pos": [
+        4967,
+        4972
+      ]
+    },
+    {
+      "content": "读取百分比",
+      "pos": [
+        4973,
+        4978
+      ]
+    },
+    {
+      "content": "未完成的 I/O",
+      "pos": [
+        4979,
+        4987
+      ]
+    },
+    {
+      "content": "I/O 模式",
+      "pos": [
+        4988,
+        4994
+      ]
+    },
+    {
+      "content": "文件服务器",
+      "pos": [
+        5023,
+        5028
+      ]
+    },
+    {
+      "content": "48163264",
+      "pos": [
+        5029,
+        5037
+      ]
+    },
+    {
+      "content": "60%20%5%5%10%",
+      "pos": [
+        5038,
+        5051
+      ]
+    },
+    {
+      "content": "80%80%80%80%80%",
+      "pos": [
+        5052,
+        5067
+      ]
+    },
+    {
+      "content": "88888",
+      "pos": [
+        5068,
+        5073
+      ]
+    },
+    {
+      "content": "全部 100% 随机",
+      "pos": [
+        5074,
+        5084
+      ]
+    },
+    {
+      "content": "SQL Server（卷 1）SQL Server（卷 2）",
+      "pos": [
+        5087,
+        5117
+      ]
+    },
+    {
+      "content": "864",
+      "pos": [
+        5118,
+        5121
+      ]
+    },
+    {
+      "content": "100%100%",
+      "pos": [
+        5122,
+        5130
+      ]
+    },
+    {
+      "content": "70%0%",
+      "pos": [
+        5131,
+        5136
+      ]
+    },
+    {
+      "content": "88",
+      "pos": [
+        5137,
+        5139
+      ]
+    },
+    {
+      "content": "100% 随机100% 连续",
+      "pos": [
+        5140,
+        5154
+      ]
+    },
+    {
+      "content": "Exchange",
+      "pos": [
+        5157,
+        5165
+      ]
+    },
+    {
+      "content": "32",
+      "pos": [
+        5166,
+        5168
+      ]
+    },
+    {
+      "content": "100%",
+      "pos": [
+        5169,
+        5173
+      ]
+    },
+    {
+      "content": "67%",
+      "pos": [
+        5174,
+        5177
+      ]
+    },
+    {
+      "content": "8",
+      "pos": [
+        5178,
+        5179
+      ]
+    },
+    {
+      "content": "100% 随机",
+      "pos": [
+        5180,
+        5187
+      ]
+    },
+    {
+      "content": "工作站/VDI",
+      "pos": [
+        5190,
+        5197
+      ]
+    },
+    {
+      "content": "464",
+      "pos": [
+        5198,
+        5201
+      ]
+    },
+    {
+      "content": "66%34%",
+      "pos": [
+        5202,
+        5208
+      ]
+    },
+    {
+      "content": "70%95%",
+      "pos": [
+        5209,
+        5215
+      ]
+    },
+    {
+      "content": "11",
+      "pos": [
+        5216,
+        5218
+      ]
+    },
+    {
+      "content": "两者都 100% 随机",
+      "pos": [
+        5219,
+        5230
+      ]
+    },
+    {
+      "content": "Web 文件服务器",
+      "pos": [
+        5233,
+        5242
+      ]
+    },
+    {
+      "content": "4864",
+      "pos": [
+        5243,
+        5247
+      ]
+    },
+    {
+      "content": "33%34%33%",
+      "pos": [
+        5248,
+        5257
+      ]
+    },
+    {
+      "content": "95%95%95%",
+      "pos": [
+        5258,
+        5267
+      ]
+    },
+    {
+      "content": "888",
+      "pos": [
+        5268,
+        5271
+      ]
+    },
+    {
+      "content": "全部 75% 随机",
+      "pos": [
+        5272,
+        5281
+      ]
+    },
+    {
+      "content": "虚拟机配置",
+      "pos": [
+        5288,
+        5293
+      ]
+    },
+    {
+      "content": "主群集上有 470 个虚拟机。",
+      "pos": [
+        5297,
+        5312
+      ]
+    },
+    {
+      "content": "所有虚拟机都具有 VHDX 磁盘。",
+      "pos": [
+        5316,
+        5333
+      ]
+    },
+    {
+      "content": "虚拟机运行表中汇总的工作负载。所有虚拟机都是使用 VMM 模板创建的。",
+      "pos": [
+        5337,
+        5372
+      ]
+    },
+    {
+      "content": "工作负载",
+      "pos": [
+        5375,
+        5379
+      ]
+    },
+    {
+      "content": "VM 数目",
+      "pos": [
+        5380,
+        5385
+      ]
+    },
+    {
+      "content": "最小 RAM (GB)",
+      "pos": [
+        5386,
+        5397
+      ]
+    },
+    {
+      "content": "最大 RAM (GB)",
+      "pos": [
+        5398,
+        5409
+      ]
+    },
+    {
+      "content": "每个 VM 的逻辑磁盘大小 (GB)",
+      "pos": [
+        5410,
+        5428
+      ]
+    },
+    {
+      "content": "最大 IOPS",
+      "pos": [
+        5429,
+        5436
+      ]
+    },
+    {
+      "content": "SQL Server",
+      "pos": [
+        5465,
+        5475
+      ]
+    },
+    {
+      "content": "51",
+      "pos": [
+        5476,
+        5478
+      ]
+    },
+    {
+      "content": "1",
+      "pos": [
+        5479,
+        5480
+      ]
+    },
+    {
+      "content": "4",
+      "pos": [
+        5481,
+        5482
+      ]
+    },
+    {
+      "content": "167",
+      "pos": [
+        5483,
+        5486
+      ]
+    },
+    {
+      "content": "10",
+      "pos": [
+        5487,
+        5489
+      ]
+    },
+    {
+      "content": "Exchange Server",
+      "pos": [
+        5492,
+        5507
+      ]
+    },
+    {
+      "content": "71",
+      "pos": [
+        5508,
+        5510
+      ]
+    },
+    {
+      "content": "1",
+      "pos": [
+        5511,
+        5512
+      ]
+    },
+    {
+      "content": "4",
+      "pos": [
+        5513,
+        5514
+      ]
+    },
+    {
+      "content": "552",
+      "pos": [
+        5515,
+        5518
+      ]
+    },
+    {
+      "content": "10",
+      "pos": [
+        5519,
+        5521
+      ]
+    },
+    {
+      "content": "文件服务器",
+      "pos": [
+        5524,
+        5529
+      ]
+    },
+    {
+      "content": "50",
+      "pos": [
+        5530,
+        5532
+      ]
+    },
+    {
+      "content": "1",
+      "pos": [
+        5533,
+        5534
+      ]
+    },
+    {
+      "content": "2",
+      "pos": [
+        5535,
+        5536
+      ]
+    },
+    {
+      "content": "552",
+      "pos": [
+        5537,
+        5540
+      ]
+    },
+    {
+      "content": "22",
+      "pos": [
+        5541,
+        5543
+      ]
+    },
+    {
+      "content": "VDI",
+      "pos": [
+        5546,
+        5549
+      ]
+    },
+    {
+      "content": "149",
+      "pos": [
+        5550,
+        5553
+      ]
+    },
+    {
+      "content": "0.5",
+      "pos": [
+        5554,
+        5557
+      ]
+    },
+    {
+      "content": "1",
+      "pos": [
+        5558,
+        5559
+      ]
+    },
+    {
+      "content": "80",
+      "pos": [
+        5560,
+        5562
+      ]
+    },
+    {
+      "content": "6",
+      "pos": [
+        5563,
+        5564
+      ]
+    },
+    {
+      "content": "Web 服务器",
+      "pos": [
+        5567,
+        5574
+      ]
+    },
+    {
+      "content": "149",
+      "pos": [
+        5575,
+        5578
+      ]
+    },
+    {
+      "content": "0.5",
+      "pos": [
+        5579,
+        5582
+      ]
+    },
+    {
+      "content": "1",
+      "pos": [
+        5583,
+        5584
+      ]
+    },
+    {
+      "content": "80",
+      "pos": [
+        5585,
+        5587
+      ]
+    },
+    {
+      "content": "6",
+      "pos": [
+        5588,
+        5589
+      ]
+    },
+    {
+      "content": "总计",
+      "pos": [
+        5592,
+        5594
+      ]
+    },
+    {
+      "content": "470",
+      "pos": [
+        5595,
+        5598
+      ]
+    },
+    {
+      "content": "96.83 TB",
+      "pos": [
+        5601,
+        5609
+      ]
+    },
+    {
+      "content": "4108",
+      "pos": [
+        5610,
+        5614
+      ]
+    },
+    {
+      "content": "Azure Site Recovery 设置",
+      "pos": [
+        5621,
+        5643
+      ]
+    },
+    {
+      "content": "针对本地到本地保护配置了 Azure Site Recovery",
+      "pos": [
+        5647,
+        5679
+      ]
+    },
+    {
+      "content": "VMM 服务器配置有四个云，包含 Hyper-V 群集服务器及其虚拟机。",
+      "pos": [
+        5683,
+        5719
+      ]
+    },
+    {
+      "content": "主 VMM 云",
+      "pos": [
+        5722,
+        5729
+      ]
+    },
+    {
+      "content": "云中受保护的虚拟机数目",
+      "pos": [
+        5730,
+        5741
+      ]
+    },
+    {
+      "content": "复制频率",
+      "pos": [
+        5742,
+        5746
+      ]
+    },
+    {
+      "content": "额外的恢复点",
+      "pos": [
+        5747,
+        5753
+      ]
+    },
+    {
+      "content": "PrimaryCloudRpo15m",
+      "pos": [
+        5774,
+        5792
+      ]
+    },
+    {
+      "content": "142",
+      "pos": [
+        5793,
+        5796
+      ]
+    },
+    {
+      "content": "15 分钟",
+      "pos": [
+        5797,
+        5802
+      ]
+    },
+    {
+      "content": "无",
+      "pos": [
+        5803,
+        5804
+      ]
+    },
+    {
+      "content": "PrimaryCloudRpo30s",
+      "pos": [
+        5807,
+        5825
+      ]
+    },
+    {
+      "content": "47",
+      "pos": [
+        5826,
+        5828
+      ]
+    },
+    {
+      "content": "30 秒",
+      "pos": [
+        5829,
+        5833
+      ]
+    },
+    {
+      "content": "无",
+      "pos": [
+        5834,
+        5835
+      ]
+    },
+    {
+      "content": "PrimaryCloudRpo30sArp1",
+      "pos": [
+        5838,
+        5860
+      ]
+    },
+    {
+      "content": "47",
+      "pos": [
+        5861,
+        5863
+      ]
+    },
+    {
+      "content": "30 秒",
+      "pos": [
+        5864,
+        5868
+      ]
+    },
+    {
+      "content": "1",
+      "pos": [
+        5869,
+        5870
+      ]
+    },
+    {
+      "content": "PrimaryCloudRpo5m",
+      "pos": [
+        5873,
+        5890
+      ]
+    },
+    {
+      "content": "235",
+      "pos": [
+        5891,
+        5894
+      ]
+    },
+    {
+      "content": "5 分钟",
+      "pos": [
+        5895,
+        5899
+      ]
+    },
+    {
+      "content": "无",
+      "pos": [
+        5900,
+        5901
+      ]
+    },
+    {
+      "content": "性能指标",
+      "pos": [
+        5908,
+        5912
+      ]
+    },
+    {
+      "content": "此表汇总了在部署中测量到的性能指标和计数器。",
+      "pos": [
+        5914,
+        5936
+      ]
+    },
+    {
+      "content": "度量值",
+      "pos": [
+        5939,
+        5942
+      ]
+    },
+    {
+      "content": "计数器",
+      "pos": [
+        5943,
+        5946
+      ]
+    },
+    {
+      "content": "CPU",
+      "pos": [
+        5959,
+        5962
+      ]
+    },
+    {
+      "content": "\\Processor(_Total)\\% Processor Time",
+      "pos": [
+        5963,
+        5998
+      ]
+    },
+    {
+      "content": "可用内存",
+      "pos": [
+        6001,
+        6005
+      ]
+    },
+    {
+      "content": "\\Memory\\Available MBytes",
+      "pos": [
+        6006,
+        6030
+      ]
+    },
+    {
+      "content": "IOPS",
+      "pos": [
+        6033,
+        6037
+      ]
+    },
+    {
+      "content": "\\PhysicalDisk(_Total)\\Disk Transfers/sec",
+      "pos": [
+        6038,
+        6078
+      ]
+    },
+    {
+      "content": "VM 读取 (IOPS) 操作数/秒",
+      "pos": [
+        6081,
+        6099
+      ]
+    },
+    {
+      "content": "\\Hyper-V Virtual Storage Device(",
+      "pos": [
+        6100,
+        6132
+      ]
+    },
+    {
+      "content": ")\\Read Operations/Sec",
+      "pos": [
+        6137,
+        6158
+      ]
+    },
+    {
+      "content": "VM 写入 (IOPS) 操作数/秒",
+      "pos": [
+        6161,
+        6179
+      ]
+    },
+    {
+      "content": "\\Hyper-V Virtual Storage Device(",
+      "pos": [
+        6180,
+        6212
+      ]
+    },
+    {
+      "content": ")\\Write Operations/S",
+      "pos": [
+        6217,
+        6237
+      ]
+    },
+    {
+      "content": "VM 读取吞吐量",
+      "pos": [
+        6240,
+        6248
+      ]
+    },
+    {
+      "content": "\\Hyper-V Virtual Storage Device(",
+      "pos": [
+        6249,
+        6281
+      ]
+    },
+    {
+      "content": ")\\Read Bytes/sec",
+      "pos": [
+        6286,
+        6302
+      ]
+    },
+    {
+      "content": "VM 写入吞吐量",
+      "pos": [
+        6305,
+        6313
+      ]
+    },
+    {
+      "content": "\\Hyper-V Virtual Storage Device(",
+      "pos": [
+        6314,
+        6346
+      ]
+    },
+    {
+      "content": ")\\Write Bytes/sec",
+      "pos": [
+        6351,
+        6368
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        6375,
+        6379
+      ]
+    },
+    {
+      "content": "设置两个本地 VMM 站点之间的保护",
+      "pos": [
+        6384,
+        6402
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"使用 Site Recovery 进行本地到本地 Hyper-V 复制的性能测试和缩放结果 | Azure\"\n    description=\"本文介绍了使用 Azure Site Recovery 进行本地到本地复制时的性能测试。\"\n    services=\"site-recovery\"\n    documentationCenter=\"\"\n    authors=\"csilauraa\"\n    manager=\"jwhit\"\n    editor=\"tysonn\"/>\n\n<tags\n    ms.service=\"site-recovery\"\n    ms.date=\"12/14/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n# 使用 Site Recovery 进行本地到本地 Hyper-V 复制的性能测试和缩放结果\n\n你可以使用 Azure Site Recovery 来协调和管理从虚拟机和物理服务器到 Azure 或辅助数据中心的复制。本文提供了我们在两个本地数据中心之间进行 Hyper-V 虚拟机复制时执行的性能测试的结果。\n\n\n\n## 概述\n\n测试目标是观察在稳定状态复制期间 Azure Site Recovery 的性能如何。当虚拟机已完成初始复制并且在同步增量更改时会发生稳定状态复制。使用稳定状态对性能进行测量非常重要，因为除非发生意外中断，这是大多数虚拟机保持的状态。\n\n\n测试部署包括两个本地站点，每个站点中有一台 VMM 服务器。此测试部署是典型的总公司/分公司部署，总公司作为主站点，分公司作为辅助站点或恢复站点。\n\n### 我们的操作\n\n下面是我们在测试过程中执行的操作：\n\n1. 使用 VMM 模板创建虚拟机。\n\n1. 启动虚拟机并捕获 12 个小时内的基准性能指标。\n\n1. 在主 VMM 服务器和恢复 VMM 服务器上创建云。\n\n1. 在 Azure Site Recovery 中配置云保护，包括源云和恢复云的映射。\n\n1. 为虚拟机启用保护并让它们完成初始复制。\n\n1. 等待几个小时以便系统达到稳定状态。\n\n1. 捕获 12 个小时内的性能指标，需要确保所有虚拟机在那 12 个小时内都保持在预期的复制状态。\n\n1. 测量基准性能指标与复制性能指标之间的增量。\n\n## 测试部署结果\n\n### 主服务器性能\n\n- Hyper-V 副本以异步方式跟踪对日志文件的更改，从而最大限度地降低了主服务器上的存储开销。\n\n- Hyper-V 副本利用自我维护的内存缓存最大程度地降低用于跟踪的 IOPS 开销。它将向 VHDX 进行的写入存储在内存中，并在将日志发送到恢复站点之前将它们刷新到日志文件中。如果写入数达到了预先确定的限制，也会发生磁盘刷新。\n\n- 下图显示了复制的稳定状态 IOPS 开销。我们可以看到由复制导致的 IOPS 开销大约为 5%，非常低。\n\n![主服务器结果](./media/site-recovery-performance-and-scaling-testing-on-premises-to-on-premises/IC744913.png)\n\nHyper-V 副本利用主服务器上的内存来优化磁盘性能。如下图中所示，主群集中所有服务器上的内存开销都很低。所显示的内存开销是复制使用的内存占 Hyper-V 服务器上安装的总内存的百分比。\n\n![主服务器结果](./media/site-recovery-performance-and-scaling-testing-on-premises-to-on-premises/IC744914.png)\n\nHyper-V 副本具有最小的 CPU 开销。如图中所示，复制的开销范围是 2-3%。\n\n![主服务器结果](./media/site-recovery-performance-and-scaling-testing-on-premises-to-on-premises/IC744915.png)\n\n### 辅助（恢复）服务器性能\n\nHyper-V 副本使用恢复服务器上的少量内存来使存储操作数量最优化。图中汇总了恢复服务器上的内存使用率。所显示的内存开销是复制使用的内存占 Hyper-V 服务器上安装的总内存的百分比。\n\n![辅助服务器结果](./media/site-recovery-performance-and-scaling-testing-on-premises-to-on-premises/IC744916.png)\n\n恢复站点上的 I/O 操作数量是主站点上的写入操作数量的一个函数。让我们在与主站点上的总 I/O 操作量和写入操作量进行比较的情况下看一下恢复站点上的总 I/O 操作量。图中显示，恢复站点上的总 IOPS 大约是\n\n- 主站点上的写入 IOPS 的 1.5 倍。\n\n- 主站点上的总 IOPS 的 37%。\n\n![辅助服务器结果](./media/site-recovery-performance-and-scaling-testing-on-premises-to-on-premises/IC744917.png)\n\n![辅助服务器结果](./media/site-recovery-performance-and-scaling-testing-on-premises-to-on-premises/IC744918.png)\n\n### 复制对网络利用率的影响\n\n在现有的每秒 5 GB 带宽中，在主节点与恢复节点（启用了压缩功能）之间平均每秒使用了 275 MB 网络带宽。\n\n![网络利用率结果](./media/site-recovery-performance-and-scaling-testing-on-premises-to-on-premises/IC744919.png)\n\n### 复制对虚拟机性能的影响\n\n一个重要的注意事项是复制对在虚拟机上运行的生产工作负荷的影响。如果主站点针对复制进行了充分的设置，则不应当对工作负荷产生任何影响。Hyper-V 副本的轻量跟踪机制可以确保在虚拟机中运行的工作负荷在稳定状态复制期间不受影响。下图中对此进行了解释。\n\n此图显示了在启用复制之前和之后运行各种工作负荷的虚拟机执行的 IOPS。你可以看到两者之间没有差别。\n\n![副本影响结果](./media/site-recovery-performance-and-scaling-testing-on-premises-to-on-premises/IC744920.png)\n\n下图显示了在启用复制之前和之后运行各种工作负荷的虚拟机的吞吐量。你可以看到复制没有明显影响。\n\n![副本影响结果](./media/site-recovery-performance-and-scaling-testing-on-premises-to-on-premises/IC744921.png)\n\n### 结束语\n\n我们的结果清晰地表明，与 Hyper-V 副本配合使用的 Azure Site Recovery 可以针对大型群集以最小的开销很好地进行扩展。Azure Site Recovery 提供了简单的部署、复制、管理和监视。Hyper-V 副本为成功进行复制扩展提供了必要的基础结构。为规划最佳的部署，建议你下载 [Hyper-V 副本容量规划器](https://www.microsoft.com/zh-cn/download/details.aspx?id=39057)。\n\n## 测试环境详细信息\n\n### 主站点\n\n- 主站点具有一个群集，其中包含运行着 470 个虚拟机的五台 Hyper-V 服务器。\n\n- 各个虚拟机运行不同的工作负载，并且都启用了 Azure Site Recovery 保护。\n\n- 群集节点的存储是由一个 iSCSI SAN 提供的。型号 - Hitachi HUS130。\n\n- 每台群集服务器具有四个网卡 (NIC)，每个为 1 Gbps。\n\n- 两个网卡连接到一个 iSCSI 专用网络，另外两个网卡连接到一个外部企业网络。其中一个外部网络保留给群集通信使用。\n\n![主要硬件要求](./media/site-recovery-performance-and-scaling-testing-on-premises-to-on-premises/IC744922.png)\n\n|服务器|RAM|型号|处理器|处理器数目|NIC|软件|\n|---|---|---|---|---|---|---|\n|群集中的 Hyper-V 服务器：<br />ESTLAB-HOST11<br />ESTLAB-HOST12<br />ESTLAB-HOST13<br />ESTLAB-HOST14<br />ESTLAB-HOST25|128ESTLAB-HOST25 有 256 个|Dell ™ PowerEdge ™ R820|Intel(R) Xeon(R) CPU E5-4620 0 @ 2.20GHz|4|I Gbps x 4|Windows Server Datacenter 2012 R2 (x64) + Hyper-V 角色|\n|VMM 服务器|2|||2|1 Gbps|Windows Server Database 2012 R2 (x64) + VMM 2012 R2|\n\n### 辅助（恢复）站点\n\n- 辅助站点具有一个六节点的故障转移群集。\n\n- 群集节点的存储是由一个 iSCSI SAN 提供的。型号 - Hitachi HUS130。\n\n![主要硬件规格](./media/site-recovery-performance-and-scaling-testing-on-premises-to-on-premises/IC744923.png)\n\n|服务器|RAM|型号|处理器|处理器数目|NIC|软件|\n|---|---|---|---|---|---|---|\n|群集中的 Hyper-V 服务器：<br />ESTLAB-HOST07<br />ESTLAB-HOST08<br />ESTLAB-HOST09<br />ESTLAB-HOST10|96|Dell ™ PowerEdge ™ R720|Intel(R) Xeon(R) CPU E5-2630 0 @ 2.30GHz|2|I Gbps x 4|Windows Server Datacenter 2012 R2 (x64) + Hyper-V 角色|\n|ESTLAB-HOST17|128|Dell ™ PowerEdge ™ R820|Intel(R) Xeon(R) CPU E5-4620 0 @ 2.20GHz|4||Windows Server Datacenter 2012 R2 (x64) + Hyper-V 角色|\n|ESTLAB-HOST24|256|Dell ™ PowerEdge ™ R820|Intel(R) Xeon(R) CPU E5-4620 0 @ 2.20GHz|2||Windows Server Datacenter 2012 R2 (x64) + Hyper-V 角色|\n|VMM 服务器|2|||2|1 Gbps|Windows Server Database 2012 R2 (x64) + VMM 2012 R2|\n\n### 服务器工作负载\n\n- 针对测试用途，我们选取了企业客户方案中常用的工作负载。\n\n- 我们使用 [IOMeter](http://www.iometer.org) 与表中汇总的工作负载特性进行模拟。\n\n- 所有 IOMeter 配置文件都设置为写入随机字节以模拟工作负载的最坏情况写入模式。\n\n|工作负载|I/O 大小 (KB)|访问百分比|读取百分比|未完成的 I/O|I/O 模式|\n|---|---|---|---|---|---|\n|文件服务器|48163264|60%20%5%5%10%|80%80%80%80%80%|88888|全部 100% 随机|\n|SQL Server（卷 1）SQL Server（卷 2）|864|100%100%|70%0%|88|100% 随机100% 连续|\n|Exchange|32|100%|67%|8|100% 随机|\n|工作站/VDI|464|66%34%|70%95%|11|两者都 100% 随机|\n|Web 文件服务器|4864|33%34%33%|95%95%95%|888|全部 75% 随机|\n\n### 虚拟机配置\n\n- 主群集上有 470 个虚拟机。\n\n- 所有虚拟机都具有 VHDX 磁盘。\n\n- 虚拟机运行表中汇总的工作负载。所有虚拟机都是使用 VMM 模板创建的。\n\n|工作负载|VM 数目|最小 RAM (GB)|最大 RAM (GB)|每个 VM 的逻辑磁盘大小 (GB)|最大 IOPS|\n|---|---|---|---|---|---|\n|SQL Server|51|1|4|167|10|\n|Exchange Server|71|1|4|552|10|\n|文件服务器|50|1|2|552|22|\n|VDI|149|0.5|1|80|6|\n|Web 服务器|149|0.5|1|80|6|\n|总计|470|||96.83 TB|4108|\n\n### Azure Site Recovery 设置\n\n- 针对本地到本地保护配置了 Azure Site Recovery\n\n- VMM 服务器配置有四个云，包含 Hyper-V 群集服务器及其虚拟机。\n\n|主 VMM 云|云中受保护的虚拟机数目|复制频率|额外的恢复点|\n|---|---|---|---|\n|PrimaryCloudRpo15m|142|15 分钟|无|\n|PrimaryCloudRpo30s|47|30 秒|无|\n|PrimaryCloudRpo30sArp1|47|30 秒|1|\n|PrimaryCloudRpo5m|235|5 分钟|无|\n\n### 性能指标\n\n此表汇总了在部署中测量到的性能指标和计数器。\n\n|度量值|计数器|\n|---|---|\n|CPU|\\Processor(_Total)\\% Processor Time|\n|可用内存|\\Memory\\Available MBytes|\n|IOPS|\\PhysicalDisk(_Total)\\Disk Transfers/sec|\n|VM 读取 (IOPS) 操作数/秒|\\Hyper-V Virtual Storage Device(<VHD>)\\Read Operations/Sec|\n|VM 写入 (IOPS) 操作数/秒|\\Hyper-V Virtual Storage Device(<VHD>)\\Write Operations/S|\n|VM 读取吞吐量|\\Hyper-V Virtual Storage Device(<VHD>)\\Read Bytes/sec|\n|VM 写入吞吐量|\\Hyper-V Virtual Storage Device(<VHD>)\\Write Bytes/sec|\n\n\n## 后续步骤\n\n- [设置两个本地 VMM 站点之间的保护](/documentation/articles/site-recovery-vmm-to-vmm)\n\n \n\n<!---HONumber=Mooncake_0104_2016-->"
+}

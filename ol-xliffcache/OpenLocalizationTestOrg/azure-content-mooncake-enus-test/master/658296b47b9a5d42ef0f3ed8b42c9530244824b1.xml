@@ -1,0 +1,1083 @@
+{
+  "nodes": [
+    {
+      "content": "优化 Linux VM 上的 MySQL 性能 | Azure",
+      "pos": [
+        27,
+        58
+      ]
+    },
+    {
+      "content": "了解如何优化运行 Linux 的 Azure 虚拟机 (VM) 上运行的 MySQL。",
+      "pos": [
+        77,
+        120
+      ]
+    },
+    {
+      "content": "优化 Azure Linux VM 上的 MySQL 性能",
+      "pos": [
+        374,
+        403
+      ]
+    },
+    {
+      "content": "影响 Azure 上 MySQL 性能的因素有很多，主要体现在虚拟硬件选择和软件配置两个方面。本文重点介绍如何通过存储、系统和数据库配置优化性能。",
+      "pos": [
+        405,
+        478
+      ]
+    },
+    {
+      "pos": [
+        480,
+        566
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]"
+    },
+    {
+      "content": "利用 Azure 虚拟机上的 RAID",
+      "pos": [
+        571,
+        590
+      ]
+    },
+    {
+      "content": "存储是影响云环境中的数据库性能的关键因素。与单个磁盘相比，RAID 可以通过并发访问提供更快的访问速度。有关更多详细信息，请参阅<bpt id=\"p1\">[</bpt>标准 RAID 级别<ept id=\"p1\">](http://en.wikipedia.org/wiki/Standard_RAID_levels)</ept>。",
+      "pos": [
+        591,
+        719
+      ]
+    },
+    {
+      "pos": [
+        721,
+        871
+      ],
+      "content": "通过 RAID 可大幅提升 Azure 中的磁盘 I/O 吞吐量和 I/O 响应时间。我们的检验测试表明，随着 RAID 磁盘数量的加倍（从 2 到 4，从 4 到 8，等等），磁盘 I/O 吞吐量平均增加一倍，I/O 响应时间平均缩短一半。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>附录 A<ept id=\"p1\">](#AppendixA)</ept>。"
+    },
+    {
+      "pos": [
+        873,
+        937
+      ],
+      "content": "增加 RAID 级别时，除了磁盘 I/O，MySQL 性能也得到改善。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>附录 B<ept id=\"p1\">](#AppendixB)</ept>。"
+    },
+    {
+      "pos": [
+        939,
+        1080
+      ],
+      "content": "你可能还要考虑区块大小。通常，区块越大，获得的开销就越低，对于大型写入操作尤其如此。不过，区块太大时，它可能会添加额外的开销，并且你无法利用 RAID。当前的默认大小为 512KB，经证实，它是大多数常见生产环境的最佳大小。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>附录 C<ept id=\"p1\">](#AppendixC)</ept>。"
+    },
+    {
+      "pos": [
+        1082,
+        1250
+      ],
+      "content": "请注意，对于不同的虚拟机类型，可添加的磁盘数量是有限制的。<bpt id=\"p1\">[</bpt>Azure 的虚拟机和云服务大小<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/azure/dn197896.aspx)</ept>中详细介绍了这些限制。你可以选择设置磁盘较少的 RAID，不过，在本文的 RAID 示例中，你需要附加 4 个数据磁盘。"
+    },
+    {
+      "content": "本文假定你已经创建 Linux 虚拟机，并且安装和配置了 MYSQL。有关入门的详细信息，请参阅“如何在 Azure 上安装 MySQL”。",
+      "pos": [
+        1252,
+        1322
+      ]
+    },
+    {
+      "content": "在 Azure 上设置 RAID",
+      "pos": [
+        1327,
+        1343
+      ]
+    },
+    {
+      "content": "以下步骤显示如何使用 Azure 门户在 Azure 上创建 RAID。你也可以使用 Windows PowerShell 脚本设置 RAID。",
+      "pos": [
+        1344,
+        1416
+      ]
+    },
+    {
+      "content": "在本示例中，我们将使用 4 个磁盘配置 RAID 0。",
+      "pos": [
+        1418,
+        1445
+      ]
+    },
+    {
+      "content": "步骤 1：向虚拟机添加数据磁盘",
+      "pos": [
+        1451,
+        1466
+      ]
+    },
+    {
+      "content": "在 Azure 门户的“虚拟机”页上，单击要向其添加数据磁盘的虚拟机。在本示例中，该虚拟机为 mysqlnode1。",
+      "pos": [
+        1470,
+        1528
+      ]
+    },
+    {
+      "content": "在该虚拟机的相应页面上，单击“仪表板”。",
+      "pos": [
+        1538,
+        1558
+      ]
+    },
+    {
+      "content": "在任务栏中，单击“附加”。",
+      "pos": [
+        1569,
+        1582
+      ]
+    },
+    {
+      "content": "然后单击“附加空磁盘”。",
+      "pos": [
+        1592,
+        1604
+      ]
+    },
+    {
+      "content": "对于数据磁盘，“主机缓存首选项”应设置为“无”。",
+      "pos": [
+        1614,
+        1638
+      ]
+    },
+    {
+      "content": "这将向你的虚拟机添加一个空磁盘。再重复此步骤三次，以便为 RAID 附加 4 个数据磁盘。",
+      "pos": [
+        1640,
+        1685
+      ]
+    },
+    {
+      "content": "通过查看内核消息日志，可以看到虚拟机中添加的驱动器。例如，若要在 Ubuntu 上查看，请使用以下命令：",
+      "pos": [
+        1687,
+        1739
+      ]
+    },
+    {
+      "content": "步骤 2：创建具有更多磁盘的 RAID",
+      "pos": [
+        1780,
+        1799
+      ]
+    },
+    {
+      "content": "有关详细的 RAID 设置步骤，请参照本文：",
+      "pos": [
+        1800,
+        1822
+      ]
+    },
+    {
+      "content": "在 Linux 上配置软件 RAID",
+      "pos": [
+        1825,
+        1843
+      ]
+    },
+    {
+      "pos": [
+        1910,
+        1958
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果使用的是 XFS 文件系统，创建 RAID 后请按照下面的步骤操作。"
+    },
+    {
+      "content": "若要在 Debian、Ubuntu 或 Linux Mint 上安装 XFS，请使用以下命令：",
+      "pos": [
+        1960,
+        2007
+      ]
+    },
+    {
+      "content": "若要在 Fedora、CentOS 或 RHEL 上安装 XFS，请使用以下命令：",
+      "pos": [
+        2044,
+        2085
+      ]
+    },
+    {
+      "content": "步骤 3：设置新的存储路径",
+      "pos": [
+        2130,
+        2143
+      ]
+    },
+    {
+      "content": "请使用以下命令：",
+      "pos": [
+        2144,
+        2152
+      ]
+    },
+    {
+      "content": "步骤 4：将原始数据复制到新的存储路径",
+      "pos": [
+        2204,
+        2223
+      ]
+    },
+    {
+      "content": "请使用以下命令：",
+      "pos": [
+        2224,
+        2232
+      ]
+    },
+    {
+      "content": "步骤 5：修改权限以便 MySQL 访问（读取和写入）数据磁盘",
+      "pos": [
+        2300,
+        2331
+      ]
+    },
+    {
+      "content": "请使用以下命令：",
+      "pos": [
+        2332,
+        2340
+      ]
+    },
+    {
+      "content": "调整磁盘 I/O 计划算法",
+      "pos": [
+        2432,
+        2445
+      ]
+    },
+    {
+      "content": "Linux 实现了四种类型的 I/O 计划算法：",
+      "pos": [
+        2446,
+        2470
+      ]
+    },
+    {
+      "content": "NOOP 算法（无操作）",
+      "pos": [
+        2476,
+        2488
+      ]
+    },
+    {
+      "content": "截止时间算法（截止时间）",
+      "pos": [
+        2493,
+        2505
+      ]
+    },
+    {
+      "content": "完全公平队列算法 (CFQ)",
+      "pos": [
+        2510,
+        2524
+      ]
+    },
+    {
+      "content": "预算期算法（预测）",
+      "pos": [
+        2529,
+        2538
+      ]
+    },
+    {
+      "content": "在不同的情况下，你可以选择使用不同的 I/O 计划程序来优化性能。在完全随机的访问环境中，CFQ 算法和截止时间算法对性能的影响区别不大。为保持稳定性，一般建议将 MySQL 数据库环境设置为截止时间算法。如果有大量的顺序 I/O，CFQ 可能会降低磁盘 I/O 性能。",
+      "pos": [
+        2542,
+        2677
+      ]
+    },
+    {
+      "content": "对于 SSD 和其他设备，使用 NOOP 或截止时间算法可以比默认计划程序实现更好的性能。",
+      "pos": [
+        2679,
+        2724
+      ]
+    },
+    {
+      "content": "从内核 2.5 开始，默认 I/O 计划算法为“截止时间”。从内核 2.6.18 开始，CFQ 成为默认 I/O 计划算法。你可以在内核启动时指定此设置或者在系统运行时动态修改此设置。",
+      "pos": [
+        2726,
+        2818
+      ]
+    },
+    {
+      "content": "下面的示例演示如何检查默认计划程序并将其设置为 NOOP 算法。",
+      "pos": [
+        2820,
+        2852
+      ]
+    },
+    {
+      "content": "对于 Debian 分发系列：",
+      "pos": [
+        2854,
+        2869
+      ]
+    },
+    {
+      "content": "步骤 1.查看当前的 I/O 计划程序",
+      "pos": [
+        2874,
+        2893
+      ]
+    },
+    {
+      "content": "请使用以下命令：",
+      "pos": [
+        2894,
+        2902
+      ]
+    },
+    {
+      "content": "你将看到以下输出，指示当前的计划程序。",
+      "pos": [
+        2963,
+        2982
+      ]
+    },
+    {
+      "content": "步骤 2.更改当前设备 (/dev/sda) 的 I/O 计划算法",
+      "pos": [
+        3013,
+        3046
+      ]
+    },
+    {
+      "content": "使用以下命令：",
+      "pos": [
+        3047,
+        3054
+      ]
+    },
+    {
+      "pos": [
+        3330,
+        3384
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>对 /dev/sda 单独进行此设置毫无用处。需对数据库所在的所有数据磁盘进行设置。"
+    },
+    {
+      "content": "你应该会看到以下输出，指示已成功重新生成 grub.cfg 并且默认计划程序已更新为 NOOP。",
+      "pos": [
+        3386,
+        3434
+      ]
+    },
+    {
+      "content": "对于 Redhat 分发系列，只需以下命令：",
+      "pos": [
+        3805,
+        3827
+      ]
+    },
+    {
+      "content": "配置系统文件操作设置",
+      "pos": [
+        3902,
+        3912
+      ]
+    },
+    {
+      "content": "最佳做法之一是禁用文件系统上的 atime 日志记录功能。Atime 指最后一次文件访问的时间。无论何时访问文件，文件系统都会在日志中记录时间戳。但是，很少使用此信息。如果不需要，可以禁用它，这样将减少总体磁盘访问时间。",
+      "pos": [
+        3913,
+        4023
+      ]
+    },
+    {
+      "content": "若要禁用 atime 日志记录，需修改文件系统配置文件 /etc/ fstab 并添加“noatime”选项。",
+      "pos": [
+        4025,
+        4080
+      ]
+    },
+    {
+      "content": "例如，编辑 vim /etc/fstab 文件，并按下面所示添加 noatime。",
+      "pos": [
+        4082,
+        4123
+      ]
+    },
+    {
+      "content": "然后，使用以下命令重新装载文件系统：",
+      "pos": [
+        4550,
+        4568
+      ]
+    },
+    {
+      "content": "测试修改后的结果。请注意，当你修改测试文件时，系统不会更新访问时间。",
+      "pos": [
+        4599,
+        4633
+      ]
+    },
+    {
+      "content": "之前的示例：",
+      "pos": [
+        4635,
+        4641
+      ]
+    },
+    {
+      "content": "之后的示例：",
+      "pos": [
+        4651,
+        4657
+      ]
+    },
+    {
+      "content": "增加系统句柄的最大数量以实现高并发",
+      "pos": [
+        4669,
+        4686
+      ]
+    },
+    {
+      "content": "MySQL 是高并发数据库。对于 Linux，默认的并发句柄数量是 1024 个，这个数量有时候不够用。<bpt id=\"p1\">**</bpt>通过执行以下步骤来增加系统的最大并发句柄数，以此支持 MySQL 的高并发<ept id=\"p1\">**</ept>。",
+      "pos": [
+        4687,
+        4781
+      ]
+    },
+    {
+      "content": "步骤 1：修改 limits.conf 文件",
+      "pos": [
+        4786,
+        4808
+      ]
+    },
+    {
+      "content": "在 /etc/security/limits.conf 文件中添加以下四行，以增加允许的最大并发句柄数。请注意，65536 是系统可以支持的最大数量。",
+      "pos": [
+        4809,
+        4884
+      ]
+    },
+    {
+      "content": "步骤 2：更新系统的新限制",
+      "pos": [
+        4984,
+        4997
+      ]
+    },
+    {
+      "content": "运行以下命令：",
+      "pos": [
+        4998,
+        5005
+      ]
+    },
+    {
+      "content": "步骤 3：确保在启动时更新限制",
+      "pos": [
+        5055,
+        5070
+      ]
+    },
+    {
+      "content": "在 /etc/rc.local 文件中放入以下启动命令，以便其在每次启动时生效。",
+      "pos": [
+        5071,
+        5111
+      ]
+    },
+    {
+      "content": "MySQL 数据库优化",
+      "pos": [
+        5206,
+        5217
+      ]
+    },
+    {
+      "content": "可以在 Azure 上使用与在本地计算机上相同的性能优化策略来配置 MySQL。",
+      "pos": [
+        5218,
+        5258
+      ]
+    },
+    {
+      "content": "主要 I/O 优化规则包括：",
+      "pos": [
+        5260,
+        5274
+      ]
+    },
+    {
+      "content": "增加缓存大小。",
+      "pos": [
+        5280,
+        5287
+      ]
+    },
+    {
+      "content": "减少 I/O 响应时间。",
+      "pos": [
+        5292,
+        5304
+      ]
+    },
+    {
+      "content": "若要优化 MySQL 服务器设置，可以更新 my.cnf 文件，它是服务器和客户端计算机的默认配置文件。",
+      "pos": [
+        5308,
+        5360
+      ]
+    },
+    {
+      "content": "以下配置项是影响 MySQL 性能的主要因素：",
+      "pos": [
+        5362,
+        5385
+      ]
+    },
+    {
+      "pos": [
+        5391,
+        5452
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>innodb\\_buffer\\_pool\\_size<ept id=\"p1\">**</ept>：缓冲池包含缓冲数据和索引。此值通常设置为物理内存的 70%。"
+    },
+    {
+      "pos": [
+        5457,
+        5551
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>innodb\\_log\\_file\\_size<ept id=\"p1\">**</ept>：这是重做日志大小。重做日志用于确保写入操作快速、可靠并且可在出现故障后恢复。此值设置为 512MB，这将为记录写入操作提供大量空间。"
+    },
+    {
+      "pos": [
+        5556,
+        5641
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>max\\_connections<ept id=\"p1\">**</ept>：应用程序有时候不会正确关闭连接。值越大，服务器就有越多时间回收空闲的连接。最大连接数为 10000，但建议的最大值为 5000。"
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>Innodb\\_file\\_per\\_table<ept id=\"p1\">**</ept>：此设置允许或禁止 InnoDB 将表存储在单独的文件中。启用该选项将确保可以有效地应用多项高级管理操作。从性能角度来看，它可以提高表空间传输的速度和优化碎片管理性能。因此，此选项的推荐设置是“打开”。",
+      "pos": [
+        5646,
+        5775
+      ]
+    },
+    {
+      "content": "从 MySQL 5.6 开始，默认设置为“打开”。因此，无需执行任何操作。对于早于 5.6 的其他版本，默认设置为“关闭”。必须启用此选项，并在加载数据之前应用此选项，因为只有新创建的表才会受影响。",
+      "pos": [
+        5781,
+        5880
+      ]
+    },
+    {
+      "pos": [
+        5885,
+        6058
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>innodb\\_flush\\_log\\_at\\_trx\\_commit<ept id=\"p1\">**</ept>：默认值为 1，范围设置为 0~2。默认值是最适合独立 MySQL DB 的选项。设置 2 支持最大程度的数据完整性，适用于 MySQL 群集中的主节点。设置 0 允许数据丢失，这可能会影响可靠性，但在某些情况下能提供更好的性能，适用于 MySQL 群集中的从属节点。"
+    },
+    {
+      "pos": [
+        6063,
+        6211
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Innodb\\_log\\_buffer\\_size<ept id=\"p1\">**</ept>：借助日志缓冲区，即使在事务提交之前未将日志刷新到磁盘，事务也可以运行。但是，如果有大型的二进制对象或文本字段，将很快地耗尽缓存，并触发频繁的磁盘 I/O。如果 Innodb\\_log\\_waits 状态变量不为 0，最好增加缓冲区大小。"
+    },
+    {
+      "pos": [
+        6216,
+        6313
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>query\\_cache\\_size<ept id=\"p1\">**</ept>：最好是从一开始就禁用。将 query\\_cache\\_size 设置为 0（现在是 MySQL 5.6 中的默认设置）并使用其他方法来提高查询速度。"
+    },
+    {
+      "pos": [
+        6317,
+        6350
+      ],
+      "content": "有关优化后的性能比较，请参阅<bpt id=\"p1\">[</bpt>附录 D<ept id=\"p1\">](#AppendixD)</ept>。"
+    },
+    {
+      "content": "启用 MySQL 慢查询日志进行性能瓶颈分析",
+      "pos": [
+        6355,
+        6377
+      ]
+    },
+    {
+      "content": "MySQL 慢查询日志有助于识别 MySQL 的慢查询。在启用 MySQL 慢查询日志后，可以使用 <bpt id=\"p1\">**</bpt>mysqldumpslow<ept id=\"p1\">**</ept> 等 MySQL 工具来识别性能瓶颈。",
+      "pos": [
+        6378,
+        6464
+      ]
+    },
+    {
+      "content": "请注意，默认情况下不启用此选项。启用慢查询日志可能会占用一些 CPU 资源。因此，建议临时启用此选项来排除性能瓶颈。",
+      "pos": [
+        6466,
+        6524
+      ]
+    },
+    {
+      "content": "步骤 1：通过在末尾添加以下行来修改 my.cnf 文件",
+      "pos": [
+        6529,
+        6557
+      ]
+    },
+    {
+      "content": "步骤 2：重新启动 mysql 服务器",
+      "pos": [
+        6667,
+        6686
+      ]
+    },
+    {
+      "content": "service  mysql  restart",
+      "pos": [
+        6691,
+        6714
+      ]
+    },
+    {
+      "content": "步骤 3：使用“show”命令检查该设置是否生效",
+      "pos": [
+        6719,
+        6743
+      ]
+    },
+    {
+      "pos": [
+        6761,
+        6827
+      ],
+      "content": "在本示例中，可以看到慢查询功能已启用。然后可以使用 <bpt id=\"p1\">**</bpt>mysqldumpslow<ept id=\"p1\">**</ept> 工具来确定性能瓶颈和优化性能，比如添加索引。"
+    },
+    {
+      "content": "附录",
+      "pos": [
+        6835,
+        6837
+      ]
+    },
+    {
+      "content": "以下是在目标实验室环境中生成的示例性能测试数据，它们提供了有关使用不同性能优化方法的性能数据趋势的常规背景信息，但是，不同环境或产品版本下的结果可能会有所不同。",
+      "pos": [
+        6839,
+        6919
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a name=\"AppendixA\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>附录 A：",
+      "pos": [
+        6921,
+        6950
+      ]
+    },
+    {
+      "content": "不同 RAID 级别的磁盘性能 (IOPS)",
+      "pos": [
+        6955,
+        6977
+      ]
+    },
+    {
+      "content": "测试命令：",
+      "pos": [
+        6992,
+        6997
+      ]
+    },
+    {
+      "content": "AZURE。请注意：此测试的工作负荷使用 64 个线程，并尝试达到 RAID 的上限。",
+      "pos": [
+        7163,
+        7206
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a name=\"AppendixB\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>附录 B：",
+      "pos": [
+        7208,
+        7237
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>不同 RAID 级别的 MySQL 性能（吞吐量）比较<ept id=\"p1\">**</ept><ph id=\"ph1\"> </ph>",
+      "pos": [
+        7240,
+        7272
+      ]
+    },
+    {
+      "content": "（XFS 文件系统）",
+      "pos": [
+        7275,
+        7285
+      ]
+    },
+    {
+      "content": "测试命令：",
+      "pos": [
+        7309,
+        7314
+      ]
+    },
+    {
+      "content": "不同 RAID 级别的 MySQL 性能 (OLTP) 比较",
+      "pos": [
+        7532,
+        7562
+      ]
+    },
+    {
+      "content": "测试命令：",
+      "pos": [
+        7578,
+        7583
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a name=\"AppendixC\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>附录 C：",
+      "pos": [
+        7842,
+        7871
+      ]
+    },
+    {
+      "content": "不同区块大小的磁盘性能 (IOPS) 比较",
+      "pos": [
+        7877,
+        7898
+      ]
+    },
+    {
+      "content": "（XFS 文件系统）",
+      "pos": [
+        7903,
+        7913
+      ]
+    },
+    {
+      "content": "测试命令：",
+      "pos": [
+        7927,
+        7932
+      ]
+    },
+    {
+      "content": "请注意，用于此测试的文件大小分别为 30GB 和 1GB，并且使用的是 RAID 0（4 个磁盘）XFS 文件系统。",
+      "pos": [
+        8260,
+        8318
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a name=\"AppendixD\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>附录 D：",
+      "pos": [
+        8321,
+        8350
+      ]
+    },
+    {
+      "content": "优化前和优化后的 MySQL 性能（吞吐量）比较",
+      "pos": [
+        8355,
+        8379
+      ]
+    },
+    {
+      "content": "（XFS 文件系统）",
+      "pos": [
+        8384,
+        8394
+      ]
+    },
+    {
+      "content": "测试命令：",
+      "pos": [
+        8408,
+        8413
+      ]
+    },
+    {
+      "content": "默认值和优化值的配置设置如下所示：",
+      "pos": [
+        8637,
+        8654
+      ]
+    },
+    {
+      "content": "Parameters",
+      "pos": [
+        8659,
+        8669
+      ]
+    },
+    {
+      "content": "默认",
+      "pos": [
+        8671,
+        8673
+      ]
+    },
+    {
+      "content": "优化值",
+      "pos": [
+        8675,
+        8678
+      ]
+    },
+    {
+      "content": "innodb\\_buffer\\_pool\\_size",
+      "pos": [
+        8719,
+        8745
+      ]
+    },
+    {
+      "content": "无",
+      "pos": [
+        8749,
+        8750
+      ]
+    },
+    {
+      "content": "7G",
+      "pos": [
+        8752,
+        8754
+      ]
+    },
+    {
+      "content": "innodb\\_log\\_file\\_size",
+      "pos": [
+        8758,
+        8781
+      ]
+    },
+    {
+      "content": "5M",
+      "pos": [
+        8785,
+        8787
+      ]
+    },
+    {
+      "content": "512M",
+      "pos": [
+        8789,
+        8793
+      ]
+    },
+    {
+      "content": "max\\_connections",
+      "pos": [
+        8797,
+        8813
+      ]
+    },
+    {
+      "content": "100",
+      "pos": [
+        8817,
+        8820
+      ]
+    },
+    {
+      "content": "5000",
+      "pos": [
+        8822,
+        8826
+      ]
+    },
+    {
+      "content": "innodb\\_file\\_per\\_table",
+      "pos": [
+        8830,
+        8854
+      ]
+    },
+    {
+      "content": "0",
+      "pos": [
+        8858,
+        8859
+      ]
+    },
+    {
+      "content": "1",
+      "pos": [
+        8861,
+        8862
+      ]
+    },
+    {
+      "content": "innodb\\_flush\\_log\\_at\\_trx\\_commit",
+      "pos": [
+        8866,
+        8901
+      ]
+    },
+    {
+      "content": "1",
+      "pos": [
+        8905,
+        8906
+      ]
+    },
+    {
+      "content": "2",
+      "pos": [
+        8908,
+        8909
+      ]
+    },
+    {
+      "content": "innodb\\_log\\_buffer\\_size",
+      "pos": [
+        8913,
+        8938
+      ]
+    },
+    {
+      "content": "8M",
+      "pos": [
+        8942,
+        8944
+      ]
+    },
+    {
+      "content": "128M",
+      "pos": [
+        8946,
+        8950
+      ]
+    },
+    {
+      "content": "query\\_cache\\_size",
+      "pos": [
+        8954,
+        8972
+      ]
+    },
+    {
+      "content": "16M",
+      "pos": [
+        8976,
+        8979
+      ]
+    },
+    {
+      "content": "0",
+      "pos": [
+        8981,
+        8982
+      ]
+    },
+    {
+      "content": "有关更多更详细的优化配置参数，请参阅 mysql 正式说明。",
+      "pos": [
+        8985,
+        9015
+      ]
+    },
+    {
+      "content": "http://dev.mysql.com/doc/refman/5.6/en/innodb-configuration.html",
+      "pos": [
+        9018,
+        9082
+      ]
+    },
+    {
+      "content": "http://dev.mysql.com/doc/refman/5.6/en/innodb-parameters.html#sysvar\\_innodb\\_flush\\_method",
+      "pos": [
+        9152,
+        9243
+      ]
+    },
+    {
+      "content": "测试环境",
+      "pos": [
+        9338,
+        9342
+      ]
+    },
+    {
+      "content": "硬件",
+      "pos": [
+        9347,
+        9349
+      ]
+    },
+    {
+      "content": "详细信息",
+      "pos": [
+        9351,
+        9355
+      ]
+    },
+    {
+      "content": "Cpu",
+      "pos": [
+        9378,
+        9381
+      ]
+    },
+    {
+      "content": "AMD Opteron(tm) 处理器 4171 HE/4 核",
+      "pos": [
+        9383,
+        9414
+      ]
+    },
+    {
+      "content": "内存",
+      "pos": [
+        9416,
+        9418
+      ]
+    },
+    {
+      "content": "14G",
+      "pos": [
+        9420,
+        9423
+      ]
+    },
+    {
+      "content": "disk",
+      "pos": [
+        9425,
+        9429
+      ]
+    },
+    {
+      "content": "10G/磁盘",
+      "pos": [
+        9431,
+        9437
+      ]
+    },
+    {
+      "content": "os",
+      "pos": [
+        9439,
+        9441
+      ]
+    },
+    {
+      "content": "Ubuntu 14.04.1 LTS",
+      "pos": [
+        9443,
+        9461
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"优化 Linux VM 上的 MySQL 性能 | Azure\"\n    description=\"了解如何优化运行 Linux 的 Azure 虚拟机 (VM) 上运行的 MySQL。\"\n    services=\"virtual-machines\"\n    documentationCenter=\"\"\n    authors=\"NingKuang\"\n    manager=\"timlt\"\n    editor=\"\"\n    tags=\"azure-service-management\"/>\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"12/15/2015\"\n    wacn.date=\"01/29/2016\"/>\n\n#优化 Azure Linux VM 上的 MySQL 性能\n\n影响 Azure 上 MySQL 性能的因素有很多，主要体现在虚拟硬件选择和软件配置两个方面。本文重点介绍如何通过存储、系统和数据库配置优化性能。\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]\n\n\n##利用 Azure 虚拟机上的 RAID\n存储是影响云环境中的数据库性能的关键因素。与单个磁盘相比，RAID 可以通过并发访问提供更快的访问速度。有关更多详细信息，请参阅[标准 RAID 级别](http://en.wikipedia.org/wiki/Standard_RAID_levels)。\n\n通过 RAID 可大幅提升 Azure 中的磁盘 I/O 吞吐量和 I/O 响应时间。我们的检验测试表明，随着 RAID 磁盘数量的加倍（从 2 到 4，从 4 到 8，等等），磁盘 I/O 吞吐量平均增加一倍，I/O 响应时间平均缩短一半。有关详细信息，请参阅[附录 A](#AppendixA)。\n\n增加 RAID 级别时，除了磁盘 I/O，MySQL 性能也得到改善。有关详细信息，请参阅[附录 B](#AppendixB)。\n\n你可能还要考虑区块大小。通常，区块越大，获得的开销就越低，对于大型写入操作尤其如此。不过，区块太大时，它可能会添加额外的开销，并且你无法利用 RAID。当前的默认大小为 512KB，经证实，它是大多数常见生产环境的最佳大小。有关详细信息，请参阅[附录 C](#AppendixC)。\n\n请注意，对于不同的虚拟机类型，可添加的磁盘数量是有限制的。[Azure 的虚拟机和云服务大小](http://msdn.microsoft.com/zh-cn/library/azure/dn197896.aspx)中详细介绍了这些限制。你可以选择设置磁盘较少的 RAID，不过，在本文的 RAID 示例中，你需要附加 4 个数据磁盘。\n\n本文假定你已经创建 Linux 虚拟机，并且安装和配置了 MYSQL。有关入门的详细信息，请参阅“如何在 Azure 上安装 MySQL”。\n\n###在 Azure 上设置 RAID\n以下步骤显示如何使用 Azure 门户在 Azure 上创建 RAID。你也可以使用 Windows PowerShell 脚本设置 RAID。 \n在本示例中，我们将使用 4 个磁盘配置 RAID 0。\n\n####步骤 1：向虚拟机添加数据磁盘  \n\n在 Azure 门户的“虚拟机”页上，单击要向其添加数据磁盘的虚拟机。在本示例中，该虚拟机为 mysqlnode1。\n\n![][1]\n\n在该虚拟机的相应页面上，单击“仪表板”。\n\n![][2]\n\n\n在任务栏中，单击“附加”。\n\n![][3]\n\n然后单击“附加空磁盘”。\n\n![][4]\n\n对于数据磁盘，“主机缓存首选项”应设置为“无”。\n\n这将向你的虚拟机添加一个空磁盘。再重复此步骤三次，以便为 RAID 附加 4 个数据磁盘。\n\n通过查看内核消息日志，可以看到虚拟机中添加的驱动器。例如，若要在 Ubuntu 上查看，请使用以下命令：\n\n    sudo grep SCSI /var/log/dmesg\n\n####步骤 2：创建具有更多磁盘的 RAID\n有关详细的 RAID 设置步骤，请参照本文：\n\n[在 Linux 上配置软件 RAID](/documentation/articles/virtual-machines-linux-configure-raid)\n\n>[AZURE.NOTE]如果使用的是 XFS 文件系统，创建 RAID 后请按照下面的步骤操作。\n\n若要在 Debian、Ubuntu 或 Linux Mint 上安装 XFS，请使用以下命令：\n\n    apt-get -y install xfsprogs  \n\n若要在 Fedora、CentOS 或 RHEL 上安装 XFS，请使用以下命令：\n\n    yum -y install xfsprogs  xfsdump\n\n\n####步骤 3：设置新的存储路径\n请使用以下命令：\n\n    root@mysqlnode1:~# mkdir -p /RAID0/mysql\n\n####步骤 4：将原始数据复制到新的存储路径\n请使用以下命令：\n\n    root@mysqlnode1:~# cp -rp /var/lib/mysql/* /RAID0/mysql/\n\n####步骤 5：修改权限以便 MySQL 访问（读取和写入）数据磁盘\n请使用以下命令：\n\n    root@mysqlnode1:~# chown -R mysql.mysql /RAID0/mysql && chmod -R 755 /RAID0/mysql\n\n\n##调整磁盘 I/O 计划算法\nLinux 实现了四种类型的 I/O 计划算法：\n\n-   NOOP 算法（无操作）\n-   截止时间算法（截止时间）\n-   完全公平队列算法 (CFQ)\n-   预算期算法（预测）  \n\n在不同的情况下，你可以选择使用不同的 I/O 计划程序来优化性能。在完全随机的访问环境中，CFQ 算法和截止时间算法对性能的影响区别不大。为保持稳定性，一般建议将 MySQL 数据库环境设置为截止时间算法。如果有大量的顺序 I/O，CFQ 可能会降低磁盘 I/O 性能。\n\n对于 SSD 和其他设备，使用 NOOP 或截止时间算法可以比默认计划程序实现更好的性能。\n\n从内核 2.5 开始，默认 I/O 计划算法为“截止时间”。从内核 2.6.18 开始，CFQ 成为默认 I/O 计划算法。你可以在内核启动时指定此设置或者在系统运行时动态修改此设置。\n\n下面的示例演示如何检查默认计划程序并将其设置为 NOOP 算法。\n\n对于 Debian 分发系列：\n\n###步骤 1.查看当前的 I/O 计划程序\n请使用以下命令：\n\n    root@mysqlnode1:~# cat /sys/block/sda/queue/scheduler\n\n你将看到以下输出，指示当前的计划程序。\n\n    noop [deadline] cfq\n\n\n###步骤 2.更改当前设备 (/dev/sda) 的 I/O 计划算法\n使用以下命令：\n\n    azureuser@mysqlnode1:~$ sudo su -\n    root@mysqlnode1:~# echo \"noop\" >/sys/block/sda/queue/scheduler\n    root@mysqlnode1:~# sed -i 's/GRUB_CMDLINE_LINUX=\"\"/GRUB_CMDLINE_LINUX_DEFAULT=\"quiet splash elevator=noop\"/g' /etc/default/grub\n    root@mysqlnode1:~# update-grub\n\n>[AZURE.NOTE]对 /dev/sda 单独进行此设置毫无用处。需对数据库所在的所有数据磁盘进行设置。\n\n你应该会看到以下输出，指示已成功重新生成 grub.cfg 并且默认计划程序已更新为 NOOP。\n\n    Generating grub configuration file ...\n    Found linux image: /boot/vmlinuz-3.13.0-34-generic\n    Found initrd image: /boot/initrd.img-3.13.0-34-generic\n    Found linux image: /boot/vmlinuz-3.13.0-32-generic\n    Found initrd image: /boot/initrd.img-3.13.0-32-generic\n    Found memtest86+ image: /memtest86+.elf\n    Found memtest86+ image: /memtest86+.bin\n    done\n\n对于 Redhat 分发系列，只需以下命令：\n\n    echo 'echo noop >/sys/block/sda/queue/scheduler' >> /etc/rc.local\n\n##配置系统文件操作设置\n最佳做法之一是禁用文件系统上的 atime 日志记录功能。Atime 指最后一次文件访问的时间。无论何时访问文件，文件系统都会在日志中记录时间戳。但是，很少使用此信息。如果不需要，可以禁用它，这样将减少总体磁盘访问时间。\n\n若要禁用 atime 日志记录，需修改文件系统配置文件 /etc/ fstab 并添加“noatime”选项。\n\n例如，编辑 vim /etc/fstab 文件，并按下面所示添加 noatime。\n\n    # CLOUD_IMG: This file was created/modified by the Cloud Image build process\n    UUID=3cc98c06-d649-432d-81df-6dcd2a584d41       /        ext4   defaults,discard        0 0\n    #Add the “noatime” option below to disable atime logging\n    UUID=\"431b1e78-8226-43ec-9460-514a9adf060e\"     /RAID0   xfs   defaults,nobootwait, noatime 0 0\n    /dev/sdb1       /mnt    auto    defaults,nobootwait,comment=cloudconfig 0       2\n\n然后，使用以下命令重新装载文件系统：\n\n    mount -o remount /RAID0\n\n测试修改后的结果。请注意，当你修改测试文件时，系统不会更新访问时间。\n\n之前的示例：\n\n![][5]\n\n之后的示例：\n\n![][6]\n\n##增加系统句柄的最大数量以实现高并发\nMySQL 是高并发数据库。对于 Linux，默认的并发句柄数量是 1024 个，这个数量有时候不够用。**通过执行以下步骤来增加系统的最大并发句柄数，以此支持 MySQL 的高并发**。\n\n###步骤 1：修改 limits.conf 文件\n在 /etc/security/limits.conf 文件中添加以下四行，以增加允许的最大并发句柄数。请注意，65536 是系统可以支持的最大数量。\n\n    * soft nofile 65536\n    * hard nofile 65536\n    * soft nproc 65536\n    * hard nproc 65536\n\n###步骤 2：更新系统的新限制\n运行以下命令：\n\n    ulimit -SHn 65536\n    ulimit -SHu 65536\n\n###步骤 3：确保在启动时更新限制\n在 /etc/rc.local 文件中放入以下启动命令，以便其在每次启动时生效。\n\n    echo “ulimit -SHn 65536” >>/etc/rc.local\n    echo “ulimit -SHu 65536” >>/etc/rc.local\n\n##MySQL 数据库优化\n可以在 Azure 上使用与在本地计算机上相同的性能优化策略来配置 MySQL。\n\n主要 I/O 优化规则包括：\n\n-   增加缓存大小。\n-   减少 I/O 响应时间。  \n\n若要优化 MySQL 服务器设置，可以更新 my.cnf 文件，它是服务器和客户端计算机的默认配置文件。\n\n以下配置项是影响 MySQL 性能的主要因素：\n\n-   **innodb\\_buffer\\_pool\\_size**：缓冲池包含缓冲数据和索引。此值通常设置为物理内存的 70%。\n-   **innodb\\_log\\_file\\_size**：这是重做日志大小。重做日志用于确保写入操作快速、可靠并且可在出现故障后恢复。此值设置为 512MB，这将为记录写入操作提供大量空间。\n-   **max\\_connections**：应用程序有时候不会正确关闭连接。值越大，服务器就有越多时间回收空闲的连接。最大连接数为 10000，但建议的最大值为 5000。\n-   **Innodb\\_file\\_per\\_table**：此设置允许或禁止 InnoDB 将表存储在单独的文件中。启用该选项将确保可以有效地应用多项高级管理操作。从性能角度来看，它可以提高表空间传输的速度和优化碎片管理性能。因此，此选项的推荐设置是“打开”。</br> 从 MySQL 5.6 开始，默认设置为“打开”。因此，无需执行任何操作。对于早于 5.6 的其他版本，默认设置为“关闭”。必须启用此选项，并在加载数据之前应用此选项，因为只有新创建的表才会受影响。\n-   **innodb\\_flush\\_log\\_at\\_trx\\_commit**：默认值为 1，范围设置为 0~2。默认值是最适合独立 MySQL DB 的选项。设置 2 支持最大程度的数据完整性，适用于 MySQL 群集中的主节点。设置 0 允许数据丢失，这可能会影响可靠性，但在某些情况下能提供更好的性能，适用于 MySQL 群集中的从属节点。\n-   **Innodb\\_log\\_buffer\\_size**：借助日志缓冲区，即使在事务提交之前未将日志刷新到磁盘，事务也可以运行。但是，如果有大型的二进制对象或文本字段，将很快地耗尽缓存，并触发频繁的磁盘 I/O。如果 Innodb\\_log\\_waits 状态变量不为 0，最好增加缓冲区大小。\n-   **query\\_cache\\_size**：最好是从一开始就禁用。将 query\\_cache\\_size 设置为 0（现在是 MySQL 5.6 中的默认设置）并使用其他方法来提高查询速度。  \n\n有关优化后的性能比较，请参阅[附录 D](#AppendixD)。\n\n\n##启用 MySQL 慢查询日志进行性能瓶颈分析\nMySQL 慢查询日志有助于识别 MySQL 的慢查询。在启用 MySQL 慢查询日志后，可以使用 **mysqldumpslow** 等 MySQL 工具来识别性能瓶颈。\n\n请注意，默认情况下不启用此选项。启用慢查询日志可能会占用一些 CPU 资源。因此，建议临时启用此选项来排除性能瓶颈。\n\n###步骤 1：通过在末尾添加以下行来修改 my.cnf 文件   \n\n    long_query_time = 2\n    slow_query_log = 1\n    slow_query_log_file = /RAID0/mysql/mysql-slow.log\n\n###步骤 2：重新启动 mysql 服务器\n    service  mysql  restart\n\n###步骤 3：使用“show”命令检查该设置是否生效\n\n![][7]\n\n![][8]\n\n在本示例中，可以看到慢查询功能已启用。然后可以使用 **mysqldumpslow** 工具来确定性能瓶颈和优化性能，比如添加索引。\n\n\n\n\n\n##附录\n\n以下是在目标实验室环境中生成的示例性能测试数据，它们提供了有关使用不同性能优化方法的性能数据趋势的常规背景信息，但是，不同环境或产品版本下的结果可能会有所不同。\n\n<a name=\"AppendixA\"></a>附录 A：  \n**不同 RAID 级别的磁盘性能 (IOPS)**\n\n\n![][9]\n\n**测试命令：**\n\n    fio -filename=/path/test -iodepth=64 -ioengine=libaio -direct=1 -rw=randwrite -bs=4k -size=5G -numjobs=64 -runtime=30 -group_reporting -name=test-randwrite\n\n>AZURE。请注意：此测试的工作负荷使用 64 个线程，并尝试达到 RAID 的上限。\n\n<a name=\"AppendixB\"></a>附录 B：  \n**不同 RAID 级别的 MySQL 性能（吞吐量）比较**   \n（XFS 文件系统）\n\n\n![][10]  \n![][11]\n\n**测试命令：**\n\n    mysqlslap -p0ps.123 --concurrency=2 --iterations=1 --number-int-cols=10 --number-char-cols=10 -a --auto-generate-sql-guid-primary --number-of-queries=10000 --auto-generate-sql-load-type=write –engine=innodb\n\n**不同 RAID 级别的 MySQL 性能 (OLTP) 比较**  \n![][12]\n\n**测试命令：**\n\n    time sysbench --test=oltp --db-driver=mysql --mysql-user=root --mysql-password=0ps.123  --mysql-table-engine=innodb --mysql-host=127.0.0.1 --mysql-port=3306 --mysql-socket=/var/run/mysqld/mysqld.sock --mysql-db=test --oltp-table-size=1000000 prepare\n\n<a name=\"AppendixC\"></a>附录 C：   \n**不同区块大小的磁盘性能 (IOPS) 比较**  \n（XFS 文件系统）\n\n\n![][13]\n\n**测试命令：**\n\n    fio -filename=/path/test -iodepth=64 -ioengine=libaio -direct=1 -rw=randwrite -bs=4k -size=30G -numjobs=64 -runtime=30 -group_reporting -name=test-randwrite\n    fio -filename=/path/test -iodepth=64 -ioengine=libaio -direct=1 -rw=randwrite -bs=4k -size=1G -numjobs=64 -runtime=30 -group_reporting -name=test-randwrite  \n\n请注意，用于此测试的文件大小分别为 30GB 和 1GB，并且使用的是 RAID 0（4 个磁盘）XFS 文件系统。\n\n\n<a name=\"AppendixD\"></a>附录 D：  \n**优化前和优化后的 MySQL 性能（吞吐量）比较**  \n（XFS 文件系统）\n\n\n![][14]\n\n**测试命令：**\n\n    mysqlslap -p0ps.123 --concurrency=2 --iterations=1 --number-int-cols=10 --number-char-cols=10 -a --auto-generate-sql-guid-primary --number-of-queries=10000 --auto-generate-sql-load-type=write –engine=innodb,misam\n\n**默认值和优化值的配置设置如下所示：**\n\n|Parameters |默认 |优化值\n|-----------|-----------|-----------\n|**innodb\\_buffer\\_pool\\_size** |无 |7G\n|**innodb\\_log\\_file\\_size** |5M |512M\n|**max\\_connections** |100 |5000\n|**innodb\\_file\\_per\\_table** |0 |1\n|**innodb\\_flush\\_log\\_at\\_trx\\_commit** |1 |2\n|**innodb\\_log\\_buffer\\_size** |8M |128M\n|**query\\_cache\\_size** |16M |0\n\n\n有关更多更详细的优化配置参数，请参阅 mysql 正式说明。\n\n[http://dev.mysql.com/doc/refman/5.6/en/innodb-configuration.html](http://dev.mysql.com/doc/refman/5.6/en/innodb-configuration.html)\n\n[http://dev.mysql.com/doc/refman/5.6/en/innodb-parameters.html#sysvar\\_innodb\\_flush\\_method](http://dev.mysql.com/doc/refman/5.6/en/innodb-parameters.html#sysvar_innodb_flush_method)\n\n**测试环境**\n\n|硬件 |详细信息\n|-----------|-------\n|Cpu |AMD Opteron(tm) 处理器 4171 HE/4 核\n|内存 |14G\n|disk |10G/磁盘\n|os |Ubuntu 14.04.1 LTS\n\n\n\n[1]: ./media/virtual-machines-linux-optimize-mysql-perf/virtual-machines-linux-optimize-mysql-perf-01.png\n[2]: ./media/virtual-machines-linux-optimize-mysql-perf/virtual-machines-linux-optimize-mysql-perf-02.png\n[3]: ./media/virtual-machines-linux-optimize-mysql-perf/virtual-machines-linux-optimize-mysql-perf-03.png\n[4]: ./media/virtual-machines-linux-optimize-mysql-perf/virtual-machines-linux-optimize-mysql-perf-04.png\n[5]: ./media/virtual-machines-linux-optimize-mysql-perf/virtual-machines-linux-optimize-mysql-perf-05.png\n[6]: ./media/virtual-machines-linux-optimize-mysql-perf/virtual-machines-linux-optimize-mysql-perf-06.png\n[7]: ./media/virtual-machines-linux-optimize-mysql-perf/virtual-machines-linux-optimize-mysql-perf-07.png\n[8]: ./media/virtual-machines-linux-optimize-mysql-perf/virtual-machines-linux-optimize-mysql-perf-08.png\n[9]: ./media/virtual-machines-linux-optimize-mysql-perf/virtual-machines-linux-optimize-mysql-perf-09.png\n[10]: ./media/virtual-machines-linux-optimize-mysql-perf/virtual-machines-linux-optimize-mysql-perf-10.png\n[11]: ./media/virtual-machines-linux-optimize-mysql-perf/virtual-machines-linux-optimize-mysql-perf-11.png\n[12]: ./media/virtual-machines-linux-optimize-mysql-perf/virtual-machines-linux-optimize-mysql-perf-12.png\n[13]: ./media/virtual-machines-linux-optimize-mysql-perf/virtual-machines-linux-optimize-mysql-perf-13.png\n[14]: ./media/virtual-machines-linux-optimize-mysql-perf/virtual-machines-linux-optimize-mysql-perf-14.png\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

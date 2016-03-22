@@ -1,0 +1,4695 @@
+{
+  "nodes": [
+    {
+      "content": "配合使用 Azure CLI 和服务管理 | Azure",
+      "pos": [
+        27,
+        55
+      ]
+    },
+    {
+      "content": "了解如何使用适用于 Mac、Linux 和 Windows 的命令行工具，在经典（Azure 服务管理）模式下使用 Azure CLI 管理 Azure。",
+      "pos": [
+        74,
+        151
+      ]
+    },
+    {
+      "content": "将适用于 Mac、Linux 和 Windows 的 Azure CLI 与 Azure 服务管理配合使用",
+      "pos": [
+        434,
+        487
+      ]
+    },
+    {
+      "pos": [
+        489,
+        575
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]"
+    },
+    {
+      "content": "本文介绍如何在服务管理模式（asm 模式）下使用 Azure CLI 在 Mac、Linux 和 Windows 计算机的命令行中创建、管理和删除服务。你可以使用 Azure SDK 的各种库、Azure PowerShell 和 Azure 门户执行许多相同的任务。在服务管理模式下使用 Azure 服务从概念上讲类似于创建和管理各个 Azure 概念和服务（如 Web 应用、虚拟机、虚拟网络、存储器等）。",
+      "pos": [
+        578,
+        783
+      ]
+    },
+    {
+      "content": "若要开始使用，首先<bpt id=\"p1\">[</bpt>安装 Azure CLI<ept id=\"p1\">](/documentation/articles/xplat-cli-install)</ept>，并<bpt id=\"p2\">[</bpt>登录以使用与你的帐户关联的 Azure 资源<ept id=\"p2\">](/documentation/articles/xplat-cli-connect)</ept>。",
+      "pos": [
+        800,
+        936
+      ]
+    },
+    {
+      "content": "本文的讨论范围",
+      "pos": [
+        941,
+        948
+      ]
+    },
+    {
+      "pos": [
+        950,
+        1148
+      ],
+      "content": "本文提供了用于经典（服务管理）部署模型的常用 Azure CLI 命令的语法和选项。它并不是完整的参考，并且你的 CLI 版本可能会显示某些不同的命令或参数。要在服务管理模式下在命令行中查看当前的命令语法和选项，请键入 <ph id=\"ph1\">`azure help`</ph>；要显示某个命令的帮助，请键入 <ph id=\"ph2\">`azure help [command]`</ph>。你还可以在创建和管理具体 Azure 服务的说明文档中找到 CLI 示例。"
+    },
+    {
+      "content": "可选参数显示在方括号中（例如，[参数]）。其他所有参数都是必需的。",
+      "pos": [
+        1150,
+        1183
+      ]
+    },
+    {
+      "content": "除了此处记录的特定于命令的可选参数外，还有三个可用于显示详细输出（例如请求选项和状态代码）的可选参数。-v 参数提供详细输出，而 -vv 参数提供更详细的输出。--json 选项将以原始的 json 格式输出结果。",
+      "pos": [
+        1185,
+        1292
+      ]
+    },
+    {
+      "content": "设置服务管理模式",
+      "pos": [
+        1297,
+        1305
+      ]
+    },
+    {
+      "content": "当前，首次安装 CLI 时，在默认情况下启用服务管理模式。如果需要，请使用以下命令启用 Azure CLI 服务管理命令。",
+      "pos": [
+        1307,
+        1368
+      ]
+    },
+    {
+      "pos": [
+        1398,
+        1465
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>Azure 资源管理器模式与 Azure 服务管理模式互斥。即在一种模式下创建的资源不能从另一种模式进行管理。"
+    },
+    {
+      "content": "管理帐户信息和发布设置",
+      "pos": [
+        1470,
+        1481
+      ]
+    },
+    {
+      "content": "该工具使用你的 Azure 订阅信息连接到你的帐户。可以从 Azure 门户中的发布设置文件中获取此信息，如下所述。可以导入发布设置文件作为永久性本地配置设置，该工具会将此设置用于后续操作。你只需导入你的发布设置一次。",
+      "pos": [
+        1482,
+        1591
+      ]
+    },
+    {
+      "content": "account download [options]",
+      "pos": [
+        1595,
+        1621
+      ]
+    },
+    {
+      "content": "此命令启动浏览器以从 Azure 门户下载你的 .publishsettings 文件。",
+      "pos": [
+        1625,
+        1669
+      ]
+    },
+    {
+      "content": "account import [options] &amp;lt;file&gt;",
+      "pos": [
+        1976,
+        2010
+      ]
+    },
+    {
+      "content": "此命令导入 publishsettings 文件或证书以便日后可以供该工具使用。",
+      "pos": [
+        2015,
+        2055
+      ]
+    },
+    {
+      "pos": [
+        2570,
+        2758
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>publishsettings 文件可以包含有关多个订阅的详细信息（即，订阅名称和 ID）。当你导入 publishsettings 文件时，第一个订阅将用作默认订阅。若要使用不同订阅，请运行以下命令。<ph id=\"ph2\">&lt;code&gt;</ph><ph id=\"ph3\">~$ azure config set subscription &amp;lt;other-subscription-id&amp;gt;</ph><ph id=\"ph4\">&lt;/code&gt;</ph>"
+    },
+    {
+      "content": "account clear [options]",
+      "pos": [
+        2762,
+        2785
+      ]
+    },
+    {
+      "content": "此命令删除已导入的存储的发布设置。如果你在此计算机上使用完该工具，并且希望确保日后不能通过你的帐户使用该工具，则使用此命令。",
+      "pos": [
+        2789,
+        2851
+      ]
+    },
+    {
+      "content": "account list [options]",
+      "pos": [
+        2925,
+        2947
+      ]
+    },
+    {
+      "content": "列出导入的订阅",
+      "pos": [
+        2951,
+        2958
+      ]
+    },
+    {
+      "content": "account set [options] &amp;lt;subscription&amp;gt;",
+      "pos": [
+        3463,
+        3505
+      ]
+    },
+    {
+      "content": "设置当前订阅",
+      "pos": [
+        3509,
+        3515
+      ]
+    },
+    {
+      "content": "管理地缘组的命令",
+      "pos": [
+        3520,
+        3528
+      ]
+    },
+    {
+      "content": "account affinity-group list [options]",
+      "pos": [
+        3532,
+        3569
+      ]
+    },
+    {
+      "content": "此命令列出你的 Azure 地缘组。",
+      "pos": [
+        3573,
+        3591
+      ]
+    },
+    {
+      "content": "可以在一组虚拟机跨越多台物理计算机时设置地缘组。地缘组指定物理计算机应尽可能彼此接近，从而减少网络延迟。",
+      "pos": [
+        3593,
+        3645
+      ]
+    },
+    {
+      "content": "account affinity-group create [options] &amp;lt;name&amp;gt;",
+      "pos": [
+        3974,
+        4026
+      ]
+    },
+    {
+      "content": "此命令创建新的地缘组",
+      "pos": [
+        4030,
+        4040
+      ]
+    },
+    {
+      "content": "account affinity-group show [options] &amp;lt;name&amp;gt;",
+      "pos": [
+        4258,
+        4308
+      ]
+    },
+    {
+      "content": "此命令显示地缘组的详细信息",
+      "pos": [
+        4312,
+        4325
+      ]
+    },
+    {
+      "content": "account affinity-group delete [options] &amp;lt;name&amp;gt;",
+      "pos": [
+        4963,
+        5015
+      ]
+    },
+    {
+      "content": "此命令将删除指定的地缘组",
+      "pos": [
+        5019,
+        5031
+      ]
+    },
+    {
+      "content": "管理帐户环境的命令",
+      "pos": [
+        5276,
+        5285
+      ]
+    },
+    {
+      "content": "account env list [options]",
+      "pos": [
+        5289,
+        5315
+      ]
+    },
+    {
+      "content": "帐户环境列表",
+      "pos": [
+        5319,
+        5325
+      ]
+    },
+    {
+      "content": "account env show [options] [environment]",
+      "pos": [
+        5566,
+        5606
+      ]
+    },
+    {
+      "content": "显示帐户环境详细信息",
+      "pos": [
+        5610,
+        5620
+      ]
+    },
+    {
+      "content": "account env add [options] [environment]",
+      "pos": [
+        5942,
+        5981
+      ]
+    },
+    {
+      "content": "此命令将一个环境添加到帐户",
+      "pos": [
+        5985,
+        5998
+      ]
+    },
+    {
+      "content": "account env set [options] [environment]",
+      "pos": [
+        6002,
+        6041
+      ]
+    },
+    {
+      "content": "此命令设置帐户环境",
+      "pos": [
+        6045,
+        6054
+      ]
+    },
+    {
+      "content": "account env delete [options] [environment]",
+      "pos": [
+        6058,
+        6100
+      ]
+    },
+    {
+      "content": "此命令从帐户中删除指定的环境",
+      "pos": [
+        6104,
+        6118
+      ]
+    },
+    {
+      "content": "用于管理 Azure 虚拟机的命令",
+      "pos": [
+        6123,
+        6140
+      ]
+    },
+    {
+      "content": "下图显示了如何在 Azure 云服务的生产部署环境中托管 Azure 虚拟机。",
+      "pos": [
+        6141,
+        6180
+      ]
+    },
+    {
+      "content": "Azure 技术图表",
+      "pos": [
+        6184,
+        6194
+      ]
+    },
+    {
+      "pos": [
+        6266,
+        6339
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>create-new<ept id=\"p1\">**</ept> 在 Blob 存储中创建驱动器（即，图中的 e:\\\\）；<bpt id=\"p2\">**</bpt>attach<ept id=\"p2\">**</ept> 会将已创建但未附加的磁盘附加到虚拟机。"
+    },
+    {
+      "content": "vm create [options] &amp;lt;dns-name&gt; &amp;lt;image&gt; &amp;lt;userName&gt; [password]",
+      "pos": [
+        6343,
+        6412
+      ]
+    },
+    {
+      "content": "此命令创建新的 Azure 虚拟机。默认情况下，所创建的每台虚拟机 (vm) 都位于其自己的云服务中；但是，你可以使用此处提及的 -c 选项指定将虚拟机添加到现有云服务中。",
+      "pos": [
+        6416,
+        6502
+      ]
+    },
+    {
+      "content": "vm create 命令与 Azure 门户一样，只会在生产部署环境中创建虚拟机。目前没有用于在云服务的过渡部署环境中创建虚拟机的选项。如果你的订阅没有现有的 Azure 存储帐户，此命令将创建一个。",
+      "pos": [
+        6504,
+        6604
+      ]
+    },
+    {
+      "content": "你可以通过 --location 参数指定位置，也可以通过 --affinity-group 参数指定地缘组。如果这两个参数任何一个都没有提供，系统将提示你从有效位置列表中提供一个。",
+      "pos": [
+        6606,
+        6697
+      ]
+    },
+    {
+      "content": "所提供密码的长度必须为 8-123 个字符，并且满足你要用于此虚拟机的操作系统的密码复杂度要求。",
+      "pos": [
+        6699,
+        6747
+      ]
+    },
+    {
+      "content": "如果你预计需要使用 SSH 来管理部署的 Linux 虚拟机（通常都是如此），则必须在创建虚拟机时通过 -e 选项启用 SSH。在创建该虚拟机后无法启用 SSH。",
+      "pos": [
+        6749,
+        6830
+      ]
+    },
+    {
+      "content": "Windows 虚拟机稍后可以通过添加端口 3389 作为终结点来启用 RDP。",
+      "pos": [
+        6832,
+        6872
+      ]
+    },
+    {
+      "content": "此命令支持以下可选参数：",
+      "pos": [
+        6874,
+        6886
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>-c, --connect<ept id=\"p1\">**</ept> 在托管服务中已创建的部署中创建虚拟机。如果 -vmname 未与此选项一起使用，将自动生成新虚拟机的名称。",
+      "pos": [
+        6888,
+        6959
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>-n, --vm-name<ept id=\"p1\">**</ept> 指定虚拟机的名称。默认情况下，此参数采用托管服务名称。如果未指定 -vmname，将生成 &amp;lt;service-name&gt;&amp;lt;id&gt; 形式的新虚拟机名称，其中 &amp;lt;id&gt; 是服务中现有虚拟机的数量加上 1。例如，如果你使用此命令向拥有一个现有虚拟机的托管服务 MyService 中添加新虚拟机，则会将新虚拟机命名为 MyService2。",
+      "pos": [
+        6967,
+        7160
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>-u, --blob-url<ept id=\"p1\">**</ept> 指定从中创建虚拟机系统磁盘的目标 Blob 存储 URL。",
+      "pos": [
+        7168,
+        7216
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>-z, --vm-size<ept id=\"p1\">**</ept> 指定虚拟机的大小。有效值为：",
+      "pos": [
+        7224,
+        7256
+      ]
+    },
+    {
+      "content": "“ExtraSmall”、“Small”、“Medium”、“Large”、“ExtraLarge”、“A5”、“A6”、“A7”、“A8”、“A9”、“A10”、“A11”、“Basic\\_A0”、“Basic\\_A1”、“Basic\\_A2”、",
+      "pos": [
+        7257,
+        7381
+      ]
+    },
+    {
+      "content": "“Basic\\_A3”、“Basic\\_A4”、“Standard\\_D1”、“Standard\\_D2”、“Standard\\_D3”、“Standard\\_D4”、“Standard\\_D11”、“Standard\\_D12”、“Standard\\_D13”、",
+      "pos": [
+        7384,
+        7516
+      ]
+    },
+    {
+      "content": "“Standard\\_D14”、“Standard\\_DS1”、“Standard\\_DS2”、“Standard\\_DS3”、“Standard\\_DS4”、“Standard\\_DS11”、“Standard\\_DS12”、“Standard\\_DS13”、",
+      "pos": [
+        7519,
+        7650
+      ]
+    },
+    {
+      "content": "“Standard\\_DS14”、“Standard\\_G1”、“Standard\\_G2”、“Standard\\_G3”、“Standard\\_G4”、“Standard_G55”。默认值为“Small”。",
+      "pos": [
+        7653,
+        7757
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>-r<ept id=\"p1\">**</ept> 添加到 Windows 虚拟机的 RDP 连接。",
+      "pos": [
+        7765,
+        7796
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>-e, --ssh<ept id=\"p1\">**</ept> 添加到 Windows 虚拟机的 SSH 连接。",
+      "pos": [
+        7803,
+        7841
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>-t, --ssh-cert<ept id=\"p1\">**</ept> 指定 SSH 证书。",
+      "pos": [
+        7849,
+        7878
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>-s<ept id=\"p1\">**</ept> 订阅。",
+      "pos": [
+        7886,
+        7896
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>-o, --community<ept id=\"p1\">**</ept> 指定的映像是社区映像。",
+      "pos": [
+        7904,
+        7935
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>-w<ept id=\"p1\">**</ept> 虚拟网络名称。",
+      "pos": [
+        7943,
+        7957
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>-l, --location<ept id=\"p1\">**</ept> 指定位置（例如，“China North”）。",
+      "pos": [
+        7964,
+        8006
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>-a, --affinity-group<ept id=\"p1\">**</ept> 指定地缘组。",
+      "pos": [
+        8014,
+        8045
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>-w, --virtual-network-name<ept id=\"p1\">**</ept> 指定要在其中添加新虚拟机的虚拟网络。可从 Azure 门户设置和管理虚拟网络。",
+      "pos": [
+        8053,
+        8123
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>-b, --subnet-names<ept id=\"p1\">**</ept> 指定要分配虚拟机的子网名称。",
+      "pos": [
+        8131,
+        8168
+      ]
+    },
+    {
+      "content": "在此示例中，MSFT\\__Win2K8R2SP1-120514-1520-141205-01-zh-CN-30GB 是该平台提供的映像。有关操作系统映像的详细信息，请参阅 VM 映像列表。",
+      "pos": [
+        8170,
+        8264
+      ]
+    },
+    {
+      "content": "vm create-from &amp;lt;dns-name&gt; &amp;lt;role-file&gt;",
+      "pos": [
+        8502,
+        8545
+      ]
+    },
+    {
+      "content": "此命令从 JSON 角色文件创建新的 Azure 虚拟机。",
+      "pos": [
+        8549,
+        8578
+      ]
+    },
+    {
+      "content": "vm list [options]",
+      "pos": [
+        8645,
+        8662
+      ]
+    },
+    {
+      "content": "此命令列出 Azure 虚拟机。--json 选项指定以原始 JSON 格式返回结果。",
+      "pos": [
+        8666,
+        8709
+      ]
+    },
+    {
+      "content": "vm location list [options]",
+      "pos": [
+        9013,
+        9039
+      ]
+    },
+    {
+      "content": "此命令列出所有可用的 Azure 帐户位置。",
+      "pos": [
+        9043,
+        9065
+      ]
+    },
+    {
+      "content": "vm show [options] &amp;lt;name&gt;",
+      "pos": [
+        9327,
+        9354
+      ]
+    },
+    {
+      "content": "此命令显示有关 Azure 虚拟机的详细信息。--json 选项指定以原始 JSON 格式返回结果。",
+      "pos": [
+        9358,
+        9408
+      ]
+    },
+    {
+      "content": "vm delete [options] &amp;lt;name&gt;",
+      "pos": [
+        10337,
+        10366
+      ]
+    },
+    {
+      "content": "此命令删除 Azure 虚拟机。默认情况下，此命令不删除从中创建操作系统磁盘和数据磁盘的 Azure Blob。若要删除该 Blob 以及作为其基础的虚拟机，请指定 -b 选项。",
+      "pos": [
+        10370,
+        10459
+      ]
+    },
+    {
+      "content": "vm start [options] &amp;lt;name&gt;",
+      "pos": [
+        10566,
+        10594
+      ]
+    },
+    {
+      "content": "此命令启动 Azure 虚拟机。",
+      "pos": [
+        10598,
+        10614
+      ]
+    },
+    {
+      "content": "vm restart [options] &amp;lt;name&gt;",
+      "pos": [
+        10718,
+        10748
+      ]
+    },
+    {
+      "content": "此命令重新启动 Azure 虚拟机。",
+      "pos": [
+        10752,
+        10770
+      ]
+    },
+    {
+      "content": "vm shutdown [options] &amp;lt;name&gt;",
+      "pos": [
+        10880,
+        10911
+      ]
+    },
+    {
+      "content": "此命令关闭 Azure 虚拟机。可以使用 -p 选项指定在关闭时不释放计算资源。",
+      "pos": [
+        10915,
+        10955
+      ]
+    },
+    {
+      "content": "vm capture &amp;lt;vm-name&gt; &amp;lt;target-image-name&gt;",
+      "pos": [
+        11080,
+        11126
+      ]
+    },
+    {
+      "content": "此命令捕获 Azure 虚拟机映像。",
+      "pos": [
+        11130,
+        11148
+      ]
+    },
+    {
+      "pos": [
+        11150,
+        11193
+      ],
+      "content": "只有当虚拟机状态为<bpt id=\"p1\">**</bpt>已停止<ept id=\"p1\">**</ept>时，才能捕获虚拟机映像。请关闭虚拟机，然后再继续操作。"
+    },
+    {
+      "content": "vm export [options] &amp;lt;vm-name&gt; &amp;lt;file-path&gt;",
+      "pos": [
+        11373,
+        11420
+      ]
+    },
+    {
+      "content": "此命令将一个 Azure 虚拟机映像导出到文件",
+      "pos": [
+        11424,
+        11447
+      ]
+    },
+    {
+      "content": "用于管理 Azure 虚拟机终结点的命令",
+      "pos": [
+        11617,
+        11637
+      ]
+    },
+    {
+      "content": "下图显示了多个虚拟机实例的典型部署的体系结构。请注意，在本示例中，端口 3389 在每台虚拟机上均为打开状态（用于进行 RDP 访问），并且负载平衡器用于将流量路由到虚拟机的每台虚拟机上还有一个内部 IP 地址（例如，168.55.11.1）。此内部 IP 地址也可用于虚拟机之间的通信。",
+      "pos": [
+        11638,
+        11782
+      ]
+    },
+    {
+      "content": "azurenetworkdiagram",
+      "pos": [
+        11786,
+        11805
+      ]
+    },
+    {
+      "content": "虚拟机的外部请求将通过负载平衡器。因此，不能针对包含多台虚拟机的部署中的特定虚拟机指定请求。对于包含多台虚拟机的部署，必须在虚拟机 (vm-port) 与负载平衡器 (lb-port) 之间配置端口映射。",
+      "pos": [
+        11872,
+        11974
+      ]
+    },
+    {
+      "content": "vm endpoint create &amp;lt;vm-name&gt; &amp;lt;lb-port&gt; [vm-port]",
+      "pos": [
+        11978,
+        12032
+      ]
+    },
+    {
+      "content": "此命令创建虚拟机终结点。你还可以使用 -u 或 --enable-direct-server-return 来指定是否在此终结点上启用直接服务器返回，默认情况下为禁用。",
+      "pos": [
+        12036,
+        12120
+      ]
+    },
+    {
+      "pos": [
+        12398,
+        12638
+      ],
+      "content": "<bpt id=\"p1\">*</bpt><bpt id=\"p2\">*</bpt>vm endpoint create-multiple [options] &amp;lt;vm-name&gt; &amp;lt;lb-port&gt;[:&amp;lt;vm-port&gt;[:&amp;lt;protocol&gt;[:&amp;lt;enable-direct-server-return&gt;[:&amp;lt;lb-set-name&gt;[:&amp;lt;probe-protocol&gt;[:&amp;lt;probe-port&gt;[:&amp;lt;probe-path&gt;[:&amp;lt;internal-lb-name&gt;]]]]]]]] {1-<ept id=\"p2\">*</ept>}<ept id=\"p1\">*</ept>*"
+    },
+    {
+      "content": "创建多个 VM 终结点。",
+      "pos": [
+        12640,
+        12652
+      ]
+    },
+    {
+      "content": "vm endpoint delete [options] &amp;lt;vm-name&gt; &amp;lt;endpoint-name&gt;",
+      "pos": [
+        12656,
+        12716
+      ]
+    },
+    {
+      "content": "此命令删除虚拟机终结点。",
+      "pos": [
+        12720,
+        12732
+      ]
+    },
+    {
+      "content": "vm endpoint list &amp;lt;vm-name&gt;",
+      "pos": [
+        13002,
+        13031
+      ]
+    },
+    {
+      "content": "此命令列出所有虚拟机终结点。--json 选项指定以原始 JSON 格式返回结果。",
+      "pos": [
+        13035,
+        13076
+      ]
+    },
+    {
+      "content": "vm endpoint update [options] &amp;lt;vm-name&gt; &amp;lt;endpoint-name&gt;",
+      "pos": [
+        13247,
+        13307
+      ]
+    },
+    {
+      "content": "此命令使用这些选项将 VM 终结点更新为新值。",
+      "pos": [
+        13311,
+        13334
+      ]
+    },
+    {
+      "content": "vm endpoint show [options] &amp;lt;vm-name&gt;",
+      "pos": [
+        13623,
+        13662
+      ]
+    },
+    {
+      "content": "此命令显示 VM 上终结点的详细信息",
+      "pos": [
+        13666,
+        13684
+      ]
+    },
+    {
+      "content": "用于管理 Azure 虚拟机映像的命令",
+      "pos": [
+        14746,
+        14765
+      ]
+    },
+    {
+      "content": "虚拟机映像是所捕获的、可根据需要进行复制的已配置虚拟机。",
+      "pos": [
+        14767,
+        14795
+      ]
+    },
+    {
+      "content": "vm image list [options]",
+      "pos": [
+        14799,
+        14822
+      ]
+    },
+    {
+      "content": "此命令获取虚拟机映像的列表。有三种类型的映像：Microsoft 创建的映像（以“MSFT”作为前缀）、第三方创建的映像（通常以供应商的名称作为前缀）以及你创建的映像。若要创建映像，你可以捕获现有虚拟机或从上载到 Blob 存储的自定义 .vhd 创建映像。有关使用自定义 .vhd 的更多信息，请参见 VM 映像创建。--json 选项指定以原始 JSON 格式返回结果。",
+      "pos": [
+        14826,
+        15013
+      ]
+    },
+    {
+      "content": "vm image show [options] &amp;lt;name&gt;",
+      "pos": [
+        16293,
+        16326
+      ]
+    },
+    {
+      "content": "此命令显示虚拟机映像的详细信息。",
+      "pos": [
+        16330,
+        16346
+      ]
+    },
+    {
+      "content": "vm image delete [options] &amp;lt;name&gt;",
+      "pos": [
+        17043,
+        17078
+      ]
+    },
+    {
+      "content": "此命令删除虚拟机映像。",
+      "pos": [
+        17082,
+        17093
+      ]
+    },
+    {
+      "content": "vm image create &amp;lt;name&gt; [source-path]",
+      "pos": [
+        17266,
+        17305
+      ]
+    },
+    {
+      "content": "此命令创建虚拟机映像。你的自定义 .vhd 文件将上载到 Blob 存储，然后从该位置创建虚拟机映像。然后可使用此虚拟机映像创建虚拟机。Location 和 OS 参数是必需的。",
+      "pos": [
+        17309,
+        17398
+      ]
+    },
+    {
+      "content": "某些系统会施加每进程文件描述符限制。如果超出此限制，工具将显示文件描述符限制错误。你可以使用 -p &amp;lt;number&gt; 参数再次运行此命令，以减小最大并行上载数。默认的最大并行上载数为 96。",
+      "pos": [
+        17400,
+        17498
+      ]
+    },
+    {
+      "pos": [
+        17942,
+        18035
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"commands-to-manage-your-azure-virtual-machine-data-disks\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 用于管理 Azure 虚拟机数据磁盘的命令"
+    },
+    {
+      "content": "数据磁盘是 Blob 存储中可供虚拟机使用的 .vhd 文件。有关如何将数据磁盘部署到 Blob 存储的详细信息，请参阅前面所示的 Azure 技术图表。",
+      "pos": [
+        18037,
+        18114
+      ]
+    },
+    {
+      "content": "用于附加数据磁盘的命令（azure vm disk attach 和 azure vm disk attach-new）会根据 SCSI 协议的要求向附加的数据磁盘分配逻辑单元号 (LUN)。将向附加到虚拟机的第一个数据磁盘分配 LUN 0，向下一个分配 LUN 1，依此类推。",
+      "pos": [
+        18116,
+        18255
+      ]
+    },
+    {
+      "content": "当使用 azure vm disk detach 命令分离数据磁盘时，请使用 &amp;lt;lun&amp;gt; 参数指明要分离的磁盘。",
+      "pos": [
+        18257,
+        18319
+      ]
+    },
+    {
+      "content": "[AZURE&gt;NOTE] 请注意，应始终按相反的顺序分离数据磁盘，即，从已分配的编号最高的 LUN 开始。Linux SCSI 层不支持在仍附加有编号较高的 LUN 时分离编号较低的 LUN。例如，不应在仍附加有 LUN 1 的情况下分离 LUN 0。",
+      "pos": [
+        18323,
+        18449
+      ]
+    },
+    {
+      "content": "vm disk show [options] &amp;lt;name&gt;",
+      "pos": [
+        18453,
+        18485
+      ]
+    },
+    {
+      "content": "此命令显示有关 Azure 磁盘的详细信息。",
+      "pos": [
+        18489,
+        18511
+      ]
+    },
+    {
+      "content": "vm disk list [options] [vm-name]",
+      "pos": [
+        19160,
+        19192
+      ]
+    },
+    {
+      "content": "此命令列出 Azure 磁盘，或者附加到指定虚拟机的磁盘。如果运行此命令时使用了虚拟机名称参数，将返回附加到该虚拟机的所有磁盘。Lun 1 是随虚拟机创建的，而列出的任何其他磁盘都是单独附加的。",
+      "pos": [
+        19196,
+        19293
+      ]
+    },
+    {
+      "content": "在不使用虚拟机名称参数的情况下执行此命令将返回所有磁盘。",
+      "pos": [
+        19621,
+        19649
+      ]
+    },
+    {
+      "content": "vm disk delete [options] &amp;lt;name&gt;",
+      "pos": [
+        20012,
+        20046
+      ]
+    },
+    {
+      "content": "此命令从个人存储库中删除 Azure 磁盘。在删除磁盘之前必须从虚拟机中分离该磁盘。",
+      "pos": [
+        20050,
+        20092
+      ]
+    },
+    {
+      "content": "vm disk create &amp;lt;name&gt; [source-path]",
+      "pos": [
+        20304,
+        20342
+      ]
+    },
+    {
+      "content": "此命令将上载并注册 Azure 磁盘。必须指定 --blob-url、--location 或 --affinity-group。如果将此命令与 [source-path] 结合使用，将上载指定的 .vhd 文件并创建新映像。然后你可以使用 vm disk attach 将此映像附加到虚拟机。",
+      "pos": [
+        20346,
+        20493
+      ]
+    },
+    {
+      "content": "某些系统会施加每进程文件描述符限制。如果超出此限制，工具将显示文件描述符限制错误。你可以使用 -p &amp;lt;number&gt; 参数再次运行此命令，以减小最大并行上载数。默认的最大并行上载数为 96。",
+      "pos": [
+        20495,
+        20593
+      ]
+    },
+    {
+      "content": "vm disk upload [options] &amp;lt;source-path&gt; &amp;lt;blob-url&gt; &amp;lt;storage-account-key&gt;",
+      "pos": [
+        20988,
+        21068
+      ]
+    },
+    {
+      "content": "此命令用来上载 vm 磁盘",
+      "pos": [
+        21072,
+        21085
+      ]
+    },
+    {
+      "content": "vm disk attach &amp;lt;vm-name&gt; &amp;lt;disk-image-name&gt;",
+      "pos": [
+        21402,
+        21450
+      ]
+    },
+    {
+      "content": "此命令将 Blob 存储中的现有磁盘附加到云服务中部署的现有虚拟机。",
+      "pos": [
+        21454,
+        21488
+      ]
+    },
+    {
+      "content": "vm disk attach-new &amp;lt;vm-name&gt; &amp;lt;size-in-gb&gt; [blob-url]",
+      "pos": [
+        21637,
+        21695
+      ]
+    },
+    {
+      "content": "此命令将数据磁盘附加到 Azure 虚拟机。在此示例中，20 是要附加的新磁盘的大小（以 GB 为单位）。你可以选择使用 Blob URL 作为显式指定要创建的目标 Blob 的最后一个参数。如果你不指定 Blob URL，将自动生成一个 Blob 对象。",
+      "pos": [
+        21699,
+        21827
+      ]
+    },
+    {
+      "content": "vm disk detach &amp;lt;vm-name&gt; &amp;lt;lun&gt;",
+      "pos": [
+        22033,
+        22069
+      ]
+    },
+    {
+      "content": "此命令将数据磁盘与 Azure 虚拟机分离。&amp;lt;lun&gt; 标识要分离的磁盘。要在分离某个磁盘之前获取与该磁盘关联的磁盘的列表，请使用 vm disk-list &amp;lt;vm-name&gt;。",
+      "pos": [
+        22073,
+        22168
+      ]
+    },
+    {
+      "content": "用于管理 Azure 云服务的命令",
+      "pos": [
+        22293,
+        22310
+      ]
+    },
+    {
+      "content": "Azure 云服务是托管在 Web 角色和辅助角色上的应用程序和服务。以下命令可用于管理 Azure 云服务。",
+      "pos": [
+        22312,
+        22367
+      ]
+    },
+    {
+      "content": "service create [options] &amp;lt;serviceName&gt;",
+      "pos": [
+        22371,
+        22412
+      ]
+    },
+    {
+      "content": "此命令创建新的云服务",
+      "pos": [
+        22416,
+        22426
+      ]
+    },
+    {
+      "content": "service show [options] &amp;lt;serviceName&gt;",
+      "pos": [
+        22824,
+        22863
+      ]
+    },
+    {
+      "content": "此命令显示 Azure 云服务的详细信息",
+      "pos": [
+        22867,
+        22887
+      ]
+    },
+    {
+      "content": "service list [options]",
+      "pos": [
+        23435,
+        23457
+      ]
+    },
+    {
+      "content": "此命令列出 Azure 云服务。",
+      "pos": [
+        23461,
+        23477
+      ]
+    },
+    {
+      "content": "service delete [options] &amp;lt;name&gt;",
+      "pos": [
+        23718,
+        23752
+      ]
+    },
+    {
+      "content": "此命令删除 Azure 云服务。",
+      "pos": [
+        23756,
+        23772
+      ]
+    },
+    {
+      "pos": [
+        23912,
+        23931
+      ],
+      "content": "若要强制删除，请使用 <ph id=\"ph1\">`-q`</ph> 参数。"
+    },
+    {
+      "content": "用于管理 Azure 证书的命令",
+      "pos": [
+        23937,
+        23953
+      ]
+    },
+    {
+      "pos": [
+        23955,
+        24077
+      ],
+      "content": "Azure 服务证书是连接到你的 Azure 帐户的 SSL 证书。有关 Azure 证书的详细信息，请参阅<bpt id=\"p1\">[</bpt>管理证书<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/azure/gg981929.aspx)</ept>。"
+    },
+    {
+      "content": "service cert list [options]",
+      "pos": [
+        24081,
+        24108
+      ]
+    },
+    {
+      "content": "此命令列出 Azure 证书。",
+      "pos": [
+        24112,
+        24127
+      ]
+    },
+    {
+      "content": "service cert create &amp;lt;dns-prefix&gt; &amp;lt;file&gt; [password]",
+      "pos": [
+        24528,
+        24584
+      ]
+    },
+    {
+      "content": "此命令上载证书。将没有密码保护的证书的密码提示保留为空。",
+      "pos": [
+        24588,
+        24616
+      ]
+    },
+    {
+      "content": "service cert delete [options] &amp;lt;thumbprint&gt;",
+      "pos": [
+        24819,
+        24864
+      ]
+    },
+    {
+      "content": "此命令删除证书。",
+      "pos": [
+        24868,
+        24876
+      ]
+    },
+    {
+      "content": "用于管理 Web 应用的命令",
+      "pos": [
+        25112,
+        25126
+      ]
+    },
+    {
+      "content": "Azure Web 应用是可通过 URI 访问的 Web 配置。 Web 应用在虚拟机中托管，但你无需自己考虑创建和部署虚拟机的详细步骤。这些详细步骤将由 Azure 为你完成。",
+      "pos": [
+        25128,
+        25217
+      ]
+    },
+    {
+      "content": "site list [options]",
+      "pos": [
+        25221,
+        25240
+      ]
+    },
+    {
+      "content": "此命令列出你的 Web 应用。",
+      "pos": [
+        25244,
+        25259
+      ]
+    },
+    {
+      "content": "site set [options] [name]",
+      "pos": [
+        25738,
+        25763
+      ]
+    },
+    {
+      "content": "此命令将设置你的 Web 应用[名称] 的配置选项",
+      "pos": [
+        25767,
+        25792
+      ]
+    },
+    {
+      "content": "site deploymentscript [options]",
+      "pos": [
+        25981,
+        26012
+      ]
+    },
+    {
+      "content": "此命令将生成一个自定义部署脚本",
+      "pos": [
+        26016,
+        26031
+      ]
+    },
+    {
+      "content": "site create [options] [name]",
+      "pos": [
+        26287,
+        26315
+      ]
+    },
+    {
+      "content": "此命令创建新的 Web 应用和本地目录。",
+      "pos": [
+        26319,
+        26339
+      ]
+    },
+    {
+      "pos": [
+        26679,
+        26727
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>站点名称必须是唯一的。你无法创建与现有站点具有相同 DNS 名称的站点。"
+    },
+    {
+      "content": "site browse [options] [name]",
+      "pos": [
+        26731,
+        26759
+      ]
+    },
+    {
+      "content": "此命令在浏览器中打开你的 Web 应用。",
+      "pos": [
+        26763,
+        26783
+      ]
+    },
+    {
+      "content": "site show [options] [name]",
+      "pos": [
+        26980,
+        27006
+      ]
+    },
+    {
+      "content": "此命令显示 Web 应用的详细信息。",
+      "pos": [
+        27010,
+        27028
+      ]
+    },
+    {
+      "content": "site delete [options] [name]",
+      "pos": [
+        28368,
+        28396
+      ]
+    },
+    {
+      "content": "此命令删除 Web 应用。",
+      "pos": [
+        28400,
+        28413
+      ]
+    },
+    {
+      "content": "site swap [options] [name]",
+      "pos": [
+        28602,
+        28628
+      ]
+    },
+    {
+      "content": "此命令交换两个 Web 应用插槽。",
+      "pos": [
+        28632,
+        28649
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        28651,
+        28663
+      ]
+    },
+    {
+      "pos": [
+        28665,
+        28705
+      ],
+      "content": "****-q 或 <bpt id=\"p1\">**</bpt>--quiet<ept id=\"p1\">**</ept>：不提示确认。在自动化脚本中使用此选项。"
+    },
+    {
+      "content": "site start [options] [name]",
+      "pos": [
+        28710,
+        28737
+      ]
+    },
+    {
+      "content": "此命令启动 Web 应用。",
+      "pos": [
+        28741,
+        28754
+      ]
+    },
+    {
+      "content": "site stop [options] [name]",
+      "pos": [
+        28939,
+        28965
+      ]
+    },
+    {
+      "content": "此命令停止 Web 应用。",
+      "pos": [
+        28969,
+        28982
+      ]
+    },
+    {
+      "content": "****site restart [options] [name]",
+      "pos": [
+        29162,
+        29195
+      ]
+    },
+    {
+      "content": "此命令停止然后启动指定的 Web 应用。",
+      "pos": [
+        29197,
+        29217
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        29219,
+        29231
+      ]
+    },
+    {
+      "pos": [
+        29233,
+        29266
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--slot<ept id=\"p1\">**</ept> &amp;lt;slot&gt;：要重新启动的插槽的名称。"
+    },
+    {
+      "content": "site location list [options]",
+      "pos": [
+        29271,
+        29299
+      ]
+    },
+    {
+      "content": "此命令列出你的 Web 应用位置。",
+      "pos": [
+        29303,
+        29320
+      ]
+    },
+    {
+      "content": "用于管理 Web 应用应用程序设置的命令",
+      "pos": [
+        29678,
+        29698
+      ]
+    },
+    {
+      "content": "site appsetting list [options] [name]",
+      "pos": [
+        29702,
+        29739
+      ]
+    },
+    {
+      "content": "此命令列出添加到 Web 应用的应用设置。",
+      "pos": [
+        29743,
+        29764
+      ]
+    },
+    {
+      "content": "site appsetting add [options] &amp;lt;keyvaluepair&gt; [name]",
+      "pos": [
+        30063,
+        30117
+      ]
+    },
+    {
+      "content": "此命令将应用设置作为键值对添加到你的 Web 应用。",
+      "pos": [
+        30121,
+        30147
+      ]
+    },
+    {
+      "content": "site appsetting delete [options] &amp;lt;key&gt; [name]",
+      "pos": [
+        30418,
+        30466
+      ]
+    },
+    {
+      "content": "此命令从 Web 应用中删除指定的应用设置。",
+      "pos": [
+        30470,
+        30492
+      ]
+    },
+    {
+      "content": "site appsetting show [options] &amp;lt;key&gt; [name]",
+      "pos": [
+        30811,
+        30857
+      ]
+    },
+    {
+      "content": "此命令显示指定应用程序设置的详细信息",
+      "pos": [
+        30861,
+        30879
+      ]
+    },
+    {
+      "content": "用于管理 Web 应用证书的命令",
+      "pos": [
+        31136,
+        31152
+      ]
+    },
+    {
+      "content": "site cert list [options] [name]",
+      "pos": [
+        31156,
+        31187
+      ]
+    },
+    {
+      "content": "此命令显示 Web 应用证书的列表。",
+      "pos": [
+        31191,
+        31209
+      ]
+    },
+    {
+      "content": "site cert add [options] &amp;lt;certificate-path&gt; [name]",
+      "pos": [
+        31932,
+        31984
+      ]
+    },
+    {
+      "content": "site cert delete [options] &amp;lt;thumbprint&gt; [name]",
+      "pos": [
+        31990,
+        32039
+      ]
+    },
+    {
+      "content": "site cert show [options] &amp;lt;thumbprint&gt; [name]",
+      "pos": [
+        32045,
+        32092
+      ]
+    },
+    {
+      "content": "此命令显示证书详细信息",
+      "pos": [
+        32096,
+        32107
+      ]
+    },
+    {
+      "content": "用于管理 Web 应用连接字符串的命令",
+      "pos": [
+        32803,
+        32822
+      ]
+    },
+    {
+      "content": "site connectionstring list [options] [name]",
+      "pos": [
+        32826,
+        32869
+      ]
+    },
+    {
+      "content": "site connectionstring add [options] &amp;lt;connectionname&gt; &amp;lt;value&gt; &amp;lt;type&gt; [name]",
+      "pos": [
+        32875,
+        32958
+      ]
+    },
+    {
+      "content": "site connectionstring delete [options] &amp;lt;connectionname&gt; [name]",
+      "pos": [
+        32964,
+        33029
+      ]
+    },
+    {
+      "content": "site connectionstring show [options] &amp;lt;connectionname&gt; [name]",
+      "pos": [
+        33035,
+        33098
+      ]
+    },
+    {
+      "content": "用于管理 Web 应用默认文档的命令",
+      "pos": [
+        33105,
+        33123
+      ]
+    },
+    {
+      "content": "site defaultdocument list [options] [name]",
+      "pos": [
+        33127,
+        33169
+      ]
+    },
+    {
+      "content": "site defaultdocument add [options] &amp;lt;document&gt; [name]",
+      "pos": [
+        33175,
+        33230
+      ]
+    },
+    {
+      "content": "site defaultdocument delete [options] &amp;lt;document&gt; [name]",
+      "pos": [
+        33236,
+        33294
+      ]
+    },
+    {
+      "content": "用于管理 Web 应用部署的命令",
+      "pos": [
+        33301,
+        33317
+      ]
+    },
+    {
+      "content": "site deployment list [options] [name]",
+      "pos": [
+        33321,
+        33358
+      ]
+    },
+    {
+      "content": "site deployment show [options] &amp;lt;commitId&gt; [name]",
+      "pos": [
+        33364,
+        33415
+      ]
+    },
+    {
+      "content": "site deployment redeploy [options] &amp;lt;commitId&gt; [name]",
+      "pos": [
+        33421,
+        33476
+      ]
+    },
+    {
+      "content": "site deployment github [options] [name]",
+      "pos": [
+        33482,
+        33521
+      ]
+    },
+    {
+      "content": "site deployment user set [options] [username] [pass]",
+      "pos": [
+        33527,
+        33579
+      ]
+    },
+    {
+      "content": "用于管理 Web 应用域的命令",
+      "pos": [
+        33586,
+        33601
+      ]
+    },
+    {
+      "content": "site domain list [options] [name]",
+      "pos": [
+        33605,
+        33638
+      ]
+    },
+    {
+      "content": "site domain add [options] &amp;lt;dn&gt; [name]",
+      "pos": [
+        33644,
+        33684
+      ]
+    },
+    {
+      "content": "site domain delete [options] &amp;lt;dn&gt; [name]",
+      "pos": [
+        33690,
+        33733
+      ]
+    },
+    {
+      "content": "用于管理 Web 应用处理程序映射的命令",
+      "pos": [
+        33740,
+        33760
+      ]
+    },
+    {
+      "content": "site handler list [options] [name]",
+      "pos": [
+        33764,
+        33798
+      ]
+    },
+    {
+      "content": "site handler add [options] &amp;lt;extension&gt; &amp;lt;processor&gt; [name]",
+      "pos": [
+        33804,
+        33867
+      ]
+    },
+    {
+      "content": "site handler delete [options] &amp;lt;extension&gt; [name]",
+      "pos": [
+        33873,
+        33924
+      ]
+    },
+    {
+      "content": "用于管理 Web 作业的命令",
+      "pos": [
+        33931,
+        33945
+      ]
+    },
+    {
+      "content": "site job list [options] [name]",
+      "pos": [
+        33949,
+        33979
+      ]
+    },
+    {
+      "content": "此命令列出某个 Web 应用下的所有 Web 作业。",
+      "pos": [
+        33983,
+        34009
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        34011,
+        34023
+      ]
+    },
+    {
+      "pos": [
+        34027,
+        34118
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--job-type<ept id=\"p1\">**</ept> &amp;lt;job-type&gt;：可选。web 作业的类型。有效值为“triggered”或“continuous”。默认情况下返回所有类型的 web 作业。"
+    },
+    {
+      "pos": [
+        34121,
+        34154
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--slot<ept id=\"p1\">**</ept> &amp;lt;slot&gt;：要重新启动的插槽的名称。"
+    },
+    {
+      "content": "site job show [options] &amp;lt;jobName&gt; &amp;lt;jobType&gt; [name]",
+      "pos": [
+        34158,
+        34214
+      ]
+    },
+    {
+      "content": "此命令显示特定 web 作业的详细信息。",
+      "pos": [
+        34218,
+        34238
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        34240,
+        34252
+      ]
+    },
+    {
+      "pos": [
+        34256,
+        34298
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--job-name<ept id=\"p1\">**</ept> &amp;lt;job-name&gt;：必需。web 作业的名称。"
+    },
+    {
+      "pos": [
+        34301,
+        34372
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--job-type<ept id=\"p1\">**</ept> &amp;lt;job-type&gt;：必需。web 作业的类型。有效值为“triggered”或“continuous”。"
+    },
+    {
+      "pos": [
+        34375,
+        34408
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--slot<ept id=\"p1\">**</ept> &amp;lt;slot&gt;：要重新启动的插槽的名称。"
+    },
+    {
+      "content": "site job delete [options] &amp;lt;jobName&gt; &amp;lt;jobType&gt; [name]",
+      "pos": [
+        34412,
+        34470
+      ]
+    },
+    {
+      "content": "此命令删除指定的 web 作业。",
+      "pos": [
+        34474,
+        34490
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        34492,
+        34504
+      ]
+    },
+    {
+      "pos": [
+        34508,
+        34550
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--job-name<ept id=\"p1\">**</ept> &amp;lt;job-name&gt; 必需。web 作业的名称。"
+    },
+    {
+      "pos": [
+        34553,
+        34624
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--job-type<ept id=\"p1\">**</ept> &amp;lt;job-type&gt; 必需。web 作业的类型。有效值为“triggered”或“continuous”。"
+    },
+    {
+      "pos": [
+        34627,
+        34667
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-q<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--quiet<ept id=\"p2\">**</ept>：不提示确认。在自动化脚本中使用此选项。"
+    },
+    {
+      "pos": [
+        34670,
+        34703
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--slot<ept id=\"p1\">**</ept> &amp;lt;slot&gt;：要重新启动的插槽的名称。"
+    },
+    {
+      "content": "site job upload [options] &amp;lt;jobName&gt; &amp;lt;jobType&gt;",
+      "pos": [
+        34707,
+        34758
+      ]
+    },
+    {
+      "content": "[name]",
+      "pos": [
+        34769,
+        34775
+      ]
+    },
+    {
+      "content": "此命令删除指定的 web 作业。",
+      "pos": [
+        34779,
+        34795
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        34797,
+        34809
+      ]
+    },
+    {
+      "pos": [
+        34813,
+        34855
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--job-name<ept id=\"p1\">**</ept> &amp;lt;job-name&gt;：必需。web 作业的名称。"
+    },
+    {
+      "pos": [
+        34858,
+        34929
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--job-type<ept id=\"p1\">**</ept> &amp;lt;job-type&gt;：必需。web 作业的类型。有效值为“triggered”或“continuous”。"
+    },
+    {
+      "pos": [
+        34932,
+        34969
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--job-file<ept id=\"p1\">**</ept> &amp;lt;job-file&gt;：必需。作业文件。"
+    },
+    {
+      "pos": [
+        34972,
+        35005
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--slot<ept id=\"p1\">**</ept> &amp;lt;slot&gt;：要重新启动的插槽的名称。"
+    },
+    {
+      "content": "site job start [options] &amp;lt;jobName&gt; &amp;lt;jobType&gt; [name]",
+      "pos": [
+        35009,
+        35066
+      ]
+    },
+    {
+      "content": "此命令启动指定的 web 作业。",
+      "pos": [
+        35070,
+        35086
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        35088,
+        35100
+      ]
+    },
+    {
+      "pos": [
+        35104,
+        35146
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--job-name<ept id=\"p1\">**</ept> &amp;lt;job-name&gt;：必需。web 作业的名称。"
+    },
+    {
+      "pos": [
+        35149,
+        35220
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--job-type<ept id=\"p1\">**</ept> &amp;lt;job-type&gt;：必需。web 作业的类型。有效值为“triggered”或“continuous”。"
+    },
+    {
+      "pos": [
+        35223,
+        35256
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--slot<ept id=\"p1\">**</ept> &amp;lt;slot&gt;：要重新启动的插槽的名称。"
+    },
+    {
+      "content": "site job stop [options] &amp;lt;jobName&gt; &amp;lt;jobType&gt; [name]",
+      "pos": [
+        35260,
+        35316
+      ]
+    },
+    {
+      "content": "此命令停止指定的 web 作业。只有连续作业可以停止。",
+      "pos": [
+        35320,
+        35347
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        35349,
+        35361
+      ]
+    },
+    {
+      "pos": [
+        35365,
+        35407
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--job-name<ept id=\"p1\">**</ept> &amp;lt;job-name&gt;：必需。web 作业的名称。"
+    },
+    {
+      "pos": [
+        35410,
+        35443
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--slot<ept id=\"p1\">**</ept> &amp;lt;slot&gt;：要重新启动的插槽的名称。"
+    },
+    {
+      "content": "用于管理 Web 作业历史记录的命令",
+      "pos": [
+        35448,
+        35466
+      ]
+    },
+    {
+      "content": "site job history list [options] [jobName] [name]",
+      "pos": [
+        35470,
+        35518
+      ]
+    },
+    {
+      "content": "此命令显示指定的 web 作业的运行历史记录。",
+      "pos": [
+        35522,
+        35545
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        35547,
+        35559
+      ]
+    },
+    {
+      "pos": [
+        35563,
+        35605
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--job-name<ept id=\"p1\">**</ept> &amp;lt;job-name&gt;：必需。web 作业的名称。"
+    },
+    {
+      "pos": [
+        35608,
+        35641
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--slot<ept id=\"p1\">**</ept> &amp;lt;slot&gt;：要重新启动的插槽的名称。"
+    },
+    {
+      "content": "site job history show [options] [jobName] [runId] [name]",
+      "pos": [
+        35645,
+        35701
+      ]
+    },
+    {
+      "content": "此命令获取为指定的 web 作业运行的作业的详细信息。",
+      "pos": [
+        35705,
+        35732
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        35734,
+        35746
+      ]
+    },
+    {
+      "pos": [
+        35750,
+        35792
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--job-name<ept id=\"p1\">**</ept> &amp;lt;job-name&gt;：必需。web 作业的名称。"
+    },
+    {
+      "pos": [
+        35795,
+        35848
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--run-id<ept id=\"p1\">**</ept> &amp;lt;run-id&gt;：可选。运行历史记录的 id。如果未指定，则显示最新运行。"
+    },
+    {
+      "pos": [
+        35851,
+        35884
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--slot<ept id=\"p1\">**</ept> &amp;lt;slot&gt;：要重新启动的插槽的名称。"
+    },
+    {
+      "content": "用于管理 Web 应用诊断的命令",
+      "pos": [
+        35889,
+        35905
+      ]
+    },
+    {
+      "content": "site log download [options] [name]",
+      "pos": [
+        35909,
+        35943
+      ]
+    },
+    {
+      "content": "下载包含你的 Web 应用诊断的 .zip 文件。",
+      "pos": [
+        35947,
+        35972
+      ]
+    },
+    {
+      "content": "site log tail [options] [name]",
+      "pos": [
+        36232,
+        36262
+      ]
+    },
+    {
+      "content": "此命令将你的终端连接到日志流式处理服务。",
+      "pos": [
+        36266,
+        36286
+      ]
+    },
+    {
+      "content": "site log set [options] [name]",
+      "pos": [
+        36526,
+        36555
+      ]
+    },
+    {
+      "content": "此命令配置你的 Web 应用的诊断选项。",
+      "pos": [
+        36559,
+        36579
+      ]
+    },
+    {
+      "content": "用于管理 Web 应用存储库的命令",
+      "pos": [
+        36960,
+        36977
+      ]
+    },
+    {
+      "content": "site repository branch [options] &amp;lt;branch&gt; [name]",
+      "pos": [
+        36981,
+        37032
+      ]
+    },
+    {
+      "content": "site repository delete [options] [name]",
+      "pos": [
+        37038,
+        37077
+      ]
+    },
+    {
+      "content": "site repository sync [options] [name]",
+      "pos": [
+        37083,
+        37120
+      ]
+    },
+    {
+      "content": "用于管理 Web 应用缩放的命令",
+      "pos": [
+        37127,
+        37143
+      ]
+    },
+    {
+      "content": "site scale mode [options] &amp;lt;mode&gt; [name]",
+      "pos": [
+        37147,
+        37189
+      ]
+    },
+    {
+      "content": "site scale instances [options] &amp;lt;instances&gt; [name]",
+      "pos": [
+        37195,
+        37247
+      ]
+    },
+    {
+      "content": "用于管理 Azure 移动服务的命令",
+      "pos": [
+        37255,
+        37273
+      ]
+    },
+    {
+      "content": "Azure 移动服务汇聚了一系列支持你的应用程序的后端功能的 Azure 服务。移动服务命令分为以下几类：",
+      "pos": [
+        37275,
+        37328
+      ]
+    },
+    {
+      "content": "用于管理移动服务实例的命令",
+      "pos": [
+        37333,
+        37346
+      ]
+    },
+    {
+      "content": "用于管理移动服务配置的命令",
+      "pos": [
+        37369,
+        37382
+      ]
+    },
+    {
+      "content": "用于管理移动服务表的命令",
+      "pos": [
+        37410,
+        37422
+      ]
+    },
+    {
+      "content": "用于管理移动服务脚本的命令",
+      "pos": [
+        37443,
+        37456
+      ]
+    },
+    {
+      "content": "用于管理已计划作业的命令",
+      "pos": [
+        37478,
+        37490
+      ]
+    },
+    {
+      "content": "用于缩放移动服务的命令",
+      "pos": [
+        37509,
+        37520
+      ]
+    },
+    {
+      "content": "以下选项适用于多数移动服务命令：",
+      "pos": [
+        37538,
+        37554
+      ]
+    },
+    {
+      "pos": [
+        37558,
+        37587
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-h<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--help<ept id=\"p2\">**</ept>：显示输出用法信息。"
+    },
+    {
+      "pos": [
+        37590,
+        37650
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-s <ph id=\"ph1\">`&lt;id&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--subscription<ph id=\"ph2\">`&lt;id&gt;`</ph><ept id=\"p2\">**</ept>：使用指定为 <ph id=\"ph3\">`&lt;id&gt;`</ph> 的特定订阅。"
+    },
+    {
+      "pos": [
+        37653,
+        37683
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-v<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--verbose<ept id=\"p2\">**</ept>：写入详细输出。"
+    },
+    {
+      "pos": [
+        37686,
+        37708
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--json<ept id=\"p1\">**</ept>：写入 JSON 输出。"
+    },
+    {
+      "pos": [
+        37714,
+        37757
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"Mobile_Services\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>用于管理移动服务实例的命令"
+    },
+    {
+      "content": "mobile locations [options]",
+      "pos": [
+        37761,
+        37787
+      ]
+    },
+    {
+      "content": "此命令列出移动服务支持的地理位置。",
+      "pos": [
+        37791,
+        37808
+      ]
+    },
+    {
+      "content": "mobile create [options] [servicename] [sqlAdminUsername] [sqlAdminPassword]",
+      "pos": [
+        37969,
+        38044
+      ]
+    },
+    {
+      "content": "此命令创建移动服务以及 SQL 数据库和服务器。",
+      "pos": [
+        38048,
+        38072
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        38493,
+        38505
+      ]
+    },
+    {
+      "pos": [
+        38509,
+        38596
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-r <ph id=\"ph1\">`&lt;sqlServer&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--sqlServer<ph id=\"ph2\">`&lt;sqlServer&gt;`</ph><ept id=\"p2\">**</ept>：使用指定为 <ph id=\"ph3\">`&lt;sqlServer&gt;`</ph> 的现有 SQL 数据库服务器。"
+    },
+    {
+      "pos": [
+        38599,
+        38668
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-d <ph id=\"ph1\">`&lt;sqlDb&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--sqlDb <ph id=\"ph2\">`&lt;sqlDb&gt;`</ph><ept id=\"p2\">**</ept>：使用指定为 <ph id=\"ph3\">`&lt;sqlDb&gt;`</ph> 的现有 SQL 数据库。"
+    },
+    {
+      "pos": [
+        38671,
+        38783
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-l <ph id=\"ph1\">`&lt;location&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--location <ph id=\"ph2\">`&lt;location&gt;`</ph><ept id=\"p2\">**</ept>：在指定为 <ph id=\"ph3\">`&lt;location&gt;`</ph> 的特定位置创建服务。运行 azure mobile locations 可获取可用位置。"
+    },
+    {
+      "pos": [
+        38786,
+        38858
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--sqlLocation <ph id=\"ph1\">`&lt;location&gt;`</ph><ept id=\"p1\">**</ept>：在特定的 <ph id=\"ph2\">`&lt;location&gt;`</ph> 中创建 SQL 服务器；默认为移动服务的位置。"
+    },
+    {
+      "content": "mobile delete [options] [servicename]",
+      "pos": [
+        38862,
+        38899
+      ]
+    },
+    {
+      "content": "此命令删除移动服务及其 SQL 数据库和服务器。",
+      "pos": [
+        38903,
+        38927
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        39376,
+        39388
+      ]
+    },
+    {
+      "pos": [
+        39392,
+        39436
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-d<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--deleteData<ept id=\"p2\">**</ept>：从此移动服务的数据库中删除所有数据。"
+    },
+    {
+      "pos": [
+        39439,
+        39479
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-a<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--deleteAll<ept id=\"p2\">**</ept>：删除 SQL 数据库和服务器。"
+    },
+    {
+      "pos": [
+        39482,
+        39522
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-q<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--quiet<ept id=\"p2\">**</ept>：不提示确认。在自动化脚本中使用此选项。"
+    },
+    {
+      "content": "mobile list [options]",
+      "pos": [
+        39526,
+        39547
+      ]
+    },
+    {
+      "content": "此命令列出您的移动服务。",
+      "pos": [
+        39551,
+        39563
+      ]
+    },
+    {
+      "content": "mobile show [options] [servicename]",
+      "pos": [
+        39924,
+        39959
+      ]
+    },
+    {
+      "content": "此命令显示有关移动服务的详细信息。",
+      "pos": [
+        39963,
+        39980
+      ]
+    },
+    {
+      "content": "mobile restart [options] [servicename]",
+      "pos": [
+        40805,
+        40843
+      ]
+    },
+    {
+      "content": "此命令重新启动移动服务实例。",
+      "pos": [
+        40847,
+        40861
+      ]
+    },
+    {
+      "content": "mobile log [options] [servicename]",
+      "pos": [
+        41056,
+        41090
+      ]
+    },
+    {
+      "pos": [
+        41094,
+        41127
+      ],
+      "content": "此命令返回移动服务日志，筛选掉除<ph id=\"ph1\">`error`</ph>之外的所有日志类型。"
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        41428,
+        41440
+      ]
+    },
+    {
+      "pos": [
+        41444,
+        41494
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-r<ph id=\"ph1\">`&lt;query&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--query <ph id=\"ph2\">`&lt;query&gt;`</ph><ept id=\"p2\">**</ept>：执行指定的日志查询。"
+    },
+    {
+      "pos": [
+        41497,
+        41592
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-t<ph id=\"ph1\">`&lt;type&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--type<ph id=\"ph2\">`&lt;type&gt;`</ph><ept id=\"p2\">**</ept>：按条目 <ph id=\"ph3\">`&lt;type&gt;`</ph>（可能是 <ph id=\"ph4\">`information`</ph>、<ph id=\"ph5\">`warning`</ph> 或 <ph id=\"ph6\">`error`</ph>）筛选返回的日志。"
+    },
+    {
+      "pos": [
+        41595,
+        41649
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-k<ph id=\"ph1\">`&lt;skip&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--skip<ph id=\"ph2\">`&lt;skip&gt;`</ph><ept id=\"p2\">**</ept>：跳过 <ph id=\"ph3\">`&lt;skip&gt;`</ph> 指定的行数。"
+    },
+    {
+      "pos": [
+        41652,
+        41706
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-p<ph id=\"ph1\">`&lt;top&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--top <ph id=\"ph2\">`&lt;top&gt;`</ph><ept id=\"p2\">**</ept>：返回由 <ph id=\"ph3\">`&lt;top&gt;`</ph> 指定的特定行数。"
+    },
+    {
+      "pos": [
+        41710,
+        41774
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph><bpt id=\"p1\">**</bpt>--query<ept id=\"p1\">**</ept> 参数优先于 <bpt id=\"p2\">**</bpt>--type<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>--skip<ept id=\"p3\">**</ept> 和 <bpt id=\"p4\">**</bpt>--top<ept id=\"p4\">**</ept>。"
+    },
+    {
+      "content": "mobile recover [options] [unhealthyservicename] [healthyservicename]",
+      "pos": [
+        41778,
+        41846
+      ]
+    },
+    {
+      "content": "此命令通过将不正常的移动服务移动到不同区域中的正常移动服务来将其恢复。",
+      "pos": [
+        41850,
+        41885
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        41887,
+        41899
+      ]
+    },
+    {
+      "pos": [
+        41901,
+        41930
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-q<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--quiet<ept id=\"p2\">**</ept>：不提示确认恢复。"
+    },
+    {
+      "content": "mobile key regenerate [options] [servicename] [type]",
+      "pos": [
+        41934,
+        41986
+      ]
+    },
+    {
+      "content": "此命令重新生成移动服务应用程序密钥。",
+      "pos": [
+        41990,
+        42008
+      ]
+    },
+    {
+      "pos": [
+        42235,
+        42266
+      ],
+      "content": "密钥类型为 <ph id=\"ph1\">`master`</ph> 和 <ph id=\"ph2\">`application`</ph>。"
+    },
+    {
+      "pos": [
+        42270,
+        42342
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>当重新生成密钥时，使用旧密钥的客户端可能无法访问你的移动服务。当重新生成应用程序密钥时，应使用新密钥值更新你的应用程序。"
+    },
+    {
+      "content": "mobile key set [options] [servicename] [type] [value]",
+      "pos": [
+        42346,
+        42399
+      ]
+    },
+    {
+      "content": "此命令将移动服务密钥设置为一个特定值。",
+      "pos": [
+        42403,
+        42422
+      ]
+    },
+    {
+      "pos": [
+        42429,
+        42477
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"Mobile_Configuration\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>用于管理移动服务配置的命令"
+    },
+    {
+      "content": "mobile config list [options] [servicename]",
+      "pos": [
+        42481,
+        42523
+      ]
+    },
+    {
+      "content": "此命令列出移动服务的配置选项。",
+      "pos": [
+        42527,
+        42542
+      ]
+    },
+    {
+      "content": "mobile config get [options] [servicename] [key]",
+      "pos": [
+        43315,
+        43362
+      ]
+    },
+    {
+      "content": "此命令获取移动服务的特定配置选项，在此示例中为动态架构。",
+      "pos": [
+        43366,
+        43394
+      ]
+    },
+    {
+      "content": "mobile config set [options] [servicename] [key] [value]",
+      "pos": [
+        43590,
+        43645
+      ]
+    },
+    {
+      "content": "此命令设置移动服务的特定配置选项，在此示例中为动态架构。",
+      "pos": [
+        43649,
+        43677
+      ]
+    },
+    {
+      "pos": [
+        43843,
+        43883
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"Mobile_Tables\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>用于管理移动服务表的命令"
+    },
+    {
+      "content": "mobile table list [options] [servicename]",
+      "pos": [
+        43887,
+        43928
+      ]
+    },
+    {
+      "content": "此命令列出您的移动服务中的所有表。",
+      "pos": [
+        43932,
+        43949
+      ]
+    },
+    {
+      "content": "mobile table show [options] [servicename] [tablename]",
+      "pos": [
+        44226,
+        44279
+      ]
+    },
+    {
+      "content": "此命令显示有关特定表的返回内容的详情。",
+      "pos": [
+        44283,
+        44302
+      ]
+    },
+    {
+      "content": "mobile table create [options] [servicename] [tablename]",
+      "pos": [
+        45041,
+        45096
+      ]
+    },
+    {
+      "content": "此命令创建表。",
+      "pos": [
+        45100,
+        45107
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        45276,
+        45288
+      ]
+    },
+    {
+      "pos": [
+        45292,
+        45516
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-p<ph id=\"ph1\">`&amp;lt;permissions&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--permissions<ph id=\"ph2\">`&amp;lt;permissions&gt;`</ph><ept id=\"p2\">**</ept>：以逗号分隔的 <ph id=\"ph3\">`&lt;operation&gt;`</ph>=<ph id=\"ph4\">`&lt;permission&gt;`</ph> 对列表，其中 <ph id=\"ph5\">`&lt;operation&gt;`</ph> 为 <ph id=\"ph6\">`insert`</ph>、<ph id=\"ph7\">`read`</ph>、<ph id=\"ph8\">`update`</ph> 或 <ph id=\"ph9\">`delete`</ph>；<ph id=\"ph10\">`&amp;lt;permissions&gt;`</ph> 为 <ph id=\"ph11\">`public`</ph>、<ph id=\"ph12\">`application`</ph>（默认值）、<ph id=\"ph13\">`user`</ph> 或 <ph id=\"ph14\">`admin`</ph>。"
+    },
+    {
+      "content": "mobile data read [options] [servicename] [tablename] [query]",
+      "pos": [
+        45520,
+        45580
+      ]
+    },
+    {
+      "content": "此命令读取表中的数据。",
+      "pos": [
+        45584,
+        45595
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        45930,
+        45942
+      ]
+    },
+    {
+      "pos": [
+        45946,
+        46000
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-k<ph id=\"ph1\">`&lt;skip&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--skip<ph id=\"ph2\">`&lt;skip&gt;`</ph><ept id=\"p2\">**</ept>：跳过 <ph id=\"ph3\">`&lt;skip&gt;`</ph> 指定的行数。"
+    },
+    {
+      "pos": [
+        46003,
+        46057
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-t<ph id=\"ph1\">`&lt;top&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--top <ph id=\"ph2\">`&lt;top&gt;`</ph><ept id=\"p2\">**</ept>：返回由 <ph id=\"ph3\">`&lt;top&gt;`</ph> 指定的特定行数。"
+    },
+    {
+      "pos": [
+        46060,
+        46090
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-l<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--list<ept id=\"p2\">**</ept>：以列表格式返回数据。"
+    },
+    {
+      "content": "mobile table update [options] [servicename] [tablename]",
+      "pos": [
+        46094,
+        46149
+      ]
+    },
+    {
+      "content": "此命令只更改管理员对表的删除权限。",
+      "pos": [
+        46153,
+        46170
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        46394,
+        46406
+      ]
+    },
+    {
+      "pos": [
+        46410,
+        46634
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-p<ph id=\"ph1\">`&amp;lt;permissions&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--permissions<ph id=\"ph2\">`&amp;lt;permissions&gt;`</ph><ept id=\"p2\">**</ept>：以逗号分隔的 <ph id=\"ph3\">`&lt;operation&gt;`</ph>=<ph id=\"ph4\">`&lt;permission&gt;`</ph> 对列表，其中 <ph id=\"ph5\">`&lt;operation&gt;`</ph> 为 <ph id=\"ph6\">`insert`</ph>、<ph id=\"ph7\">`read`</ph>、<ph id=\"ph8\">`update`</ph> 或 <ph id=\"ph9\">`delete`</ph>；<ph id=\"ph10\">`&amp;lt;permissions&gt;`</ph> 为 <ph id=\"ph11\">`public`</ph>、<ph id=\"ph12\">`application`</ph>（默认值）、<ph id=\"ph13\">`user`</ph> 或 <ph id=\"ph14\">`admin`</ph>。"
+    },
+    {
+      "pos": [
+        46637,
+        46695
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--deleteColumn <ph id=\"ph1\">`&lt;columns&gt;`</ph><ept id=\"p1\">**</ept>：要删除的列的逗号分隔列表，如 <ph id=\"ph2\">`&lt;columns&gt;`</ph>。"
+    },
+    {
+      "pos": [
+        46698,
+        46729
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-q<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--quiet<ept id=\"p2\">**</ept>：删除列而不提示确认。"
+    },
+    {
+      "pos": [
+        46732,
+        46775
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--addIndex<ph id=\"ph1\">`&lt;columns&gt;`</ph><ept id=\"p1\">**</ept>：要包含在索引中的列的逗号分隔列表。"
+    },
+    {
+      "pos": [
+        46778,
+        46824
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--deleteIndex<ph id=\"ph1\">`&lt;columns&gt;`</ph><ept id=\"p1\">**</ept>：要从索引中排除的列的逗号分隔列表。"
+    },
+    {
+      "content": "mobile table delete [options] [servicename] [tablename]",
+      "pos": [
+        46828,
+        46883
+      ]
+    },
+    {
+      "content": "此命令删除表。",
+      "pos": [
+        46887,
+        46894
+      ]
+    },
+    {
+      "content": "指定 -q 参数可在不提示确认的情况下删除表。执行此操作可以防止阻止自动化脚本。",
+      "pos": [
+        47120,
+        47160
+      ]
+    },
+    {
+      "content": "mobile data truncate [options] [servicename] [tablename]",
+      "pos": [
+        47164,
+        47220
+      ]
+    },
+    {
+      "content": "此命令从表中删除所有数据行。",
+      "pos": [
+        47224,
+        47238
+      ]
+    },
+    {
+      "pos": [
+        47539,
+        47577
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"Mobile_Scripts\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>用于管理脚本的命令"
+    },
+    {
+      "pos": [
+        47579,
+        47696
+      ],
+      "content": "本部分中的命令用于管理属于移动服务的服务器脚本。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>使用移动服务中的服务器脚本<ept id=\"p1\">](/documentation/articles/mobile-services-how-to-use-server-scripts)</ept>。"
+    },
+    {
+      "content": "mobile script list [options] [servicename]",
+      "pos": [
+        47700,
+        47742
+      ]
+    },
+    {
+      "content": "此命令列出注册的脚本，包括表和计划程序脚本。",
+      "pos": [
+        47746,
+        47768
+      ]
+    },
+    {
+      "content": "mobile script download [options] [servicename] [scriptname]",
+      "pos": [
+        48509,
+        48568
+      ]
+    },
+    {
+      "pos": [
+        48572,
+        48638
+      ],
+      "content": "此命令将插入脚本从 TodoItem 表下载到 <ph id=\"ph1\">`table`</ph> 子文件夹中名为 <ph id=\"ph2\">`todoitem.insert.js`</ph> 的文件中。"
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        48867,
+        48879
+      ]
+    },
+    {
+      "pos": [
+        48883,
+        48946
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-p<ph id=\"ph1\">`&lt;path&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--path <ph id=\"ph2\">`&lt;path&gt;`</ph><ept id=\"p2\">**</ept>：文件中用于保存脚本的位置，其中当前工作目录是默认值。"
+    },
+    {
+      "pos": [
+        48949,
+        49001
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-f<ph id=\"ph1\">`&lt;file&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--file<ph id=\"ph2\">`&lt;file&gt;`</ph><ept id=\"p2\">**</ept>：要将脚本保存在其中的文件的名称。"
+    },
+    {
+      "pos": [
+        49004,
+        49035
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-o<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--override<ept id=\"p2\">**</ept>：覆盖现有文件。"
+    },
+    {
+      "pos": [
+        49038,
+        49076
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-c<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--console<ept id=\"p2\">**</ept>：将脚本写入到控制台而不是文件。"
+    },
+    {
+      "content": "mobile script upload [options] [servicename] [scriptname]",
+      "pos": [
+        49080,
+        49137
+      ]
+    },
+    {
+      "pos": [
+        49141,
+        49189
+      ],
+      "content": "此命令从 <ph id=\"ph1\">`table`</ph> 子文件夹上载名为 <ph id=\"ph2\">`todoitem.insert.js`</ph> 的新脚本。"
+    },
+    {
+      "pos": [
+        49356,
+        49476
+      ],
+      "content": "该文件的名称必须由表和操作名称组成，并且该文件必须位于相对于命令执行位置的 table 子文件夹中。你还可以使用 <bpt id=\"p1\">**</bpt>-f <ph id=\"ph1\">`&lt;file&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--file <ph id=\"ph2\">`&lt;file&gt;`</ph><ept id=\"p2\">**</ept> 参数指定其他包含要注册的脚本的文件的文件名和路径。"
+    },
+    {
+      "content": "mobile script delete [options] [servicename] [scriptname]",
+      "pos": [
+        49481,
+        49538
+      ]
+    },
+    {
+      "content": "此命令从 TodoItem 表中删除现有插入脚本。",
+      "pos": [
+        49542,
+        49567
+      ]
+    },
+    {
+      "pos": [
+        49738,
+        49776
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"Mobile_Jobs\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>用于管理已计划作业的命令"
+    },
+    {
+      "pos": [
+        49778,
+        49887
+      ],
+      "content": "本部分中的命令用于管理属于移动服务的已计划作业。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>计划作业<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/windowsazure/jj860528.aspx)</ept>。"
+    },
+    {
+      "content": "mobile job list [options] [servicename]",
+      "pos": [
+        49891,
+        49930
+      ]
+    },
+    {
+      "content": "此命令列出计划作业。",
+      "pos": [
+        49934,
+        49944
+      ]
+    },
+    {
+      "content": "mobile job create [options] [servicename] [jobname]",
+      "pos": [
+        50523,
+        50574
+      ]
+    },
+    {
+      "pos": [
+        50578,
+        50613
+      ],
+      "content": "此命令创建计划为每小时运行的名为 <ph id=\"ph1\">`getUpdates`</ph> 的新作业。"
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        50984,
+        50996
+      ]
+    },
+    {
+      "pos": [
+        51000,
+        51069
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-i<ph id=\"ph1\">`&lt;number&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--interval<ph id=\"ph2\">`&lt;number&gt;`</ph><ept id=\"p2\">**</ept>：作业时间间隔，数值类型为整数；默认值为 <ph id=\"ph3\">`15`</ph>。"
+    },
+    {
+      "pos": [
+        51072,
+        51136
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-u<ph id=\"ph1\">`&lt;unit&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--intervalUnit <ph id=\"ph2\">`&lt;unit&gt;`</ph><ept id=\"p2\">**</ept>：<bpt id=\"p3\">_</bpt>时间间隔<ept id=\"p3\">_</ept>的单位，可以是以下值之一："
+    },
+    {
+      "pos": [
+        51143,
+        51158
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>minute<ept id=\"p1\">**</ept>（默认值）"
+    },
+    {
+      "content": "hour",
+      "pos": [
+        51167,
+        51171
+      ]
+    },
+    {
+      "content": "day",
+      "pos": [
+        51182,
+        51185
+      ]
+    },
+    {
+      "content": "month",
+      "pos": [
+        51196,
+        51201
+      ]
+    },
+    {
+      "pos": [
+        51210,
+        51224
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>none<ept id=\"p1\">**</ept>（按需作业）"
+    },
+    {
+      "pos": [
+        51227,
+        51300
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-t<ph id=\"ph1\">`&lt;time&gt;`</ph><ept id=\"p1\">**</ept> <bpt id=\"p2\">**</bpt>--startTime <ph id=\"ph2\">`&lt;time&gt;`</ph><ept id=\"p2\">**</ept> 脚本的首次运行开始时间，采用 ISO 格式；默认值为 <ph id=\"ph3\">`now`</ph>。"
+    },
+    {
+      "pos": [
+        51304,
+        51407
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>创建的新作业处于禁用状态，因为还必须上载脚本。请使用 <bpt id=\"p1\">**</bpt>mobile script upload<ept id=\"p1\">**</ept> 命令上载脚本并使用 <bpt id=\"p2\">**</bpt>mobile job update<ept id=\"p2\">**</ept> 命令启用作业。"
+    },
+    {
+      "content": "mobile job update [options] [servicename] [jobname]",
+      "pos": [
+        51411,
+        51462
+      ]
+    },
+    {
+      "pos": [
+        51466,
+        51491
+      ],
+      "content": "以下命令启用已禁用的<ph id=\"ph1\">`getUpdates`</ph>作业。"
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        51646,
+        51658
+      ]
+    },
+    {
+      "pos": [
+        51662,
+        51731
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-i<ph id=\"ph1\">`&lt;number&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--interval<ph id=\"ph2\">`&lt;number&gt;`</ph><ept id=\"p2\">**</ept>：作业时间间隔，数值类型为整数；默认值为 <ph id=\"ph3\">`15`</ph>。"
+    },
+    {
+      "pos": [
+        51734,
+        51798
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-u<ph id=\"ph1\">`&lt;unit&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--intervalUnit <ph id=\"ph2\">`&lt;unit&gt;`</ph><ept id=\"p2\">**</ept>：<bpt id=\"p3\">_</bpt>时间间隔<ept id=\"p3\">_</ept>的单位，可以是以下值之一："
+    },
+    {
+      "pos": [
+        51805,
+        51820
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>minute<ept id=\"p1\">**</ept>（默认值）"
+    },
+    {
+      "content": "hour",
+      "pos": [
+        51829,
+        51833
+      ]
+    },
+    {
+      "content": "day",
+      "pos": [
+        51844,
+        51847
+      ]
+    },
+    {
+      "content": "month",
+      "pos": [
+        51858,
+        51863
+      ]
+    },
+    {
+      "pos": [
+        51872,
+        51886
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>none<ept id=\"p1\">**</ept>（按需作业）"
+    },
+    {
+      "pos": [
+        51889,
+        51962
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-t<ph id=\"ph1\">`&lt;time&gt;`</ph><ept id=\"p1\">**</ept> <bpt id=\"p2\">**</bpt>--startTime <ph id=\"ph2\">`&lt;time&gt;`</ph><ept id=\"p2\">**</ept> 脚本的首次运行开始时间，采用 ISO 格式；默认值为 <ph id=\"ph3\">`now`</ph>。"
+    },
+    {
+      "pos": [
+        51965,
+        52040
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-a<ph id=\"ph1\">`&lt;status&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--status <ph id=\"ph2\">`&lt;status&gt;`</ph><ept id=\"p2\">**</ept>：作业状态，可以是 <ph id=\"ph3\">`enabled`</ph> 或 <ph id=\"ph4\">`disabled`</ph>。"
+    },
+    {
+      "content": "mobile job delete [options] [servicename] [jobname]",
+      "pos": [
+        52044,
+        52095
+      ]
+    },
+    {
+      "content": "此命令从 TodoList 服务器中删除 getUpdates 已计划作业。",
+      "pos": [
+        52099,
+        52137
+      ]
+    },
+    {
+      "pos": [
+        52283,
+        52310
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>删除作业也将删除已上载的脚本。"
+    },
+    {
+      "pos": [
+        52316,
+        52354
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"Mobile_Scale\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>用于缩放移动服务的命令"
+    },
+    {
+      "pos": [
+        52356,
+        52459
+      ],
+      "content": "本部分中的命令用于缩放移动服务。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>缩放移动服务<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/windowsazure/jj193178.aspx)</ept>。"
+    },
+    {
+      "content": "mobile scale show [options] [servicename]",
+      "pos": [
+        52463,
+        52504
+      ]
+    },
+    {
+      "content": "此命令显示缩放信息，包括当前计算模式和实例数。",
+      "pos": [
+        52508,
+        52531
+      ]
+    },
+    {
+      "content": "mobile scale change [options] [servicename]",
+      "pos": [
+        52766,
+        52809
+      ]
+    },
+    {
+      "content": "此命令将移动服务的规模从免费模式更改为高级模式。",
+      "pos": [
+        52813,
+        52837
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        53028,
+        53040
+      ]
+    },
+    {
+      "pos": [
+        53044,
+        53116
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-c<ph id=\"ph1\">`&lt;mode&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--computeMode <ph id=\"ph2\">`&lt;mode&gt;`</ph><ept id=\"p2\">**</ept>：计算模式必须为 <ph id=\"ph3\">`Free`</ph> 或 <ph id=\"ph4\">`Reserved`</ph>。"
+    },
+    {
+      "pos": [
+        53119,
+        53186
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-i<ph id=\"ph1\">`&lt;count&gt;`</ph><ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--numberOfInstances<ph id=\"ph2\">`&lt;count&gt;`</ph><ept id=\"p2\">**</ept>：在保留模式下运行时使用的实例数。"
+    },
+    {
+      "pos": [
+        53190,
+        53245
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>将计算模式设置为<ph id=\"ph2\">`Reserved`</ph>时，同一区域中的所有移动服务都将在高级模式下运行。"
+    },
+    {
+      "content": "用于为移动服务启用预览版功能的命令",
+      "pos": [
+        53251,
+        53268
+      ]
+    },
+    {
+      "content": "mobile preview list [options] [servicename]",
+      "pos": [
+        53272,
+        53315
+      ]
+    },
+    {
+      "content": "此命令显示在指定的服务上可用的预览版功能，以及它们是否已启用。",
+      "pos": [
+        53319,
+        53350
+      ]
+    },
+    {
+      "content": "mobile preview enable [options] [servicename] [featurename]",
+      "pos": [
+        53757,
+        53816
+      ]
+    },
+    {
+      "content": "此命令为移动服务启用指定的预览版功能。请注意，一旦启用，将无法为移动服务禁用预览版功能。",
+      "pos": [
+        53820,
+        53864
+      ]
+    },
+    {
+      "content": "用于管理移动服务 API 的命令",
+      "pos": [
+        53869,
+        53885
+      ]
+    },
+    {
+      "content": "mobile api list [options] [servicename]",
+      "pos": [
+        53889,
+        53928
+      ]
+    },
+    {
+      "content": "此命令列出你为你的移动服务创建的移动服务自定义 API。",
+      "pos": [
+        53932,
+        53960
+      ]
+    },
+    {
+      "content": "mobile api create [options] [servicename] [apiname]",
+      "pos": [
+        54513,
+        54564
+      ]
+    },
+    {
+      "content": "创建移动服务自定义 API",
+      "pos": [
+        54568,
+        54581
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        54889,
+        54901
+      ]
+    },
+    {
+      "pos": [
+        54903,
+        54974
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-p<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--permissions<ept id=\"p2\">**</ept> &amp;lt;permissions&gt;：以逗号分隔的 &amp;lt;方法&gt;=&amp;lt;权限&gt; 对列表。"
+    },
+    {
+      "content": "mobile api update [options] [servicename] [apiname]",
+      "pos": [
+        54978,
+        55029
+      ]
+    },
+    {
+      "content": "此命令更新指定的移动服务自定义 API。",
+      "pos": [
+        55033,
+        55053
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        55055,
+        55067
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        55069,
+        55081
+      ]
+    },
+    {
+      "pos": [
+        55085,
+        55156
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-p<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--permissions<ept id=\"p2\">**</ept> &amp;lt;permissions&gt;：以逗号分隔的 &amp;lt;方法&gt;=&amp;lt;权限&gt; 对列表。"
+    },
+    {
+      "pos": [
+        55159,
+        55199
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-f<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--force<ept id=\"p2\">**</ept>：覆盖对权限元数据文件的任何自定义更改。"
+    },
+    {
+      "content": "mobile api delete [options] [servicename] [apiname]",
+      "pos": [
+        55203,
+        55254
+      ]
+    },
+    {
+      "content": "此命令删除指定的移动服务自定义 API。",
+      "pos": [
+        55450,
+        55470
+      ]
+    },
+    {
+      "content": "用于管理移动应用程序的应用程序设置的命令",
+      "pos": [
+        55475,
+        55495
+      ]
+    },
+    {
+      "content": "mobile appsetting list [options] [servicename]",
+      "pos": [
+        55499,
+        55545
+      ]
+    },
+    {
+      "content": "此命令显示指定的服务的移动应用程序的应用程序设置。",
+      "pos": [
+        55549,
+        55574
+      ]
+    },
+    {
+      "content": "mobile appsetting add [options] [servicename] [name] [value]",
+      "pos": [
+        55866,
+        55926
+      ]
+    },
+    {
+      "content": "此命令为移动服务添加自定义应用程序设置。",
+      "pos": [
+        55930,
+        55950
+      ]
+    },
+    {
+      "content": "mobile appsetting delete [options] [servicename] [name]",
+      "pos": [
+        56174,
+        56229
+      ]
+    },
+    {
+      "content": "此命令为移动服务删除指定的应用程序设置。",
+      "pos": [
+        56233,
+        56253
+      ]
+    },
+    {
+      "content": "mobile appsetting show [options] [servicename] [name]",
+      "pos": [
+        56503,
+        56556
+      ]
+    },
+    {
+      "content": "此命令为移动服务删除指定的应用程序设置。",
+      "pos": [
+        56560,
+        56580
+      ]
+    },
+    {
+      "content": "管理工具本地设置",
+      "pos": [
+        56815,
+        56823
+      ]
+    },
+    {
+      "content": "本地设置是指你的订阅 ID 和默认存储帐户名称。",
+      "pos": [
+        56825,
+        56849
+      ]
+    },
+    {
+      "content": "config list [options]",
+      "pos": [
+        56853,
+        56874
+      ]
+    },
+    {
+      "content": "此命令显示配置设置。",
+      "pos": [
+        56878,
+        56888
+      ]
+    },
+    {
+      "content": "config set [options] &amp;lt;name&amp;gt;,&amp;lt;value&amp;gt;",
+      "pos": [
+        57171,
+        57218
+      ]
+    },
+    {
+      "content": "此命令更改配置设置。",
+      "pos": [
+        57222,
+        57232
+      ]
+    },
+    {
+      "content": "用于管理 Service Bus 的命令",
+      "pos": [
+        57380,
+        57400
+      ]
+    },
+    {
+      "content": "使用这些命令来管理你的 Service Bus 帐户",
+      "pos": [
+        57402,
+        57428
+      ]
+    },
+    {
+      "content": "sb namespace check [options] &amp;lt;name&gt;",
+      "pos": [
+        57432,
+        57470
+      ]
+    },
+    {
+      "content": "检查某个 service bus 命名空间是否合法并可用。",
+      "pos": [
+        57474,
+        57503
+      ]
+    },
+    {
+      "content": "sb namespace create &amp;lt;name&gt; &amp;lt;location&gt;",
+      "pos": [
+        57507,
+        57550
+      ]
+    },
+    {
+      "content": "创建新的 Service Bus 命名空间。",
+      "pos": [
+        57554,
+        57576
+      ]
+    },
+    {
+      "content": "sb namespace delete &amp;lt;name&gt;",
+      "pos": [
+        58519,
+        58548
+      ]
+    },
+    {
+      "content": "删除某个命名空间。",
+      "pos": [
+        58552,
+        58561
+      ]
+    },
+    {
+      "content": "sb namespace list",
+      "pos": [
+        58809,
+        58826
+      ]
+    },
+    {
+      "content": "列出为你的帐户创建的所有命名空间。",
+      "pos": [
+        58830,
+        58847
+      ]
+    },
+    {
+      "content": "sb namespace location list",
+      "pos": [
+        59150,
+        59176
+      ]
+    },
+    {
+      "content": "显示所有可用的命名空间位置的列表。",
+      "pos": [
+        59180,
+        59197
+      ]
+    },
+    {
+      "content": "sb namespace show &amp;lt;name&gt;",
+      "pos": [
+        59807,
+        59834
+      ]
+    },
+    {
+      "content": "显示有关特定命名空间的详细信息。",
+      "pos": [
+        59838,
+        59854
+      ]
+    },
+    {
+      "content": "sb namespace verify &amp;lt;name&gt;",
+      "pos": [
+        60753,
+        60782
+      ]
+    },
+    {
+      "content": "检查命名空间是否可用。",
+      "pos": [
+        60786,
+        60797
+      ]
+    },
+    {
+      "content": "用于管理存储对象的命令",
+      "pos": [
+        60802,
+        60813
+      ]
+    },
+    {
+      "content": "用于管理存储帐户的命令",
+      "pos": [
+        60818,
+        60829
+      ]
+    },
+    {
+      "content": "storage account list [options]",
+      "pos": [
+        60833,
+        60863
+      ]
+    },
+    {
+      "content": "此命令显示你的订阅上的存储帐户。",
+      "pos": [
+        60867,
+        60883
+      ]
+    },
+    {
+      "content": "storage account show [options]",
+      "pos": [
+        61187,
+        61217
+      ]
+    },
+    {
+      "content": "此命令显示有关指定的存储帐户的信息，包括 URI 和帐户属性。",
+      "pos": [
+        61228,
+        61259
+      ]
+    },
+    {
+      "content": "storage account create [options]",
+      "pos": [
+        61263,
+        61295
+      ]
+    },
+    {
+      "content": "此命令根据提供的选项创建存储帐户。",
+      "pos": [
+        61306,
+        61323
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        61552,
+        61564
+      ]
+    },
+    {
+      "pos": [
+        61568,
+        61608
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-e<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--label<ept id=\"p2\">**</ept> &amp;lt;label&gt;：存储帐户的标签。"
+    },
+    {
+      "pos": [
+        61611,
+        61663
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-d<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--description<ept id=\"p2\">**</ept> &amp;lt;description&gt;：存储帐户的说明。"
+    },
+    {
+      "pos": [
+        61666,
+        61716
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-l<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--location<ept id=\"p2\">**</ept> &amp;lt;name&gt;：要在其中创建存储帐户的地理区域。"
+    },
+    {
+      "pos": [
+        61719,
+        61772
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-a<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--affinity-group<ept id=\"p2\">**</ept> &amp;lt;name&gt;：要与存储帐户关联的地缘组。"
+    },
+    {
+      "pos": [
+        61775,
+        61838
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--type<ept id=\"p1\">**</ept>：指示要创建的帐户的类型：带冗余选项的标准存储 (LRS/GRS/RAGRS) 或高级存储 (PLRS)。"
+    },
+    {
+      "content": "storage account set [options]",
+      "pos": [
+        61842,
+        61871
+      ]
+    },
+    {
+      "content": "此命令更新指定的存储帐户。",
+      "pos": [
+        61882,
+        61895
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        62082,
+        62094
+      ]
+    },
+    {
+      "pos": [
+        62098,
+        62138
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-e<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--label<ept id=\"p2\">**</ept> &amp;lt;label&gt;：存储帐户的标签。"
+    },
+    {
+      "pos": [
+        62141,
+        62193
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-d<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--description<ept id=\"p2\">**</ept> &amp;lt;description&gt;：存储帐户的说明。"
+    },
+    {
+      "pos": [
+        62196,
+        62246
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-l<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--location<ept id=\"p2\">**</ept> &amp;lt;name&gt;：要在其中创建存储帐户的地理区域。"
+    },
+    {
+      "pos": [
+        62249,
+        62309
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--type<ept id=\"p1\">**</ept>：指示帐户的新类型：带冗余选项的标准存储 (LRS/GRS/RAGRS) 或高级存储 (PLRS)。"
+    },
+    {
+      "content": "storage account delete [options]",
+      "pos": [
+        62313,
+        62345
+      ]
+    },
+    {
+      "content": "此命令删除指定的存储帐户。",
+      "pos": [
+        62356,
+        62369
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        62371,
+        62383
+      ]
+    },
+    {
+      "pos": [
+        62385,
+        62425
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-q<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--quiet<ept id=\"p2\">**</ept>：不提示确认。在自动化脚本中使用此选项。"
+    },
+    {
+      "content": "用于管理存储帐户密钥的命令",
+      "pos": [
+        62430,
+        62443
+      ]
+    },
+    {
+      "content": "storage account keys list [options]",
+      "pos": [
+        62447,
+        62482
+      ]
+    },
+    {
+      "content": "此命令列出指定的存储帐户的主要和辅助密钥。",
+      "pos": [
+        62493,
+        62514
+      ]
+    },
+    {
+      "content": "storage account keys renew [options]",
+      "pos": [
+        62518,
+        62554
+      ]
+    },
+    {
+      "content": "用于管理存储容器的命令",
+      "pos": [
+        62568,
+        62579
+      ]
+    },
+    {
+      "content": "storage container list [options] [prefix]",
+      "pos": [
+        62583,
+        62624
+      ]
+    },
+    {
+      "content": "此命令显示指定的存储帐户的存储容器列表。存储帐户是通过连接字符串或者存储帐户名称和帐户密钥指定的。",
+      "pos": [
+        62628,
+        62677
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        62679,
+        62691
+      ]
+    },
+    {
+      "pos": [
+        62695,
+        62737
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-p<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>-prefix<ept id=\"p2\">**</ept> &amp;lt;prefix&gt;：存储容器名称前缀。"
+    },
+    {
+      "pos": [
+        62740,
+        62792
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-a<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-name<ept id=\"p2\">**</ept> &amp;lt;accountName&gt;：存储帐户名称。"
+    },
+    {
+      "pos": [
+        62795,
+        62845
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-k<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-key<ept id=\"p2\">**</ept> &amp;lt;accountKey&gt;：存储帐户密钥。"
+    },
+    {
+      "pos": [
+        62848,
+        62911
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-c<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--connection-string<ept id=\"p2\">**</ept> &amp;lt;connectionString&gt;：存储连接字符串。"
+    },
+    {
+      "pos": [
+        62914,
+        62946
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--debug<ept id=\"p1\">**</ept>：在调试模式下运行 storage 命令。"
+    },
+    {
+      "pos": [
+        62948,
+        63047
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>storage container show [options] [container]<ept id=\"p1\">**</ept> <bpt id=\"p2\">**</bpt>storage container create [options] [container]<ept id=\"p2\">**</ept>"
+    },
+    {
+      "content": "此命令为指定的存储帐户创建存储容器。存储帐户是通过连接字符串或者存储帐户名称和帐户密钥指定的。",
+      "pos": [
+        63049,
+        63096
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        63098,
+        63110
+      ]
+    },
+    {
+      "pos": [
+        63114,
+        63157
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--container<ept id=\"p1\">**</ept> &amp;lt;container&gt;：要创建的存储容器的名称。"
+    },
+    {
+      "pos": [
+        63160,
+        63202
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-p<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>-prefix<ept id=\"p2\">**</ept> &amp;lt;prefix&gt;：存储容器名称前缀。"
+    },
+    {
+      "pos": [
+        63205,
+        63256
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-a<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-name<ept id=\"p2\">**</ept> &amp;lt;accountName&gt;：存储帐户名称"
+    },
+    {
+      "pos": [
+        63259,
+        63308
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-k<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-key<ept id=\"p2\">**</ept> &amp;lt;accountKey&gt;：存储帐户密钥"
+    },
+    {
+      "pos": [
+        63311,
+        63373
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-c<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--connection-string<ept id=\"p2\">**</ept> &amp;lt;connectionString&gt;：存储连接字符串"
+    },
+    {
+      "pos": [
+        63376,
+        63408
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--debug<ept id=\"p1\">**</ept>：在调试模式下运行 storage 命令。"
+    },
+    {
+      "content": "storage container delete [options] [container]",
+      "pos": [
+        63412,
+        63458
+      ]
+    },
+    {
+      "content": "此命令删除指定的存储容器。存储帐户是通过连接字符串或者存储帐户名称和帐户密钥指定的。",
+      "pos": [
+        63462,
+        63504
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        63506,
+        63518
+      ]
+    },
+    {
+      "pos": [
+        63522,
+        63565
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--container<ept id=\"p1\">**</ept> &amp;lt;container&gt;：要创建的存储容器的名称。"
+    },
+    {
+      "pos": [
+        63568,
+        63610
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-p<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>-prefix<ept id=\"p2\">**</ept> &amp;lt;prefix&gt;：存储容器名称前缀。"
+    },
+    {
+      "pos": [
+        63613,
+        63665
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-a<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-name<ept id=\"p2\">**</ept> &amp;lt;accountName&gt;：存储帐户名称。"
+    },
+    {
+      "pos": [
+        63668,
+        63718
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-k<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-key<ept id=\"p2\">**</ept> &amp;lt;accountKey&gt;：存储帐户密钥。"
+    },
+    {
+      "pos": [
+        63721,
+        63784
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-c<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--connection-string<ept id=\"p2\">**</ept> &amp;lt;connectionString&gt;：存储连接字符串。"
+    },
+    {
+      "pos": [
+        63787,
+        63819
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--debug<ept id=\"p1\">**</ept>：在调试模式下运行 storage 命令。"
+    },
+    {
+      "content": "storage container set [options] [container]",
+      "pos": [
+        63823,
+        63866
+      ]
+    },
+    {
+      "content": "此命令设置存储容器的访问控制列表。存储帐户是通过连接字符串或者存储帐户名称和帐户密钥指定的。",
+      "pos": [
+        63870,
+        63916
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        63918,
+        63930
+      ]
+    },
+    {
+      "pos": [
+        63934,
+        63977
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--container<ept id=\"p1\">**</ept> &amp;lt;container&gt;：要创建的存储容器的名称。"
+    },
+    {
+      "pos": [
+        63980,
+        64022
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-p<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>-prefix<ept id=\"p2\">**</ept> &amp;lt;prefix&gt;：存储容器名称前缀。"
+    },
+    {
+      "pos": [
+        64025,
+        64077
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-a<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-name<ept id=\"p2\">**</ept> &amp;lt;accountName&gt;：存储帐户名称。"
+    },
+    {
+      "pos": [
+        64080,
+        64130
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-k<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-key<ept id=\"p2\">**</ept> &amp;lt;accountKey&gt;：存储帐户密钥。"
+    },
+    {
+      "pos": [
+        64133,
+        64196
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-c<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--connection-string<ept id=\"p2\">**</ept> &amp;lt;connectionString&gt;：存储连接字符串。"
+    },
+    {
+      "pos": [
+        64199,
+        64231
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--debug<ept id=\"p1\">**</ept>：在调试模式下运行 storage 命令。"
+    },
+    {
+      "content": "用于管理存储 blob 的命令",
+      "pos": [
+        64236,
+        64251
+      ]
+    },
+    {
+      "content": "storage blob list [options] [container] [prefix]",
+      "pos": [
+        64255,
+        64303
+      ]
+    },
+    {
+      "content": "此命令返回指定的存储容器中的存储 blob 的列表。",
+      "pos": [
+        64307,
+        64333
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        64335,
+        64347
+      ]
+    },
+    {
+      "pos": [
+        64351,
+        64394
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--container<ept id=\"p1\">**</ept> &amp;lt;container&gt;：要创建的存储容器的名称。"
+    },
+    {
+      "pos": [
+        64397,
+        64439
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-p<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>-prefix<ept id=\"p2\">**</ept> &amp;lt;prefix&gt;：存储容器名称前缀。"
+    },
+    {
+      "pos": [
+        64442,
+        64494
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-a<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-name<ept id=\"p2\">**</ept> &amp;lt;accountName&gt;：存储帐户名称。"
+    },
+    {
+      "pos": [
+        64497,
+        64547
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-k<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-key<ept id=\"p2\">**</ept> &amp;lt;accountKey&gt;：存储帐户密钥。"
+    },
+    {
+      "pos": [
+        64550,
+        64613
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-c<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--connection-string<ept id=\"p2\">**</ept> &amp;lt;connectionString&gt;：存储连接字符串。"
+    },
+    {
+      "pos": [
+        64616,
+        64648
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--debug<ept id=\"p1\">**</ept>：在调试模式下运行 storage 命令。"
+    },
+    {
+      "content": "storage blob show [options] [container] [blob]",
+      "pos": [
+        64652,
+        64698
+      ]
+    },
+    {
+      "content": "此命令显示指定的存储 blob 的详细信息。",
+      "pos": [
+        64702,
+        64724
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        64726,
+        64738
+      ]
+    },
+    {
+      "pos": [
+        64742,
+        64785
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--container<ept id=\"p1\">**</ept> &amp;lt;container&gt;：要创建的存储容器的名称。"
+    },
+    {
+      "pos": [
+        64788,
+        64830
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-p<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>-prefix<ept id=\"p2\">**</ept> &amp;lt;prefix&gt;：存储容器名称前缀。"
+    },
+    {
+      "pos": [
+        64833,
+        64885
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-a<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-name<ept id=\"p2\">**</ept> &amp;lt;accountName&gt;：存储帐户名称。"
+    },
+    {
+      "pos": [
+        64888,
+        64938
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-k<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-key<ept id=\"p2\">**</ept> &amp;lt;accountKey&gt;：存储帐户密钥。"
+    },
+    {
+      "pos": [
+        64941,
+        65004
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-c<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--connection-string<ept id=\"p2\">**</ept> &amp;lt;connectionString&gt;：存储连接字符串。"
+    },
+    {
+      "pos": [
+        65007,
+        65039
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--debug<ept id=\"p1\">**</ept>：在调试模式下运行 storage 命令。"
+    },
+    {
+      "content": "storage blob delete [options] [container] [blob]",
+      "pos": [
+        65043,
+        65091
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        65095,
+        65107
+      ]
+    },
+    {
+      "pos": [
+        65111,
+        65154
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--container<ept id=\"p1\">**</ept> &amp;lt;container&gt;：要创建的存储容器的名称。"
+    },
+    {
+      "pos": [
+        65157,
+        65207
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-b<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--blob<ept id=\"p2\">**</ept> &amp;lt;blobName&gt;：要删除的存储 blob 的名称。"
+    },
+    {
+      "pos": [
+        65210,
+        65249
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-q<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--quiet<ept id=\"p2\">**</ept>：删除指定的存储 blob 且不确认。"
+    },
+    {
+      "pos": [
+        65252,
+        65304
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-a<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-name<ept id=\"p2\">**</ept> &amp;lt;accountName&gt;：存储帐户名称。"
+    },
+    {
+      "pos": [
+        65307,
+        65357
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-k<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-key<ept id=\"p2\">**</ept> &amp;lt;accountKey&gt;：存储帐户密钥。"
+    },
+    {
+      "pos": [
+        65360,
+        65423
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-c<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--connection-string<ept id=\"p2\">**</ept> &amp;lt;connectionString&gt;：存储连接字符串。"
+    },
+    {
+      "pos": [
+        65426,
+        65458
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--debug<ept id=\"p1\">**</ept>：在调试模式下运行 storage 命令。"
+    },
+    {
+      "content": "storage blob upload [options] [file] [container] [blob]",
+      "pos": [
+        65462,
+        65517
+      ]
+    },
+    {
+      "content": "此命令将指定的文件上载到指定的存储 blob。",
+      "pos": [
+        65521,
+        65544
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        65546,
+        65558
+      ]
+    },
+    {
+      "pos": [
+        65562,
+        65605
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--container<ept id=\"p1\">**</ept> &amp;lt;container&gt;：要创建的存储容器的名称。"
+    },
+    {
+      "pos": [
+        65608,
+        65658
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-b<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--blob<ept id=\"p2\">**</ept> &amp;lt;blobName&gt;：要上载的存储 blob 的名称。"
+    },
+    {
+      "pos": [
+        65661,
+        65723
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-t<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--blobtype<ept id=\"p2\">**</ept> &amp;lt;blobtype&gt;：存储 blob 类型：Page 或 Block。"
+    },
+    {
+      "pos": [
+        65726,
+        65872
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-p<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--properties<ept id=\"p2\">**</ept> &amp;lt;properties&gt;：上载的文件的存储 blob 属性。属性是以分号 (;) 分隔的“键=值”对。可用的属性有 contentType、contentEncoding、contentLanguage 和 cacheControl。"
+    },
+    {
+      "pos": [
+        65875,
+        65953
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-m<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--metadata<ept id=\"p2\">**</ept> &amp;lt;metadata&gt;：上载的文件的存储 blob 元数据。元数据是以分号 (;) 分隔的“键=值”对。"
+    },
+    {
+      "pos": [
+        65956,
+        66019
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--concurrenttaskcount<ept id=\"p1\">**</ept> &amp;lt;concurrenttaskcount&gt;：并发上载请求的最大数目。"
+    },
+    {
+      "pos": [
+        66022,
+        66061
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-q<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--quiet<ept id=\"p2\">**</ept>：覆盖指定的存储 blob 且不确认。"
+    },
+    {
+      "pos": [
+        66064,
+        66116
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-a<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-name<ept id=\"p2\">**</ept> &amp;lt;accountName&gt;：存储帐户名称。"
+    },
+    {
+      "pos": [
+        66119,
+        66169
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-k<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-key<ept id=\"p2\">**</ept> &amp;lt;accountKey&gt;：存储帐户密钥。"
+    },
+    {
+      "pos": [
+        66172,
+        66235
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-c<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--connection-string<ept id=\"p2\">**</ept> &amp;lt;connectionString&gt;：存储连接字符串。"
+    },
+    {
+      "pos": [
+        66238,
+        66270
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--debug<ept id=\"p1\">**</ept>：在调试模式下运行 storage 命令。"
+    },
+    {
+      "content": "storage blob download [options] [container] [blob] [destination]",
+      "pos": [
+        66274,
+        66338
+      ]
+    },
+    {
+      "content": "此命令下载指定的存储 blob。",
+      "pos": [
+        66342,
+        66358
+      ]
+    },
+    {
+      "content": "此命令支持以下附加选项：",
+      "pos": [
+        66360,
+        66372
+      ]
+    },
+    {
+      "pos": [
+        66376,
+        66419
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--container<ept id=\"p1\">**</ept> &amp;lt;container&gt;：要创建的存储容器的名称。"
+    },
+    {
+      "pos": [
+        66422,
+        66467
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-b<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--blob<ept id=\"p2\">**</ept> &amp;lt;blobName&gt;：存储 blob 名称。"
+    },
+    {
+      "pos": [
+        66470,
+        66523
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-d<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--destination<ept id=\"p2\">**</ept> [destination]：下载目标文件或目录路径。"
+    },
+    {
+      "pos": [
+        66526,
+        66566
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-m<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--checkmd5<ept id=\"p2\">**</ept>：下载的文件的校验 md5sum。"
+    },
+    {
+      "pos": [
+        66569,
+        66631
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--concurrenttaskcount<ept id=\"p1\">**</ept> &amp;lt;concurrenttaskcount&gt; 并发上载请求的最大数目"
+    },
+    {
+      "pos": [
+        66634,
+        66666
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-q<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--quiet<ept id=\"p2\">**</ept>：覆盖目标文件且不确认。"
+    },
+    {
+      "pos": [
+        66669,
+        66721
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-a<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-name<ept id=\"p2\">**</ept> &amp;lt;accountName&gt;：存储帐户名称。"
+    },
+    {
+      "pos": [
+        66724,
+        66774
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-k<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--account-key<ept id=\"p2\">**</ept> &amp;lt;accountKey&gt;：存储帐户密钥。"
+    },
+    {
+      "pos": [
+        66777,
+        66840
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-c<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>--connection-string<ept id=\"p2\">**</ept> &amp;lt;connectionString&gt;：存储连接字符串。"
+    },
+    {
+      "pos": [
+        66843,
+        66875
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>--debug<ept id=\"p1\">**</ept>：在调试模式下运行 storage 命令。"
+    },
+    {
+      "content": "用于管理 SQL 数据库的命令",
+      "pos": [
+        66880,
+        66895
+      ]
+    },
+    {
+      "content": "使用这些命令来管理你的 Azure SQL 数据库",
+      "pos": [
+        66897,
+        66922
+      ]
+    },
+    {
+      "content": "用于管理 SQL Server 的数据库",
+      "pos": [
+        66927,
+        66947
+      ]
+    },
+    {
+      "content": "使用这些命令来管理你的 SQL Server",
+      "pos": [
+        66949,
+        66971
+      ]
+    },
+    {
+      "content": "sql server create &amp;lt;administratorLogin&gt; &amp;lt;administratorPassword&gt; &amp;lt;location&gt;",
+      "pos": [
+        66975,
+        67057
+      ]
+    },
+    {
+      "content": "创建新的数据库服务器",
+      "pos": [
+        67061,
+        67071
+      ]
+    },
+    {
+      "content": "sql server show &amp;lt;name&gt;",
+      "pos": [
+        67284,
+        67309
+      ]
+    },
+    {
+      "content": "显示服务器详细信息。",
+      "pos": [
+        67313,
+        67323
+      ]
+    },
+    {
+      "content": "sql server list",
+      "pos": [
+        67707,
+        67722
+      ]
+    },
+    {
+      "content": "获取服务器的列表。",
+      "pos": [
+        67726,
+        67735
+      ]
+    },
+    {
+      "content": "sql server delete &amp;lt;name&gt;",
+      "pos": [
+        67982,
+        68009
+      ]
+    },
+    {
+      "content": "删除服务器",
+      "pos": [
+        68013,
+        68018
+      ]
+    },
+    {
+      "content": "用于管理 SQL 数据库的命令",
+      "pos": [
+        68221,
+        68236
+      ]
+    },
+    {
+      "content": "使用这些命令来管理你的 SQL 数据库。",
+      "pos": [
+        68238,
+        68258
+      ]
+    },
+    {
+      "content": "sql db create [options] &amp;lt;serverName&gt; &amp;lt;databaseName&gt; &amp;lt;administratorPassword&gt;",
+      "pos": [
+        68262,
+        68346
+      ]
+    },
+    {
+      "content": "创建一个新的数据库实例",
+      "pos": [
+        68350,
+        68361
+      ]
+    },
+    {
+      "content": "sql db show [options] &amp;lt;serverName&gt; &amp;lt;databaseName&gt; &amp;lt;administratorPassword&gt;",
+      "pos": [
+        68570,
+        68652
+      ]
+    },
+    {
+      "content": "显示数据库详细信息。",
+      "pos": [
+        68656,
+        68666
+      ]
+    },
+    {
+      "content": "sql db list [options] &amp;lt;serverName&gt; &amp;lt;administratorPassword&gt;",
+      "pos": [
+        71408,
+        71472
+      ]
+    },
+    {
+      "content": "列出数据库。",
+      "pos": [
+        71476,
+        71482
+      ]
+    },
+    {
+      "content": "sql db delete [options] &amp;lt;serverName&gt; &amp;lt;databaseName&gt; &amp;lt;administratorPassword&gt;",
+      "pos": [
+        71885,
+        71969
+      ]
+    },
+    {
+      "content": "删除数据库。",
+      "pos": [
+        71973,
+        71979
+      ]
+    },
+    {
+      "content": "管理 SQL Server 防火墙规则的命令",
+      "pos": [
+        72248,
+        72270
+      ]
+    },
+    {
+      "content": "使用这些命令来管理 SQL Server 防火墙规则",
+      "pos": [
+        72272,
+        72298
+      ]
+    },
+    {
+      "content": "sql firewallrule create [options] &amp;lt;serverName&gt; &amp;lt;ruleName&gt; &amp;lt;startIPAddress&gt; &amp;lt;endIPAddress&gt;",
+      "pos": [
+        72302,
+        72403
+      ]
+    },
+    {
+      "content": "为 SQL Server 创建新的防火墙规则。",
+      "pos": [
+        72407,
+        72430
+      ]
+    },
+    {
+      "content": "sql firewallrule show [options] &amp;lt;serverName&gt; &amp;lt;ruleName&gt;",
+      "pos": [
+        72651,
+        72712
+      ]
+    },
+    {
+      "content": "显示防火墙规则详细信息。",
+      "pos": [
+        72716,
+        72728
+      ]
+    },
+    {
+      "content": "sql firewallrule list [options] &amp;lt;serverName&gt;",
+      "pos": [
+        73508,
+        73555
+      ]
+    },
+    {
+      "content": "列出防火墙规则。",
+      "pos": [
+        73559,
+        73567
+      ]
+    },
+    {
+      "content": "sql firewallrule delete [options] &amp;lt;serverName&gt; &amp;lt;ruleName&gt;",
+      "pos": [
+        73891,
+        73954
+      ]
+    },
+    {
+      "content": "此命令将删除防火墙规则。",
+      "pos": [
+        73958,
+        73970
+      ]
+    },
+    {
+      "content": "用于管理虚拟网络的命令",
+      "pos": [
+        74197,
+        74208
+      ]
+    },
+    {
+      "content": "使用这些命令来管理你的虚拟网络",
+      "pos": [
+        74210,
+        74225
+      ]
+    },
+    {
+      "content": "network vnet create [options] &amp;lt;location&gt;",
+      "pos": [
+        74229,
+        74272
+      ]
+    },
+    {
+      "content": "创建新的虚拟网络。",
+      "pos": [
+        74276,
+        74285
+      ]
+    },
+    {
+      "content": "network vnet show &amp;lt;name&gt;",
+      "pos": [
+        75104,
+        75131
+      ]
+    },
+    {
+      "content": "显示虚拟网络的详细信息。",
+      "pos": [
+        75135,
+        75147
+      ]
+    },
+    {
+      "content": "vnet list",
+      "pos": [
+        75602,
+        75611
+      ]
+    },
+    {
+      "content": "列出所有现有的虚拟网络。",
+      "pos": [
+        75615,
+        75627
+      ]
+    },
+    {
+      "content": "network vnet delete &amp;lt;name&gt;",
+      "pos": [
+        76031,
+        76060
+      ]
+    },
+    {
+      "content": "删除指定的虚拟网络。",
+      "pos": [
+        76064,
+        76074
+      ]
+    },
+    {
+      "content": "network export [file-path]",
+      "pos": [
+        76357,
+        76383
+      ]
+    },
+    {
+      "content": "若要进行高级网络配置，请在本地导出你的网络配置。注意，导出的网络配置包括 DNS 服务器设置、虚拟网络设置、本地网络站点设置和其他设置。",
+      "pos": [
+        76387,
+        76455
+      ]
+    },
+    {
+      "content": "network import [file-path]",
+      "pos": [
+        76459,
+        76485
+      ]
+    },
+    {
+      "content": "导入本地网络配置。",
+      "pos": [
+        76489,
+        76498
+      ]
+    },
+    {
+      "content": "network dnsserver register [options] &amp;lt;dnsIP&gt;",
+      "pos": [
+        76502,
+        76549
+      ]
+    },
+    {
+      "content": "注册你计划在网络配置中用来进行名称解析的 DNS 服务器。",
+      "pos": [
+        76553,
+        76582
+      ]
+    },
+    {
+      "content": "network dnsserver list",
+      "pos": [
+        76852,
+        76874
+      ]
+    },
+    {
+      "content": "列出在你的网络配置中注册的所有 DNS 服务器。",
+      "pos": [
+        76878,
+        76902
+      ]
+    },
+    {
+      "content": "network dnsserver unregister [options] &amp;lt;dnsIP&gt;",
+      "pos": [
+        77277,
+        77326
+      ]
+    },
+    {
+      "content": "从网络配置中删除 DNS 服务器条目。",
+      "pos": [
+        77330,
+        77349
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"配合使用 Azure CLI 和服务管理 | Azure\"\n    description=\"了解如何使用适用于 Mac、Linux 和 Windows 的命令行工具，在经典（Azure 服务管理）模式下使用 Azure CLI 管理 Azure。\"\n    services=\"virtual-machines, mobile-services, cloud-services\"\n    documentationCenter=\"\"\n    authors=\"dlepow\"\n    manager=\"timlt\"\n    editor=\"tysonn\"\n    tags=\"azure-service-management\"/>\n\n<tags\n    ms.service=\"multiple\"\n    ms.date=\"10/07/2015\"\n    wacn.date=\"02/17/2016\"/>\n\n# 将适用于 Mac、Linux 和 Windows 的 Azure CLI 与 Azure 服务管理配合使用\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]\n\n\n本文介绍如何在服务管理模式（asm 模式）下使用 Azure CLI 在 Mac、Linux 和 Windows 计算机的命令行中创建、管理和删除服务。你可以使用 Azure SDK 的各种库、Azure PowerShell 和 Azure 门户执行许多相同的任务。在服务管理模式下使用 Azure 服务从概念上讲类似于创建和管理各个 Azure 概念和服务（如 Web 应用、虚拟机、虚拟网络、存储器等）。\n\n> [AZURE.NOTE]\n若要开始使用，首先[安装 Azure CLI](/documentation/articles/xplat-cli-install)，并[登录以使用与你的帐户关联的 Azure 资源](/documentation/articles/xplat-cli-connect)。\n\n## 本文的讨论范围\n\n本文提供了用于经典（服务管理）部署模型的常用 Azure CLI 命令的语法和选项。它并不是完整的参考，并且你的 CLI 版本可能会显示某些不同的命令或参数。要在服务管理模式下在命令行中查看当前的命令语法和选项，请键入 `azure help`；要显示某个命令的帮助，请键入 `azure help [command]`。你还可以在创建和管理具体 Azure 服务的说明文档中找到 CLI 示例。\n\n可选参数显示在方括号中（例如，[参数]）。其他所有参数都是必需的。\n\n除了此处记录的特定于命令的可选参数外，还有三个可用于显示详细输出（例如请求选项和状态代码）的可选参数。-v 参数提供详细输出，而 -vv 参数提供更详细的输出。--json 选项将以原始的 json 格式输出结果。\n\n## 设置服务管理模式\n\n当前，首次安装 CLI 时，在默认情况下启用服务管理模式。如果需要，请使用以下命令启用 Azure CLI 服务管理命令。\n\n    azure config mode asm\n\n>[AZURE.NOTE]Azure 资源管理器模式与 Azure 服务管理模式互斥。即在一种模式下创建的资源不能从另一种模式进行管理。\n\n## 管理帐户信息和发布设置\n该工具使用你的 Azure 订阅信息连接到你的帐户。可以从 Azure 门户中的发布设置文件中获取此信息，如下所述。可以导入发布设置文件作为永久性本地配置设置，该工具会将此设置用于后续操作。你只需导入你的发布设置一次。\n\n**account download [options]**\n\n此命令启动浏览器以从 Azure 门户下载你的 .publishsettings 文件。\n\n    ~$ azure account download\n    info:   Executing command account download\n    info:   Launching browser to https://windows.azure.com/download/publishprofile.aspx\n    help:   Save the downloaded file, then execute the command\n    help:   account import <file>\n    info:   account download command OK\n\n**account import [options] &lt;file>**\n\n\n此命令导入 publishsettings 文件或证书以便日后可以供该工具使用。\n\n    ~$ azure account import publishsettings.publishsettings\n    info:   Importing publish settings file publishsettings.publishsettings\n    info:   Found subscription: 3-Month 1-RMB Trial\n    info:   Found subscription: Pay-As-You-Go\n    info:   Setting default subscription to: 3-Month 1-RMB Trial\n    warn:   The 'publishsettings.publishsettings' file contains sensitive information.\n    warn:   Remember to delete it now that it has been imported.\n    info:   Account publish settings imported successfully\n\n> [AZURE.NOTE]publishsettings 文件可以包含有关多个订阅的详细信息（即，订阅名称和 ID）。当你导入 publishsettings 文件时，第一个订阅将用作默认订阅。若要使用不同订阅，请运行以下命令。<code>~$ azure config set subscription &lt;other-subscription-id&gt;</code>\n\n**account clear [options]**\n\n此命令删除已导入的存储的发布设置。如果你在此计算机上使用完该工具，并且希望确保日后不能通过你的帐户使用该工具，则使用此命令。\n\n    ~$ azure account clear\n    Clearing account info.\n    info:   OK\n\n**account list [options]**\n\n列出导入的订阅\n\n    ~$ azure account list\n    info:    Executing command account list\n    data:    Name                                    Id\n           Current\n    data:    --------------------------------------  -------------------------------\n    -----  -------\n    data:    Forums Subscription                     8679c8be-3b05-49d9-b8fb  true\n    data:    Evangelism Team Subscription            9e672699-1055-41ae-9c36  false\n    data:    MSOpenTech-Prod                         c13e6a92-706e-4cf5-94b6  false\n\n**account set [options] &lt;subscription&gt;**\n\n设置当前订阅\n\n###管理地缘组的命令\n\n**account affinity-group list [options]**\n\n此命令列出你的 Azure 地缘组。\n\n可以在一组虚拟机跨越多台物理计算机时设置地缘组。地缘组指定物理计算机应尽可能彼此接近，从而减少网络延迟。\n\n    ~$ azure account affinity-group list\n    + Fetching affinity groups\n    data:   Name                                  Label   Location\n    data:   ------------------------------------  ------  --------\n    data:   535EBAED-BF8B-4B18-A2E9-8755FB9D733F  opentec  West US\n    info:   account affinity-group list command OK\n\n**account affinity-group create [options] &lt;name&gt;**\n\n此命令创建新的地缘组\n\n    ~$ azure account affinity-group create opentec -l \"China North\"\n    info:    Executing command account affinity-group create\n    + Creating affinity group\n    info:    account affinity-group create command OK\n\n**account affinity-group show [options] &lt;name&gt;**\n\n此命令显示地缘组的详细信息\n\n    ~$ azure account affinity-group show opentec\n    info:    Executing command account affinity-group show\n    + Getting affinity groups\n    data:    $ xmlns \"http://schemas.microsoft.com/windowsazure\"\n    data:    $ xmlns:i \"http://www.w3.org/2001/XMLSchema-instance\"\n    data:    Name \"opentec\"\n    data:    Label \"b3BlbnRlYw==\"\n    data:    Description $ i:nil \"true\"\n    data:    Location \"China North\"\n    data:    HostedServices \"\"\n    data:    StorageServices \"\"\n    data:    Capabilities Capability 0 \"PersistentVMRole\"\n    data:    Capabilities Capability 1 \"HighMemory\"\n    info:    account affinity-group show command OK\n\n**account affinity-group delete [options] &lt;name&gt;**\n\n此命令将删除指定的地缘组\n\n    ~$ azure account affinity-group delete opentec\n    info:    Executing command account affinity-group delete\n    Delete affinity group opentec? [y/n] y\n    + Deleting affinity group\n    info:    account affinity-group delete command OK\n\n###管理帐户环境的命令\n\n**account env list [options]**\n\n帐户环境列表\n\n    C:\\windows\\system32>azure account env list\n    info:    Executing command account env list\n    data:    Name\n    data:    ---------------\n    data:    AzureCloud\n    data:    AzureChinaCloud\n    info:    account env list command OK\n\n**account env show [options] [environment]**\n\n显示帐户环境详细信息\n\n    ~$ azure account env show\n    info:    Executing command account env show\n    Environment name: AzureCloud\n    data:    Environment publishingProfile  http://go.microsoft.com/fwlink/?LinkId=2544\n    data:    Environment portal  http://go.microsoft.com/fwlink/?LinkId=2544\n    info:    account env show command OK\n\n**account env add [options] [environment]**\n\n此命令将一个环境添加到帐户\n\n**account env set [options] [environment]**\n\n此命令设置帐户环境\n\n**account env delete [options] [environment]**\n\n此命令从帐户中删除指定的环境\n\n## 用于管理 Azure 虚拟机的命令\n下图显示了如何在 Azure 云服务的生产部署环境中托管 Azure 虚拟机。\n\n![Azure 技术图表](./media/virtual-machines-command-line-tools/architecturediagram.jpg)\n\n**create-new** 在 Blob 存储中创建驱动器（即，图中的 e:\\\\）；**attach** 会将已创建但未附加的磁盘附加到虚拟机。\n\n**vm create [options] &lt;dns-name> &lt;image> &lt;userName> [password]**\n\n此命令创建新的 Azure 虚拟机。默认情况下，所创建的每台虚拟机 (vm) 都位于其自己的云服务中；但是，你可以使用此处提及的 -c 选项指定将虚拟机添加到现有云服务中。\n\nvm create 命令与 Azure 门户一样，只会在生产部署环境中创建虚拟机。目前没有用于在云服务的过渡部署环境中创建虚拟机的选项。如果你的订阅没有现有的 Azure 存储帐户，此命令将创建一个。\n\n你可以通过 --location 参数指定位置，也可以通过 --affinity-group 参数指定地缘组。如果这两个参数任何一个都没有提供，系统将提示你从有效位置列表中提供一个。\n\n所提供密码的长度必须为 8-123 个字符，并且满足你要用于此虚拟机的操作系统的密码复杂度要求。\n\n如果你预计需要使用 SSH 来管理部署的 Linux 虚拟机（通常都是如此），则必须在创建虚拟机时通过 -e 选项启用 SSH。在创建该虚拟机后无法启用 SSH。\n\nWindows 虚拟机稍后可以通过添加端口 3389 作为终结点来启用 RDP。\n\n此命令支持以下可选参数：\n\n**-c, --connect** 在托管服务中已创建的部署中创建虚拟机。如果 -vmname 未与此选项一起使用，将自动生成新虚拟机的名称。<br /> \n**-n, --vm-name** 指定虚拟机的名称。默认情况下，此参数采用托管服务名称。如果未指定 -vmname，将生成 &lt;service-name>&lt;id> 形式的新虚拟机名称，其中 &lt;id> 是服务中现有虚拟机的数量加上 1。例如，如果你使用此命令向拥有一个现有虚拟机的托管服务 MyService 中添加新虚拟机，则会将新虚拟机命名为 MyService2。<br /> \n**-u, --blob-url** 指定从中创建虚拟机系统磁盘的目标 Blob 存储 URL。<br /> \n**-z, --vm-size** 指定虚拟机的大小。有效值为：\n“ExtraSmall”、“Small”、“Medium”、“Large”、“ExtraLarge”、“A5”、“A6”、“A7”、“A8”、“A9”、“A10”、“A11”、“Basic\\_A0”、“Basic\\_A1”、“Basic\\_A2”、  \n“Basic\\_A3”、“Basic\\_A4”、“Standard\\_D1”、“Standard\\_D2”、“Standard\\_D3”、“Standard\\_D4”、“Standard\\_D11”、“Standard\\_D12”、“Standard\\_D13”、  \n“Standard\\_D14”、“Standard\\_DS1”、“Standard\\_DS2”、“Standard\\_DS3”、“Standard\\_DS4”、“Standard\\_DS11”、“Standard\\_DS12”、“Standard\\_DS13”、  \n“Standard\\_DS14”、“Standard\\_G1”、“Standard\\_G2”、“Standard\\_G3”、“Standard\\_G4”、“Standard_G55”。默认值为“Small”。<br /> \n**-r** 添加到 Windows 虚拟机的 RDP 连接。<br />\n**-e, --ssh** 添加到 Windows 虚拟机的 SSH 连接。<br /> \n**-t, --ssh-cert** 指定 SSH 证书。<br /> \n**-s** 订阅。<br /> \n**-o, --community** 指定的映像是社区映像。<br /> \n**-w** 虚拟网络名称。<br/> \n**-l, --location** 指定位置（例如，“China North”）。<br /> \n**-a, --affinity-group** 指定地缘组。<br /> \n**-w, --virtual-network-name** 指定要在其中添加新虚拟机的虚拟网络。可从 Azure 门户设置和管理虚拟网络。<br /> \n**-b, --subnet-names** 指定要分配虚拟机的子网名称。\n\n在此示例中，MSFT\\__Win2K8R2SP1-120514-1520-141205-01-zh-CN-30GB 是该平台提供的映像。有关操作系统映像的详细信息，请参阅 VM 映像列表。\n\n    ~$ azure vm create my-vm-name MSFT__Windows-Server-2008-R2-SP1.11-29-2011 username --location \"West US\" -r\n    info:   Executing command vm create\n    Enter VM 'my-vm-name' password: ************\n    info:   vm create command OK\n\n**vm create-from &lt;dns-name> &lt;role-file>**\n\n此命令从 JSON 角色文件创建新的 Azure 虚拟机。\n\n    ~$ azure vm create-from my-vm example.json\n    info:   OK\n\n**vm list [options]**\n\n此命令列出 Azure 虚拟机。--json 选项指定以原始 JSON 格式返回结果。\n\n    ~$ azure vm list\n    info:   Executing command vm list\n    data:   DNS Name                          VM Name      Status\n    data:   --------------------------------  -----------  ---------\n    data:   my-vm-name.cloudapp-preview.net        my-vm        ReadyRole\n    info:   vm list command OK\n\n**vm location list [options]**\n\n此命令列出所有可用的 Azure 帐户位置。\n\n    ~$ azure vm location list\n    info:   Executing command vm location list\n    data:   Name                   Display Name\n    data:   ---------------------  ------------\n    data:   Azure Preview  China North\n    info:   account location list command OK\n\n**vm show [options] &lt;name>**\n\n此命令显示有关 Azure 虚拟机的详细信息。--json 选项指定以原始 JSON 格式返回结果。\n\n    ~$ azure vm show my-vm\n    info:   Executing command vm show\n    data:   {\n    data:       InstanceSize: 'Small',\n    data:       InstanceStatus: 'ReadyRole',\n    data:       DataDisks: [],\n    data:       IPAddress: '10.26.192.206',\n    data:       DNSName: 'my-vm.chinacloudapp.cn',\n    data:       InstanceStateDetails: {},\n    data:       VMName: 'my-vm',\n    data:       Network: {\n    data:           Endpoints: [\n    data:               {\n    data:                   Protocol: 'tcp',\n    data:                   Vip: '65.52.250.250',\n    data:                   Port: '63238' ,\n    data:                   LocalPort: '3389',\n    data:                   Name: 'RemoteDesktop'\n    data:               }\n    data:           ]\n    data:       },\n    data:       Image: 'MSFT__Windows-Server-2008-R2-SP1.11-29-2011',\n    data:       OSVersion: 'WA-GUEST-OS-1.18_201203-01'\n    data:   }\n    info:   vm show command OK\n\n**vm delete [options] &lt;name>**\n\n此命令删除 Azure 虚拟机。默认情况下，此命令不删除从中创建操作系统磁盘和数据磁盘的 Azure Blob。若要删除该 Blob 以及作为其基础的虚拟机，请指定 -b 选项。\n\n    ~$ azure vm delete my-vm\n    info:   Executing command vm delete\n    info:   vm delete command OK\n\n**vm start [options] &lt;name>**\n\n此命令启动 Azure 虚拟机。\n\n    ~$ azure vm start my-vm\n    info:   Executing command vm start\n    info:   vm start command OK\n\n**vm restart [options] &lt;name>**\n\n此命令重新启动 Azure 虚拟机。\n\n    ~$ azure vm restart my-vm\n    info:   Executing command vm restart\n    info:   vm restart command OK\n\n**vm shutdown [options] &lt;name>**\n\n此命令关闭 Azure 虚拟机。可以使用 -p 选项指定在关闭时不释放计算资源。\n\n    \n    ~$ azure vm shutdown my-vm\n    info:   Executing command vm shutdown\n    info:   vm shutdown command OK  \n    \n\n**vm capture &lt;vm-name> &lt;target-image-name>**\n\n此命令捕获 Azure 虚拟机映像。\n\n只有当虚拟机状态为**已停止**时，才能捕获虚拟机映像。请关闭虚拟机，然后再继续操作。\n\n    ~$ azure.cmd vm capture my-vm mycaptureimagename --delete\n    info:   Executing command vm capture\n    + Fetching VMs\n    + Capturing VM\n    info:   vm capture command OK\n\n**vm export [options] &lt;vm-name> &lt;file-path>**\n\n此命令将一个 Azure 虚拟机映像导出到文件\n\n    ~$ azure vm export \"myvm\" \"C:\"\n    info:    Executing command vm export\n    + Getting virtual machines\n    + Exporting the VM\n    info:   vm export command OK\n\n##  用于管理 Azure 虚拟机终结点的命令\n下图显示了多个虚拟机实例的典型部署的体系结构。请注意，在本示例中，端口 3389 在每台虚拟机上均为打开状态（用于进行 RDP 访问），并且负载平衡器用于将流量路由到虚拟机的每台虚拟机上还有一个内部 IP 地址（例如，168.55.11.1）。此内部 IP 地址也可用于虚拟机之间的通信。\n\n![azurenetworkdiagram](./media/virtual-machines-command-line-tools/networkdiagram.jpg)\n\n虚拟机的外部请求将通过负载平衡器。因此，不能针对包含多台虚拟机的部署中的特定虚拟机指定请求。对于包含多台虚拟机的部署，必须在虚拟机 (vm-port) 与负载平衡器 (lb-port) 之间配置端口映射。\n\n**vm endpoint create &lt;vm-name> &lt;lb-port> [vm-port]**\n\n此命令创建虚拟机终结点。你还可以使用 -u 或 --enable-direct-server-return 来指定是否在此终结点上启用直接服务器返回，默认情况下为禁用。\n\n    ~$ azure vm endpoint create my-vm 8888 8888\n    azure vm endpoint create my-vm 8888 8888\n    info:   Executing command vm endpoint create\n    + Fetching VM\n    + Reading network configuration\n    + Updating network configuration\n    info:   vm endpoint create command OK\n\n**vm endpoint create-multiple [options] &lt;vm-name> &lt;lb-port>[:&lt;vm-port>[:&lt;protocol>[:&lt;enable-direct-server-return>[:&lt;lb-set-name>[:&lt;probe-protocol>[:&lt;probe-port>[:&lt;probe-path>[:&lt;internal-lb-name>]]]]]]]] {1-*}**\n\n创建多个 VM 终结点。\n\n**vm endpoint delete [options] &lt;vm-name> &lt;endpoint-name>**\n\n此命令删除虚拟机终结点。\n\n    ~$ azure vm endpoint delete my-vm http\n    azure vm endpoint delete my-vm http\n    info:   Executing command vm endpoint delete\n    + Fetching VM\n    + Reading network configuration\n    + Updating network configuration\n    info:   vm endpoint delete command OK\n\n**vm endpoint list &lt;vm-name>**\n\n此命令列出所有虚拟机终结点。--json 选项指定以原始 JSON 格式返回结果。\n\n    ~$ azure vm endpoint list my-linux-vm\n    data:   Name  External Port  Local Port\n    data:   ----  -------------  ----------\n    data:   ssh   22             22\n\n**vm endpoint update [options] &lt;vm-name> &lt;endpoint-name>**\n\n此命令使用这些选项将 VM 终结点更新为新值。\n\n    -n, --endpoint-name <name>          the new endpoint name\n    -lo, --lb-port <port>                the new load balancer port\n    -t, --vm-port <port>                the new local port\n    -o, --endpoint-protocol <protocol>  the new transport layer protocol for port (tcp or udp)\n\n**vm endpoint show [options] &lt;vm-name>**\n\n此命令显示 VM 上终结点的详细信息\n\n    ~$ azure vm endpoint show \"mycouchvm\"\n    info:    Executing command vm endpoint show\n    + Getting virtual machines\n    data:    Network Endpoints 0 LoadBalancedEndpointSetName \"CouchDB_EP-5984\"\n    data:    Network Endpoints 0 LocalPort \"5984\"\n    data:    Network Endpoints 0 Name \"CouchDB_EP\"\n    data:    Network Endpoints 0 Port \"5984\"\n    data:    Network Endpoints 0 Protocol \"tcp\"\n    data:    Network Endpoints 0 Vip \"168.61.9.97\"\n    data:    Network Endpoints 1 LoadBalancedEndpointSetName \"CouchEP_2-2020\"\n    data:    Network Endpoints 1 LocalPort \"2020\"\n    data:    Network Endpoints 1 Name \"CouchEP_2\"\n    data:    Network Endpoints 1 Port \"2020\"\n    data:    Network Endpoints 1 Protocol \"tcp\"\n    data:    Network Endpoints 1 Vip \"168.61.9.97\"\n    data:    Network Endpoints 2 LocalPort \"3389\"\n    data:    Network Endpoints 2 Name \"RemoteDesktop\"\n    data:    Network Endpoints 2 Port \"3389\"\n    data:    Network Endpoints 2 Protocol \"tcp\"\n    data:    Network Endpoints 2 Vip \"168.61.9.97\"\n    info:    vm endpoint show command OK\n\n## 用于管理 Azure 虚拟机映像的命令\n\n虚拟机映像是所捕获的、可根据需要进行复制的已配置虚拟机。\n\n**vm image list [options]**\n\n此命令获取虚拟机映像的列表。有三种类型的映像：Microsoft 创建的映像（以“MSFT”作为前缀）、第三方创建的映像（通常以供应商的名称作为前缀）以及你创建的映像。若要创建映像，你可以捕获现有虚拟机或从上载到 Blob 存储的自定义 .vhd 创建映像。有关使用自定义 .vhd 的更多信息，请参见 VM 映像创建。--json 选项指定以原始 JSON 格式返回结果。\n\n    ~$ azure vm image list\n    data:   Name                                                                   Category   OS\n    data:   ---------------------------------------------------------------------  ---------  -------\n    data:   CANONICAL__Canonical-Ubuntu-12-04-20120519-2012-05-19-zh-CN-30GB.vhd   Canonical  Linux\n    data:   MSFT__Windows-Server-2008-R2-SP1.11-29-2011                            Microsoft  Windows\n    data:   MSFT__Windows-Server-2008-R2-SP1-with-SQL-Server-2012-Eval.11-29-2011  Microsoft  Windows\n    data:   MSFT__Windows-Server-8-Beta.zh-CN.30GB.2012-03-22                      Microsoft  Windows\n    data:   MSFT__Windows-Server-8-Beta.2-17-2012                                  Microsoft  Windows\n    data:   MSFT__Windows-Server-2008-R2-SP1.zh-CN.30GB.2012-3-22                  Microsoft  Windows\n    data:   OpenLogic__OpenLogic-CentOS-62-20120509-zh-CN-30GB.vhd                 OpenLogic  Linux\n    data:   SUSE__SUSE-Linux-Enterprise-Server-11SP2-20120521-zh-CN-30GB.vhd       SUSE       Linux\n    data:   SUSE__OpenSUSE64121-03192012-zh-CN-15GB.vhd                            SUSE       Linux\n    data:   WIN2K8-R2-WINRM                                                        User       Windows\n    info:   vm image list command OK\n\n**vm image show [options] &lt;name>**\n\n此命令显示虚拟机映像的详细信息。\n\n    ~$ azure vm image show MSFT__Windows-Server-2008-R2-SP1.11-29-2011\n    + Fetching VM image\n    info:   Executing command vm image show\n    data:   {\n    data:       Label: 'Windows Server 2008 R2 SP1, Nov 2011',\n    data:       Name: 'MSFT__Windows-Server-2008-R2-SP1.11-29-2011',\n    data:       Description: 'Microsoft Windows Server 2008 R2 SP1',\n    data:       @: { xmlns: 'http://schemas.microsoft.com/windowsazure', xmlns:i: 'http://www.w3.org/2001/XMLSchema-instance' },\n    data:       Category: 'Microsoft',\n    data:       OS: 'Windows',\n    data:       Eula: 'http://www.microsoft.com',\n    data:       LogicalSizeInGB: '30'\n    data:   }\n    info:   vm image show command OK\n\n**vm image delete [options] &lt;name>**\n\n此命令删除虚拟机映像。\n\n    ~$ azure vm image delete my-vm-image\n    info:   Executing command vm image delete\n    info:   VM image deleted: my-vm-image\n    info:   vm image delete command OK\n\n**vm image create &lt;name> [source-path]**\n\n此命令创建虚拟机映像。你的自定义 .vhd 文件将上载到 Blob 存储，然后从该位置创建虚拟机映像。然后可使用此虚拟机映像创建虚拟机。Location 和 OS 参数是必需的。\n\n某些系统会施加每进程文件描述符限制。如果超出此限制，工具将显示文件描述符限制错误。你可以使用 -p &lt;number> 参数再次运行此命令，以减小最大并行上载数。默认的最大并行上载数为 96。\n\n    ~$ azure vm image create mytestimage ./Sample.vhd -o windows -l \"China North\"\n    info:   Executing command vm image create\n    + Retrieving storage accounts\n    info:   VHD size : 13 MB\n    info:   Uploading 13312.5 KB\n    Requested:100.0% Completed:100.0% Running: 105 Time:    8s Speed:  1721 KB/s\n    info:   http://myaccount.blob.core.azure.com/vm-images/Sample.vhd is uploaded successfully\n    info:   vm image create command OK\n\n##<a name=\"commands-to-manage-your-azure-virtual-machine-data-disks\"></a> 用于管理 Azure 虚拟机数据磁盘的命令\n\n数据磁盘是 Blob 存储中可供虚拟机使用的 .vhd 文件。有关如何将数据磁盘部署到 Blob 存储的详细信息，请参阅前面所示的 Azure 技术图表。\n\n用于附加数据磁盘的命令（azure vm disk attach 和 azure vm disk attach-new）会根据 SCSI 协议的要求向附加的数据磁盘分配逻辑单元号 (LUN)。将向附加到虚拟机的第一个数据磁盘分配 LUN 0，向下一个分配 LUN 1，依此类推。\n\n当使用 azure vm disk detach 命令分离数据磁盘时，请使用 &lt;lun&gt; 参数指明要分离的磁盘。\n\n> [AZURE>NOTE] 请注意，应始终按相反的顺序分离数据磁盘，即，从已分配的编号最高的 LUN 开始。Linux SCSI 层不支持在仍附加有编号较高的 LUN 时分离编号较低的 LUN。例如，不应在仍附加有 LUN 1 的情况下分离 LUN 0。\n\n**vm disk show [options] &lt;name>**\n\n此命令显示有关 Azure 磁盘的详细信息。\n\n    ~$ azure vm disk show anucentos-anucentos-0-20120524070008\n    info:   Executing command vm disk show\n    data:   AttachedTo DeploymentName \"mycentos\"\n    data:   AttachedTo HostedServiceName \"myanucentos\"\n    data:   AttachedTo RoleName \"myanucentos\"\n    data:   OS \"Linux\"\n    data:   Location \"Azure Preview\"\n    data:   LogicalDiskSizeInGB \"30\"\n    data:   MediaLink \"http://mystorageaccount.blob.core.azure-preview.com/vhd-store/mycentos-cb39b8223b01f95c.vhd\"\n    data:   Name \"mycentos-mycentos-0-20120524070008\"\n    data:   SourceImageName \"OpenLogic__OpenLogic-CentOS-62-20120509-zh-CN-30GB.vhd\"\n    info:   vm disk show command OK\n\n**vm disk list [options] [vm-name]**\n\n此命令列出 Azure 磁盘，或者附加到指定虚拟机的磁盘。如果运行此命令时使用了虚拟机名称参数，将返回附加到该虚拟机的所有磁盘。Lun 1 是随虚拟机创建的，而列出的任何其他磁盘都是单独附加的。\n\n    ~$ azure vm disk list mycentos\n    info:   Executing command vm disk list\n    data:   Lun  Size(GB)  Blob-Name\n    data:   ---  --------  --------------------------------\n    data:   1    30        mycentos-cb39b8223b01f95c.vhd\n    data:   2    10        mycentos-e3f0d717950bb78d.vhd\n    info:   vm disk list command OK\n\n在不使用虚拟机名称参数的情况下执行此命令将返回所有磁盘。\n\n    ~$ azure vm disk list\n    data:   Name                                        OS\n    data:   ------------------------------------------  -------\n    data:   mycentos-mycentos-0-20120524070008          Linux\n    data:   mycentos-mycentos-2-20120525055052\n    data:   mywindows-winvm-20120522223119              Windows\n    info:   vm disk list command OK\n\n**vm disk delete [options] &lt;name>**\n\n此命令从个人存储库中删除 Azure 磁盘。在删除磁盘之前必须从虚拟机中分离该磁盘。\n\n    ~$ azure vm disk delete mycentos-mycentos-2-20120525055052\n    info:   Executing command vm disk delete\n    info:   Disk deleted: mycentos-mycentos-2-20120525055052\n    info:   vm disk delete command OK\n\n**vm disk create &lt;name> [source-path]**\n\n此命令将上载并注册 Azure 磁盘。必须指定 --blob-url、--location 或 --affinity-group。如果将此命令与 [source-path] 结合使用，将上载指定的 .vhd 文件并创建新映像。然后你可以使用 vm disk attach 将此映像附加到虚拟机。\n\n某些系统会施加每进程文件描述符限制。如果超出此限制，工具将显示文件描述符限制错误。你可以使用 -p &lt;number> 参数再次运行此命令，以减小最大并行上载数。默认的最大并行上载数为 96。\n\n    ~$ azure vm disk create my-data-disk ~/test.vhd --location \"China North\"\n    info:   Executing command vm disk create\n    info:   VHD size : 10 MB\n    info:   Uploading 10240.5 KB\n    Requested:100.0% Completed:100.0% Running:  81 Time:   11s Speed:   952 KB/s\n    info:   http://account.blob.core.azure.com/disks/test.vhd is uploaded successfully\n    info:   vm disk create command OK\n\n**vm disk upload [options] &lt;source-path> &lt;blob-url> &lt;storage-account-key>**\n\n此命令用来上载 vm 磁盘\n\n    ~$ azure vm disk upload \"http://sourcestorage.blob.core.chinacloudapi.cn/vhds/sample.vhd\" \"http://destinationstorage.blob.core.chinacloudapi.cn/vhds/sample.vhd\" \"DESTINATIONSTORAGEACCOUNTKEY\"\n    info:   Executing command vm disk upload\n    info:   Uploading 12351.5 KB\n    info:   vm disk upload command OK\n\n**vm disk attach &lt;vm-name> &lt;disk-image-name>**\n\n此命令将 Blob 存储中的现有磁盘附加到云服务中部署的现有虚拟机。\n\n    ~$ azure vm disk attach my-vm my-vm-my-vm-2-201242418259\n    info:   Executing command vm disk attach\n    info:   vm disk attach command OK\n\n**vm disk attach-new &lt;vm-name> &lt;size-in-gb> [blob-url]**\n\n此命令将数据磁盘附加到 Azure 虚拟机。在此示例中，20 是要附加的新磁盘的大小（以 GB 为单位）。你可以选择使用 Blob URL 作为显式指定要创建的目标 Blob 的最后一个参数。如果你不指定 Blob URL，将自动生成一个 Blob 对象。\n\n    ~$ azure vm disk attach-new nick-test36 20 http://nghinazz.blob.core.azure-preview.com/vhds/vmdisk1.vhd\n    info:   Executing command vm disk attach-new\n    info:   vm disk attach-new command OK  \n\n**vm disk detach &lt;vm-name> &lt;lun>**\n\n此命令将数据磁盘与 Azure 虚拟机分离。&lt;lun> 标识要分离的磁盘。要在分离某个磁盘之前获取与该磁盘关联的磁盘的列表，请使用 vm disk-list &lt;vm-name>。\n\n    ~$ azure vm disk detach my-vm 2\n    info:   Executing command vm disk detach\n    info:   vm disk detach command OK\n\n## 用于管理 Azure 云服务的命令\n\nAzure 云服务是托管在 Web 角色和辅助角色上的应用程序和服务。以下命令可用于管理 Azure 云服务。\n\n**service create [options] &lt;serviceName>**\n\n此命令创建新的云服务\n\n    ~$ azure service create newservicemsopentech\n    info:    Executing command service create\n    + Getting locations\n    help:    Location:\n      1) East Asia\n      2) Southeast Asia\n      3) North Europe\n      4) West Europe\n      5) East US\n      6) West US\n      : 6\n    + Creating cloud service\n    data:    Cloud service name newservicemsopentech\n    info:    service create command OK\n\n**service show [options] &lt;serviceName>**\n\n此命令显示 Azure 云服务的详细信息\n\n    ~$ azure service show newservicemsopentech\n    info:    Executing command service show\n    + Getting cloud service\n    data:    Name newservicemsopentech\n    data:    Url https://management.core.chinacloudapi.cn/9e672699-1055-41ae-9c36-e85152f2e352/services/hostedservices/newservicemsopentech\n    data:    Properties location West US\n    data:    Properties label newservicemsopentech\n    data:    Properties status Created\n    data:    Properties dateCreated\n    data:    Properties dateLastModified\n    info:    service show command OK\n\n**service list [options]**\n\n此命令列出 Azure 云服务。\n\n    ~$ azure service list\n    info:   Executing command service list\n    data:   Name         Status\n    data:   -----------  -------\n    data:   service1     Created\n    data:   service2     Created\n    info:   service list command OK\n\n**service delete [options] &lt;name>**\n\n此命令删除 Azure 云服务。\n\n    ~$ azure service delete myservice\n    info:   Executing command service delete myservice\n    info:   cloud-service delete command OK\n\n若要强制删除，请使用 `-q` 参数。\n\n\n## 用于管理 Azure 证书的命令\n\nAzure 服务证书是连接到你的 Azure 帐户的 SSL 证书。有关 Azure 证书的详细信息，请参阅[管理证书](http://msdn.microsoft.com/zh-cn/library/azure/gg981929.aspx)。\n\n**service cert list [options]**\n\n此命令列出 Azure 证书。\n\n    ~$ azure service cert list\n    info:   Executing command service cert list\n    + Fetching cloud services\n    + Fetching certificates\n    data:   Service   Thumbprint                                Algorithm\n    data:   --------  ----------------------------------------  ---------\n    data:   myservice  262DBF95B5E61375FA27F1E74AC7D9EAE842916C  sha1\n    info:   service cert list command OK\n\n**service cert create &lt;dns-prefix> &lt;file> [password]**\n\n此命令上载证书。将没有密码保护的证书的密码提示保留为空。\n\n    ~$ azure service cert create nghinazz ~/publishSet.pfx\n    info:   Executing command service cert create\n    Cert password:\n    + Creating certificate\n    info:   service cert create command OK\n\n**service cert delete [options] &lt;thumbprint>**\n\n此命令删除证书。\n\n    ~$ azure service cert delete 262DBF95B5E61375FA27F1E74AC7D9EAE842916C\n    info:   Executing command service cert delete\n    + Deleting certificate\n    info:   nghinazz : cert deleted\n    info:   service cert delete command OK\n\n## 用于管理 Web 应用的命令\n\nAzure Web 应用是可通过 URI 访问的 Web 配置。 Web 应用在虚拟机中托管，但你无需自己考虑创建和部署虚拟机的详细步骤。这些详细步骤将由 Azure 为你完成。\n\n**site list [options]**\n\n此命令列出你的 Web 应用。\n\n    ~$ azure site list\n    info:   Executing command site list\n    data:   Name            State    Host names\n    data:   --------------  -------  --------------------------------------------------\n    data:   mongosite       Running  mongosite.antdf0.antares.chinacloudapi.cn\n    data:   myphpsite       Running  myphpsite.antdf0.antares.chinacloudapi.cn\n    data:   mydrupalsite36  Running  mydrupalsite36.antdf0.antares.chinacloudapi.cn\n    info:   site list command OK\n\n**site set [options] [name]**\n\n此命令将设置你的 Web 应用[名称] 的配置选项\n\n    ~$ azure site set\n    info:    Executing command site set\n    Web site name: mydemosite\n    + Getting sites\n    + Updating site config information\n    info:    site set command OK\n\n**site deploymentscript [options]**\n\n此命令将生成一个自定义部署脚本\n\n    ~$ azure site deploymentscript --node\n    info:    Executing command site deploymentscript\n    info:    Generating deployment script for node.js Web Site\n    info:    Generated deployment script files\n    info:    site deploymentscript command OK\n\n**site create [options] [name]**\n\n此命令创建新的 Web 应用和本地目录。\n\n    ~$ azure site create mysite\n    info:   Executing command site create\n    info:   Using location northeuropewebspace\n    info:   Creating a new web site\n    info:   Created web site at  mysite.antdf0.antares.chinacloudapi.cn\n    info:   Initializing repository\n    info:   Repository initialized\n    info:   site create command OK\n\n> [AZURE.NOTE]站点名称必须是唯一的。你无法创建与现有站点具有相同 DNS 名称的站点。\n\n**site browse [options] [name]**\n\n此命令在浏览器中打开你的 Web 应用。\n\n    ~$ azure site browse mysite\n    info:   Executing command site browse\n    info:   Launching browser to http://mysite.antdf0.antares-test.windows-int.net\n    info:   site browse command OK\n\n**site show [options] [name]**\n\n此命令显示 Web 应用的详细信息。\n\n    ~$ azure site show mysite\n    info:   Executing command site show\n    info:   Showing details for site\n    data:   Site AdminEnabled true\n    data:   Site HostNames mysite.antdf0.antares-test.windows-int.net\n    data:   Site Name mysite\n    data:   Site Owner 00060000814EDDEE\n    data:   Site RepositorySiteName mysite\n    data:   Site SelfLink https://s1.api.antdf0.antares.chinacloudapi.cn:454/subscriptions/444e62ff-4c5f-4116-a695-5c803ed584a5/webspaces/northeuropewebspace/sites/mysite\n    data:   Site State Running\n    data:   Site UsageState Normal\n    data:   Site WebSpace northeuropewebspace\n    data:   Config AppSettings\n    data:   Config ConnectionStrings\n    data:   Config DefaultDocuments 0=Default.htm, 1=Default.asp, 2=index.htm, 3=index.html, 4=iisstart.htm, 5=default.aspx, 6=index.php, 7=hostingstart.aspx\n    data:   Config DetailedErrorLoggingEnabled false\n    data:   Config HttpLoggingEnabled false\n    data:   Config Metadata\n    data:   Config NetFrameworkVersion v4.0\n    data:   Config NumberOfWorkers 1\n    data:   Config PhpVersion 5.3\n    data:   Config PublishingPassword rJ}[Er2v[Y]q16B6vTD]n$[C2z}Z.pvgLfRcLnAp%ax]xstiLny};o@vmMAote@d\n    data:   Config RequestTracingEnabled false\n    data:   Repository https://mysite.scm.antdf0.antares-test.windows-int.net/\n    info:   site show command OK\n\n**site delete [options] [name]**\n\n此命令删除 Web 应用。\n\n    ~$ azure site delete mysite\n    info:   Executing command site delete\n    info:   Deleting site mysite\n    info:   Site mysite has been deleted\n    info:   site delete command OK\n\n **site swap [options] [name]**\n\n此命令交换两个 Web 应用插槽。\n\n此命令支持以下附加选项：\n\n****-q 或 **--quiet**：不提示确认。在自动化脚本中使用此选项。\n\n\n**site start [options] [name]**\n\n此命令启动 Web 应用。\n\n    ~$ azure site start mysite\n    info:   Executing command site start\n    info:   Starting site mysite\n    info:   Site mysite has been started\n    info:   site start command OK\n\n**site stop [options] [name]**\n\n此命令停止 Web 应用。\n\n    ~$ azure site stop mysite\n    info:   Executing command site stop\n    info:   Stopping site mysite\n    info:   Site mysite has been stopped\n    info:   site stop command OK\n\n****site restart [options] [name]\n\n此命令停止然后启动指定的 Web 应用。\n\n此命令支持以下附加选项：\n\n**--slot** &lt;slot>：要重新启动的插槽的名称。\n\n\n**site location list [options]**\n\n此命令列出你的 Web 应用位置。\n\n    ~$ azure site location list\n    info:    Executing command site location list\n    + Getting locations\n    data:    Name\n    data:    ----------------\n    data:    West Europe\n    data:    China North\n    data:    North Central China\n    data:    North Europe\n    data:    East Asia\n    data:    ChinaEast\n    info:    site location list command OK\n\n###用于管理 Web 应用应用程序设置的命令\n\n**site appsetting list [options] [name]**\n\n此命令列出添加到 Web 应用的应用设置。\n\n    ~$ azure site appsetting list\n    info:    Executing command site appsetting list\n    Web site name: mydemosite\n    + Getting sites\n    + Getting site config information\n    data:    Name  Value\n    data:    ----  -----\n    data:    test  value\n    info:    site appsetting list command OK\n\n**site appsetting add [options] &lt;keyvaluepair> [name]**\n\n此命令将应用设置作为键值对添加到你的 Web 应用。\n\n    ~$ azure site appsetting add test=value\n    info:    Executing command site appsetting add\n    Web site name: mydemosite\n    + Getting sites\n    + Getting site config information\n    + Updating site config information\n    info:    site appsetting add command OK\n\n**site appsetting delete [options] &lt;key> [name]**\n\n此命令从 Web 应用中删除指定的应用设置。\n\n    ~$ azure site appsetting delete test\n    info:    Executing command site appsetting delete\n    Web site name: mydemosite\n    + Getting sites\n    + Getting site config information\n    Delete application setting test? [y/n] y\n    + Updating site config information\n    info:    site appsetting delete command OK\n\n**site appsetting show [options] &lt;key> [name]**\n\n此命令显示指定应用程序设置的详细信息\n\n    ~$ azure site appsetting show test\n    info:    Executing command site appsetting show\n    Web site name: mydemosite\n    + Getting sites\n    + Getting site config information\n    data:    Value:  value\n    info:    site appsetting show command OK\n\n###用于管理 Web 应用证书的命令\n\n**site cert list [options] [name]**\n\n此命令显示 Web 应用证书的列表。\n\n    ~$ azure site cert list\n    info:    Executing command site cert list\n    Web site name: mydemosite\n    + Getting sites\n    + Getting site information\n    data:    Subject                       Expiration Date                    Thumbprint\n    data:    ----------------------------  -----------------------------------------\n    ----------------  ----------------------------------------\n    data:    *.msopentech.com              Fri Nov 28 2014 09:49:57 GMT-0800 (Pacific Standard Time)  A40E82D3DC0286D1F58650E570ECF8224F69A148\n    data:    msopentech.chinacloudsites.cn  Fri Jun 19 2015 11:57:32 GMT-0700 (Pacific Daylight Time)  CE1CD6538852BF7A5DC32001C2E26A29B541F0E8\n    info:    site cert list command OK\n\n**site cert add [options] &lt;certificate-path> [name]**\n\n**site cert delete [options] &lt;thumbprint> [name]**\n\n**site cert show [options] &lt;thumbprint> [name]**\n\n此命令显示证书详细信息\n\n    ~$ azure site cert show CE1CD65852B38DC32001C2E0E8F7A526A29B541F\n    info:    Executing command site cert show\n    Web site name: mydemosite\n    + Getting sites\n    + Getting site information\n    data:    Certificate hostNames 0=msopentech.chinacloudsites.cn\n    data:    Certificate expirationDate\n    data:    Certificate friendlyName msopentech.chinacloudsites.cn\n    data:    Certificate issueDate\n    data:    Certificate issuer CN=MSIT Machine Auth CA 2, DC=redmond, DC=corp, DC=microsoft, DC=com\n    data:    Certificate subjectName msopentech.chinacloudsites.cn\n    data:    Certificate thumbprint CE1CD65852B38DC32001C2E0E8F7A526A29B541F\n    info:    site cert show command OK\n\n###用于管理 Web 应用连接字符串的命令\n\n**site connectionstring list [options] [name]**\n\n**site connectionstring add [options] &lt;connectionname> &lt;value> &lt;type> [name]**\n\n**site connectionstring delete [options] &lt;connectionname> [name]**\n\n**site connectionstring show [options] &lt;connectionname> [name]**\n\n###用于管理 Web 应用默认文档的命令\n\n**site defaultdocument list [options] [name]**\n\n**site defaultdocument add [options] &lt;document> [name]**\n\n**site defaultdocument delete [options] &lt;document> [name]**\n\n###用于管理 Web 应用部署的命令\n\n**site deployment list [options] [name]**\n\n**site deployment show [options] &lt;commitId> [name]**\n\n**site deployment redeploy [options] &lt;commitId> [name]**\n\n**site deployment github [options] [name]**\n\n**site deployment user set [options] [username] [pass]**\n\n###用于管理 Web 应用域的命令\n\n**site domain list [options] [name]**\n\n**site domain add [options] &lt;dn> [name]**\n\n**site domain delete [options] &lt;dn> [name]**\n\n###用于管理 Web 应用处理程序映射的命令\n\n**site handler list [options] [name]**\n\n**site handler add [options] &lt;extension> &lt;processor> [name]**\n\n**site handler delete [options] &lt;extension> [name]**\n\n###用于管理 Web 作业的命令\n\n**site job list [options] [name]**\n\n此命令列出某个 Web 应用下的所有 Web 作业。\n\n此命令支持以下附加选项：\n\n+ **--job-type** &lt;job-type>：可选。web 作业的类型。有效值为“triggered”或“continuous”。默认情况下返回所有类型的 web 作业。\n+ **--slot** &lt;slot>：要重新启动的插槽的名称。\n\n**site job show [options] &lt;jobName> &lt;jobType> [name]**\n\n此命令显示特定 web 作业的详细信息。\n\n此命令支持以下附加选项：\n\n+ **--job-name** &lt;job-name>：必需。web 作业的名称。\n+ **--job-type** &lt;job-type>：必需。web 作业的类型。有效值为“triggered”或“continuous”。\n+ **--slot** &lt;slot>：要重新启动的插槽的名称。\n\n**site job delete [options] &lt;jobName> &lt;jobType> [name]**\n\n此命令删除指定的 web 作业。\n\n此命令支持以下附加选项：\n\n+ **--job-name** &lt;job-name> 必需。web 作业的名称。\n+ **--job-type** &lt;job-type> 必需。web 作业的类型。有效值为“triggered”或“continuous”。\n+ **-q** 或 **--quiet**：不提示确认。在自动化脚本中使用此选项。\n+ **--slot** &lt;slot>：要重新启动的插槽的名称。\n\n**site job upload [options] &lt;jobName> &lt;jobType> <jobFile> [name]**\n\n此命令删除指定的 web 作业。\n\n此命令支持以下附加选项：\n\n+ **--job-name** &lt;job-name>：必需。web 作业的名称。\n+ **--job-type** &lt;job-type>：必需。web 作业的类型。有效值为“triggered”或“continuous”。\n+ **--job-file** &lt;job-file>：必需。作业文件。\n+ **--slot** &lt;slot>：要重新启动的插槽的名称。\n\n**site job start [options] &lt;jobName> &lt;jobType> [name]**\n\n此命令启动指定的 web 作业。\n\n此命令支持以下附加选项：\n\n+ **--job-name** &lt;job-name>：必需。web 作业的名称。\n+ **--job-type** &lt;job-type>：必需。web 作业的类型。有效值为“triggered”或“continuous”。\n+ **--slot** &lt;slot>：要重新启动的插槽的名称。\n\n**site job stop [options] &lt;jobName> &lt;jobType> [name]**\n\n此命令停止指定的 web 作业。只有连续作业可以停止。\n\n此命令支持以下附加选项：\n\n+ **--job-name** &lt;job-name>：必需。web 作业的名称。\n+ **--slot** &lt;slot>：要重新启动的插槽的名称。\n\n###用于管理 Web 作业历史记录的命令\n\n**site job history list [options] [jobName] [name]**\n\n此命令显示指定的 web 作业的运行历史记录。\n\n此命令支持以下附加选项：\n\n+ **--job-name** &lt;job-name>：必需。web 作业的名称。\n+ **--slot** &lt;slot>：要重新启动的插槽的名称。\n\n**site job history show [options] [jobName] [runId] [name]**\n\n此命令获取为指定的 web 作业运行的作业的详细信息。\n\n此命令支持以下附加选项：\n\n+ **--job-name** &lt;job-name>：必需。web 作业的名称。\n+ **--run-id** &lt;run-id>：可选。运行历史记录的 id。如果未指定，则显示最新运行。\n+ **--slot** &lt;slot>：要重新启动的插槽的名称。\n\n###用于管理 Web 应用诊断的命令\n\n**site log download [options] [name]**\n\n下载包含你的 Web 应用诊断的 .zip 文件。\n\n    ~$ azure site log download\n    info:    Executing command site log download\n    Web site name: mydemosite\n    + Getting sites\n    + Getting site information\n    + Downloading diagnostic log to diagnostics.zip\n    info:    site log download command OK\n\n**site log tail [options] [name]**\n\n此命令将你的终端连接到日志流式处理服务。\n\n    ~$ azure site log tail\n    info:    Executing command site log tail\n    Web site name: mydemosite\n    + Getting sites\n    + Getting site information\n    2013-11-19T17:24:17  Welcome, you are now connected to log-streaming service.\n\n**site log set [options] [name]**\n\n此命令配置你的 Web 应用的诊断选项。\n\n    ~$ azure site log set -a\n    info:    Executing command site log set\n    + Getting output options\n    help:    Output:\n      1) file\n      2) storage\n      : 1\n    Web site name: mydemosite\n    + Getting locations\n    + Getting sites\n    + Getting site information\n    + Getting diagnostic settings\n    + Updating diagnostic settings\n    info:    site log set command OK\n\n###用于管理 Web 应用存储库的命令\n\n**site repository branch [options] &lt;branch> [name]**\n\n**site repository delete [options] [name]**\n\n**site repository sync [options] [name]**\n\n###用于管理 Web 应用缩放的命令\n\n**site scale mode [options] &lt;mode> [name]**\n\n**site scale instances [options] &lt;instances> [name]**\n\n\n## 用于管理 Azure 移动服务的命令\n\nAzure 移动服务汇聚了一系列支持你的应用程序的后端功能的 Azure 服务。移动服务命令分为以下几类：\n\n+ [用于管理移动服务实例的命令](#Mobile_Services)\n+ [用于管理移动服务配置的命令](#Mobile_Configuration)\n+ [用于管理移动服务表的命令](#Mobile_Tables)\n+ [用于管理移动服务脚本的命令](#Mobile_Scripts)\n+ [用于管理已计划作业的命令](#Mobile_Jobs)\n+ [用于缩放移动服务的命令](#Mobile_Scale)\n\n以下选项适用于多数移动服务命令：\n\n+ **-h** 或 **--help**：显示输出用法信息。\n+ **-s `<id>`** 或 **--subscription`<id>`**：使用指定为 `<id>` 的特定订阅。\n+ **-v** 或 **--verbose**：写入详细输出。\n+ **--json**：写入 JSON 输出。\n\n### <a name=\"Mobile_Services\"></a>用于管理移动服务实例的命令\n\n**mobile locations [options]**\n\n此命令列出移动服务支持的地理位置。\n\n    ~$ azure mobile locations\n    info:    Executing command mobile locations\n    info:    East US (default)\n    info:    West US\n    info:    North Europe\n\n**mobile create [options] [servicename] [sqlAdminUsername] [sqlAdminPassword]**\n\n此命令创建移动服务以及 SQL 数据库和服务器。\n\n    ~$ azure mobile create todolist your_login_name Secure$Password\n    info:    Executing command mobile create\n    + Creating mobile service\n    info:    Overall application state: Healthy\n    info:    Mobile service (todolist) state: ProvisionConfigured\n    info:    SQL database (todolist_db) state: Provisioned\n    info:    SQL server (e96ean1c6v) state: ProvisionConfigured\n    info:    mobile create command OK\n\n此命令支持以下附加选项：\n\n+ **-r `<sqlServer>`** 或 **--sqlServer`<sqlServer>`**：使用指定为 `<sqlServer>` 的现有 SQL 数据库服务器。\n+ **-d `<sqlDb>`** 或 **--sqlDb `<sqlDb>`**：使用指定为 `<sqlDb>` 的现有 SQL 数据库。\n+ **-l `<location>`** 或 **--location `<location>`**：在指定为 `<location>` 的特定位置创建服务。运行 azure mobile locations 可获取可用位置。\n+ **--sqlLocation `<location>`**：在特定的 `<location>` 中创建 SQL 服务器；默认为移动服务的位置。\n\n**mobile delete [options] [servicename]**\n\n此命令删除移动服务及其 SQL 数据库和服务器。\n\n    ~$ azure mobile delete todolist -a -q\n    info:    Executing command mobile delete\n    data:    Mobile service todolist\n    data:    SQL database todolistAwrhcL60azo1C401\n    data:    SQL server fh1kvbc7la\n    + Deleting mobile service\n    info:    Deleted mobile service\n    + Deleting SQL server\n    info:    Deleted SQL server\n    + Deleting mobile application\n    info:    Deleted mobile application\n    info:    mobile delete command OK\n\n此命令支持以下附加选项：\n\n+ **-d** 或 **--deleteData**：从此移动服务的数据库中删除所有数据。\n+ **-a** 或 **--deleteAll**：删除 SQL 数据库和服务器。\n+ **-q** 或 **--quiet**：不提示确认。在自动化脚本中使用此选项。\n\n**mobile list [options]**\n\n此命令列出您的移动服务。\n\n    ~$ azure mobile list\n    info:    Executing command mobile list\n    data:    Name          State  URL\n    data:    ------------  -----  --------------------------------------\n    data:    todolist      Ready  https://todolist.azure-mobile.net/\n    data:    mymobileapp   Ready  https://mymobileapp.azure-mobile.net/\n    info:    mobile list command OK\n\n**mobile show [options] [servicename]**\n\n此命令显示有关移动服务的详细信息。\n\n    ~$ azure mobile show todolist\n    info:    Executing command mobile show\n    + Getting information\n    info:    Mobile application\n    data:    status Healthy\n    data:    Mobile service name todolist\n    data:    Mobile service status ProvisionConfigured\n    data:    SQL database name todolistAwrhcL60azo1C401\n    data:    SQL database status Linked\n    data:    SQL server name fh1kvbc7la\n    data:    SQL server status Linked\n    info:    Mobile service\n    data:    name todolist\n    data:    state Ready\n    data:    applicationUrl https://todolist.azure-mobile.net/\n    data:    applicationKey XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n    data:    masterKey XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n    data:    webspace WESTUSWEBSPACE\n    data:    region West US\n    data:    tables TodoItem\n    info:    mobile show command OK\n\n**mobile restart [options] [servicename]**\n\n此命令重新启动移动服务实例。\n\n    ~$ azure mobile restart todolist\n    info:    Executing command mobile restart\n    + Restarting mobile service\n    info:    Service was restarted.\n    info:    mobile restart command OK\n\n**mobile log [options] [servicename]**\n\n此命令返回移动服务日志，筛选掉除`error`之外的所有日志类型。\n\n    ~$ azure mobile log todolist -t error\n    info:    Executing command mobile log\n    data:\n    data:    timeCreated 2013-01-07T16:04:43.351Z\n    data:    type error\n    data:    source /scheduler/TestingLogs.js\n    data:    message This is an error.\n    data:\n    info:    mobile log command OK\n\n此命令支持以下附加选项：\n\n+ **-r`<query>`** 或 **--query `<query>`**：执行指定的日志查询。\n+ **-t`<type>`** 或 **--type`<type>`**：按条目 `<type>`（可能是 `information`、`warning` 或 `error`）筛选返回的日志。\n+ **-k`<skip>`** 或 **--skip`<skip>`**：跳过 `<skip>` 指定的行数。\n+ **-p`<top>`** 或 **--top `<top>`**：返回由 `<top>` 指定的特定行数。\n\n> [AZURE.NOTE]**--query** 参数优先于 **--type**、**--skip** 和 **--top**。\n\n**mobile recover [options] [unhealthyservicename] [healthyservicename]**\n\n此命令通过将不正常的移动服务移动到不同区域中的正常移动服务来将其恢复。\n\n此命令支持以下附加选项：\n\n**-q** 或 **--quiet**：不提示确认恢复。\n\n**mobile key regenerate [options] [servicename] [type]**\n\n此命令重新生成移动服务应用程序密钥。\n\n    ~$ azure mobile key regenerate todolist application\n    info:    Executing command mobile key regenerate\n    info:    New application key is SmLorAWVfslMcOKWSsuJvuzdJkfUpt40\n    info:    mobile key regenerate command OK\n\n密钥类型为 `master` 和 `application`。\n\n> [AZURE.NOTE]当重新生成密钥时，使用旧密钥的客户端可能无法访问你的移动服务。当重新生成应用程序密钥时，应使用新密钥值更新你的应用程序。\n\n**mobile key set [options] [servicename] [type] [value]**\n\n此命令将移动服务密钥设置为一个特定值。\n\n\n### <a name=\"Mobile_Configuration\"></a>用于管理移动服务配置的命令\n\n**mobile config list [options] [servicename]**\n\n此命令列出移动服务的配置选项。\n\n    ~$ azure mobile config list todolist\n    info:    Executing command mobile config list\n    + Getting mobile service configuration\n    data:    dynamicSchemaEnabled true\n    data:    microsoftAccountClientSecret Not configured\n    data:    microsoftAccountClientId Not configured\n    data:    microsoftAccountPackageSID Not configured\n    data:    facebookClientId Not configured\n    data:    facebookClientSecret Not configured\n    data:    twitterClientId Not configured\n    data:    twitterClientSecret Not configured\n    data:    googleClientId Not configured\n    data:    googleClientSecret Not configured\n    data:    apnsMode none\n    data:    apnsPassword Not configured\n    data:    apnsCertifcate Not configured\n    info:    mobile config list command OK\n\n**mobile config get [options] [servicename] [key]**\n\n此命令获取移动服务的特定配置选项，在此示例中为动态架构。\n\n    ~$ azure mobile config get todolist dynamicSchemaEnabled\n    info:    Executing command mobile config get\n    data:    dynamicSchemaEnabled true\n    info:    mobile config get command OK\n\n**mobile config set [options] [servicename] [key] [value]**\n\n此命令设置移动服务的特定配置选项，在此示例中为动态架构。\n\n    ~$ azure mobile config set todolist dynamicSchemaEnabled false\n    info:    Executing command mobile config set\n    info:    mobile config set command OK\n\n\n### <a name=\"Mobile_Tables\"></a>用于管理移动服务表的命令\n\n**mobile table list [options] [servicename]**\n\n此命令列出您的移动服务中的所有表。\n\n    ~$azure mobile table list todolist\n    info:    Executing command mobile table list\n    data:    Name      Indexes  Rows\n    data:    --------  -------  ----\n    data:    Channel   1        0\n    data:    TodoItem  1        0\n    info:    mobile table list command OK\n\n**mobile table show [options] [servicename] [tablename]**\n\n此命令显示有关特定表的返回内容的详情。\n\n    ~$azure mobile table show todolist\n    info:    Executing command mobile table show\n    + Getting table information\n    info:    Table statistics:\n    data:    Number of records 5\n    info:    Table operations:\n    data:    Operation  Script       Permissions\n    data:    ---------  -----------  -----------\n    data:    insert     1900 bytes   user\n    data:    read       Not defined  user\n    data:    update     Not defined  user\n    data:    delete     Not defined  user\n    info:    Table columns:\n    data:    Name  Type           Indexed\n    data:    ----  -------------  -------\n    data:    id    bigint(MSSQL)  Yes\n    data:    text      string\n    data:    complete  boolean\n    info:    mobile table show command OK\n\n**mobile table create [options] [servicename] [tablename]**\n\n此命令创建表。\n\n    ~$azure mobile table create todolist Channels\n    info:    Executing command mobile table create\n    + Creating table\n    info:    mobile table create command OK\n\n此命令支持以下附加选项：\n\n+ **-p`&lt;permissions>`** 或 **--permissions`&lt;permissions>`**：以逗号分隔的 `<operation>`=`<permission>` 对列表，其中 `<operation>` 为 `insert`、`read`、`update` 或 `delete`；`&lt;permissions>` 为 `public`、`application`（默认值）、`user` 或 `admin`。\n\n**mobile data read [options] [servicename] [tablename] [query]**\n\n此命令读取表中的数据。\n\n    ~$azure mobile data read todolist TodoItem\n    info:    Executing command mobile data read\n    data:    id  text     complete\n    data:    --  -------  --------\n    data:    1   item #1  false\n    data:    2   item #2  true\n    data:    3   item #3  false\n    data:    4   item #4  true\n    info:    mobile data read command OK\n\n此命令支持以下附加选项：\n\n+ **-k`<skip>`** 或 **--skip`<skip>`**：跳过 `<skip>` 指定的行数。\n+ **-t`<top>`** 或 **--top `<top>`**：返回由 `<top>` 指定的特定行数。\n+ **-l** 或 **--list**：以列表格式返回数据。\n\n**mobile table update [options] [servicename] [tablename]**\n\n此命令只更改管理员对表的删除权限。\n\n    ~$azure mobile table update todolist Channels -p delete=admin\n    info:    Executing command mobile table update\n    + Updating permissions\n    info:    Updated permissions\n    info:    mobile table update command OK\n\n此命令支持以下附加选项：\n\n+ **-p`&lt;permissions>`** 或 **--permissions`&lt;permissions>`**：以逗号分隔的 `<operation>`=`<permission>` 对列表，其中 `<operation>` 为 `insert`、`read`、`update` 或 `delete`；`&lt;permissions>` 为 `public`、`application`（默认值）、`user` 或 `admin`。\n+ **--deleteColumn `<columns>`**：要删除的列的逗号分隔列表，如 `<columns>`。\n+ **-q** 或 **--quiet**：删除列而不提示确认。\n+ **--addIndex`<columns>`**：要包含在索引中的列的逗号分隔列表。\n+ **--deleteIndex`<columns>`**：要从索引中排除的列的逗号分隔列表。\n\n**mobile table delete [options] [servicename] [tablename]**\n\n此命令删除表。\n\n    ~$azure mobile table delete todolist Channels\n    info:    Executing command mobile table delete\n    Do you really want to delete the table (yes/no): yes\n    + Deleting table\n    info:    mobile table delete command OK\n\n指定 -q 参数可在不提示确认的情况下删除表。执行此操作可以防止阻止自动化脚本。\n\n**mobile data truncate [options] [servicename] [tablename]**\n\n此命令从表中删除所有数据行。\n\n    ~$azure mobile data truncate todolist TodoItem\n    info:    Executing command mobile data truncate\n    info:    There are 7 data rows in the table.\n    Do you really want to delete all data from the table? (y/n): y\n    info:    Deleted 7 rows.\n    info:    mobile data truncate command OK\n\n\n### <a name=\"Mobile_Scripts\"></a>用于管理脚本的命令\n\n本部分中的命令用于管理属于移动服务的服务器脚本。有关详细信息，请参阅[使用移动服务中的服务器脚本](/documentation/articles/mobile-services-how-to-use-server-scripts)。\n\n**mobile script list [options] [servicename]**\n\n此命令列出注册的脚本，包括表和计划程序脚本。\n\n    ~$azure mobile script list todolist\n    info:    Executing command mobile script list\n    + Getting script information\n    info:    Table scripts\n    data:    Name                   Size\n    data:    ---------------------  ----\n    data:    table/TodoItem.delete  256\n    data:    table/Devices.insert   1660\n    error:   Unable to get shared scripts\n    info:    Scheduler scripts\n    data:    Name                 Status     Interval   Last run   Next run\n    data:    -------------------  ---------  ---------  ---------  ---------\n    data:    scheduler/undefined  undefined  undefined  undefined  undefined\n    data:    scheduler/undefined  undefined  undefined  undefined  undefined\n    info:    mobile script list command OK\n\n**mobile script download [options] [servicename] [scriptname]**\n\n此命令将插入脚本从 TodoItem 表下载到 `table` 子文件夹中名为 `todoitem.insert.js` 的文件中。\n\n    ~$azure mobile script download todolist table/todoitem.insert.js\n    info:    Executing command mobile script download\n    info:    Saved script to ./table/todoitem.insert.js\n    info:    mobile script download command OK\n\n此命令支持以下附加选项：\n\n+ **-p`<path>`** 或 **--path `<path>`**：文件中用于保存脚本的位置，其中当前工作目录是默认值。\n+ **-f`<file>`** 或 **--file`<file>`**：要将脚本保存在其中的文件的名称。\n+ **-o** 或 **--override**：覆盖现有文件。\n+ **-c** 或 **--console**：将脚本写入到控制台而不是文件。\n\n**mobile script upload [options] [servicename] [scriptname]**\n\n此命令从 `table` 子文件夹上载名为 `todoitem.insert.js` 的新脚本。\n\n    ~$azure mobile script upload todolist table/todoitem.insert.js\n    info:    Executing command mobile script upload\n    info:    mobile script upload command OK\n\n该文件的名称必须由表和操作名称组成，并且该文件必须位于相对于命令执行位置的 table 子文件夹中。你还可以使用 **-f `<file>`** 或 **--file `<file>`** 参数指定其他包含要注册的脚本的文件的文件名和路径。\n\n\n**mobile script delete [options] [servicename] [scriptname]**\n\n此命令从 TodoItem 表中删除现有插入脚本。\n\n    ~$azure mobile script delete todolist table/todoitem.insert.js\n    info:    Executing command mobile script delete\n    info:    mobile script delete command OK\n\n### <a name=\"Mobile_Jobs\"></a>用于管理已计划作业的命令\n\n本部分中的命令用于管理属于移动服务的已计划作业。有关详细信息，请参阅[计划作业](http://msdn.microsoft.com/zh-cn/library/windowsazure/jj860528.aspx)。\n\n**mobile job list [options] [servicename]**\n\n此命令列出计划作业。\n\n    ~$azure mobile job list todolist\n    info:    Executing command mobile job list\n    info:    Scheduled jobs\n    data:    Job name    Script name           Status    Interval     Last run              Next run\n    data:    ----------  --------------------  --------  -----------  --------------------  --------------------\n    data:    getUpdates  scheduler/getUpdates  enabled   15 [minute]  2013-01-14T16:15:00Z  2013-01-14T16:30:00Z\n    info:    You can manipulate scheduled job scripts using the 'azure mobile script' command.\n    info:    mobile job list command OK\n\n**mobile job create [options] [servicename] [jobname]**\n\n此命令创建计划为每小时运行的名为 `getUpdates` 的新作业。\n\n    ~$azure mobile job create -i 1 -u hour todolist getUpdates\n    info:    Executing command mobile job create\n    info:    Job was created in disabled state. You can enable the job using the 'azure mobile job update' command.\n    info:    You can manipulate the scheduled job script using the 'azure mobile script' command.\n    info:    mobile job create command OK\n\n此命令支持以下附加选项：\n\n+ **-i`<number>`** 或 **--interval`<number>`**：作业时间间隔，数值类型为整数；默认值为 `15`。\n+ **-u`<unit>`** 或 **--intervalUnit `<unit>`**：_时间间隔_的单位，可以是以下值之一：\n    + **minute**（默认值）\n    + **hour**\n    + **day**\n    + **month**\n    + **none**（按需作业）\n+ **-t`<time>`** **--startTime `<time>`** 脚本的首次运行开始时间，采用 ISO 格式；默认值为 `now`。\n\n> [AZURE.NOTE]创建的新作业处于禁用状态，因为还必须上载脚本。请使用 **mobile script upload** 命令上载脚本并使用 **mobile job update** 命令启用作业。\n\n**mobile job update [options] [servicename] [jobname]**\n\n以下命令启用已禁用的`getUpdates`作业。\n\n    ~$azure mobile job update -a enabled todolist getUpdates\n    info:    Executing command mobile job update\n    info:    mobile job update command OK\n\n此命令支持以下附加选项：\n\n+ **-i`<number>`** 或 **--interval`<number>`**：作业时间间隔，数值类型为整数；默认值为 `15`。\n+ **-u`<unit>`** 或 **--intervalUnit `<unit>`**：_时间间隔_的单位，可以是以下值之一：\n    + **minute**（默认值）\n    + **hour**\n    + **day**\n    + **month**\n    + **none**（按需作业）\n+ **-t`<time>`** **--startTime `<time>`** 脚本的首次运行开始时间，采用 ISO 格式；默认值为 `now`。\n+ **-a`<status>`** 或 **--status `<status>`**：作业状态，可以是 `enabled` 或 `disabled`。\n\n**mobile job delete [options] [servicename] [jobname]**\n\n此命令从 TodoList 服务器中删除 getUpdates 已计划作业。\n\n    ~$azure mobile job delete todolist getUpdates\n    info:    Executing command mobile job delete\n    info:    mobile job delete command OK\n\n> [AZURE.NOTE]删除作业也将删除已上载的脚本。\n\n### <a name=\"Mobile_Scale\"></a>用于缩放移动服务的命令\n\n本部分中的命令用于缩放移动服务。有关详细信息，请参阅[缩放移动服务](http://msdn.microsoft.com/zh-cn/library/windowsazure/jj193178.aspx)。\n\n**mobile scale show [options] [servicename]**\n\n此命令显示缩放信息，包括当前计算模式和实例数。\n\n    ~$azure mobile scale show todolist\n    info:    Executing command mobile scale show\n    data:    webspace WESTUSWEBSPACE\n    data:    computeMode Free\n    data:    numberOfInstances 1\n    info:    mobile scale show command OK\n\n**mobile scale change [options] [servicename]**\n\n此命令将移动服务的规模从免费模式更改为高级模式。\n\n    ~$azure mobile scale change -c Reserved -i 1 todolist\n    info:    Executing command mobile scale change\n    + Rescaling the mobile service\n    info:    mobile scale change command OK\n\n此命令支持以下附加选项：\n\n+ **-c`<mode>`** 或 **--computeMode `<mode>`**：计算模式必须为 `Free` 或 `Reserved`。\n+ **-i`<count>`** 或 **--numberOfInstances`<count>`**：在保留模式下运行时使用的实例数。\n\n> [AZURE.NOTE]将计算模式设置为`Reserved`时，同一区域中的所有移动服务都将在高级模式下运行。\n\n\n###用于为移动服务启用预览版功能的命令\n\n**mobile preview list [options] [servicename]**\n\n此命令显示在指定的服务上可用的预览版功能，以及它们是否已启用。\n\n    ~$ azure mobile preview list mysite\n    info:    Executing command mobile preview list\n    + Getting preview features\n    data:    Preview feature  Enabled\n    data:    ---------------  -------\n    data:    SourceControl    No\n    data:    Users            No\n    info:    You can enable preview features using the 'azure mobile preview enable' command.\n    info:    mobile preview list command OK\n\n**mobile preview enable [options] [servicename] [featurename]**\n\n此命令为移动服务启用指定的预览版功能。请注意，一旦启用，将无法为移动服务禁用预览版功能。\n\n###用于管理移动服务 API 的命令\n\n**mobile api list [options] [servicename]**\n\n此命令列出你为你的移动服务创建的移动服务自定义 API。\n\n    ~$ azure mobile api list mysite\n    info:    Executing command mobile api list\n    + Retrieving list of APIs\n    info:    APIs\n    data:    Name                  Get          Put          Post         Patch        Delete\n    data:    --------------------  -----------  -----------  -----------  -----------  -----------\n    data:    myCustomRetrieveAPI   application  application  application  application  application\n    info:    You can manipulate API scripts using the 'azure mobile script' command.\n    info:    mobile api list command OK\n\n**mobile api create [options] [servicename] [apiname]**\n\n创建移动服务自定义 API\n\n    ~$ azure mobile api create mysite myCustomRetrieveAPI\n    info:    Executing command mobile api create\n    + Creating custom API: 'myCustomRetrieveAPI'\n    info:    API was created successfully. You can modify the API using the 'azure mobile script' command.\n    info:    mobile api create command OK\n\n此命令支持以下附加选项：\n\n**-p** 或 **--permissions** &lt;permissions>：以逗号分隔的 &lt;方法>=&lt;权限> 对列表。\n\n**mobile api update [options] [servicename] [apiname]**\n\n此命令更新指定的移动服务自定义 API。\n\n此命令支持以下附加选项：\n\n此命令支持以下附加选项：\n\n+ **-p** 或 **--permissions** &lt;permissions>：以逗号分隔的 &lt;方法>=&lt;权限> 对列表。\n+ **-f** 或 **--force**：覆盖对权限元数据文件的任何自定义更改。\n\n**mobile api delete [options] [servicename] [apiname]**\n\n    ~$ azure mobile api delete mysite myCustomRetrieveAPI\n    info:    Executing command mobile api delete\n    + Deleting API: 'myCustomRetrieveAPI'\n    info:    mobile api delete command OK\n\n此命令删除指定的移动服务自定义 API。\n\n###用于管理移动应用程序的应用程序设置的命令\n\n**mobile appsetting list [options] [servicename]**\n\n此命令显示指定的服务的移动应用程序的应用程序设置。\n\n    ~$ azure mobile appsetting list mysite\n    info:    Executing command mobile appsetting list\n    + Retrieving app settings\n    data:    Name               Value\n    data:    -----------------  -----\n    data:    enablebetacontent  true\n    info:    mobile appsetting list command OK\n\n**mobile appsetting add [options] [servicename] [name] [value]**\n\n此命令为移动服务添加自定义应用程序设置。\n\n    ~$ azure mobile appsetting add mysite enablebetacontent true\n    info:    Executing command mobile appsetting add\n    + Retrieving app settings\n    + Adding app setting\n    info:    mobile appsetting add command OK\n\n**mobile appsetting delete [options] [servicename] [name]**\n\n此命令为移动服务删除指定的应用程序设置。\n\n    ~$ azure mobile appsetting delete mysite enablebetacontent\n    info:    Executing command mobile appsetting delete\n    + Retrieving app settings\n    + Removing app setting 'enablebetacontent'\n    info:    mobile appsetting delete command OK\n\n**mobile appsetting show [options] [servicename] [name]**\n\n此命令为移动服务删除指定的应用程序设置。\n\n    ~$ azure mobile appsetting show mysite enablebetacontent\n    info:    Executing command mobile appsetting show\n    + Retrieving app settings\n    info:    enablebetacontent: true\n    info:    mobile appsetting show command OK\n\n## 管理工具本地设置\n\n本地设置是指你的订阅 ID 和默认存储帐户名称。\n\n**config list [options]**\n\n此命令显示配置设置。\n\n    ~$ azure config list\n    info:   Displaying config settings\n    data:   Setting                Value\n    data:   ---------------------  ------------------------------------\n    data:   subscription           32-digit-subscription-key\n    data:   defaultStorageAccount  name\n\n**config set [options] &lt;name&gt;,&lt;value&gt;**\n\n此命令更改配置设置。\n\n    ~$ azure config set defaultStorageAccount myname\n    info:   Setting 'defaultStorageAccount' to value 'myname'\n    info:   Changes saved.\n\n## 用于管理 Service Bus 的命令\n\n使用这些命令来管理你的 Service Bus 帐户\n\n**sb namespace check [options] &lt;name>**\n\n检查某个 service bus 命名空间是否合法并可用。\n\n**sb namespace create &lt;name> &lt;location>**\n\n创建新的 Service Bus 命名空间。\n\n    ~$ azure sb namespace create mysbnamespacea-test \"West US\"\n    info:    Executing command sb namespace create\n    + Creating namespace mysbnamespacea-test in region West US\n    data:    Name: mysbnamespacea-test\n    data:    Region: West US\n    data:    DefaultKey: fBu8nQ9svPIesFfMFVhCFD+/sY0rRbifWMoRpYy0Ynk=\n    data:    Status: Activating\n    data:    CreatedAt: 2013-11-14T16:23:29.32Z\n    data:    AcsManagementEndpoint: https://mysbnamespacea-test-sb.accesscontrol.chinacloudapi.cn/\n    data:    ServiceBusEndpoint: https://mysbnamespacea-test.servicebus.chinacloudapi.cn/\n\n    data:    ConnectionString: Endpoint=sb://mysbnamespacea-test.servicebus.windows.\n    net/;SharedSecretIssuer=owner;SharedSecretValue=fBu8nQ9svPIesFfMFVhCFD+/sY0rRbif\n    WMoRpYy0Ynk=\n    data:    SubscriptionId: 8679c8be3b0549d9b8fb4bd232a48931\n    data:    Enabled: true\n    data:    _: [object Object]\n    info:    sb namespace create command OK\n\n\n**sb namespace delete &lt;name>**\n\n删除某个命名空间。\n\n    ~$ azure sb namespace delete mysbnamespacea-test\n    info:    Executing command sb namespace delete\n    Delete namespace mysbnamespacea-test? [y/n] y\n    + Deleting namespace mysbnamespacea-test\n    info:    sb namespace delete command OK\n\n**sb namespace list**\n\n列出为你的帐户创建的所有命名空间。\n\n    ~$ azure sb namespace list\n    info:    Executing command sb namespace list\n    + Getting namespaces\n    data:    Name                 Region   Status\n    data:    -------------------  -------  ------\n    data:    mysbnamespacea-test  West US  Active\n    info:    sb namespace list command OK\n\n\n**sb namespace location list**\n\n显示所有可用的命名空间位置的列表。\n\n    ~$ azure sb namespace location list\n    info:    Executing command sb namespace location list\n    + Getting locations\n    data:    Name              Code\n    data:    ----------------  ----------------\n    data:    East Asia         East Asia\n    data:    West Europe       West Europe\n    data:    North Europe      North Europe\n    data:    East US           East US\n    data:    Southeast Asia    Southeast Asia\n    data:    North Central US  North Central US\n    data:    West US           West US\n    data:    South Central US  South Central US\n    info:    sb namespace location list command OK\n\n**sb namespace show &lt;name>**\n\n显示有关特定命名空间的详细信息。\n\n    ~$ azure sb namespace show mysbnamespacea-test\n    info:    Executing command sb namespace show\n    + Getting namespace\n    data:    Name: mysbnamespacea-test\n    data:    Region: West US\n    data:    DefaultKey: fBu8nQ9svPIesFfMFVhCFD+/sY0rRbifWMoRpYy0Ynk=\n    data:    Status: Active\n    data:    CreatedAt: 2013-11-14T16:23:29.32Z\n    data:    AcsManagementEndpoint: https://mysbnamespacea-test-sb.accesscontrol.chinacloudapi.cn/\n    data:    ServiceBusEndpoint: https://mysbnamespacea-test.servicebus.chinacloudapi.cn/\n\n    data:    ConnectionString: Endpoint=sb://mysbnamespacea-test.servicebus.windows.\n    net/;SharedSecretIssuer=owner;SharedSecretValue=fBu8nQ9svPIesFfMFVhCFD+/sY0rRbif\n    WMoRpYy0Ynk=\n    data:    SubscriptionId: 8679c8be3b0549d9b8fb4bd232a48931\n    data:    Enabled: true\n    data:    UpdatedAt: 2013-11-14T16:25:37.85Z\n    info:    sb namespace show command OK\n\n**sb namespace verify &lt;name>**\n\n检查命名空间是否可用。\n\n## 用于管理存储对象的命令\n\n###用于管理存储帐户的命令\n\n**storage account list [options]**\n\n此命令显示你的订阅上的存储帐户。\n\n    ~$ azure storage account list\n    info:    Executing command storage account list\n    + Getting storage accounts\n    data:    Name             Label  Location\n    data:    ---------------  -----  --------\n    data:    mybasestorage           West US\n    info:    storage account list command OK\n\n**storage account show [options] <name>**\n\n此命令显示有关指定的存储帐户的信息，包括 URI 和帐户属性。\n\n**storage account create [options] <name>**\n\n此命令根据提供的选项创建存储帐户。\n\n    ~$ azure storage account create mybasestorage --label PrimaryStorage --location \"West US\"\n    info:    Executing command storage account create\n    + Creating storage account\n    info:    storage account create command OK\n\n此命令支持以下附加选项：\n\n+ **-e** 或 **--label** &lt;label>：存储帐户的标签。\n+ **-d** 或 **--description** &lt;description>：存储帐户的说明。\n+ **-l** 或 **--location** &lt;name>：要在其中创建存储帐户的地理区域。\n+ **-a** 或 **--affinity-group** &lt;name>：要与存储帐户关联的地缘组。\n+ **--type**：指示要创建的帐户的类型：带冗余选项的标准存储 (LRS/GRS/RAGRS) 或高级存储 (PLRS)。\n\n**storage account set [options] <name>**\n\n此命令更新指定的存储帐户。\n\n    ~$ azure storage account set mybasestorage --type GRS\n    info:    Executing command storage account set\n    + Updating storage account\n    info:    storage account set command OK\n\n此命令支持以下附加选项：\n\n+ **-e** 或 **--label** &lt;label>：存储帐户的标签。\n+ **-d** 或 **--description** &lt;description>：存储帐户的说明。\n+ **-l** 或 **--location** &lt;name>：要在其中创建存储帐户的地理区域。\n+ **--type**：指示帐户的新类型：带冗余选项的标准存储 (LRS/GRS/RAGRS) 或高级存储 (PLRS)。\n\n**storage account delete [options] <name>**\n\n此命令删除指定的存储帐户。\n\n此命令支持以下附加选项：\n\n**-q** 或 **--quiet**：不提示确认。在自动化脚本中使用此选项。\n\n###用于管理存储帐户密钥的命令\n\n**storage account keys list [options] <name>**\n\n此命令列出指定的存储帐户的主要和辅助密钥。\n\n**storage account keys renew [options] <name>**\n\n###用于管理存储容器的命令\n\n**storage container list [options] [prefix]**\n\n此命令显示指定的存储帐户的存储容器列表。存储帐户是通过连接字符串或者存储帐户名称和帐户密钥指定的。\n\n此命令支持以下附加选项：\n\n+ **-p** 或 **-prefix** &lt;prefix>：存储容器名称前缀。\n+ **-a** 或 **--account-name** &lt;accountName>：存储帐户名称。\n+ **-k** 或 **--account-key** &lt;accountKey>：存储帐户密钥。\n+ **-c** 或 **--connection-string** &lt;connectionString>：存储连接字符串。\n+ **--debug**：在调试模式下运行 storage 命令。\n\n**storage container show [options] [container]** **storage container create [options] [container]**\n\n此命令为指定的存储帐户创建存储容器。存储帐户是通过连接字符串或者存储帐户名称和帐户密钥指定的。\n\n此命令支持以下附加选项：\n\n+ **--container** &lt;container>：要创建的存储容器的名称。\n+ **-p** 或 **-prefix** &lt;prefix>：存储容器名称前缀。\n+ **-a** 或 **--account-name** &lt;accountName>：存储帐户名称\n+ **-k** 或 **--account-key** &lt;accountKey>：存储帐户密钥\n+ **-c** 或 **--connection-string** &lt;connectionString>：存储连接字符串\n+ **--debug**：在调试模式下运行 storage 命令。\n\n**storage container delete [options] [container]**\n\n此命令删除指定的存储容器。存储帐户是通过连接字符串或者存储帐户名称和帐户密钥指定的。\n\n此命令支持以下附加选项：\n\n+ **--container** &lt;container>：要创建的存储容器的名称。\n+ **-p** 或 **-prefix** &lt;prefix>：存储容器名称前缀。\n+ **-a** 或 **--account-name** &lt;accountName>：存储帐户名称。\n+ **-k** 或 **--account-key** &lt;accountKey>：存储帐户密钥。\n+ **-c** 或 **--connection-string** &lt;connectionString>：存储连接字符串。\n+ **--debug**：在调试模式下运行 storage 命令。\n\n**storage container set [options] [container]**\n\n此命令设置存储容器的访问控制列表。存储帐户是通过连接字符串或者存储帐户名称和帐户密钥指定的。\n\n此命令支持以下附加选项：\n\n+ **--container** &lt;container>：要创建的存储容器的名称。\n+ **-p** 或 **-prefix** &lt;prefix>：存储容器名称前缀。\n+ **-a** 或 **--account-name** &lt;accountName>：存储帐户名称。\n+ **-k** 或 **--account-key** &lt;accountKey>：存储帐户密钥。\n+ **-c** 或 **--connection-string** &lt;connectionString>：存储连接字符串。\n+ **--debug**：在调试模式下运行 storage 命令。\n\n###用于管理存储 blob 的命令\n\n**storage blob list [options] [container] [prefix]**\n\n此命令返回指定的存储容器中的存储 blob 的列表。\n\n此命令支持以下附加选项：\n\n+ **--container** &lt;container>：要创建的存储容器的名称。\n+ **-p** 或 **-prefix** &lt;prefix>：存储容器名称前缀。\n+ **-a** 或 **--account-name** &lt;accountName>：存储帐户名称。\n+ **-k** 或 **--account-key** &lt;accountKey>：存储帐户密钥。\n+ **-c** 或 **--connection-string** &lt;connectionString>：存储连接字符串。\n+ **--debug**：在调试模式下运行 storage 命令。\n\n**storage blob show [options] [container] [blob]**\n\n此命令显示指定的存储 blob 的详细信息。\n\n此命令支持以下附加选项：\n\n+ **--container** &lt;container>：要创建的存储容器的名称。\n+ **-p** 或 **-prefix** &lt;prefix>：存储容器名称前缀。\n+ **-a** 或 **--account-name** &lt;accountName>：存储帐户名称。\n+ **-k** 或 **--account-key** &lt;accountKey>：存储帐户密钥。\n+ **-c** 或 **--connection-string** &lt;connectionString>：存储连接字符串。\n+ **--debug**：在调试模式下运行 storage 命令。\n\n**storage blob delete [options] [container] [blob]**\n\n此命令支持以下附加选项：\n\n+ **--container** &lt;container>：要创建的存储容器的名称。\n+ **-b** 或 **--blob** &lt;blobName>：要删除的存储 blob 的名称。\n+ **-q** 或 **--quiet**：删除指定的存储 blob 且不确认。\n+ **-a** 或 **--account-name** &lt;accountName>：存储帐户名称。\n+ **-k** 或 **--account-key** &lt;accountKey>：存储帐户密钥。\n+ **-c** 或 **--connection-string** &lt;connectionString>：存储连接字符串。\n+ **--debug**：在调试模式下运行 storage 命令。\n\n**storage blob upload [options] [file] [container] [blob]**\n\n此命令将指定的文件上载到指定的存储 blob。\n\n此命令支持以下附加选项：\n\n+ **--container** &lt;container>：要创建的存储容器的名称。\n+ **-b** 或 **--blob** &lt;blobName>：要上载的存储 blob 的名称。\n+ **-t** 或 **--blobtype** &lt;blobtype>：存储 blob 类型：Page 或 Block。\n+ **-p** 或 **--properties** &lt;properties>：上载的文件的存储 blob 属性。属性是以分号 (;) 分隔的“键=值”对。可用的属性有 contentType、contentEncoding、contentLanguage 和 cacheControl。\n+ **-m** 或 **--metadata** &lt;metadata>：上载的文件的存储 blob 元数据。元数据是以分号 (;) 分隔的“键=值”对。\n+ **--concurrenttaskcount** &lt;concurrenttaskcount>：并发上载请求的最大数目。\n+ **-q** 或 **--quiet**：覆盖指定的存储 blob 且不确认。\n+ **-a** 或 **--account-name** &lt;accountName>：存储帐户名称。\n+ **-k** 或 **--account-key** &lt;accountKey>：存储帐户密钥。\n+ **-c** 或 **--connection-string** &lt;connectionString>：存储连接字符串。\n+ **--debug**：在调试模式下运行 storage 命令。\n\n**storage blob download [options] [container] [blob] [destination]**\n\n此命令下载指定的存储 blob。\n\n此命令支持以下附加选项：\n\n+ **--container** &lt;container>：要创建的存储容器的名称。\n+ **-b** 或 **--blob** &lt;blobName>：存储 blob 名称。\n+ **-d** 或 **--destination** [destination]：下载目标文件或目录路径。\n+ **-m** 或 **--checkmd5**：下载的文件的校验 md5sum。\n+ **--concurrenttaskcount** &lt;concurrenttaskcount> 并发上载请求的最大数目\n+ **-q** 或 **--quiet**：覆盖目标文件且不确认。\n+ **-a** 或 **--account-name** &lt;accountName>：存储帐户名称。\n+ **-k** 或 **--account-key** &lt;accountKey>：存储帐户密钥。\n+ **-c** 或 **--connection-string** &lt;connectionString>：存储连接字符串。\n+ **--debug**：在调试模式下运行 storage 命令。\n\n## 用于管理 SQL 数据库的命令\n\n使用这些命令来管理你的 Azure SQL 数据库\n\n###用于管理 SQL Server 的数据库\n\n使用这些命令来管理你的 SQL Server\n\n**sql server create &lt;administratorLogin> &lt;administratorPassword> &lt;location>**\n\n创建新的数据库服务器\n\n    ~$ azure sql server create test T3stte$t \"West US\"\n    info:    Executing command sql server create\n    + Creating SQL Server\n    data:    Server Name i1qwc540ts\n    info:    sql server create command OK\n\n**sql server show &lt;name>**\n\n显示服务器详细信息。\n\n    ~$ azure sql server show xclfgcndfg\n    info:    Executing command sql server show\n    + Getting SQL server\n    data:    SQL Server Name xclfgcndfg\n    data:    SQL Server AdministratorLogin msopentechforums\n    data:    SQL Server Location West US\n    data:    SQL Server FullyQualifiedDomainName xclfgcndfg.database.chinacloudapi.cn\n    info:    sql server show command OK\n\n**sql server list**\n\n获取服务器的列表。\n\n    ~$ azure sql server list\n    info:    Executing command sql server list\n    + Getting SQL server\n    data:    Name        Location\n    data:    ----------  --------\n    data:    xclfgcndfg  West US\n    info:    sql server list command OK\n\n**sql server delete &lt;name>**\n\n删除服务器\n\n    ~$ azure sql server delete i1qwc540ts\n    info:    Executing command sql server delete\n    Delete server i1qwc540ts? [y/n] y\n    + Removing SQL Server\n    info:    sql server delete command OK\n\n###用于管理 SQL 数据库的命令\n\n使用这些命令来管理你的 SQL 数据库。\n\n**sql db create [options] &lt;serverName> &lt;databaseName> &lt;administratorPassword>**\n\n创建一个新的数据库实例\n\n    ~$ azure sql db create fr8aelne00 newdb test\n    info:    Executing command sql db create\n    Administrator password: ********\n    + Creating SQL Server Database\n    info:    sql db create command OK\n\n**sql db show [options] &lt;serverName> &lt;databaseName> &lt;administratorPassword>**\n\n显示数据库详细信息。\n\n    C:\\windows\\system32>azure sql db show fr8aelne00 newdb test\n    info:    Executing command sql db show\n    Administrator password: ********\n    + Getting SQL server databases\n    data:    Database _ ContentRootElement=m:properties, id=https://fr8aelne00.datab\n    ase.chinacloudapi.cn/v1/ManagementService.svc/Server2('fr8aelne00')/Databases(4), ter\n    m=Microsoft.SqlServer.Management.Server.Domain.Database, scheme=http://schemas.m\n    icrosoft.com/ado/2007/08/dataservices/scheme, link=[rel=edit, title=Database, hr\n    ef=Databases(4), rel=http://schemas.microsoft.com/ado/2007/08/dataservices/relat\n    ed/Server, type=application/atom+xml;type=entry, title=Server, href=Databases(4)\n    /Server, rel=http://schemas.microsoft.com/ado/2007/08/dataservices/related/Servi\n    ceObjective, type=application/atom+xml;type=entry, title=ServiceObjective, href=\n    Databases(4)/ServiceObjective, rel=http://schemas.microsoft.com/ado/2007/08/data\n    services/related/DatabaseMetrics, type=application/atom+xml;type=entry, title=Da\n    tabaseMetrics, href=Databases(4)/DatabaseMetrics, rel=http://schemas.microsoft.c\n    om/ado/2007/08/dataservices/related/DatabaseCopies, type=application/atom+xml;ty\n    pe=feed, title=DatabaseCopies, href=Databases(4)/DatabaseCopies], title=, update\n    d=2013-11-18T19:48:27Z, name=\n    data:    Database Id 4\n    data:    Database Name newdb\n    data:    Database ServiceObjectiveId 910b4fcb-8a29-4c3e-958f-f7ba794388b2\n    data:    Database AssignedServiceObjectiveId 910b4fcb-8a29-4c3e-958f-f7ba794388b2\n    data:    Database ServiceObjectiveAssignmentState 1\n    data:    Database ServiceObjectiveAssignmentStateDescription Complete\n    data:    Database ServiceObjectiveAssignmentErrorCode\n    data:    Database ServiceObjectiveAssignmentErrorDescription\n    data:    Database ServiceObjectiveAssignmentSuccessDate\n    data:    Database Edition Web\n    data:    Database MaxSizeGB 1\n    data:    Database MaxSizeBytes 1073741824\n    data:    Database CollationName SQL_Latin1_General_CP1_CI_AS\n    data:    Database CreationDate\n    data:    Database RecoveryPeriodStartDate\n    data:    Database IsSystemObject\n    data:    Database Status 1\n    data:    Database IsFederationRoot\n    data:    Database SizeMB -1\n    data:    Database IsRecursiveTriggersOn\n    data:    Database IsReadOnly\n    data:    Database IsFederationMember\n    data:    Database IsQueryStoreOn\n    data:    Database IsQueryStoreReadOnly\n    data:    Database QueryStoreMaxSizeMB\n    data:    Database QueryStoreFlushPeriodSeconds\n    data:    Database QueryStoreIntervalLengthMinutes\n    data:    Database QueryStoreClearAll\n    data:    Database QueryStoreStaleQueryThresholdDays\n    info:    sql db show command OK\n\n**sql db list [options] &lt;serverName> &lt;administratorPassword>**\n\n列出数据库。\n\n    ~$ azure sql db list fr8aelne00 test\n    info:    Executing command sql db list\n    Administrator password: ********\n    + Getting SQL server databases\n    data:    Name    Edition  Collation                     MaxSizeInGB\n    data:    ------  -------  ----------------------------  -----------\n    data:    master  Web      SQL_Latin1_General_CP1_CI_AS  5\n    info:    sql db list command OK\n\n**sql db delete [options] &lt;serverName> &lt;databaseName> &lt;administratorPassword>**\n\n删除数据库。\n\n    ~$ azure sql db delete fr8aelne00 newdb test\n    info:    Executing command sql db delete\n    Administrator password: ********\n    Delete database newdb? [y/n] y\n    + Getting SQL server databases\n    + Removing database\n    info:    sql db delete command OK\n\n###管理 SQL Server 防火墙规则的命令\n\n使用这些命令来管理 SQL Server 防火墙规则\n\n**sql firewallrule create [options] &lt;serverName> &lt;ruleName> &lt;startIPAddress> &lt;endIPAddress>**\n\n为 SQL Server 创建新的防火墙规则。\n\n    ~$ azure sql firewallrule create fr8aelne00 allowed 131.107.0.0 131.107.255.255\n    info:    Executing command sql firewallrule create\n    + Creating Firewall Rule\n    info:    sql firewallrule create command OK\n\n**sql firewallrule show [options] &lt;serverName> &lt;ruleName>**\n\n显示防火墙规则详细信息。\n\n    ~$ azure sql firewallrule show fr8aelne00 allowed\n    info:    Executing command sql firewallrule show\n    + Getting firewall rule\n    data:    Firewall rule Name allowed\n    data:    Firewall rule Type Microsoft.SqlAzure.FirewallRule\n    data:    Firewall rule State Normal\n    data:    Firewall rule SelfLink https://management.core.chinacloudapi.cn/9e672699-105\n    5-41ae-9c36-e85152f2e352/services/sqlservers/servers/fr8aelne00/firewallrules/allowed\n    data:    Firewall rule ParentLink https://management.core.chinacloudapi.cn/9e672699-1\n    055-41ae-9c36-e85152f2e352/services/sqlservers/servers/fr8aelne00\n    data:    Firewall rule StartIPAddress 131.107.0.0\n    data:    Firewall rule EndIPAddress 131.107.255.255\n    info:    sql firewallrule show command OK\n\n**sql firewallrule list [options] &lt;serverName>**\n\n列出防火墙规则。\n\n    ~$ azure sql firewallrule list fr8aelne00\n    info:    Executing command sql firewallrule list\n    \\data:    Name     Start IP address  End IP address\n    data:    -------  ----------------  ---------------\n    data:    allowed  131.107.0.0       131.107.255.255\n    +\n    info:    sql firewallrule list command OK\n\n**sql firewallrule delete [options] &lt;serverName> &lt;ruleName>**\n\n此命令将删除防火墙规则。\n\n    ~$ azure sql firewallrule delete fr8aelne00 allowed\n    info:    Executing command sql firewallrule delete\n    Delete rule allowed? [y/n] y\n    + Removing firewall rule\n    info:    sql firewallrule delete command OK\n\n## 用于管理虚拟网络的命令\n\n使用这些命令来管理你的虚拟网络\n\n**network vnet create [options] &lt;location>**\n\n创建新的虚拟网络。\n\n    ~$ azure network vnet create vnet1 --location \"West US\" -v\n    info:    Executing command network vnet create\n    info:    Using default address space start IP: 10.0.0.0\n    info:    Using default address space cidr: 8\n    info:    Using default subnet start IP: 10.0.0.0\n    info:    Using default subnet cidr: 11\n    verbose: Address Space [Starting IP/CIDR (Max VM Count)]: 10.0.0.0/8 (16777216)\n    verbose: Subnet [Starting IP/CIDR (Max VM Count)]: 10.0.0.0/11 (2097152)\n    verbose: Fetching Network Configuration\n    verbose: Fetching or creating affinity group\n    verbose: Fetching Affinity Groups\n    verbose: Fetching Locations\n    verbose: Creating new affinity group AG1\n    info:    Using affinity group AG1\n    verbose: Updating Network Configuration\n    info:    network vnet create command OK\n\n**network vnet show &lt;name>**\n\n显示虚拟网络的详细信息。\n\n    ~$ azure network vnet show vnet1\n    info:    Executing command network vnet show\n    + Fetching Virtual Networks\n    data:    Name \"vnet1\"\n    data:    Id \"25786fbe-08e8-4e7e-b1de-b98b7e586c7a\"\n    data:    AffinityGroup \"AG1\"\n    data:    State \"Created\"\n    data:    AddressSpace AddressPrefixes 0 \"10.0.0.0/8\"\n    data:    Subnets 0 Name \"subnet-1\"\n    data:    Subnets 0 AddressPrefix \"10.0.0.0/11\"\n    info:    network vnet show command OK\n\n**vnet list**\n\n列出所有现有的虚拟网络。\n\n    ~$ azure network vnet list\n    info:    Executing command network vnet list\n    + Fetching Virtual Networks\n    data:    Name        Status   AffinityGroup\n    data:    ----------  -------  -------------\n    data:    vnet1      Created  AG1\n    data:    vnet2      Created  AG1\n    data:    vnet3      Created  AG1\n    data:    vnet4      Created  AG1\n    info:    network vnet list command OK\n\n\n**network vnet delete &lt;name>**\n\n删除指定的虚拟网络。\n\n    ~$ azure network vnet delete opentechvn1\n    info:    Executing command network vnet delete\n    + Fetching Network Configuration\n    Delete the virtual network opentechvn1 ?  (y/n) y\n    + Deleting the virtual network opentechvn1\n    info:    network vnet delete command OK\n\n**network export [file-path]**\n\n若要进行高级网络配置，请在本地导出你的网络配置。注意，导出的网络配置包括 DNS 服务器设置、虚拟网络设置、本地网络站点设置和其他设置。\n\n**network import [file-path]**\n\n导入本地网络配置。\n\n**network dnsserver register [options] &lt;dnsIP>**\n\n注册你计划在网络配置中用来进行名称解析的 DNS 服务器。\n\n    ~$ azure network dnsserver register 98.138.253.109 --dns-id FrontEndDnsServer\n    info:    Executing command network dnsserver register\n    + Fetching Network Configuration\n    + Updating Network Configuration\n    info:    network dnsserver register command OK\n\n**network dnsserver list**\n\n列出在你的网络配置中注册的所有 DNS 服务器。\n\n    ~$ azure network dnsserver list\n    info:    Executing command network dnsserver list\n    + Fetching Network Configuration\n    data:    DNS Server ID         DNS Server IP\n    data:    --------------------  --------------\n    data:    DNS-bb39b4ac34d66a86  44.55.22.11\n    data:    FrontEndDnsServer     98.138.253.109\n    info:    network dnsserver list command OK\n\n**network dnsserver unregister [options] &lt;dnsIP>**\n\n从网络配置中删除 DNS 服务器条目。\n\n    ~$ azure network dnsserver unregister 77.88.99.11\n    info:    Executing command network dnsserver unregister\n    + Fetching Network Configuration\n    Delete the DNS server entry dns-4 ( 77.88.99.11 ) %s ? (y/n) y\n    + Deleting the DNS server entry dns-4 ( 77.88.99.11 )\n    info:    network dnsserver unregister command OK\n\n<!---HONumber=79-->"
+}

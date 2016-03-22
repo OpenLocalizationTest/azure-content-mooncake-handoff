@@ -1,0 +1,411 @@
+{
+  "nodes": [
+    {
+      "content": "管理 HPC Pack 群集计算节点 | Azure",
+      "pos": [
+        24,
+        50
+      ]
+    },
+    {
+      "content": "了解 PowerShell 脚本工具如何添加、删除、启动和停止 Azure 的 HPC Pack 群集计算节点",
+      "pos": [
+        66,
+        121
+      ]
+    },
+    {
+      "content": "管理 Azure 的 HPC Pack 群集中计算节点的数量和可用性",
+      "pos": [
+        363,
+        397
+      ]
+    },
+    {
+      "pos": [
+        399,
+        485
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]"
+    },
+    {
+      "content": "如果你在 Azure VM 中创建了一个 HPC Pack 群集，你可能希望有轻松添加、删除、启动（设置）或停止（取消设置）群集中大量计算节点 VM 的方法。若要执行这些任务，请运行头节点 VM（从 HPC Pack 2012 R2 Update 1 开始）中安装的 Azure PowerShell 脚本。这些脚本可帮助你控制 HPC Pack 群集资源的数量和可用性，以便你可以控制成本。",
+      "pos": [
+        488,
+        684
+      ]
+    },
+    {
+      "pos": [
+        687,
+        746
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 脚本位于头节点上的 %CCP\\_HOME%bin 文件夹中。你必须以管理员身份运行各个脚本。"
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        751,
+        755
+      ]
+    },
+    {
+      "pos": [
+        759,
+        1039
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Azure VM 中的 HPC Pack 群集<ept id=\"p1\">**</ept> - 在经典（服务管理）部署模型中，使用 HPC Pack 2012 R2 Update 1 以上版本创建一个 HPC Pack 群集。例如，可以通过使用 Azure 库中的 HPC Pack VM 映像和 Azure PowerShell 脚本，自动执行部署。有关信息和先决条件，请参阅<bpt id=\"p2\">[</bpt>使用 HPC Pack IaaS 部署脚本创建 HPC 群集<ept id=\"p2\">](/documentation/articles/virtual-machines-hpcpack-cluster-powershell-script)</ept>。"
+    },
+    {
+      "pos": [
+        1043,
+        1084
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Azure 发布设置文件或管理证书<ept id=\"p1\">**</ept> - 你需要在头节点上执行下列操作之一："
+    },
+    {
+      "pos": [
+        1092,
+        1149
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>导入 Azure 发布设置文件<ept id=\"p1\">**</ept>。为此，在头节点上运行以下 Azure PowerShell cmdlet："
+    },
+    {
+      "pos": [
+        1289,
+        1436
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>在头节点上配置 Azure 管理证书<ept id=\"p1\">**</ept>。如果你有 .cer 文件，将其导入至 CurrentUser\\\\My certificate store，然后为 Azure 环境（AzureCloud 或 AzureChinaCloud）运行以下 Azure PowerShell cmdlet："
+    },
+    {
+      "content": "添加计算节点 VM",
+      "pos": [
+        1637,
+        1646
+      ]
+    },
+    {
+      "pos": [
+        1648,
+        1684
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>Add-HpcIaaSNode.ps1<ept id=\"p1\">**</ept> 脚本添加计算节点。"
+    },
+    {
+      "content": "语法",
+      "pos": [
+        1690,
+        1692
+      ]
+    },
+    {
+      "content": "Parameters",
+      "pos": [
+        1944,
+        1954
+      ]
+    },
+    {
+      "pos": [
+        1958,
+        2000
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>ServiceName<ept id=\"p1\">**</ept> - 云服务的名称，新计算节点 VM 将添加到该服务。"
+    },
+    {
+      "pos": [
+        2004,
+        2110
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>ImageName<ept id=\"p1\">**</ept> - Azure VM 映像名称，可以通过 Azure 管理门户或 Azure PowerShell cmdlet <bpt id=\"p2\">**</bpt>Get-AzureVMImage<ept id=\"p2\">**</ept> 获得。映像必须满足以下要求："
+    },
+    {
+      "content": "必须安装了 Windows 操作系统。",
+      "pos": [
+        2119,
+        2138
+      ]
+    },
+    {
+      "content": "HPC Pack 必须安装在计算节点角色中。",
+      "pos": [
+        2147,
+        2169
+      ]
+    },
+    {
+      "content": "映像的“用户”类别必须是私有映像，而不是公共 Azure VM 映像。",
+      "pos": [
+        2178,
+        2213
+      ]
+    },
+    {
+      "pos": [
+        2217,
+        2247
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Quantity<ept id=\"p1\">**</ept>- 要添加的计算节点 VM 的数量。"
+    },
+    {
+      "pos": [
+        2251,
+        2282
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>InstanceSize<ept id=\"p1\">**</ept> - 计算节点 VM 的大小。"
+    },
+    {
+      "pos": [
+        2286,
+        2326
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>DomainUserName<ept id=\"p1\">**</ept> - 域用户名称，用于将新 VM 加入到域。"
+    },
+    {
+      "pos": [
+        2330,
+        2362
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>DomainUserPassword<ept id=\"p1\">**</ept> - 域用户的密码。"
+    },
+    {
+      "pos": [
+        2366,
+        2516
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>NodeNameSeries<ept id=\"p1\">**</ept>（可选）- 计算节点的命名模式。格式必须为 &amp;lt;<bpt id=\"p2\">*</bpt>Root\\_Name<ept id=\"p2\">*</ept>&amp;gt;&amp;lt;<bpt id=\"p3\">*</bpt>Start\\_Number<ept id=\"p3\">*</ept>&amp;gt;%。例如，MyCN%10% 是指从 MyCN11 开始的一系列计算节点名称。如果未指定，脚本会使用 HPC 群集中配置的节点名称系列。"
+    },
+    {
+      "content": "示例",
+      "pos": [
+        2522,
+        2524
+      ]
+    },
+    {
+      "pos": [
+        2526,
+        2592
+      ],
+      "content": "下面的示例基于 VM 映像 <bpt id=\"p1\">*</bpt>hpccnimage1<ept id=\"p1\">*</ept>，在云服务 <bpt id=\"p2\">*</bpt>hpcservice1<ept id=\"p2\">*</ept> 中添加了 20 个大型计算节点 VM。"
+    },
+    {
+      "content": "删除计算节点 VM",
+      "pos": [
+        2783,
+        2792
+      ]
+    },
+    {
+      "pos": [
+        2794,
+        2833
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>Remove-HpcIaaSNode.ps1<ept id=\"p1\">**</ept> 脚本删除计算节点。"
+    },
+    {
+      "content": "语法",
+      "pos": [
+        2839,
+        2841
+      ]
+    },
+    {
+      "content": "Parameters",
+      "pos": [
+        3053,
+        3063
+      ]
+    },
+    {
+      "pos": [
+        3067,
+        3128
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Name<ept id=\"p1\">**</ept> - 要删除的群集节点的名称。支持通配符。参数集名称是“名称”。你无法指定<bpt id=\"p2\">**</bpt>名称<ept id=\"p2\">**</ept>和<bpt id=\"p3\">**</bpt>节点<ept id=\"p3\">**</ept>参数。"
+    },
+    {
+      "pos": [
+        3132,
+        3296
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Node<ept id=\"p1\">**</ept> - 要删除的节点的 HpcNode 对象，可通过 HPC PowerShell cmdlet <bpt id=\"p2\">[</bpt>Get-HpcNode<ept id=\"p2\">](https://technet.microsoft.com/zh-cn/library/dn887927.aspx)</ept> 获得。参数集名称是“节点”。你无法指定<bpt id=\"p3\">**</bpt>名称<ept id=\"p3\">**</ept>和<bpt id=\"p4\">**</bpt>节点<ept id=\"p4\">**</ept>参数。"
+    },
+    {
+      "pos": [
+        3300,
+        3337
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>DeleteVHD<ept id=\"p1\">**</ept>（可选）- 删除已删除 VM 的关联磁盘的设置。"
+    },
+    {
+      "pos": [
+        3341,
+        3377
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Force<ept id=\"p1\">**</ept>（可选）- 在删除 HPC 节点之前强制其脱机的设置。"
+    },
+    {
+      "pos": [
+        3381,
+        3409
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Confirm<ept id=\"p1\">**</ept>（可选）- 执行命令前的确认提示。"
+    },
+    {
+      "pos": [
+        3413,
+        3460
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>WhatIf<ept id=\"p1\">**</ept> - 一项设置，用于说明如果你执行了命令，但命令没有被实际执行时出现情况。"
+    },
+    {
+      "content": "示例",
+      "pos": [
+        3466,
+        3468
+      ]
+    },
+    {
+      "pos": [
+        3470,
+        3518
+      ],
+      "content": "下面的示例强制名称以 <bpt id=\"p1\">*</bpt>HPCNode-CN-<ept id=\"p1\">*</ept> 开头的脱机节点，然后删除这些节点及其关联磁盘。"
+    },
+    {
+      "content": "启动计算节点 VM",
+      "pos": [
+        3587,
+        3596
+      ]
+    },
+    {
+      "pos": [
+        3598,
+        3636
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>Start-HpcIaaSNode.ps1<ept id=\"p1\">**</ept> 脚本启动计算节点。"
+    },
+    {
+      "content": "语法",
+      "pos": [
+        3642,
+        3644
+      ]
+    },
+    {
+      "content": "Parameters",
+      "pos": [
+        3778,
+        3788
+      ]
+    },
+    {
+      "pos": [
+        3792,
+        3853
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Name<ept id=\"p1\">**</ept> - 要启动的群集节点的名称。支持通配符。参数集名称是“名称”。你无法指定<bpt id=\"p2\">**</bpt>名称<ept id=\"p2\">**</ept>和<bpt id=\"p3\">**</bpt>节点<ept id=\"p3\">**</ept>参数。"
+    },
+    {
+      "pos": [
+        3857,
+        4022
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Node<ept id=\"p1\">**</ept> - 要启动的节点的 HpcNode 对象，可以通过 HPC PowerShell cmdlet <bpt id=\"p2\">[</bpt>Get-HpcNode<ept id=\"p2\">](https://technet.microsoft.com/zh-cn/library/dn887927.aspx)</ept> 获得。参数集名称是“节点”。你无法指定<bpt id=\"p3\">**</bpt>名称<ept id=\"p3\">**</ept>和<bpt id=\"p4\">**</bpt>节点<ept id=\"p4\">**</ept>参数。"
+    },
+    {
+      "content": "示例",
+      "pos": [
+        4028,
+        4030
+      ]
+    },
+    {
+      "pos": [
+        4032,
+        4063
+      ],
+      "content": "下面的示例启动名称以 <bpt id=\"p1\">*</bpt>HPCNode-CN-<ept id=\"p1\">*</ept> 开头的节点。"
+    },
+    {
+      "content": "停止计算节点 VM",
+      "pos": [
+        4113,
+        4122
+      ]
+    },
+    {
+      "pos": [
+        4124,
+        4161
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>Stop-HpcIaaSNode.ps1<ept id=\"p1\">**</ept> 脚本停止计算节点。"
+    },
+    {
+      "content": "语法",
+      "pos": [
+        4167,
+        4169
+      ]
+    },
+    {
+      "content": "Parameters",
+      "pos": [
+        4319,
+        4329
+      ]
+    },
+    {
+      "pos": [
+        4334,
+        4395
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Name<ept id=\"p1\">**</ept> - 要停止的群集节点的名称。支持通配符。参数集名称是“名称”。你无法指定<bpt id=\"p2\">**</bpt>名称<ept id=\"p2\">**</ept>和<bpt id=\"p3\">**</bpt>节点<ept id=\"p3\">**</ept>参数。"
+    },
+    {
+      "pos": [
+        4399,
+        4563
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Node<ept id=\"p1\">**</ept> - 要停止的节点的 HpcNode 对象，可通过 HPC PowerShell cmdlet <bpt id=\"p2\">[</bpt>Get-HpcNode<ept id=\"p2\">](https://technet.microsoft.com/zh-cn/library/dn887927.aspx)</ept> 获得。参数集名称是“节点”。你无法指定<bpt id=\"p3\">**</bpt>名称<ept id=\"p3\">**</ept>和<bpt id=\"p4\">**</bpt>节点<ept id=\"p4\">**</ept>参数。"
+    },
+    {
+      "pos": [
+        4567,
+        4603
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Force<ept id=\"p1\">**</ept>（可选）- 在停止 HPC 节点之前强制其脱机的设置。"
+    },
+    {
+      "content": "示例",
+      "pos": [
+        4609,
+        4611
+      ]
+    },
+    {
+      "pos": [
+        4613,
+        4655
+      ],
+      "content": "下面的示例强制名称以 <bpt id=\"p1\">*</bpt>HPCNode-CN-<ept id=\"p1\">*</ept> 开头的脱机节点，然后停止这些节点。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        4711,
+        4715
+      ]
+    },
+    {
+      "pos": [
+        4719,
+        4876
+      ],
+      "content": "如果你想要有一种方法能够根据群集上作业及任务的当前工作负荷自动增加或减少群集节点，请参阅<bpt id=\"p1\">[</bpt>自动增加和减少 HPC Pack 群集中的 Azure 计算资源<ept id=\"p1\">](/documentation/articles/virtual-machines-hpcpack-cluster-node-autogrowshrink)</ept>。"
+    }
+  ],
+  "content": "<properties\n pageTitle=\"管理 HPC Pack 群集计算节点 | Azure\"\n description=\"了解 PowerShell 脚本工具如何添加、删除、启动和停止 Azure 的 HPC Pack 群集计算节点\"\n services=\"virtual-machines\"\n documentationCenter=\"\"\n authors=\"dlepow\"\n manager=\"timlt\"\n editor=\"\"\n tags=\"azure-service-management,hpc-pack\"/>\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"01/08/2016\"\n    wacn.date=\"02/26/2016\"/>\n\n# 管理 Azure 的 HPC Pack 群集中计算节点的数量和可用性\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]\n\n\n如果你在 Azure VM 中创建了一个 HPC Pack 群集，你可能希望有轻松添加、删除、启动（设置）或停止（取消设置）群集中大量计算节点 VM 的方法。若要执行这些任务，请运行头节点 VM（从 HPC Pack 2012 R2 Update 1 开始）中安装的 Azure PowerShell 脚本。这些脚本可帮助你控制 HPC Pack 群集资源的数量和可用性，以便你可以控制成本。\n\n>[AZURE.NOTE] 脚本位于头节点上的 %CCP\\_HOME%bin 文件夹中。你必须以管理员身份运行各个脚本。\n\n## 先决条件\n\n* **Azure VM 中的 HPC Pack 群集** - 在经典（服务管理）部署模型中，使用 HPC Pack 2012 R2 Update 1 以上版本创建一个 HPC Pack 群集。例如，可以通过使用 Azure 库中的 HPC Pack VM 映像和 Azure PowerShell 脚本，自动执行部署。有关信息和先决条件，请参阅[使用 HPC Pack IaaS 部署脚本创建 HPC 群集](/documentation/articles/virtual-machines-hpcpack-cluster-powershell-script)。\n\n* **Azure 发布设置文件或管理证书** - 你需要在头节点上执行下列操作之一：\n\n    * **导入 Azure 发布设置文件**。为此，在头节点上运行以下 Azure PowerShell cmdlet：\n\n            Get-AzurePublishSettingsFile\n\n            Import-AzurePublishSettingsFile -PublishSettingsFile <publish settings file>\n\n    * **在头节点上配置 Azure 管理证书**。如果你有 .cer 文件，将其导入至 CurrentUser\\\\My certificate store，然后为 Azure 环境（AzureCloud 或 AzureChinaCloud）运行以下 Azure PowerShell cmdlet：\n\n            Set-AzureSubscription -SubscriptionName <Sub Name> -SubscriptionId <Sub ID> -Certificate (Get-Item Cert:\\CurrentUser\\My<Cert Thrumbprint>) -Environment <AzureCloud | AzureChinaCloud>\n\n## 添加计算节点 VM\n\n使用 **Add-HpcIaaSNode.ps1** 脚本添加计算节点。\n\n### 语法\n\n    Add-HPCIaaSNode.ps1 [-ServiceName] <String> [-ImageName] <String> `\n        [-Quantity] <Int32> [-InstanceSize] <String> [-DomainUserName] <String> `\n        [[-DomainUserPassword] <String>] [[-NodeNameSeries] <String>] [<CommonParameters>]\n\n### Parameters\n\n* **ServiceName** - 云服务的名称，新计算节点 VM 将添加到该服务。\n\n* **ImageName** - Azure VM 映像名称，可以通过 Azure 管理门户或 Azure PowerShell cmdlet **Get-AzureVMImage** 获得。映像必须满足以下要求：\n\n    1. 必须安装了 Windows 操作系统。\n\n    2. HPC Pack 必须安装在计算节点角色中。\n\n    3. 映像的“用户”类别必须是私有映像，而不是公共 Azure VM 映像。\n\n* **Quantity**- 要添加的计算节点 VM 的数量。\n\n* **InstanceSize** - 计算节点 VM 的大小。\n\n* **DomainUserName** - 域用户名称，用于将新 VM 加入到域。\n\n* **DomainUserPassword** - 域用户的密码。\n\n* **NodeNameSeries**（可选）- 计算节点的命名模式。格式必须为 &lt;*Root\\_Name*&gt;&lt;*Start\\_Number*&gt;%。例如，MyCN%10% 是指从 MyCN11 开始的一系列计算节点名称。如果未指定，脚本会使用 HPC 群集中配置的节点名称系列。\n\n### 示例\n\n下面的示例基于 VM 映像 *hpccnimage1*，在云服务 *hpcservice1* 中添加了 20 个大型计算节点 VM。\n\n    Add-HPCIaaSNode.ps1 -ServiceName hpcservice1 -ImageName hpccniamge1 `\n        -Quantity 20 -InstanceSize Large -DomainUserName <username> `\n        -DomainUserPassword <password> `\n\n## 删除计算节点 VM\n\n使用 **Remove-HpcIaaSNode.ps1** 脚本删除计算节点。\n\n### 语法\n\n    Remove-HPCIaaSNode.ps1 -Name <String[]> [-DeleteVHD] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]\n\n    Remove-HPCIaaSNode.ps1 -Node <Object> [-DeleteVHD] [-Force] [-Confirm] [<CommonParameters>]\n\n### Parameters\n\n* **Name** - 要删除的群集节点的名称。支持通配符。参数集名称是“名称”。你无法指定**名称**和**节点**参数。\n\n* **Node** - 要删除的节点的 HpcNode 对象，可通过 HPC PowerShell cmdlet [Get-HpcNode](https://technet.microsoft.com/zh-cn/library/dn887927.aspx) 获得。参数集名称是“节点”。你无法指定**名称**和**节点**参数。\n\n* **DeleteVHD**（可选）- 删除已删除 VM 的关联磁盘的设置。\n\n* **Force**（可选）- 在删除 HPC 节点之前强制其脱机的设置。\n\n* **Confirm**（可选）- 执行命令前的确认提示。\n\n* **WhatIf** - 一项设置，用于说明如果你执行了命令，但命令没有被实际执行时出现情况。\n\n### 示例\n\n下面的示例强制名称以 *HPCNode-CN-* 开头的脱机节点，然后删除这些节点及其关联磁盘。\n\n    Remove-HPCIaaSNode.ps1 -Name HPCNodeCN-* -DeleteVHD -Force\n\n## 启动计算节点 VM\n\n使用 **Start-HpcIaaSNode.ps1** 脚本启动计算节点。\n\n### 语法\n\n    Start-HPCIaaSNode.ps1 -Name <String[]> [<CommonParameters>]\n\n    Start-HPCIaaSNode.ps1 -Node <Object> [<CommonParameters>]\n\n### Parameters\n\n* **Name** - 要启动的群集节点的名称。支持通配符。参数集名称是“名称”。你无法指定**名称**和**节点**参数。\n\n* **Node** - 要启动的节点的 HpcNode 对象，可以通过 HPC PowerShell cmdlet [Get-HpcNode](https://technet.microsoft.com/zh-cn/library/dn887927.aspx) 获得。参数集名称是“节点”。你无法指定**名称**和**节点**参数。\n\n### 示例\n\n下面的示例启动名称以 *HPCNode-CN-* 开头的节点。\n\n    Start-HPCIaaSNode.ps1 -Name HPCNodeCN-*\n\n## 停止计算节点 VM\n\n使用 **Stop-HpcIaaSNode.ps1** 脚本停止计算节点。\n\n### 语法\n\n    Stop-HPCIaaSNode.ps1 -Name <String[]> [-Force] [<CommonParameters>]\n\n    Stop-HPCIaaSNode.ps1 -Node <Object> [-Force] [<CommonParameters>]\n\n### Parameters\n\n\n* **Name** - 要停止的群集节点的名称。支持通配符。参数集名称是“名称”。你无法指定**名称**和**节点**参数。\n\n* **Node** - 要停止的节点的 HpcNode 对象，可通过 HPC PowerShell cmdlet [Get-HpcNode](https://technet.microsoft.com/zh-cn/library/dn887927.aspx) 获得。参数集名称是“节点”。你无法指定**名称**和**节点**参数。\n\n* **Force**（可选）- 在停止 HPC 节点之前强制其脱机的设置。\n\n### 示例\n\n下面的示例强制名称以 *HPCNode-CN-* 开头的脱机节点，然后停止这些节点。\n\n    Stop-HPCIaaSNode.ps1 -Name HPCNodeCN-* -Force\n\n## 后续步骤\n\n* 如果你想要有一种方法能够根据群集上作业及任务的当前工作负荷自动增加或减少群集节点，请参阅[自动增加和减少 HPC Pack 群集中的 Azure 计算资源](/documentation/articles/virtual-machines-hpcpack-cluster-node-autogrowshrink)。\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

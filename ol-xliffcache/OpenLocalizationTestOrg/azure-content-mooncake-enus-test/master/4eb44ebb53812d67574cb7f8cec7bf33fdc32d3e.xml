@@ -1,0 +1,705 @@
+{
+  "nodes": [
+    {
+      "content": "在两个 Azure 数据中心之间配置 HBase 复制 | Azure",
+      "pos": [
+        27,
+        62
+      ]
+    },
+    {
+      "content": "了解如何在两个 Azure 虚拟网络之间配置 VPN 连接，如何在两个虚拟网络之间配置域名解析，以及如何配置 HBase 地域复制",
+      "pos": [
+        81,
+        146
+      ]
+    },
+    {
+      "content": "在 HDInsight 中配置 HBase 地域复制",
+      "pos": [
+        359,
+        385
+      ]
+    },
+    {
+      "content": "配置 VPN 连接",
+      "pos": [
+        390,
+        399
+      ]
+    },
+    {
+      "content": "配置 DNS",
+      "pos": [
+        477,
+        483
+      ]
+    },
+    {
+      "content": "配置 HBase 复制",
+      "pos": [
+        559,
+        570
+      ]
+    },
+    {
+      "content": "了解如何跨两个数据中心配置 HBase 复制。群集复制的部分用例包括：",
+      "pos": [
+        632,
+        667
+      ]
+    },
+    {
+      "content": "备份和灾难恢复",
+      "pos": [
+        671,
+        678
+      ]
+    },
+    {
+      "content": "数据聚合",
+      "pos": [
+        681,
+        685
+      ]
+    },
+    {
+      "content": "地理数据分布",
+      "pos": [
+        688,
+        694
+      ]
+    },
+    {
+      "content": "联机数据引入并结合脱机数据分析",
+      "pos": [
+        697,
+        712
+      ]
+    },
+    {
+      "pos": [
+        714,
+        963
+      ],
+      "content": "群集复制使用源推送方法。HBase 群集可以是一个源、目标，也可以同时充当这两个角色。复制是异步的，复制的目标是保持最终一致性。当源接收到对列系列的编辑并启用复制时，该编辑将传播到所有目标群集。当将数据从一个群集复制到另一个群集，将会跟踪源群集和所有已使用数据的群集，以防止复制循环。在本教程中，你将要配置源-目标复制。对于其他群集拓扑，请参阅 <bpt id=\"p1\">[</bpt>Apache HBase 参考指南<ept id=\"p1\">](http://hbase.apache.org/book.html#_cluster_replication)</ept>。"
+    },
+    {
+      "content": "这是系列教程的第三个部分：",
+      "pos": [
+        965,
+        978
+      ]
+    },
+    {
+      "content": "在两个虚拟网络之间配置 VPN 连接",
+      "pos": [
+        983,
+        1001
+      ]
+    },
+    {
+      "content": "为虚拟网络配置 DNS",
+      "pos": [
+        1040,
+        1051
+      ]
+    },
+    {
+      "content": "配置 HBase 地域复制（本教程）",
+      "pos": [
+        1088,
+        1106
+      ]
+    },
+    {
+      "pos": [
+        1108,
+        1236
+      ],
+      "content": "下图演示了你<bpt id=\"p1\">[</bpt>在配置两个虚拟网络之间的 VPN 连接<ept id=\"p1\">][hdinsight-hbase-geo-replication-vnet]</ept>和<bpt id=\"p2\">[</bpt>为虚拟网络配置 DNS<ept id=\"p2\">][hdinsight-hbase-replication-dns]</ept>中创建的两个虚拟网络和网络连接："
+    },
+    {
+      "content": "HDInsight HBase 复制虚拟网络示意图",
+      "pos": [
+        1240,
+        1265
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a id=\"prerequisites\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>先决条件",
+      "pos": [
+        1288,
+        1318
+      ]
+    },
+    {
+      "content": "在开始阅读本教程前，你必须具有：",
+      "pos": [
+        1319,
+        1335
+      ]
+    },
+    {
+      "pos": [
+        1339,
+        1467
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>一个 Azure 订阅<ept id=\"p1\">**</ept>。Azure 是基于订阅的平台。有关获取订阅的详细信息，请参阅 [购买选项][azure-purchase-options]、[会员优惠][azure-member-offers] 或 [免费试用][azure-trial]。"
+    },
+    {
+      "pos": [
+        1471,
+        1669
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>已安装并已配置 Azure PowerShell 的工作站<ept id=\"p1\">**</ept>。有关说明，请参阅 [安装和配置 Azure PowerShell][powershell-install]。若要执行 PowerShell 脚本，必须以管理员身份运行 Azure PowerShell 并将执行策略设为 <bpt id=\"p2\">*</bpt>RemoteSigned<ept id=\"p2\">*</ept>。请参阅 [使用 Set-ExecutionPolicy cmdlet][2]。"
+    },
+    {
+      "pos": [
+        1673,
+        1836
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>已配置 VPN 连接和 DNS 的两个 Azure 虚拟网络<ept id=\"p1\">**</ept>。有关说明，请参阅<bpt id=\"p2\">[</bpt>在两个 Azure 虚拟网络之间配置 VPN 连接<ept id=\"p2\">][hdinsight-hbase-replication-vnet]</ept>和<bpt id=\"p3\">[</bpt>在两个 Azure 虚拟网络之间配置 DNS<ept id=\"p3\">][hdinsight-hbase-replication-dns]</ept>。"
+    },
+    {
+      "content": "在 HDInsight 中设置 HBase 群集",
+      "pos": [
+        2055,
+        2079
+      ]
+    },
+    {
+      "pos": [
+        2081,
+        2262
+      ],
+      "content": "在<bpt id=\"p1\">[</bpt>在两个 Azure 虚拟网络之间配置 VPN 连接<ept id=\"p1\">][hdinsight-hbase-replication-vnet]</ept>中，你已分别在欧洲数据中心和美国数据中心各创建了一个虚拟网络。这两个虚拟网络将通过 VPN 连接。在本课中，你将要在其中的每个虚拟网络中设置 HBase 群集。在本教程的后面，你将使其中一个 HBase 群集复制另一个 HBase 群集。"
+    },
+    {
+      "pos": [
+        2264,
+        2479
+      ],
+      "content": "Azure 门户不支持使用自定义配置选项设置 HDInsight 群集。例如，将 <bpt id=\"p1\">*</bpt>hbase.replication<ept id=\"p1\">*</ept> 设置为 <bpt id=\"p2\">*</bpt>true<ept id=\"p2\">*</ept>。如果设置群集后在配置文件中设置该值，你将在重新创建群集映像后丢失该设置。有关详细信息，请参阅<bpt id=\"p3\">[</bpt>在 HDInsight 中预配 Hadoop 群集<ept id=\"p3\">][hdinsight-provision]</ept>。使用自定义选项设置 HDInsight 群集的选项之一是使用 Azure PowerShell。"
+    },
+    {
+      "content": "在 Contoso-VNet-CN 中预配 HBase 群集",
+      "pos": [
+        2484,
+        2514
+      ]
+    },
+    {
+      "content": "在工作站上打开 Windows PowerShell ISE。",
+      "pos": [
+        2521,
+        2552
+      ]
+    },
+    {
+      "content": "设置脚本开头位置的变量，然后运行该脚本。",
+      "pos": [
+        2556,
+        2576
+      ]
+    },
+    {
+      "content": "在 Contoso-VNet-CE 中预配 HBase 群集",
+      "pos": [
+        5932,
+        5962
+      ]
+    },
+    {
+      "content": "使用包含以下值的同一个脚本：",
+      "pos": [
+        5968,
+        5982
+      ]
+    },
+    {
+      "content": "由于你已连接到 Azure 帐户，因此不再需要运行以下 cmdlet：",
+      "pos": [
+        6226,
+        6261
+      ]
+    },
+    {
+      "content": "配置 DNS 条件转发器",
+      "pos": [
+        6380,
+        6392
+      ]
+    },
+    {
+      "pos": [
+        6394,
+        6502
+      ],
+      "content": "在<bpt id=\"p1\">[</bpt>为虚拟网络配置 DNS<ept id=\"p1\">][hdinsight-hbase-replication-dns]</ept> 中，你已经为两个网络配置了 DNS 服务器。HBase 群集具有不同的域后缀。因此，你需要配置其他 DNS 条件转发器。"
+    },
+    {
+      "content": "若要配置条件转发器，你需要知道两个 HBase 群集的域后缀。",
+      "pos": [
+        6504,
+        6535
+      ]
+    },
+    {
+      "content": "查找两个 HBase 群集的域后缀",
+      "pos": [
+        6539,
+        6556
+      ]
+    },
+    {
+      "pos": [
+        6563,
+        6685
+      ],
+      "content": "通过 RDP 访问 <bpt id=\"p1\">**</bpt>Contoso-HBase-EU<ept id=\"p1\">**</ept>。有关说明，请参阅<bpt id=\"p2\">[</bpt>使用 Azure 门户在 HDInsight 中管理 Hadoop 群集<ept id=\"p2\">][hdinsight-manage-portal]</ept>。它实际上是群集的 headnode0。"
+    },
+    {
+      "content": "打开 Windows PowerShell 控制台或命令提示符。",
+      "pos": [
+        6689,
+        6721
+      ]
+    },
+    {
+      "pos": [
+        6725,
+        6762
+      ],
+      "content": "运行 <bpt id=\"p1\">**</bpt>ipconfig<ept id=\"p1\">**</ept>，并记下<bpt id=\"p2\">**</bpt>特定于连接的 DNS 后缀<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "请不要关闭 RDP 会话。稍后你要使用它来测试域名解析。",
+      "pos": [
+        6766,
+        6794
+      ]
+    },
+    {
+      "pos": [
+        6798,
+        6850
+      ],
+      "content": "重复相同的步骤，以找出 <bpt id=\"p1\">**</bpt>Contoso-HBase-US<ept id=\"p1\">**</ept> 的<bpt id=\"p2\">**</bpt>特定于连接的 DNS 后缀<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "配置 DNS 转发器",
+      "pos": [
+        6855,
+        6865
+      ]
+    },
+    {
+      "pos": [
+        6874,
+        6903
+      ],
+      "content": "通过 RDP 访问 <bpt id=\"p1\">**</bpt>Contoso-DNS-CN<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "单击左下角的 Windows 键。",
+      "pos": [
+        6909,
+        6926
+      ]
+    },
+    {
+      "content": "单击“管理工具”。",
+      "pos": [
+        6931,
+        6940
+      ]
+    },
+    {
+      "content": "单击“DNS”。",
+      "pos": [
+        6945,
+        6953
+      ]
+    },
+    {
+      "content": "在左窗格中，展开“DSN”、“Contoso-DNS-CN”。",
+      "pos": [
+        6958,
+        6989
+      ]
+    },
+    {
+      "content": "右键单击“条件转发器”，然后单击“新建条件转发器”。",
+      "pos": [
+        6994,
+        7020
+      ]
+    },
+    {
+      "content": "输入以下信息：",
+      "pos": [
+        7026,
+        7033
+      ]
+    },
+    {
+      "pos": [
+        7040,
+        7128
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>DNS 域<ept id=\"p1\">**</ept>：输入 Contoso-HBase-US 的 DNS 后缀。示例：Contoso-HBase-US.f5.internal.chinacloudapp.cn."
+    },
+    {
+      "pos": [
+        7135,
+        7221
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>主服务器的 IP 地址<ept id=\"p1\">**</ept>：输入 10.2.0.4，这是 Contoso-DNS-CE 的 IP 地址。请验证该 IP。你的 DNS 服务器可以具有不同的 IP 地址。"
+    },
+    {
+      "pos": [
+        7226,
+        7296
+      ],
+      "content": "按 <bpt id=\"p1\">**</bpt>ENTER<ept id=\"p1\">**</ept>，然后单击“确定”。现在，你可以从 Contoso-DNS-CN 解析 Contoso-DNS-CE 的 IP 地址。"
+    },
+    {
+      "content": "重复上述步骤，以使用以下值将 DNS 条件转发器添加到 Contoso-DNS-CE 虚拟机上的 DNS 服务：",
+      "pos": [
+        7301,
+        7357
+      ]
+    },
+    {
+      "pos": [
+        7364,
+        7403
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>DNS 域<ept id=\"p1\">**</ept>：输入 Contoso-HBase-EU 的 DNS 后缀。"
+    },
+    {
+      "pos": [
+        7411,
+        7465
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>主服务器的 IP 地址<ept id=\"p1\">**</ept>：输入 10.2.0.4，这是 Contoso-DNS-CN 的 IP 地址。"
+    },
+    {
+      "content": "测试域名解析",
+      "pos": [
+        7469,
+        7475
+      ]
+    },
+    {
+      "content": "切换到 Contoso-HBase-EU RDP 窗口。",
+      "pos": [
+        7482,
+        7510
+      ]
+    },
+    {
+      "content": "打开命令提示符。",
+      "pos": [
+        7514,
+        7522
+      ]
+    },
+    {
+      "content": "运行 ping 命令：",
+      "pos": [
+        7526,
+        7537
+      ]
+    },
+    {
+      "content": "HBase 群集的辅助节点将打开 ICM 协议",
+      "pos": [
+        7600,
+        7623
+      ]
+    },
+    {
+      "content": "请不要关闭 RDP 会话。本教程后面的步骤中仍会用到它。",
+      "pos": [
+        7628,
+        7656
+      ]
+    },
+    {
+      "content": "重复相同的步骤，以从 Contoso-HBase-US ping Contoso-HBase-EU 的 headnode0。",
+      "pos": [
+        7660,
+        7722
+      ]
+    },
+    {
+      "pos": [
+        7725,
+        7764
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>在继续后面的步骤之前，DNS 必须正常工作。"
+    },
+    {
+      "content": "在 HBase 表之间启用复制",
+      "pos": [
+        7768,
+        7783
+      ]
+    },
+    {
+      "content": "现在，你可以创建示例 HBase 表，启用复制，然后使用一些数据对其进行测试。要使用的示例表包含两个列系列：“个人”和“办公”。",
+      "pos": [
+        7785,
+        7849
+      ]
+    },
+    {
+      "content": "在本教程中，你要将欧洲 HBase 群集用作源群集，将美国HBase 群集用作目标群集。",
+      "pos": [
+        7851,
+        7895
+      ]
+    },
+    {
+      "pos": [
+        7897,
+        8034
+      ],
+      "content": "在源和目标群集上创建具有相同名称和列系列的 HBase 表，使目标群集知道在何处存储它要接收的数据。有关使用 HBase shell 的详细信息，请参阅 <bpt id=\"p1\">[</bpt>HDInsight 中的 Apache HBase 入门<ept id=\"p1\">][hdinsight-hbase-get-started]</ept>。"
+    },
+    {
+      "content": "在 Contoso-HBase-EU 中创建 HBase 表",
+      "pos": [
+        8038,
+        8068
+      ]
+    },
+    {
+      "pos": [
+        8075,
+        8107
+      ],
+      "content": "切换到 <bpt id=\"p1\">**</bpt>Contoso-HBase-EU<ept id=\"p1\">**</ept> RDP 窗口。"
+    },
+    {
+      "content": "在桌面上单击“Hadoop 命令行”。",
+      "pos": [
+        8111,
+        8130
+      ]
+    },
+    {
+      "content": "将文件夹更改为 HBase 主目录：",
+      "pos": [
+        8134,
+        8152
+      ]
+    },
+    {
+      "content": "打开 HBase shell：",
+      "pos": [
+        8185,
+        8200
+      ]
+    },
+    {
+      "content": "创建 HBase 表：",
+      "pos": [
+        8225,
+        8236
+      ]
+    },
+    {
+      "content": "请不要关闭 RDP 会话和 Hadoop 命令行窗口。本教程后面的步骤中仍会用到它们。",
+      "pos": [
+        8289,
+        8332
+      ]
+    },
+    {
+      "content": "在 Contoso-HBase-US 中创建 HBase 表",
+      "pos": [
+        8340,
+        8370
+      ]
+    },
+    {
+      "content": "重复相同的步骤，在 Contoso-HBase-US 中创建相同的表。",
+      "pos": [
+        8376,
+        8411
+      ]
+    },
+    {
+      "content": "将 Contoso-HBase-US 添加为复制对等方",
+      "pos": [
+        8416,
+        8443
+      ]
+    },
+    {
+      "pos": [
+        8450,
+        8482
+      ],
+      "content": "切换到 <bpt id=\"p1\">**</bpt>Contoso-HBase-EU<ept id=\"p1\">**</ept> RDP 窗口。"
+    },
+    {
+      "content": "在 HBase shell 窗口中，添加目标群集 (Contoso-HBase-US) 作为对等方，例如：",
+      "pos": [
+        8486,
+        8539
+      ]
+    },
+    {
+      "pos": [
+        8753,
+        8849
+      ],
+      "content": "在示例中，域后缀是 <bpt id=\"p1\">*</bpt>contoso-hbase us.d4.internal.chinacloudapp.cn<ept id=\"p1\">*</ept>。你需要更新它，以匹配美国 HBase 群集的域后缀。确保主机名之间没有空格。"
+    },
+    {
+      "content": "配置要在源群集上复制的每个列系列",
+      "pos": [
+        8853,
+        8869
+      ]
+    },
+    {
+      "pos": [
+        8876,
+        8934
+      ],
+      "content": "从 <bpt id=\"p1\">**</bpt>Contso-HBase-EU<ept id=\"p1\">**</ept> RDP 会话的 HBase shell 窗口中，配置要复制的每个列系列："
+    },
+    {
+      "content": "将数据批量上载到 HBase 表",
+      "pos": [
+        9136,
+        9152
+      ]
+    },
+    {
+      "content": "已使用以下 URL 将一个示例数据文件上载到公共 Azure Blob 容器：",
+      "pos": [
+        9156,
+        9195
+      ]
+    },
+    {
+      "content": "文件的内容：",
+      "pos": [
+        9278,
+        9284
+      ]
+    },
+    {
+      "content": "可以将同一个数据文件上载到 HBase 群集中，并从那里导入数据。",
+      "pos": [
+        9931,
+        9964
+      ]
+    },
+    {
+      "pos": [
+        9969,
+        10001
+      ],
+      "content": "切换到 <bpt id=\"p1\">**</bpt>Contoso-HBase-EU<ept id=\"p1\">**</ept> RDP 窗口。"
+    },
+    {
+      "content": "在桌面上单击“Hadoop 命令行”。",
+      "pos": [
+        10005,
+        10024
+      ]
+    },
+    {
+      "content": "将文件夹更改为 HBase 主目录：",
+      "pos": [
+        10028,
+        10046
+      ]
+    },
+    {
+      "content": "上载数据：",
+      "pos": [
+        10080,
+        10085
+      ]
+    },
+    {
+      "content": "验证数据复制是否正在进行",
+      "pos": [
+        10442,
+        10454
+      ]
+    },
+    {
+      "content": "你可以通过使用以下 HBase shell 命令扫描两个群集中的表，来验证复制是否正在进行：",
+      "pos": [
+        10456,
+        10502
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        10532,
+        10536
+      ]
+    },
+    {
+      "content": "在本教程中，你已学习如何跨两个数据中心配置 HBase 复制。若要了解有关 HDInsight 和 HBase 的详细信息，请参阅：",
+      "pos": [
+        10538,
+        10604
+      ]
+    },
+    {
+      "content": "HDInsight 服务页",
+      "pos": [
+        10609,
+        10622
+      ]
+    },
+    {
+      "content": "HDInsight 文档",
+      "pos": [
+        10654,
+        10666
+      ]
+    },
+    {
+      "content": "开始在 HDInsight 中使用 Apache HBase",
+      "pos": [
+        10707,
+        10737
+      ]
+    },
+    {
+      "content": "HDInsight HBase 概述",
+      "pos": [
+        10771,
+        10789
+      ]
+    },
+    {
+      "content": "在 Azure 虚拟网络上设置 HBase 群集",
+      "pos": [
+        10820,
+        10844
+      ]
+    },
+    {
+      "content": "使用 HDInsight (Hadoop) 中的 Storm 和 HBase 分析传感器数据",
+      "pos": [
+        10884,
+        10930
+      ]
+    }
+  ],
+  "content": "<properties \n   pageTitle=\"在两个 Azure 数据中心之间配置 HBase 复制 | Azure\" \n   description=\"了解如何在两个 Azure 虚拟网络之间配置 VPN 连接，如何在两个虚拟网络之间配置域名解析，以及如何配置 HBase 地域复制\" \n   services=\"hdinsight\" \n   documentationCenter=\"\" \n   authors=\"mumian\" \n   manager=\"paulettm\" \n   editor=\"cgronlun\"/>\n\n<tags\n    ms.service=\"hdinsight\"\n    ms.date=\"12/02/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n# 在 HDInsight 中配置 HBase 地域复制\n\n- [配置 VPN 连接](/documentation/articles/hdinsight-hbase-geo-replication-configure-VNets)\n- [配置 DNS](/documentation/articles/hdinsight-hbase-geo-replication-configure-DNS)\n- [配置 HBase 复制](/documentation/articles/hdinsight-hbase-geo-replication) \n \n了解如何跨两个数据中心配置 HBase 复制。群集复制的部分用例包括：\n\n- 备份和灾难恢复\n- 数据聚合\n- 地理数据分布\n- 联机数据引入并结合脱机数据分析\n\n群集复制使用源推送方法。HBase 群集可以是一个源、目标，也可以同时充当这两个角色。复制是异步的，复制的目标是保持最终一致性。当源接收到对列系列的编辑并启用复制时，该编辑将传播到所有目标群集。当将数据从一个群集复制到另一个群集，将会跟踪源群集和所有已使用数据的群集，以防止复制循环。在本教程中，你将要配置源-目标复制。对于其他群集拓扑，请参阅 [Apache HBase 参考指南](http://hbase.apache.org/book.html#_cluster_replication)。\n\n这是系列教程的第三个部分：\n\n- [在两个虚拟网络之间配置 VPN 连接][hdinsight-hbase-replication-vnet]\n- [为虚拟网络配置 DNS][hdinsight-hbase-replication-dns]\n- 配置 HBase 地域复制（本教程）\n\n下图演示了你[在配置两个虚拟网络之间的 VPN 连接][hdinsight-hbase-geo-replication-vnet]和[为虚拟网络配置 DNS][hdinsight-hbase-replication-dns]中创建的两个虚拟网络和网络连接：\n\n![HDInsight HBase 复制虚拟网络示意图][img-vnet-diagram]\n\n##<a id=\"prerequisites\"></a>先决条件\n在开始阅读本教程前，你必须具有：\n\n- **一个 Azure 订阅**。Azure 是基于订阅的平台。有关获取订阅的详细信息，请参阅 [购买选项][azure-purchase-options]、[会员优惠][azure-member-offers] 或 [免费试用][azure-trial]。\n\n- **已安装并已配置 Azure PowerShell 的工作站**。有关说明，请参阅 [安装和配置 Azure PowerShell][powershell-install]。若要执行 PowerShell 脚本，必须以管理员身份运行 Azure PowerShell 并将执行策略设为 *RemoteSigned*。请参阅 [使用 Set-ExecutionPolicy cmdlet][2]。\n\n- **已配置 VPN 连接和 DNS 的两个 Azure 虚拟网络**。有关说明，请参阅[在两个 Azure 虚拟网络之间配置 VPN 连接][hdinsight-hbase-replication-vnet]和[在两个 Azure 虚拟网络之间配置 DNS][hdinsight-hbase-replication-dns]。\n\n\n    在运行 PowerShell 脚本之前，请确保你已使用以下 cmdlet 连接到 Azure 订阅：\n\n        Add-AzureAccount -Environment AzureChinaCloud\n\n    如果你有多个 Azure 订阅，请使用以下 cmdlet 来设置当前订阅：\n\n        Select-AzureSubscription <AzureSubscriptionName>\n\n\n\n##在 HDInsight 中设置 HBase 群集\n\n在[在两个 Azure 虚拟网络之间配置 VPN 连接][hdinsight-hbase-replication-vnet]中，你已分别在欧洲数据中心和美国数据中心各创建了一个虚拟网络。这两个虚拟网络将通过 VPN 连接。在本课中，你将要在其中的每个虚拟网络中设置 HBase 群集。在本教程的后面，你将使其中一个 HBase 群集复制另一个 HBase 群集。\n\nAzure 门户不支持使用自定义配置选项设置 HDInsight 群集。例如，将 *hbase.replication* 设置为 *true*。如果设置群集后在配置文件中设置该值，你将在重新创建群集映像后丢失该设置。有关详细信息，请参阅[在 HDInsight 中预配 Hadoop 群集][hdinsight-provision]。使用自定义选项设置 HDInsight 群集的选项之一是使用 Azure PowerShell。\n\n\n**在 Contoso-VNet-CN 中预配 HBase 群集**\n\n1. 在工作站上打开 Windows PowerShell ISE。\n2. 设置脚本开头位置的变量，然后运行该脚本。\n\n        # create hbase cluster with replication enabled\n        \n        $azureSubscriptionName = \"[AzureSubscriptionName]\"\n        \n        $hbaseClusterName = \"Contoso-HBase-EU\" # This is the HBase cluster name to be used.\n        $hbaseClusterSize = 1   # You must provision a cluster that contains at least 3 nodes for high availability of the HBase services.\n        $hadoopUserLogin = \"[HadoopUserName]\"\n        $hadoopUserpw = \"[HadoopUserPassword]\"\n        \n        $vNetName = \"Contoso-VNet-CN\"  # This name must match your Europe virtual network name.\n        $subNetName = 'Subnet-1' # This name must match your Europe virtual network subnet name.  The default name is \"Subnet-1\".\n        \n        $storageAccountName = 'ContosoStoreEU'  # The script will create this storage account for you.  The storage account name doesn't support hyphens. \n        $storageAccountName = $storageAccountName.ToLower() #Storage account name must be in lower case.\n        $blobContainerName = $hbaseClusterName.ToLower()  #Use the cluster name as the default container name.\n        \n        #connect to your Azure subscription\n        Add-AzureAccount -Environment AzureChinaCloud \n        Select-AzureSubscription $azureSubscriptionName\n        \n        # Create a storage account used by the HBase cluster\n        $location = Get-AzureVNetSite -VNetName $vNetName | %{$_.Location} # use the virtual network location\n        New-AzureStorageAccount -StorageAccountName $storageAccountName -Location $location\n        \n        # Create a blob container used by the HBase cluster\n        $storageAccountKey = Get-AzureStorageKey -StorageAccountName $storageAccountName | %{$_.Primary}\n        $storageContext = New-AzureStorageContext -StorageAccountName $storageAccountName -StorageAccountKey $storageAccountKey\n        New-AzureStorageContainer -Name $blobContainerName -Context $storageContext\n        \n        # Create provision configuration object\n        $hbaseConfigValues = new-object 'Microsoft.WindowsAzure.Management.HDInsight.Cmdlet.DataObjects.AzureHDInsightHBaseConfiguration'\n            \n        $hbaseConfigValues.Configuration = @{ \"hbase.replication\"=\"true\" } #this modifies the hbase-site.xml file\n        \n        # retrieve vnet id based on vnetname\n        $vNetID = Get-AzureVNetSite -VNetName $vNetName | %{$_.id}\n        \n        $config = New-AzureHDInsightClusterConfig `\n                        -ClusterSizeInNodes $hbaseClusterSize `\n                        -ClusterType HBase `\n                        -VirtualNetworkId $vNetID `\n                        -SubnetName $subNetName `\n                    | Set-AzureHDInsightDefaultStorage `\n                        -StorageAccountName $storageAccountName `\n                        -StorageAccountKey $storageAccountKey `\n                        -StorageContainerName $blobContainerName `\n                    | Add-AzureHDInsightConfigValues `\n                        -HBase $hbaseConfigValues\n        \n        # provision HDInsight cluster\n        $hadoopUserPassword = ConvertTo-SecureString -String $hadoopUserpw -AsPlainText -Force     \n        $credential = New-Object System.Management.Automation.PSCredential($hadoopUserLogin,$hadoopUserPassword)\n        \n        $config | New-AzureHDInsightCluster -Name $hbaseClusterName -Location $location -Credential $credential\n\n\n\n**在 Contoso-VNet-CE 中预配 HBase 群集**\n\n- 使用包含以下值的同一个脚本：\n\n        $hbaseClusterName = \"Contoso-HBase-US\" # This is the HBase cluster name to be used.\n        $vNetName = \"Contoso-VNet-CE\"  # This name must match your Europe virtual network name.\n        $storageAccountName = 'ContosoStoreUS'  \n\n    由于你已连接到 Azure 帐户，因此不再需要运行以下 cmdlet：\n\n        Add-AzureAccount -Environment AzureChinaCloud \n        Select-AzureSubscription $azureSubscriptionName\n\n\n\n\n# 配置 DNS 条件转发器\n\n在[为虚拟网络配置 DNS][hdinsight-hbase-replication-dns] 中，你已经为两个网络配置了 DNS 服务器。HBase 群集具有不同的域后缀。因此，你需要配置其他 DNS 条件转发器。\n\n若要配置条件转发器，你需要知道两个 HBase 群集的域后缀。\n\n**查找两个 HBase 群集的域后缀**\n\n1. 通过 RDP 访问 **Contoso-HBase-EU**。有关说明，请参阅[使用 Azure 门户在 HDInsight 中管理 Hadoop 群集][hdinsight-manage-portal]。它实际上是群集的 headnode0。\n2. 打开 Windows PowerShell 控制台或命令提示符。\n3. 运行 **ipconfig**，并记下**特定于连接的 DNS 后缀**。\n4. 请不要关闭 RDP 会话。稍后你要使用它来测试域名解析。\n5. 重复相同的步骤，以找出 **Contoso-HBase-US** 的**特定于连接的 DNS 后缀**。\n\n\n**配置 DNS 转发器**\n \n1.  通过 RDP 访问 **Contoso-DNS-CN**。 \n2.  单击左下角的 Windows 键。\n2.  单击“管理工具”。\n3.  单击“DNS”。\n4.  在左窗格中，展开“DSN”、“Contoso-DNS-CN”。\n5.  右键单击“条件转发器”，然后单击“新建条件转发器”。 \n5.  输入以下信息：\n    - **DNS 域**：输入 Contoso-HBase-US 的 DNS 后缀。示例：Contoso-HBase-US.f5.internal.chinacloudapp.cn.\n    - **主服务器的 IP 地址**：输入 10.2.0.4，这是 Contoso-DNS-CE 的 IP 地址。请验证该 IP。你的 DNS 服务器可以具有不同的 IP 地址。\n6.  按 **ENTER**，然后单击“确定”。现在，你可以从 Contoso-DNS-CN 解析 Contoso-DNS-CE 的 IP 地址。\n7.  重复上述步骤，以使用以下值将 DNS 条件转发器添加到 Contoso-DNS-CE 虚拟机上的 DNS 服务：\n    - **DNS 域**：输入 Contoso-HBase-EU 的 DNS 后缀。 \n    - **主服务器的 IP 地址**：输入 10.2.0.4，这是 Contoso-DNS-CN 的 IP 地址。\n\n**测试域名解析**\n\n1. 切换到 Contoso-HBase-EU RDP 窗口。\n2. 打开命令提示符。\n3. 运行 ping 命令：\n\n        ping headnode0.[DNS suffix of Contoso-HBase-US]\n\n    HBase 群集的辅助节点将打开 ICM 协议\n\n4. 请不要关闭 RDP 会话。本教程后面的步骤中仍会用到它。\n5. 重复相同的步骤，以从 Contoso-HBase-US ping Contoso-HBase-EU 的 headnode0。\n\n>[AZURE.IMPORTANT]在继续后面的步骤之前，DNS 必须正常工作。\n\n##在 HBase 表之间启用复制\n\n现在，你可以创建示例 HBase 表，启用复制，然后使用一些数据对其进行测试。要使用的示例表包含两个列系列：“个人”和“办公”。\n\n在本教程中，你要将欧洲 HBase 群集用作源群集，将美国HBase 群集用作目标群集。\n\n在源和目标群集上创建具有相同名称和列系列的 HBase 表，使目标群集知道在何处存储它要接收的数据。有关使用 HBase shell 的详细信息，请参阅 [HDInsight 中的 Apache HBase 入门][hdinsight-hbase-get-started]。\n\n**在 Contoso-HBase-EU 中创建 HBase 表**\n\n1. 切换到 **Contoso-HBase-EU** RDP 窗口。\n2. 在桌面上单击“Hadoop 命令行”。\n2. 将文件夹更改为 HBase 主目录：\n\n        cd %HBASE_HOME%\\bin\n3. 打开 HBase shell：\n\n        hbase shell\n4. 创建 HBase 表：\n\n        create 'Contacts', 'Personal', 'Office'\n5. 请不要关闭 RDP 会话和 Hadoop 命令行窗口。本教程后面的步骤中仍会用到它们。\n    \n**在 Contoso-HBase-US 中创建 HBase 表**\n\n- 重复相同的步骤，在 Contoso-HBase-US 中创建相同的表。\n\n\n**将 Contoso-HBase-US 添加为复制对等方**\n\n1. 切换到 **Contoso-HBase-EU** RDP 窗口。\n2. 在 HBase shell 窗口中，添加目标群集 (Contoso-HBase-US) 作为对等方，例如：\n\n        add_peer '1', 'zookeeper0.contoso-hbase-us.d4.internal.chinacloudapp.cn,zookeeper1.contoso-hbase-us.d4.internal.chinacloudapp.cn,zookeeper2.contoso-hbase-us.d4.internal.chinacloudapp.cn:2181:/hbase'\n\n    在示例中，域后缀是 *contoso-hbase us.d4.internal.chinacloudapp.cn*。你需要更新它，以匹配美国 HBase 群集的域后缀。确保主机名之间没有空格。\n\n**配置要在源群集上复制的每个列系列**\n\n1. 从 **Contso-HBase-EU** RDP 会话的 HBase shell 窗口中，配置要复制的每个列系列：\n\n        disable 'Contacts'\n        alter 'Contacts', {NAME => 'Personal', REPLICATION_SCOPE => '1'}\n        alter 'Contacts', {NAME => 'Office', REPLICATION_SCOPE => '1'}\n        enable 'Contacts'\n\n**将数据批量上载到 HBase 表**\n\n已使用以下 URL 将一个示例数据文件上载到公共 Azure Blob 容器：\n\n        wasb://hbasecontacts@hditutorialdata.blob.core.windows.net/contacts.txt\n\n文件的内容：\n\n        8396    Calvin Raji 230-555-0191    5415 San Gabriel Dr.\n        16600   Karen Wu    646-555-0113    9265 La Paz\n        4324    Karl Xie    508-555-0163    4912 La Vuelta\n        16891   Jonathan Jackson    674-555-0110    40 Ellis St.\n        3273    Miguel Miller   397-555-0155    6696 Anchor Drive\n        3588    Osarumwense Agbonile    592-555-0152    1873 Lion Circle\n        10272   Julia Lee   870-555-0110    3148 Rose Street\n        4868    Jose Hayes  599-555-0171    793 Crawford Street\n        4761    Caleb Alexander 670-555-0141    4775 Kentucky Dr.\n        16443   Terry Chander   998-555-0171    771 Northridge Drive\n\n可以将同一个数据文件上载到 HBase 群集中，并从那里导入数据。\n\n1. 切换到 **Contoso-HBase-EU** RDP 窗口。\n2. 在桌面上单击“Hadoop 命令行”。\n3. 将文件夹更改为 HBase 主目录：\n\n        cd %HBASE_HOME%\\bin\n\n4. 上载数据：\n\n        hbase org.apache.hadoop.hbase.mapreduce.ImportTsv -Dimporttsv.columns=\"HBASE_ROW_KEY,Personal:Name, Personal:HomePhone, Office:Address\" -Dimporttsv.bulk.output=/tmpOutput Contacts wasb://hbasecontacts@hditutorialdata.blob.core.windows.net/contacts.txt\n\n        hbase org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles /tmpOutput Contacts\n\n\n##验证数据复制是否正在进行\n\n你可以通过使用以下 HBase shell 命令扫描两个群集中的表，来验证复制是否正在进行：\n\n        Scan 'Contacts'\n\n\n##后续步骤\n\n在本教程中，你已学习如何跨两个数据中心配置 HBase 复制。若要了解有关 HDInsight 和 HBase 的详细信息，请参阅：\n\n- [HDInsight 服务页](/home/features/hdinsight/)\n- [HDInsight 文档](/documentation/services/hdinsight/)\n- [开始在 HDInsight 中使用 Apache HBase][hdinsight-hbase-get-started]\n- [HDInsight HBase 概述][hdinsight-hbase-overview]\n- [在 Azure 虚拟网络上设置 HBase 群集][hdinsight-hbase-provision-vnet-v1]\n- [使用 HDInsight (Hadoop) 中的 Storm 和 HBase 分析传感器数据][hdinsight-sensor-data]\n\n[hdinsight-hbase-geo-replication-vnet]: /documentation/articles/hdinsight-hbase-geo-replication-configure-VNets\n<!-- [hdinsight-hbase-geo-replication-dns]: /documentation/articles/hdinsight-hbase-geo-replication-configure-VNet -->\n\n\n[img-vnet-diagram]: ./media/hdinsight-hbase-geo-replication/HDInsight.HBase.Replication.Network.diagram.png\n\n\n[hdinsight-hbase-get-started]: /documentation/articles/hdinsight-hbase-tutorial-get-started-v1\n[hdinsight-manage-portal]: /documentation/articles/hdinsight-administer-use-management-portal-v1\n[hdinsight-provision]: /documentation/articles/hdinsight-provision-clusters-v1\n[hdinsight-hbase-replication-vnet]: /documentation/articles/hdinsight-hbase-geo-replication-configure-VNets\n[hdinsight-hbase-replication-dns]: /documentation/articles/hdinsight-hbase-geo-replication-configure-DNS\n<!-- [hdinsight-hbase-twitter-sentiment]: /documentation/articles/hdinsight-hbase-analyze-twitter-sentiment -->\n[hdinsight-sensor-data]: /documentation/articles/hdinsight-storm-sensor-data-analysis\n[hdinsight-hbase-overview]: /documentation/articles/hdinsight-hbase-overview\n[hdinsight-hbase-provision-vnet-v1]: /documentation/articles/hdinsight-hbase-provision-vnet-v1\n[hdinsight-hbase-get-started]: /documentation/articles/hdinsight-hbase-tutorial-get-started-v1\n\n<!---HONumber=71-->"
+}

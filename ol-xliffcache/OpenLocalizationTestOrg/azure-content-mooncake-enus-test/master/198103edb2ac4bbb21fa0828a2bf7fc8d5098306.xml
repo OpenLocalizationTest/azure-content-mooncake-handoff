@@ -1,0 +1,810 @@
+{
+  "nodes": [
+    {
+      "content": "Azure SQL 数据库弹性数据库池的价格和性能注意事项",
+      "pos": [
+        28,
+        57
+      ]
+    },
+    {
+      "content": "弹性数据库池是由一组弹性数据库共享的可用资源的集合。本文提供相关的指导来帮助你评估是否适合对一组数据库使用弹性数据库池。",
+      "pos": [
+        77,
+        137
+      ]
+    },
+    {
+      "content": "弹性数据库池的价格和性能注意事项",
+      "pos": [
+        360,
+        376
+      ]
+    },
+    {
+      "content": "本文档提供相关的指导来帮助你根据数据库使用模式以及弹性数据库池与单一数据库之间的定价差异，评估对一组数据库使用弹性数据库池是否能够产生成本效益。此外，还提供了其他指导来帮助你确定一组现有 SQL 数据库所需的当前池大小。",
+      "pos": [
+        379,
+        489
+      ]
+    },
+    {
+      "pos": [
+        493,
+        576
+      ],
+      "content": "有关弹性数据库池的概述，请参阅 <bpt id=\"p1\">[</bpt>SQL 数据库弹性数据库池<ept id=\"p1\">](/documentation/articles/sql-database-elastic-pool)</ept>。"
+    },
+    {
+      "pos": [
+        579,
+        676
+      ],
+      "content": "有关弹性数据库池的详细信息，请参阅 <bpt id=\"p1\">[</bpt>SQL 数据库弹性数据库池参考<ept id=\"p1\">](/documentation/articles/sql-database-elastic-pool-reference)</ept>。"
+    },
+    {
+      "pos": [
+        681,
+        728
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 弹性数据库池目前为预览版，仅适用于 SQL 数据库 V12 服务器。"
+    },
+    {
+      "content": "弹性数据库池",
+      "pos": [
+        733,
+        739
+      ]
+    },
+    {
+      "content": "SaaS ISV 开发构建在由多个数据库组成的大规模数据层上的应用程序。常见的应用程序模式是每个数据库有不同的客户，但有独特的且无法预期的使用模式。因此让 ISV 难以个别预测每个数据库的资源要求。在这些情况下，ISV 可能以可观的费用过度设置资源，以确保所有数据库能有最佳吞吐量和响应时间。或者，ISV 可能用较少的费用，让客户承担体验性能不佳的风险。",
+      "pos": [
+        741,
+        918
+      ]
+    },
+    {
+      "content": "Azure SQL 数据库中的弹性数据库池可让 SaaS ISV 将一组数据库的价格性能优化在规定的预算内，同时为每个数据库提供性能弹性。弹性数据库池可让 ISV 为由多个数据库共享的池购买弹性数据库吞吐量单位 (eDTU)，以适应单一数据库使用时段不可预测的情况。池的 eDTU 要求取决于其数据库的聚合使用量。池可用的 eDTU 数量由 ISV 预算控制。弹性数据库池可让 ISV 轻松为其池推断预算对性能的影响，反之亦然。ISV 只要将数据库加入到弹性数据库池、设置数据库需要任何 eDTU 保证或容量，并根据其预算设置池的 eDTU。通过使用弹性数据库池，ISV 可以顺畅地扩大其服务，以渐增的规模从精简的新创公司到成熟的企业。",
+      "pos": [
+        920,
+        1238
+      ]
+    },
+    {
+      "content": "何时考虑使用弹性数据库池",
+      "pos": [
+        1247,
+        1259
+      ]
+    },
+    {
+      "content": "弹性数据库池很适合具有特定使用模式的大量数据库。对于给定的数据库，此模式的特征是低平均使用量与相对不频繁的使用高峰。",
+      "pos": [
+        1261,
+        1319
+      ]
+    },
+    {
+      "content": "可以加入池的数据库越多，实现的节省就越大。但根据应用程序使用模式，你可能会看到与使用 2 个 S3 数据库一样少的节约。",
+      "pos": [
+        1321,
+        1381
+      ]
+    },
+    {
+      "content": "以下各部分将帮助你了解如何评估特定的数据库集合是否会因使用弹性数据库池而受益。这些示例使用标准弹性数据库池，但同样的原理也适用于基本和高级池。",
+      "pos": [
+        1383,
+        1454
+      ]
+    },
+    {
+      "content": "评估数据库使用模式",
+      "pos": [
+        1460,
+        1469
+      ]
+    },
+    {
+      "content": "下图显示了一个数据库示例，该数据库有大量的闲置时间，但也会定期出现活动高峰。这是非常适合弹性数据库池的使用模式：",
+      "pos": [
+        1471,
+        1527
+      ]
+    },
+    {
+      "content": "1 个数据库",
+      "pos": [
+        1535,
+        1541
+      ]
+    },
+    {
+      "content": "对于如上所示的一小时期间，DB1 高峰最高达到 90 个 DTU，但其整体平均使用量低于 5 个 DTU。需要购买 S3 性能级别才能在单一数据库中运行此工作负荷。不过，这会在低活动时段使大多数资源保持为未使用状态。",
+      "pos": [
+        1547,
+        1655
+      ]
+    },
+    {
+      "content": "弹性数据库池可让这些未使用的 DTU 跨多个数据库共享，因此减少了所需的 DTU 总量和总体成本。",
+      "pos": [
+        1657,
+        1706
+      ]
+    },
+    {
+      "content": "以上一个示例为基础，假设有其他数据库具有与 DB1 类似的使用模式。在接下来的两个图形中，4 个数据库和 20 个数据库的使用量分层放在相同的图形，以说明经过一段时间其使用量非重叠的性质：",
+      "pos": [
+        1708,
+        1802
+      ]
+    },
+    {
+      "content": "4 个数据库",
+      "pos": [
+        1809,
+        1815
+      ]
+    },
+    {
+      "content": "20 个数据库",
+      "pos": [
+        1826,
+        1833
+      ]
+    },
+    {
+      "content": "在上图中，黑线表示跨所有 20 个数据库的聚合 DTU 使用量。其中表明聚合 DTU 使用量永远不会超过 100 个 DTU，并指出 20 个数据库可以在这段期间共享 100 个 eDTU。相比于将每个数据库放在单一数据库的 S3 性能级别，这会导致 DTU 减少 20 倍和价格降低 13 倍。",
+      "pos": [
+        1839,
+        1987
+      ]
+    },
+    {
+      "content": "由于以下原因，此示例很理想：",
+      "pos": [
+        1990,
+        2004
+      ]
+    },
+    {
+      "content": "每一数据库之间的高峰使用量和平均使用量有相当大的差异。",
+      "pos": [
+        2008,
+        2035
+      ]
+    },
+    {
+      "content": "每个数据库的高峰使用量在不同时间点发生。",
+      "pos": [
+        2040,
+        2060
+      ]
+    },
+    {
+      "content": "eDTU 在大量数据库之间共享。",
+      "pos": [
+        2064,
+        2080
+      ]
+    },
+    {
+      "pos": [
+        2083,
+        2221
+      ],
+      "content": "弹性数据库池的价格由池 eDTU 决定。尽管池的 eDTU 单位价格比单一数据库的 DTU 的单位价格多 1.5 倍，但<bpt id=\"p1\">**</bpt>池 eDTU 可由多个数据库共享，因而在许多情况下所需的 eDTU 总数更少<ept id=\"p1\">**</ept>。定价方面和 eDTU 共享的这些差异是池可以提供成本节省可能性的基础。"
+    },
+    {
+      "content": "以下数据库计数和数据库使用率相关规则的经验法则可帮助确保弹性数据库池提供相比于使用单一数据库的性能级别降低的成本。",
+      "pos": [
+        2229,
+        2286
+      ]
+    },
+    {
+      "content": "数据库的最小数目",
+      "pos": [
+        2293,
+        2301
+      ]
+    },
+    {
+      "pos": [
+        2303,
+        2517
+      ],
+      "content": "如果单一数据库的性能级别的 DTU 总和比池所需的 eDTU 多 1.5 倍，则弹性池更具成本效益。有关可用的大小，请参阅<bpt id=\"p1\">[</bpt>弹性数据库池和弹性数据库的 eDTU 和存储限制<ept id=\"p1\">](/documentation/articles/sql-database-elastic-pool-reference/#edtu-and-storage-limits-for-elastic-pools-and-elastic-databases)</ept>。"
+    },
+    {
+      "content": "示例",
+      "pos": [
+        2523,
+        2525
+      ]
+    },
+    {
+      "content": "100 个 eDTU 弹性数据库池需要至少 2 个 S3 数据库或至少 15 个 S0 数据库，才能比使用单一数据库的性能级别更具成本效益。",
+      "pos": [
+        2533,
+        2603
+      ]
+    },
+    {
+      "content": "并发高峰数据库的最大数目",
+      "pos": [
+        2611,
+        2623
+      ]
+    },
+    {
+      "content": "通过共享 eDTU，并非池中的所有数据库都能同时使用 eDTU 达到使用单一数据库的性能级别时的最大限制。并发高峰的数据库越少，可以设置的池 eDTU 就越低，也就能实现越大的成本效益。一般而言，池中不能有 2/3（或 67%）以上的数据库的高峰同时达到其 eDTU 限制。",
+      "pos": [
+        2625,
+        2762
+      ]
+    },
+    {
+      "content": "示例",
+      "pos": [
+        2767,
+        2769
+      ]
+    },
+    {
+      "content": "为了降低 200 eDTU 池中 3 个 S3 数据库的成本，在其使用量中最多可以有 2 个数据库同时处于高峰。否则，如果 4 个 S3 数据库中超过 2 个同时高峰，则必须将池缩放为超过 200 个 eDTU。而且，如果将池缩放大小为超过 200 个 eDTU，则需要加入更多的 S3 数据库到池，以使成本保持低于单一数据库的性能级别。",
+      "pos": [
+        2777,
+        2946
+      ]
+    },
+    {
+      "content": "请注意，此示例未考虑池中其他数据库的使用率。如果在任何给定时间点，所有数据库都有一些使用量，则可以同时处于高峰的数据库应少于 2/3（或 67%）。",
+      "pos": [
+        2949,
+        3023
+      ]
+    },
+    {
+      "content": "每个数据库的 DTU 使用率",
+      "pos": [
+        3030,
+        3044
+      ]
+    },
+    {
+      "content": "数据库的高峰和平均使用率之间的差异为，长时间的低使用率和短时间的高使用率。这个使用模式非常适合在数据库之间共享资源。当数据库的高峰使用率比平均使用率大 1.5 倍左右时，应考虑将数据库用作池。",
+      "pos": [
+        3046,
+        3142
+      ]
+    },
+    {
+      "content": "示例",
+      "pos": [
+        3152,
+        3154
+      ]
+    },
+    {
+      "content": "高峰为 100 个 DTU 且平均使用 67 个 DTU 或更少的 S3 数据库是在弹性数据库池中共享 eDTU 的良好候选项。或者，高峰为 20 个 DTU 且平均使用 13 个 DTU 或更少的 S1 数据库是弹性数据库池的良好候选项。",
+      "pos": [
+        3162,
+        3282
+      ]
+    },
+    {
+      "content": "比较弹性数据库池与单一数据库的定价差异的启发式方法",
+      "pos": [
+        3292,
+        3317
+      ]
+    },
+    {
+      "content": "下面启发式方法可帮助你预估弹性数据库池是否比使用单个的单一数据库更具成本效益。",
+      "pos": [
+        3320,
+        3359
+      ]
+    },
+    {
+      "content": "通过以下项目来估算池所需的 eDTU：",
+      "pos": [
+        3364,
+        3383
+      ]
+    },
+    {
+      "pos": [
+        3393,
+        3462
+      ],
+      "content": "MAX(<bpt id=\"p1\">*</bpt>数据库的总数目<ept id=\"p1\">*</ept> * <bpt id=\"p2\">*</bpt>每一数据库的平均 DTU 使用率<ept id=\"p2\">*</ept>、<bpt id=\"p3\">*</bpt>并发高峰数据库的数目<ept id=\"p3\">*</ept> * <bpt id=\"p4\">*</bpt>每一数据库的高峰 DTU 使用率<ept id=\"p4\">*</ept>)"
+    },
+    {
+      "pos": [
+        3467,
+        3679
+      ],
+      "content": "选择大于步骤 1 估算值的池的最小可用 eDTU 值。有关可用的 eDTU 选项，请参阅此处所列的 eDTU 有效值：<bpt id=\"p1\">[</bpt>弹性数据库池和弹性数据库的 eDTU 和存储限制<ept id=\"p1\">](/documentation/articles/sql-database-elastic-pool-reference/#edtu-and-storage-limits-for-elastic-pools-and-elastic-databases)</ept>。"
+    },
+    {
+      "content": "按如下所述计算池的价格：",
+      "pos": [
+        3685,
+        3697
+      ]
+    },
+    {
+      "pos": [
+        3703,
+        3733
+      ],
+      "content": "池价格 = <bpt id=\"p1\">*</bpt>池 eDTU 数<ept id=\"p1\">*</ept> * <bpt id=\"p2\">*</bpt>池 eDTU 单价<ept id=\"p2\">*</ept>"
+    },
+    {
+      "pos": [
+        3739,
+        3798
+      ],
+      "content": "有关价格信息，请参阅 <bpt id=\"p1\">[</bpt>SQL 数据库定价<ept id=\"p1\">](/home/features/sql-database/#price)</ept>。"
+    },
+    {
+      "content": "将步骤 3 的池价格与单一数据库适当性能级别的价格相比较。",
+      "pos": [
+        3804,
+        3833
+      ]
+    },
+    {
+      "content": "为现有 SQL 数据库确定最佳的池 eDTU 大小",
+      "pos": [
+        3840,
+        3865
+      ]
+    },
+    {
+      "content": "弹性数据库池的最佳大小取决于聚合 eDTU 和池中所有数据库所需的存储资源。这涉及到决定以下两个数量的较大值：",
+      "pos": [
+        3868,
+        3923
+      ]
+    },
+    {
+      "content": "池中所有数据库使用的最大 DTU。",
+      "pos": [
+        3927,
+        3944
+      ]
+    },
+    {
+      "content": "池中所有数据库使用的最大存储字节。",
+      "pos": [
+        3947,
+        3964
+      ]
+    },
+    {
+      "pos": [
+        3967,
+        4131
+      ],
+      "content": "有关可用的大小，请参阅<bpt id=\"p1\">[</bpt>弹性数据库池和弹性数据库的 eDTU 和存储限制<ept id=\"p1\">](/documentation/articles/sql-database-elastic-pool-reference/#edtu-and-storage-limits-for-elastic-pools-and-elastic-databases)</ept>。"
+    },
+    {
+      "content": "使用服务层顾问 (STA) 和动态管理视图 (DMV) 获得选型建议",
+      "pos": [
+        4138,
+        4172
+      ]
+    },
+    {
+      "content": "STA 和 DMV 为调整弹性数据库池大小提供了不同的工具选项和功能。无论使用何种工具选项，大小估算值应该仅用于弹性数据库池的初步评估与创建。创建池后，应该准确地监视其资源使用情况，并根据需要调高和调低池的性能设置。",
+      "pos": [
+        4177,
+        4285
+      ]
+    },
+    {
+      "content": "STA",
+      "pos": [
+        4289,
+        4292
+      ]
+    },
+    {
+      "content": "STA 是 <bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>中的内置工具，它可以自动评估现有 SQL 数据库服务器中数据库的历史资源使用率，并推荐适当的弹性数据库池配置。有关详细信息，请参阅<bpt id=\"p2\">[</bpt>弹性数据库池定价层建议<ept id=\"p2\">](/documentation/articles/sql-database-elastic-pool-portal/#elastic-database-pool-pricing-tier-recommendations)</ept>。",
+      "pos": [
+        4298,
+        4535
+      ]
+    },
+    {
+      "content": "DMV 大小调整工具",
+      "pos": [
+        4539,
+        4549
+      ]
+    },
+    {
+      "content": "DMV 大小调整工具以 PowerShell 脚本的形式提供，可让你自定义服务器中现有数据库弹性数据库池的大小估算值。",
+      "pos": [
+        4555,
+        4614
+      ]
+    },
+    {
+      "content": "STA 和 DMV 工具之间的选择",
+      "pos": [
+        4620,
+        4637
+      ]
+    },
+    {
+      "content": "选择适用于分析特定应用程序的工具。下表汇总了这两个大小调整工具之间的差异：",
+      "pos": [
+        4640,
+        4677
+      ]
+    },
+    {
+      "content": "功能",
+      "pos": [
+        4681,
+        4683
+      ]
+    },
+    {
+      "content": "STA",
+      "pos": [
+        4686,
+        4689
+      ]
+    },
+    {
+      "content": "DMV",
+      "pos": [
+        4692,
+        4695
+      ]
+    },
+    {
+      "content": "分析中使用的数据示例粒度。",
+      "pos": [
+        4723,
+        4736
+      ]
+    },
+    {
+      "content": "15 秒",
+      "pos": [
+        4739,
+        4743
+      ]
+    },
+    {
+      "content": "15 秒",
+      "pos": [
+        4746,
+        4750
+      ]
+    },
+    {
+      "content": "考虑单一数据库的池与性能级别之间的价格差异。",
+      "pos": [
+        4755,
+        4777
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        4780,
+        4781
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        4784,
+        4785
+      ]
+    },
+    {
+      "content": "允许自定义服务器内所分析数据库的列表。",
+      "pos": [
+        4790,
+        4809
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        4812,
+        4813
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        4816,
+        4817
+      ]
+    },
+    {
+      "content": "允许自定义分析中使用的时间段。",
+      "pos": [
+        4822,
+        4837
+      ]
+    },
+    {
+      "content": "否",
+      "pos": [
+        4840,
+        4841
+      ]
+    },
+    {
+      "content": "是",
+      "pos": [
+        4844,
+        4845
+      ]
+    },
+    {
+      "content": "使用 STA 估算弹性池大小",
+      "pos": [
+        4854,
+        4868
+      ]
+    },
+    {
+      "content": "STA 评估数据库的使用率历史记录，并在比使用单一数据库的性能级别更具成本效益时，推荐你使用弹性数据库池。如果推荐使用某个池，该工具将提供推荐的数据库列表，以及推荐的池 eDTU 数量和每个弹性数据库的最小/最大 eDTU 设置。若要将某个数据库视为池的候选项，该数据库必须至少存在 7 天。",
+      "pos": [
+        4872,
+        5018
+      ]
+    },
+    {
+      "content": "将弹性数据库池添加到现有服务器时，门户中会提供 STA。如果出现了有关该服务器弹性数据库池的建议，这些建议将显示在“弹性数据库池”创建页中。客户可以随时更改推荐的设置，以创建自己的弹性数据库池组。",
+      "pos": [
+        5020,
+        5118
+      ]
+    },
+    {
+      "pos": [
+        5120,
+        5253
+      ],
+      "content": "有关详细信息，请参阅<bpt id=\"p1\">[</bpt>弹性数据库池定价层建议<ept id=\"p1\">](/documentation/articles/sql-database-elastic-pool-portal/#elastic-database-pool-pricing-tier-recommendations)</ept>"
+    },
+    {
+      "content": "使用动态管理视图 (DMV) 估算弹性池大小",
+      "pos": [
+        5259,
+        5281
+      ]
+    },
+    {
+      "pos": [
+        5284,
+        5467
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>sys.dm\\_db\\_resource\\_stats<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/dn800981.aspx)</ept> DMV 可测量单个数据库的资源使用率。此 DMV 以数据库性能级别限制百分比的形式提供 CPU、IO、日志与数据库的日志使用率。此数据可用于计算任意给定 15 秒间隔内数据库的 DTU 使用率。"
+    },
+    {
+      "content": "可以通过聚合 15 秒间隔内所有候选数据库的 eDTU 使用率，估算弹性数据库池在该时间段的聚合 eDTU 使用率。根据具体的性能目标，可能有必要忽略较小百分比的示例数据。例如，可以应用跨所有时间间隔的聚合 eDTU 第 99 个百分位值，以排除极端值并提供弹性数据库池 eDTU，以符合 99% 的采样时间间隔。",
+      "pos": [
+        5469,
+        5626
+      ]
+    },
+    {
+      "content": "用于估算数据库聚合 eDTU 使用率的 PowerShell 脚本",
+      "pos": [
+        5631,
+        5664
+      ]
+    },
+    {
+      "content": "这里提供了一个示例 PowerShell 脚本，用于估算 SQL 数据库服务器中用户数据库的聚合 eDTU 值。",
+      "pos": [
+        5666,
+        5722
+      ]
+    },
+    {
+      "content": "该脚本只在运行时收集数据。对于典型的生产工作负荷，应该至少运行该脚本一天，但运行一周甚至更长时间可以提供更准确的估算值。针对代表数据库典型工作负荷的持续时间运行该脚本。",
+      "pos": [
+        5724,
+        5808
+      ]
+    },
+    {
+      "pos": [
+        5812,
+        5928
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph> 运行该脚本时，必须一直打开 PowerShell 窗口。除非你已运行该脚本足够的一段时间，并捕获了足够的数据来呈现跨越正常和高峰使用时间的典型工作负荷，否则请不要关闭 PowerShell 窗口。"
+    },
+    {
+      "content": "脚本先决条件",
+      "pos": [
+        5934,
+        5940
+      ]
+    },
+    {
+      "content": "运行该脚本之前，请安装以下各项：",
+      "pos": [
+        5943,
+        5959
+      ]
+    },
+    {
+      "pos": [
+        5963,
+        6039
+      ],
+      "content": "最新的 <bpt id=\"p1\">[</bpt>PowerShell 命令行工具<ept id=\"p1\">](http://go.microsoft.com/?linkid=9811175&amp;clcid=0x409)</ept>。"
+    },
+    {
+      "pos": [
+        6042,
+        6127
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>SQL Server 2014 功能包<ept id=\"p1\">](http://www.microsoft.com/zh-cn/download/details.aspx?id=42295)</ept>。"
+    },
+    {
+      "content": "脚本详细信息",
+      "pos": [
+        6134,
+        6140
+      ]
+    },
+    {
+      "pos": [
+        6143,
+        6302
+      ],
+      "content": "你可以从本机计算机或云上的 VM 运行该脚本。从本地计算机运行时，由于脚本需要从目标数据库下载数据，因此可能会产生数据输出费用。下面根据目标数据库数目和运行脚本的持续时间显示了数据卷估算值。有关 Azure 数据传输费用，请参阅<bpt id=\"p1\">[</bpt>数据传输定价详细信息<ept id=\"p1\">](/pricing/details/data-transfer)</ept>。"
+    },
+    {
+      "content": "每小时 1 个数据库 = 38KB",
+      "pos": [
+        6318,
+        6335
+      ]
+    },
+    {
+      "content": "每天 1 个数据库 = 900KB",
+      "pos": [
+        6343,
+        6360
+      ]
+    },
+    {
+      "content": "每周 1 个数据库 = 6MB",
+      "pos": [
+        6368,
+        6383
+      ]
+    },
+    {
+      "content": "每天 100 个数据库 = 90MB",
+      "pos": [
+        6391,
+        6409
+      ]
+    },
+    {
+      "content": "每周 500 个数据库 = 3GB",
+      "pos": [
+        6417,
+        6434
+      ]
+    },
+    {
+      "content": "该脚本将排除不适合用作标准弹性池层的当前公共预览版产品的某些数据库。",
+      "pos": [
+        6436,
+        6470
+      ]
+    },
+    {
+      "content": "如果你需要从目标服务器排除其他数据库，可以根据你的条件更改该脚本。默认情况下，脚本不会编译以下项的信息：",
+      "pos": [
+        6471,
+        6523
+      ]
+    },
+    {
+      "content": "弹性数据库（数据库已在弹性池中）。",
+      "pos": [
+        6527,
+        6544
+      ]
+    },
+    {
+      "content": "服务器的 master 数据库。",
+      "pos": [
+        6547,
+        6563
+      ]
+    },
+    {
+      "content": "该脚本需要使用一个输出数据库来存储中间数据以供分析。你可以使用新的或现有的数据库。输出数据库应该在不同的服务器，以免影响分析结果，不过，从技术上讲，不需要满足该条件也能运行该工具。建议输出数据库的性能级别至少为 S0 或更高。长时间收集大量数据库的数据时，你可以考虑将输出数据库升级到较高的性能级别。",
+      "pos": [
+        6565,
+        6715
+      ]
+    },
+    {
+      "content": "该脚本需要你提供用于连接目标服务器（弹性数据库池候选项）的凭据与完整服务器名称，例如“abcdef.database.chinacloudapi.cn”。该脚本目前不支持一次分析多个服务器。",
+      "pos": [
+        6717,
+        6812
+      ]
+    },
+    {
+      "content": "提交初始参数集的值之后，系统会提示你使用 Azure 帐户登录。这是用于登录目标服务器而不是输出数据库服务器的帐户。",
+      "pos": [
+        6815,
+        6873
+      ]
+    },
+    {
+      "content": "如果你在运行脚本时遇到以下警告，可将其忽略：",
+      "pos": [
+        6879,
+        6901
+      ]
+    },
+    {
+      "content": "警告: Switch-AzureMode cmdlet 已过时。",
+      "pos": [
+        6905,
+        6937
+      ]
+    },
+    {
+      "content": "警告: 无法获取 SQL Server 服务信息。尝试连接到 'Microsoft.Azure.Commands.Sql.dll' 上的 WMI 时失败并出现以下错误: RPC 服务器不可用。",
+      "pos": [
+        6940,
+        7036
+      ]
+    },
+    {
+      "content": "脚本完成时，会输出要包含目标服务器中所有候选数据库，弹性池需要的 eDTU 估算数目。此估算的 eDTU 可用于创建和配置弹性数据库池，以容纳这些数据库。创建池并将数据库移到池中之后，应密切监控池数天，并根据需要对池 eDTU 配置进行任何调整。",
+      "pos": [
+        7038,
+        7161
+      ]
+    },
+    {
+      "pos": [
+        7165,
+        7462
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph> 此脚本包含到 Azure PowerShell 版本 1.0 <bpt id=\"p1\">*</bpt>但不是包括<ept id=\"p1\">*</ept> 1.0 及更高版本的命令。可以使用 <bpt id=\"p2\">**</bpt>Get-Module azure | format-table version<ept id=\"p2\">**</ept> 命令查看 Azure PowerShell 的版本。有关详细信息，请参阅<bpt id=\"p3\">[</bpt>弃用 Azure PowerShell 中的 Switch-AzureMode<ept id=\"p3\">](https://github.com/Azure/azure-powershell/wiki/Deprecation-of-Switch-AzureMode-in-Azure-PowerShell)</ept>。"
+    },
+    {
+      "content": "摘要",
+      "pos": [
+        18575,
+        18577
+      ]
+    },
+    {
+      "content": "并非所有单一数据库都是弹性数据库池的最佳候选项。使用模式表现为低平均使用率与相对不频繁使用率高峰的数据库，是弹性数据库池的绝佳候选项。应用程序使用模式是动态的，因此，请使用本文中所述的信息和工具来进行初始评估，以确定弹性数据库池是否是部分或所有数据库的良好选择。本文只是帮助你确定弹性数据库池是否合适的起点。请记住，你应该持续监视历史资源使用量（使用 STA 或 DMV），并不断地重新评估所有数据库的性能级别。要知道，你可以轻松地将数据库移入和移出弹性数据库池，如果你有极多的数据库，可以创建大小不一的池，以将数据库划分到其中。",
+      "pos": [
+        18579,
+        18844
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"Azure SQL 数据库弹性数据库池的价格和性能注意事项\" \n    description=\"弹性数据库池是由一组弹性数据库共享的可用资源的集合。本文提供相关的指导来帮助你评估是否适合对一组数据库使用弹性数据库池。\" \n    services=\"sql-database\" \n    documentationCenter=\"\" \n    authors=\"stevestein\" \n    manager=\"jeffreyg\" \n    editor=\"\"/>\n\n<tags \n    ms.service=\"sql-database\"\n    ms.date=\"12/01/2015\" \n    wacn.date=\"01/29/2016\"/>\n\n\n# 弹性数据库池的价格和性能注意事项\n\n\n本文档提供相关的指导来帮助你根据数据库使用模式以及弹性数据库池与单一数据库之间的定价差异，评估对一组数据库使用弹性数据库池是否能够产生成本效益。此外，还提供了其他指导来帮助你确定一组现有 SQL 数据库所需的当前池大小。\n\n- 有关弹性数据库池的概述，请参阅 [SQL 数据库弹性数据库池](/documentation/articles/sql-database-elastic-pool)。\n- 有关弹性数据库池的详细信息，请参阅 [SQL 数据库弹性数据库池参考](/documentation/articles/sql-database-elastic-pool-reference)。\n\n\n> [AZURE.NOTE] 弹性数据库池目前为预览版，仅适用于 SQL 数据库 V12 服务器。\n\n## 弹性数据库池\n\nSaaS ISV 开发构建在由多个数据库组成的大规模数据层上的应用程序。常见的应用程序模式是每个数据库有不同的客户，但有独特的且无法预期的使用模式。因此让 ISV 难以个别预测每个数据库的资源要求。在这些情况下，ISV 可能以可观的费用过度设置资源，以确保所有数据库能有最佳吞吐量和响应时间。或者，ISV 可能用较少的费用，让客户承担体验性能不佳的风险。\n\nAzure SQL 数据库中的弹性数据库池可让 SaaS ISV 将一组数据库的价格性能优化在规定的预算内，同时为每个数据库提供性能弹性。弹性数据库池可让 ISV 为由多个数据库共享的池购买弹性数据库吞吐量单位 (eDTU)，以适应单一数据库使用时段不可预测的情况。池的 eDTU 要求取决于其数据库的聚合使用量。池可用的 eDTU 数量由 ISV 预算控制。弹性数据库池可让 ISV 轻松为其池推断预算对性能的影响，反之亦然。ISV 只要将数据库加入到弹性数据库池、设置数据库需要任何 eDTU 保证或容量，并根据其预算设置池的 eDTU。通过使用弹性数据库池，ISV 可以顺畅地扩大其服务，以渐增的规模从精简的新创公司到成熟的企业。\n  \n\n\n## 何时考虑使用弹性数据库池\n\n弹性数据库池很适合具有特定使用模式的大量数据库。对于给定的数据库，此模式的特征是低平均使用量与相对不频繁的使用高峰。\n\n可以加入池的数据库越多，实现的节省就越大。但根据应用程序使用模式，你可能会看到与使用 2 个 S3 数据库一样少的节约。\n\n以下各部分将帮助你了解如何评估特定的数据库集合是否会因使用弹性数据库池而受益。这些示例使用标准弹性数据库池，但同样的原理也适用于基本和高级池。\n\n### 评估数据库使用模式\n\n下图显示了一个数据库示例，该数据库有大量的闲置时间，但也会定期出现活动高峰。这是非常适合弹性数据库池的使用模式：\n \n   ![1 个数据库][1]\n\n对于如上所示的一小时期间，DB1 高峰最高达到 90 个 DTU，但其整体平均使用量低于 5 个 DTU。需要购买 S3 性能级别才能在单一数据库中运行此工作负荷。不过，这会在低活动时段使大多数资源保持为未使用状态。\n\n弹性数据库池可让这些未使用的 DTU 跨多个数据库共享，因此减少了所需的 DTU 总量和总体成本。\n\n以上一个示例为基础，假设有其他数据库具有与 DB1 类似的使用模式。在接下来的两个图形中，4 个数据库和 20 个数据库的使用量分层放在相同的图形，以说明经过一段时间其使用量非重叠的性质：\n\n   ![4 个数据库][2]\n\n   ![20 个数据库][3]\n\n在上图中，黑线表示跨所有 20 个数据库的聚合 DTU 使用量。其中表明聚合 DTU 使用量永远不会超过 100 个 DTU，并指出 20 个数据库可以在这段期间共享 100 个 eDTU。相比于将每个数据库放在单一数据库的 S3 性能级别，这会导致 DTU 减少 20 倍和价格降低 13 倍。\n\n\n由于以下原因，此示例很理想：\n\n- 每一数据库之间的高峰使用量和平均使用量有相当大的差异。  \n- 每个数据库的高峰使用量在不同时间点发生。 \n- eDTU 在大量数据库之间共享。\n\n\n弹性数据库池的价格由池 eDTU 决定。尽管池的 eDTU 单位价格比单一数据库的 DTU 的单位价格多 1.5 倍，但**池 eDTU 可由多个数据库共享，因而在许多情况下所需的 eDTU 总数更少**。定价方面和 eDTU 共享的这些差异是池可以提供成本节省可能性的基础。\n\n<br>\n\n以下数据库计数和数据库使用率相关规则的经验法则可帮助确保弹性数据库池提供相比于使用单一数据库的性能级别降低的成本。\n\n\n### 数据库的最小数目\n\n如果单一数据库的性能级别的 DTU 总和比池所需的 eDTU 多 1.5 倍，则弹性池更具成本效益。有关可用的大小，请参阅[弹性数据库池和弹性数据库的 eDTU 和存储限制](/documentation/articles/sql-database-elastic-pool-reference/#edtu-and-storage-limits-for-elastic-pools-and-elastic-databases)。\n\n\n***示例***<br>\n100 个 eDTU 弹性数据库池需要至少 2 个 S3 数据库或至少 15 个 S0 数据库，才能比使用单一数据库的性能级别更具成本效益。\n\n\n\n### 并发高峰数据库的最大数目\n\n通过共享 eDTU，并非池中的所有数据库都能同时使用 eDTU 达到使用单一数据库的性能级别时的最大限制。并发高峰的数据库越少，可以设置的池 eDTU 就越低，也就能实现越大的成本效益。一般而言，池中不能有 2/3（或 67%）以上的数据库的高峰同时达到其 eDTU 限制。\n\n***示例***<br>\n为了降低 200 eDTU 池中 3 个 S3 数据库的成本，在其使用量中最多可以有 2 个数据库同时处于高峰。否则，如果 4 个 S3 数据库中超过 2 个同时高峰，则必须将池缩放为超过 200 个 eDTU。而且，如果将池缩放大小为超过 200 个 eDTU，则需要加入更多的 S3 数据库到池，以使成本保持低于单一数据库的性能级别。\n\n\n请注意，此示例未考虑池中其他数据库的使用率。如果在任何给定时间点，所有数据库都有一些使用量，则可以同时处于高峰的数据库应少于 2/3（或 67%）。\n\n\n### 每个数据库的 DTU 使用率\n\n数据库的高峰和平均使用率之间的差异为，长时间的低使用率和短时间的高使用率。这个使用模式非常适合在数据库之间共享资源。当数据库的高峰使用率比平均使用率大 1.5 倍左右时，应考虑将数据库用作池。\n\n    \n***示例***<br>\n高峰为 100 个 DTU 且平均使用 67 个 DTU 或更少的 S3 数据库是在弹性数据库池中共享 eDTU 的良好候选项。或者，高峰为 20 个 DTU 且平均使用 13 个 DTU 或更少的 S1 数据库是弹性数据库池的良好候选项。\n    \n\n## 比较弹性数据库池与单一数据库的定价差异的启发式方法 \n\n下面启发式方法可帮助你预估弹性数据库池是否比使用单个的单一数据库更具成本效益。\n\n1. 通过以下项目来估算池所需的 eDTU：\n    \n    MAX(*数据库的总数目* * *每一数据库的平均 DTU 使用率*、*并发高峰数据库的数目* * *每一数据库的高峰 DTU 使用率*)\n\n2. 选择大于步骤 1 估算值的池的最小可用 eDTU 值。有关可用的 eDTU 选项，请参阅此处所列的 eDTU 有效值：[弹性数据库池和弹性数据库的 eDTU 和存储限制](/documentation/articles/sql-database-elastic-pool-reference/#edtu-and-storage-limits-for-elastic-pools-and-elastic-databases)。\n\n\n3. 按如下所述计算池的价格：\n\n    池价格 = *池 eDTU 数* * *池 eDTU 单价*\n\n    有关价格信息，请参阅 [SQL 数据库定价](/home/features/sql-database/#price)。\n\n\n4. 将步骤 3 的池价格与单一数据库适当性能级别的价格相比较。\n\n\n\n## 为现有 SQL 数据库确定最佳的池 eDTU 大小 \n\n弹性数据库池的最佳大小取决于聚合 eDTU 和池中所有数据库所需的存储资源。这涉及到决定以下两个数量的较大值：\n\n* 池中所有数据库使用的最大 DTU。\n* 池中所有数据库使用的最大存储字节。 \n\n有关可用的大小，请参阅[弹性数据库池和弹性数据库的 eDTU 和存储限制](/documentation/articles/sql-database-elastic-pool-reference/#edtu-and-storage-limits-for-elastic-pools-and-elastic-databases)。\n\n\n### 使用服务层顾问 (STA) 和动态管理视图 (DMV) 获得选型建议   \n\nSTA 和 DMV 为调整弹性数据库池大小提供了不同的工具选项和功能。无论使用何种工具选项，大小估算值应该仅用于弹性数据库池的初步评估与创建。创建池后，应该准确地监视其资源使用情况，并根据需要调高和调低池的性能设置。\n\n**STA**<br>STA 是 [Azure 门户](https://manage.windowsazure.cn)中的内置工具，它可以自动评估现有 SQL 数据库服务器中数据库的历史资源使用率，并推荐适当的弹性数据库池配置。有关详细信息，请参阅[弹性数据库池定价层建议](/documentation/articles/sql-database-elastic-pool-portal/#elastic-database-pool-pricing-tier-recommendations)。\n\n**DMV 大小调整工具**<br>DMV 大小调整工具以 PowerShell 脚本的形式提供，可让你自定义服务器中现有数据库弹性数据库池的大小估算值。\n\n### STA 和 DMV 工具之间的选择 \n\n选择适用于分析特定应用程序的工具。下表汇总了这两个大小调整工具之间的差异：\n\n| 功能 | STA | DMV |\n| :--- | :--- | :--- |\n| 分析中使用的数据示例粒度。 | 15 秒 | 15 秒 |\n| 考虑单一数据库的池与性能级别之间的价格差异。 | 是 | 否 |\n| 允许自定义服务器内所分析数据库的列表。 | 否 | 是 |\n| 允许自定义分析中使用的时间段。 | 否 | 是 |\n\n\n### 使用 STA 估算弹性池大小  \n\nSTA 评估数据库的使用率历史记录，并在比使用单一数据库的性能级别更具成本效益时，推荐你使用弹性数据库池。如果推荐使用某个池，该工具将提供推荐的数据库列表，以及推荐的池 eDTU 数量和每个弹性数据库的最小/最大 eDTU 设置。若要将某个数据库视为池的候选项，该数据库必须至少存在 7 天。\n\n将弹性数据库池添加到现有服务器时，门户中会提供 STA。如果出现了有关该服务器弹性数据库池的建议，这些建议将显示在“弹性数据库池”创建页中。客户可以随时更改推荐的设置，以创建自己的弹性数据库池组。\n\n有关详细信息，请参阅[弹性数据库池定价层建议](/documentation/articles/sql-database-elastic-pool-portal/#elastic-database-pool-pricing-tier-recommendations)\n\n### 使用动态管理视图 (DMV) 估算弹性池大小 \n\n[sys.dm\\_db\\_resource\\_stats](https://msdn.microsoft.com/zh-cn/library/dn800981.aspx) DMV 可测量单个数据库的资源使用率。此 DMV 以数据库性能级别限制百分比的形式提供 CPU、IO、日志与数据库的日志使用率。此数据可用于计算任意给定 15 秒间隔内数据库的 DTU 使用率。\n\n可以通过聚合 15 秒间隔内所有候选数据库的 eDTU 使用率，估算弹性数据库池在该时间段的聚合 eDTU 使用率。根据具体的性能目标，可能有必要忽略较小百分比的示例数据。例如，可以应用跨所有时间间隔的聚合 eDTU 第 99 个百分位值，以排除极端值并提供弹性数据库池 eDTU，以符合 99% 的采样时间间隔。\n\n## 用于估算数据库聚合 eDTU 使用率的 PowerShell 脚本\n\n这里提供了一个示例 PowerShell 脚本，用于估算 SQL 数据库服务器中用户数据库的聚合 eDTU 值。\n\n该脚本只在运行时收集数据。对于典型的生产工作负荷，应该至少运行该脚本一天，但运行一周甚至更长时间可以提供更准确的估算值。针对代表数据库典型工作负荷的持续时间运行该脚本。\n\n> [AZURE.IMPORTANT] 运行该脚本时，必须一直打开 PowerShell 窗口。除非你已运行该脚本足够的一段时间，并捕获了足够的数据来呈现跨越正常和高峰使用时间的典型工作负荷，否则请不要关闭 PowerShell 窗口。\n\n### 脚本先决条件 \n\n运行该脚本之前，请安装以下各项：\n\n- 最新的 [PowerShell 命令行工具](http://go.microsoft.com/?linkid=9811175&clcid=0x409)。\n- [SQL Server 2014 功能包](http://www.microsoft.com/zh-cn/download/details.aspx?id=42295)。\n\n\n### 脚本详细信息\n\n\n你可以从本机计算机或云上的 VM 运行该脚本。从本地计算机运行时，由于脚本需要从目标数据库下载数据，因此可能会产生数据输出费用。下面根据目标数据库数目和运行脚本的持续时间显示了数据卷估算值。有关 Azure 数据传输费用，请参阅[数据传输定价详细信息](/pricing/details/data-transfer)。\n       \n -     每小时 1 个数据库 = 38KB\n -     每天 1 个数据库 = 900KB\n -     每周 1 个数据库 = 6MB\n -     每天 100 个数据库 = 90MB\n -     每周 500 个数据库 = 3GB\n\n该脚本将排除不适合用作标准弹性池层的当前公共预览版产品的某些数据库。\n如果你需要从目标服务器排除其他数据库，可以根据你的条件更改该脚本。默认情况下，脚本不会编译以下项的信息：\n\n* 弹性数据库（数据库已在弹性池中）。\n* 服务器的 master 数据库。\n\n该脚本需要使用一个输出数据库来存储中间数据以供分析。你可以使用新的或现有的数据库。输出数据库应该在不同的服务器，以免影响分析结果，不过，从技术上讲，不需要满足该条件也能运行该工具。建议输出数据库的性能级别至少为 S0 或更高。长时间收集大量数据库的数据时，你可以考虑将输出数据库升级到较高的性能级别。\n\n该脚本需要你提供用于连接目标服务器（弹性数据库池候选项）的凭据与完整服务器名称，例如“abcdef.database.chinacloudapi.cn”。该脚本目前不支持一次分析多个服务器。\n\n\n提交初始参数集的值之后，系统会提示你使用 Azure 帐户登录。这是用于登录目标服务器而不是输出数据库服务器的帐户。\n    \n如果你在运行脚本时遇到以下警告，可将其忽略：\n\n- 警告: Switch-AzureMode cmdlet 已过时。\n- 警告: 无法获取 SQL Server 服务信息。尝试连接到 'Microsoft.Azure.Commands.Sql.dll' 上的 WMI 时失败并出现以下错误: RPC 服务器不可用。\n\n脚本完成时，会输出要包含目标服务器中所有候选数据库，弹性池需要的 eDTU 估算数目。此估算的 eDTU 可用于创建和配置弹性数据库池，以容纳这些数据库。创建池并将数据库移到池中之后，应密切监控池数天，并根据需要对池 eDTU 配置进行任何调整。\n\n> [AZURE.IMPORTANT] 此脚本包含到 Azure PowerShell 版本 1.0 *但不是包括* 1.0 及更高版本的命令。可以使用 **Get-Module azure | format-table version** 命令查看 Azure PowerShell 的版本。有关详细信息，请参阅[弃用 Azure PowerShell 中的 Switch-AzureMode](https://github.com/Azure/azure-powershell/wiki/Deprecation-of-Switch-AzureMode-in-Azure-PowerShell)。\n\n\n    \n    param (\n    [Parameter(Mandatory=$true)][string]$AzureSubscriptionName, # Azure Subscription name - can be found on the Azure portal: https://manage.windowsazure.cn/\n    [Parameter(Mandatory=$true)][string]$ResourceGroupName, # Resource Group name - can be found on the Azure portal: https://manage.windowsazure.cn/\n    [Parameter(Mandatory=$true)][string]$servername, # full server name like \"abcdefg.database.chinacloudapi.cn\"\n    [Parameter(Mandatory=$true)][string]$username, # user name\n    [Parameter(Mandatory=$true)][string]$serverPassword, # password\n    [Parameter(Mandatory=$true)][string]$outputServerName, # metrics collection database for analysis. full server name like \"zyxwvu.database.chinacloudapi.cn\"\n    [Parameter(Mandatory=$true)][string]$outputdatabaseName,\n    [Parameter(Mandatory=$true)][string]$outputDBUsername,\n    [Parameter(Mandatory=$true)][string]$outputDBpassword,\n    [Parameter(Mandatory=$true)][int]$duration_minutes # How long to run. Recommend to run for the period of time when your typical workload is running. At least 10 mins.\n    )\n    \n    Add-AzureAccount -Environment AzureChinaCloud \n    Select-AzureSubscription $AzureSubscriptionName\n    Switch-AzureMode AzureResourceManager\n    \n    $server = Get-AzureSqlServer -ServerName $servername.Split('.')[0] -ResourceGroupName $ResourceGroupName\n    \n    # Check version/upgrade status of the server\n    $upgradestatus = Get-AzureSqlServerUpgrade -ServerName $servername.Split('.')[0] -ResourceGroupName $ResourceGroupName\n    $version = \"\"\n    if ([string]::IsNullOrWhiteSpace($server.ServerVersion)) \n    {\n    $version = $upgradestatus.Status\n    }\n    else\n    {\n    $version = $server.ServerVersion\n    }\n    \n    # For Elastic database pool candidates, we exclude master, and any databases that are already in a pool. You may add more databases to the excluded list below as needed\n    $ListOfDBs = Get-AzureSqlDatabase -ServerName $servername.Split('.')[0] -ResourceGroupName $ResourceGroupName | Where-Object {$_.DatabaseName -notin (\"master\") -and $_.CurrentServiceLevelObjectiveName -notin (\"ElasticPool\") -and $_.CurrentServiceObjectiveName -notin (\"ElasticPool\")}\n    \n    $outputConnectionString = \"Data Source=$outputServerName;Integrated Security=false;Initial Catalog=$outputdatabaseName;User Id=$outputDBUsername;Password=$outputDBpassword\"\n    $destinationTableName = \"resource_stats_output\"\n    \n    # Create a table in output database for metrics collection\n    $sql = \"\n    IF  NOT EXISTS (SELECT * FROM sys.objects \n    WHERE object_id = OBJECT_ID(N'$($destinationTableName)') AND type in (N'U'))\n    \n    BEGIN\n    Create Table $($destinationTableName) (database_name varchar(128), slo varchar(20), end_time datetime, avg_cpu float, avg_io float, avg_log float, db_size float);\n    Create Clustered Index ci_endtime ON $($destinationTableName) (end_time);\n    END\n    TRUNCATE TABLE $($destinationTableName);\n    \"\n    Invoke-Sqlcmd -ServerInstance $outputServerName -Database $outputdatabaseName -Username $outputDBUsername -Password $outputDBpassword -Query $sql -ConnectionTimeout 120 -QueryTimeout 120 \n    \n    # waittime (minutes) is interval between data collection queries in the loop below.\n    $Waittime = 10\n    $end_Time = [DateTime]::UtcNow\n    $start_time = $end_time.AddMinutes(-$Waittime)\n    $finish_time = $end_Time.AddMinutes($duration_minutes)\n    \n    While ($end_time -lt $finish_time)\n    {\n    Write-Host \"Collecting metrics...\" \n    foreach ($db in $ListOfDBs)\n    {\n    if ($version -in (\"12.0\", \"Completed\")) # for V12 databases \n    {\n    $sql = \"Declare @dbname varchar(128) = '$($db.DatabaseName)';\"\n    $sql += \"Declare @SLO varchar(20) = '$($db.CurrentServiceLevelObjectiveName)';\"\n    $sql+= \"\n    Declare @DTU_cap int, @db_size float;\n    Select @DTU_cap = CASE @SLO \n    WHEN 'Basic' THEN 5\n    WHEN 'S0' THEN 10\n    WHEN 'S1' THEN 20\n    WHEN 'S2' THEN 50\n    WHEN 'S3' THEN 100\n    WHEN 'P1' THEN 125\n    WHEN 'P2' THEN 250\n    WHEN 'P3' THEN 1000\n    ELSE 50 -- assume Web/Business DBs\n    END\n    SELECT @db_size = SUM(reserved_page_count) * 8.0/1024/1024 FROM sys.dm_db_partition_stats\n    SELECT @dbname as database_name, @SLO, dateadd(second, round(datediff(second, '2015-01-01', end_time) / 15.0, 0) * 15,'2015-01-01')\n    as end_time, avg_cpu_percent * (@DTU_cap/100.0) AS avg_cpu, avg_data_io_percent * (@DTU_cap/100.0) AS avg_io, avg_log_write_percent * (@DTU_cap/100.0) AS avg_log, @db_size as db_size FROM sys.dm_db_resource_stats\n    WHERE end_time > '$($start_time)' and end_time <= '$($end_time)';\n    \" \n    }\n    else\n    {\n    $sql = \"Declare @dbname varchar(128) = '$($db.DatabaseName)';\"\n    $sql += \"Declare @SLO varchar(20) = '$($db.CurrentServiceLevelObjectiveName)';\"\n    $sql+= \"\n    Declare @DTU_cap int, @db_size float;\n    Select @DTU_cap = CASE @SLO \n    WHEN 'Basic' THEN 5\n    WHEN 'S0' THEN 10\n    WHEN 'S1' THEN 20\n    WHEN 'S2' THEN 50\n    WHEN 'P1' THEN 100\n    WHEN 'P2' THEN 200\n    WHEN 'P3' THEN 800\n    ELSE 50 -- assume Web/Business DBs\n    END\n    SELECT @db_size = SUM(reserved_page_count) * 8.0/1024/1024 from sys.dm_db_partition_stats\n    SELECT @dbname as database_name, @SLO, dateadd(second, round(datediff(second, '2015-01-01', end_time) / 15.0, 0) * 15,'2015-01-01')\n    as end_time, avg_cpu_percent * (@DTU_cap/100.0) AS avg_cpu, avg_data_io_percent * (@DTU_cap/100.0) AS avg_io, avg_log_write_percent * (@DTU_cap/100.0) AS avg_log, @db_size as db_size FROM sys.dm_db_resource_stats\n    WHERE end_time > '$($start_time)' and end_time <= '$($end_time)';\n    \" \n    }\n    \n    $result = Invoke-Sqlcmd -ServerInstance $servername -Database $db.DatabaseName -Username $username -Password $serverPassword -Query $sql -ConnectionTimeout 120 -QueryTimeout 3600 \n    #bulk copy the metrics to output database\n    $bulkCopy = new-object (\"Data.SqlClient.SqlBulkCopy\") $outputConnectionString \n    $bulkCopy.BulkCopyTimeout = 600\n    $bulkCopy.DestinationTableName = \"$destinationTableName\";\n    $bulkCopy.WriteToServer($result);\n    \n    }\n    \n    $start_time = $start_time.AddMinutes($Waittime)\n    $end_time = $end_time.AddMinutes($Waittime)\n    Write-Host $start_time\n    Write-Host $end_time\n    do {\n    Start-Sleep 1\n       }\n    until (([DateTime]::UtcNow) -ge $end_time)\n    }\n    \n    Write-Host \"Analyzing the collected metrics....\"\n    # Analysis query that does aggregation of the resource metrics to calculate pool size.\n    $sql1 = 'Declare @DTU_Perf_99 as float, @DTU_Storage as float;\n    WITH group_stats AS\n    (\n    SELECT end_time, SUM(db_size) AS avg_group_Storage, SUM(avg_cpu) AS avg_group_cpu, SUM(avg_io) AS avg_group_io,SUM(avg_log) AS avg_group_log\n    FROM resource_stats_output \n    WHERE slo LIKE '\n    \n    $sql2 = '\n    GROUP BY end_time\n    )\n    -- calculate aggregate storage and DTUs for all DBs in the group\n    , group_DTU AS\n    (\n    SELECT end_time, avg_group_Storage, \n    (SELECT Max(v)\n       FROM (VALUES (avg_group_cpu), (avg_group_log), (avg_group_io)) AS value(v)) AS avg_group_DTU\n    FROM group_stats\n    )\n    -- Get top 1 percent of the storage and DTU utilization samples.\n    , top1_percent AS (\n    SELECT TOP 1 PERCENT avg_group_Storage, avg_group_dtu FROM group_dtu ORDER BY [avg_group_DTU] DESC\n    )\n    \n    -- Max and 99th percentile DTU for the given list of databases if converted into an elastic pool. Storage is increased by factor of 1.25 to accommodate for future growth. Currently storage limit of the pool is determined by the amount of DTUs based on 1GB/DTU.\n    --SELECT MAX(avg_group_Storage)*1.25/1024.0 AS Group_Storage_DTU, MAX(avg_group_dtu) AS Group_Performance_DTU, MIN(avg_group_dtu) AS Group_Performance_DTU_99th_percentile FROM top1_percent;\n    SELECT @DTU_Storage = MAX(avg_group_Storage)*1.25/1024.0, @DTU_Perf_99 = MIN(avg_group_dtu) FROM top1_percent;\n    IF @DTU_Storage > @DTU_Perf_99 \n    SELECT ''Total number of DTUs dominated by storage: '' + convert(varchar(100), @DTU_Storage)\n    ELSE \n    SELECT ''Total number of DTUs dominated by resource consumption: '' + convert(varchar(100), @DTU_Perf_99)'\n    \n    #check if there are any web/biz edition dbs in the collected metrics\n    $checkslo = \"SELECT TOP 1 slo FROM resource_stats_output WHERE slo LIKE 'shared%'\"\n    $output = Invoke-Sqlcmd -ServerInstance $outputServerName -Database $outputdatabaseName -Username $outputDBUsername -Password $outputDBpassword -Query $checkslo -QueryTimeout 3600 | select -expand slo\n    if ($output -like \"Shared*\")\n    {\n    write-host \"`nWeb/Business edition:\" -BackgroundColor Green -ForegroundColor Black\n    $sql = $sql1 + \"'Shared%'\"  + $sql2\n    $data = Invoke-Sqlcmd -ServerInstance $outputServerName -Database $outputdatabaseName -Username $outputDBUsername -Password $outputDBpassword -Query $sql -QueryTimeout 3600\n    $data | %{'{0}' -f $_[0]}\n    }\n    \n    #check if there are any basic edition dbs in the collected metrics\n    $checkslo = \"SELECT TOP 1 slo FROM resource_stats_output WHERE slo LIKE 'Basic%'\"\n    $output = Invoke-Sqlcmd -ServerInstance $outputServerName -Database $outputdatabaseName -Username $outputDBUsername -Password $outputDBpassword -Query $checkslo -QueryTimeout 3600 | select -expand slo\n    if ($output -like \"Basic*\")\n    {\n    write-host \"`nBasic edition:\" -BackgroundColor Green -ForegroundColor Black\n    $sql = $sql1 + \"'Basic%'\"  + $sql2\n    $data = Invoke-Sqlcmd -ServerInstance $outputServerName -Database $outputdatabaseName -Username $outputDBUsername -Password $outputDBpassword -Query $sql -QueryTimeout 3600\n    $data | %{'{0}' -f $_[0]} \n    }\n    \n    #check if there are any standard edition dbs in the collected metrics\n    $checkslo = \"SELECT TOP 1 slo FROM resource_stats_output WHERE slo LIKE 'S%' AND slo NOT LIKE 'Shared%'\"\n    $output = Invoke-Sqlcmd -ServerInstance $outputServerName -Database $outputdatabaseName -Username $outputDBUsername -Password $outputDBpassword -Query $checkslo -QueryTimeout 3600 | select -expand slo\n    if ($output -like \"S*\")\n    {\n    write-host \"`nStandard edition:\" -BackgroundColor Green -ForegroundColor Black\n    $sql = $sql1 + \"'S%' AND slo NOT LIKE 'Shared%'\"  + $sql2\n    $data = Invoke-Sqlcmd -ServerInstance $outputServerName -Database $outputdatabaseName -Username $outputDBUsername -Password $outputDBpassword -Query $sql -QueryTimeout 3600\n    $data | %{'{0}' -f $_[0]}\n    }\n    \n    #check if there are any premium edition dbs in the collected metrics\n    $checkslo = \"SELECT TOP 1 slo FROM resource_stats_output WHERE slo LIKE 'P%'\"\n    $output = Invoke-Sqlcmd -ServerInstance $outputServerName -Database $outputdatabaseName -Username $outputDBUsername -Password $outputDBpassword -Query $checkslo -QueryTimeout 3600 | select -expand slo\n    if ($output -like \"P*\")\n    {\n    write-host \"`nPremium edition:\" -BackgroundColor Green -ForegroundColor Black\n    $sql = $sql1 + \"'P%'\"  + $sql2\n    $data = Invoke-Sqlcmd -ServerInstance $outputServerName -Database $outputdatabaseName -Username $outputDBUsername -Password $outputDBpassword -Query $sql -QueryTimeout 3600\n    $data | %{'{0}' -f $_[0]}\n    }\n        \n\n## 摘要\n\n并非所有单一数据库都是弹性数据库池的最佳候选项。使用模式表现为低平均使用率与相对不频繁使用率高峰的数据库，是弹性数据库池的绝佳候选项。应用程序使用模式是动态的，因此，请使用本文中所述的信息和工具来进行初始评估，以确定弹性数据库池是否是部分或所有数据库的良好选择。本文只是帮助你确定弹性数据库池是否合适的起点。请记住，你应该持续监视历史资源使用量（使用 STA 或 DMV），并不断地重新评估所有数据库的性能级别。要知道，你可以轻松地将数据库移入和移出弹性数据库池，如果你有极多的数据库，可以创建大小不一的池，以将数据库划分到其中。\n\n\n\n<!--Image references-->\n[1]: ./media/sql-database-elastic-pool-guidance/one-database.png\n[2]: ./media/sql-database-elastic-pool-guidance/four-databases.png\n[3]: ./media/sql-database-elastic-pool-guidance/twenty-databases.png\n\n<!---HONumber=Mooncake_0118_2016-->\n"
+}

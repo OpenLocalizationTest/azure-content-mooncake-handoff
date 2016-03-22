@@ -1,0 +1,68 @@
+{
+  "nodes": [
+    {
+      "content": "接下来，需要更改注册推送通知的方式，以确保在尝试注册之前对用户进行身份验证。客户端应用更新取决于实现推送通知的方式。",
+      "pos": [
+        1,
+        59
+      ]
+    },
+    {
+      "content": "使用 Visual Studio 2013 Update 2 或更高版本中的推送通知向导",
+      "pos": [
+        65,
+        109
+      ]
+    },
+    {
+      "content": "按此方法，该向导在你的项目中生成新的 push.register.js 和 service.js 文件。",
+      "pos": [
+        111,
+        163
+      ]
+    },
+    {
+      "pos": [
+        168,
+        266
+      ],
+      "content": "在 Solution Explorer 中的 Visual Studio 内，打开 push.register.js 项目文件然后注释掉或删除对 <bpt id=\"p1\">**</bpt>addEventListener<ept id=\"p1\">**</ept> 的调用。"
+    },
+    {
+      "pos": [
+        272,
+        310
+      ],
+      "content": "在 default.js 项目文件中，将现有<bpt id=\"p1\">**</bpt>登录<ept id=\"p1\">**</ept>函数替换为以下代码："
+    },
+    {
+      "content": "手动启用推送通知",
+      "pos": [
+        1649,
+        1657
+      ]
+    },
+    {
+      "content": "使用此方法时，您将本教程中的注册代码直接添加到 default.js 项目文件。",
+      "pos": [
+        1667,
+        1707
+      ]
+    },
+    {
+      "pos": [
+        1712,
+        1869
+      ],
+      "content": "在 Solution Explorer 中的 Visual Studio 内，打开 default.js 项目文件并在 <bpt id=\"p1\">**</bpt>onActivated<ept id=\"p1\">**</ept> 事件处理程序中，找到调用 <bpt id=\"p2\">**</bpt>createPushNotificationChannelForApplicationAsync<ept id=\"p2\">**</ept> 函数的代码行，代码行如下所示："
+    },
+    {
+      "pos": [
+        2258,
+        2321
+      ],
+      "content": "将此代码行移到<bpt id=\"p1\">**</bpt>登录<ept id=\"p1\">**</ept>函数，就移到对 <bpt id=\"p2\">**</bpt>refreshTodoItems<ept id=\"p2\">**</ept> 的调用之前，以便<bpt id=\"p3\">**</bpt>登录<ept id=\"p3\">**</ept>函数如下所示："
+    }
+  ],
+  "content": "\n接下来，需要更改注册推送通知的方式，以确保在尝试注册之前对用户进行身份验证。客户端应用更新取决于实现推送通知的方式。\n\n### 使用 Visual Studio 2013 Update 2 或更高版本中的推送通知向导\n\n按此方法，该向导在你的项目中生成新的 push.register.js 和 service.js 文件。\n\n1. 在 Solution Explorer 中的 Visual Studio 内，打开 push.register.js 项目文件然后注释掉或删除对 **addEventListener** 的调用。 \n\n2. 在 default.js 项目文件中，将现有**登录**函数替换为以下代码：\n \n        // Request authentication from Mobile Services using a Facebook login.\n        var login = function () {\n            return new WinJS.Promise(function (complete) {\n                client.login(\"facebook\").done(function (results) {\n                    userId = results.userId;\n                    // Request a push notification channel.\n                    Windows.Networking.PushNotifications\n                        .PushNotificationChannelManager\n                        .createPushNotificationChannelForApplicationAsync()\n                        .then(function (channel) {\n                            // Register for notifications using the new channel\n                            client.push.registerNative(channel.uri);\n                        });\n                    refreshTodoItems();\n                    var message = \"You are now logged in as: \" + userId;\n                    var dialog = new Windows.UI.Popups.MessageDialog(message);\n                    dialog.showAsync().done(complete);\n                }, function (error) {\n                    userId = null;\n                    var dialog = new Windows.UI.Popups\n                        .MessageDialog(\"An error occurred during login\", \"Login Required\");\n                    dialog.showAsync().done(complete);\n                });\n            });\n        }  \n\n### 手动启用推送通知        \n\n使用此方法时，您将本教程中的注册代码直接添加到 default.js 项目文件。\n\n1. 在 Solution Explorer 中的 Visual Studio 内，打开 default.js 项目文件并在 **onActivated** 事件处理程序中，找到调用 **createPushNotificationChannelForApplicationAsync** 函数的代码行，代码行如下所示：\n\n        // Request a push notification channel.\n        Windows.Networking.PushNotifications\n            .PushNotificationChannelManager\n            .createPushNotificationChannelForApplicationAsync()\n            .then(function (channel) {\n                // Register for notifications using the new channel\n                client.push.registerNative(channel.uri);\n            }); \n \n2. 将此代码行移到**登录**函数，就移到对 **refreshTodoItems** 的调用之前，以便**登录**函数如下所示：\n \n        // Request authentication from Mobile Services using a Facebook login.\n        var login = function () {\n            return new WinJS.Promise(function (complete) {\n                client.login(\"facebook\").done(function (results) {\n                    userId = results.userId;\n                    // Request a push notification channel.\n                    Windows.Networking.PushNotifications\n                        .PushNotificationChannelManager\n                        .createPushNotificationChannelForApplicationAsync()\n                        .then(function (channel) {\n                            // Register for notifications using the new channel\n                            client.push.registerNative(channel.uri);\n                        });\n                    refreshTodoItems();\n                    var message = \"You are now logged in as: \" + userId;\n                    var dialog = new Windows.UI.Popups.MessageDialog(message);\n                    dialog.showAsync().done(complete);\n                }, function (error) {\n                    userId = null;\n                    var dialog = new Windows.UI.Popups\n                        .MessageDialog(\"An error occurred during login\", \"Login Required\");\n                    dialog.showAsync().done(complete);\n                });\n            });\n        }  \n\n<!---HONumber=74-->"
+}

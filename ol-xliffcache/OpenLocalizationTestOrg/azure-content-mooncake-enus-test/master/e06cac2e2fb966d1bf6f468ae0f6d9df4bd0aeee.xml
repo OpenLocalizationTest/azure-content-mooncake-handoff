@@ -1,0 +1,4293 @@
+{
+  "nodes": [
+    {
+      "content": "使用 Azure Site Recovery（旧版）将 VMware 虚拟机和物理服务器复制到 Azure | Mcirosoft Azure",
+      "pos": [
+        27,
+        98
+      ]
+    },
+    {
+      "content": "介绍一种旧的部署方式，可以通过设置 Azure Site Recovery 来协调从本地 VMware 虚拟机和 Windows/Linux 物理服务器到 Azure 的复制、故障转移和恢复操作。",
+      "pos": [
+        118,
+        216
+      ]
+    },
+    {
+      "content": "通过 Azure Site Recovery（旧版）将 VMware 虚拟机和物理服务器复制到 Azure",
+      "pos": [
+        438,
+        491
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        495,
+        511
+      ]
+    },
+    {
+      "content": "Enhanced",
+      "pos": [
+        515,
+        523
+      ]
+    },
+    {
+      "content": "Legacy",
+      "pos": [
+        591,
+        597
+      ]
+    },
+    {
+      "pos": [
+        671,
+        859
+      ],
+      "content": "Azure Site Recovery 服务有助于业务连续性和灾难恢复 (BCDR) 策略，因为它可以协调虚拟机和物理服务器的复制、故障转移和恢复。虚拟机可复制到 Azure 中，也可复制到本地数据中心中。如需快速概览，请阅读<bpt id=\"p1\">[</bpt>什么是 Azure Site Recovery？<ept id=\"p1\">](/documentation/articles/site-recovery-overview)</ept>。"
+    },
+    {
+      "content": "概述",
+      "pos": [
+        864,
+        866
+      ]
+    },
+    {
+      "content": "本文将介绍如何：",
+      "pos": [
+        868,
+        876
+      ]
+    },
+    {
+      "pos": [
+        880,
+        966
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>将 VMware 虚拟机复制到 Azure<ept id=\"p1\">**</ept> - 部署 Site Recovery，以便协调本地 VMware 虚拟机到 Azure 存储空间的复制、故障转移和恢复。"
+    },
+    {
+      "pos": [
+        969,
+        1062
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>将物理服务器复制到 Azure<ept id=\"p1\">**</ept> - 部署 Azure Site Recovery，以便协调本地 Windows 和 Linux 物理服务器到 Azure 的复制、故障转移和恢复。"
+    },
+    {
+      "pos": [
+        1065,
+        1219
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 本文所述方案包含<bpt id=\"p1\">**</bpt>旧版说明<ept id=\"p1\">**</ept>。新部署请勿遵循本文。请改用针对经典门户的<bpt id=\"p2\">[</bpt>增强型部署<ept id=\"p2\">](/documentation/articles/site-recovery-vmware-to-azure-classic)</ept>说明。如果你已使用本文所述方法进行了部署，则建议你迁移到下述新版本。"
+    },
+    {
+      "content": "迁移到增强型部署",
+      "pos": [
+        1225,
+        1233
+      ]
+    },
+    {
+      "content": "只有在你已经根据本文说明将 VMware 虚拟机或 Windows/Linux 物理服务器复制到 Azure 的情况下，才应参考本部分。",
+      "pos": [
+        1235,
+        1303
+      ]
+    },
+    {
+      "content": "若要迁移现有的部署，需执行以下操作：",
+      "pos": [
+        1305,
+        1323
+      ]
+    },
+    {
+      "content": "在本地站点中部署新的 Site Recovery 组件。",
+      "pos": [
+        1328,
+        1356
+      ]
+    },
+    {
+      "content": "在新的配置服务器上为 vCenter 服务器和源计算机配置凭据。",
+      "pos": [
+        1360,
+        1392
+      ]
+    },
+    {
+      "content": "通过新的配置服务器发现现有的 vCenter 服务器。",
+      "pos": [
+        1396,
+        1423
+      ]
+    },
+    {
+      "content": "通过新的配置服务器创建新的保护组。",
+      "pos": [
+        1427,
+        1444
+      ]
+    },
+    {
+      "content": "在开始之前，请注意：",
+      "pos": [
+        1447,
+        1457
+      ]
+    },
+    {
+      "content": "建议你计划一个维护时间，以便迁移到增强型部署。",
+      "pos": [
+        1461,
+        1484
+      ]
+    },
+    {
+      "content": "只有在现有保护组已在旧部署过程中创建的情况下，“迁移计算机”选项才可用。",
+      "pos": [
+        1487,
+        1523
+      ]
+    },
+    {
+      "content": "完成迁移步骤以后，可能需要 15 分钟或更长的时间才能完成凭据的刷新以及虚拟机的发现和刷新（刷新后才能将其添加到保护组）。你可以手动进行刷新，不必等待。",
+      "pos": [
+        1526,
+        1602
+      ]
+    },
+    {
+      "content": "按如下方式进行迁移：",
+      "pos": [
+        1605,
+        1615
+      ]
+    },
+    {
+      "pos": [
+        1620,
+        1924
+      ],
+      "content": "阅读有关<bpt id=\"p1\">[</bpt>增强型功能<ept id=\"p1\">](/documentation/articles/site-recovery-vmware-to-azure-classic#enhanced-deployment)</ept>的信息，确保你了解新的<bpt id=\"p2\">[</bpt>体系结构<ept id=\"p2\">](/documentation/articles/site-recovery-vmware-to-azure-classic#scenario-architecture)</ept>，并查看增强型部署的<bpt id=\"p3\">[</bpt>先决条件<ept id=\"p3\">](/documentation/articles/site-recovery-vmware-to-azure-classic#before-you-start-deployment)</ept>。"
+    },
+    {
+      "pos": [
+        1928,
+        2287
+      ],
+      "content": "获取<bpt id=\"p1\">[</bpt>保管库注册密钥<ept id=\"p1\">](/documentation/articles/site-recovery-vmware-to-azure-classic#step-3:-download-a-vault-registration-key)</ept>并<bpt id=\"p2\">[</bpt>运行统一安装程序向导<ept id=\"p2\">](/documentation/articles/site-recovery-vmware-to-azure-classic#step-5-install-the-management-server)</ept>，以便在管理服务器上安装配置服务器、进程服务器和主目标服务器组件。阅读有关<bpt id=\"p3\">[</bpt>容量规划<ept id=\"p3\">](/documentation/articles/site-recovery-vmware-to-azure-classic#capacity-planning)</ept>的更多信息。"
+    },
+    {
+      "pos": [
+        2291,
+        2591
+      ],
+      "content": "如果你有一个 VMware vCenter 服务器，请<bpt id=\"p1\">[</bpt>设置凭据<ept id=\"p1\">](/documentation/articles/site-recovery-vmware-to-azure-classic#step-6-set-up-credentials-for-the-vcenter-server)</ept>对其进行访问，使得 Site Recovery 能够自动发现所管理的 VM。阅读有关<bpt id=\"p2\">[</bpt>所需权限<ept id=\"p2\">](/documentation/articles/site-recovery-vmware-to-azure-classic#vmware-permissions-for-vcenter-access)</ept>的更多信息。"
+    },
+    {
+      "pos": [
+        2595,
+        2751
+      ],
+      "content": "添加 <bpt id=\"p1\">[</bpt>vCenter 服务器或 ESXi 主机<ept id=\"p1\">](/documentation/articles/site-recovery-vmware-to-azure-classic#step-7-add-vcenter-servers-and-esxi-hosts)</ept>。门户进行刷新以显示凭据的时间可能长达 15 分钟。"
+    },
+    {
+      "pos": [
+        2755,
+        2927
+      ],
+      "content": "创建<bpt id=\"p1\">[</bpt>新的保护组<ept id=\"p1\">](/documentation/articles/site-recovery-vmware-to-azure-classic#step-8-create-a-protection-group)</ept>。门户进行刷新以发现和显示虚拟机的时间可能长达 15 分钟。如果你不想等待，则可突出显示管理服务器名称（请勿单击），然后单击“刷新”。"
+    },
+    {
+      "content": "在新的保护组下，单击“迁移计算机”。",
+      "pos": [
+        2931,
+        2949
+      ]
+    },
+    {
+      "content": "添加帐户",
+      "pos": [
+        2957,
+        2961
+      ]
+    },
+    {
+      "content": "在“选择计算机”中，选择要从其进行迁移的保护组，以及要迁移的计算机。",
+      "pos": [
+        3043,
+        3077
+      ]
+    },
+    {
+      "content": "添加帐户",
+      "pos": [
+        3085,
+        3089
+      ]
+    },
+    {
+      "content": "在“配置目标设置”中，指定你是否希望对所有计算机使用相同的设置，然后选择进程服务器和 Azure 存储帐户。如果你已设置单个管理服务器，则进程服务器就是该管理服务器的 IP 地址。",
+      "pos": [
+        3171,
+        3261
+      ]
+    },
+    {
+      "content": "添加帐户",
+      "pos": [
+        3269,
+        3273
+      ]
+    },
+    {
+      "content": "在“指定帐户”中，选择所创建的帐户，以便自动将新版移动服务推送到受保护的计算机。",
+      "pos": [
+        3355,
+        3395
+      ]
+    },
+    {
+      "content": "添加帐户",
+      "pos": [
+        3403,
+        3407
+      ]
+    },
+    {
+      "content": "Site Recovery 会将你的已复制数据迁移到你所提供的 Azure 存储帐户。（可选）你可以重复使用在旧部署中使用的存储帐户。",
+      "pos": [
+        3490,
+        3557
+      ]
+    },
+    {
+      "content": "作业完成后，虚拟机会自动同步。同步完成后，你可以从旧保护组中删除虚拟机。",
+      "pos": [
+        3562,
+        3598
+      ]
+    },
+    {
+      "content": "所有计算机都迁移完以后，你可以删除旧保护组。",
+      "pos": [
+        3603,
+        3625
+      ]
+    },
+    {
+      "content": "请记住，在同步完成后，需要指定计算机的故障转移属性以及 Azure 网络设置。",
+      "pos": [
+        3630,
+        3669
+      ]
+    },
+    {
+      "content": "如果你有现成的恢复计划，则可通过“迁移恢复计划”将其迁移到增强型部署。只有在所有受保护的计算机迁移完后，才能执行此操作。",
+      "pos": [
+        3674,
+        3734
+      ]
+    },
+    {
+      "content": "添加帐户",
+      "pos": [
+        3743,
+        3747
+      ]
+    },
+    {
+      "content": "我需要做好哪些准备？",
+      "pos": [
+        3830,
+        3840
+      ]
+    },
+    {
+      "content": "此图显示了部署组件。",
+      "pos": [
+        3842,
+        3852
+      ]
+    },
+    {
+      "content": "新保管库",
+      "pos": [
+        3856,
+        3860
+      ]
+    },
+    {
+      "content": "以下是你需要做好的准备：",
+      "pos": [
+        3934,
+        3946
+      ]
+    },
+    {
+      "content": "组件",
+      "pos": [
+        3950,
+        3952
+      ]
+    },
+    {
+      "content": "部署",
+      "pos": [
+        3959,
+        3961
+      ]
+    },
+    {
+      "content": "详细信息",
+      "pos": [
+        3968,
+        3972
+      ]
+    },
+    {
+      "content": "配置服务器",
+      "pos": [
+        3993,
+        3998
+      ]
+    },
+    {
+      "content": "在与 Site Recovery 相同的订阅中部署一个 Azure 标准 A3 虚拟机。",
+      "pos": [
+        4006,
+        4050
+      ]
+    },
+    {
+      "content": "在 Site Recovery 门户中设置",
+      "pos": [
+        4058,
+        4079
+      ]
+    },
+    {
+      "content": "此服务器可在 Azure 中协调受保护的计算机、进程服务器和主目标服务器之间的通信。在执行故障转移时，它可在 Azure 中设置复制并协调恢复。",
+      "pos": [
+        4086,
+        4158
+      ]
+    },
+    {
+      "content": "主目标服务器",
+      "pos": [
+        4161,
+        4167
+      ]
+    },
+    {
+      "content": "你可以将其部署为基于 Windows Server 2012 R2 库映像（用于保护 Windows 计算机）的 Azure 虚拟机或 Windows 服务器，或将其部署为基于 OpenLogic CentOS 6.6 库映像（用于保护 Linux 计算机）的 Linux 服务器。",
+      "pos": [
+        4175,
+        4316
+      ]
+    },
+    {
+      "content": "共有三个大小选项可供选择 – 标准 A4、标准 D14 和标准 DS4。",
+      "pos": [
+        4324,
+        4360
+      ]
+    },
+    {
+      "content": "该服务器连接到配置服务器所在的 Azure 网络。",
+      "pos": [
+        4367,
+        4392
+      ]
+    },
+    {
+      "content": "在 Site Recovery 门户中设置",
+      "pos": [
+        4399,
+        4420
+      ]
+    },
+    {
+      "content": "它使用在 Azure 存储帐户的 Blob 存储上所创建的附加 VHD 从受保护计算机接收并保留复制的数据。",
+      "pos": [
+        4430,
+        4484
+      ]
+    },
+    {
+      "content": "标准 DS4 专门用于针对需要通过高级存储帐户持续提供高性能和低延迟的工作负荷配置保护。",
+      "pos": [
+        4492,
+        4536
+      ]
+    },
+    {
+      "content": "进程服务器",
+      "pos": [
+        4543,
+        4548
+      ]
+    },
+    {
+      "content": "部署为运行 Windows Server 2012 R2 的本地虚拟或物理服务器",
+      "pos": [
+        4556,
+        4596
+      ]
+    },
+    {
+      "content": "我们建议将进程服务器放置在与要保护的计算机相同的网络和 LAN 网段中，但是，它可以运行在不同网络上，只要受保护的计算机对其拥有 L3 网络可见性即可。",
+      "pos": [
+        4603,
+        4679
+      ]
+    },
+    {
+      "content": "可以在 Site Recovery 门户中设置该服务器并将其注册到配置服务器。",
+      "pos": [
+        4686,
+        4725
+      ]
+    },
+    {
+      "content": "受保护的虚拟机将复制数据发送到本地进程服务器。它具有基于磁盘的缓存，用于缓存所收到的复制数据。它对该数据执行多种操作。",
+      "pos": [
+        4735,
+        4794
+      ]
+    },
+    {
+      "content": "它通过在发送数据到主目标服务器之前，缓存、压缩和加密数据来优化数据。",
+      "pos": [
+        4801,
+        4835
+      ]
+    },
+    {
+      "content": "处理移动服务的推送安装。",
+      "pos": [
+        4842,
+        4854
+      ]
+    },
+    {
+      "content": "它执行 VMware 虚拟机的自动发现。",
+      "pos": [
+        4861,
+        4881
+      ]
+    },
+    {
+      "content": "本地计算机",
+      "pos": [
+        4888,
+        4893
+      ]
+    },
+    {
+      "content": "本地虚拟机是在 VMware 虚拟机监控程序上运行的虚拟机，或是运行 Windows 或 Linux 的物理服务器。",
+      "pos": [
+        4898,
+        4956
+      ]
+    },
+    {
+      "content": "你可以设置应用于虚拟机和服务器的复制设置。你可以故障转移单个计算机，或更常见地，随着包含多个虚拟机的恢复方案一起故障转移。",
+      "pos": [
+        4959,
+        5020
+      ]
+    },
+    {
+      "content": "移动服务",
+      "pos": [
+        5023,
+        5027
+      ]
+    },
+    {
+      "content": "在想要保护的每个虚拟机或物理服务器上安装",
+      "pos": [
+        5035,
+        5055
+      ]
+    },
+    {
+      "content": "为服务器启用保护时，可以手动安装或推送并由进程服务器自动安装。",
+      "pos": [
+        5062,
+        5093
+      ]
+    },
+    {
+      "content": "移动服务随着初始复制（重新同步处理）将数据发送到进程服务器。 一旦服务器进入受保护状态（重新同步处理完成之后），移动服务将执行写入磁盘的内存中捕获，并将其发送到进程服务器。Windows 服务器的应用程序一致性是使用 VSS 框架实现的。",
+      "pos": [
+        5100,
+        5219
+      ]
+    },
+    {
+      "content": "Azure Site Recovery 保管库",
+      "pos": [
+        5222,
+        5245
+      ]
+    },
+    {
+      "content": "在订阅 Site Recovery 服务之后设置。",
+      "pos": [
+        5250,
+        5275
+      ]
+    },
+    {
+      "content": "在 Site Recovery 保管库中注册服务器。保管库可协调和安排本地站点与 Azure 之间的数据复制、故障转移和恢复。",
+      "pos": [
+        5278,
+        5341
+      ]
+    },
+    {
+      "content": "复制机制",
+      "pos": [
+        5344,
+        5348
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>通过 Internet<ept id=\"p1\">**</ept> — 通过公共 Internet 连接使用安全 SSL/TLS 通信通信并从受保护的本地服务器和 Azure 复制数据。这是默认选项。",
+      "pos": [
+        5356,
+        5438
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>VPN/ExpressRoute<ept id=\"p1\">**</ept> — 通过 VPN 连接通信并在本地服务器与 Azure 之间复制数据。你将需要在本地站点与 Azure 网络之间设置站点到站点 VPN 或 <bpt id=\"p2\">[</bpt>ExpressRoute<ept id=\"p2\">](/documentation/articles/expressroute-introduction)</ept> 连接。",
+      "pos": [
+        5445,
+        5605
+      ]
+    },
+    {
+      "content": "需选择要在 Site Recovery 部署期间复制的方式。配置机制后，你无法在不影响已受保护服务器上的保护的前提下更改该机制。",
+      "pos": [
+        5612,
+        5676
+      ]
+    },
+    {
+      "content": "无论是哪个选项，都不需要你在受保护的计算机上打开任何入站网络端口。所有网络通信都从本地站点启动。",
+      "pos": [
+        5685,
+        5733
+      ]
+    },
+    {
+      "pos": [
+        5740,
+        5843
+      ],
+      "content": "可以在 <bpt id=\"p1\">[</bpt>Site Recovery 组件<ept id=\"p1\">](/documentation/articles/site-recovery-components)</ept>中深入了解 Site Recovery 组件、提供程序和代理。"
+    },
+    {
+      "content": "容量规划",
+      "pos": [
+        5848,
+        5852
+      ]
+    },
+    {
+      "content": "考虑的主要方面为：",
+      "pos": [
+        5854,
+        5863
+      ]
+    },
+    {
+      "pos": [
+        5867,
+        5899
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>源环境<ept id=\"p1\">**</ept> — VMware 基础结构、源计算机设置和要求。"
+    },
+    {
+      "pos": [
+        5902,
+        5932
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>组件服务器<ept id=\"p1\">**</ept> — 进程服务器、配置服务器和主目标服务器"
+    },
+    {
+      "content": "有关源环境的注意事项",
+      "pos": [
+        5939,
+        5949
+      ]
+    },
+    {
+      "pos": [
+        5953,
+        6017
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>磁盘最大大小<ept id=\"p1\">**</ept> — 可以连接到虚拟机的磁盘的当前大小上限为 1 TB。因此，可以复制的源磁盘的最大大小也限制为 1 TB。"
+    },
+    {
+      "pos": [
+        6020,
+        6086
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>每个源的最大大小<ept id=\"p1\">**</ept> — 单个源计算机的最大大小是 31 TB（包含 31 个磁盘），以及对主目标服务器预配一个 D14 实例。"
+    },
+    {
+      "pos": [
+        6090,
+        6210
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>每个主目标服务器的源数目<ept id=\"p1\">**</ept> — 可以使用单个主目标服务器保护多个源计算机。但是，无法通过多个主目标服务器保护单个计算机，因为在磁盘复制时，镜像磁盘大小的 VHD 在 Azure Blob 存储上创建，并作为数据磁盘附加到主目标服务器。"
+    },
+    {
+      "pos": [
+        6215,
+        6316
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>每个源的每日更改率上限<ept id=\"p1\">**</ept> — 考虑每个源建议的更改率时，有三个需要考虑的因素。对于基于目标的考虑因素，源上每个操作的目标磁盘需要两个 IOPS。这是因为目标磁盘上会发生旧数据的读取和新数据的写入。"
+    },
+    {
+      "pos": [
+        6324,
+        6413
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>进程服务器支持的每日更改率<ept id=\"p1\">**</ept> — 一个源计算机不能跨多个进程服务器。单个进程服务器可以支持多达 1 TB 的每日更改率。因此 1 TB 是源计算机支持的每日数据更改率上限。"
+    },
+    {
+      "pos": [
+        6421,
+        6684
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>目标磁盘支持的最大吞吐量<ept id=\"p1\">**</ept> — 每个源磁盘的最大变换不能超过 144 GB/天（8K 写入大小）。请参阅主目标部分中的表，以获取各种写入大小的目标的吞吐量与 IOPS。必须将此数字除以 2，因为每个源 IOP 在目标磁盘上生成 2 个 IOPS。配置高级存储帐户的目标时，请参阅<bpt id=\"p2\">[</bpt>使用高级存储时的缩放性和性能目标<ept id=\"p2\">](/documentation/articles/storage-scalability-targets#scalability-targets-for-premium-storage-accounts)</ept>。"
+    },
+    {
+      "pos": [
+        6691,
+        6942
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>存储帐户支持的最大吞吐量<ept id=\"p1\">**</ept> — 一个源不能跨越多个存储帐户。假设某个存储帐户每秒可接受最多 20,000 个请求，并且每个源 IOP 在主目标服务器上生成 2 个 IOPS，则建议将源的 IOPS 数目保留为 10,000。配置高级存储帐户的源时，请参阅<bpt id=\"p2\">[</bpt>使用高级存储时的缩放性和性能目标<ept id=\"p2\">](/documentation/articles/storage-scalability-targets#scalability-targets-for-premium-storage-accounts)</ept>。"
+    },
+    {
+      "content": "有关组件服务器的注意事项",
+      "pos": [
+        6948,
+        6960
+      ]
+    },
+    {
+      "content": "表 1 汇总了配置服务器与主目标服务器的虚拟机大小。",
+      "pos": [
+        6962,
+        6988
+      ]
+    },
+    {
+      "content": "组件",
+      "pos": [
+        6992,
+        6994
+      ]
+    },
+    {
+      "content": "部署的 Azure 实例",
+      "pos": [
+        7001,
+        7013
+      ]
+    },
+    {
+      "content": "核心数",
+      "pos": [
+        7020,
+        7023
+      ]
+    },
+    {
+      "content": "内存",
+      "pos": [
+        7030,
+        7032
+      ]
+    },
+    {
+      "content": "最大磁盘数",
+      "pos": [
+        7039,
+        7044
+      ]
+    },
+    {
+      "content": "磁盘大小",
+      "pos": [
+        7051,
+        7055
+      ]
+    },
+    {
+      "content": "配置服务器",
+      "pos": [
+        7092,
+        7097
+      ]
+    },
+    {
+      "content": "标准 A3",
+      "pos": [
+        7100,
+        7105
+      ]
+    },
+    {
+      "content": "4",
+      "pos": [
+        7108,
+        7109
+      ]
+    },
+    {
+      "content": "7 GB",
+      "pos": [
+        7112,
+        7116
+      ]
+    },
+    {
+      "content": "8",
+      "pos": [
+        7119,
+        7120
+      ]
+    },
+    {
+      "content": "1023 GB",
+      "pos": [
+        7123,
+        7130
+      ]
+    },
+    {
+      "content": "主目标服务器",
+      "pos": [
+        7131,
+        7137
+      ]
+    },
+    {
+      "content": "标准 A4",
+      "pos": [
+        7140,
+        7145
+      ]
+    },
+    {
+      "content": "8",
+      "pos": [
+        7148,
+        7149
+      ]
+    },
+    {
+      "content": "14 GB",
+      "pos": [
+        7152,
+        7157
+      ]
+    },
+    {
+      "content": "16",
+      "pos": [
+        7160,
+        7162
+      ]
+    },
+    {
+      "content": "1023 GB",
+      "pos": [
+        7165,
+        7172
+      ]
+    },
+    {
+      "content": "标准 D14",
+      "pos": [
+        7176,
+        7182
+      ]
+    },
+    {
+      "content": "16",
+      "pos": [
+        7185,
+        7187
+      ]
+    },
+    {
+      "content": "112 GB",
+      "pos": [
+        7190,
+        7196
+      ]
+    },
+    {
+      "content": "32",
+      "pos": [
+        7199,
+        7201
+      ]
+    },
+    {
+      "content": "1023 GB",
+      "pos": [
+        7204,
+        7211
+      ]
+    },
+    {
+      "content": "标准 DS4",
+      "pos": [
+        7215,
+        7221
+      ]
+    },
+    {
+      "content": "8",
+      "pos": [
+        7224,
+        7225
+      ]
+    },
+    {
+      "content": "28 GB",
+      "pos": [
+        7228,
+        7233
+      ]
+    },
+    {
+      "content": "16",
+      "pos": [
+        7236,
+        7238
+      ]
+    },
+    {
+      "content": "1023 GB",
+      "pos": [
+        7241,
+        7248
+      ]
+    },
+    {
+      "content": "表 1",
+      "pos": [
+        7252,
+        7255
+      ]
+    },
+    {
+      "content": "进程服务器注意事项",
+      "pos": [
+        7264,
+        7273
+      ]
+    },
+    {
+      "content": "进程服务器的大小通常取决于跨所有受保护工作负荷的每日更改率。主要注意事项包括：",
+      "pos": [
+        7275,
+        7314
+      ]
+    },
+    {
+      "content": "需要有足够的计算容量才能执行内联压缩和加密等任务。",
+      "pos": [
+        7320,
+        7345
+      ]
+    },
+    {
+      "content": "进程服务器使用基于磁盘的缓存。请确保提供建议的缓存空间和磁盘吞吐量，以便在出现网络瓶颈或服务中断时能够存储数据更改。",
+      "pos": [
+        7350,
+        7408
+      ]
+    },
+    {
+      "content": "确保提供足够的带宽，使进程服务器能够将数据上载到主目标服务器，以提供持续的数据保护。",
+      "pos": [
+        7414,
+        7456
+      ]
+    },
+    {
+      "content": "表 2 提供了进程服务器的指导摘要。",
+      "pos": [
+        7459,
+        7477
+      ]
+    },
+    {
+      "content": "数据更改率",
+      "pos": [
+        7481,
+        7486
+      ]
+    },
+    {
+      "content": "CPU",
+      "pos": [
+        7493,
+        7496
+      ]
+    },
+    {
+      "content": "内存",
+      "pos": [
+        7503,
+        7505
+      ]
+    },
+    {
+      "content": "缓存磁盘大小",
+      "pos": [
+        7512,
+        7518
+      ]
+    },
+    {
+      "content": "缓存磁盘吞吐量",
+      "pos": [
+        7524,
+        7531
+      ]
+    },
+    {
+      "content": "带宽入口/出口",
+      "pos": [
+        7538,
+        7545
+      ]
+    },
+    {
+      "content": "&lt; 300 GB",
+      "pos": [
+        7582,
+        7590
+      ]
+    },
+    {
+      "content": "4 个 vCPU（2 个插槽 * 2 个核心 @ 2.5GHz）",
+      "pos": [
+        7593,
+        7625
+      ]
+    },
+    {
+      "content": "4 GB",
+      "pos": [
+        7628,
+        7632
+      ]
+    },
+    {
+      "content": "600 GB",
+      "pos": [
+        7635,
+        7641
+      ]
+    },
+    {
+      "content": "每秒 7 到 10 MB",
+      "pos": [
+        7644,
+        7656
+      ]
+    },
+    {
+      "content": "30 Mbps/21 Mbps",
+      "pos": [
+        7659,
+        7674
+      ]
+    },
+    {
+      "content": "300 到 600 GB",
+      "pos": [
+        7675,
+        7687
+      ]
+    },
+    {
+      "content": "8 个 vCPU（2 个插槽 * 4 个核心 @ 2.5GHz）",
+      "pos": [
+        7690,
+        7722
+      ]
+    },
+    {
+      "content": "6 GB",
+      "pos": [
+        7725,
+        7729
+      ]
+    },
+    {
+      "content": "600 GB",
+      "pos": [
+        7732,
+        7738
+      ]
+    },
+    {
+      "content": "每秒 11 到 15 MB",
+      "pos": [
+        7741,
+        7754
+      ]
+    },
+    {
+      "content": "60 Mbps/42 Mbps",
+      "pos": [
+        7757,
+        7772
+      ]
+    },
+    {
+      "content": "600 GB 到 1 TB",
+      "pos": [
+        7773,
+        7786
+      ]
+    },
+    {
+      "content": "12 个 vCPU（2 个插槽 * 6 个核心 @ 2.5GHz）",
+      "pos": [
+        7789,
+        7822
+      ]
+    },
+    {
+      "content": "8 GB",
+      "pos": [
+        7825,
+        7829
+      ]
+    },
+    {
+      "content": "600 GB",
+      "pos": [
+        7832,
+        7838
+      ]
+    },
+    {
+      "content": "每秒 16 到 20 MB",
+      "pos": [
+        7841,
+        7854
+      ]
+    },
+    {
+      "content": "100 Mbps/70 Mbps",
+      "pos": [
+        7857,
+        7873
+      ]
+    },
+    {
+      "content": "&gt; 1 TB",
+      "pos": [
+        7874,
+        7880
+      ]
+    },
+    {
+      "content": "部署另一个进程服务器",
+      "pos": [
+        7883,
+        7893
+      ]
+    },
+    {
+      "content": "表 2",
+      "pos": [
+        7906,
+        7909
+      ]
+    },
+    {
+      "content": "其中：",
+      "pos": [
+        7913,
+        7916
+      ]
+    },
+    {
+      "content": "入口是下载带宽（源与进程服务器之间的 Intranet）。",
+      "pos": [
+        7920,
+        7949
+      ]
+    },
+    {
+      "content": "出口是上载带宽（进程服务器与主目标服务器之间的 Internet）。出口数字假设平均进程服务器压缩率为 30%。",
+      "pos": [
+        7952,
+        8008
+      ]
+    },
+    {
+      "content": "对于缓存磁盘，建议为所有进程服务器提供一个至少有 128 GB 的独立 OS 磁盘。",
+      "pos": [
+        8011,
+        8053
+      ]
+    },
+    {
+      "content": "缓存磁盘吞吐量已使用以下存储进行基准测试：8 个采用 RAID 10 配置的 10K RPM SAS 驱动器。",
+      "pos": [
+        8056,
+        8111
+      ]
+    },
+    {
+      "content": "配置服务器注意事项",
+      "pos": [
+        8118,
+        8127
+      ]
+    },
+    {
+      "content": "每个配置服务器最多支持 100 个包含 3 到 4 个卷的源计算机。如果超过这些数字，建议部署另一个配置服务器。有关配置服务器的默认虚拟机属性，请参阅“表 1”。",
+      "pos": [
+        8129,
+        8210
+      ]
+    },
+    {
+      "content": "主目标服务器与存储帐户注意事项",
+      "pos": [
+        8217,
+        8232
+      ]
+    },
+    {
+      "content": "每个主目标服务器的存储由 OS 磁盘、保留卷和数据磁盘组成。保留驱动器可以维护 Site Recovery 门户中定义的特定时段内的磁盘更改日志。有关主目标的虚拟机服务器属性，请参阅“表 1”。表 3 显示了如何使用 A4 的磁盘。",
+      "pos": [
+        8234,
+        8350
+      ]
+    },
+    {
+      "content": "实例",
+      "pos": [
+        8354,
+        8356
+      ]
+    },
+    {
+      "content": "操作系统磁盘",
+      "pos": [
+        8363,
+        8369
+      ]
+    },
+    {
+      "content": "保留",
+      "pos": [
+        8376,
+        8378
+      ]
+    },
+    {
+      "content": "数据磁盘数",
+      "pos": [
+        8385,
+        8390
+      ]
+    },
+    {
+      "content": "保留",
+      "pos": [
+        8422,
+        8424
+      ]
+    },
+    {
+      "content": "数据磁盘数",
+      "pos": [
+        8431,
+        8436
+      ]
+    },
+    {
+      "content": "标准 A4",
+      "pos": [
+        8439,
+        8444
+      ]
+    },
+    {
+      "content": "1 个磁盘 (1 * 1023 GB)",
+      "pos": [
+        8447,
+        8466
+      ]
+    },
+    {
+      "content": "1 个磁盘 ( 1 * 1023 GB)",
+      "pos": [
+        8469,
+        8489
+      ]
+    },
+    {
+      "content": "15 个磁盘 (15 * 1023 GB)",
+      "pos": [
+        8492,
+        8513
+      ]
+    },
+    {
+      "content": "标准 D14",
+      "pos": [
+        8514,
+        8520
+      ]
+    },
+    {
+      "content": "1 个磁盘 (1 * 1023 GB)",
+      "pos": [
+        8523,
+        8542
+      ]
+    },
+    {
+      "content": "1 个磁盘 ( 1 * 1023 GB)",
+      "pos": [
+        8545,
+        8565
+      ]
+    },
+    {
+      "content": "31 个磁盘 (15 * 1023 GB)",
+      "pos": [
+        8568,
+        8589
+      ]
+    },
+    {
+      "content": "标准 DS4",
+      "pos": [
+        8590,
+        8596
+      ]
+    },
+    {
+      "content": "1 个磁盘 (1 * 1023 GB)",
+      "pos": [
+        8599,
+        8618
+      ]
+    },
+    {
+      "content": "1 个磁盘 ( 1 * 1023 GB)",
+      "pos": [
+        8621,
+        8641
+      ]
+    },
+    {
+      "content": "15 个磁盘 (15 * 1023 GB)",
+      "pos": [
+        8644,
+        8665
+      ]
+    },
+    {
+      "content": "表 3",
+      "pos": [
+        8669,
+        8672
+      ]
+    },
+    {
+      "content": "主目标服务器的容量规划取决于：",
+      "pos": [
+        8676,
+        8691
+      ]
+    },
+    {
+      "content": "Azure 存储空间性能和限制",
+      "pos": [
+        8695,
+        8710
+      ]
+    },
+    {
+      "pos": [
+        8717,
+        9035
+      ],
+      "content": "单个存储帐户中标准层 VM 的高度使用的磁盘数目上限约为 40（每个磁盘 20,000/500 IOPS）。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>标准存储帐户的可伸缩性目标<ept id=\"p1\">](/documentation/articles/storage-scalability-targets#scalability-targets-for-standard-storage-accounts)</ept>。有关高级存储帐户的详细信息，请参阅<bpt id=\"p2\">[</bpt>高级存储帐户的可伸缩性目标<ept id=\"p2\">](/documentation/articles/storage-scalability-targets#scalability-targets-for-premium-storage-accounts)</ept>。"
+    },
+    {
+      "content": "每日更改率",
+      "pos": [
+        9040,
+        9045
+      ]
+    },
+    {
+      "content": "保留卷存储。",
+      "pos": [
+        9051,
+        9057
+      ]
+    },
+    {
+      "content": "请注意：",
+      "pos": [
+        9059,
+        9063
+      ]
+    },
+    {
+      "content": "一个源不能跨越多个存储帐户。此限制适用于属于配置保护时选择的存储帐户的数据磁盘。OS 和保留磁盘通常属于自动部署的存储帐户。",
+      "pos": [
+        9067,
+        9129
+      ]
+    },
+    {
+      "content": "所需的保留存储卷取决于每日更改率和保留天数。每个主目标服务器所需的保留存储 = 每日来自源的变换总计 * 保留天数。",
+      "pos": [
+        9132,
+        9190
+      ]
+    },
+    {
+      "content": "每个主目标服务器只有一个保留卷。保留卷在附加到主目标服务器的磁盘之间共享。例如：",
+      "pos": [
+        9194,
+        9234
+      ]
+    },
+    {
+      "content": "如果有一台包含 5 个磁盘的源计算机，并且在源上的每个磁盘生成 120 IOPS（8K 大小），则相当于每个磁盘 240 IOPS（在每个源的目标磁盘上生成 2 个 IO 操作）。每个磁盘 IOPS 限制 500，在 Azure 中是 240 IOPS。",
+      "pos": [
+        9241,
+        9368
+      ]
+    },
+    {
+      "content": "在保留卷上，这会变成 120 * 5 = 600 IOPS，而这可能会造成瓶颈。在此情况下，合理的策略是将更多磁盘添加到保留卷，并将这些磁盘分散成 RAID 条带配置。由于 IOPS 分散在多个驱动器之间，因此可以提高性能。要添加到保留卷的驱动器数目如下：",
+      "pos": [
+        9375,
+        9503
+      ]
+    },
+    {
+      "content": "来自源环境的 IOPS 总计 / 500",
+      "pos": [
+        9514,
+        9534
+      ]
+    },
+    {
+      "content": "每日来自源环境的变换总计（未压缩）/ 287 GB。287 GB 是目标磁盘每日支持的最大吞吐量。此度量值根据因数为 8K 的写入大小而异，因为在此情况下，8K 是假设的写入大小。例如，如果写入大小为 4K，则吞吐量为 287/2。同理，如果写入大小为 16K，则吞吐量为 287*2。",
+      "pos": [
+        9545,
+        9688
+      ]
+    },
+    {
+      "content": "所需的存储帐户数 = 源 IOPS 总计/10000。",
+      "pos": [
+        9691,
+        9718
+      ]
+    },
+    {
+      "content": "开始之前",
+      "pos": [
+        9724,
+        9728
+      ]
+    },
+    {
+      "content": "组件",
+      "pos": [
+        9732,
+        9734
+      ]
+    },
+    {
+      "content": "要求",
+      "pos": [
+        9741,
+        9743
+      ]
+    },
+    {
+      "content": "详细信息",
+      "pos": [
+        9750,
+        9754
+      ]
+    },
+    {
+      "content": "Azure 帐户",
+      "pos": [
+        9776,
+        9784
+      ]
+    },
+    {
+      "pos": [
+        9789,
+        9848
+      ],
+      "content": "需要一个 <bpt id=\"p1\">[</bpt>Azure<ept id=\"p1\">](/)</ept> 帐户。你可以从 <bpt id=\"p2\">[</bpt>1rmb 试用版<ept id=\"p2\">](/pricing/1rmb-trial/)</ept>开始。"
+    },
+    {
+      "content": "Azure 存储空间",
+      "pos": [
+        9851,
+        9861
+      ]
+    },
+    {
+      "content": "需要使用 Azure 存储帐户来存储复制的数据",
+      "pos": [
+        9869,
+        9892
+      ]
+    },
+    {
+      "content": "该帐户应该是<bpt id=\"p1\">[</bpt>标准异地冗余存储帐户<ept id=\"p1\">](/documentation/articles/storage-redundancy#geo-redundant-storage)</ept>或<bpt id=\"p2\">[</bpt>高级存储帐户<ept id=\"p2\">](/documentation/articles/storage-premium-storage-preview-portal)</ept>。",
+      "pos": [
+        9899,
+        10057
+      ]
+    },
+    {
+      "content": "它应该位于 Azure Site Recovery 保管库所在的区域中，并与相同订阅关联。",
+      "pos": [
+        10064,
+        10109
+      ]
+    },
+    {
+      "content": "若要了解详细信息，请阅读 <bpt id=\"p1\">[</bpt>Azure 存储空间简介<ept id=\"p1\">](/documentation/articles/storage-introduction)</ept>",
+      "pos": [
+        10116,
+        10189
+      ]
+    },
+    {
+      "content": "Azure 虚拟网络",
+      "pos": [
+        10196,
+        10206
+      ]
+    },
+    {
+      "content": "你将需要 Azure 虚拟网络，配置服务器和主目标服务器将部署在该网络上。它应该位于 Azure Site Recovery 保管库所在的订阅和区域中。如果你要通过 ExpressRoute 或 VPN 连接复制数据，Azure 虚拟网络必须通过 ExpressRoute 连接或站点到站点 VPN 连接到本地网络。",
+      "pos": [
+        10211,
+        10369
+      ]
+    },
+    {
+      "content": "Azure 资源",
+      "pos": [
+        10372,
+        10380
+      ]
+    },
+    {
+      "pos": [
+        10385,
+        10491
+      ],
+      "content": "确保你有足够的 Azure 资源用于部署所有组件。在 <bpt id=\"p1\">[</bpt>Azure 订阅限制<ept id=\"p1\">](/documentation/articles/azure-subscription-service-limits)</ept>中阅读更多内容。"
+    },
+    {
+      "content": "Azure 虚拟机",
+      "pos": [
+        10494,
+        10503
+      ]
+    },
+    {
+      "content": "要保护的虚拟机应该符合 <bpt id=\"p1\">[</bpt>Azure 先决条件<ept id=\"p1\">](/documentation/articles/site-recovery-best-practices)</ept>。",
+      "pos": [
+        10511,
+        10590
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>磁盘计数<ept id=\"p1\">**</ept> — 单个受保护的服务器最多可以支持 31 个磁盘",
+      "pos": [
+        10597,
+        10630
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>磁盘大小<ept id=\"p1\">**</ept> — 单个磁盘的容量不能超过 1023 GB",
+      "pos": [
+        10637,
+        10667
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>群集<ept id=\"p1\">**</ept> — 不支持群集服务器",
+      "pos": [
+        10674,
+        10691
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>启动<ept id=\"p1\">**</ept> — 不支持统一可扩展固件接口 (UEFI)/可扩展固件接口 (EFI)",
+      "pos": [
+        10698,
+        10740
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>卷<ept id=\"p1\">**</ept> — 不支持 Bitlocker 加密卷",
+      "pos": [
+        10747,
+        10772
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>服务器名称<ept id=\"p1\">**</ept> — 名称应包含 1 到 63 个字符（字母、数字和连字符）。名称必须以字母或数字开头，并以字母或数字结尾。在计算机受到保护后，你可以修改 Azure 名称。",
+      "pos": [
+        10779,
+        10867
+      ]
+    },
+    {
+      "content": "配置服务器",
+      "pos": [
+        10874,
+        10879
+      ]
+    },
+    {
+      "content": "将在你的订阅中针对配置服务器创建基于 Azure Site Recovery Windows Server 2012 R2 库映像的标准 A3 虚拟机。它将作为第一个实例在新的云服务中创建。如果你选择“公共 Internet”作为配置服务器的连接类型，将使用保留的公共 IP 地址创建云服务。",
+      "pos": [
+        10887,
+        11033
+      ]
+    },
+    {
+      "content": "安装路径应该只包含英文字符。",
+      "pos": [
+        11040,
+        11054
+      ]
+    },
+    {
+      "content": "主目标服务器",
+      "pos": [
+        11061,
+        11067
+      ]
+    },
+    {
+      "content": "标准 A4、D14 或 DS4 Azure 虚拟机。",
+      "pos": [
+        11075,
+        11101
+      ]
+    },
+    {
+      "content": "安装路径应该只包含英文字符。例如，对于运行 Linux 的主目标服务器，路径应为 <bpt id=\"p1\">**</bpt>/usr/local/ASR<ept id=\"p1\">**</ept>。",
+      "pos": [
+        11108,
+        11168
+      ]
+    },
+    {
+      "content": "进程服务器",
+      "pos": [
+        11175,
+        11180
+      ]
+    },
+    {
+      "content": "你可以在运行带有最新更新的 Windows Server 2012 R2 的物理或虚拟机上部署进程服务器。在 C:/ 上安装。",
+      "pos": [
+        11188,
+        11251
+      ]
+    },
+    {
+      "content": "我们建议你将该服务器放置在你要保护的计算机所在的网络和子网上。",
+      "pos": [
+        11258,
+        11289
+      ]
+    },
+    {
+      "content": "在进程服务器上安装 VMware vSphere CLI 5.5.0。进程服务器上需要有 VMware vSphere CLI 组件才能发现 vCenter 服务器管理的虚拟机或 ESXi 主机上运行的虚拟机。",
+      "pos": [
+        11296,
+        11401
+      ]
+    },
+    {
+      "content": "安装路径应该只包含英文字符。",
+      "pos": [
+        11408,
+        11422
+      ]
+    },
+    {
+      "content": "不支持 ReFS 文件系统。",
+      "pos": [
+        11429,
+        11443
+      ]
+    },
+    {
+      "content": "VMware",
+      "pos": [
+        11450,
+        11456
+      ]
+    },
+    {
+      "content": "用于管理 VMware vSphere 虚拟机监控程序的 VMware vCenter 服务器。它应该运行的是带有最新更新的 vCenter 5.1 或 5.5 版。",
+      "pos": [
+        11464,
+        11547
+      ]
+    },
+    {
+      "content": "一个或多个包含要保护的 VMware 虚拟机的 vSphere 虚拟机监控程序。虚拟机监控程序应该运行的是带有最新更新的 ESX/ESXi 版本 5.1 或 5.5。",
+      "pos": [
+        11554,
+        11637
+      ]
+    },
+    {
+      "content": "VMware 虚拟机上应已安装并运行 VMware 工具。",
+      "pos": [
+        11644,
+        11673
+      ]
+    },
+    {
+      "content": "Windows 计算机",
+      "pos": [
+        11682,
+        11693
+      ]
+    },
+    {
+      "content": "受保护的物理服务器或运行 Windows 的 VMware 虚拟机需要满足许多要求。",
+      "pos": [
+        11701,
+        11743
+      ]
+    },
+    {
+      "content": "支持的 64 位操作系统：<bpt id=\"p1\">**</bpt>Windows Server 2012 R2<ept id=\"p1\">**</ept>、<bpt id=\"p2\">**</bpt>Windows Server 2012<ept id=\"p2\">**</ept> 或<bpt id=\"p3\">**</bpt>Windows Server 2008 R2 SP1<ept id=\"p3\">**</ept> 及其更高版本。",
+      "pos": [
+        11750,
+        11853
+      ]
+    },
+    {
+      "content": "主机名、装入点、设备名称、Windows 系统路径（例如：C:/Windows）只能采用英文形式。",
+      "pos": [
+        11860,
+        11909
+      ]
+    },
+    {
+      "content": "操作系统应安装在 C:/ 驱动器上。",
+      "pos": [
+        11916,
+        11934
+      ]
+    },
+    {
+      "content": "仅支持基本磁盘。不支持动态磁盘。",
+      "pos": [
+        11941,
+        11957
+      ]
+    },
+    {
+      "content": "受保护的计算机上的防火墙规则应允许其访问 Azure 中的配置服务器和主目标服务器。",
+      "pos": [
+        11964,
+        12006
+      ]
+    },
+    {
+      "content": "你需要提供管理员帐户（必须是 Windows 计算机上的本地管理员）才能在 Windows 服务器上推送安装移动服务。如果提供的帐户不是域帐户，则你将需要在本地计算机上禁用远程用户访问控制。为此，请在 HKEY\\_LOCAL\\_MACHINE\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Policies\\\\System 下添加值为 1 的 LocalAccountTokenFilterPolicy DWORD 注册表项。若要从 CLI 添加注册表项，请打开 cmd 或 powershell 并输入 <bpt id=\"p1\">**</bpt><ph id=\"ph1\">`REG ADD HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System /v LocalAccountTokenFilterPolicy /t REG_DWORD /d 1`</ph><ept id=\"p1\">**</ept>。<bpt id=\"p2\">[</bpt>详细了解<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/aa826699.aspx)</ept>有关访问控制的信息。",
+      "pos": [
+        12013,
+        12504
+      ]
+    },
+    {
+      "content": "故障转移之后，如果你要通过远程桌面连接到 Azure 中的 Windows 虚拟机，请确保对本地计算机启用远程桌面。如果你没有通过 VPN 连接，则防火墙规则应允许通过 Internet 的远程桌面连接。",
+      "pos": [
+        12511,
+        12613
+      ]
+    },
+    {
+      "content": "Linux 计算机",
+      "pos": [
+        12620,
+        12629
+      ]
+    },
+    {
+      "content": "支持的 64 位操作系统：<bpt id=\"p1\">**</bpt>Centos 6.4、6.5、6.6<ept id=\"p1\">**</ept>；<bpt id=\"p2\">**</bpt>Oracle Enterprise Linux 6.4、6.5（运行 Red Hat 兼容内核或 Unbreakable Enterprise Kern Release 3 (UEK3)）<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>SUSE Linux Enterprise Server 11 SP3<ept id=\"p3\">**</ept>。",
+      "pos": [
+        12637,
+        12812
+      ]
+    },
+    {
+      "content": "受保护的计算机上的防火墙规则应允许其访问 Azure 中的配置服务器和主目标服务器。",
+      "pos": [
+        12819,
+        12861
+      ]
+    },
+    {
+      "content": "受保护计算机上的 /etc/hosts 文件应该包含将本地主机名映射到所有 NIC 关联的 IP 地址的条目",
+      "pos": [
+        12868,
+        12922
+      ]
+    },
+    {
+      "content": "如果要在故障转移后使用 Secure Shell 客户端 (ssh) 连接到运行 Linux 的 Azure 虚拟机，请确保将受保护的计算机上的 Secure Shell 服务设置为在系统启动时自动启动，并且防火墙规则允许建立到它的 ssh 连接。",
+      "pos": [
+        12929,
+        13053
+      ]
+    },
+    {
+      "content": "主机名、装载点、设备名称，以及 Linux 系统路径和文件名（例如 /etc/；/usr）只能采用英文形式。主机名、装载点、设备名称，以及 Linux 系统路径和文件名（例如 /etc/；/usr）只能采用英文形式。",
+      "pos": [
+        13060,
+        13168
+      ]
+    },
+    {
+      "content": "可以对使用以下存储的本地计算机启用保护：",
+      "pos": [
+        13175,
+        13195
+      ]
+    },
+    {
+      "content": "文件系统：EXT3、ETX4、ReiserFS、XFS",
+      "pos": [
+        13199,
+        13226
+      ]
+    },
+    {
+      "content": "多路径软件 - 设备映射器（多路径）",
+      "pos": [
+        13230,
+        13248
+      ]
+    },
+    {
+      "content": "卷管理器：LVM2",
+      "pos": [
+        13252,
+        13261
+      ]
+    },
+    {
+      "content": "不支持使用 HP CCISS 控制器存储的物理服务器。",
+      "pos": [
+        13265,
+        13292
+      ]
+    },
+    {
+      "content": "第三方",
+      "pos": [
+        13299,
+        13302
+      ]
+    },
+    {
+      "pos": [
+        13307,
+        13370
+      ],
+      "content": "在这种情况下，一些部署组件依赖第三方软件才能正常工作。有关完整列表，请参阅<bpt id=\"p1\">[</bpt>第三方软件通知和信息<ept id=\"p1\">](#third-party)</ept>"
+    },
+    {
+      "content": "部署",
+      "pos": [
+        13375,
+        13377
+      ]
+    },
+    {
+      "content": "该图汇总了部署步骤。",
+      "pos": [
+        13379,
+        13389
+      ]
+    },
+    {
+      "content": "部署步骤",
+      "pos": [
+        13393,
+        13397
+      ]
+    },
+    {
+      "content": "网络连接",
+      "pos": [
+        13478,
+        13482
+      ]
+    },
+    {
+      "content": "可以使用两个选项来配置本地站点与部署基础结构组件（配置服务器、主目标服务器）的 Azure 虚拟网络之间的网络连接。在部署配置服务器之前，需要决定所要使用的网络连接选项。你需要在部署时做出选择，以后无法更改。",
+      "pos": [
+        13484,
+        13588
+      ]
+    },
+    {
+      "pos": [
+        13590,
+        13781
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>公共 Internet：<ept id=\"p1\">**</ept>本地服务器（进程服务器、受保护的服务器）与 Azure 基础结构组件服务器（配置服务器、主目标服务器）之间的通信和数据复制通过安全 SSL/TLS 连接从本地到配置服务器与主目标服务器上的公共终结点进行。（唯一的例外是 TCP 端口 9080 上的进程服务器与主目标服务器之间的连接未加密。在此连接上，只会交换用于设置复制的复制协议相关的控制信息。）"
+    },
+    {
+      "content": "部署示意图 - Internet",
+      "pos": [
+        13785,
+        13801
+      ]
+    },
+    {
+      "pos": [
+        13882,
+        14050
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>VPN：<ept id=\"p1\">**</ept>本地服务器（进程服务器、受保护的服务器）与 Azure 基础结构组件服务器（配置服务器、主目标服务器）之间的通信和数据复制通过 VPN 连接在本地网络与部署配置服务器和主目标服务器的 Azure 虚拟网络之间进行。确保本地网络通过 ExpressRoute 连接或站点到站点 VPN 连接来与 Azure 虚拟网络连接。"
+    },
+    {
+      "content": "部署示意图 - VPN",
+      "pos": [
+        14054,
+        14065
+      ]
+    },
+    {
+      "content": "步骤 1：创建保管库",
+      "pos": [
+        14145,
+        14155
+      ]
+    },
+    {
+      "pos": [
+        14160,
+        14202
+      ],
+      "content": "登录到<bpt id=\"p1\">[</bpt>管理门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>。"
+    },
+    {
+      "content": "展开“数据服务”&gt;“恢复服务”，并单击“Site Recovery 保管库”。",
+      "pos": [
+        14208,
+        14247
+      ]
+    },
+    {
+      "content": "单击“新建”&gt;“快速创建”。",
+      "pos": [
+        14253,
+        14267
+      ]
+    },
+    {
+      "content": "在“名称”中，输入一个友好名称以标识此保管库。",
+      "pos": [
+        14272,
+        14295
+      ]
+    },
+    {
+      "pos": [
+        14300,
+        14403
+      ],
+      "content": "在“区域”中，为保管库选择地理区域。若要查看受支持的区域，请参阅 <bpt id=\"p1\">[</bpt>Azure Site Recovery 价格详细信息<ept id=\"p1\">](pricing/details/site-recovery/)</ept>中的“地域可用性”。"
+    },
+    {
+      "content": "单击“创建保管库”。",
+      "pos": [
+        14408,
+        14418
+      ]
+    },
+    {
+      "content": "新保管库",
+      "pos": [
+        14426,
+        14430
+      ]
+    },
+    {
+      "content": "检查状态栏以确认保管库已成功创建。保管库将以“活动”状态列在主要的“恢复服务”页上。",
+      "pos": [
+        14516,
+        14558
+      ]
+    },
+    {
+      "content": "步骤 2：部署配置服务器",
+      "pos": [
+        14563,
+        14575
+      ]
+    },
+    {
+      "content": "配置服务器设置",
+      "pos": [
+        14581,
+        14588
+      ]
+    },
+    {
+      "content": "在“恢复服务”页中，单击保管库以打开“快速启动”页。也可随时使用该图标打开“快速启动”。",
+      "pos": [
+        14593,
+        14637
+      ]
+    },
+    {
+      "content": "“快速启动”图标",
+      "pos": [
+        14645,
+        14653
+      ]
+    },
+    {
+      "content": "在下拉列表中，选择“在使用 VMware/物理服务器的本地站点与 Azure 之间”。",
+      "pos": [
+        14734,
+        14777
+      ]
+    },
+    {
+      "content": "在“准备目标(Azure)资源”中，单击“部署配置服务器”。",
+      "pos": [
+        14781,
+        14811
+      ]
+    },
+    {
+      "content": "部署配置服务器",
+      "pos": [
+        14819,
+        14826
+      ]
+    },
+    {
+      "content": "在“新配置服务器详细信息”中指定：",
+      "pos": [
+        14901,
+        14918
+      ]
+    },
+    {
+      "content": "配置服务器的名称和用于连接它的凭据。",
+      "pos": [
+        14926,
+        14944
+      ]
+    },
+    {
+      "content": "在“网络连接类型”下拉列表中，选择“公共 Internet”或“VPN”。",
+      "pos": [
+        14951,
+        14988
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 你需要在部署时选择此设置，以后无法更改。",
+      "pos": [
+        14996,
+        15029
+      ]
+    },
+    {
+      "content": "- 选择该服务器所在的 Azure 网络。如果指定了 VPN 作为网络连接类型，请确保此 Azure 虚拟网络通过 ExpressRoute 连接或站点到站点 VPN 连接到本地站点。",
+      "pos": [
+        15036,
+        15128
+      ]
+    },
+    {
+      "content": "- 指定要分配到该服务器的内部 IP 地址和子网。请注意，任何子网中的前四个 IP 地址保留给 Azure 内部使用。请使用任何其他可用的 IP 地址。",
+      "pos": [
+        15133,
+        15209
+      ]
+    },
+    {
+      "content": "部署配置服务器",
+      "pos": [
+        15221,
+        15228
+      ]
+    },
+    {
+      "content": "在单击“确定”时，将在你的订阅中针对配置服务器创建基于 Azure Site Recovery Windows Server 2012 R2 库映像的标准 A3 虚拟机。它将作为第一个实例在新的云服务中创建。如果你将网络连接类型指定为“公共 Internet”，则会使用保留的公共 IP 地址创建云服务。你可以在“作业”选项卡中监视进度。",
+      "pos": [
+        15303,
+        15472
+      ]
+    },
+    {
+      "content": "监视进度",
+      "pos": [
+        15480,
+        15484
+      ]
+    },
+    {
+      "pos": [
+        15560,
+        15732
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>仅当连接类型是“公共 Internet”时，此步骤才适用。<ept id=\"p1\">**</ept> 在部署配置服务器后，请在 Azure 门户中的“虚拟机”页上记下分配给它的公用 IP 地址。然后，在“终结点”选项卡中，记下映射到专用端口 443 的公用 HTTPS 端口。稍后将主目标服务器和处理服务器注册到配置服务器时，你将需要用到这些信息。配置服务器使用以下终结点部署："
+    },
+    {
+      "content": "HTTPS：公用端口用于协调通过 Internet 在组件服务器与 Azure 之间进行的通信。专用端口 443 用于协调通过 VPN 在组件服务器与 Azure 之间进行的通信。",
+      "pos": [
+        15740,
+        15830
+      ]
+    },
+    {
+      "content": "自定义：公用端口用于通过 Internet 进行的故障回复工具",
+      "pos": [
+        15837,
+        15868
+      ]
+    },
+    {
+      "content": "通信。专用端口 9443 用于通过 VPN 进行的故障回复工具通信。",
+      "pos": [
+        15875,
+        15909
+      ]
+    },
+    {
+      "content": "PowerShell：专用端口 5986",
+      "pos": [
+        15916,
+        15936
+      ]
+    },
+    {
+      "content": "远程桌面：专用端口 3389",
+      "pos": [
+        15943,
+        15957
+      ]
+    },
+    {
+      "content": "VM 终结点",
+      "pos": [
+        15969,
+        15975
+      ]
+    },
+    {
+      "pos": [
+        16054,
+        16102
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.WARNING]</ph> 请勿删除在配置服务器部署期间创建的任何终结点的公用或专用端口号。"
+    },
+    {
+      "pos": [
+        16104,
+        16342
+      ],
+      "content": "配置服务器使用保留的 IP 地址部署在自动创建的 Azure 云服务中。需要使用保留的地址确保云服务上的虚拟机（包括配置服务器）在重新启动后，配置服务器云服务 IP 地址仍然相同。在停用配置服务器后，必须手动将保留的公共 IP 地址取消保留，否则会继续保留。每个订阅保留的公共 IP 地址数默认限制为 20 个。<bpt id=\"p1\">[</bpt>详细了解<ept id=\"p1\">](/documentation/articles/virtual-networks-reserved-private-ip)</ept>有关保留 IP 地址的信息。"
+    },
+    {
+      "content": "在保管库中注册配置服务器",
+      "pos": [
+        16348,
+        16360
+      ]
+    },
+    {
+      "content": "在“快速启动”页中，单击“准备目标资源”&gt;“下载注册密钥”。此时将自动生成密钥文件。该文件在生成后的 5 天内有效。将它复制到配置服务器。",
+      "pos": [
+        16365,
+        16434
+      ]
+    },
+    {
+      "pos": [
+        16438,
+        16651
+      ],
+      "content": "在“虚拟机”中，从虚拟机列表中选择配置服务器。打开“仪表板”选项卡，然后单击“连接”。<bpt id=\"p1\">**</bpt>打开<ept id=\"p1\">**</ept>下载的 RDP 文件，以使用远程桌面登录到配置服务器。如果配置服务器部署在 VPN 网络上，则使用配置服务器的内部 IP 地址（这是在部署配置服务器时指定的 IP 地址，也可以在配置服务器虚拟机的虚拟机仪表板页上看到），以通过远程桌面从本地网络访问它。当你首次登录时，Azure Site Recovery 安装向导将自动运行。"
+    },
+    {
+      "content": "注册",
+      "pos": [
+        16659,
+        16661
+      ]
+    },
+    {
+      "content": "在“第三方软件安装”中，单击“我接受”以下载并安装 MySQL。",
+      "pos": [
+        16732,
+        16764
+      ]
+    },
+    {
+      "content": "MySQL 安装",
+      "pos": [
+        16772,
+        16780
+      ]
+    },
+    {
+      "content": "在“MySQL 服务器详细信息”中，创建用于登录 MySQL 服务器实例的凭据。",
+      "pos": [
+        16853,
+        16893
+      ]
+    },
+    {
+      "content": "MySQL 凭据",
+      "pos": [
+        16901,
+        16909
+      ]
+    },
+    {
+      "content": "在“Internet 设置”中，指定配置服务器连接到 Internet 的方式。请注意：",
+      "pos": [
+        16986,
+        17030
+      ]
+    },
+    {
+      "content": "如果希望使用自定义代理，则应当在安装该提供程序之前设置它。",
+      "pos": [
+        17038,
+        17067
+      ]
+    },
+    {
+      "content": "当你单击“下一步”时，将会运行测试来检查代理连接。",
+      "pos": [
+        17074,
+        17099
+      ]
+    },
+    {
+      "content": "如果你确实使用自定义代理，或者你的默认代理要求进行身份验证，则需要输入代理详细信息，包括地址、端口和凭据。",
+      "pos": [
+        17106,
+        17159
+      ]
+    },
+    {
+      "content": "应可通过代理访问以下 URL：",
+      "pos": [
+        17166,
+        17181
+      ]
+    },
+    {
+      "content": "*.hypervrecoverymanager.windowsazure.cn",
+      "pos": [
+        17192,
+        17231
+      ]
+    },
+    {
+      "content": "*.accesscontrol.chinacloudapi.cn",
+      "pos": [
+        17242,
+        17274
+      ]
+    },
+    {
+      "content": "*.backup.windowsazure.cn",
+      "pos": [
+        17285,
+        17309
+      ]
+    },
+    {
+      "content": "*.blob.core.chinacloudapi.cn",
+      "pos": [
+        17320,
+        17348
+      ]
+    },
+    {
+      "content": "*.store.core.chinacloudapi.cn",
+      "pos": [
+        17359,
+        17388
+      ]
+    },
+    {
+      "pos": [
+        17395,
+        17582
+      ],
+      "content": "如果你采用了基于 IP 地址的防火墙规则，请确保这些规则设置为允许配置服务器与 <bpt id=\"p1\">[</bpt>Azure 数据中心 IP 范围<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/dn175718.aspx)</ept>和 HTTPS (443) 协议中所述的 IP 地址通信。必须将你打算使用的 Azure 区域以及美国西部的 IP 范围加入允许列表。"
+    },
+    {
+      "content": "代理注册",
+      "pos": [
+        17590,
+        17594
+      ]
+    },
+    {
+      "content": "在“提供程序错误消息本地化设置”中指定显示错误消息的语言。",
+      "pos": [
+        17673,
+        17702
+      ]
+    },
+    {
+      "content": "错误消息注册",
+      "pos": [
+        17710,
+        17716
+      ]
+    },
+    {
+      "content": "在“Azure Site Recovery 注册”中，浏览并选择已复制到该服务器的密钥文件。",
+      "pos": [
+        17796,
+        17842
+      ]
+    },
+    {
+      "content": "密钥文件注册",
+      "pos": [
+        17850,
+        17856
+      ]
+    },
+    {
+      "content": "在向导的完成页上选择以下选项：",
+      "pos": [
+        17935,
+        17950
+      ]
+    },
+    {
+      "content": "选择“启动帐户管理对话框”，指定在完成向导后应该打开“管理帐户”对话框。",
+      "pos": [
+        17958,
+        17994
+      ]
+    },
+    {
+      "content": "选择“为 Cspsconfigtool 创建桌面图标”，以便在配置服务器上添加桌面快捷方式，使你能够在任何时间打开“管理帐户”对话框，而无需重新运行向导。",
+      "pos": [
+        18001,
+        18078
+      ]
+    },
+    {
+      "content": "完成注册",
+      "pos": [
+        18086,
+        18090
+      ]
+    },
+    {
+      "content": "单击“完成”以完成向导。此时将生成一个通行短语。将其复制到安全位置。你将需要它进行身份验证，并将处理服务器和主目标服务器注册到配置服务器。它还可用于确保配置服务器通信中的通道完整性。你可以重新生成该通行短语，但是此后，你将需要使用新通行短语重新注册主目标服务器和进程服务器。",
+      "pos": [
+        18169,
+        18306
+      ]
+    },
+    {
+      "content": "通行短语",
+      "pos": [
+        18314,
+        18318
+      ]
+    },
+    {
+      "content": "注册后，保管库中的“配置服务器”页上将列出该配置服务器。",
+      "pos": [
+        18390,
+        18418
+      ]
+    },
+    {
+      "content": "设置和管理帐户",
+      "pos": [
+        18424,
+        18431
+      ]
+    },
+    {
+      "content": "在部署期间，Site Recovery 将请求以下操作的凭据：",
+      "pos": [
+        18433,
+        18464
+      ]
+    },
+    {
+      "content": "当你添加 vCenter 服务器，以便自动发现 vCenter 服务器管理的虚拟机时。自动发现虚拟机需要 vCenter 帐户。",
+      "pos": [
+        18468,
+        18532
+      ]
+    },
+    {
+      "content": "当你添加要保护的计算机，以便 Site Recovery 可在这些计算机上安装移动服务时。",
+      "pos": [
+        18535,
+        18580
+      ]
+    },
+    {
+      "content": "注册配置服务器后，可以打开“管理帐户”对话框来添加和管理要用于这些操作的帐户。可通过多种方式实现此目的：",
+      "pos": [
+        18582,
+        18634
+      ]
+    },
+    {
+      "content": "打开你在安装程序最后一页上的对话框中为配置服务器 (cspsconfigtool) 创建的快捷方式。",
+      "pos": [
+        18638,
+        18688
+      ]
+    },
+    {
+      "content": "打开配置服务器安装程序完成页上的对话框。",
+      "pos": [
+        18691,
+        18711
+      ]
+    },
+    {
+      "content": "在“管理帐户”中，单击“添加帐户”。你还可以修改和删除现有帐户。",
+      "pos": [
+        18716,
+        18748
+      ]
+    },
+    {
+      "content": "管理帐户",
+      "pos": [
+        18756,
+        18760
+      ]
+    },
+    {
+      "content": "在“帐户详细信息”中，指定要在 Azure 中使用的帐户名和凭据（域/用户名）。",
+      "pos": [
+        18839,
+        18879
+      ]
+    },
+    {
+      "content": "管理帐户",
+      "pos": [
+        18887,
+        18891
+      ]
+    },
+    {
+      "content": "连接到配置服务器",
+      "pos": [
+        18972,
+        18980
+      ]
+    },
+    {
+      "content": "可通过两种方式连接到配置服务器：",
+      "pos": [
+        18983,
+        18999
+      ]
+    },
+    {
+      "content": "通过 VPN 站点到站点或 ExpressRoute 连接",
+      "pos": [
+        19003,
+        19032
+      ]
+    },
+    {
+      "content": "通过 Internet",
+      "pos": [
+        19035,
+        19046
+      ]
+    },
+    {
+      "content": "请注意：",
+      "pos": [
+        19049,
+        19053
+      ]
+    },
+    {
+      "content": "Internet 连接将虚拟机的终结点与服务器的公用虚拟 IP 地址结合使用。",
+      "pos": [
+        19057,
+        19096
+      ]
+    },
+    {
+      "content": "VPN 连接将服务器的内部 IP 地址与终结点的专用端口结合使用。",
+      "pos": [
+        19099,
+        19132
+      ]
+    },
+    {
+      "content": "确定是要从本地服务器通过 VPN 连接还是 Internet 连接到 Azure 中运行的各种组件服务器（配置服务器、主目标服务器，以访问控制和复制数据），这项决定是最终性的。以后无法更改此设置。如果这样做，将需要重新部署方案并重新保护计算机。",
+      "pos": [
+        19135,
+        19257
+      ]
+    },
+    {
+      "content": "步骤 3：部署主目标服务器",
+      "pos": [
+        19265,
+        19278
+      ]
+    },
+    {
+      "content": "在“准备目标(Azure)资源”中，单击“部署主目标服务器”。",
+      "pos": [
+        19283,
+        19314
+      ]
+    },
+    {
+      "content": "指定主目标服务器的详细信息和凭据。该服务器将部署在注册到的配置服务器所在的 Azure 网络中。在单击完成时，将使用 Windows 或 Linux 库映像创建 Azure 虚拟机。",
+      "pos": [
+        19318,
+        19409
+      ]
+    },
+    {
+      "content": "目标服务器设置",
+      "pos": [
+        19417,
+        19424
+      ]
+    },
+    {
+      "content": "请注意，任何子网中的前四个 IP 地址保留给 Azure 内部使用。请指定任何其他可用的 IP 地址。",
+      "pos": [
+        19500,
+        19551
+      ]
+    },
+    {
+      "pos": [
+        19554,
+        19697
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 使用<bpt id=\"p1\">[</bpt>高级存储帐户<ept id=\"p1\">](/documentation/articles/storage-premium-storage-preview-portal)</ept>为需要持续性的高 IO 性能和低延迟才能托管 IO 密集型工作负荷的工作负荷配置保护时，请选择“标准 DS4”。"
+    },
+    {
+      "content": "Windows 主目标服务器虚拟机使用以下终结点创建：（仅当部署类型是“公共 Internet”时，才创建公开终结点）：",
+      "pos": [
+        19703,
+        19763
+      ]
+    },
+    {
+      "content": "自定义：进程服务器使用公用端口来通过 Internet 发送复制数据。处理服务器使用专用端口 9443 来通过 VPN 将复制数据发送到主目标服务器。",
+      "pos": [
+        19771,
+        19846
+      ]
+    },
+    {
+      "content": "自定义 1：进程服务器使用公用端口来通过 Internet 发送控制元数据。处理服务器使用专用端口 9080 来通过 VPN 将控制元数据发送到主目标服务器。",
+      "pos": [
+        19853,
+        19932
+      ]
+    },
+    {
+      "content": "PowerShell：专用端口 5986",
+      "pos": [
+        19939,
+        19959
+      ]
+    },
+    {
+      "content": "远程桌面：专用端口 3389",
+      "pos": [
+        19966,
+        19980
+      ]
+    },
+    {
+      "content": "Linux 主目标服务器虚拟机使用以下终结点创建：（仅当部署类型是“公共 Internet”时，才创建公开终结点）：",
+      "pos": [
+        19985,
+        20043
+      ]
+    },
+    {
+      "content": "自定义：进程服务器使用公用端口来通过 Internet 发送复制数据。处理服务器使用专用端口 9443 来通过 VPN 将复制数据发送到主目标服务器。",
+      "pos": [
+        20051,
+        20126
+      ]
+    },
+    {
+      "content": "自定义 1：进程服务器使用公用端口来通过 Internet 发送控制元数据。处理服务器使用专用端口 9080 来通过 VPN 将控制数据发送到主目标服务器",
+      "pos": [
+        20133,
+        20210
+      ]
+    },
+    {
+      "content": "SSH：专用端口 22",
+      "pos": [
+        20217,
+        20228
+      ]
+    },
+    {
+      "pos": [
+        20235,
+        20287
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.WARNING]</ph> 请勿删除或更改在主目标服务器部署期间创建的任何终结点的公用或专用端口号。"
+    },
+    {
+      "content": "在“虚拟机”中，等待虚拟机启动。",
+      "pos": [
+        20292,
+        20308
+      ]
+    },
+    {
+      "content": "如果该服务器已配置有 Windows，请记下远程桌面详细信息。",
+      "pos": [
+        20316,
+        20347
+      ]
+    },
+    {
+      "content": "如果已配置有 Linux，并且要通过 VPN 连接，请记下虚拟机的内部 IP 地址。如果要通过 Internet 连接，请记下公用 IP 地址。",
+      "pos": [
+        20354,
+        20426
+      ]
+    },
+    {
+      "content": "登录到该服务器以完成安装，并将其注册到配置服务器。",
+      "pos": [
+        20432,
+        20457
+      ]
+    },
+    {
+      "content": "如果你运行的是 Windows，请执行以下操作：",
+      "pos": [
+        20462,
+        20486
+      ]
+    },
+    {
+      "content": "启动到虚拟机的远程桌面连接。在首次登录时，将在 PowerShell 窗口中运行一个脚本。请勿将其关闭。在它完成之后，主机代理配置工具将自动打开以注册服务器。",
+      "pos": [
+        20495,
+        20574
+      ]
+    },
+    {
+      "content": "在“主机代理配置”中，指定配置服务器的内部 IP 地址和端口 443。你可以使用内部地址和专用端口 443，即使你没有通过 VPN 连接，因为虚拟机附加到配置服务器所在的 Azure 网络。保持“使用 HTTPS”处于启用状态。输入以前记下的配置服务器的密码。单击“确定”以注册服务器。请注意，你可以忽略该页上的 NAT 选项。这些选项不会用到。",
+      "pos": [
+        20582,
+        20755
+      ]
+    },
+    {
+      "pos": [
+        20763,
+        20948
+      ],
+      "content": "如果估计的保留驱动器要求超过 1 TB，你可以使用虚拟磁盘和<bpt id=\"p1\">[</bpt>存储空间<ept id=\"p1\">](http://blogs.technet.com/b/askpfeplat/archive/2013/10/21/storage-spaces-how-to-configure-storage-tiers-with-windows-server-2012-r2.aspx)</ept>来配置保留卷 (R:)。"
+    },
+    {
+      "content": "Windows 主目标服务器",
+      "pos": [
+        20960,
+        20974
+      ]
+    },
+    {
+      "content": "如果你运行的是 Linux，请执行以下操作：",
+      "pos": [
+        21054,
+        21076
+      ]
+    },
+    {
+      "pos": [
+        21084,
+        21224
+      ],
+      "content": "在安装主目标服务器软件之前，请确保已安装最新的 Linux 集成服务 (LIS)。可以在<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](https://www.microsoft.com/download/details.aspx?id=46842)</ept>找到最新版本的 LIS 和安装说明。安装 LIS 后重新启动计算机。"
+    },
+    {
+      "pos": [
+        21232,
+        21428
+      ],
+      "content": "在“准备目标(Azure)资源”中，单击“下载并安装其他软件(仅适用于 Linux 主目标服务器)”以下载 Linux 主目标服务器包。使用 sftp 客户端将下载的 tar 文件复制到虚拟机。你也可以登录到已部署的 Linux 主目标服务器，并使用 <bpt id=\"p1\">*</bpt>wget http://go.microsoft.com/fwlink/?LinkID=529757&amp;clcid=0x409<ept id=\"p1\">*</ept> 下载文件。"
+    },
+    {
+      "content": "使用 Secure Shell 客户端登录到服务器。请注意，如果你已通过 VPN 连接到 Azure 网络，请使用内部 IP 地址。否则，请使用外部 IP 地址和 SSH 公用终结点。",
+      "pos": [
+        21436,
+        21528
+      ]
+    },
+    {
+      "pos": [
+        21536,
+        21703
+      ],
+      "content": "运行以下程序：**tar –xvzf Microsoft-ASR\\_UA\\_8.4.0.0\\_RHEL6-64***\n![Linux 主目标服务器](./media/site-recovery-vmware-to-azure-classic-legacy/linux-tar.png)，从 gzip 压缩过的安装程序中提取文件",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "运行以下程序：<bpt id=\"p1\">**</bpt>tar –xvzf Microsoft-ASR\\_UA\\_8.4.0.0\\_RHEL6-64<ept id=\"p1\">**</ept>*",
+          "pos": [
+            0,
+            58
+          ]
+        },
+        {
+          "content": "<ph id=\"ph1\">![</ph>Linux 主目标服务器<ph id=\"ph2\">](./media/site-recovery-vmware-to-azure-classic-legacy/linux-tar.png)</ph>，从 gzip 压缩过的安装程序中提取文件",
+          "pos": [
+            59,
+            163
+          ]
+        }
+      ]
+    },
+    {
+      "content": "确保你位于 tar 文件内容提取到的目录中。",
+      "pos": [
+        21711,
+        21733
+      ]
+    },
+    {
+      "pos": [
+        21741,
+        21806
+      ],
+      "content": "使用命令 <bpt id=\"p1\">**</bpt>echo <bpt id=\"p2\">*</bpt><ph id=\"ph1\">`&lt;passphrase&gt;`</ph><ept id=\"p2\">*</ept> &gt;passphrase.txt<ept id=\"p1\">**</ept> 将配置服务器的通行短语复制到本地文件"
+    },
+    {
+      "pos": [
+        21814,
+        21978
+      ],
+      "content": "运行命令“<bpt id=\"p1\">**</bpt>sudo ./install -t both -a host -R MasterTarget -d /usr/local/ASR -i <bpt id=\"p2\">*</bpt><ph id=\"ph1\">`&lt;Configuration server internal IP address&gt;`</ph><ept id=\"p2\">*</ept> -p 443 -s y -c https -P passphrase.txt<ept id=\"p1\">**</ept>”。"
+    },
+    {
+      "content": "注册目标服务器",
+      "pos": [
+        21986,
+        21993
+      ]
+    },
+    {
+      "content": "等待几分钟 (10-15)，然后在“服务器”&gt;“配置服务器”页上，检查主目标服务器是否作为注册服务器列在“服务器详细信息”选项卡中。如果运行的是 Linux，并且它未注册，请从 /usr/local/ASR/Vx/bin/hostconfigcli 再次运行主机配置工具。你需要以 root 身份运行 chmod 以设置访问权限。",
+      "pos": [
+        22074,
+        22239
+      ]
+    },
+    {
+      "content": "验证目标服务器",
+      "pos": [
+        22247,
+        22254
+      ]
+    },
+    {
+      "pos": [
+        22335,
+        22421
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 请注意，在注册完成之后，最多需要 15 分钟，配置服务器下才会列出主目标服务器。若要立即更新，请单击配置服务器页面底部的刷新按钮以刷新配置服务器。"
+    },
+    {
+      "content": "步骤 4：部署本地进程服务器",
+      "pos": [
+        22426,
+        22440
+      ]
+    },
+    {
+      "pos": [
+        22443,
+        22496
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 建议在进程服务器上配置静态 IP 地址，以保证在重新启动后可持续使用相同的地址。"
+    },
+    {
+      "content": "单击“快速启动”&gt;“在本地安装进程服务器”&gt;“下载并安装进程服务器”。",
+      "pos": [
+        22501,
+        22536
+      ]
+    },
+    {
+      "content": "安装进程服务器",
+      "pos": [
+        22544,
+        22551
+      ]
+    },
+    {
+      "content": "将下载的 zip 文件复制到要将处理服务器安装到的服务器。该 zip 文件包含两个安装文件：",
+      "pos": [
+        22626,
+        22672
+      ]
+    },
+    {
+      "content": "Microsoft-ASR\\_CX\\_TP\\_8.4.0.0\\_Windows*",
+      "pos": [
+        22680,
+        22720
+      ]
+    },
+    {
+      "content": "Microsoft-ASR\\_CX\\_8.4.0.0\\_Windows*",
+      "pos": [
+        22727,
+        22763
+      ]
+    },
+    {
+      "content": "解压缩存档，然后将安装文件复制到该服务器上的某个位置。",
+      "pos": [
+        22768,
+        22795
+      ]
+    },
+    {
+      "pos": [
+        22799,
+        22878
+      ],
+      "content": "运行 <bpt id=\"p1\">**</bpt>Microsoft-ASR\\_CX\\_TP\\_8.4.0.0\\_Windows<ept id=\"p1\">**</ept>* 安装文件，然后按相关说明操作。此时将安装部署所需的第三方组件。"
+    },
+    {
+      "pos": [
+        22882,
+        22929
+      ],
+      "content": "然后，运行 <bpt id=\"p1\">**</bpt>Microsoft-ASR\\_CX\\_8.4.0.0\\_Windows<ept id=\"p1\">**</ept>*。"
+    },
+    {
+      "content": "在“服务器模式”页上，选择“进程服务器”。",
+      "pos": [
+        22933,
+        22954
+      ]
+    },
+    {
+      "content": "在“环境详细信息”页上执行以下操作：",
+      "pos": [
+        22958,
+        22976
+      ]
+    },
+    {
+      "content": "安装 VMware vCLI 时，请注意以下事项：",
+      "pos": [
+        23071,
+        23096
+      ]
+    },
+    {
+      "pos": [
+        23104,
+        23171
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>仅支持 VMware vSphere CLI 5.5.0<ept id=\"p1\">**</ept>。进程服务器无法与 vSphere CLI 的其他版本或更新配合使用。"
+    },
+    {
+      "pos": [
+        23178,
+        23282
+      ],
+      "content": "从<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](https://my.vmware.com/web/vmware/details?downloadGroup=VCLI550&amp;productId=352)</ept>下载 vSphere CLI 5.5.0。"
+    },
+    {
+      "content": "如果在开始安装进程服务器之前刚刚安装了 vSphere CLI，并且安装程序未检测到它，请等待最多五分钟的时间再重新尝试安装。这可以确保执行 vSphere CLI 检测所需的所有环境变量已正确初始化。",
+      "pos": [
+        23289,
+        23390
+      ]
+    },
+    {
+      "content": "在“进程服务器的 NIC 选择范围”中，选择进程服务器应该使用的网络适配器。",
+      "pos": [
+        23396,
+        23434
+      ]
+    },
+    {
+      "content": "选择适配器",
+      "pos": [
+        23442,
+        23447
+      ]
+    },
+    {
+      "content": "在“配置服务器详细信息”中：",
+      "pos": [
+        23519,
+        23533
+      ]
+    },
+    {
+      "content": "对于 IP 地址和端口，如果你要通过 VPN 连接，请指定配置服务器的内部 IP 地址和端口 443。否则，请指定公用虚拟 IP 地址和映射的公用 HTTP 终结点。",
+      "pos": [
+        23541,
+        23624
+      ]
+    },
+    {
+      "content": "键入配置服务器的密码。",
+      "pos": [
+        23631,
+        23642
+      ]
+    },
+    {
+      "content": "如果要在使用自动推送安装服务时禁用验证，请清除“验证移动服务软件签名”。签名验证需要来自处理器的 Internet 连接。",
+      "pos": [
+        23649,
+        23710
+      ]
+    },
+    {
+      "pos": [
+        23717,
+        23729
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“下一步”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "注册配置服务器",
+      "pos": [
+        23737,
+        23744
+      ]
+    },
+    {
+      "content": "在“选择安装驱动器”中，选择缓存驱动器。进程服务器需要至少有 600 GB 可用空间的缓存驱动器。然后单击“安装”。",
+      "pos": [
+        23816,
+        23874
+      ]
+    },
+    {
+      "content": "注册配置服务器",
+      "pos": [
+        23882,
+        23889
+      ]
+    },
+    {
+      "content": "请注意，可能需要重新启动服务器才能完成安装。在“配置服务器”&gt;“服务器详细信息”中，检查该进程服务器是否已显示并已在保管库中成功注册。",
+      "pos": [
+        23963,
+        24030
+      ]
+    },
+    {
+      "pos": [
+        24033,
+        24112
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>注册完成之后，最多需要 15 分钟，配置服务器下才会列出进程服务器。若要立即更新，请单击配置服务器页面底部的刷新按钮以刷新配置服务器。"
+    },
+    {
+      "content": "验证进程服务器",
+      "pos": [
+        24117,
+        24124
+      ]
+    },
+    {
+      "content": "如果在注册进程服务器时未对移动服务禁用签名验证，则稍后可以按以下方式执行该操作：",
+      "pos": [
+        24197,
+        24237
+      ]
+    },
+    {
+      "pos": [
+        24242,
+        24395
+      ],
+      "content": "以管理员身份登录到处理服务器，然后打开文件 C:\\\\pushinstallsvc\\\\pushinstaller.conf 以进行编辑。在 <bpt id=\"p1\">**</bpt>[PushInstaller.transport]<ept id=\"p1\">**</ept> 节下，添加以下行：<bpt id=\"p2\">**</bpt>SignatureVerificationChecks=”0”<ept id=\"p2\">**</ept>。保存并关闭该文件。"
+    },
+    {
+      "content": "重新启动 InMage PushInstall 服务。",
+      "pos": [
+        24399,
+        24426
+      ]
+    },
+    {
+      "content": "步骤 5：安装最新更新",
+      "pos": [
+        24432,
+        24443
+      ]
+    },
+    {
+      "content": "继续之前，请确保你已安装最新更新。请记得按以下顺序安装更新：",
+      "pos": [
+        24445,
+        24475
+      ]
+    },
+    {
+      "content": "配置服务器",
+      "pos": [
+        24480,
+        24485
+      ]
+    },
+    {
+      "content": "进程服务器",
+      "pos": [
+        24489,
+        24494
+      ]
+    },
+    {
+      "content": "主目标服务器",
+      "pos": [
+        24498,
+        24504
+      ]
+    },
+    {
+      "content": "故障回复工具 (vContinuum)",
+      "pos": [
+        24508,
+        24527
+      ]
+    },
+    {
+      "content": "你可以在 Site Recovery 的“仪表板”上获取更新。**对于 Linux 安装，请从 gzip 压缩过的安装程序中提取文件，然后运行命令“sudo ./install”以安装更新",
+      "pos": [
+        24529,
+        24623
+      ]
+    },
+    {
+      "pos": [
+        24625,
+        24708
+      ],
+      "content": "从<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](http://go.microsoft.com/fwlink/?LinkID=533813)</ept>下载<bpt id=\"p2\">**</bpt>故障回复工具 (vContinuum)<ept id=\"p2\">**</ept> 的最新更新"
+    },
+    {
+      "content": "如果运行的虚拟机或物理服务器上已安装移动服务，你可以按如下所示获取服务更新：",
+      "pos": [
+        24710,
+        24748
+      ]
+    },
+    {
+      "content": "按如下所示获取服务更新：",
+      "pos": [
+        24752,
+        24764
+      ]
+    },
+    {
+      "content": "Windows Server（仅限 64 位）",
+      "pos": [
+        24772,
+        24795
+      ]
+    },
+    {
+      "content": "CentOS 6.4、6.5、6.6（仅限 64 位）",
+      "pos": [
+        24945,
+        24972
+      ]
+    },
+    {
+      "content": "Oracle Enterprise Linux 6.4、6.5（仅限 64 位）",
+      "pos": [
+        25126,
+        25166
+      ]
+    },
+    {
+      "content": "SUSE Linux Enterprise Server SP3（仅限 64 位）",
+      "pos": [
+        25318,
+        25359
+      ]
+    },
+    {
+      "content": "或者，在更新进程服务器之后，可以从进程服务器上的 C:\\\\pushinstallsvc\\\\repository 文件夹获取移动服务的更新版本。",
+      "pos": [
+        25513,
+        25584
+      ]
+    },
+    {
+      "pos": [
+        25587,
+        25820
+      ],
+      "content": "如果你已有安装旧版的移动服务的受保护计算机，则还可以从管理门户自动升级受保护计算机上的移动服务。为此，请选择计算机所属的保护组，突出显示受保护的计算机并单击底部的“更新移动服务”按钮。仅当有较新版本的移动服务时，“更新移动服务”按钮才会激活。在更新移动服务之前，请确保进程服务器运行最新版本的进程服务器软件。受保护的服务器必须符合所有<bpt id=\"p1\">[</bpt>自动推送安装先决条件<ept id=\"p1\">](#install-the-mobility-service-automatically)</ept>才能更新移动服务。"
+    },
+    {
+      "content": "选择 vCenter 服务器",
+      "pos": [
+        25824,
+        25838
+      ]
+    },
+    {
+      "content": "在“选择帐户”中，指定用于更新受保护服务器上的移动服务的管理员帐户。单击“确定”并等待触发的作业完成。",
+      "pos": [
+        25915,
+        25966
+      ]
+    },
+    {
+      "content": "步骤 6：添加 vCenter 服务器或 ESXi 主机",
+      "pos": [
+        25972,
+        26000
+      ]
+    },
+    {
+      "content": "在“服务器”&gt;“配置服务器”选项卡上，选择配置服务器并单击“添加 VCENTER 服务器”以添加 vCenter 服务器或 ESXi 主机。",
+      "pos": [
+        26005,
+        26075
+      ]
+    },
+    {
+      "content": "选择 vCenter 服务器",
+      "pos": [
+        26083,
+        26097
+      ]
+    },
+    {
+      "content": "指定 vCenter 服务器或 ESXi 主机的详细信息，并选择要用于发现它的进程服务器。",
+      "pos": [
+        26173,
+        26218
+      ]
+    },
+    {
+      "content": "如果 vCenter 服务器不在默认端口 443 上运行，请指定 vCenter 服务器运行所在的端口号。",
+      "pos": [
+        26226,
+        26279
+      ]
+    },
+    {
+      "content": "进程服务器必须位于 vCenter 服务器/ESXi 主机所在的网络上，并且应安装有 VMware vSphere CLI 5.5.0。",
+      "pos": [
+        26286,
+        26354
+      ]
+    },
+    {
+      "content": "vCenter 服务器设置",
+      "pos": [
+        26362,
+        26375
+      ]
+    },
+    {
+      "content": "发现完成之后，vCenter 服务器将在“配置服务器详细信息”下方列出。",
+      "pos": [
+        26453,
+        26489
+      ]
+    },
+    {
+      "content": "vCenter 服务器设置",
+      "pos": [
+        26497,
+        26510
+      ]
+    },
+    {
+      "content": "如果你使用非管理员帐户添加 vCenter 服务器或 ESXi 主机，请确保该帐户具有以下权限：",
+      "pos": [
+        26587,
+        26635
+      ]
+    },
+    {
+      "content": "vCenter 帐户应该已启用数据中心、数据存储、文件夹、主机、网络、资源、存储视图、虚拟机和 vSphere 分布式交换机权限。",
+      "pos": [
+        26643,
+        26708
+      ]
+    },
+    {
+      "content": "ESXi 主机帐户应该已启用数据中心、数据存储、文件夹、主机、网络、资源、虚拟机和 vSphere 分布式交换机权限",
+      "pos": [
+        26715,
+        26773
+      ]
+    },
+    {
+      "content": "步骤 7：创建保护组",
+      "pos": [
+        26780,
+        26790
+      ]
+    },
+    {
+      "content": "打开“受保护的项”&gt;“保护组”，然后单击即可添加一个保护组。",
+      "pos": [
+        26795,
+        26825
+      ]
+    },
+    {
+      "content": "创建保护组",
+      "pos": [
+        26833,
+        26838
+      ]
+    },
+    {
+      "content": "在“指定保护组设置”页上，指定保护组的名称，并选择要在其上创建该组的配置服务器。",
+      "pos": [
+        26913,
+        26953
+      ]
+    },
+    {
+      "content": "保护组设置",
+      "pos": [
+        26961,
+        26966
+      ]
+    },
+    {
+      "content": "在“指定复制设置”页上，配置要用于该组中的所有计算机的复制设置。",
+      "pos": [
+        27041,
+        27073
+      ]
+    },
+    {
+      "content": "保护组复制",
+      "pos": [
+        27081,
+        27086
+      ]
+    },
+    {
+      "content": "设置：",
+      "pos": [
+        27161,
+        27164
+      ]
+    },
+    {
+      "pos": [
+        27171,
+        27287
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>多 VM 一致性<ept id=\"p1\">**</ept>：如果你将此项打开，则它将在保护组中的计算机之间创建共享的应用程序一致性恢复点。当保护组中的所有计算机运行的是相同工作负荷时，此设置最为有用。所有计算机都将恢复到相同数据点。仅适用于 Windows 服务器。"
+    },
+    {
+      "pos": [
+        27294,
+        27339
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>RPO 阈值<ept id=\"p1\">**</ept>：当连续数据保护复制 RPO 超过配置的 RPO 阈值时，将生成警报。"
+    },
+    {
+      "pos": [
+        27346,
+        27384
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>恢复点保留期<ept id=\"p1\">**</ept>：指定保留时段。受保护的计算机可在此时段内恢复到任何点。"
+    },
+    {
+      "pos": [
+        27391,
+        27430
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>应用程序一致性快照频率<ept id=\"p1\">**</ept>：指定创建包含应用程序一致性快照的恢复点的频率。"
+    },
+    {
+      "content": "你可以监视保护组，因为它们是在“受保护的项”页上创建的。",
+      "pos": [
+        27432,
+        27460
+      ]
+    },
+    {
+      "content": "步骤 8：设置想要保护的计算机",
+      "pos": [
+        27465,
+        27480
+      ]
+    },
+    {
+      "content": "需在要保护的虚拟机和物理服务器上安装移动服务。可通过两种方式实现此目的：",
+      "pos": [
+        27482,
+        27518
+      ]
+    },
+    {
+      "content": "从进程服务器自动推送并在每台计算机上安装该服务。",
+      "pos": [
+        27522,
+        27546
+      ]
+    },
+    {
+      "content": "手动安装该服务。",
+      "pos": [
+        27549,
+        27557
+      ]
+    },
+    {
+      "content": "自动安装移动服务",
+      "pos": [
+        27564,
+        27572
+      ]
+    },
+    {
+      "content": "在向保护组添加计算机时，进程服务器将自动推送移动服务，并将其安装在每个计算机上。",
+      "pos": [
+        27574,
+        27614
+      ]
+    },
+    {
+      "content": "在 Windows 服务器上自动推送安装移动服务：",
+      "pos": [
+        27618,
+        27643
+      ]
+    },
+    {
+      "pos": [
+        27650,
+        27723
+      ],
+      "content": "按<bpt id=\"p1\">[</bpt>步骤 5：安装最新更新<ept id=\"p1\">](#step-5-install-latest-updates)</ept>中所述安装进程服务器的最新更新，并确定进程服务器可用。"
+    },
+    {
+      "content": "确保源计算机和进程服务器之间已建立网络连接，并且可从进程服务器访问源计算机。",
+      "pos": [
+        27728,
+        27766
+      ]
+    },
+    {
+      "content": "将 Windows 防火墙配置为允许“文件和打印机共享”和“Windows Management Instrumentation”。在 Windows 防火墙设置中，选择“允许应用或功能通过防火墙”选项，然后选择应用程序，如下图所示。对于属于某个域的计算机，你可以使用 GPO 配置防火墙策略。",
+      "pos": [
+        27772,
+        27919
+      ]
+    },
+    {
+      "content": "防火墙设置",
+      "pos": [
+        27927,
+        27932
+      ]
+    },
+    {
+      "content": "用于执行推式安装的帐户必须位于要保护的计算机上的“管理员”组中。这些凭据仅用于推送移动服务的安装，在向保护组添加计算机时，你将要提供这些凭据。",
+      "pos": [
+        28010,
+        28081
+      ]
+    },
+    {
+      "pos": [
+        28085,
+        28444
+      ],
+      "content": "如果提供的帐户不是域帐户，你将需要在本地计算机上禁用远程用户访问控制。为此，请在 HKEY\\_LOCAL\\_MACHINE\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Policies\\\\System 下添加值为 1 的 LocalAccountTokenFilterPolicy DWORD 注册表项。若要从 CLI 添加注册表项，请打开 cmd 或 powershell 并输入 <bpt id=\"p1\">**</bpt><ph id=\"ph1\">`REG ADD HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System /v LocalAccountTokenFilterPolicy /t REG_DWORD /d 1`</ph><ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "在 Linux 服务器上自动推送安装移动服务：",
+      "pos": [
+        28449,
+        28472
+      ]
+    },
+    {
+      "pos": [
+        28479,
+        28552
+      ],
+      "content": "按<bpt id=\"p1\">[</bpt>步骤 5：安装最新更新<ept id=\"p1\">](#step-5-install-latest-updates)</ept>中所述安装进程服务器的最新更新，并确定进程服务器可用。"
+    },
+    {
+      "content": "确保源计算机和进程服务器之间已建立网络连接，并且可从进程服务器访问源计算机。",
+      "pos": [
+        28556,
+        28594
+      ]
+    },
+    {
+      "content": "确保帐户是源 Linux 服务器上的 root 用户。",
+      "pos": [
+        28600,
+        28627
+      ]
+    },
+    {
+      "content": "确保源 Linux 服务器上的 /etc/hosts 文件包含用于将本地主机名映射到所有 NIC 关联的 IP 地址的条目。",
+      "pos": [
+        28631,
+        28693
+      ]
+    },
+    {
+      "content": "在要保护的计算机上安装最新的 openssh、openssh-server 和 openssl 包。",
+      "pos": [
+        28697,
+        28747
+      ]
+    },
+    {
+      "content": "确保 SSH 已启用且正在端口 22 上运行。",
+      "pos": [
+        28751,
+        28774
+      ]
+    },
+    {
+      "content": "在 sshd\\_config 文件中启用 SFTP 子系统与密码身份验证，如下所示：",
+      "pos": [
+        28779,
+        28821
+      ]
+    },
+    {
+      "content": "a) 以 root 身份登录。",
+      "pos": [
+        28830,
+        28845
+      ]
+    },
+    {
+      "pos": [
+        28852,
+        28919
+      ],
+      "content": "b) 在文件 /etc/ssh/sshd\\_config 中，找到以 <bpt id=\"p1\">**</bpt>PasswordAuthentication<ept id=\"p1\">**</ept> 开头的行。"
+    },
+    {
+      "content": "c) 取消注释该行，并将值从“no”更改为“yes”。",
+      "pos": [
+        28926,
+        28953
+      ]
+    },
+    {
+      "content": "Linux 移动服务",
+      "pos": [
+        28965,
+        28975
+      ]
+    },
+    {
+      "content": "d) 找到以 Subsystem 开头的行，并取消注释该行。",
+      "pos": [
+        29053,
+        29083
+      ]
+    },
+    {
+      "content": "Linux 推送移动服务",
+      "pos": [
+        29099,
+        29111
+      ]
+    },
+    {
+      "content": "确保支持源计算机 Linux 变体。",
+      "pos": [
+        29187,
+        29205
+      ]
+    },
+    {
+      "content": "手动安装移动服务",
+      "pos": [
+        29212,
+        29220
+      ]
+    },
+    {
+      "content": "用于安装移动服务的软件包位于进程服务器上的 C:\\\\pushinstallsvc\\\\repository 中。请登录进程服务器，并根据下表将相应的安装包复制到源计算机：",
+      "pos": [
+        29222,
+        29306
+      ]
+    },
+    {
+      "content": "源操作系统",
+      "pos": [
+        29310,
+        29315
+      ]
+    },
+    {
+      "content": "进程服务器上的移动服务包",
+      "pos": [
+        29318,
+        29330
+      ]
+    },
+    {
+      "content": "Windows Server（仅限 64 位）",
+      "pos": [
+        29497,
+        29520
+      ]
+    },
+    {
+      "content": "CentOS 6.4、6.5、6.6（仅限 64 位）",
+      "pos": [
+        29616,
+        29643
+      ]
+    },
+    {
+      "content": "SUSE Linux Enterprise Server 11 SP3（仅限 64 位）",
+      "pos": [
+        29743,
+        29787
+      ]
+    },
+    {
+      "content": "Oracle Enterprise Linux 6.4、6.5（仅限 64 位）",
+      "pos": [
+        29891,
+        29931
+      ]
+    },
+    {
+      "pos": [
+        30029,
+        30066
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>若要在 Windows 服务器上手动安装移动服务<ept id=\"p1\">**</ept>，请执行以下操作："
+    },
+    {
+      "pos": [
+        30071,
+        30165
+      ],
+      "content": "将上表所列进程服务器目录路径中的 <bpt id=\"p1\">**</bpt>Microsoft-ASR\\_UA\\_8.4.0.0\\_Windows\\_GA\\_28Jul2015\\_release.exe<ept id=\"p1\">**</ept> 包复制到源计算机。"
+    },
+    {
+      "content": "在源计算机上运行该可执行文件以安装移动服务。",
+      "pos": [
+        30169,
+        30191
+      ]
+    },
+    {
+      "content": "遵循安装程序说明操作。",
+      "pos": [
+        30195,
+        30206
+      ]
+    },
+    {
+      "content": "选择“移动服务”作为角色，然后单击“下一步”。",
+      "pos": [
+        30210,
+        30233
+      ]
+    },
+    {
+      "content": "安装移动服务",
+      "pos": [
+        30245,
+        30251
+      ]
+    },
+    {
+      "content": "将安装目录保留为默认安装路径，然后单击“安装”。",
+      "pos": [
+        30326,
+        30350
+      ]
+    },
+    {
+      "content": "在“主机代理配置”中，指定配置服务器的 IP 地址与 HTTPS 端口。",
+      "pos": [
+        30354,
+        30390
+      ]
+    },
+    {
+      "content": "如果你通过 Internet 进行连接，请指定公共虚拟 IP 地址和公共 HTTPS 终结点作为端口。",
+      "pos": [
+        30398,
+        30449
+      ]
+    },
+    {
+      "content": "如果你通过 VPN 进行连接，请指定内部 IP 地址和端口 443。保持“使用 HTTPS”的选中状态。",
+      "pos": [
+        30456,
+        30508
+      ]
+    },
+    {
+      "content": "安装移动服务",
+      "pos": [
+        30516,
+        30522
+      ]
+    },
+    {
+      "content": "指定配置服务器通行短语，然后单击“确定”将移动服务注册到配置服务器。",
+      "pos": [
+        30598,
+        30632
+      ]
+    },
+    {
+      "content": "从命令行运行：",
+      "pos": [
+        30636,
+        30643
+      ]
+    },
+    {
+      "content": "将通行短语从 CX 复制到服务器上的“C:\\\\connection.passphrase”文件中，然后运行此命令。在本示例中，CX 是 104.40.75.37，HTTPS 端口是 62519：",
+      "pos": [
+        30650,
+        30747
+      ]
+    },
+    {
+      "pos": [
+        31059,
+        31084
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>在 Linux 服务器上手动安装移动服务<ept id=\"p1\">**</ept>："
+    },
+    {
+      "content": "根据上表，将相应的 tar 存档从进程服务器复制到源计算机。",
+      "pos": [
+        31089,
+        31119
+      ]
+    },
+    {
+      "pos": [
+        31123,
+        31198
+      ],
+      "content": "打开 shell 程序，并通过执行 <ph id=\"ph1\">`tar -xvzf Microsoft-ASR_UA_8.2.0.0*`</ph> 将压缩的 tar 存档解压缩到本地路径"
+    },
+    {
+      "pos": [
+        31202,
+        31293
+      ],
+      "content": "通过 shell 输入 <bpt id=\"p1\">*</bpt><ph id=\"ph1\">`echo &lt;passphrase&gt; &gt;passphrase.txt`</ph><ept id=\"p1\">*</ept>，在 tar 存档内容解压缩到的本地目录中创建 passphrase.txt 文件。"
+    },
+    {
+      "pos": [
+        31297,
+        31428
+      ],
+      "content": "输入 <bpt id=\"p1\">*</bpt><ph id=\"ph1\">`sudo ./install -t both -a host -R Agent -d /usr/local/ASR -i &lt;IP address&gt; -p &lt;port&gt; -s y -c https -P passphrase.txt`</ph><ept id=\"p1\">*</ept> 以安装移动服务。"
+    },
+    {
+      "content": "指定 IP 地址和端口：",
+      "pos": [
+        31432,
+        31444
+      ]
+    },
+    {
+      "pos": [
+        31452,
+        31538
+      ],
+      "content": "如果你通过 Internet 连接到配置服务器，请在 <ph id=\"ph1\">`&lt;IP address&gt;`</ph> 和 <ph id=\"ph2\">`&lt;port&gt;`</ph> 中指定配置服务器的虚拟公共 IP 地址和公共 HTTPS 终结点。"
+    },
+    {
+      "content": "如果你通过 VPN 建立连接，请指定内部 IP 地址和端口 443。",
+      "pos": [
+        31545,
+        31579
+      ]
+    },
+    {
+      "content": "从命令行运行：",
+      "pos": [
+        31583,
+        31590
+      ]
+    },
+    {
+      "content": "将通行短语从 CX 复制到服务器上的“passphrase.txt”文件中，然后运行此命令。在本示例中，CX 是 104.40.75.37，HTTPS 端口是 62519：",
+      "pos": [
+        31597,
+        31683
+      ]
+    },
+    {
+      "content": "在生产服务器上安装：",
+      "pos": [
+        31685,
+        31695
+      ]
+    },
+    {
+      "content": "在目标服务器上安装：",
+      "pos": [
+        31813,
+        31823
+      ]
+    },
+    {
+      "pos": [
+        31949,
+        31996
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 如果将计算机添加到已运行适当版本移动服务的保护组，则会跳过推送安装。"
+    },
+    {
+      "content": "步骤 9：启用保护",
+      "pos": [
+        32002,
+        32011
+      ]
+    },
+    {
+      "content": "若要启用保护，请将虚拟机和物理服务器添加到保护组。开始之前，请注意：",
+      "pos": [
+        32013,
+        32047
+      ]
+    },
+    {
+      "content": "系统会每隔 15 分钟发现虚拟机一次，在发现之后，最多需要 15 分钟时间虚拟机才会出现在 Azure Site Recovery 中。",
+      "pos": [
+        32051,
+        32119
+      ]
+    },
+    {
+      "content": "虚拟机上的环境更改（例如 VMware 工具安装）最多也可能需要 15 分钟时间才能在 Site Recovery 中更新。",
+      "pos": [
+        32122,
+        32184
+      ]
+    },
+    {
+      "content": "你可以在“配置服务器”页上 vCenter 服务器/ESXi 主机的“上次联系时间”字段中检查上次发现的时间。",
+      "pos": [
+        32187,
+        32242
+      ]
+    },
+    {
+      "content": "如果你已创建保护组，并在其后添加 vCenter 服务器或 ESXi 主机，则 Azure Site Recovery 门户需要 15 分钟刷新，而虚拟机需要 15 分钟列在“向保护组添加计算机”对话框中。",
+      "pos": [
+        32245,
+        32348
+      ]
+    },
+    {
+      "content": "如果你要立即将计算机添加到保护组而不想要等待完成计划的发现，请突出显示配置服务器（不要单击它），然后单击“刷新”按钮。",
+      "pos": [
+        32351,
+        32410
+      ]
+    },
+    {
+      "content": "将虚拟机或物理机添加到保护组时，进程服务器将自动推送并在源服务器上安装移动服务（如果尚未安装）。",
+      "pos": [
+        32413,
+        32461
+      ]
+    },
+    {
+      "content": "为了使自动推送机制发挥作用，请确保你已按上一步所述设置你的受保护的计算机。",
+      "pos": [
+        32464,
+        32501
+      ]
+    },
+    {
+      "content": "按如下所示添加计算机：",
+      "pos": [
+        32503,
+        32514
+      ]
+    },
+    {
+      "content": "“受保护的项”&gt;“保护组”&gt;“计算机”选项卡。单击“添加计算机”。作为最佳实践，我们建议，保护组应镜像你的工作负荷，以便于你向相同组中添加运行特定应用程序的计算机。",
+      "pos": [
+        32519,
+        32601
+      ]
+    },
+    {
+      "content": "如果你要保护物理服务器，请在“添加物理计算机”向导的“选择虚拟机”中，提供 IP 地址和友好名称。然后选择操作系统系列。",
+      "pos": [
+        32605,
+        32665
+      ]
+    },
+    {
+      "content": "添加 V-Center 服务器",
+      "pos": [
+        32673,
+        32688
+      ]
+    },
+    {
+      "content": "如果你要保护 VMware 虚拟机，请在“选择虚拟机”中，选择负责管理虚拟机（或其运行所在的 EXSi 主机）的 vCenter 服务器，然后选择计算机。",
+      "pos": [
+        32769,
+        32846
+      ]
+    },
+    {
+      "content": "添加 V-Center 服务器",
+      "pos": [
+        32854,
+        32869
+      ]
+    },
+    {
+      "pos": [
+        32944,
+        33168
+      ],
+      "content": "在“指定目标资源”中选择用于复制的主目标服务器和存储，并选择是否应将设置用于所有工作负荷。为需要持续性的高 IO 性能和低延迟才能托管 IO 密集型工作负荷的工作负荷配置保护时，请选择“高级存储帐户”。<bpt id=\"p1\">[</bpt><ept id=\"p1\">](/documentation/articles/storage-premium-storage-preview-portal)</ept>如果你希望工作负荷磁盘使用高级存储帐户，则需使用 DS 系列的主目标。非 DS 系列的主目标无法使用高级存储磁盘。"
+    },
+    {
+      "content": "vCenter 服务器",
+      "pos": [
+        33176,
+        33187
+      ]
+    },
+    {
+      "content": "在“指定帐户”中，选择用于在受保护计算机上安装移动服务的帐户。需要使用帐户凭据来自动安装移动服务。如果你无法选择帐户，请确保按步骤 2 中所述设置一个。请注意，Azure 无法访问此帐户。对于 Windows 服务器，帐户应该对源服务器具有管理员权限。对于 Linux，帐户必须是 root。",
+      "pos": [
+        33269,
+        33415
+      ]
+    },
+    {
+      "content": "Linux 凭据",
+      "pos": [
+        33423,
+        33431
+      ]
+    },
+    {
+      "content": "单击复选标记以完成向保护组添加计算机，并对每个计算机启动初始复制。你可以在“作业”页上监视状态。",
+      "pos": [
+        33512,
+        33560
+      ]
+    },
+    {
+      "content": "添加 V-Center 服务器",
+      "pos": [
+        33568,
+        33583
+      ]
+    },
+    {
+      "content": "此外，你可以单击“受保护的项”&gt; 保护组名称 &gt;“虚拟机”来监视保护状态。初始复制完成并且计算机同步数据后，它们将显示“受保护”状态。",
+      "pos": [
+        33656,
+        33723
+      ]
+    },
+    {
+      "content": "虚拟机作业",
+      "pos": [
+        33731,
+        33736
+      ]
+    },
+    {
+      "content": "设置受保护的计算机属性",
+      "pos": [
+        33810,
+        33821
+      ]
+    },
+    {
+      "content": "在计算机的状态为“受保护”后，你可以配置其故障转移属性。在“保护组详细信息”中，选择计算机，然后打开“配置”选项卡。",
+      "pos": [
+        33826,
+        33884
+      ]
+    },
+    {
+      "content": "在故障转移后，你可以在 Azure 中修改要提供给计算机的名称，以及 Azure 虚拟机大小。你还可以选择故障转移后要将计算机连接到的 Azure 网络。",
+      "pos": [
+        33888,
+        33965
+      ]
+    },
+    {
+      "content": "设置虚拟机属性",
+      "pos": [
+        33973,
+        33980
+      ]
+    },
+    {
+      "content": "请注意：",
+      "pos": [
+        34050,
+        34054
+      ]
+    },
+    {
+      "content": "Azure 计算机的名称必须符合 Azure 要求。",
+      "pos": [
+        34058,
+        34084
+      ]
+    },
+    {
+      "content": "默认情况下，Azure 中的复制虚拟机不连接到 Azure 网络。如果希望复制的虚拟机进行通信，请确保为其设置相同的 Azure 网络。",
+      "pos": [
+        34087,
+        34155
+      ]
+    },
+    {
+      "content": "如果你调整了 VMware 虚拟机或物理服务器上卷的大小，它将进入关键状态。如果你需要修改大小，请执行以下操作：",
+      "pos": [
+        34158,
+        34214
+      ]
+    },
+    {
+      "content": "a) 更改大小设置。",
+      "pos": [
+        34222,
+        34232
+      ]
+    },
+    {
+      "content": "b) 在“虚拟机”选项卡中选择虚拟机，然后单击“删除”。",
+      "pos": [
+        34239,
+        34267
+      ]
+    },
+    {
+      "content": "c) 在“删除虚拟机”中，选择“禁用保护(用于恢复深化和重设卷大小)”。此选项将禁用保护，但在 Azure 中保留恢复点。",
+      "pos": [
+        34274,
+        34335
+      ]
+    },
+    {
+      "content": "设置虚拟机属性",
+      "pos": [
+        34347,
+        34354
+      ]
+    },
+    {
+      "content": "d) 为虚拟机重新启用保护。在重新启用保护时，调整过大小的卷的数据将被传输到 Azure。",
+      "pos": [
+        34431,
+        34476
+      ]
+    },
+    {
+      "content": "步骤 10：运行故障转移",
+      "pos": [
+        34487,
+        34499
+      ]
+    },
+    {
+      "content": "目前只能为受保护的 VMware 虚拟机和物理服务器运行非计划的故障转移。注意以下事项：",
+      "pos": [
+        34501,
+        34545
+      ]
+    },
+    {
+      "content": "启动故障转移之前，请确保配置服务器和主目标服务器正常运行，否则故障转移将会失败。",
+      "pos": [
+        34551,
+        34591
+      ]
+    },
+    {
+      "content": "在执行非计划的故障转移期间，源计算机不会关闭。执行非计划的故障转移会停止受保护服务器的数据复制。你需要从保护组中删除计算机并重新添加，然后才能在非计划的故障转移完成之后再次开始保护计算机。",
+      "pos": [
+        34594,
+        34688
+      ]
+    },
+    {
+      "content": "如果你想要故障转移而不丢失任何数据，请确保主站点虚拟机在启动故障转移之前已关闭。",
+      "pos": [
+        34691,
+        34731
+      ]
+    },
+    {
+      "content": "在“恢复计划”页上，添加恢复计划。指定该计划的详细信息，并选择“Azure”作为目标。",
+      "pos": [
+        34736,
+        34779
+      ]
+    },
+    {
+      "content": "配置恢复计划",
+      "pos": [
+        34787,
+        34793
+      ]
+    },
+    {
+      "pos": [
+        34864,
+        34972
+      ],
+      "content": "在“选择虚拟机”中，选择保护组，然后选择该组中要添加到恢复计划的计算机。<bpt id=\"p1\">[</bpt>详细了解<ept id=\"p1\">](/documentation/articles/site-recovery-create-recovery-plans)</ept>恢复计划。"
+    },
+    {
+      "content": "添加虚拟机",
+      "pos": [
+        34980,
+        34985
+      ]
+    },
+    {
+      "pos": [
+        35056,
+        35219
+      ],
+      "content": "如果需要，你可以自定义该计划以创建组，并排列顺序，恢复计划中的计算机以该顺序进行故障转移。你还可以添加手动操作和脚本的提示。在恢复到 Azure 时，可以使用 <bpt id=\"p1\">[</bpt>Azure 自动化 Runbook<ept id=\"p1\">](/documentation/articles/site-recovery-runbook-automation)</ept> 添加脚本。"
+    },
+    {
+      "content": "在“恢复计划”页中，选择该计划，然后单击“非计划的故障转移”。",
+      "pos": [
+        35224,
+        35255
+      ]
+    },
+    {
+      "content": "在“确认故障转移”中，验证故障转移方向（到 Azure），然后选择要故障转移到的恢复点。",
+      "pos": [
+        35259,
+        35303
+      ]
+    },
+    {
+      "content": "等待故障转移作业完成，然后验证故障转移是否按预期工作，以及复制的虚拟机是否在 Azure 中成功启动。",
+      "pos": [
+        35307,
+        35358
+      ]
+    },
+    {
+      "content": "步骤 11：故障回复 Azure 中已故障转移的计算机",
+      "pos": [
+        35366,
+        35393
+      ]
+    },
+    {
+      "pos": [
+        35395,
+        35511
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>详细了解<ept id=\"p1\">](/documentation/articles/site-recovery-failback-azure-to-vmware-classic-legacy)</ept>如何将 Azure 中运行的已故障转移的计算机恢复到本地环境。"
+    },
+    {
+      "content": "管理进程服务器",
+      "pos": [
+        35517,
+        35524
+      ]
+    },
+    {
+      "content": "进程服务器将复制数据发送到 Azure 中的主目标服务器，并发现已添加到 vCenter 服务器的新 VMware 虚拟机。在以下情况下，你可能要更改部署中的进程服务器：",
+      "pos": [
+        35526,
+        35611
+      ]
+    },
+    {
+      "content": "如果当前进程服务器已关闭",
+      "pos": [
+        35615,
+        35627
+      ]
+    },
+    {
+      "content": "如果恢复点目标 (RPO) 提升到组织无法接受的程度。",
+      "pos": [
+        35630,
+        35657
+      ]
+    },
+    {
+      "content": "如果需要，你可以将部分或所有本地 VMware 虚拟机和物理服务器的复制转移到另一台进程服务器。例如：",
+      "pos": [
+        35659,
+        35710
+      ]
+    },
+    {
+      "pos": [
+        35714,
+        35864
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>故障<ept id=\"p1\">**</ept> — 如果进程服务器发生故障或不可用，你可以将受保护计算机的复制转移到另一台进程服务器。源计算机和副本计算机的元数据将转移到新的进程服务器并且会重新同步。新的进程服务器将自动连接到 vCenter 服务器以执行自动发现。你可以在 Site Recovery 仪表板上监视进程服务器的状态。"
+    },
+    {
+      "pos": [
+        35867,
+        36015
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>负载平衡以调整 RPO<ept id=\"p1\">**</ept> — 若要改善负载平衡，你可以在 Site Recovery 门户中选择不同的进程服务器，并将一台或多台计算机的复制转移到该服务器，以手动进行负载平衡。在此情况下，选择的源和副本计算机的元数据将转移到新的进程服务器。原始进程服务器仍然连接到 vCenter 服务器。"
+    },
+    {
+      "content": "监视进程服务器",
+      "pos": [
+        36022,
+        36029
+      ]
+    },
+    {
+      "content": "如果进程服务器处于关键状态，Site Recovery 仪表板上会显示状态警告。你可以单击状态以打开“事件”选项卡，然后向下钻取到“作业”选项卡上的特定作业。",
+      "pos": [
+        36031,
+        36110
+      ]
+    },
+    {
+      "content": "修改用于复制的进程服务器",
+      "pos": [
+        36116,
+        36128
+      ]
+    },
+    {
+      "content": "转到“服务器”下的“配置服务器”页",
+      "pos": [
+        36133,
+        36150
+      ]
+    },
+    {
+      "content": "单击配置服务器的名称转到“服务器详细信息”。",
+      "pos": [
+        36154,
+        36176
+      ]
+    },
+    {
+      "pos": [
+        36180,
+        36302
+      ],
+      "content": "在“进程服务器”列表中，单击要修改的服务器旁边的“更改进程服务器”。  \n ![更改进程服务器 1](./media/site-recovery-vmware-to-azure-classic-legacy/change-ps1.png)",
+      "leadings": [
+        "",
+        "   "
+      ],
+      "nodes": [
+        {
+          "content": "在“进程服务器”列表中，单击要修改的服务器旁边的“更改进程服务器”。",
+          "pos": [
+            0,
+            34
+          ]
+        },
+        {
+          "content": "更改进程服务器 1",
+          "pos": [
+            40,
+            49
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        36306,
+        36522
+      ],
+      "content": "在“更改进程服务器”对话框中，在“目标进程服务器”中选择新服务器，然后选择要复制到新服务器的虚拟机。若要获取相关信息，包括可用空间、已用内存，请单击服务器名称旁边的信息图标。随后会显示将每个所选虚拟机复制到新进程服务器所需的平均空间，以帮助你做出负载决策。  \n ![更改进程服务器 2](./media/site-recovery-vmware-to-azure-classic-legacy/change-ps2.png)",
+      "leadings": [
+        "",
+        "   "
+      ],
+      "nodes": [
+        {
+          "content": "在“更改进程服务器”对话框中，在“目标进程服务器”中选择新服务器，然后选择要复制到新服务器的虚拟机。若要获取相关信息，包括可用空间、已用内存，请单击服务器名称旁边的信息图标。随后会显示将每个所选虚拟机复制到新进程服务器所需的平均空间，以帮助你做出负载决策。",
+          "pos": [
+            0,
+            128
+          ]
+        },
+        {
+          "content": "更改进程服务器 2",
+          "pos": [
+            134,
+            143
+          ]
+        }
+      ]
+    },
+    {
+      "content": "单击复选标记以开始复制到新的进程服务器。如果你从某个重要的进程服务器中删除所有虚拟机，仪表板中应该不再会显示关键警告。",
+      "pos": [
+        36526,
+        36585
+      ]
+    },
+    {
+      "content": "第三方软件通知和信息",
+      "pos": [
+        36591,
+        36601
+      ]
+    },
+    {
+      "content": "请勿翻译或本地化",
+      "pos": [
+        36603,
+        36611
+      ]
+    },
+    {
+      "content": "Microsoft 产品或服务中运行的软件和固件基于或包含下列项目中的材料（统称为“第三方代码”）。Microsoft 不是“第三方代码”的原创作者。Microsoft 获取此类“第三方代码”依据的原始版权声明和许可证如下文所述。",
+      "pos": [
+        36613,
+        36728
+      ]
+    },
+    {
+      "content": "A 部分中的信息与下列项目中的“第三方代码”组件相关。提供的此类许可证和信息仅供参考。本“第三方代码”将由 Microsoft 依据 Microsoft 产品或服务的 Microsoft 软件许可条款重新许可给你。",
+      "pos": [
+        36730,
+        36837
+      ]
+    },
+    {
+      "content": "B 部分中的信息与 Microsoft 要依据原始许可条款提供给你的“第三方代码”组件相关。",
+      "pos": [
+        36839,
+        36885
+      ]
+    },
+    {
+      "pos": [
+        36887,
+        37013
+      ],
+      "content": "完整文件可以在 <bpt id=\"p1\">[</bpt>Microsoft 下载中心<ept id=\"p1\">](http://go.microsoft.com/fwlink/?linkid=529428&amp;clcid=0x409)</ept>找到。Microsoft 保留未在此处明确授予的所有权利，无论是暗示、禁止或其他方式。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"使用 Azure Site Recovery（旧版）将 VMware 虚拟机和物理服务器复制到 Azure | Mcirosoft Azure\" \n    description=\"介绍一种旧的部署方式，可以通过设置 Azure Site Recovery 来协调从本地 VMware 虚拟机和 Windows/Linux 物理服务器到 Azure 的复制、故障转移和恢复操作。\"\n    services=\"site-recovery\" \n    documentationCenter=\"\" \n    authors=\"rayne-wiselman\" \n    manager=\"jwhit\" \n    editor=\"\"/>\n\n<tags\n    ms.service=\"site-recovery\"\n    ms.date=\"01/06/2016\"\n    wacn.date=\"02/25/2016\"/>\n\n# 通过 Azure Site Recovery（旧版）将 VMware 虚拟机和物理服务器复制到 Azure\n\n> [AZURE.SELECTOR]\n- [Enhanced](/documentation/articles/site-recovery-vmware-to-azure-classic)\n- [Legacy](/documentation/articles/site-recovery-vmware-to-azure-classic-legacy)\n\n\nAzure Site Recovery 服务有助于业务连续性和灾难恢复 (BCDR) 策略，因为它可以协调虚拟机和物理服务器的复制、故障转移和恢复。虚拟机可复制到 Azure 中，也可复制到本地数据中心中。如需快速概览，请阅读[什么是 Azure Site Recovery？](/documentation/articles/site-recovery-overview)。\n\n## 概述\n\n本文将介绍如何：\n\n- **将 VMware 虚拟机复制到 Azure** - 部署 Site Recovery，以便协调本地 VMware 虚拟机到 Azure 存储空间的复制、故障转移和恢复。\n- **将物理服务器复制到 Azure** - 部署 Azure Site Recovery，以便协调本地 Windows 和 Linux 物理服务器到 Azure 的复制、故障转移和恢复。\n\n>[AZURE.NOTE] 本文所述方案包含**旧版说明**。新部署请勿遵循本文。请改用针对经典门户的[增强型部署](/documentation/articles/site-recovery-vmware-to-azure-classic)说明。如果你已使用本文所述方法进行了部署，则建议你迁移到下述新版本。\n\n\n## 迁移到增强型部署\n\n只有在你已经根据本文说明将 VMware 虚拟机或 Windows/Linux 物理服务器复制到 Azure 的情况下，才应参考本部分。\n\n若要迁移现有的部署，需执行以下操作：\n\n1. 在本地站点中部署新的 Site Recovery 组件。\n2. 在新的配置服务器上为 vCenter 服务器和源计算机配置凭据。\n3. 通过新的配置服务器发现现有的 vCenter 服务器。\n3. 通过新的配置服务器创建新的保护组。\n\n\n在开始之前，请注意：\n\n- 建议你计划一个维护时间，以便迁移到增强型部署。\n- 只有在现有保护组已在旧部署过程中创建的情况下，“迁移计算机”选项才可用。\n- 完成迁移步骤以后，可能需要 15 分钟或更长的时间才能完成凭据的刷新以及虚拟机的发现和刷新（刷新后才能将其添加到保护组）。你可以手动进行刷新，不必等待。 \n\n按如下方式进行迁移：\n\n1. 阅读有关[增强型功能](/documentation/articles/site-recovery-vmware-to-azure-classic#enhanced-deployment)的信息，确保你了解新的[体系结构](/documentation/articles/site-recovery-vmware-to-azure-classic#scenario-architecture)，并查看增强型部署的[先决条件](/documentation/articles/site-recovery-vmware-to-azure-classic#before-you-start-deployment)。\n2. 获取[保管库注册密钥](/documentation/articles/site-recovery-vmware-to-azure-classic#step-3:-download-a-vault-registration-key)并[运行统一安装程序向导](/documentation/articles/site-recovery-vmware-to-azure-classic#step-5-install-the-management-server)，以便在管理服务器上安装配置服务器、进程服务器和主目标服务器组件。阅读有关[容量规划](/documentation/articles/site-recovery-vmware-to-azure-classic#capacity-planning)的更多信息。\n3. 如果你有一个 VMware vCenter 服务器，请[设置凭据](/documentation/articles/site-recovery-vmware-to-azure-classic#step-6-set-up-credentials-for-the-vcenter-server)对其进行访问，使得 Site Recovery 能够自动发现所管理的 VM。阅读有关[所需权限](/documentation/articles/site-recovery-vmware-to-azure-classic#vmware-permissions-for-vcenter-access)的更多信息。\n4. 添加 [vCenter 服务器或 ESXi 主机](/documentation/articles/site-recovery-vmware-to-azure-classic#step-7-add-vcenter-servers-and-esxi-hosts)。门户进行刷新以显示凭据的时间可能长达 15 分钟。\n5. 创建[新的保护组](/documentation/articles/site-recovery-vmware-to-azure-classic#step-8-create-a-protection-group)。门户进行刷新以发现和显示虚拟机的时间可能长达 15 分钟。如果你不想等待，则可突出显示管理服务器名称（请勿单击），然后单击“刷新”。\n6. 在新的保护组下，单击“迁移计算机”。\n\n    ![添加帐户](./media/site-recovery-vmware-to-azure-classic-legacy/legacy-migration1.png)\n\n7. 在“选择计算机”中，选择要从其进行迁移的保护组，以及要迁移的计算机。\n\n    ![添加帐户](./media/site-recovery-vmware-to-azure-classic-legacy/legacy-migration2.png)\n\n8. 在“配置目标设置”中，指定你是否希望对所有计算机使用相同的设置，然后选择进程服务器和 Azure 存储帐户。如果你已设置单个管理服务器，则进程服务器就是该管理服务器的 IP 地址。\n\n    ![添加帐户](./media/site-recovery-vmware-to-azure-classic-legacy/legacy-migration3.png)\n\n9. 在“指定帐户”中，选择所创建的帐户，以便自动将新版移动服务推送到受保护的计算机。\n\n    ![添加帐户](./media/site-recovery-vmware-to-azure-classic-legacy/legacy-migration4.png)\n\n10. Site Recovery 会将你的已复制数据迁移到你所提供的 Azure 存储帐户。（可选）你可以重复使用在旧部署中使用的存储帐户。\n11. 作业完成后，虚拟机会自动同步。同步完成后，你可以从旧保护组中删除虚拟机。\n12. 所有计算机都迁移完以后，你可以删除旧保护组。\n13. 请记住，在同步完成后，需要指定计算机的故障转移属性以及 Azure 网络设置。\n14. 如果你有现成的恢复计划，则可通过“迁移恢复计划”将其迁移到增强型部署。只有在所有受保护的计算机迁移完后，才能执行此操作。 \n\n    ![添加帐户](./media/site-recovery-vmware-to-azure-classic-legacy/legacy-migration5.png)\n\n\n## 我需要做好哪些准备？\n\n此图显示了部署组件。\n\n![新保管库](./media/site-recovery-vmware-to-azure-classic-legacy/architecture.png)\n\n以下是你需要做好的准备：\n\n**组件** | **部署** | **详细信息**\n--- | --- | ---\n**配置服务器** | <p>在与 Site Recovery 相同的订阅中部署一个 Azure 标准 A3 虚拟机。</p> <p>在 Site Recovery 门户中设置</p> | 此服务器可在 Azure 中协调受保护的计算机、进程服务器和主目标服务器之间的通信。在执行故障转移时，它可在 Azure 中设置复制并协调恢复。\n**主目标服务器** | <p>你可以将其部署为基于 Windows Server 2012 R2 库映像（用于保护 Windows 计算机）的 Azure 虚拟机或 Windows 服务器，或将其部署为基于 OpenLogic CentOS 6.6 库映像（用于保护 Linux 计算机）的 Linux 服务器。</p> <p>共有三个大小选项可供选择 – 标准 A4、标准 D14 和标准 DS4。</p><p>该服务器连接到配置服务器所在的 Azure 网络。</p><p>在 Site Recovery 门户中设置</p> | <p>它使用在 Azure 存储帐户的 Blob 存储上所创建的附加 VHD 从受保护计算机接收并保留复制的数据。</p> <p>标准 DS4 专门用于针对需要通过高级存储帐户持续提供高性能和低延迟的工作负荷配置保护。</p>\n**进程服务器** | <p>部署为运行 Windows Server 2012 R2 的本地虚拟或物理服务器</p><p>我们建议将进程服务器放置在与要保护的计算机相同的网络和 LAN 网段中，但是，它可以运行在不同网络上，只要受保护的计算机对其拥有 L3 网络可见性即可。</p><p>可以在 Site Recovery 门户中设置该服务器并将其注册到配置服务器。</p> | <p>受保护的虚拟机将复制数据发送到本地进程服务器。它具有基于磁盘的缓存，用于缓存所收到的复制数据。它对该数据执行多种操作。</p><p>它通过在发送数据到主目标服务器之前，缓存、压缩和加密数据来优化数据。</p><p>处理移动服务的推送安装。</p><p>它执行 VMware 虚拟机的自动发现。</p>\n**本地计算机** | 本地虚拟机是在 VMware 虚拟机监控程序上运行的虚拟机，或是运行 Windows 或 Linux 的物理服务器。 | 你可以设置应用于虚拟机和服务器的复制设置。你可以故障转移单个计算机，或更常见地，随着包含多个虚拟机的恢复方案一起故障转移。\n**移动服务** | <p>在想要保护的每个虚拟机或物理服务器上安装</p><p>为服务器启用保护时，可以手动安装或推送并由进程服务器自动安装。</p> | 移动服务随着初始复制（重新同步处理）将数据发送到进程服务器。 一旦服务器进入受保护状态（重新同步处理完成之后），移动服务将执行写入磁盘的内存中捕获，并将其发送到进程服务器。Windows 服务器的应用程序一致性是使用 VSS 框架实现的。\n**Azure Site Recovery 保管库** | 在订阅 Site Recovery 服务之后设置。 | 在 Site Recovery 保管库中注册服务器。保管库可协调和安排本地站点与 Azure 之间的数据复制、故障转移和恢复。\n**复制机制** | <p>**通过 Internet** — 通过公共 Internet 连接使用安全 SSL/TLS 通信通信并从受保护的本地服务器和 Azure 复制数据。这是默认选项。</p><p>**VPN/ExpressRoute** — 通过 VPN 连接通信并在本地服务器与 Azure 之间复制数据。你将需要在本地站点与 Azure 网络之间设置站点到站点 VPN 或 [ExpressRoute](/documentation/articles/expressroute-introduction) 连接。</p><p>需选择要在 Site Recovery 部署期间复制的方式。配置机制后，你无法在不影响已受保护服务器上的保护的前提下更改该机制。</p>| <p>无论是哪个选项，都不需要你在受保护的计算机上打开任何入站网络端口。所有网络通信都从本地站点启动。</p> \n\n可以在 [Site Recovery 组件](/documentation/articles/site-recovery-components)中深入了解 Site Recovery 组件、提供程序和代理。\n\n## 容量规划\n\n考虑的主要方面为：\n\n- **源环境** — VMware 基础结构、源计算机设置和要求。\n- **组件服务器** — 进程服务器、配置服务器和主目标服务器 \n\n### 有关源环境的注意事项\n\n- **磁盘最大大小** — 可以连接到虚拟机的磁盘的当前大小上限为 1 TB。因此，可以复制的源磁盘的最大大小也限制为 1 TB。\n- **每个源的最大大小** — 单个源计算机的最大大小是 31 TB（包含 31 个磁盘），以及对主目标服务器预配一个 D14 实例。 \n- **每个主目标服务器的源数目** — 可以使用单个主目标服务器保护多个源计算机。但是，无法通过多个主目标服务器保护单个计算机，因为在磁盘复制时，镜像磁盘大小的 VHD 在 Azure Blob 存储上创建，并作为数据磁盘附加到主目标服务器。  \n- **每个源的每日更改率上限** — 考虑每个源建议的更改率时，有三个需要考虑的因素。对于基于目标的考虑因素，源上每个操作的目标磁盘需要两个 IOPS。这是因为目标磁盘上会发生旧数据的读取和新数据的写入。 \n    - **进程服务器支持的每日更改率** — 一个源计算机不能跨多个进程服务器。单个进程服务器可以支持多达 1 TB 的每日更改率。因此 1 TB 是源计算机支持的每日数据更改率上限。 \n    - **目标磁盘支持的最大吞吐量** — 每个源磁盘的最大变换不能超过 144 GB/天（8K 写入大小）。请参阅主目标部分中的表，以获取各种写入大小的目标的吞吐量与 IOPS。必须将此数字除以 2，因为每个源 IOP 在目标磁盘上生成 2 个 IOPS。配置高级存储帐户的目标时，请参阅[使用高级存储时的缩放性和性能目标](/documentation/articles/storage-scalability-targets#scalability-targets-for-premium-storage-accounts)。\n    - **存储帐户支持的最大吞吐量** — 一个源不能跨越多个存储帐户。假设某个存储帐户每秒可接受最多 20,000 个请求，并且每个源 IOP 在主目标服务器上生成 2 个 IOPS，则建议将源的 IOPS 数目保留为 10,000。配置高级存储帐户的源时，请参阅[使用高级存储时的缩放性和性能目标](/documentation/articles/storage-scalability-targets#scalability-targets-for-premium-storage-accounts)。\n\n### 有关组件服务器的注意事项\n\n表 1 汇总了配置服务器与主目标服务器的虚拟机大小。\n\n**组件** | **部署的 Azure 实例** | **核心数** | **内存** | **最大磁盘数** | **磁盘大小**\n--- | --- | --- | --- | --- | ---\n配置服务器 | 标准 A3 | 4 | 7 GB | 8 | 1023 GB\n主目标服务器 | 标准 A4 | 8 | 14 GB | 16 | 1023 GB\n | 标准 D14 | 16 | 112 GB | 32 | 1023 GB\n | 标准 DS4 | 8 | 28 GB | 16 | 1023 GB\n\n**表 1**\n\n#### 进程服务器注意事项\n\n进程服务器的大小通常取决于跨所有受保护工作负荷的每日更改率。主要注意事项包括：\n\n-   需要有足够的计算容量才能执行内联压缩和加密等任务。\n-   进程服务器使用基于磁盘的缓存。请确保提供建议的缓存空间和磁盘吞吐量，以便在出现网络瓶颈或服务中断时能够存储数据更改。 \n-   确保提供足够的带宽，使进程服务器能够将数据上载到主目标服务器，以提供持续的数据保护。 \n\n表 2 提供了进程服务器的指导摘要。\n\n**数据更改率** | **CPU** | **内存** | **缓存磁盘大小**| **缓存磁盘吞吐量** | **带宽入口/出口**\n--- | --- | --- | --- | --- | ---\n< 300 GB | 4 个 vCPU（2 个插槽 * 2 个核心 @ 2.5GHz） | 4 GB | 600 GB | 每秒 7 到 10 MB | 30 Mbps/21 Mbps\n300 到 600 GB | 8 个 vCPU（2 个插槽 * 4 个核心 @ 2.5GHz） | 6 GB | 600 GB | 每秒 11 到 15 MB | 60 Mbps/42 Mbps\n600 GB 到 1 TB | 12 个 vCPU（2 个插槽 * 6 个核心 @ 2.5GHz） | 8 GB | 600 GB | 每秒 16 到 20 MB | 100 Mbps/70 Mbps\n> 1 TB | 部署另一个进程服务器 | | | | \n\n**表 2**\n\n其中：\n\n- 入口是下载带宽（源与进程服务器之间的 Intranet）。\n- 出口是上载带宽（进程服务器与主目标服务器之间的 Internet）。出口数字假设平均进程服务器压缩率为 30%。\n- 对于缓存磁盘，建议为所有进程服务器提供一个至少有 128 GB 的独立 OS 磁盘。\n- 缓存磁盘吞吐量已使用以下存储进行基准测试：8 个采用 RAID 10 配置的 10K RPM SAS 驱动器。\n\n#### 配置服务器注意事项\n\n每个配置服务器最多支持 100 个包含 3 到 4 个卷的源计算机。如果超过这些数字，建议部署另一个配置服务器。有关配置服务器的默认虚拟机属性，请参阅“表 1”。\n\n#### 主目标服务器与存储帐户注意事项\n\n每个主目标服务器的存储由 OS 磁盘、保留卷和数据磁盘组成。保留驱动器可以维护 Site Recovery 门户中定义的特定时段内的磁盘更改日志。有关主目标的虚拟机服务器属性，请参阅“表 1”。表 3 显示了如何使用 A4 的磁盘。\n\n**实例** | **操作系统磁盘** | **保留** | **数据磁盘数**\n--- | --- | --- | ---\n | | **保留** | **数据磁盘数**\n标准 A4 | 1 个磁盘 (1 * 1023 GB) | 1 个磁盘 ( 1 * 1023 GB) | 15 个磁盘 (15 * 1023 GB)\n标准 D14 | 1 个磁盘 (1 * 1023 GB) | 1 个磁盘 ( 1 * 1023 GB) | 31 个磁盘 (15 * 1023 GB)\n标准 DS4 | 1 个磁盘 (1 * 1023 GB) | 1 个磁盘 ( 1 * 1023 GB) | 15 个磁盘 (15 * 1023 GB)\n\n**表 3**\n\n主目标服务器的容量规划取决于：\n\n- Azure 存储空间性能和限制\n    - 单个存储帐户中标准层 VM 的高度使用的磁盘数目上限约为 40（每个磁盘 20,000/500 IOPS）。有关详细信息，请参阅[标准存储帐户的可伸缩性目标](/documentation/articles/storage-scalability-targets#scalability-targets-for-standard-storage-accounts)。有关高级存储帐户的详细信息，请参阅[高级存储帐户的可伸缩性目标](/documentation/articles/storage-scalability-targets#scalability-targets-for-premium-storage-accounts)。\n-   每日更改率 \n-   保留卷存储。\n\n请注意：\n\n- 一个源不能跨越多个存储帐户。此限制适用于属于配置保护时选择的存储帐户的数据磁盘。OS 和保留磁盘通常属于自动部署的存储帐户。\n- 所需的保留存储卷取决于每日更改率和保留天数。每个主目标服务器所需的保留存储 = 每日来自源的变换总计 * 保留天数。 \n- 每个主目标服务器只有一个保留卷。保留卷在附加到主目标服务器的磁盘之间共享。例如：\n    - 如果有一台包含 5 个磁盘的源计算机，并且在源上的每个磁盘生成 120 IOPS（8K 大小），则相当于每个磁盘 240 IOPS（在每个源的目标磁盘上生成 2 个 IO 操作）。每个磁盘 IOPS 限制 500，在 Azure 中是 240 IOPS。\n    - 在保留卷上，这会变成 120 * 5 = 600 IOPS，而这可能会造成瓶颈。在此情况下，合理的策略是将更多磁盘添加到保留卷，并将这些磁盘分散成 RAID 条带配置。由于 IOPS 分散在多个驱动器之间，因此可以提高性能。要添加到保留卷的驱动器数目如下：\n        - 来自源环境的 IOPS 总计 / 500\n        - 每日来自源环境的变换总计（未压缩）/ 287 GB。287 GB 是目标磁盘每日支持的最大吞吐量。此度量值根据因数为 8K 的写入大小而异，因为在此情况下，8K 是假设的写入大小。例如，如果写入大小为 4K，则吞吐量为 287/2。同理，如果写入大小为 16K，则吞吐量为 287*2。\n- 所需的存储帐户数 = 源 IOPS 总计/10000。\n\n\n## 开始之前\n\n**组件** | **要求** | **详细信息**\n--- | --- | --- \n**Azure 帐户** | 需要一个 [Azure](/) 帐户。你可以从 [1rmb 试用版](/pricing/1rmb-trial/)开始。\n**Azure 存储空间** | <p>需要使用 Azure 存储帐户来存储复制的数据</p><p>该帐户应该是[标准异地冗余存储帐户](/documentation/articles/storage-redundancy#geo-redundant-storage)或[高级存储帐户](/documentation/articles/storage-premium-storage-preview-portal)。</p><p>它应该位于 Azure Site Recovery 保管库所在的区域中，并与相同订阅关联。</p><p>若要了解详细信息，请阅读 [Azure 存储空间简介](/documentation/articles/storage-introduction)</p>\n**Azure 虚拟网络** | 你将需要 Azure 虚拟网络，配置服务器和主目标服务器将部署在该网络上。它应该位于 Azure Site Recovery 保管库所在的订阅和区域中。如果你要通过 ExpressRoute 或 VPN 连接复制数据，Azure 虚拟网络必须通过 ExpressRoute 连接或站点到站点 VPN 连接到本地网络。\n**Azure 资源** | 确保你有足够的 Azure 资源用于部署所有组件。在 [Azure 订阅限制](/documentation/articles/azure-subscription-service-limits)中阅读更多内容。\n**Azure 虚拟机** | <p>要保护的虚拟机应该符合 [Azure 先决条件](/documentation/articles/site-recovery-best-practices)。</p><p>**磁盘计数** — 单个受保护的服务器最多可以支持 31 个磁盘</p><p>**磁盘大小** — 单个磁盘的容量不能超过 1023 GB</p><p>**群集** — 不支持群集服务器</p><p>**启动** — 不支持统一可扩展固件接口 (UEFI)/可扩展固件接口 (EFI)</p><p>**卷** — 不支持 Bitlocker 加密卷</p><p>**服务器名称** — 名称应包含 1 到 63 个字符（字母、数字和连字符）。名称必须以字母或数字开头，并以字母或数字结尾。在计算机受到保护后，你可以修改 Azure 名称。</p>\n**配置服务器** | <p>将在你的订阅中针对配置服务器创建基于 Azure Site Recovery Windows Server 2012 R2 库映像的标准 A3 虚拟机。它将作为第一个实例在新的云服务中创建。如果你选择“公共 Internet”作为配置服务器的连接类型，将使用保留的公共 IP 地址创建云服务。</p><p>安装路径应该只包含英文字符。</p>\n**主目标服务器** | <p>标准 A4、D14 或 DS4 Azure 虚拟机。</p><p>安装路径应该只包含英文字符。例如，对于运行 Linux 的主目标服务器，路径应为 **/usr/local/ASR**。</p>\n**进程服务器** | <p>你可以在运行带有最新更新的 Windows Server 2012 R2 的物理或虚拟机上部署进程服务器。在 C:/ 上安装。</p><p>我们建议你将该服务器放置在你要保护的计算机所在的网络和子网上。</p><p>在进程服务器上安装 VMware vSphere CLI 5.5.0。进程服务器上需要有 VMware vSphere CLI 组件才能发现 vCenter 服务器管理的虚拟机或 ESXi 主机上运行的虚拟机。</p><p>安装路径应该只包含英文字符。</p><p>不支持 ReFS 文件系统。</p>\n**VMware** | <p>用于管理 VMware vSphere 虚拟机监控程序的 VMware vCenter 服务器。它应该运行的是带有最新更新的 vCenter 5.1 或 5.5 版。</p><p>一个或多个包含要保护的 VMware 虚拟机的 vSphere 虚拟机监控程序。虚拟机监控程序应该运行的是带有最新更新的 ESX/ESXi 版本 5.1 或 5.5。</p><p>VMware 虚拟机上应已安装并运行 VMware 工具。</p>  \n**Windows 计算机** | <p>受保护的物理服务器或运行 Windows 的 VMware 虚拟机需要满足许多要求。</p><p>支持的 64 位操作系统：**Windows Server 2012 R2**、**Windows Server 2012** 或**Windows Server 2008 R2 SP1** 及其更高版本。</p><p>主机名、装入点、设备名称、Windows 系统路径（例如：C:/Windows）只能采用英文形式。</p><p>操作系统应安装在 C:/ 驱动器上。</p><p>仅支持基本磁盘。不支持动态磁盘。</p><p>受保护的计算机上的防火墙规则应允许其访问 Azure 中的配置服务器和主目标服务器。</p><p>你需要提供管理员帐户（必须是 Windows 计算机上的本地管理员）才能在 Windows 服务器上推送安装移动服务。如果提供的帐户不是域帐户，则你将需要在本地计算机上禁用远程用户访问控制。为此，请在 HKEY\\_LOCAL\\_MACHINE\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Policies\\\\System 下添加值为 1 的 LocalAccountTokenFilterPolicy DWORD 注册表项。若要从 CLI 添加注册表项，请打开 cmd 或 powershell 并输入 **`REG ADD HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System /v LocalAccountTokenFilterPolicy /t REG_DWORD /d 1`**。[详细了解](https://msdn.microsoft.com/zh-cn/library/aa826699.aspx)有关访问控制的信息。</p><p>故障转移之后，如果你要通过远程桌面连接到 Azure 中的 Windows 虚拟机，请确保对本地计算机启用远程桌面。如果你没有通过 VPN 连接，则防火墙规则应允许通过 Internet 的远程桌面连接。</p>\n**Linux 计算机** | <p>支持的 64 位操作系统：**Centos 6.4、6.5、6.6**；**Oracle Enterprise Linux 6.4、6.5（运行 Red Hat 兼容内核或 Unbreakable Enterprise Kern Release 3 (UEK3)）**、**SUSE Linux Enterprise Server 11 SP3**。</p><p>受保护的计算机上的防火墙规则应允许其访问 Azure 中的配置服务器和主目标服务器。</p><p>受保护计算机上的 /etc/hosts 文件应该包含将本地主机名映射到所有 NIC 关联的 IP 地址的条目</p><p>如果要在故障转移后使用 Secure Shell 客户端 (ssh) 连接到运行 Linux 的 Azure 虚拟机，请确保将受保护的计算机上的 Secure Shell 服务设置为在系统启动时自动启动，并且防火墙规则允许建立到它的 ssh 连接。</p><p>主机名、装载点、设备名称，以及 Linux 系统路径和文件名（例如 /etc/；/usr）只能采用英文形式。主机名、装载点、设备名称，以及 Linux 系统路径和文件名（例如 /etc/；/usr）只能采用英文形式。</p><p>可以对使用以下存储的本地计算机启用保护：<br>文件系统：EXT3、ETX4、ReiserFS、XFS<br>多路径软件 - 设备映射器（多路径）<br>卷管理器：LVM2<br>不支持使用 HP CCISS 控制器存储的物理服务器。</p>\n**第三方** | 在这种情况下，一些部署组件依赖第三方软件才能正常工作。有关完整列表，请参阅[第三方软件通知和信息](#third-party)\n\n## 部署\n\n该图汇总了部署步骤。\n\n![部署步骤](./media/site-recovery-vmware-to-azure-classic-legacy/deployment-steps.png)\n\n## 网络连接\n\n可以使用两个选项来配置本地站点与部署基础结构组件（配置服务器、主目标服务器）的 Azure 虚拟网络之间的网络连接。在部署配置服务器之前，需要决定所要使用的网络连接选项。你需要在部署时做出选择，以后无法更改。\n\n**公共 Internet：**本地服务器（进程服务器、受保护的服务器）与 Azure 基础结构组件服务器（配置服务器、主目标服务器）之间的通信和数据复制通过安全 SSL/TLS 连接从本地到配置服务器与主目标服务器上的公共终结点进行。（唯一的例外是 TCP 端口 9080 上的进程服务器与主目标服务器之间的连接未加密。在此连接上，只会交换用于设置复制的复制协议相关的控制信息。）\n\n![部署示意图 - Internet](./media/site-recovery-vmware-to-azure-classic-legacy/internet-deployment.png)\n\n**VPN：**本地服务器（进程服务器、受保护的服务器）与 Azure 基础结构组件服务器（配置服务器、主目标服务器）之间的通信和数据复制通过 VPN 连接在本地网络与部署配置服务器和主目标服务器的 Azure 虚拟网络之间进行。确保本地网络通过 ExpressRoute 连接或站点到站点 VPN 连接来与 Azure 虚拟网络连接。\n\n![部署示意图 - VPN](./media/site-recovery-vmware-to-azure-classic-legacy/vpn-deployment.png)\n\n\n## 步骤 1：创建保管库\n\n1. 登录到[管理门户](https://manage.windowsazure.cn)。\n\n\n2. 展开“数据服务”>“恢复服务”，并单击“Site Recovery 保管库”。\n\n\n3. 单击“新建”>“快速创建”。\n\n4. 在“名称”中，输入一个友好名称以标识此保管库。\n\n5. 在“区域”中，为保管库选择地理区域。若要查看受支持的区域，请参阅 [Azure Site Recovery 价格详细信息](pricing/details/site-recovery/)中的“地域可用性”。\n\n6. 单击“创建保管库”。\n\n    ![新保管库](./media/site-recovery-vmware-to-azure-classic-legacy/quick-start-create-vault.png)\n\n检查状态栏以确认保管库已成功创建。保管库将以“活动”状态列在主要的“恢复服务”页上。\n\n## 步骤 2：部署配置服务器\n\n### 配置服务器设置\n\n1. 在“恢复服务”页中，单击保管库以打开“快速启动”页。也可随时使用该图标打开“快速启动”。\n\n    ![“快速启动”图标](./media/site-recovery-vmware-to-azure-classic-legacy/quick-start-icon.png)\n\n2. 在下拉列表中，选择“在使用 VMware/物理服务器的本地站点与 Azure 之间”。\n3. 在“准备目标(Azure)资源”中，单击“部署配置服务器”。\n\n    ![部署配置服务器](./media/site-recovery-vmware-to-azure-classic-legacy/deploy-cs2.png)\n\n4. 在“新配置服务器详细信息”中指定：\n\n    - 配置服务器的名称和用于连接它的凭据。\n    - 在“网络连接类型”下拉列表中，选择“公共 Internet”或“VPN”。  \n    >[AZURE.NOTE] 你需要在部署时选择此设置，以后无法更改。  \n    - 选择该服务器所在的 Azure 网络。如果指定了 VPN 作为网络连接类型，请确保此 Azure 虚拟网络通过 ExpressRoute 连接或站点到站点 VPN 连接到本地站点。\n    - 指定要分配到该服务器的内部 IP 地址和子网。请注意，任何子网中的前四个 IP 地址保留给 Azure 内部使用。请使用任何其他可用的 IP 地址。\n    \n    ![部署配置服务器](./media/site-recovery-vmware-to-azure-classic-legacy/cs-details.png)\n\n5. 在单击“确定”时，将在你的订阅中针对配置服务器创建基于 Azure Site Recovery Windows Server 2012 R2 库映像的标准 A3 虚拟机。它将作为第一个实例在新的云服务中创建。如果你将网络连接类型指定为“公共 Internet”，则会使用保留的公共 IP 地址创建云服务。你可以在“作业”选项卡中监视进度。\n\n    ![监视进度](./media/site-recovery-vmware-to-azure-classic-legacy/monitor-cs.png)\n\n6.  **仅当连接类型是“公共 Internet”时，此步骤才适用。** 在部署配置服务器后，请在 Azure 门户中的“虚拟机”页上记下分配给它的公用 IP 地址。然后，在“终结点”选项卡中，记下映射到专用端口 443 的公用 HTTPS 端口。稍后将主目标服务器和处理服务器注册到配置服务器时，你将需要用到这些信息。配置服务器使用以下终结点部署：\n\n    - HTTPS：公用端口用于协调通过 Internet 在组件服务器与 Azure 之间进行的通信。专用端口 443 用于协调通过 VPN 在组件服务器与 Azure 之间进行的通信。\n    - 自定义：公用端口用于通过 Internet 进行的故障回复工具\n    - 通信。专用端口 9443 用于通过 VPN 进行的故障回复工具通信。\n    - PowerShell：专用端口 5986\n    - 远程桌面：专用端口 3389\n    \n    ![VM 终结点](./media/site-recovery-vmware-to-azure-classic-legacy/vm-endpoints.png)\n\n    >[AZURE.WARNING] 请勿删除在配置服务器部署期间创建的任何终结点的公用或专用端口号。\n\n配置服务器使用保留的 IP 地址部署在自动创建的 Azure 云服务中。需要使用保留的地址确保云服务上的虚拟机（包括配置服务器）在重新启动后，配置服务器云服务 IP 地址仍然相同。在停用配置服务器后，必须手动将保留的公共 IP 地址取消保留，否则会继续保留。每个订阅保留的公共 IP 地址数默认限制为 20 个。[详细了解](/documentation/articles/virtual-networks-reserved-private-ip)有关保留 IP 地址的信息。\n\n### 在保管库中注册配置服务器\n\n1. 在“快速启动”页中，单击“准备目标资源”>“下载注册密钥”。此时将自动生成密钥文件。该文件在生成后的 5 天内有效。将它复制到配置服务器。\n2. 在“虚拟机”中，从虚拟机列表中选择配置服务器。打开“仪表板”选项卡，然后单击“连接”。**打开**下载的 RDP 文件，以使用远程桌面登录到配置服务器。如果配置服务器部署在 VPN 网络上，则使用配置服务器的内部 IP 地址（这是在部署配置服务器时指定的 IP 地址，也可以在配置服务器虚拟机的虚拟机仪表板页上看到），以通过远程桌面从本地网络访问它。当你首次登录时，Azure Site Recovery 安装向导将自动运行。\n\n    ![注册](./media/site-recovery-vmware-to-azure-classic-legacy/splash.png)\n\n3. 在“第三方软件安装”中，单击“我接受”以下载并安装 MySQL。\n\n    ![MySQL 安装](./media/site-recovery-vmware-to-azure-classic-legacy/sql-eula.png)\n\n4. 在“MySQL 服务器详细信息”中，创建用于登录 MySQL 服务器实例的凭据。\n\n    ![MySQL 凭据](./media/site-recovery-vmware-to-azure-classic-legacy/sql-password.png)\n\n5. 在“Internet 设置”中，指定配置服务器连接到 Internet 的方式。请注意：\n\n    - 如果希望使用自定义代理，则应当在安装该提供程序之前设置它。\n    - 当你单击“下一步”时，将会运行测试来检查代理连接。\n    - 如果你确实使用自定义代理，或者你的默认代理要求进行身份验证，则需要输入代理详细信息，包括地址、端口和凭据。\n    - 应可通过代理访问以下 URL：\n        - *.hypervrecoverymanager.windowsazure.cn\n        - *.accesscontrol.chinacloudapi.cn\n        - *.backup.windowsazure.cn\n        - *.blob.core.chinacloudapi.cn\n        - *.store.core.chinacloudapi.cn\n    - 如果你采用了基于 IP 地址的防火墙规则，请确保这些规则设置为允许配置服务器与 [Azure 数据中心 IP 范围](https://msdn.microsoft.com/zh-cn/library/azure/dn175718.aspx)和 HTTPS (443) 协议中所述的 IP 地址通信。必须将你打算使用的 Azure 区域以及美国西部的 IP 范围加入允许列表。\n\n    ![代理注册](./media/site-recovery-vmware-to-azure-classic-legacy/register-proxy.png)\n\n6. 在“提供程序错误消息本地化设置”中指定显示错误消息的语言。\n\n    ![错误消息注册](./media/site-recovery-vmware-to-azure-classic-legacy/register-locale.png)\n\n7. 在“Azure Site Recovery 注册”中，浏览并选择已复制到该服务器的密钥文件。\n\n    ![密钥文件注册](./media/site-recovery-vmware-to-azure-classic-legacy/register-vault.png)\n\n8. 在向导的完成页上选择以下选项：\n\n    - 选择“启动帐户管理对话框”，指定在完成向导后应该打开“管理帐户”对话框。\n    - 选择“为 Cspsconfigtool 创建桌面图标”，以便在配置服务器上添加桌面快捷方式，使你能够在任何时间打开“管理帐户”对话框，而无需重新运行向导。\n\n    ![完成注册](./media/site-recovery-vmware-to-azure-classic-legacy/register-final.png)\n\n9. 单击“完成”以完成向导。此时将生成一个通行短语。将其复制到安全位置。你将需要它进行身份验证，并将处理服务器和主目标服务器注册到配置服务器。它还可用于确保配置服务器通信中的通道完整性。你可以重新生成该通行短语，但是此后，你将需要使用新通行短语重新注册主目标服务器和进程服务器。\n\n    ![通行短语](./media/site-recovery-vmware-to-azure-classic-legacy/passphrase.png)\n\n注册后，保管库中的“配置服务器”页上将列出该配置服务器。\n\n### 设置和管理帐户\n\n在部署期间，Site Recovery 将请求以下操作的凭据：\n\n- 当你添加 vCenter 服务器，以便自动发现 vCenter 服务器管理的虚拟机时。自动发现虚拟机需要 vCenter 帐户。\n- 当你添加要保护的计算机，以便 Site Recovery 可在这些计算机上安装移动服务时。\n\n注册配置服务器后，可以打开“管理帐户”对话框来添加和管理要用于这些操作的帐户。可通过多种方式实现此目的：\n\n- 打开你在安装程序最后一页上的对话框中为配置服务器 (cspsconfigtool) 创建的快捷方式。\n- 打开配置服务器安装程序完成页上的对话框。\n\n1. 在“管理帐户”中，单击“添加帐户”。你还可以修改和删除现有帐户。\n\n    ![管理帐户](./media/site-recovery-vmware-to-azure-classic-legacy/manage-account.png)\n\n2. 在“帐户详细信息”中，指定要在 Azure 中使用的帐户名和凭据（域/用户名）。\n\n    ![管理帐户](./media/site-recovery-vmware-to-azure-classic-legacy/account-details.png)\n\n### 连接到配置服务器 \n\n可通过两种方式连接到配置服务器：\n\n- 通过 VPN 站点到站点或 ExpressRoute 连接\n- 通过 Internet \n\n请注意：\n\n- Internet 连接将虚拟机的终结点与服务器的公用虚拟 IP 地址结合使用。\n- VPN 连接将服务器的内部 IP 地址与终结点的专用端口结合使用。\n- 确定是要从本地服务器通过 VPN 连接还是 Internet 连接到 Azure 中运行的各种组件服务器（配置服务器、主目标服务器，以访问控制和复制数据），这项决定是最终性的。以后无法更改此设置。如果这样做，将需要重新部署方案并重新保护计算机。  \n\n\n## 步骤 3：部署主目标服务器\n\n1. 在“准备目标(Azure)资源”中，单击“部署主目标服务器”。\n2. 指定主目标服务器的详细信息和凭据。该服务器将部署在注册到的配置服务器所在的 Azure 网络中。在单击完成时，将使用 Windows 或 Linux 库映像创建 Azure 虚拟机。\n\n    ![目标服务器设置](./media/site-recovery-vmware-to-azure-classic-legacy/target-details.png)\n\n请注意，任何子网中的前四个 IP 地址保留给 Azure 内部使用。请指定任何其他可用的 IP 地址。\n\n>[AZURE.NOTE] 使用[高级存储帐户](/documentation/articles/storage-premium-storage-preview-portal)为需要持续性的高 IO 性能和低延迟才能托管 IO 密集型工作负荷的工作负荷配置保护时，请选择“标准 DS4”。\n\n\n3. Windows 主目标服务器虚拟机使用以下终结点创建：（仅当部署类型是“公共 Internet”时，才创建公开终结点）：\n\n    - 自定义：进程服务器使用公用端口来通过 Internet 发送复制数据。处理服务器使用专用端口 9443 来通过 VPN 将复制数据发送到主目标服务器。\n    - 自定义 1：进程服务器使用公用端口来通过 Internet 发送控制元数据。处理服务器使用专用端口 9080 来通过 VPN 将控制元数据发送到主目标服务器。\n    - PowerShell：专用端口 5986\n    - 远程桌面：专用端口 3389\n\n4. Linux 主目标服务器虚拟机使用以下终结点创建：（仅当部署类型是“公共 Internet”时，才创建公开终结点）：\n\n    - 自定义：进程服务器使用公用端口来通过 Internet 发送复制数据。处理服务器使用专用端口 9443 来通过 VPN 将复制数据发送到主目标服务器。\n    - 自定义 1：进程服务器使用公用端口来通过 Internet 发送控制元数据。处理服务器使用专用端口 9080 来通过 VPN 将控制数据发送到主目标服务器\n    - SSH：专用端口 22\n\n    >[AZURE.WARNING] 请勿删除或更改在主目标服务器部署期间创建的任何终结点的公用或专用端口号。\n\n5. 在“虚拟机”中，等待虚拟机启动。\n\n    - 如果该服务器已配置有 Windows，请记下远程桌面详细信息。\n    - 如果已配置有 Linux，并且要通过 VPN 连接，请记下虚拟机的内部 IP 地址。如果要通过 Internet 连接，请记下公用 IP 地址。\n\n6.  登录到该服务器以完成安装，并将其注册到配置服务器。\n7.  如果你运行的是 Windows，请执行以下操作：\n\n    1. 启动到虚拟机的远程桌面连接。在首次登录时，将在 PowerShell 窗口中运行一个脚本。请勿将其关闭。在它完成之后，主机代理配置工具将自动打开以注册服务器。\n    2. 在“主机代理配置”中，指定配置服务器的内部 IP 地址和端口 443。你可以使用内部地址和专用端口 443，即使你没有通过 VPN 连接，因为虚拟机附加到配置服务器所在的 Azure 网络。保持“使用 HTTPS”处于启用状态。输入以前记下的配置服务器的密码。单击“确定”以注册服务器。请注意，你可以忽略该页上的 NAT 选项。这些选项不会用到。\n    3. 如果估计的保留驱动器要求超过 1 TB，你可以使用虚拟磁盘和[存储空间](http://blogs.technet.com/b/askpfeplat/archive/2013/10/21/storage-spaces-how-to-configure-storage-tiers-with-windows-server-2012-r2.aspx)来配置保留卷 (R:)。\n    \n    ![Windows 主目标服务器](./media/site-recovery-vmware-to-azure-classic-legacy/target-register.png)\n\n8. 如果你运行的是 Linux，请执行以下操作：\n    1. 在安装主目标服务器软件之前，请确保已安装最新的 Linux 集成服务 (LIS)。可以在[此处](https://www.microsoft.com/download/details.aspx?id=46842)找到最新版本的 LIS 和安装说明。安装 LIS 后重新启动计算机。\n    2. 在“准备目标(Azure)资源”中，单击“下载并安装其他软件(仅适用于 Linux 主目标服务器)”以下载 Linux 主目标服务器包。使用 sftp 客户端将下载的 tar 文件复制到虚拟机。你也可以登录到已部署的 Linux 主目标服务器，并使用 *wget http://go.microsoft.com/fwlink/?LinkID=529757&clcid=0x409* 下载文件。\n    2. 使用 Secure Shell 客户端登录到服务器。请注意，如果你已通过 VPN 连接到 Azure 网络，请使用内部 IP 地址。否则，请使用外部 IP 地址和 SSH 公用终结点。\n    3. 运行以下程序：**tar –xvzf Microsoft-ASR\\_UA\\_8.4.0.0\\_RHEL6-64***\n    ![Linux 主目标服务器](./media/site-recovery-vmware-to-azure-classic-legacy/linux-tar.png)，从 gzip 压缩过的安装程序中提取文件\n    4. 确保你位于 tar 文件内容提取到的目录中。\n    5. 使用命令 **echo *`<passphrase>`* >passphrase.txt** 将配置服务器的通行短语复制到本地文件\n    6. 运行命令“**sudo ./install -t both -a host -R MasterTarget -d /usr/local/ASR -i *`<Configuration server internal IP address>`* -p 443 -s y -c https -P passphrase.txt**”。\n\n    ![注册目标服务器](./media/site-recovery-vmware-to-azure-classic-legacy/linux-mt-install.png)\n\n9. 等待几分钟 (10-15)，然后在“服务器”>“配置服务器”页上，检查主目标服务器是否作为注册服务器列在“服务器详细信息”选项卡中。如果运行的是 Linux，并且它未注册，请从 /usr/local/ASR/Vx/bin/hostconfigcli 再次运行主机配置工具。你需要以 root 身份运行 chmod 以设置访问权限。\n\n    ![验证目标服务器](./media/site-recovery-vmware-to-azure-classic-legacy/target-server-list.png)\n\n>[AZURE.NOTE] 请注意，在注册完成之后，最多需要 15 分钟，配置服务器下才会列出主目标服务器。若要立即更新，请单击配置服务器页面底部的刷新按钮以刷新配置服务器。\n\n## 步骤 4：部署本地进程服务器\n\n>[AZURE.NOTE] 建议在进程服务器上配置静态 IP 地址，以保证在重新启动后可持续使用相同的地址。\n\n1. 单击“快速启动”>“在本地安装进程服务器”>“下载并安装进程服务器”。\n\n    ![安装进程服务器](./media/site-recovery-vmware-to-azure-classic-legacy/ps-deploy.png)\n\n2.  将下载的 zip 文件复制到要将处理服务器安装到的服务器。该 zip 文件包含两个安装文件：\n\n    - Microsoft-ASR\\_CX\\_TP\\_8.4.0.0\\_Windows*\n    - Microsoft-ASR\\_CX\\_8.4.0.0\\_Windows*\n\n3. 解压缩存档，然后将安装文件复制到该服务器上的某个位置。\n4. 运行 **Microsoft-ASR\\_CX\\_TP\\_8.4.0.0\\_Windows*** 安装文件，然后按相关说明操作。此时将安装部署所需的第三方组件。\n5. 然后，运行 **Microsoft-ASR\\_CX\\_8.4.0.0\\_Windows***。\n6. 在“服务器模式”页上，选择“进程服务器”。\n7. 在“环境详细信息”页上执行以下操作：\n\n\n    - 如果你想要保护 VMware 虚拟机，请单击“是”\n    - 如果你只要保护物理服务器，则不需要在进程服务器上安装 VMware vCLI。请单击“否”并继续。\n\n8. 安装 VMware vCLI 时，请注意以下事项：\n\n    - **仅支持 VMware vSphere CLI 5.5.0**。进程服务器无法与 vSphere CLI 的其他版本或更新配合使用。\n    - 从[此处](https://my.vmware.com/web/vmware/details?downloadGroup=VCLI550&productId=352)下载 vSphere CLI 5.5.0。\n    - 如果在开始安装进程服务器之前刚刚安装了 vSphere CLI，并且安装程序未检测到它，请等待最多五分钟的时间再重新尝试安装。这可以确保执行 vSphere CLI 检测所需的所有环境变量已正确初始化。\n\n9.  在“进程服务器的 NIC 选择范围”中，选择进程服务器应该使用的网络适配器。\n\n    ![选择适配器](./media/site-recovery-vmware-to-azure-classic-legacy/ps-nic.png)\n\n10. 在“配置服务器详细信息”中：\n\n    - 对于 IP 地址和端口，如果你要通过 VPN 连接，请指定配置服务器的内部 IP 地址和端口 443。否则，请指定公用虚拟 IP 地址和映射的公用 HTTP 终结点。\n    - 键入配置服务器的密码。\n    - 如果要在使用自动推送安装服务时禁用验证，请清除“验证移动服务软件签名”。签名验证需要来自处理器的 Internet 连接。\n    - 单击**“下一步”**。\n\n    ![注册配置服务器](./media/site-recovery-vmware-to-azure-classic-legacy/ps-cs.png)\n\n\n11. 在“选择安装驱动器”中，选择缓存驱动器。进程服务器需要至少有 600 GB 可用空间的缓存驱动器。然后单击“安装”。\n\n    ![注册配置服务器](./media/site-recovery-vmware-to-azure-classic-legacy/ps-cache.png)\n\n12. 请注意，可能需要重新启动服务器才能完成安装。在“配置服务器”>“服务器详细信息”中，检查该进程服务器是否已显示并已在保管库中成功注册。\n\n>[AZURE.NOTE]注册完成之后，最多需要 15 分钟，配置服务器下才会列出进程服务器。若要立即更新，请单击配置服务器页面底部的刷新按钮以刷新配置服务器。\n \n![验证进程服务器](./media/site-recovery-vmware-to-azure-classic-legacy/ps-register.png)\n\n如果在注册进程服务器时未对移动服务禁用签名验证，则稍后可以按以下方式执行该操作：\n\n1. 以管理员身份登录到处理服务器，然后打开文件 C:\\\\pushinstallsvc\\\\pushinstaller.conf 以进行编辑。在 **[PushInstaller.transport]** 节下，添加以下行：**SignatureVerificationChecks=”0”**。保存并关闭该文件。\n2. 重新启动 InMage PushInstall 服务。\n\n\n## 步骤 5：安装最新更新\n\n继续之前，请确保你已安装最新更新。请记得按以下顺序安装更新：\n\n1. 配置服务器\n2. 进程服务器\n3. 主目标服务器\n4. 故障回复工具 (vContinuum)\n\n你可以在 Site Recovery 的“仪表板”上获取更新。**对于 Linux 安装，请从 gzip 压缩过的安装程序中提取文件，然后运行命令“sudo ./install”以安装更新\n\n从[此处](http://go.microsoft.com/fwlink/?LinkID=533813)下载**故障回复工具 (vContinuum)** 的最新更新\n\n如果运行的虚拟机或物理服务器上已安装移动服务，你可以按如下所示获取服务更新：\n\n- 按如下所示获取服务更新：\n    - [Windows Server（仅限 64 位）](http://download.microsoft.com/download/8/4/8/8487F25A-E7D9-4810-99E4-6C18DF13A6D3/Microsoft-ASR_UA_8.4.0.0_Windows_GA_28Jul2015_release.exe)\n    - [CentOS 6.4、6.5、6.6（仅限 64 位）](http://download.microsoft.com/download/7/E/D/7ED50614-1FE1-41F8-B4D2-25D73F623E9B/Microsoft-ASR_UA_8.4.0.0_RHEL6-64_GA_28Jul2015_release.tar.gz)\n    - [Oracle Enterprise Linux 6.4、6.5（仅限 64 位）](http://download.microsoft.com/download/5/2/6/526AFE4B-7280-4DC6-B10B-BA3FD18B8091/Microsoft-ASR_UA_8.4.0.0_OL6-64_GA_28Jul2015_release.tar.gz)\n    - [SUSE Linux Enterprise Server SP3（仅限 64 位）](http://download.microsoft.com/download/B/4/2/B4229162-C25C-4DB2-AD40-D0AE90F92305/Microsoft-ASR_UA_8.4.0.0_SLES11-SP3-64_GA_28Jul2015_release.tar.gz)\n- 或者，在更新进程服务器之后，可以从进程服务器上的 C:\\\\pushinstallsvc\\\\repository 文件夹获取移动服务的更新版本。\n- 如果你已有安装旧版的移动服务的受保护计算机，则还可以从管理门户自动升级受保护计算机上的移动服务。为此，请选择计算机所属的保护组，突出显示受保护的计算机并单击底部的“更新移动服务”按钮。仅当有较新版本的移动服务时，“更新移动服务”按钮才会激活。在更新移动服务之前，请确保进程服务器运行最新版本的进程服务器软件。受保护的服务器必须符合所有[自动推送安装先决条件](#install-the-mobility-service-automatically)才能更新移动服务。\n\n![选择 vCenter 服务器](./media/site-recovery-vmware-to-azure-classic-legacy/update-mobility.png)\n\n在“选择帐户”中，指定用于更新受保护服务器上的移动服务的管理员帐户。单击“确定”并等待触发的作业完成。\n\n\n## 步骤 6：添加 vCenter 服务器或 ESXi 主机\n\n1. 在“服务器”>“配置服务器”选项卡上，选择配置服务器并单击“添加 VCENTER 服务器”以添加 vCenter 服务器或 ESXi 主机。\n\n    ![选择 vCenter 服务器](./media/site-recovery-vmware-to-azure-classic-legacy/add-vcenter.png)\n\n2. 指定 vCenter 服务器或 ESXi 主机的详细信息，并选择要用于发现它的进程服务器。\n\n    - 如果 vCenter 服务器不在默认端口 443 上运行，请指定 vCenter 服务器运行所在的端口号。\n    - 进程服务器必须位于 vCenter 服务器/ESXi 主机所在的网络上，并且应安装有 VMware vSphere CLI 5.5.0。\n\n    ![vCenter 服务器设置](./media/site-recovery-vmware-to-azure-classic-legacy/add-vcenter4.png)\n\n\n3. 发现完成之后，vCenter 服务器将在“配置服务器详细信息”下方列出。\n\n    ![vCenter 服务器设置](./media/site-recovery-vmware-to-azure-classic-legacy/add-vcenter2.png)\n\n4. 如果你使用非管理员帐户添加 vCenter 服务器或 ESXi 主机，请确保该帐户具有以下权限：\n\n    - vCenter 帐户应该已启用数据中心、数据存储、文件夹、主机、网络、资源、存储视图、虚拟机和 vSphere 分布式交换机权限。\n    - ESXi 主机帐户应该已启用数据中心、数据存储、文件夹、主机、网络、资源、虚拟机和 vSphere 分布式交换机权限\n\n\n\n## 步骤 7：创建保护组\n\n1. 打开“受保护的项”>“保护组”，然后单击即可添加一个保护组。\n\n    ![创建保护组](./media/site-recovery-vmware-to-azure-classic-legacy/create-pg1.png)\n\n2. 在“指定保护组设置”页上，指定保护组的名称，并选择要在其上创建该组的配置服务器。\n\n    ![保护组设置](./media/site-recovery-vmware-to-azure-classic-legacy/create-pg2.png)\n\n3. 在“指定复制设置”页上，配置要用于该组中的所有计算机的复制设置。\n\n    ![保护组复制](./media/site-recovery-vmware-to-azure-classic-legacy/create-pg3.png)\n\n4. 设置：\n    - **多 VM 一致性**：如果你将此项打开，则它将在保护组中的计算机之间创建共享的应用程序一致性恢复点。当保护组中的所有计算机运行的是相同工作负荷时，此设置最为有用。所有计算机都将恢复到相同数据点。仅适用于 Windows 服务器。\n    - **RPO 阈值**：当连续数据保护复制 RPO 超过配置的 RPO 阈值时，将生成警报。\n    - **恢复点保留期**：指定保留时段。受保护的计算机可在此时段内恢复到任何点。\n    - **应用程序一致性快照频率**：指定创建包含应用程序一致性快照的恢复点的频率。\n\n你可以监视保护组，因为它们是在“受保护的项”页上创建的。\n\n## 步骤 8：设置想要保护的计算机\n\n需在要保护的虚拟机和物理服务器上安装移动服务。可通过两种方式实现此目的：\n\n- 从进程服务器自动推送并在每台计算机上安装该服务。\n- 手动安装该服务。 \n\n### 自动安装移动服务\n\n在向保护组添加计算机时，进程服务器将自动推送移动服务，并将其安装在每个计算机上。\n\n**在 Windows 服务器上自动推送安装移动服务：**\n\n1. 按[步骤 5：安装最新更新](#step-5-install-latest-updates)中所述安装进程服务器的最新更新，并确定进程服务器可用。 \n2. 确保源计算机和进程服务器之间已建立网络连接，并且可从进程服务器访问源计算机。  \n3. 将 Windows 防火墙配置为允许“文件和打印机共享”和“Windows Management Instrumentation”。在 Windows 防火墙设置中，选择“允许应用或功能通过防火墙”选项，然后选择应用程序，如下图所示。对于属于某个域的计算机，你可以使用 GPO 配置防火墙策略。\n\n    ![防火墙设置](./media/site-recovery-vmware-to-azure-classic-legacy/push-firewall.png)\n\n4. 用于执行推式安装的帐户必须位于要保护的计算机上的“管理员”组中。这些凭据仅用于推送移动服务的安装，在向保护组添加计算机时，你将要提供这些凭据。\n5. 如果提供的帐户不是域帐户，你将需要在本地计算机上禁用远程用户访问控制。为此，请在 HKEY\\_LOCAL\\_MACHINE\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Policies\\\\System 下添加值为 1 的 LocalAccountTokenFilterPolicy DWORD 注册表项。若要从 CLI 添加注册表项，请打开 cmd 或 powershell 并输入 **`REG ADD HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System /v LocalAccountTokenFilterPolicy /t REG_DWORD /d 1`**。 \n\n**在 Linux 服务器上自动推送安装移动服务：**\n\n1. 按[步骤 5：安装最新更新](#step-5-install-latest-updates)中所述安装进程服务器的最新更新，并确定进程服务器可用。\n2. 确保源计算机和进程服务器之间已建立网络连接，并且可从进程服务器访问源计算机。  \n3. 确保帐户是源 Linux 服务器上的 root 用户。\n4. 确保源 Linux 服务器上的 /etc/hosts 文件包含用于将本地主机名映射到所有 NIC 关联的 IP 地址的条目。\n5. 在要保护的计算机上安装最新的 openssh、openssh-server 和 openssl 包。\n6. 确保 SSH 已启用且正在端口 22 上运行。 \n7. 在 sshd\\_config 文件中启用 SFTP 子系统与密码身份验证，如下所示： \n\n    - a) 以 root 身份登录。\n    - b) 在文件 /etc/ssh/sshd\\_config 中，找到以 **PasswordAuthentication** 开头的行。\n    - c) 取消注释该行，并将值从“no”更改为“yes”。\n\n        ![Linux 移动服务](./media/site-recovery-vmware-to-azure-classic-legacy/linux-push.png)\n\n    - d) 找到以 Subsystem 开头的行，并取消注释该行。\n    \n        ![Linux 推送移动服务](./media/site-recovery-vmware-to-azure-classic-legacy/linux-push2.png)\n\n8. 确保支持源计算机 Linux 变体。\n \n### 手动安装移动服务\n\n用于安装移动服务的软件包位于进程服务器上的 C:\\\\pushinstallsvc\\\\repository 中。请登录进程服务器，并根据下表将相应的安装包复制到源计算机：\n\n| 源操作系统 | 进程服务器上的移动服务包 |\n|---------------------------------------------------    |------------------------------------------------------------------------------------------------------ |\n| Windows Server（仅限 64 位） | `C:\\pushinstallsvc\\repository\\Microsoft-ASR_UA_8.4.0.0_Windows_GA_28Jul2015_release.exe` |\n| CentOS 6.4、6.5、6.6（仅限 64 位） | `C:\\pushinstallsvc\\repository\\Microsoft-ASR_UA_8.4.0.0_RHEL6-64_GA_28Jul2015_release.tar.gz` |\n| SUSE Linux Enterprise Server 11 SP3（仅限 64 位） | `C:\\pushinstallsvc\\repository\\Microsoft-ASR_UA_8.4.0.0_SLES11-SP3-64_GA_28Jul2015_release.tar.gz`|\n| Oracle Enterprise Linux 6.4、6.5（仅限 64 位） | `C:\\pushinstallsvc\\repository\\Microsoft-ASR_UA_8.4.0.0_OL6-64_GA_28Jul2015_release.tar.gz` |\n\n\n**若要在 Windows 服务器上手动安装移动服务**，请执行以下操作：\n\n1. 将上表所列进程服务器目录路径中的 **Microsoft-ASR\\_UA\\_8.4.0.0\\_Windows\\_GA\\_28Jul2015\\_release.exe** 包复制到源计算机。\n2. 在源计算机上运行该可执行文件以安装移动服务。\n3. 遵循安装程序说明操作。\n4. 选择“移动服务”作为角色，然后单击“下一步”。\n    \n    ![安装移动服务](./media/site-recovery-vmware-to-azure-classic-legacy/ms-install.png)\n\n5. 将安装目录保留为默认安装路径，然后单击“安装”。\n6. 在“主机代理配置”中，指定配置服务器的 IP 地址与 HTTPS 端口。\n\n    - 如果你通过 Internet 进行连接，请指定公共虚拟 IP 地址和公共 HTTPS 终结点作为端口。\n    - 如果你通过 VPN 进行连接，请指定内部 IP 地址和端口 443。保持“使用 HTTPS”的选中状态。\n\n    ![安装移动服务](./media/site-recovery-vmware-to-azure-classic-legacy/ms-install2.png)\n\n7. 指定配置服务器通行短语，然后单击“确定”将移动服务注册到配置服务器。\n\n**从命令行运行：**\n\n1. 将通行短语从 CX 复制到服务器上的“C:\\\\connection.passphrase”文件中，然后运行此命令。在本示例中，CX 是 104.40.75.37，HTTPS 端口是 62519：\n\n    `C:\\Microsoft-ASR_UA_8.2.0.0_Windows_PREVIEW_20Mar2015_Release.exe\" -ip 104.40.75.37 -port 62519 -mode UA /LOG=\"C:\\stdout.txt\" /DIR=\"C:\\Program Files (x86)\\Azure Site Recovery\" /VERYSILENT  /SUPPRESSMSGBOXES /norestart  -usesysvolumes  /CommunicationMode https /PassphrasePath \"C:\\connection.passphrase\"`\n\n**在 Linux 服务器上手动安装移动服务**：\n\n1. 根据上表，将相应的 tar 存档从进程服务器复制到源计算机。\n2. 打开 shell 程序，并通过执行 `tar -xvzf Microsoft-ASR_UA_8.2.0.0*` 将压缩的 tar 存档解压缩到本地路径\n3. 通过 shell 输入 *`echo <passphrase> >passphrase.txt`*，在 tar 存档内容解压缩到的本地目录中创建 passphrase.txt 文件。\n4. 输入 *`sudo ./install -t both -a host -R Agent -d /usr/local/ASR -i <IP address> -p <port> -s y -c https -P passphrase.txt`* 以安装移动服务。\n5. 指定 IP 地址和端口：\n\n    - 如果你通过 Internet 连接到配置服务器，请在 `<IP address>` 和 `<port>` 中指定配置服务器的虚拟公共 IP 地址和公共 HTTPS 终结点。\n    - 如果你通过 VPN 建立连接，请指定内部 IP 地址和端口 443。\n\n**从命令行运行：**\n\n1. 将通行短语从 CX 复制到服务器上的“passphrase.txt”文件中，然后运行此命令。在本示例中，CX 是 104.40.75.37，HTTPS 端口是 62519：\n\n在生产服务器上安装：\n\n    ./install -t both -a host -R Agent -d /usr/local/ASR -i 104.40.75.37 -p 62519 -s y -c https -P passphrase.txt\n \n在目标服务器上安装：\n\n\n    ./install -t both -a host -R MasterTarget -d /usr/local/ASR -i 104.40.75.37 -p 62519 -s y -c https -P passphrase.txt\n\n>[AZURE.NOTE] 如果将计算机添加到已运行适当版本移动服务的保护组，则会跳过推送安装。\n\n\n## 步骤 9：启用保护\n\n若要启用保护，请将虚拟机和物理服务器添加到保护组。开始之前，请注意：\n\n- 系统会每隔 15 分钟发现虚拟机一次，在发现之后，最多需要 15 分钟时间虚拟机才会出现在 Azure Site Recovery 中。\n- 虚拟机上的环境更改（例如 VMware 工具安装）最多也可能需要 15 分钟时间才能在 Site Recovery 中更新。\n- 你可以在“配置服务器”页上 vCenter 服务器/ESXi 主机的“上次联系时间”字段中检查上次发现的时间。\n- 如果你已创建保护组，并在其后添加 vCenter 服务器或 ESXi 主机，则 Azure Site Recovery 门户需要 15 分钟刷新，而虚拟机需要 15 分钟列在“向保护组添加计算机”对话框中。\n- 如果你要立即将计算机添加到保护组而不想要等待完成计划的发现，请突出显示配置服务器（不要单击它），然后单击“刷新”按钮。\n- 将虚拟机或物理机添加到保护组时，进程服务器将自动推送并在源服务器上安装移动服务（如果尚未安装）。\n- 为了使自动推送机制发挥作用，请确保你已按上一步所述设置你的受保护的计算机。\n\n按如下所示添加计算机：\n\n1. “受保护的项”>“保护组”>“计算机”选项卡。单击“添加计算机”。作为最佳实践，我们建议，保护组应镜像你的工作负荷，以便于你向相同组中添加运行特定应用程序的计算机。\n2. 如果你要保护物理服务器，请在“添加物理计算机”向导的“选择虚拟机”中，提供 IP 地址和友好名称。然后选择操作系统系列。\n\n    ![添加 V-Center 服务器](./media/site-recovery-vmware-to-azure-classic-legacy/physical-protect.png)\n\n3. 如果你要保护 VMware 虚拟机，请在“选择虚拟机”中，选择负责管理虚拟机（或其运行所在的 EXSi 主机）的 vCenter 服务器，然后选择计算机。\n\n    ![添加 V-Center 服务器](./media/site-recovery-vmware-to-azure-classic-legacy/select-vms.png) \n4. 在“指定目标资源”中选择用于复制的主目标服务器和存储，并选择是否应将设置用于所有工作负荷。为需要持续性的高 IO 性能和低延迟才能托管 IO 密集型工作负荷的工作负荷配置保护时，请选择“高级存储帐户”。[](/documentation/articles/storage-premium-storage-preview-portal)如果你希望工作负荷磁盘使用高级存储帐户，则需使用 DS 系列的主目标。非 DS 系列的主目标无法使用高级存储磁盘。\n\n    ![vCenter 服务器](./media/site-recovery-vmware-to-azure-classic-legacy/machine-resources.png)\n\n5. 在“指定帐户”中，选择用于在受保护计算机上安装移动服务的帐户。需要使用帐户凭据来自动安装移动服务。如果你无法选择帐户，请确保按步骤 2 中所述设置一个。请注意，Azure 无法访问此帐户。对于 Windows 服务器，帐户应该对源服务器具有管理员权限。对于 Linux，帐户必须是 root。\n\n    ![Linux 凭据](./media/site-recovery-vmware-to-azure-classic-legacy/mobility-account.png)\n\n6. 单击复选标记以完成向保护组添加计算机，并对每个计算机启动初始复制。你可以在“作业”页上监视状态。\n\n    ![添加 V-Center 服务器](./media/site-recovery-vmware-to-azure-classic-legacy/pg-jobs2.png)\n\n7. 此外，你可以单击“受保护的项”> 保护组名称 >“虚拟机”来监视保护状态。初始复制完成并且计算机同步数据后，它们将显示“受保护”状态。\n\n    ![虚拟机作业](./media/site-recovery-vmware-to-azure-classic-legacy/pg-jobs.png)\n\n\n### 设置受保护的计算机属性\n\n1. 在计算机的状态为“受保护”后，你可以配置其故障转移属性。在“保护组详细信息”中，选择计算机，然后打开“配置”选项卡。\n2. 在故障转移后，你可以在 Azure 中修改要提供给计算机的名称，以及 Azure 虚拟机大小。你还可以选择故障转移后要将计算机连接到的 Azure 网络。\n\n    ![设置虚拟机属性](./media/site-recovery-vmware-to-azure-classic-legacy/vm-props.png)\n\n请注意：\n\n- Azure 计算机的名称必须符合 Azure 要求。\n- 默认情况下，Azure 中的复制虚拟机不连接到 Azure 网络。如果希望复制的虚拟机进行通信，请确保为其设置相同的 Azure 网络。\n- 如果你调整了 VMware 虚拟机或物理服务器上卷的大小，它将进入关键状态。如果你需要修改大小，请执行以下操作：\n\n    - a) 更改大小设置。\n    - b) 在“虚拟机”选项卡中选择虚拟机，然后单击“删除”。\n    - c) 在“删除虚拟机”中，选择“禁用保护(用于恢复深化和重设卷大小)”。此选项将禁用保护，但在 Azure 中保留恢复点。\n\n        ![设置虚拟机属性](./media/site-recovery-vmware-to-azure-classic-legacy/remove-vm.png)\n\n    - d) 为虚拟机重新启用保护。在重新启用保护时，调整过大小的卷的数据将被传输到 Azure。\n\n    \n\n## 步骤 10：运行故障转移\n\n目前只能为受保护的 VMware 虚拟机和物理服务器运行非计划的故障转移。注意以下事项：\n\n\n\n- 启动故障转移之前，请确保配置服务器和主目标服务器正常运行，否则故障转移将会失败。\n- 在执行非计划的故障转移期间，源计算机不会关闭。执行非计划的故障转移会停止受保护服务器的数据复制。你需要从保护组中删除计算机并重新添加，然后才能在非计划的故障转移完成之后再次开始保护计算机。\n- 如果你想要故障转移而不丢失任何数据，请确保主站点虚拟机在启动故障转移之前已关闭。\n\n1. 在“恢复计划”页上，添加恢复计划。指定该计划的详细信息，并选择“Azure”作为目标。\n\n    ![配置恢复计划](./media/site-recovery-vmware-to-azure-classic-legacy/rplan1.png)\n\n2. 在“选择虚拟机”中，选择保护组，然后选择该组中要添加到恢复计划的计算机。[详细了解](/documentation/articles/site-recovery-create-recovery-plans)恢复计划。\n\n    ![添加虚拟机](./media/site-recovery-vmware-to-azure-classic-legacy/rplan2.png)\n\n3. 如果需要，你可以自定义该计划以创建组，并排列顺序，恢复计划中的计算机以该顺序进行故障转移。你还可以添加手动操作和脚本的提示。在恢复到 Azure 时，可以使用 [Azure 自动化 Runbook](/documentation/articles/site-recovery-runbook-automation) 添加脚本。\n\n4. 在“恢复计划”页中，选择该计划，然后单击“非计划的故障转移”。\n5. 在“确认故障转移”中，验证故障转移方向（到 Azure），然后选择要故障转移到的恢复点。\n6. 等待故障转移作业完成，然后验证故障转移是否按预期工作，以及复制的虚拟机是否在 Azure 中成功启动。\n\n\n\n\n## 步骤 11：故障回复 Azure 中已故障转移的计算机\n\n[详细了解](/documentation/articles/site-recovery-failback-azure-to-vmware-classic-legacy)如何将 Azure 中运行的已故障转移的计算机恢复到本地环境。\n\n\n## 管理进程服务器\n\n进程服务器将复制数据发送到 Azure 中的主目标服务器，并发现已添加到 vCenter 服务器的新 VMware 虚拟机。在以下情况下，你可能要更改部署中的进程服务器：\n\n- 如果当前进程服务器已关闭\n- 如果恢复点目标 (RPO) 提升到组织无法接受的程度。\n\n如果需要，你可以将部分或所有本地 VMware 虚拟机和物理服务器的复制转移到另一台进程服务器。例如：\n\n- **故障** — 如果进程服务器发生故障或不可用，你可以将受保护计算机的复制转移到另一台进程服务器。源计算机和副本计算机的元数据将转移到新的进程服务器并且会重新同步。新的进程服务器将自动连接到 vCenter 服务器以执行自动发现。你可以在 Site Recovery 仪表板上监视进程服务器的状态。\n- **负载平衡以调整 RPO** — 若要改善负载平衡，你可以在 Site Recovery 门户中选择不同的进程服务器，并将一台或多台计算机的复制转移到该服务器，以手动进行负载平衡。在此情况下，选择的源和副本计算机的元数据将转移到新的进程服务器。原始进程服务器仍然连接到 vCenter 服务器。 \n\n### 监视进程服务器\n\n如果进程服务器处于关键状态，Site Recovery 仪表板上会显示状态警告。你可以单击状态以打开“事件”选项卡，然后向下钻取到“作业”选项卡上的特定作业。\n\n### 修改用于复制的进程服务器\n\n1. 转到“服务器”下的“配置服务器”页\n2. 单击配置服务器的名称转到“服务器详细信息”。\n3. 在“进程服务器”列表中，单击要修改的服务器旁边的“更改进程服务器”。  \n    ![更改进程服务器 1](./media/site-recovery-vmware-to-azure-classic-legacy/change-ps1.png)\n4. 在“更改进程服务器”对话框中，在“目标进程服务器”中选择新服务器，然后选择要复制到新服务器的虚拟机。若要获取相关信息，包括可用空间、已用内存，请单击服务器名称旁边的信息图标。随后会显示将每个所选虚拟机复制到新进程服务器所需的平均空间，以帮助你做出负载决策。  \n    ![更改进程服务器 2](./media/site-recovery-vmware-to-azure-classic-legacy/change-ps2.png)\n5. 单击复选标记以开始复制到新的进程服务器。如果你从某个重要的进程服务器中删除所有虚拟机，仪表板中应该不再会显示关键警告。\n\n\n## 第三方软件通知和信息\n\n请勿翻译或本地化\n\nMicrosoft 产品或服务中运行的软件和固件基于或包含下列项目中的材料（统称为“第三方代码”）。Microsoft 不是“第三方代码”的原创作者。Microsoft 获取此类“第三方代码”依据的原始版权声明和许可证如下文所述。\n\nA 部分中的信息与下列项目中的“第三方代码”组件相关。提供的此类许可证和信息仅供参考。本“第三方代码”将由 Microsoft 依据 Microsoft 产品或服务的 Microsoft 软件许可条款重新许可给你。\n\nB 部分中的信息与 Microsoft 要依据原始许可条款提供给你的“第三方代码”组件相关。\n\n完整文件可以在 [Microsoft 下载中心](http://go.microsoft.com/fwlink/?linkid=529428&clcid=0x409)找到。Microsoft 保留未在此处明确授予的所有权利，无论是暗示、禁止或其他方式。\n\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

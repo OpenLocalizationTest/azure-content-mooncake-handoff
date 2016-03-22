@@ -1,0 +1,340 @@
+{
+  "nodes": [
+    {
+      "content": "将磁盘附加到 Linux VM | Azure",
+      "pos": [
+        27,
+        50
+      ]
+    },
+    {
+      "content": "了解如何将数据磁盘附加到运行 Linux 的 Azure 虚拟机并将其初始化，以便它可供使用。",
+      "pos": [
+        69,
+        116
+      ]
+    },
+    {
+      "content": "如何将数据磁盘附加到 Linux 虚拟机",
+      "pos": [
+        376,
+        396
+      ]
+    },
+    {
+      "pos": [
+        398,
+        484
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]"
+    },
+    {
+      "content": "你可以附加空磁盘和包含数据的磁盘。在这两种情况下，这些磁盘实际上是驻留在 Azure 存储帐户中的 .vhd 文件。此外，也是在这两种情况下，在附加磁盘之后，你将需要对其进行初始化，然后才能使用。",
+      "pos": [
+        487,
+        585
+      ]
+    },
+    {
+      "pos": [
+        589,
+        908
+      ],
+      "content": "[AZURE.NOTE] 最佳做法是使用一个或多个不同的磁盘来存储虚拟机的数据。当你创建 Azure 虚拟机时，该虚拟机有一个操作系统磁盘和一个临时磁盘。**不要使用临时磁盘来存储数据。** 顾名思义，它仅提供临时存储。它不提供冗余或备份，因为它不驻留在 Azure 存储空间中。\n临时磁盘通常由 Azure Linux 代理管理并且自动装载到 **/mnt/resource**（或 Ubuntu 映像上的 **/mnt**）。另一方面，数据磁盘可以由 Linux 内核命名为 `/dev/sdc` 这样的形式，而用户则需对该资源进行分区、格式化和安装。有关详细信息，请参阅 [Azure Linux 代理用户指南][Agent]。",
+      "leadings": [
+        "",
+        "> "
+      ],
+      "nodes": [
+        {
+          "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 最佳做法是使用一个或多个不同的磁盘来存储虚拟机的数据。当你创建 Azure 虚拟机时，该虚拟机有一个操作系统磁盘和一个临时磁盘。<bpt id=\"p1\">**</bpt>不要使用临时磁盘来存储数据。<ept id=\"p1\">**</ept> 顾名思义，它仅提供临时存储。它不提供冗余或备份，因为它不驻留在 Azure 存储空间中。",
+          "pos": [
+            0,
+            140
+          ]
+        },
+        {
+          "content": "临时磁盘通常由 Azure Linux 代理管理并且自动装载到 <bpt id=\"p1\">**</bpt>/mnt/resource<ept id=\"p1\">**</ept>（或 Ubuntu 映像上的 <bpt id=\"p2\">**</bpt>/mnt<ept id=\"p2\">**</ept>）。另一方面，数据磁盘可以由 Linux 内核命名为 <ph id=\"ph1\">`/dev/sdc`</ph> 这样的形式，而用户则需对该资源进行分区、格式化和安装。有关详细信息，请参阅 <bpt id=\"p3\">[</bpt>Azure Linux 代理用户指南<ept id=\"p3\">][Agent]</ept>。",
+          "pos": [
+            141,
+            317
+          ]
+        }
+      ]
+    },
+    {
+      "content": "如何：在 Linux 中初始化新的数据磁盘",
+      "pos": [
+        1004,
+        1025
+      ]
+    },
+    {
+      "content": "可以按照相同的说明使用如下所示的正确设备标识符来初始化多个数据磁盘。",
+      "pos": [
+        1027,
+        1061
+      ]
+    },
+    {
+      "pos": [
+        1066,
+        1109
+      ],
+      "content": "连接到虚拟机。有关说明，请参阅<bpt id=\"p1\">[</bpt>如何登录到运行 Linux 的虚拟机<ept id=\"p1\">][Logon]</ept>。"
+    },
+    {
+      "content": "接下来，你需要查找可供数据磁盘初始化的设备标识符。可通过两种方式实现该目的：",
+      "pos": [
+        1116,
+        1154
+      ]
+    },
+    {
+      "content": "a) 在 SSH 窗口中，键入下面的命令，然后输入为管理虚拟机而创建的帐户的密码：",
+      "pos": [
+        1160,
+        1201
+      ]
+    },
+    {
+      "pos": [
+        1254,
+        1348
+      ],
+      "content": "如果是最近的 Ubuntu 分发，你可能需要使用 <ph id=\"ph1\">`sudo grep SCSI /var/log/syslog`</ph>，因为默认情况下可能已禁止登录到 <ph id=\"ph2\">`/var/log/messages`</ph>。"
+    },
+    {
+      "content": "您可以在所示消息中找到最后添加的数据磁盘的标识符。",
+      "pos": [
+        1354,
+        1379
+      ]
+    },
+    {
+      "content": "获取磁盘消息",
+      "pos": [
+        1387,
+        1393
+      ]
+    },
+    {
+      "content": "或",
+      "pos": [
+        1468,
+        1469
+      ]
+    },
+    {
+      "pos": [
+        1475,
+        1705
+      ],
+      "content": "b) 使用 <ph id=\"ph1\">`lsscsi`</ph> 命令找出设备 ID。<ph id=\"ph2\">`lsscsi`</ph> 的安装可以通过 <ph id=\"ph3\">`yum install lsscsi`</ph>（在基于 Red Hat 的分发上）或 <ph id=\"ph4\">`apt-get install lsscsi`</ph>（在基于 Debian 的分发上）来进行。你可以通过 <bpt id=\"p1\">_</bpt>lun<ept id=\"p1\">_</ept>（即<bpt id=\"p2\">**</bpt>逻辑单元号<ept id=\"p2\">**</ept>）找到所要的磁盘。例如，所附加磁盘的 <bpt id=\"p3\">_</bpt>lun<ept id=\"p3\">_</ept> 可以轻松地通过 <ph id=\"ph5\">`azure vm disk list &lt;virtual-machine&gt;`</ph> 来查看，如下所示："
+    },
+    {
+      "pos": [
+        2299,
+        2331
+      ],
+      "content": "将此结果与同一示例性虚拟机的 <ph id=\"ph1\">`lsscsi`</ph> 的输出进行比较："
+    },
+    {
+      "pos": [
+        2826,
+        2873
+      ],
+      "content": "每一行的元组中的最后一个数字就是 <bpt id=\"p1\">_</bpt>lun<ept id=\"p1\">_</ept>。有关详细信息，请参阅 <ph id=\"ph1\">`man lsscsi`</ph>。"
+    },
+    {
+      "content": "在 SSH 窗口中，键入下面的命令以新建设备，然后输入帐户密码：",
+      "pos": [
+        2878,
+        2910
+      ]
+    },
+    {
+      "pos": [
+        2947,
+        3025
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 此示例中，如果 /sbin 或 /usr/sbin 不在你的 <ph id=\"ph2\">`$PATH`</ph> 中，你在某些分发上可能需要使用 <ph id=\"ph3\">`sudo -i`</ph>。"
+    },
+    {
+      "pos": [
+        3031,
+        3053
+      ],
+      "content": "出现提示时，键入 <bpt id=\"p1\">**</bpt>n<ept id=\"p1\">**</ept> 以创建新分区。"
+    },
+    {
+      "pos": [
+        3141,
+        3254
+      ],
+      "content": "出现提示时，键入 <bpt id=\"p1\">**</bpt>p<ept id=\"p1\">**</ept> 将该分区设置为主分区，键入 <bpt id=\"p2\">**</bpt>1<ept id=\"p2\">**</ept> 将其设置为第一分区，然后键入 Enter 以接受柱面的默认值。在某些系统上，它可以显示第一个和最后一个扇区（而不是柱面）的默认值。你可以选择接受这些默认值。"
+    },
+    {
+      "pos": [
+        3343,
+        3367
+      ],
+      "content": "键入 <bpt id=\"p1\">**</bpt>p<ept id=\"p1\">**</ept> 以查看有关分区磁盘的详细信息。"
+    },
+    {
+      "content": "键入“w”以写入磁盘的设置。",
+      "pos": [
+        3454,
+        3468
+      ]
+    },
+    {
+      "content": "在新分区上创建文件系统。将分区数 (1) 追加到设备 ID 后面。例如，可键入以下命令，然后输入帐户密码：",
+      "pos": [
+        3554,
+        3607
+      ]
+    },
+    {
+      "content": "创建文件系统",
+      "pos": [
+        3654,
+        3660
+      ]
+    },
+    {
+      "pos": [
+        3738,
+        3836
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 请注意，对于 ext4 文件系统，SUSE Linux Enterprise 11 系统仅支持只读访问。对于这些系统，建议将新文件系统格式化为 ext3 而非 ext4。"
+    },
+    {
+      "content": "创建一个目录来装载新的文件系统。例如，可键入以下命令，然后输入帐户密码：",
+      "pos": [
+        3842,
+        3878
+      ]
+    },
+    {
+      "content": "键入下面的命令以安装驱动器：",
+      "pos": [
+        3918,
+        3932
+      ]
+    },
+    {
+      "pos": [
+        3981,
+        4010
+      ],
+      "content": "数据磁盘现在可以作为 <bpt id=\"p1\">**</bpt>/datadrive<ept id=\"p1\">**</ept> 使用。"
+    },
+    {
+      "content": "将新驱动器添加到 /etc/fstab：",
+      "pos": [
+        4017,
+        4037
+      ]
+    },
+    {
+      "content": "若要确保在重新引导后自动重新装载驱动器，必须将其添加到 /etc/fstab 文件。此外，强烈建议在 /etc/fstab 中使用 UUID（全局唯一标识符）来引用驱动器而不是只使用设备名称（即 /dev/sdc1）。若要查找新驱动器的 UUID，可以使用 blkid 实用程序：",
+      "pos": [
+        4043,
+        4183
+      ]
+    },
+    {
+      "content": "输出与以下内容类似：",
+      "pos": [
+        4214,
+        4224
+      ]
+    },
+    {
+      "pos": [
+        4458,
+        4569
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 错误地编辑 <bpt id=\"p1\">**</bpt>/etc/fstab<ept id=\"p1\">**</ept> 文件可能会导致系统无法引导。如果没有把握，请参考分发的文档来获取有关如何正确编辑该文件的信息。另外，建议在编辑之前创建 /etc/fstab 文件的备份。"
+    },
+    {
+      "pos": [
+        4575,
+        4652
+      ],
+      "content": "接下来，请在文本编辑器中打开 <bpt id=\"p1\">**</bpt>/etc/fstab<ept id=\"p1\">**</ept> 文件。请注意，/etc/fstab 是系统文件，因此需使用 <ph id=\"ph1\">`sudo`</ph> 来编辑该文件，例如："
+    },
+    {
+      "pos": [
+        4688,
+        4786
+      ],
+      "content": "在此示例中，我们将使用在之前的步骤中创建的新 <bpt id=\"p1\">**</bpt>/dev/sdc1<ept id=\"p1\">**</ept> 设备的 UUID 值并使用装载点 <bpt id=\"p2\">**</bpt>/datadrive<ept id=\"p2\">**</ept>。将以下行添加到 <bpt id=\"p3\">**</bpt>/etc/fstab<ept id=\"p3\">**</ept> 文件的末尾："
+    },
+    {
+      "content": "另外，在基于 SUSE Linux 的系统上，您可能需要使用稍微不同的格式：",
+      "pos": [
+        4882,
+        4920
+      ]
+    },
+    {
+      "pos": [
+        5029,
+        5099
+      ],
+      "content": "现在，你可以通过简单地卸载并重新装载文件系统（即使用在之前的步骤中创建的示例装载点 <ph id=\"ph1\">`/datadrive`</ph>）来测试文件系统是否已正确装载："
+    },
+    {
+      "pos": [
+        5171,
+        5258
+      ],
+      "content": "如果 <ph id=\"ph1\">`mount`</ph> 命令产生错误，请检查 /etc/fstab 文件的语法是否正确。如果还创建了其他数据驱动器或分区，您同样也需要分别将其输入到 /etc/fstab 中。"
+    },
+    {
+      "content": "你需要使用以下命令使驱动器可写：",
+      "pos": [
+        5264,
+        5280
+      ]
+    },
+    {
+      "pos": [
+        5321,
+        5478
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 之后，在不编辑 fstab 的情况下删除数据磁盘可能会导致 VM 无法引导。如果这是一种常见情况，则请注意，大多数分发都提供了 <ph id=\"ph2\">`nofail`</ph> 和/或 <ph id=\"ph3\">`nobootwait`</ph> fstab 选项，这些选项使系统在磁盘无法装载的情况下也能引导。有关这些参数的详细信息，请查阅您的分发文档。"
+    },
+    {
+      "content": "其他资源",
+      "pos": [
+        5483,
+        5487
+      ]
+    },
+    {
+      "content": "如何登录到运行 Linux 的虚拟机",
+      "pos": [
+        5489,
+        5507
+      ]
+    },
+    {
+      "content": "如何从 Linux 虚拟机分离磁盘",
+      "pos": [
+        5518,
+        5535
+      ]
+    },
+    {
+      "content": "使用带服务管理 API 的 Azure CLI",
+      "pos": [
+        5606,
+        5629
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"将磁盘附加到 Linux VM | Azure\"\n    description=\"了解如何将数据磁盘附加到运行 Linux 的 Azure 虚拟机并将其初始化，以便它可供使用。\"\n    services=\"virtual-machines\"\n    documentationCenter=\"\"\n    authors=\"dsk-2015\"\n    manager=\"timlt\"\n    editor=\"tysonn\"\n    tags=\"azure-service-management\"/>\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"01/07/2016\"\n    wacn.date=\"02/26/2016\"/>\n\n# 如何将数据磁盘附加到 Linux 虚拟机\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]\n\n\n你可以附加空磁盘和包含数据的磁盘。在这两种情况下，这些磁盘实际上是驻留在 Azure 存储帐户中的 .vhd 文件。此外，也是在这两种情况下，在附加磁盘之后，你将需要对其进行初始化，然后才能使用。\n\n> [AZURE.NOTE] 最佳做法是使用一个或多个不同的磁盘来存储虚拟机的数据。当你创建 Azure 虚拟机时，该虚拟机有一个操作系统磁盘和一个临时磁盘。**不要使用临时磁盘来存储数据。** 顾名思义，它仅提供临时存储。它不提供冗余或备份，因为它不驻留在 Azure 存储空间中。\n> 临时磁盘通常由 Azure Linux 代理管理并且自动装载到 **/mnt/resource**（或 Ubuntu 映像上的 **/mnt**）。另一方面，数据磁盘可以由 Linux 内核命名为 `/dev/sdc` 这样的形式，而用户则需对该资源进行分区、格式化和安装。有关详细信息，请参阅 [Azure Linux 代理用户指南][Agent]。\n\n[AZURE.INCLUDE [howto-attach-disk-windows-linux](../includes/howto-attach-disk-linux.md)]\n\n## 如何：在 Linux 中初始化新的数据磁盘\n\n可以按照相同的说明使用如下所示的正确设备标识符来初始化多个数据磁盘。\n\n1. 连接到虚拟机。有关说明，请参阅[如何登录到运行 Linux 的虚拟机][Logon]。\n\n\n\n2. 接下来，你需要查找可供数据磁盘初始化的设备标识符。可通过两种方式实现该目的：\n\n    a) 在 SSH 窗口中，键入下面的命令，然后输入为管理虚拟机而创建的帐户的密码：\n\n            $sudo grep SCSI /var/log/messages\n\n    如果是最近的 Ubuntu 分发，你可能需要使用 `sudo grep SCSI /var/log/syslog`，因为默认情况下可能已禁止登录到 `/var/log/messages`。\n\n    您可以在所示消息中找到最后添加的数据磁盘的标识符。\n\n    ![获取磁盘消息](./media/virtual-machines-linux-how-to-attach-disk/DiskMessages.png)\n\n    或\n\n    b) 使用 `lsscsi` 命令找出设备 ID。`lsscsi` 的安装可以通过 `yum install lsscsi`（在基于 Red Hat 的分发上）或 `apt-get install lsscsi`（在基于 Debian 的分发上）来进行。你可以通过 _lun_（即**逻辑单元号**）找到所要的磁盘。例如，所附加磁盘的 _lun_ 可以轻松地通过 `azure vm disk list <virtual-machine>` 来查看，如下所示：\n\n            ~$ azure vm disk list ubuntuVMasm\n            info:    Executing command vm disk list\n            + Fetching disk images\n            + Getting virtual machines\n            + Getting VM disks\n            data:    Lun  Size(GB)  Blob-Name                         OS\n            data:    ---  --------  --------------------------------  -----\n            data:         30        ubuntuVMasm-2645b8030676c8f8.vhd  Linux\n            data:    1    10        test.VHD\n            data:    2    30        ubuntuVMasm-76f7ee1ef0f6dddc.vhd\n            info:    vm disk list command OK\n\n    将此结果与同一示例性虚拟机的 `lsscsi` 的输出进行比较：\n\n            adminuser@ubuntuVMasm:~$ lsscsi\n            [1:0:0:0]    cd/dvd  Msft     Virtual CD/ROM   1.0   /dev/sr0\n            [2:0:0:0]    disk    Msft     Virtual Disk     1.0   /dev/sda\n            [3:0:1:0]    disk    Msft     Virtual Disk     1.0   /dev/sdb\n            [5:0:0:0]    disk    Msft     Virtual Disk     1.0   /dev/sdc\n            [5:0:0:1]    disk    Msft     Virtual Disk     1.0   /dev/sdd\n            [5:0:0:2]    disk    Msft     Virtual Disk     1.0   /dev/sde\n\n    每一行的元组中的最后一个数字就是 _lun_。有关详细信息，请参阅 `man lsscsi`。\n\n3. 在 SSH 窗口中，键入下面的命令以新建设备，然后输入帐户密码：\n\n        $sudo fdisk /dev/sdc\n\n    >[AZURE.NOTE] 此示例中，如果 /sbin 或 /usr/sbin 不在你的 `$PATH` 中，你在某些分发上可能需要使用 `sudo -i`。\n\n\n4. 出现提示时，键入 **n** 以创建新分区。\n\n\n    ![新建设备](./media/virtual-machines-linux-how-to-attach-disk/DiskPartition.png)\n\n5. 出现提示时，键入 **p** 将该分区设置为主分区，键入 **1** 将其设置为第一分区，然后键入 Enter 以接受柱面的默认值。在某些系统上，它可以显示第一个和最后一个扇区（而不是柱面）的默认值。你可以选择接受这些默认值。\n\n\n    ![创建分区](./media/virtual-machines-linux-how-to-attach-disk/DiskCylinder.png)\n\n\n\n6. 键入 **p** 以查看有关分区磁盘的详细信息。\n\n\n    ![列出磁盘信息](./media/virtual-machines-linux-how-to-attach-disk/DiskInfo.png)\n\n\n\n7. 键入“w”以写入磁盘的设置。\n\n\n    ![写入磁盘更改](./media/virtual-machines-linux-how-to-attach-disk/DiskWrite.png)\n\n8. 在新分区上创建文件系统。将分区数 (1) 追加到设备 ID 后面。例如，可键入以下命令，然后输入帐户密码：\n\n        # sudo mkfs -t ext4 /dev/sdc1\n\n    ![创建文件系统](./media/virtual-machines-linux-how-to-attach-disk/DiskFileSystem.png)\n\n    >[AZURE.NOTE] 请注意，对于 ext4 文件系统，SUSE Linux Enterprise 11 系统仅支持只读访问。对于这些系统，建议将新文件系统格式化为 ext3 而非 ext4。\n\n\n9. 创建一个目录来装载新的文件系统。例如，可键入以下命令，然后输入帐户密码：\n\n        # sudo mkdir /datadrive\n\n\n10. 键入下面的命令以安装驱动器：\n\n        # sudo mount /dev/sdc1 /datadrive\n\n    数据磁盘现在可以作为 **/datadrive** 使用。\n\n\n11. 将新驱动器添加到 /etc/fstab：\n\n    若要确保在重新引导后自动重新装载驱动器，必须将其添加到 /etc/fstab 文件。此外，强烈建议在 /etc/fstab 中使用 UUID（全局唯一标识符）来引用驱动器而不是只使用设备名称（即 /dev/sdc1）。若要查找新驱动器的 UUID，可以使用 blkid 实用程序：\n\n        # sudo -i blkid\n\n    输出与以下内容类似：\n\n        /dev/sda1: UUID=\"11111111-1b1b-1c1c-1d1d-1e1e1e1e1e1e\" TYPE=\"ext4\"\n        /dev/sdb1: UUID=\"22222222-2b2b-2c2c-2d2d-2e2e2e2e2e2e\" TYPE=\"ext4\"\n        /dev/sdc1: UUID=\"33333333-3b3b-3c3c-3d3d-3e3e3e3e3e3e\" TYPE=\"ext4\"\n\n\n    >[AZURE.NOTE] 错误地编辑 **/etc/fstab** 文件可能会导致系统无法引导。如果没有把握，请参考分发的文档来获取有关如何正确编辑该文件的信息。另外，建议在编辑之前创建 /etc/fstab 文件的备份。\n\n    接下来，请在文本编辑器中打开 **/etc/fstab** 文件。请注意，/etc/fstab 是系统文件，因此需使用 `sudo` 来编辑该文件，例如：\n\n        # sudo vi /etc/fstab\n\n    在此示例中，我们将使用在之前的步骤中创建的新 **/dev/sdc1** 设备的 UUID 值并使用装载点 **/datadrive**。将以下行添加到 **/etc/fstab** 文件的末尾：\n\n        UUID=33333333-3b3b-3c3c-3d3d-3e3e3e3e3e3e   /datadrive   ext4   defaults   1   2\n\n    另外，在基于 SUSE Linux 的系统上，您可能需要使用稍微不同的格式：\n\n        /dev/disk/by-uuid/33333333-3b3b-3c3c-3d3d-3e3e3e3e3e3e   /datadrive   ext3   defaults   1   2\n\n    现在，你可以通过简单地卸载并重新装载文件系统（即使用在之前的步骤中创建的示例装载点 `/datadrive`）来测试文件系统是否已正确装载：\n\n        # sudo umount /datadrive\n        # sudo mount /datadrive\n\n    如果 `mount` 命令产生错误，请检查 /etc/fstab 文件的语法是否正确。如果还创建了其他数据驱动器或分区，您同样也需要分别将其输入到 /etc/fstab 中。\n\n    你需要使用以下命令使驱动器可写：\n\n        # sudo chmod go+w /datadrive\n\n>[AZURE.NOTE] 之后，在不编辑 fstab 的情况下删除数据磁盘可能会导致 VM 无法引导。如果这是一种常见情况，则请注意，大多数分发都提供了 `nofail` 和/或 `nobootwait` fstab 选项，这些选项使系统在磁盘无法装载的情况下也能引导。有关这些参数的详细信息，请查阅您的分发文档。\n\n## 其他资源\n[如何登录到运行 Linux 的虚拟机][Logon]\n\n[如何从 Linux 虚拟机分离磁盘](/documentation/articles/virtual-machines-linux-how-to-detach-disk)\n\n[使用带服务管理 API 的 Azure CLI](/documentation/articles/virtual-machines-command-line-tools)\n\n<!--Link references-->\n[Agent]: /documentation/articles/virtual-machines-linux-agent-user-guide\n[Logon]: /documentation/articles/virtual-machines-linux-how-to-log-on\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

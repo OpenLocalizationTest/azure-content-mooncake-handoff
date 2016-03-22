@@ -1,0 +1,656 @@
+{
+  "nodes": [
+    {
+      "content": "配合使用 Azure CLI 和资源管理器 | Azure",
+      "pos": [
+        27,
+        56
+      ]
+    },
+    {
+      "content": "了解如何使用适用于 Mac、Linux 和 Windows 的 Azure CLI，在 Azure 资源管理器模式下管理 Azure 资源。",
+      "pos": [
+        75,
+        145
+      ]
+    },
+    {
+      "content": "将适用于 Mac、Linux 和 Windows 的 Azure CLI 与 Azure 资源管理器配合使用",
+      "pos": [
+        434,
+        488
+      ]
+    },
+    {
+      "pos": [
+        490,
+        571
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-rm-include.md)</ept>]"
+    },
+    {
+      "content": "本文介绍如何在 Azure 资源管理器模式下使用 Azure 命令行接口 (Azure CLI)，在 Mac、Linux 和 Windows 计算机的命令行中创建、管理和删除服务。你可以使用 Azure SDK 的各种库、Azure PowerShell 和 Azure 门户执行许多相同的任务。",
+      "pos": [
+        573,
+        721
+      ]
+    },
+    {
+      "content": "Azure 资源管理器可让你创建一组资源 - 虚拟机、网站、数据库等 - 作为单个可部署单元。然后，可以通过一个协调的操作为应用程序部署、更新或删除所有资源。在部署的 JSON 模板中描述组资源，然后，可以针对不同的环境（如测试、过渡和生产）使用该模板。",
+      "pos": [
+        723,
+        850
+      ]
+    },
+    {
+      "content": "本文的讨论范围",
+      "pos": [
+        855,
+        862
+      ]
+    },
+    {
+      "pos": [
+        864,
+        1060
+      ],
+      "content": "本文提供了用于资源管理器部署模型的常用 Azure CLI 命令的语法和选项。它并不是完整的参考，并且你的 CLI 版本可能会显示某些不同的命令或参数。要在资源管理器模式下在命令行中查看当前的命令语法和选项，请键入 <ph id=\"ph1\">`azure help`</ph>；要显示某个命令的帮助，请键入 <ph id=\"ph2\">`azure help [command]`</ph>。你还可以在创建和管理具体 Azure 服务的说明文档中找到 CLI 示例。"
+    },
+    {
+      "content": "可选参数显示在方括号中（例如，[参数]）。其他所有参数都是必需的。",
+      "pos": [
+        1062,
+        1095
+      ]
+    },
+    {
+      "pos": [
+        1097,
+        1325
+      ],
+      "content": "除了此处记录的特定于命令的可选参数外，还有三个可用于显示详细输出（例如请求选项和状态代码）的可选参数。-v 参数提供详细输出，而 -vv 参数提供更详细的输出。--json 选项将以原始的 json 格式输出结果。使用 --json 开关的情况很常见，在获取和了解返回资源信息、状态和日志的 Azure CLI 操作的结果以及使用模板时，该开关非常重要。你可能想要安装 JSON 分析器工具（如 <bpt id=\"p1\">**</bpt>jq<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>jsawk<ept id=\"p2\">**</ept>）或使用你偏爱的语言库。"
+    },
+    {
+      "content": "命令性和声明性方法",
+      "pos": [
+        1330,
+        1339
+      ]
+    },
+    {
+      "pos": [
+        1341,
+        1669
+      ],
+      "content": "与 <bpt id=\"p1\">[</bpt>Azure 服务管理模式<ept id=\"p1\">](/documentation/articles/virtual-machines-command-line-tools)</ept>一样，Azure CLI 的资源管理器模式可提供命令让你在命令行上强制创建资源。例如，如果键入 <ph id=\"ph1\">`azure group create &lt;groupname&gt; &lt;location&gt;`</ph>，则会要求 Azure 创建资源组；如果键入 <ph id=\"ph2\">`azure group deployment create &lt;resourcegroup&gt; &lt;deploymentname&gt;`</ph>，则会指示 Azure 创建包含任意项数的部署，并将其放在组中。由于每种类型的资源都有强制命令，你可以将这些命令链接在一起，以创建相当复杂的部署。"
+    },
+    {
+      "pos": [
+        1671,
+        1846
+      ],
+      "content": "但是，使用用于描述资源组的资源组<bpt id=\"p1\">_</bpt>模板<ept id=\"p1\">_</ept>是一种强大得多的声明性方法，它允许你针对（几乎）任何目的自动完成包含（几乎）任意数量的资源的复杂部署。使用模板时，唯一的强制性命令是单一部署。有关模板、资源和资源组的一般概述，请参阅 <bpt id=\"p2\">[</bpt>Azure 资源组概述<ept id=\"p2\">](/documentation/articles/resource-group-overview)</ept>。"
+    },
+    {
+      "content": "用法要求",
+      "pos": [
+        1850,
+        1854
+      ]
+    },
+    {
+      "content": "对配合使用资源管理器模式和 Azure CLI 的设置要求如下：",
+      "pos": [
+        1856,
+        1888
+      ]
+    },
+    {
+      "pos": [
+        1892,
+        1937
+      ],
+      "content": "一个 Azure 帐户（<bpt id=\"p1\">[</bpt>在此处获取试用版<ept id=\"p1\">](/pricing/1rmb-trial/)</ept>）"
+    },
+    {
+      "content": "安装 Azure CLI",
+      "pos": [
+        1941,
+        1953
+      ]
+    },
+    {
+      "content": "获取帐户并安装 Azure CLI 后，你必须",
+      "pos": [
+        2000,
+        2023
+      ]
+    },
+    {
+      "pos": [
+        2027,
+        2111
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>配置 Azure CLI<ept id=\"p1\">](/documentation/articles/xplat-cli-connect)</ept> 以使用工作或学校帐户或 Microsoft 帐户标识"
+    },
+    {
+      "pos": [
+        2114,
+        2154
+      ],
+      "content": "通过键入 <ph id=\"ph1\">`azure config mode arm`</ph> 切换到资源管理器模式。"
+    },
+    {
+      "content": "azure account：管理你的帐户信息",
+      "pos": [
+        2160,
+        2182
+      ]
+    },
+    {
+      "content": "该工具使用你的 Azure 订阅信息连接到你的帐户。",
+      "pos": [
+        2183,
+        2209
+      ]
+    },
+    {
+      "content": "列出导入的订阅",
+      "pos": [
+        2213,
+        2220
+      ]
+    },
+    {
+      "content": "显示有关订阅的详细信息",
+      "pos": [
+        2254,
+        2265
+      ]
+    },
+    {
+      "content": "设置当前订阅",
+      "pos": [
+        2322,
+        2328
+      ]
+    },
+    {
+      "content": "删除订阅或环境，或清除所有存储的帐户和环境信息",
+      "pos": [
+        2384,
+        2407
+      ]
+    },
+    {
+      "content": "用于管理帐户环境的命令",
+      "pos": [
+        2442,
+        2453
+      ]
+    },
+    {
+      "content": "azure ad：用于显示 Active Directory 对象的命令",
+      "pos": [
+        2672,
+        2708
+      ]
+    },
+    {
+      "content": "用于显示 Active Directory 应用程序的命令",
+      "pos": [
+        2712,
+        2741
+      ]
+    },
+    {
+      "content": "用于显示 Active Directory 组的命令",
+      "pos": [
+        2816,
+        2842
+      ]
+    },
+    {
+      "content": "用于提供 Active Directory 子组或成员信息的命令",
+      "pos": [
+        2905,
+        2937
+      ]
+    },
+    {
+      "content": "用于显示 Active Directory 服务主体的命令",
+      "pos": [
+        2990,
+        3019
+      ]
+    },
+    {
+      "content": "用于显示 Active Directory 用户的命令",
+      "pos": [
+        3159,
+        3186
+      ]
+    },
+    {
+      "content": "azure availset：用于管理可用性集的命令",
+      "pos": [
+        3248,
+        3274
+      ]
+    },
+    {
+      "content": "在资源组中创建可用性集",
+      "pos": [
+        3278,
+        3289
+      ]
+    },
+    {
+      "content": "列出资源组中的可用性集",
+      "pos": [
+        3368,
+        3379
+      ]
+    },
+    {
+      "content": "获取资源组中的一个可用性集",
+      "pos": [
+        3431,
+        3444
+      ]
+    },
+    {
+      "content": "删除资源组中的一个可用性集",
+      "pos": [
+        3503,
+        3516
+      ]
+    },
+    {
+      "content": "azure config：用于管理本地设置的命令",
+      "pos": [
+        3578,
+        3602
+      ]
+    },
+    {
+      "content": "列出 Azure CLI 配置设置",
+      "pos": [
+        3606,
+        3623
+      ]
+    },
+    {
+      "content": "删除配置设置",
+      "pos": [
+        3659,
+        3665
+      ]
+    },
+    {
+      "content": "更新配置设置",
+      "pos": [
+        3710,
+        3716
+      ]
+    },
+    {
+      "content": "将 Azure CLI 工作模式设置为 arm 或 asm",
+      "pos": [
+        3756,
+        3785
+      ]
+    },
+    {
+      "content": "azure feature：用于管理帐户功能的命令",
+      "pos": [
+        3834,
+        3859
+      ]
+    },
+    {
+      "content": "列出订阅可用的所有功能",
+      "pos": [
+        3863,
+        3874
+      ]
+    },
+    {
+      "content": "显示一个功能",
+      "pos": [
+        3908,
+        3914
+      ]
+    },
+    {
+      "content": "注册资源提供程序的预览功能",
+      "pos": [
+        3977,
+        3990
+      ]
+    },
+    {
+      "content": "azure group：用于管理资源组的命令",
+      "pos": [
+        4058,
+        4080
+      ]
+    },
+    {
+      "content": "创建新的资源组",
+      "pos": [
+        4084,
+        4091
+      ]
+    },
+    {
+      "content": "向资源组设置标记",
+      "pos": [
+        4143,
+        4151
+      ]
+    },
+    {
+      "content": "删除资源组",
+      "pos": [
+        4196,
+        4201
+      ]
+    },
+    {
+      "content": "列出订阅的资源组",
+      "pos": [
+        4242,
+        4250
+      ]
+    },
+    {
+      "content": "显示订阅的资源组",
+      "pos": [
+        4282,
+        4290
+      ]
+    },
+    {
+      "content": "用于管理资源组日志的命令",
+      "pos": [
+        4329,
+        4341
+      ]
+    },
+    {
+      "content": "用于管理资源组中的部署的命令",
+      "pos": [
+        4384,
+        4398
+      ]
+    },
+    {
+      "content": "用于管理本地或库资源组模板的命令",
+      "pos": [
+        4670,
+        4686
+      ]
+    },
+    {
+      "content": "azure insights：与监视 Insights（事件、警报规则、自动缩放设置、度量值）相关的命令",
+      "pos": [
+        4876,
+        4928
+      ]
+    },
+    {
+      "content": "检索订阅、correlationId、资源组、资源或资源提供程序的操作日志",
+      "pos": [
+        4932,
+        4969
+      ]
+    },
+    {
+      "content": "azure location：用于获取所有资源类型的可用位置的命令",
+      "pos": [
+        5010,
+        5043
+      ]
+    },
+    {
+      "content": "列出可用位置",
+      "pos": [
+        5047,
+        5053
+      ]
+    },
+    {
+      "content": "azure network：用于管理网络资源的命令",
+      "pos": [
+        5089,
+        5114
+      ]
+    },
+    {
+      "content": "在 Azure 中国，VNet 还不能用 ARM 进行管理。有关 VNet 的 Azure CLI ASM 命令，请阅读以下的文章：",
+      "pos": [
+        5116,
+        5182
+      ]
+    },
+    {
+      "content": "使用 Azure CLI 创建虚拟网络（经典）",
+      "pos": [
+        5187,
+        5210
+      ]
+    },
+    {
+      "content": "如何在 Azure CLI 中创建 NSG（经典）",
+      "pos": [
+        5281,
+        5306
+      ]
+    },
+    {
+      "content": "使用 Azure CLI 控制路由和使用虚拟设备（经典）",
+      "pos": [
+        5376,
+        5404
+      ]
+    },
+    {
+      "content": "使用 Azure CLI 部署多 NIC VM（经典）",
+      "pos": [
+        5473,
+        5500
+      ]
+    },
+    {
+      "content": "如何在 Azure CLI 中设置静态专用 IP 地址（经典）",
+      "pos": [
+        5574,
+        5605
+      ]
+    },
+    {
+      "content": "azure provider：用于管理资源提供程序注册的命令",
+      "pos": [
+        5683,
+        5713
+      ]
+    },
+    {
+      "content": "列出 ARM 中当前已注册的提供程序",
+      "pos": [
+        5717,
+        5735
+      ]
+    },
+    {
+      "content": "显示有关请求的提供程序命名空间的详细信息",
+      "pos": [
+        5770,
+        5790
+      ]
+    },
+    {
+      "content": "将提供程序注册到订阅",
+      "pos": [
+        5837,
+        5847
+      ]
+    },
+    {
+      "content": "从订阅中取消注册提供程序",
+      "pos": [
+        5898,
+        5910
+      ]
+    },
+    {
+      "content": "azure resource：用于管理资源的命令",
+      "pos": [
+        5964,
+        5988
+      ]
+    },
+    {
+      "content": "在资源组中创建资源",
+      "pos": [
+        5992,
+        6001
+      ]
+    },
+    {
+      "content": "更新资源组中不带任何模板或参数的资源",
+      "pos": [
+        6103,
+        6121
+      ]
+    },
+    {
+      "content": "列出资源",
+      "pos": [
+        6222,
+        6226
+      ]
+    },
+    {
+      "content": "获取资源组或订阅中的一个资源",
+      "pos": [
+        6278,
+        6292
+      ]
+    },
+    {
+      "content": "删除资源组中的资源",
+      "pos": [
+        6381,
+        6390
+      ]
+    },
+    {
+      "content": "azure role：用于管理 Azure 角色的命令",
+      "pos": [
+        6482,
+        6509
+      ]
+    },
+    {
+      "content": "获取所有可用的角色定义",
+      "pos": [
+        6513,
+        6524
+      ]
+    },
+    {
+      "content": "获取一个可用的角色定义",
+      "pos": [
+        6555,
+        6566
+      ]
+    },
+    {
+      "content": "用于管理角色分配的命令",
+      "pos": [
+        6604,
+        6615
+      ]
+    },
+    {
+      "content": "azure storage：用于管理存储对象的命令",
+      "pos": [
+        7014,
+        7039
+      ]
+    },
+    {
+      "pos": [
+        7041,
+        7178
+      ],
+      "content": "在 Azure 中国，Azure 存储还不能用 ARM 进行管理。有关 Azure 存储的 Azure CLI ASM 命令，请阅读<bpt id=\"p1\">[</bpt>使用 Azure CLI 管理 Azure 存储服务<ept id=\"p1\">](/documentation/articles/storage-azure-cli)</ept>"
+    },
+    {
+      "content": "azure tag：用于管理资源管理器标记的命令",
+      "pos": [
+        7183,
+        7207
+      ]
+    },
+    {
+      "content": "添加标记",
+      "pos": [
+        7211,
+        7215
+      ]
+    },
+    {
+      "content": "删除整个标记或标记值",
+      "pos": [
+        7262,
+        7272
+      ]
+    },
+    {
+      "content": "列出标记信息",
+      "pos": [
+        7319,
+        7325
+      ]
+    },
+    {
+      "content": "获取标记",
+      "pos": [
+        7355,
+        7359
+      ]
+    },
+    {
+      "content": "azure vm：用于管理 Azure 虚拟机的命令",
+      "pos": [
+        7397,
+        7423
+      ]
+    },
+    {
+      "pos": [
+        7425,
+        7609
+      ],
+      "content": "在 Azure 中国，Azure 虚拟机还不能用 ARM 进行管理。有关 Azure 虚拟机的 Azure CLI ASM 命令，请阅读<bpt id=\"p1\">[</bpt>将适用于 Mac、Linux 和 Windows 的 Azure CLI 与 Azure 服务管理配合使用<ept id=\"p1\">](/documentation/articles/virtual-machines-command-line-tools)</ept>"
+    },
+    {
+      "content": "azure hdinsight：用于管理 HDInsight 群集的命令",
+      "pos": [
+        7614,
+        7650
+      ]
+    },
+    {
+      "pos": [
+        7652,
+        7837
+      ],
+      "content": "在 Azure 中国，Azure HDInsight 还不能用 ARM 进行管理。有关 Azure HDInsight 的 Azure CLI ASM 命令，请阅读<bpt id=\"p1\">[</bpt>使用 Azure CLI 管理 HDInsight 中的 Hadoop 群集<ept id=\"p1\">](/documentation/articles/hdinsight-administer-use-command-line)</ept>"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"配合使用 Azure CLI 和资源管理器 | Azure\"\n    description=\"了解如何使用适用于 Mac、Linux 和 Windows 的 Azure CLI，在 Azure 资源管理器模式下管理 Azure 资源。\"\n    services=\"virtual-machines,virtual-network,mobile-services,cloud-services\"\n    documentationCenter=\"\"\n    authors=\"dlepow\"\n    manager=\"timlt\"\n    editor=\"\"\n    tags=\"azure-resource-manager\"/>\n\n<tags\n    ms.service=\"multiple\"\n    ms.date=\"11/18/2015\"\n    wacn.date=\"01/29/2016\"/>\n\n# 将适用于 Mac、Linux 和 Windows 的 Azure CLI 与 Azure 资源管理器配合使用\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-rm-include.md)]\n\n本文介绍如何在 Azure 资源管理器模式下使用 Azure 命令行接口 (Azure CLI)，在 Mac、Linux 和 Windows 计算机的命令行中创建、管理和删除服务。你可以使用 Azure SDK 的各种库、Azure PowerShell 和 Azure 门户执行许多相同的任务。\n\nAzure 资源管理器可让你创建一组资源 - 虚拟机、网站、数据库等 - 作为单个可部署单元。然后，可以通过一个协调的操作为应用程序部署、更新或删除所有资源。在部署的 JSON 模板中描述组资源，然后，可以针对不同的环境（如测试、过渡和生产）使用该模板。\n\n## 本文的讨论范围\n\n本文提供了用于资源管理器部署模型的常用 Azure CLI 命令的语法和选项。它并不是完整的参考，并且你的 CLI 版本可能会显示某些不同的命令或参数。要在资源管理器模式下在命令行中查看当前的命令语法和选项，请键入 `azure help`；要显示某个命令的帮助，请键入 `azure help [command]`。你还可以在创建和管理具体 Azure 服务的说明文档中找到 CLI 示例。\n\n可选参数显示在方括号中（例如，[参数]）。其他所有参数都是必需的。\n\n除了此处记录的特定于命令的可选参数外，还有三个可用于显示详细输出（例如请求选项和状态代码）的可选参数。-v 参数提供详细输出，而 -vv 参数提供更详细的输出。--json 选项将以原始的 json 格式输出结果。使用 --json 开关的情况很常见，在获取和了解返回资源信息、状态和日志的 Azure CLI 操作的结果以及使用模板时，该开关非常重要。你可能想要安装 JSON 分析器工具（如 **jq** 或 **jsawk**）或使用你偏爱的语言库。\n\n## 命令性和声明性方法\n\n与 [Azure 服务管理模式](/documentation/articles/virtual-machines-command-line-tools)一样，Azure CLI 的资源管理器模式可提供命令让你在命令行上强制创建资源。例如，如果键入 `azure group create <groupname> <location>`，则会要求 Azure 创建资源组；如果键入 `azure group deployment create <resourcegroup> <deploymentname>`，则会指示 Azure 创建包含任意项数的部署，并将其放在组中。由于每种类型的资源都有强制命令，你可以将这些命令链接在一起，以创建相当复杂的部署。\n\n但是，使用用于描述资源组的资源组_模板_是一种强大得多的声明性方法，它允许你针对（几乎）任何目的自动完成包含（几乎）任意数量的资源的复杂部署。使用模板时，唯一的强制性命令是单一部署。有关模板、资源和资源组的一般概述，请参阅 [Azure 资源组概述](/documentation/articles/resource-group-overview)。\n\n##用法要求\n\n对配合使用资源管理器模式和 Azure CLI 的设置要求如下：\n\n- 一个 Azure 帐户（[在此处获取试用版](/pricing/1rmb-trial/)）\n- [安装 Azure CLI](/documentation/articles/xplat-cli-install)\n\n\n获取帐户并安装 Azure CLI 后，你必须\n\n- [配置 Azure CLI](/documentation/articles/xplat-cli-connect) 以使用工作或学校帐户或 Microsoft 帐户标识\n- 通过键入 `azure config mode arm` 切换到资源管理器模式。\n\n\n## azure account：管理你的帐户信息\n该工具使用你的 Azure 订阅信息连接到你的帐户。\n\n**列出导入的订阅**\n\n    account list [options]\n\n**显示有关订阅的详细信息**\n\n    account show [options] [subscriptionNameOrId]\n\n**设置当前订阅**\n\n    account set [options] <subscriptionNameOrId>\n\n**删除订阅或环境，或清除所有存储的帐户和环境信息**\n\n    account clear [options]\n\n**用于管理帐户环境的命令**\n\n    account env list [options]\n    account env show [options] [environment]\n    account env add [options] [environment]\n    account env set [options] [environment]\n    account env delete [options] [environment]\n\n## azure ad：用于显示 Active Directory 对象的命令\n\n**用于显示 Active Directory 应用程序的命令**\n\n    ad app create [options]\n    ad app delete [options] <object-id>\n\n**用于显示 Active Directory 组的命令**\n\n    ad group list [options]\n    ad group show [options]\n\n**用于提供 Active Directory 子组或成员信息的命令**\n\n    ad group member list [options] [objectId]\n\n**用于显示 Active Directory 服务主体的命令**\n\n    ad sp list [options]\n    ad sp show [options]\n    ad sp create [options] <application-id>\n    ad sp delete [options] <object-id>\n\n**用于显示 Active Directory 用户的命令**\n\n    ad user list [options]\n    ad user show [options]\n\n## azure availset：用于管理可用性集的命令\n\n**在资源组中创建可用性集**\n\n    availset create [options] <resource-group> <name> <location> [tags]\n\n**列出资源组中的可用性集**\n\n    availset list [options] <resource-group>\n\n**获取资源组中的一个可用性集**\n\n    availset show [options] <resource-group> <name>\n\n**删除资源组中的一个可用性集**\n\n    availset delete [options] <resource-group> <name>\n\n## azure config：用于管理本地设置的命令\n\n**列出 Azure CLI 配置设置**\n\n    conconfig list [options]\n\n**删除配置设置**\n\n    conconfig delete [options] <name>\n\n**更新配置设置**\n\n    conconfig set <name> <value>\n\n**将 Azure CLI 工作模式设置为 arm 或 asm**\n\n    conconfig mode [options] <modename>\n\n\n## azure feature：用于管理帐户功能的命令\n\n**列出订阅可用的所有功能**\n\n    feature list [options]\n\n**显示一个功能**\n\n    feature show [options] <providerName> <featureName>\n\n**注册资源提供程序的预览功能**\n\n    feature register [options] <providerName> <featureName>\n\n## azure group：用于管理资源组的命令\n\n**创建新的资源组**\n\n    group create [options] <name> <location>\n\n**向资源组设置标记**\n\n    group set [options] <name> <tags>\n\n**删除资源组**\n\n    group delete [options] <name>\n\n**列出订阅的资源组**\n\n    group list [options]\n\n**显示订阅的资源组**\n\n    group show [options] <name>\n\n**用于管理资源组日志的命令**\n\n    group log show [options] [name]\n\n**用于管理资源组中的部署的命令**\n\n    group deployment create [options] [resource-group] [name]\n    group deployment list [options] <resource-group> [state]\n    group deployment show [options] <resource-group> [deployment-name]\n    group deployment stop [options] <resource-group> [deployment-name]\n\n**用于管理本地或库资源组模板的命令**\n\n    group template list [options]\n    group template show [options] <name>\n    group template download [options] [name] [file]\n    group template validate [options] <resource-group>\n\n## azure insights：与监视 Insights（事件、警报规则、自动缩放设置、度量值）相关的命令\n\n**检索订阅、correlationId、资源组、资源或资源提供程序的操作日志**\n\n    insights logs list [options]\n\n## azure location：用于获取所有资源类型的可用位置的命令\n\n**列出可用位置**\n\n    location list [options]\n\n## azure network：用于管理网络资源的命令\n\n在 Azure 中国，VNet 还不能用 ARM 进行管理。有关 VNet 的 Azure CLI ASM 命令，请阅读以下的文章：\n\n- [使用 Azure CLI 创建虚拟网络（经典）](/documentation/articles/virtual-networks-create-vnet-classic-cli)\n- [如何在 Azure CLI 中创建 NSG（经典）](/documentation/articles/virtual-networks-create-nsg-classic-cli)\n- [使用 Azure CLI 控制路由和使用虚拟设备（经典）](/documentation/articles/virtual-network-create-udr-classic-cli)\n- [使用 Azure CLI 部署多 NIC VM（经典）](/documentation/articles/virtual-network-deploy-multinic-classic-cli)\n- [如何在 Azure CLI 中设置静态专用 IP 地址（经典）](/documentation/articles/virtual-networks-static-private-ip-classic-cli)\n\n## azure provider：用于管理资源提供程序注册的命令\n\n**列出 ARM 中当前已注册的提供程序**\n\n    provider list [options]\n\n**显示有关请求的提供程序命名空间的详细信息**\n\n    provider show [options] <namespace>\n\n**将提供程序注册到订阅**\n\n    provider register [options] <namespace>\n\n**从订阅中取消注册提供程序**\n\n    provider unregister [options] <namespace>\n\n## azure resource：用于管理资源的命令\n\n**在资源组中创建资源**\n\n    resource create [options] <resource-group> <name> <resource-type> <location> <api-version>\n\n**更新资源组中不带任何模板或参数的资源**\n\n    resource set [options] <resource-group> <name> <resource-type> <properties> <api-version>\n\n**列出资源**\n\n    resource list [options] [resource-group]\n\n**获取资源组或订阅中的一个资源**\n\n    resource show [options] <resource-group> <name> <resource-type> <api-version>\n\n**删除资源组中的资源**\n\n    resource delete [options] <resource-group> <name> <resource-type> <api-version>\n\n## azure role：用于管理 Azure 角色的命令\n\n**获取所有可用的角色定义**\n\n    role list [options]\n\n**获取一个可用的角色定义**\n\n    role show [options] [name]\n\n**用于管理角色分配的命令**\n\n    role assignment create [options] [objectId] [upn] [mail] [spn] [role] [scope] [resource-group] [resource-type] [resource-name]\n    role assignment list [options] [objectId] [upn] [mail] [spn] [role] [scope] [resource-group] [resource-type] [resource-name]\n    role assignment delete [options] [objectId] [upn] [mail] [spn] [role] [scope] [resource-group] [resource-type] [resource-name]\n\n## azure storage：用于管理存储对象的命令\n\n在 Azure 中国，Azure 存储还不能用 ARM 进行管理。有关 Azure 存储的 Azure CLI ASM 命令，请阅读[使用 Azure CLI 管理 Azure 存储服务](/documentation/articles/storage-azure-cli)\n\n## azure tag：用于管理资源管理器标记的命令\n\n**添加标记**\n\n    tag create [options] <name> <value>\n\n**删除整个标记或标记值**\n\n    tag delete [options] <name> <value>\n\n**列出标记信息**\n\n    tag list [options]\n\n**获取标记**\n\n    tag show [options] [name]\n\n## azure vm：用于管理 Azure 虚拟机的命令\n\n在 Azure 中国，Azure 虚拟机还不能用 ARM 进行管理。有关 Azure 虚拟机的 Azure CLI ASM 命令，请阅读[将适用于 Mac、Linux 和 Windows 的 Azure CLI 与 Azure 服务管理配合使用](/documentation/articles/virtual-machines-command-line-tools)\n\n## azure hdinsight：用于管理 HDInsight 群集的命令\n\n在 Azure 中国，Azure HDInsight 还不能用 ARM 进行管理。有关 Azure HDInsight 的 Azure CLI ASM 命令，请阅读[使用 Azure CLI 管理 HDInsight 中的 Hadoop 群集](/documentation/articles/hdinsight-administer-use-command-line)\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

@@ -1,0 +1,236 @@
+{
+  "nodes": [
+    {
+      "content": "使用 DMV 监视工作负荷 | Azure",
+      "pos": [
+        26,
+        47
+      ]
+    },
+    {
+      "content": "了解如何使用 DMV 监视工作负荷。",
+      "pos": [
+        65,
+        83
+      ]
+    },
+    {
+      "content": "使用 DMV 监视工作负荷",
+      "pos": [
+        301,
+        314
+      ]
+    },
+    {
+      "content": "本文介绍如何使用动态管理视图 (DMV) 在 Azure SQL 数据仓库中监视工作负荷及调查查询执行情况。",
+      "pos": [
+        316,
+        370
+      ]
+    },
+    {
+      "content": "监视连接",
+      "pos": [
+        377,
+        381
+      ]
+    },
+    {
+      "pos": [
+        383,
+        516
+      ],
+      "content": "你可以使用 <bpt id=\"p1\">*</bpt>sys.dm\\_pdw\\_nodes\\_exec\\_connections<ept id=\"p1\">*</ept> 视图来检索有关与 Azure SQL 数据仓库数据库建立的连接的信息。此外，<bpt id=\"p2\">*</bpt>sys.dm\\_exec\\_sessions<ept id=\"p2\">*</ept> 视图在检索有关所有活动用户连接的信息时非常有用。"
+    },
+    {
+      "content": "使用以下查询可以检索有关当前连接的信息。",
+      "pos": [
+        625,
+        645
+      ]
+    },
+    {
+      "content": "调查查询执行情况",
+      "pos": [
+        829,
+        837
+      ]
+    },
+    {
+      "content": "你可能会遇到查询未完成，或运行时间超过预期的情况。在这种情况下，你可以使用以下步骤收集数据，并缩小问题的范围。",
+      "pos": [
+        838,
+        893
+      ]
+    },
+    {
+      "content": "步骤 1：查找要调查的查询",
+      "pos": [
+        901,
+        914
+      ]
+    },
+    {
+      "content": "保存查询的请求 ID。",
+      "pos": [
+        1129,
+        1140
+      ]
+    },
+    {
+      "content": "步骤 2：检查查询是否正在等待资源",
+      "pos": [
+        1150,
+        1167
+      ]
+    },
+    {
+      "content": "上述查询的结果将显示请求的等待状态。",
+      "pos": [
+        1703,
+        1721
+      ]
+    },
+    {
+      "pos": [
+        1725,
+        1769
+      ],
+      "content": "如果查询正在等待另一个查询的资源，则状态将为 <bpt id=\"p1\">**</bpt>AcquireResources<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        1772,
+        1823
+      ],
+      "content": "如果查询具有全部所需资源且不在等待，则状态将为 <bpt id=\"p1\">**</bpt>Granted<ept id=\"p1\">**</ept>。在这种情况下，请转到查询步骤。"
+    },
+    {
+      "content": "步骤 3：查找运行时间最长的查询步骤",
+      "pos": [
+        1832,
+        1850
+      ]
+    },
+    {
+      "content": "使用请求 ID 检索所有分布式查询步骤的列表。通过查看总已用时间，查找长时间运行的步骤。",
+      "pos": [
+        1852,
+        1896
+      ]
+    },
+    {
+      "content": "保存长时间运行步骤的步骤索引。",
+      "pos": [
+        2110,
+        2125
+      ]
+    },
+    {
+      "pos": [
+        2127,
+        2161
+      ],
+      "content": "检查长时间运行的查询步骤的 <bpt id=\"p1\">*</bpt>operation\\_type<ept id=\"p1\">*</ept> 列："
+    },
+    {
+      "pos": [
+        2165,
+        2234
+      ],
+      "content": "针对以下 <bpt id=\"p1\">**</bpt>SQL 操作<ept id=\"p1\">**</ept>继续执行步骤 4a：OnOperation、RemoteOperation、ReturnOperation。"
+    },
+    {
+      "pos": [
+        2237,
+        2374
+      ],
+      "content": "针对以下<bpt id=\"p1\">**</bpt>数据移动操作<ept id=\"p1\">**</ept>继续执行步骤 4b：ShuffleMoveOperation、BroadcastMoveOperation、TrimMoveOperation、PartitionMoveOperation、MoveOperation、CopyOperation。"
+    },
+    {
+      "content": "步骤 4a：查找 SQL 步骤的执行进度",
+      "pos": [
+        2383,
+        2403
+      ]
+    },
+    {
+      "content": "使用请求 ID 和步骤索引，将 SQL Server 查询分布的相关信息检索为查询中 SQL 步骤的一部分。保存分发 ID 和 SPID。",
+      "pos": [
+        2405,
+        2474
+      ]
+    },
+    {
+      "content": "使用以下查询在特定节点上检索 SQL 步骤的 SQL Server 执行计划。",
+      "pos": [
+        2696,
+        2735
+      ]
+    },
+    {
+      "content": "步骤 4b：查找 DMS 步骤的执行进度",
+      "pos": [
+        2976,
+        2996
+      ]
+    },
+    {
+      "content": "使用请求 ID 和步骤索引检索对每个分布运行的数据移动步骤的相关信息。",
+      "pos": [
+        2998,
+        3033
+      ]
+    },
+    {
+      "pos": [
+        3284,
+        3341
+      ],
+      "content": "检查 <bpt id=\"p1\">*</bpt>total\\_elapsed\\_time<ept id=\"p1\">*</ept> 列，以查看是否有特定分布在数据移动上比其他分布花费了更多时间。"
+    },
+    {
+      "pos": [
+        3345,
+        3419
+      ],
+      "content": "对于长时间运行的分布，请检查 <bpt id=\"p1\">*</bpt>rows\\_processed<ept id=\"p1\">*</ept> 列，以查看从该分布移动的行数是否远远多于其他分布。这会显示你的查询出现了数据偏斜。"
+    },
+    {
+      "content": "调查数据偏斜",
+      "pos": [
+        3428,
+        3434
+      ]
+    },
+    {
+      "content": "此查询的结果将显示存储在数据库中每组 60 个分布内的表行数目。为了获得最佳性能，分布式表中的行应该平均分散在所有分布区中。",
+      "pos": [
+        3539,
+        3601
+      ]
+    },
+    {
+      "content": "若要了解详细信息，请参阅<bpt id=\"p1\">[</bpt>表设计<ept id=\"p1\">][]</ept>。",
+      "pos": [
+        3602,
+        3622
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        3629,
+        3633
+      ]
+    },
+    {
+      "pos": [
+        3634,
+        3665
+      ],
+      "content": "有关管理 SQL 数据仓库的更多技巧，请参阅<bpt id=\"p1\">[</bpt>管理概述<ept id=\"p1\">][]</ept>。"
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"使用 DMV 监视工作负荷 | Azure\"\n   description=\"了解如何使用 DMV 监视工作负荷。\"\n   services=\"sql-data-warehouse\"\n   documentationCenter=\"NA\"\n   authors=\"sahaj08\"\n   manager=\"barbkess\"\n   editor=\"\"/>\n\n<tags\n   ms.service=\"sql-data-warehouse\"\n   ms.date=\"12/15/2015\"\n   wacn.date=\"01/29/2016\"/>\n\n# 使用 DMV 监视工作负荷\n\n本文介绍如何使用动态管理视图 (DMV) 在 Azure SQL 数据仓库中监视工作负荷及调查查询执行情况。\n\n\n\n## 监视连接\n\n你可以使用 *sys.dm\\_pdw\\_nodes\\_exec\\_connections* 视图来检索有关与 Azure SQL 数据仓库数据库建立的连接的信息。此外，*sys.dm\\_exec\\_sessions* 视图在检索有关所有活动用户连接的信息时非常有用。\n\n```\n\nSELECT * FROM sys.dm_pdw_nodes_exec_connections;\nSELECT * FROM sys.dm_pdw_nodes_exec_sessions;\n\n```\n\n\n使用以下查询可以检索有关当前连接的信息。\n\n```\n\nSELECT * \nFROM sys.dm_pdw_nodes_exec_connections AS c \n   JOIN sys.dm_pdw_nodes_exec_sessions AS s \n   ON c.session_id = s.session_id \nWHERE c.session_id = @@SPID;\n\n```\n\n\n\n\n\n## 调查查询执行情况\n你可能会遇到查询未完成，或运行时间超过预期的情况。在这种情况下，你可以使用以下步骤收集数据，并缩小问题的范围。\n\n\n\n### 步骤 1：查找要调查的查询\n\n```\n\n-- Monitor running queries\nSELECT * FROM sys.dm_pdw_exec_requests WHERE status = 'Running';\n\n-- Find the longest running queries\nSELECT * FROM sys.dm_pdw_exec_requests ORDER BY total_elapsed_time DESC;\n\n```\n\n保存查询的请求 ID。\n\n\n  \n### 步骤 2：检查查询是否正在等待资源\n\n```\n\n-- Find waiting tasks for your session.\n-- Replace request_id with value from Step 1.\n\nSELECT waits.session_id,\n      waits.request_id,  \n      requests.command,\n      requests.status, \n      requests.start_time,  \n      waits.type,  \n      waits.object_type, \n      waits.object_name,  \n      waits.state  \nFROM   sys.dm_pdw_waits waits \n   JOIN  sys.dm_pdw_exec_requests requests\n   ON waits.request_id=requests.request_id \nWHERE waits.request_id = 'QID33188'\nORDER BY waits.object_name, waits.object_type, waits.state;\n\n```\n\n\n上述查询的结果将显示请求的等待状态。\n\n- 如果查询正在等待另一个查询的资源，则状态将为 **AcquireResources**。\n- 如果查询具有全部所需资源且不在等待，则状态将为 **Granted**。在这种情况下，请转到查询步骤。\n\n\n\n\n### 步骤 3：查找运行时间最长的查询步骤\n\n使用请求 ID 检索所有分布式查询步骤的列表。通过查看总已用时间，查找长时间运行的步骤。\n\n```\n\n-- Find the distributed query plan steps for a specific query.\n-- Replace request_id with value from Step 1.\n \nSELECT * FROM sys.dm_pdw_request_steps\nWHERE request_id = 'QID33209'\nORDER BY step_index;\n\n```\n\n保存长时间运行步骤的步骤索引。\n\n检查长时间运行的查询步骤的 *operation\\_type* 列：\n\n- 针对以下 **SQL 操作**继续执行步骤 4a：OnOperation、RemoteOperation、ReturnOperation。\n- 针对以下**数据移动操作**继续执行步骤 4b：ShuffleMoveOperation、BroadcastMoveOperation、TrimMoveOperation、PartitionMoveOperation、MoveOperation、CopyOperation。\n\n\n\n\n### 步骤 4a：查找 SQL 步骤的执行进度\n\n使用请求 ID 和步骤索引，将 SQL Server 查询分布的相关信息检索为查询中 SQL 步骤的一部分。保存分发 ID 和 SPID。\n\n```\n\n-- Find the distribution run times for a SQL step.\n-- Replace request_id and step_index with values from Step 1 and 3.\n\nSELECT * FROM sys.dm_pdw_sql_requests\nWHERE request_id = 'QID33209' AND step_index = 2;\n\n```\n\n\n使用以下查询在特定节点上检索 SQL 步骤的 SQL Server 执行计划。\n\n```\n\n-- Find the SQL Server execution plan for a query running on a specific SQL Data Warehouse Compute or Control node. \n-- Replace distribution_id and spid with values from previous query.\n\nDBCC PDW_SHOWEXECUTIONPLAN(1, 78);\n\n```\n\n\n\n### 步骤 4b：查找 DMS 步骤的执行进度\n\n使用请求 ID 和步骤索引检索对每个分布运行的数据移动步骤的相关信息。\n\n```\n\n-- Find the information about all the workers completing a Data Movement Step.\n-- Replace request_id and step_index with values from Step 1 and 3.\n \nSELECT * FROM sys.dm_pdw_dms_workers\nWHERE request_id = 'QID33209' AND step_index = 2;\n\n```\n\n- 检查 *total\\_elapsed\\_time* 列，以查看是否有特定分布在数据移动上比其他分布花费了更多时间。 \n- 对于长时间运行的分布，请检查 *rows\\_processed* 列，以查看从该分布移动的行数是否远远多于其他分布。这会显示你的查询出现了数据偏斜。\n\n\n\n\n\n## 调查数据偏斜\n\n```\n\n-- Find data skew for a distributed table\nDBCC PDW_SHOWSPACEUSED(\"dbo.FactInternetSales\");\n\n```\n\n\n此查询的结果将显示存储在数据库中每组 60 个分布内的表行数目。为了获得最佳性能，分布式表中的行应该平均分散在所有分布区中。\n若要了解详细信息，请参阅[表设计][]。\n\n\n\n## 后续步骤\n有关管理 SQL 数据仓库的更多技巧，请参阅[管理概述][]。\n\n<!--Image references-->\n\n<!--Article references-->\n[管理概述]: /documentation/articles/sql-data-warehouse-overview-manage\n[表设计]: /documentation/articles/sql-data-warehouse-develop-table-design\n\n<!--MSDN references-->\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

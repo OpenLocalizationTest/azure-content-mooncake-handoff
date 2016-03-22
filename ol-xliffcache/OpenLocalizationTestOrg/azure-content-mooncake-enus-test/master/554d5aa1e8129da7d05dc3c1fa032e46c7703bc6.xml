@@ -1,0 +1,691 @@
+{
+  "nodes": [
+    {
+      "content": "使用 Azure 资源管理器创建、启动或删除应用程序网关 | Azure",
+      "pos": [
+        27,
+        63
+      ]
+    },
+    {
+      "content": "本页提供有关使用 Azure 资源管理器创建、配置、启动和删除 Azure 应用程序网关的说明",
+      "pos": [
+        81,
+        128
+      ]
+    },
+    {
+      "content": "使用 Azure 资源管理器创建、启动或删除应用程序网关",
+      "pos": [
+        351,
+        379
+      ]
+    },
+    {
+      "content": "应用程序网关是第 7 层负载平衡器。它在不同服务器之间提供故障转移和性能路由 HTTP 请求，而不管它们是在云中还是本地。应用程序网关具有以下应用程序传递功能：HTTP 负载平衡、基于 Cookie 的会话相关性和 SSL 卸载。",
+      "pos": [
+        381,
+        496
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        501,
+        517
+      ]
+    },
+    {
+      "content": "Azure 经典 PowerShell 步骤",
+      "pos": [
+        521,
+        543
+      ]
+    },
+    {
+      "content": "Azure 資源管理員 PowerShell",
+      "pos": [
+        608,
+        630
+      ]
+    },
+    {
+      "content": "Azure 资源管理器模板",
+      "pos": [
+        699,
+        712
+      ]
+    },
+    {
+      "content": "本文将指导你完成创建、配置、启动和删除应用程序网关的步骤。",
+      "pos": [
+        796,
+        825
+      ]
+    },
+    {
+      "pos": [
+        829,
+        1134
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>在使用 Azure 资源之前，请务必了解 Azure 当前使用两种部署模型：资源管理器部署模型和经典部署模型。在使用任何 Azure 资源之前，请确保你了解<bpt id=\"p1\">[</bpt>部署模型和工具<ept id=\"p1\">](/documentation/articles/azure-classic-rm)</ept>。可以通过单击本文顶部的选项卡来查看不同工具的文档。本文档将说明使用 Azure 资源管理器创建应用程序网关的方式。若要使用经典版本，请转到<bpt id=\"p2\">[</bpt>使用 PowerShell 创建应用程序网关经典部署<ept id=\"p2\">](/documentation/articles/application-gateway-create-gateway)</ept>。"
+    },
+    {
+      "content": "开始之前",
+      "pos": [
+        1141,
+        1145
+      ]
+    },
+    {
+      "pos": [
+        1150,
+        1249
+      ],
+      "content": "使用 Web 平台安装程序安装最新版本的 Azure PowerShell cmdlet。可以从<bpt id=\"p1\">[</bpt>下载页面<ept id=\"p1\">](/downloads)</ept>的“Windows PowerShell”部分下载并安装最新版本。"
+    },
+    {
+      "content": "你将为应用程序网关创建虚拟网络和子网。请确保没有虚拟机或云部署正在使用子网。应用程序网关必须单独位于虚拟网络子网中。",
+      "pos": [
+        1253,
+        1311
+      ]
+    },
+    {
+      "content": "要配置为使用应用程序网关的服务器必须存在，或者在虚拟网络中为其创建终结点，或者为其分配公共 IP/VIP。",
+      "pos": [
+        1315,
+        1368
+      ]
+    },
+    {
+      "content": "创建应用程序网关需要什么？",
+      "pos": [
+        1373,
+        1386
+      ]
+    },
+    {
+      "pos": [
+        1392,
+        1450
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>后端服务器池：<ept id=\"p1\">**</ept>后端服务器的 IP 地址列表。列出的 IP 地址应属于虚拟网络子网，或者是公共 IP/VIP。"
+    },
+    {
+      "pos": [
+        1454,
+        1523
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>后端服务器池设置：<ept id=\"p1\">**</ept>每个池都有一些设置，例如端口、协议和基于 Cookie 的关联性。这些设置绑定到池，并会应用到池中的所有服务器。"
+    },
+    {
+      "pos": [
+        1526,
+        1579
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>前端端口：<ept id=\"p1\">**</ept>此端口是应用程序网关上打开的公共端口。客户流量将抵达此端口，然后重定向到后端服务器之一。"
+    },
+    {
+      "pos": [
+        1582,
+        1647
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>侦听器：<ept id=\"p1\">**</ept>侦听器具有前端端口、协议（Http 或 Https，区分大小写）和 SSL 证书名称（如果要配置 SSL 卸载）。"
+    },
+    {
+      "pos": [
+        1651,
+        1731
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>规则：<ept id=\"p1\">**</ept>规则将会绑定侦听器和后端服务器池，并定义当流量抵达特定侦听器时应定向到的后端服务器池。目前仅支持<bpt id=\"p2\">*</bpt>基本<ept id=\"p2\">*</ept>规则。<bpt id=\"p3\">*</bpt>基本<ept id=\"p3\">*</ept>规则是一种轮循负载分发模式。"
+    },
+    {
+      "content": "创建新的应用程序网关",
+      "pos": [
+        1739,
+        1749
+      ]
+    },
+    {
+      "content": "使用 Azure 经典门户和 Azure 资源管理器的差别在于创建应用程序网关的顺序和需要配置的项。",
+      "pos": [
+        1751,
+        1801
+      ]
+    },
+    {
+      "content": "使用资源管理器，组成应用程序网关的所有项都将分开配置，然后放在一起创建应用程序网关资源。",
+      "pos": [
+        1803,
+        1847
+      ]
+    },
+    {
+      "content": "以下是创建应用程序网关所要执行的步骤：",
+      "pos": [
+        1850,
+        1869
+      ]
+    },
+    {
+      "content": "创建资源管理器的资源组",
+      "pos": [
+        1874,
+        1885
+      ]
+    },
+    {
+      "content": "创建应用程序网关的虚拟网络、子网和公共 IP",
+      "pos": [
+        1889,
+        1911
+      ]
+    },
+    {
+      "content": "创建应用程序网关配置对象",
+      "pos": [
+        1915,
+        1927
+      ]
+    },
+    {
+      "content": "创建应用程序网关资源",
+      "pos": [
+        1931,
+        1941
+      ]
+    },
+    {
+      "content": "创建资源管理器的资源组",
+      "pos": [
+        1947,
+        1958
+      ]
+    },
+    {
+      "pos": [
+        1960,
+        2095
+      ],
+      "content": "确保将 PowerShell 模式切换为使用 ARM cmdlet。<bpt id=\"p1\">[</bpt>将 Windows PowerShell 与资源管理器配合使用<ept id=\"p1\">](/documentation/articles/powershell-azure-resource-manager)</ept>中提供了详细信息。"
+    },
+    {
+      "content": "步骤 1",
+      "pos": [
+        2101,
+        2105
+      ]
+    },
+    {
+      "content": "步骤 2",
+      "pos": [
+        2211,
+        2215
+      ]
+    },
+    {
+      "content": "检查帐户的订阅",
+      "pos": [
+        2217,
+        2224
+      ]
+    },
+    {
+      "content": "系统将提示你使用凭据进行身份验证。",
+      "pos": [
+        2268,
+        2285
+      ]
+    },
+    {
+      "content": "步骤 3",
+      "pos": [
+        2295,
+        2299
+      ]
+    },
+    {
+      "content": "选择要使用的 Azure 订阅。",
+      "pos": [
+        2302,
+        2318
+      ]
+    },
+    {
+      "content": "步骤 4",
+      "pos": [
+        2413,
+        2417
+      ]
+    },
+    {
+      "content": "创建新的资源组（如果要使用现有的资源组，请跳过此步骤）",
+      "pos": [
+        2419,
+        2446
+      ]
+    },
+    {
+      "content": "Azure 资源管理器要求所有资源组指定一个位置。此位置将用作该资源组中的资源的默认位置。请确保用于创建应用程序网关的所有命令都使用相同的资源组。",
+      "pos": [
+        2516,
+        2589
+      ]
+    },
+    {
+      "content": "在上面的示例中，我们在位置“中国东部”创建了名为“appgw-RG”的资源组。",
+      "pos": [
+        2591,
+        2630
+      ]
+    },
+    {
+      "content": "为应用程序网关创建虚拟网络和子网",
+      "pos": [
+        2635,
+        2651
+      ]
+    },
+    {
+      "content": "以下示例演示如何使用资源管理器创建虚拟网络：",
+      "pos": [
+        2653,
+        2675
+      ]
+    },
+    {
+      "content": "步骤 1",
+      "pos": [
+        2681,
+        2685
+      ]
+    },
+    {
+      "content": "将地址范围 10.0.0.0/24 分配给用于创建虚拟网络的子网变量",
+      "pos": [
+        2790,
+        2824
+      ]
+    },
+    {
+      "content": "步骤 2",
+      "pos": [
+        2830,
+        2834
+      ]
+    },
+    {
+      "content": "使用前缀 10.0.0.0/16 和子网 10.0.0.0/24，在中国东部区域的“appw-rg”资源组中创建名为“appgwvnet”的虚拟网络",
+      "pos": [
+        2988,
+        3062
+      ]
+    },
+    {
+      "content": "步骤 3",
+      "pos": [
+        3068,
+        3072
+      ]
+    },
+    {
+      "content": "创建前端配置的公共 IP 地址",
+      "pos": [
+        3111,
+        3126
+      ]
+    },
+    {
+      "content": "在中国东部区域的“appw-rg”资源组中创建公共 IP 资源“publicIP01”。",
+      "pos": [
+        3266,
+        3310
+      ]
+    },
+    {
+      "content": "创建应用程序网关配置对象",
+      "pos": [
+        3316,
+        3328
+      ]
+    },
+    {
+      "content": "步骤 1",
+      "pos": [
+        3334,
+        3338
+      ]
+    },
+    {
+      "content": "创建名为“gatewayIP01”的应用程序网关 IP 配置。当应用程序网关启动时，它会从配置的子网获取 IP 地址，再将网络流量路由到后端 IP 池中的 IP 地址。请记住，每个实例需要一个 IP 地址。",
+      "pos": [
+        3437,
+        3540
+      ]
+    },
+    {
+      "content": "步骤 2",
+      "pos": [
+        3547,
+        3551
+      ]
+    },
+    {
+      "content": "此步骤将配置名为“pool01”的后端 IP 地址池，其 IP 地址为“134.170.185.46、134.170.188.221、134.170.185.50”。这些 IP 地址将接收来自前端 IP 终结点的网络流量。你要替换上述 IP 地址，添加你自己的应用程序 IP 地址终结点。",
+      "pos": [
+        3694,
+        3838
+      ]
+    },
+    {
+      "content": "步骤 3",
+      "pos": [
+        3844,
+        3848
+      ]
+    },
+    {
+      "content": "为后端池中负载平衡的网络流量配置应用程序网关设置“poolsetting01”。",
+      "pos": [
+        3993,
+        4033
+      ]
+    },
+    {
+      "content": "步骤 4",
+      "pos": [
+        4039,
+        4043
+      ]
+    },
+    {
+      "content": "在本例中，为公共 IP 终结点配置名为“frontendport01”的前端 IP 端口。",
+      "pos": [
+        4129,
+        4174
+      ]
+    },
+    {
+      "content": "步骤 5",
+      "pos": [
+        4180,
+        4184
+      ]
+    },
+    {
+      "content": "创建名为“fipconfig01”的前端 IP 配置，并将公共 IP 地址与前端 IP 配置相关联。",
+      "pos": [
+        4295,
+        4345
+      ]
+    },
+    {
+      "content": "步骤 6",
+      "pos": [
+        4351,
+        4355
+      ]
+    },
+    {
+      "content": "创建名为“listener01”的侦听器，并将前端端口与前端 IP 配置相关联。",
+      "pos": [
+        4503,
+        4543
+      ]
+    },
+    {
+      "content": "步骤 7",
+      "pos": [
+        4549,
+        4553
+      ]
+    },
+    {
+      "content": "创建名为“rule01”的负载平衡器路由规则，并配置负载平衡器的行为。",
+      "pos": [
+        4730,
+        4765
+      ]
+    },
+    {
+      "content": "步骤 8",
+      "pos": [
+        4771,
+        4775
+      ]
+    },
+    {
+      "content": "配置应用程序网关的实例大小",
+      "pos": [
+        4870,
+        4883
+      ]
+    },
+    {
+      "pos": [
+        4886,
+        5020
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph><bpt id=\"p1\">*</bpt>InstanceCount<ept id=\"p1\">*</ept> 的默认值为 2，最大值为 10。<bpt id=\"p2\">*</bpt>GatewaySize<ept id=\"p2\">*</ept> 的默认值为 Medium。你可以在 Standard\\_Small、Standard\\_Medium 和 Standard\\_Large 之间进行选择。"
+    },
+    {
+      "content": "使用 New-AzureApplicationGateway 创建应用程序网关",
+      "pos": [
+        5025,
+        5064
+      ]
+    },
+    {
+      "content": "创建包含上述步骤中所有配置项的应用程序网关。示例中的应用程序网关名为“appgwtest”。",
+      "pos": [
+        5402,
+        5448
+      ]
+    },
+    {
+      "content": "启动应用程序网关",
+      "pos": [
+        5454,
+        5462
+      ]
+    },
+    {
+      "pos": [
+        5464,
+        5543
+      ],
+      "content": "配置网关后，使用 <ph id=\"ph1\">`Start-AzureRmApplicationGateway`</ph> cmdlet 来启动网关。成功启动网关后，将开始计收应用程序网关的费用。"
+    },
+    {
+      "pos": [
+        5546,
+        5616
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept><ph id=\"ph1\">`Start-AzureRmApplicationGateway`</ph> cmdlet 最多可能需要 15 到 20 分钟才能完成。"
+    },
+    {
+      "content": "在以下示例中，应用程序网关名为“appgwtest”，资源组为“app-rg”：",
+      "pos": [
+        5618,
+        5658
+      ]
+    },
+    {
+      "content": "步骤 1",
+      "pos": [
+        5665,
+        5669
+      ]
+    },
+    {
+      "content": "获取应用程序网关对象，并将其关联到变量“$getgw”：",
+      "pos": [
+        5671,
+        5699
+      ]
+    },
+    {
+      "content": "步骤 2",
+      "pos": [
+        5793,
+        5797
+      ]
+    },
+    {
+      "pos": [
+        5804,
+        5850
+      ],
+      "content": "使用 <ph id=\"ph1\">`Start-AzureRmApplicationGateway`</ph> 启动应用程序网关："
+    },
+    {
+      "content": "验证应用程序网关状态",
+      "pos": [
+        5928,
+        5938
+      ]
+    },
+    {
+      "pos": [
+        5940,
+        6078
+      ],
+      "content": "使用 <ph id=\"ph1\">`Get-AzureRmApplicationGateway`</ph> cmdlet 检查网关的状态。如果前一步骤中的 <bpt id=\"p1\">*</bpt>Start-AzureApplicationGateway<ept id=\"p1\">*</ept> 成功，则 State 应为 <bpt id=\"p2\">*</bpt>Running<ept id=\"p2\">*</ept>，Vip 和 DnsName 应包含有效的条目。"
+    },
+    {
+      "pos": [
+        6080,
+        6159
+      ],
+      "content": "此示例演示了一个正常运行并已准备好将流量定向到 <ph id=\"ph1\">`http://&lt;generated-dns-name&gt;.chinacloudapp.cn`</ph> 的应用程序网关。"
+    },
+    {
+      "content": "删除应用程序网关",
+      "pos": [
+        15877,
+        15885
+      ]
+    },
+    {
+      "content": "若要删除应用程序网关，需要按顺序执行以下操作：",
+      "pos": [
+        15887,
+        15910
+      ]
+    },
+    {
+      "pos": [
+        15915,
+        15964
+      ],
+      "content": "使用 <ph id=\"ph1\">`Stop-AzureRmApplicationGateway`</ph> cmdlet 停止该网关。"
+    },
+    {
+      "pos": [
+        15969,
+        16020
+      ],
+      "content": "使用 <ph id=\"ph1\">`Remove-AzureRmApplicationGateway`</ph> cmdlet 删除该网关。"
+    },
+    {
+      "pos": [
+        16024,
+        16077
+      ],
+      "content": "使用 <ph id=\"ph1\">`Get-AzureRmApplicationGateway`</ph> cmdlet 验证是否已删除该网关。"
+    },
+    {
+      "content": "步骤 1",
+      "pos": [
+        16084,
+        16088
+      ]
+    },
+    {
+      "content": "获取应用程序网关对象，并将其关联到变量“$getgw”：",
+      "pos": [
+        16090,
+        16118
+      ]
+    },
+    {
+      "content": "步骤 2",
+      "pos": [
+        16214,
+        16218
+      ]
+    },
+    {
+      "pos": [
+        16225,
+        16270
+      ],
+      "content": "使用 <ph id=\"ph1\">`Stop-AzureRmApplicationGateway`</ph> 停止应用程序网关："
+    },
+    {
+      "pos": [
+        16338,
+        16404
+      ],
+      "content": "应用程序网关进入停止状态后，请使用 <ph id=\"ph1\">`Remove-AzureRmApplicationGateway`</ph> cmdlet 删除该服务。"
+    },
+    {
+      "pos": [
+        16504,
+        16539
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>可以使用“-force”开关来抑制删除确认消息"
+    },
+    {
+      "pos": [
+        16543,
+        16608
+      ],
+      "content": "若要验证是否已删除服务，可以使用 <ph id=\"ph1\">`Get-AzureRmApplicationGateway`</ph> cmdlet。此步骤不是必需的。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        16699,
+        16703
+      ]
+    },
+    {
+      "pos": [
+        16705,
+        16792
+      ],
+      "content": "如果你要配置 SSL 卸载，请参阅<bpt id=\"p1\">[</bpt>配置应用程序网关以进行 SSL 卸载<ept id=\"p1\">](/documentation/articles/application-gateway-ssl)</ept>。"
+    },
+    {
+      "pos": [
+        16794,
+        16900
+      ],
+      "content": "如果你想要将应用程序网关配置为与 ILB 配合使用，请参阅<bpt id=\"p1\">[</bpt>创建具有内部负载平衡器 (ILB) 的应用程序网关<ept id=\"p1\">](/documentation/articles/application-gateway-ilb)</ept>。"
+    },
+    {
+      "content": "如需负载平衡选项的其他常规信息，请参阅：",
+      "pos": [
+        16902,
+        16922
+      ]
+    },
+    {
+      "content": "Azure 负载平衡器",
+      "pos": [
+        16927,
+        16938
+      ]
+    },
+    {
+      "content": "Azure 流量管理器",
+      "pos": [
+        16982,
+        16993
+      ]
+    }
+  ],
+  "content": "<properties \n   pageTitle=\"使用 Azure 资源管理器创建、启动或删除应用程序网关 | Azure\"\n   description=\"本页提供有关使用 Azure 资源管理器创建、配置、启动和删除 Azure 应用程序网关的说明\"\n   documentationCenter=\"na\"\n   services=\"application-gateway\"\n   authors=\"joaoma\"\n   manager=\"jdial\"\n   editor=\"tysonn\"/>\n<tags \n   ms.service=\"application-gateway\"\n   ms.date=\"11/24/2015\"\n   wacn.date=\"01/15/2016\"/>\n\n\n# 使用 Azure 资源管理器创建、启动或删除应用程序网关\n\n应用程序网关是第 7 层负载平衡器。它在不同服务器之间提供故障转移和性能路由 HTTP 请求，而不管它们是在云中还是本地。应用程序网关具有以下应用程序传递功能：HTTP 负载平衡、基于 Cookie 的会话相关性和 SSL 卸载。\n\n\n> [AZURE.SELECTOR]\n- [Azure 经典 PowerShell 步骤](/documentation/articles/application-gateway-create-gateway)\n- [Azure 資源管理員 PowerShell](/documentation/articles/application-gateway-create-gateway-arm)\n- [Azure 资源管理器模板](/documentation/articles/application-gateway-create-gateway-arm-template)\n\n\n<BR>\n\n\n本文将指导你完成创建、配置、启动和删除应用程序网关的步骤。\n\n\n>[AZURE.IMPORTANT]在使用 Azure 资源之前，请务必了解 Azure 当前使用两种部署模型：资源管理器部署模型和经典部署模型。在使用任何 Azure 资源之前，请确保你了解[部署模型和工具](/documentation/articles/azure-classic-rm)。可以通过单击本文顶部的选项卡来查看不同工具的文档。本文档将说明使用 Azure 资源管理器创建应用程序网关的方式。若要使用经典版本，请转到[使用 PowerShell 创建应用程序网关经典部署](/documentation/articles/application-gateway-create-gateway)。\n\n\n\n## 开始之前\n\n1. 使用 Web 平台安装程序安装最新版本的 Azure PowerShell cmdlet。可以从[下载页面](/downloads)的“Windows PowerShell”部分下载并安装最新版本。\n2. 你将为应用程序网关创建虚拟网络和子网。请确保没有虚拟机或云部署正在使用子网。应用程序网关必须单独位于虚拟网络子网中。\n3. 要配置为使用应用程序网关的服务器必须存在，或者在虚拟网络中为其创建终结点，或者为其分配公共 IP/VIP。\n\n## 创建应用程序网关需要什么？\n \n\n- **后端服务器池：**后端服务器的 IP 地址列表。列出的 IP 地址应属于虚拟网络子网，或者是公共 IP/VIP。 \n- **后端服务器池设置：**每个池都有一些设置，例如端口、协议和基于 Cookie 的关联性。这些设置绑定到池，并会应用到池中的所有服务器。\n- **前端端口：**此端口是应用程序网关上打开的公共端口。客户流量将抵达此端口，然后重定向到后端服务器之一。\n- **侦听器：**侦听器具有前端端口、协议（Http 或 Https，区分大小写）和 SSL 证书名称（如果要配置 SSL 卸载）。 \n- **规则：**规则将会绑定侦听器和后端服务器池，并定义当流量抵达特定侦听器时应定向到的后端服务器池。目前仅支持*基本*规则。*基本*规则是一种轮循负载分发模式。\n\n\n \n## 创建新的应用程序网关\n\n使用 Azure 经典门户和 Azure 资源管理器的差别在于创建应用程序网关的顺序和需要配置的项。\n\n使用资源管理器，组成应用程序网关的所有项都将分开配置，然后放在一起创建应用程序网关资源。\n\n\n以下是创建应用程序网关所要执行的步骤：\n\n1. 创建资源管理器的资源组\n2. 创建应用程序网关的虚拟网络、子网和公共 IP\n3. 创建应用程序网关配置对象\n4. 创建应用程序网关资源\n\n\n## 创建资源管理器的资源组\n\n确保将 PowerShell 模式切换为使用 ARM cmdlet。[将 Windows PowerShell 与资源管理器配合使用](/documentation/articles/powershell-azure-resource-manager)中提供了详细信息。\n\n### 步骤 1\n\n        PS C:\\> Login-AzureRmAccount –Environment (Get-AzureRmEnvironment –Name AzureChinaCloud)\n\n\n\n### 步骤 2\n\n检查帐户的订阅\n\n        PS C:\\> get-AzureRmSubscription \n\n系统将提示你使用凭据进行身份验证。<BR>\n\n### 步骤 3 \n\n选择要使用的 Azure 订阅。<BR>\n\n\n        PS C:\\> Select-AzureRmSubscription -Subscriptionid \"GUID of subscription\"\n\n\n### 步骤 4\n\n创建新的资源组（如果要使用现有的资源组，请跳过此步骤）\n\n    New-AzureRmResourceGroup -Name appgw-rg -location \"China East\"\n\nAzure 资源管理器要求所有资源组指定一个位置。此位置将用作该资源组中的资源的默认位置。请确保用于创建应用程序网关的所有命令都使用相同的资源组。\n\n在上面的示例中，我们在位置“中国东部”创建了名为“appgw-RG”的资源组。\n\n## 为应用程序网关创建虚拟网络和子网\n\n以下示例演示如何使用资源管理器创建虚拟网络：\n\n### 步骤 1    \n    \n    $subnet = New-AzureRmVirtualNetworkSubnetConfig -Name subnet01 -AddressPrefix 10.0.0.0/24\n\n将地址范围 10.0.0.0/24 分配给用于创建虚拟网络的子网变量\n\n### 步骤 2    \n    $vnet = New-AzureRmVirtualNetwork -Name appgwvnet -ResourceGroupName appgw-rg -Location \"China East\" -AddressPrefix 10.0.0.0/16 -Subnet $subnet\n\n使用前缀 10.0.0.0/16 和子网 10.0.0.0/24，在中国东部区域的“appw-rg”资源组中创建名为“appgwvnet”的虚拟网络\n\n### 步骤 3\n    \n    $subnet=$vnet.Subnets[0]\n\n## 创建前端配置的公共 IP 地址\n\n    $publicip = New-AzureRmPublicIpAddress -ResourceGroupName appgw-rg -name publicIP01 -location \"China East\" -AllocationMethod Dynamic\n\n在中国东部区域的“appw-rg”资源组中创建公共 IP 资源“publicIP01”。\n\n\n## 创建应用程序网关配置对象\n\n### 步骤 1\n\n    $gipconfig = New-AzureRmApplicationGatewayIPConfiguration -Name gatewayIP01 -Subnet $subnet\n\n创建名为“gatewayIP01”的应用程序网关 IP 配置。当应用程序网关启动时，它会从配置的子网获取 IP 地址，再将网络流量路由到后端 IP 池中的 IP 地址。请记住，每个实例需要一个 IP 地址。\n \n### 步骤 2\n\n    $pool = New-AzureRmApplicationGatewayBackendAddressPool -Name pool01 -BackendIPAddresses 134.170.185.46, 134.170.188.221,134.170.185.50\n\n此步骤将配置名为“pool01”的后端 IP 地址池，其 IP 地址为“134.170.185.46、134.170.188.221、134.170.185.50”。这些 IP 地址将接收来自前端 IP 终结点的网络流量。你要替换上述 IP 地址，添加你自己的应用程序 IP 地址终结点。\n\n### 步骤 3\n\n    $poolSetting = New-AzureRmApplicationGatewayBackendHttpSettings -Name poolsetting01 -Port 80 -Protocol Http -CookieBasedAffinity Disabled\n\n为后端池中负载平衡的网络流量配置应用程序网关设置“poolsetting01”。\n\n### 步骤 4\n\n    $fp = New-AzureRmApplicationGatewayFrontendPort -Name frontendport01  -Port 80\n\n在本例中，为公共 IP 终结点配置名为“frontendport01”的前端 IP 端口。\n\n### 步骤 5\n\n    $fipconfig = New-AzureRmApplicationGatewayFrontendIPConfig -Name fipconfig01 -PublicIPAddress $publicip\n\n创建名为“fipconfig01”的前端 IP 配置，并将公共 IP 地址与前端 IP 配置相关联。\n\n### 步骤 6\n\n    $listener = New-AzureRmApplicationGatewayHttpListener -Name listener01  -Protocol Http -FrontendIPConfiguration $fipconfig -FrontendPort $fp\n\n创建名为“listener01”的侦听器，并将前端端口与前端 IP 配置相关联。\n\n### 步骤 7 \n\n    $rule = New-AzureRmApplicationGatewayRequestRoutingRule -Name rule01 -RuleType Basic -BackendHttpSettings $poolSetting -HttpListener $listener -BackendAddressPool $pool\n\n创建名为“rule01”的负载平衡器路由规则，并配置负载平衡器的行为。\n\n### 步骤 8\n\n    $sku = New-AzureRmApplicationGatewaySku -Name Standard_Small -Tier Standard -Capacity 2\n\n配置应用程序网关的实例大小\n\n>[AZURE.NOTE]*InstanceCount* 的默认值为 2，最大值为 10。*GatewaySize* 的默认值为 Medium。你可以在 Standard\\_Small、Standard\\_Medium 和 Standard\\_Large 之间进行选择。\n\n## 使用 New-AzureApplicationGateway 创建应用程序网关\n\n    $appgw = New-AzureRmApplicationGateway -Name appgwtest -ResourceGroupName appw-rg -Location \"China East\" -BackendAddressPools $pool -BackendHttpSettingsCollection $poolSetting -FrontendIpConfigurations $fipconfig  -GatewayIpConfigurations $gipconfig -FrontendPorts $fp -HttpListeners $listener -RequestRoutingRules $rule -Sku $sku\n\n创建包含上述步骤中所有配置项的应用程序网关。示例中的应用程序网关名为“appgwtest”。\n\n\n## 启动应用程序网关\n\n配置网关后，使用 `Start-AzureRmApplicationGateway` cmdlet 来启动网关。成功启动网关后，将开始计收应用程序网关的费用。\n\n\n**注意：**`Start-AzureRmApplicationGateway` cmdlet 最多可能需要 15 到 20 分钟才能完成。\n\n在以下示例中，应用程序网关名为“appgwtest”，资源组为“app-rg”：\n\n\n### 步骤 1\n\n获取应用程序网关对象，并将其关联到变量“$getgw”：\n \n    $getgw =  Get-AzureRmApplicationGateway -Name appgwtest -ResourceGroupName app-rg\n\n### 步骤 2\n     \n使用 `Start-AzureRmApplicationGateway` 启动应用程序网关：\n\n     Start-AzureRmApplicationGateway -ApplicationGateway $getgw  \n\n    \n\n## 验证应用程序网关状态\n\n使用 `Get-AzureRmApplicationGateway` cmdlet 检查网关的状态。如果前一步骤中的 *Start-AzureApplicationGateway* 成功，则 State 应为 *Running*，Vip 和 DnsName 应包含有效的条目。\n\n此示例演示了一个正常运行并已准备好将流量定向到 `http://<generated-dns-name>.chinacloudapp.cn` 的应用程序网关。\n\n    Get-AzureRmApplicationGateway -Name appgwtest -ResourceGroupName appgw-rg\n\n    Sku                               : Microsoft.Azure.Commands.Network.Models.PSApplicationGatewaySku\n    GatewayIPConfigurations           : {gatewayip01}\n    SslCertificates                   : {}\n    FrontendIPConfigurations          : {frontendip01}\n    FrontendPorts                     : {frontendport01}\n    BackendAddressPools               : {pool01}\n    BackendHttpSettingsCollection     : {setting01}\n    HttpListeners                     : {listener01}\n    RequestRoutingRules               : {rule01}\n    OperationalState                  : \n    ProvisioningState                 : Succeeded\n    GatewayIpConfigurationsText       : [\n                                      {\n                                        \"Subnet\": {\n                                          \"Id\": \"/subscriptions/###############################/resourceGroups/appgw-rg\n                                    /providers/Microsoft.Network/virtualNetworks/vnet01/subnets/subnet01\"\n                                        },\n                                        \"ProvisioningState\": \"Succeeded\",\n                                        \"Name\": \"gatewayip01\",\n                                        \"Etag\": \"W/\"ddb0408e-a54c-4501-a7f8-8487c3530bd7\"\",\n                                        \"Id\": \"/subscriptions/###############################/resourceGroups/appgw-rg/p\n                                    roviders/Microsoft.Network/applicationGateways/appgwtest/gatewayIPConfigurations/gatewayip\n                                    01\"\n                                      }\n                                    ]\n    SslCertificatesText               : []\n    FrontendIpConfigurationsText      : [\n                                      {\n                                        \"PrivateIPAddress\": null,\n                                        \"PrivateIPAllocationMethod\": \"Dynamic\",\n                                        \"Subnet\": null,\n                                        \"PublicIPAddress\": {\n                                          \"Id\": \"/subscriptions/###############################/resourceGroups/appgw-rg\n                                    /providers/Microsoft.Network/publicIPAddresses/publicip01\"\n                                        },\n                                        \"ProvisioningState\": \"Succeeded\",\n                                        \"Name\": \"frontendip01\",\n                                        \"Etag\": \"W/\"ddb0408e-a54c-4501-a7f8-8487c3530bd7\"\",\n                                        \"Id\": \"/subscriptions/###############################/resourceGroups/appgw-rg/p\n                                    roviders/Microsoft.Network/applicationGateways/appgwtest/frontendIPConfigurations/frontend\n                                    ip01\"\n                                      }\n                                    ]\n    FrontendPortsText                 : [\n                                      {\n                                        \"Port\": 80,\n                                        \"ProvisioningState\": \"Succeeded\",\n                                        \"Name\": \"frontendport01\",\n                                        \"Etag\": \"W/\"ddb0408e-a54c-4501-a7f8-8487c3530bd7\"\",\n                                        \"Id\": \"/subscriptions/###############################/resourceGroups/appgw-rg/p\n                                    roviders/Microsoft.Network/applicationGateways/appgwtest/frontendPorts/frontendport01\"\n                                      }\n                                    ]\n    BackendAddressPoolsText           : [\n                                      {\n                                        \"BackendAddresses\": [\n                                          {\n                                            \"Fqdn\": null,\n                                            \"IpAddress\": \"134.170.185.46\"\n                                          },\n                                          {\n                                            \"Fqdn\": null,\n                                            \"IpAddress\": \"134.170.188.221\"\n                                          },\n                                          {\n                                            \"Fqdn\": null,\n                                            \"IpAddress\": \"134.170.185.50\"\n                                          }\n                                        ],\n                                        \"BackendIpConfigurations\": [],\n                                        \"ProvisioningState\": \"Succeeded\",\n                                        \"Name\": \"pool01\",\n                                        \"Etag\": \"W/\"ddb0408e-a54c-4501-a7f8-8487c3530bd7\"\",\n                                        \"Id\": \"/subscriptions/###############################/resourceGroups/appgw-rg/p\n                                    roviders/Microsoft.Network/applicationGateways/appgwtest/backendAddressPools/pool01\"\n                                      }\n                                    ]\n    BackendHttpSettingsCollectionText : [\n                                      {\n                                        \"Port\": 80,\n                                        \"Protocol\": \"Http\",\n                                        \"CookieBasedAffinity\": \"Disabled\",\n                                        \"ProvisioningState\": \"Succeeded\",\n                                        \"Name\": \"setting01\",\n                                        \"Etag\": \"W/\"ddb0408e-a54c-4501-a7f8-8487c3530bd7\"\",\n                                        \"Id\": \"/subscriptions/###############################/resourceGroups/appgw-rg/p\n                                    roviders/Microsoft.Network/applicationGateways/appgwtest/backendHttpSettingsCollection/set\n                                    ting01\"\n                                      }\n                                    ]\n    HttpListenersText                 : [\n                                      {\n                                        \"FrontendIpConfiguration\": {\n                                          \"Id\": \"/subscriptions/###############################/resourceGroups/appgw-rg\n                                    /providers/Microsoft.Network/applicationGateways/appgwtest/frontendIPConfigurations/fronte\n                                    ndip01\"\n                                        },\n                                        \"FrontendPort\": {\n                                          \"Id\": \"/subscriptions/###############################/resourceGroups/appgw-rg\n                                    /providers/Microsoft.Network/applicationGateways/appgwtest/frontendPorts/frontendport01\"\n                                        },\n                                        \"Protocol\": \"Http\",\n                                        \"SslCertificate\": null,\n                                        \"ProvisioningState\": \"Succeeded\",\n                                        \"Name\": \"listener01\",\n                                        \"Etag\": \"W/\"ddb0408e-a54c-4501-a7f8-8487c3530bd7\"\",\n                                        \"Id\": \"/subscriptions/###############################/resourceGroups/appgw-rg/p\n                                    roviders/Microsoft.Network/applicationGateways/appgwtest/httpListeners/listener01\"\n                                      }\n                                    ]\n    RequestRoutingRulesText           : [\n                                      {\n                                        \"RuleType\": \"Basic\",\n                                        \"BackendAddressPool\": {\n                                          \"Id\": \"/subscriptions/###############################/resourceGroups/appgw-rg\n                                    /providers/Microsoft.Network/applicationGateways/appgwtest/backendAddressPools/pool01\"\n                                        },\n                                        \"BackendHttpSettings\": {\n                                          \"Id\": \"/subscriptions/###############################/resourceGroups/appgw-rg\n                                    /providers/Microsoft.Network/applicationGateways/appgwtest/backendHttpSettingsCollection/s\n                                    etting01\"\n                                        },\n                                        \"HttpListener\": {\n                                          \"Id\": \"/subscriptions/###############################/resourceGroups/appgw-rg\n                                    /providers/Microsoft.Network/applicationGateways/appgwtest/httpListeners/listener01\"\n                                        },\n                                        \"ProvisioningState\": \"Succeeded\",\n                                        \"Name\": \"rule01\",\n                                        \"Etag\": \"W/\"ddb0408e-a54c-4501-a7f8-8487c3530bd7\"\",\n                                        \"Id\": \"/subscriptions/###############################/resourceGroups/appgw-rg/p\n                                    roviders/Microsoft.Network/applicationGateways/appgwtest/requestRoutingRules/rule01\"\n                                      }\n                                    ]\n    ResourceGroupName                 : appgw-rg\n    Location                          : chinanorth\n        Tag                               : {}\n    TagsTable                         : \n    Name                              : appgwtest\n    Etag                              : W/\"ddb0408e-a54c-4501-a7f8-8487c3530bd7\"\n    Id                                : /subscriptions/###############################/resourceGroups/appgw-rg/providers/Microsoft.Network/applicationGateways/appgwtest\n\n\n\n\n## 删除应用程序网关\n\n若要删除应用程序网关，需要按顺序执行以下操作：\n\n1. 使用 `Stop-AzureRmApplicationGateway` cmdlet 停止该网关。 \n2. 使用 `Remove-AzureRmApplicationGateway` cmdlet 删除该网关。\n3. 使用 `Get-AzureRmApplicationGateway` cmdlet 验证是否已删除该网关。\n\n\n### 步骤 1\n\n获取应用程序网关对象，并将其关联到变量“$getgw”：\n \n    $getgw =  Get-AzureRmApplicationGateway -Name appgwtest -ResourceGroupName appgw-rg\n\n### 步骤 2\n     \n使用 `Stop-AzureRmApplicationGateway` 停止应用程序网关：\n\n    Stop-AzureRmApplicationGateway -ApplicationGateway $getgw  \n\n\n应用程序网关进入停止状态后，请使用 `Remove-AzureRmApplicationGateway` cmdlet 删除该服务。\n\n\n    Remove-AzureRmApplicationGateway -Name $appgwtest -ResourceGroupName appgw-rg -Force\n\n    \n\n>[AZURE.NOTE]可以使用“-force”开关来抑制删除确认消息\n>\n\n若要验证是否已删除服务，可以使用 `Get-AzureRmApplicationGateway` cmdlet。此步骤不是必需的。\n\n\n    Get-AzureRmApplicationGateway -Name appgwtest-ResourceGroupName appgw-rg\n\n    \n\n\n## 后续步骤\n\n如果你要配置 SSL 卸载，请参阅[配置应用程序网关以进行 SSL 卸载](/documentation/articles/application-gateway-ssl)。\n\n如果你想要将应用程序网关配置为与 ILB 配合使用，请参阅[创建具有内部负载平衡器 (ILB) 的应用程序网关](/documentation/articles/application-gateway-ilb)。\n\n如需负载平衡选项的其他常规信息，请参阅：\n\n- [Azure 负载平衡器](/documentation/services/load-balancer)\n- [Azure 流量管理器](/documentation/services/traffic-manager)\n\n<!---HONumber=Mooncake_0104_2016-->\n"
+}

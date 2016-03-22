@@ -1,0 +1,502 @@
+{
+  "nodes": [
+    {
+      "content": "使用 AES-128 动态加密和密钥传送服务",
+      "pos": [
+        27,
+        49
+      ]
+    },
+    {
+      "content": "借助 Azure 媒体服务，你可以传送使用 AES 128 位加密密钥加密的内容。媒体服务还提供密钥传送服务，将加密密钥传送给已授权的用户。本主题说明如何使用 AES-128 动态加密以及如何使用密钥传送服务。",
+      "pos": [
+        68,
+        173
+      ]
+    },
+    {
+      "content": "使用 AES-128 动态加密和密钥传送服务",
+      "pos": [
+        388,
+        410
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        414,
+        430
+      ]
+    },
+    {
+      "content": ".NET",
+      "pos": [
+        434,
+        438
+      ]
+    },
+    {
+      "content": "Java",
+      "pos": [
+        503,
+        507
+      ]
+    },
+    {
+      "content": "PHP",
+      "pos": [
+        588,
+        591
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        675,
+        677
+      ]
+    },
+    {
+      "content": "借助 Azure 媒体服务，你能够传送使用高级加密标准 (AES) 加密的 Http 实时流式处理 (HLS) 和平滑流（使用 128 位加密密钥）。媒体服务还提供密钥传送服务，将加密密钥传送给已授权的用户。如果你需要媒体服务来加密资产，则需要将加密密钥与资产相关联，并配置密钥的授权策略。当播放器请求流时，媒体服务将使用指定的密钥通过 AES 加密来动态加密你的内容。为了解密流，播放器将从密钥传送服务请求密钥。为了确定用户是否被授权获取密钥，服务将评估你为密钥指定的授权策略。",
+      "pos": [
+        679,
+        919
+      ]
+    },
+    {
+      "pos": [
+        921,
+        1308
+      ],
+      "content": "媒体服务支持通过多种方式对发出密钥请求的用户进行身份验证。内容密钥授权策略可能受到一种或多种授权限制：开放、令牌限制或 IP 限制。令牌限制策略必须附带由安全令牌服务 (STS) 颁发的令牌。媒体服务支持采用<bpt id=\"p1\">[</bpt>简单 Web 令牌<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/gg185950.aspx#BKMK_2)</ept> (SWT) 格式和 <bpt id=\"p2\">[</bpt>JSON Web 令牌<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/gg185950.aspx#BKMK_3)</ept> (JWT) 格式的令牌。有关详细信息，请参阅<bpt id=\"p3\">[</bpt>配置内容密钥授权策略<ept id=\"p3\">](/documentation/articles/media-services-protect-with-aes128#configure_key_auth_policy)</ept>。"
+    },
+    {
+      "content": "为了充分利用动态加密，你的资产必须包含一组多码率 MP4 文件或多码率平滑流源文件。你还需要为资产配置传送策略（在本主题后面部分介绍）。然后，根据你在流 URL 中指定的格式，按需流式处理服务器将确保使用你选定的协议来传送流。因此，你只需以单一存储格式存储文件并为其付费，然后媒体服务服务就会基于客户端的请求构建并提供相应响应。",
+      "pos": [
+        1310,
+        1474
+      ]
+    },
+    {
+      "content": "本主题适合开发受保护媒体传送应用程序的开发人员。本主题介绍如何使用授权策略来配置密钥传送服务，确保只有经过授权的客户端才能接收加密密钥。此外还将介绍如何使用动态加密。",
+      "pos": [
+        1476,
+        1559
+      ]
+    },
+    {
+      "pos": [
+        1562,
+        1714
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>若要开始使用动态加密，你必须首先获取至少一个缩放单位（也称为流式处理单位）。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何缩放媒体服务<ept id=\"p1\">](/documentation/articles/media-services-manage-origins#scale_streaming_endpoints)</ept>。"
+    },
+    {
+      "content": "AES-128 动态加密和密钥传送服务工作流",
+      "pos": [
+        1718,
+        1740
+      ]
+    },
+    {
+      "content": "下面是使用 AES 加密资产时需要执行的常规步骤，这些步骤使用媒体服务密钥传送服务，也使用动态加密。",
+      "pos": [
+        1742,
+        1792
+      ]
+    },
+    {
+      "pos": [
+        1797,
+        1886
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>创建资产并将文件上载到资产<ept id=\"p1\">](/documentation/articles/media-services-protect-with-aes128#create_asset)</ept>。"
+    },
+    {
+      "pos": [
+        1891,
+        1990
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>将包含文件的资产编码为自适应比特率 MP4 集<ept id=\"p1\">](/documentation/articles/media-services-protect-with-aes128#encode_asset)</ept>。"
+    },
+    {
+      "pos": [
+        1994,
+        2113
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>创建内容密钥并将其与编码资产相关联<ept id=\"p1\">](/documentation/articles/media-services-protect-with-aes128#create_contentkey)</ept>。在媒体服务中，内容密钥包含资产的加密密钥。"
+    },
+    {
+      "pos": [
+        2117,
+        2255
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>配置内容密钥授权策略<ept id=\"p1\">](/documentation/articles/media-services-protect-with-aes128#configure_key_auth_policy)</ept>。你必须配置内容密钥授权策略，客户端必须遵守该策略，才能将内容密钥传送到客户端。"
+    },
+    {
+      "pos": [
+        2260,
+        2478
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>为资产配置传送策略<ept id=\"p1\">](/documentation/articles/media-services-protect-with-aes128#configure_asset_delivery_policy)</ept>。传送策略配置包括：密钥获取 URL 和初始化向量 (IV)（进行加密和解密时，AES 128 要求提供同一个初始化向量）、传送协议（例如 MPEG DASH、HLS、HDS、平滑流或全部）、动态加密类型（例如信封或无动态加密）。"
+    },
+    {
+      "content": "你可以将不同的策略应用到同一资产上的每个协议。例如，可以将 PlayReady 加密应用到平滑流/DASH，将 AES 信封应用到 HLS。将阻止流式处理传送策略中未定义的任何协议（例如，添加仅将 HLS 指定为协议的单个策略）。如果你根本没有定义任何传送策略，则情况不是这样。此时，将允许所有明文形式的协议。",
+      "pos": [
+        2485,
+        2640
+      ]
+    },
+    {
+      "pos": [
+        2645,
+        2746
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>创建 OnDemand 定位符<ept id=\"p1\">](/documentation/articles/media-services-protect-with-aes128#create_locator)</ept>以获取流 URL。"
+    },
+    {
+      "pos": [
+        2748,
+        2853
+      ],
+      "content": "本主题还说明了<bpt id=\"p1\">[</bpt>客户端应用程序如何从密钥传送服务请求密钥<ept id=\"p1\">](/documentation/articles/media-services-protect-with-aes128#client_request)</ept>。"
+    },
+    {
+      "pos": [
+        2855,
+        2947
+      ],
+      "content": "你可以在主题末尾找到完整的 .NET <bpt id=\"p1\">[</bpt>示例<ept id=\"p1\">](/documentation/articles/media-services-protect-with-aes128#example)</ept>。"
+    },
+    {
+      "content": "下图演示了上述工作流。在图中，使用令牌进行了身份验证。",
+      "pos": [
+        2949,
+        2976
+      ]
+    },
+    {
+      "content": "使用 AES-128 提供保护",
+      "pos": [
+        2980,
+        2995
+      ]
+    },
+    {
+      "content": "本主题的余下部分提供了详细说明、代码示例和主题链接，向你演示如何完成上述任务。",
+      "pos": [
+        3097,
+        3136
+      ]
+    },
+    {
+      "content": "当前限制",
+      "pos": [
+        3140,
+        3144
+      ]
+    },
+    {
+      "content": "如果你添加或更新资产的传送策略，则必须删除现有定位符（如果有）并创建新定位符。",
+      "pos": [
+        3146,
+        3185
+      ]
+    },
+    {
+      "pos": [
+        3189,
+        3229
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"create_asset\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>创建资产并将文件上载到资产"
+    },
+    {
+      "content": "为了对视频进行管理、编码和流式处理，必须首先将内容上载到 Azure 媒体服务中。上载完成后，相关内容即安全地存储在云中供后续处理和流式处理。",
+      "pos": [
+        3231,
+        3302
+      ]
+    },
+    {
+      "pos": [
+        3304,
+        3389
+      ],
+      "content": "有关详细信息，请参阅<bpt id=\"p1\">[</bpt>将文件上载到媒体服务帐户<ept id=\"p1\">](/documentation/articles/media-services-dotnet-upload-files)</ept>。"
+    },
+    {
+      "pos": [
+        3393,
+        3443
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"encode_asset\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>将包含文件的资产编码为自适应比特率 MP4 集"
+    },
+    {
+      "pos": [
+        3445,
+        3662
+      ],
+      "content": "使用动态加密时，你只需创建包含一组多码率 MP4 文件或多码率平滑流源文件的资产。然后，点播流服务器会确保你以选定的协议按清单或分段请求中的指定格式接收流。因此，你只需以单一存储格式存储文件并为其付费，然后媒体服务服务就会基于客户端的请求构建并提供相应响应。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>动态打包概述<ept id=\"p1\">](/documentation/articles/media-services-dynamic-packaging-overview)</ept>主题。"
+    },
+    {
+      "pos": [
+        3664,
+        3781
+      ],
+      "content": "有关如何编码的说明，请参阅<bpt id=\"p1\">[</bpt>如何使用媒体编码器标准版对资产进行编码<ept id=\"p1\">](/documentation/articles/media-services-dotnet-encode-with-media-encoder-standard)</ept>。"
+    },
+    {
+      "pos": [
+        3785,
+        3834
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"create_contentkey\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>创建内容密钥并将其与编码资产相关联"
+    },
+    {
+      "content": "在媒体服务中，内容密钥包含用于加密资产的密钥。",
+      "pos": [
+        3836,
+        3859
+      ]
+    },
+    {
+      "pos": [
+        3861,
+        3945
+      ],
+      "content": "有关详细信息，请参阅<bpt id=\"p1\">[</bpt>创建内容密钥<ept id=\"p1\">](/documentation/articles/media-services-dotnet-create-contentkey)</ept>。"
+    },
+    {
+      "pos": [
+        3949,
+        3999
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"configure_key_auth_policy\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>配置内容密钥授权策略"
+    },
+    {
+      "content": "媒体服务支持通过多种方式对发出密钥请求的用户进行身份验证。你必须配置内容密钥授权策略，客户端（播放器）必须遵守该策略，才能将密钥传送到客户端。内容密钥授权策略可能受到一种或多种授权限制：开放、令牌限制或 IP 限制。",
+      "pos": [
+        4001,
+        4109
+      ]
+    },
+    {
+      "pos": [
+        4111,
+        4215
+      ],
+      "content": "有关详细信息，请参阅<bpt id=\"p1\">[</bpt>配置内容密钥授权策略<ept id=\"p1\">](/documentation/articles/media-services-dotnet-configure-content-key-auth-policy)</ept>。"
+    },
+    {
+      "pos": [
+        4219,
+        4273
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"configure_asset_delivery_policy\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>配置资产传送策略"
+    },
+    {
+      "content": "为资产配置传送策略。资产传送策略配置包括：",
+      "pos": [
+        4276,
+        4297
+      ]
+    },
+    {
+      "content": "密钥获取 URL。",
+      "pos": [
+        4301,
+        4310
+      ]
+    },
+    {
+      "content": "用于信封加密的初始化向量 (IV)。进行加密和解密时，AES - 128 要求提供同一个 IV。",
+      "pos": [
+        4314,
+        4362
+      ]
+    },
+    {
+      "content": "资产传送协议（例如 MPEG DASH、HLS、HDS、平滑流或全部）。",
+      "pos": [
+        4366,
+        4402
+      ]
+    },
+    {
+      "content": "动态加密类型（例如 AES 信封）或无动态加密。",
+      "pos": [
+        4405,
+        4429
+      ]
+    },
+    {
+      "pos": [
+        4432,
+        4530
+      ],
+      "content": "有关详细信息，请参阅<bpt id=\"p1\">[</bpt>配置资产传送策略<ept id=\"p1\">](/documentation/articles/media-services-rest-configure-asset-delivery-policy)</ept>。"
+    },
+    {
+      "pos": [
+        4534,
+        4587
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"create_locator\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>创建 OnDemand 流定位符以获取流 URL"
+    },
+    {
+      "content": "需要为用户提供平滑流、DASH 或 HLS 的流 URL。",
+      "pos": [
+        4589,
+        4618
+      ]
+    },
+    {
+      "pos": [
+        4621,
+        4672
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果你添加或更新资产的传送策略，则必须删除现有定位符（如果有）并创建新定位符。"
+    },
+    {
+      "pos": [
+        4674,
+        4774
+      ],
+      "content": "有关如何发布资产和生成流 URL 的说明，请参阅<bpt id=\"p1\">[</bpt>生成流 URL<ept id=\"p1\">](/documentation/articles/media-services-deliver-streaming-content)</ept>。"
+    },
+    {
+      "content": "获取测试令牌",
+      "pos": [
+        4778,
+        4784
+      ]
+    },
+    {
+      "content": "获取用于密钥授权策略的基于令牌限制的测试令牌。",
+      "pos": [
+        4786,
+        4809
+      ]
+    },
+    {
+      "pos": [
+        5494,
+        5578
+      ],
+      "content": "你可以使用 <bpt id=\"p1\">[</bpt>AMS Player<ept id=\"p1\">](http://amsplayer.azurewebsites.net/azuremediaplayer.html)</ept> 来测试你的流。"
+    },
+    {
+      "pos": [
+        5582,
+        5630
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"client_request\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>你的客户端如何从密钥传送服务请求密钥？"
+    },
+    {
+      "content": "在上一步骤中，你构造了指向清单文件的 URL。你的客户端需要从流清单文件提取必要的信息，以便向密钥传送服务发出请求。",
+      "pos": [
+        5632,
+        5690
+      ]
+    },
+    {
+      "content": "清单文件",
+      "pos": [
+        5695,
+        5699
+      ]
+    },
+    {
+      "content": "客户端需要从清单文件提取 URL（也包含内容密钥 ID (kid)）值。然后，客户端将尝试从密钥传送服务获取加密密钥。客户端还需要提取 IV 值，并使用该值来解密流。以下代码段显示了平滑流清单的",
+      "pos": [
+        5701,
+        5798
+      ]
+    },
+    {
+      "content": "元素。",
+      "pos": [
+        5812,
+        5815
+      ]
+    },
+    {
+      "content": "对于 HLS，根清单将划分成段文件。",
+      "pos": [
+        6511,
+        6529
+      ]
+    },
+    {
+      "content": "例如，根清单是： http://test001.origin.mediaservices.chinacloudapi.cn/8bfe7d6f-34e3-4d1a-b289-3e48a8762490/BigBuckBunny.ism/manifest(format=m3u8-aapl) ，并且包含段文件名的列表。",
+      "pos": [
+        6531,
+        6687
+      ]
+    },
+    {
+      "content": "如果在文本编辑器中打开某个段文件（例如 http://test001.origin.mediaservices.chinacloudapi.cn/8bfe7d6f-34e3-4d1a-b289-3e48a8762490/BigBuckBunny.ism/QualityLevels(514369)/Manifest(video,format=m3u8-aapl) ），它应包含 #EXT-X-KEY，指示文件已加密。",
+      "pos": [
+        7061,
+        7269
+      ]
+    },
+    {
+      "content": "从密钥传送服务请求密钥",
+      "pos": [
+        7749,
+        7760
+      ]
+    },
+    {
+      "content": "以下代码演示如何使用密钥传送 Uri（从清单提取）和令牌（本主题不讨论如何从安全令牌服务获取简单 Web 令牌），向媒体服务密钥传送服务发送请求。",
+      "pos": [
+        7762,
+        7835
+      ]
+    },
+    {
+      "pos": [
+        9005,
+        9029
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"example\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>示例"
+    },
+    {
+      "content": "创建新的控制台项目。",
+      "pos": [
+        9034,
+        9044
+      ]
+    },
+    {
+      "content": "使用 NuGet 安装和添加 Azure 媒体服务.NET SDK Extensions。安装此包也会安装适用于 .NET 的媒体服务 SDK 并添加所有其他必需的依赖项。",
+      "pos": [
+        9048,
+        9134
+      ]
+    },
+    {
+      "content": "添加包含帐户名称和密钥信息的配置文件：",
+      "pos": [
+        9138,
+        9157
+      ]
+    },
+    {
+      "content": "使用本部分中所示的代码覆盖 Program.cs 文件中的代码。",
+      "pos": [
+        9742,
+        9774
+      ]
+    },
+    {
+      "content": "请务必将变量更新为指向输入文件所在的文件夹。",
+      "pos": [
+        9784,
+        9806
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"使用 AES-128 动态加密和密钥传送服务\"\n    description=\"借助 Azure 媒体服务，你可以传送使用 AES 128 位加密密钥加密的内容。媒体服务还提供密钥传送服务，将加密密钥传送给已授权的用户。本主题说明如何使用 AES-128 动态加密以及如何使用密钥传送服务。\"\n    services=\"media-services\"\n    documentationCenter=\"\"\n    authors=\"Juliako\"\n    manager=\"dwrede\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"media-services\"\n    ms.date=\"02/03/2016\"  \n    wacn.date=\"03/21/2016\"/>\n\n#使用 AES-128 动态加密和密钥传送服务\n\n> [AZURE.SELECTOR]\n- [.NET](/documentation/articles/media-services-protect-with-aes128)\n- [Java](https://github.com/southworkscom/azure-sdk-for-media-services-java-samples)\n- [PHP](https://github.com/Azure/azure-sdk-for-php/tree/master/examples/MediaServices)\n\n##概述\n\n借助 Azure 媒体服务，你能够传送使用高级加密标准 (AES) 加密的 Http 实时流式处理 (HLS) 和平滑流（使用 128 位加密密钥）。媒体服务还提供密钥传送服务，将加密密钥传送给已授权的用户。如果你需要媒体服务来加密资产，则需要将加密密钥与资产相关联，并配置密钥的授权策略。当播放器请求流时，媒体服务将使用指定的密钥通过 AES 加密来动态加密你的内容。为了解密流，播放器将从密钥传送服务请求密钥。为了确定用户是否被授权获取密钥，服务将评估你为密钥指定的授权策略。\n\n媒体服务支持通过多种方式对发出密钥请求的用户进行身份验证。内容密钥授权策略可能受到一种或多种授权限制：开放、令牌限制或 IP 限制。令牌限制策略必须附带由安全令牌服务 (STS) 颁发的令牌。媒体服务支持采用[简单 Web 令牌](https://msdn.microsoft.com/zh-cn/library/gg185950.aspx#BKMK_2) (SWT) 格式和 [JSON Web 令牌](https://msdn.microsoft.com/zh-cn/library/gg185950.aspx#BKMK_3) (JWT) 格式的令牌。有关详细信息，请参阅[配置内容密钥授权策略](/documentation/articles/media-services-protect-with-aes128#configure_key_auth_policy)。\n\n为了充分利用动态加密，你的资产必须包含一组多码率 MP4 文件或多码率平滑流源文件。你还需要为资产配置传送策略（在本主题后面部分介绍）。然后，根据你在流 URL 中指定的格式，按需流式处理服务器将确保使用你选定的协议来传送流。因此，你只需以单一存储格式存储文件并为其付费，然后媒体服务服务就会基于客户端的请求构建并提供相应响应。\n\n本主题适合开发受保护媒体传送应用程序的开发人员。本主题介绍如何使用授权策略来配置密钥传送服务，确保只有经过授权的客户端才能接收加密密钥。此外还将介绍如何使用动态加密。\n\n>[AZURE.NOTE]若要开始使用动态加密，你必须首先获取至少一个缩放单位（也称为流式处理单位）。有关详细信息，请参阅[如何缩放媒体服务](/documentation/articles/media-services-manage-origins#scale_streaming_endpoints)。\n\n##AES-128 动态加密和密钥传送服务工作流\n\n下面是使用 AES 加密资产时需要执行的常规步骤，这些步骤使用媒体服务密钥传送服务，也使用动态加密。\n\n1. [创建资产并将文件上载到资产](/documentation/articles/media-services-protect-with-aes128#create_asset)。 \n1. [将包含文件的资产编码为自适应比特率 MP4 集](/documentation/articles/media-services-protect-with-aes128#encode_asset)。\n1. [创建内容密钥并将其与编码资产相关联](/documentation/articles/media-services-protect-with-aes128#create_contentkey)。在媒体服务中，内容密钥包含资产的加密密钥。\n1. [配置内容密钥授权策略](/documentation/articles/media-services-protect-with-aes128#configure_key_auth_policy)。你必须配置内容密钥授权策略，客户端必须遵守该策略，才能将内容密钥传送到客户端。 \n1. [为资产配置传送策略](/documentation/articles/media-services-protect-with-aes128#configure_asset_delivery_policy)。传送策略配置包括：密钥获取 URL 和初始化向量 (IV)（进行加密和解密时，AES 128 要求提供同一个初始化向量）、传送协议（例如 MPEG DASH、HLS、HDS、平滑流或全部）、动态加密类型（例如信封或无动态加密）。 \n\n    你可以将不同的策略应用到同一资产上的每个协议。例如，可以将 PlayReady 加密应用到平滑流/DASH，将 AES 信封应用到 HLS。将阻止流式处理传送策略中未定义的任何协议（例如，添加仅将 HLS 指定为协议的单个策略）。如果你根本没有定义任何传送策略，则情况不是这样。此时，将允许所有明文形式的协议。\n\n1. [创建 OnDemand 定位符](/documentation/articles/media-services-protect-with-aes128#create_locator)以获取流 URL。\n\n本主题还说明了[客户端应用程序如何从密钥传送服务请求密钥](/documentation/articles/media-services-protect-with-aes128#client_request)。\n\n你可以在主题末尾找到完整的 .NET [示例](/documentation/articles/media-services-protect-with-aes128#example)。\n\n下图演示了上述工作流。在图中，使用令牌进行了身份验证。\n\n![使用 AES-128 提供保护](./media/media-services-content-protection-overview/media-services-content-protection-with-aes.png)\n\n本主题的余下部分提供了详细说明、代码示例和主题链接，向你演示如何完成上述任务。\n\n##当前限制\n\n如果你添加或更新资产的传送策略，则必须删除现有定位符（如果有）并创建新定位符。\n\n##<a name=\"create_asset\"></a>创建资产并将文件上载到资产\n\n为了对视频进行管理、编码和流式处理，必须首先将内容上载到 Azure 媒体服务中。上载完成后，相关内容即安全地存储在云中供后续处理和流式处理。\n\n有关详细信息，请参阅[将文件上载到媒体服务帐户](/documentation/articles/media-services-dotnet-upload-files)。\n\n##<a name=\"encode_asset\"></a>将包含文件的资产编码为自适应比特率 MP4 集\n\n使用动态加密时，你只需创建包含一组多码率 MP4 文件或多码率平滑流源文件的资产。然后，点播流服务器会确保你以选定的协议按清单或分段请求中的指定格式接收流。因此，你只需以单一存储格式存储文件并为其付费，然后媒体服务服务就会基于客户端的请求构建并提供相应响应。有关详细信息，请参阅[动态打包概述](/documentation/articles/media-services-dynamic-packaging-overview)主题。\n\n有关如何编码的说明，请参阅[如何使用媒体编码器标准版对资产进行编码](/documentation/articles/media-services-dotnet-encode-with-media-encoder-standard)。\n\n##<a name=\"create_contentkey\"></a>创建内容密钥并将其与编码资产相关联\n\n在媒体服务中，内容密钥包含用于加密资产的密钥。\n\n有关详细信息，请参阅[创建内容密钥](/documentation/articles/media-services-dotnet-create-contentkey)。\n\n##<a name=\"configure_key_auth_policy\"></a>配置内容密钥授权策略\n\n媒体服务支持通过多种方式对发出密钥请求的用户进行身份验证。你必须配置内容密钥授权策略，客户端（播放器）必须遵守该策略，才能将密钥传送到客户端。内容密钥授权策略可能受到一种或多种授权限制：开放、令牌限制或 IP 限制。\n\n有关详细信息，请参阅[配置内容密钥授权策略](/documentation/articles/media-services-dotnet-configure-content-key-auth-policy)。\n\n##<a name=\"configure_asset_delivery_policy\"></a>配置资产传送策略 \n\n为资产配置传送策略。资产传送策略配置包括：\n\n- 密钥获取 URL。 \n- 用于信封加密的初始化向量 (IV)。进行加密和解密时，AES - 128 要求提供同一个 IV。 \n- 资产传送协议（例如 MPEG DASH、HLS、HDS、平滑流或全部）。\n- 动态加密类型（例如 AES 信封）或无动态加密。 \n\n有关详细信息，请参阅[配置资产传送策略](/documentation/articles/media-services-rest-configure-asset-delivery-policy)。\n\n##<a name=\"create_locator\"></a>创建 OnDemand 流定位符以获取流 URL\n\n需要为用户提供平滑流、DASH 或 HLS 的流 URL。\n\n>[AZURE.NOTE]如果你添加或更新资产的传送策略，则必须删除现有定位符（如果有）并创建新定位符。\n\n有关如何发布资产和生成流 URL 的说明，请参阅[生成流 URL](/documentation/articles/media-services-deliver-streaming-content)。\n\n##获取测试令牌\n\n获取用于密钥授权策略的基于令牌限制的测试令牌。\n\n    // Deserializes a string containing an Xml representation of a TokenRestrictionTemplate\n    // back into a TokenRestrictionTemplate class instance.\n    TokenRestrictionTemplate tokenTemplate = \n        TokenRestrictionTemplateSerializer.Deserialize(tokenTemplateString);\n    \n    // Generate a test token based on the data in the given TokenRestrictionTemplate.\n    //The GenerateTestToken method returns the token without the word “Bearer” in front\n    //so you have to add it in front of the token string. \n    string testToken = TokenRestrictionTemplateSerializer.GenerateTestToken(tokenTemplate);\n    Console.WriteLine(\"The authorization token is:\\nBearer {0}\", testToken);\n\n你可以使用 [AMS Player](http://amsplayer.azurewebsites.net/azuremediaplayer.html) 来测试你的流。\n\n##<a name=\"client_request\"></a>你的客户端如何从密钥传送服务请求密钥？\n\n在上一步骤中，你构造了指向清单文件的 URL。你的客户端需要从流清单文件提取必要的信息，以便向密钥传送服务发出请求。\n\n###清单文件\n\n客户端需要从清单文件提取 URL（也包含内容密钥 ID (kid)）值。然后，客户端将尝试从密钥传送服务获取加密密钥。客户端还需要提取 IV 值，并使用该值来解密流。以下代码段显示了平滑流清单的 <Protection> 元素。\n\n    <Protection>\n      <ProtectionHeader SystemID=\"B47B251A-2409-4B42-958E-08DBAE7B4EE9\">\n        <ContentProtection xmlns:sea=\"urn:mpeg:dash:schema:sea:2012\" schemeIdUri=\"urn:mpeg:dash:sea:2012\">\n          <sea:SegmentEncryption schemeIdUri=\"urn:mpeg:dash:sea:aes128-cbc:2013\"/>\n          <sea:KeySystem keySystemUri=\"urn:mpeg:dash:sea:keysys:http:2013\"/>\n          <sea:CryptoPeriod IV=\"0xD7D7D7D7D7D7D7D7D7D7D7D7D7D7D7D7\" \n                            keyUriTemplate=\"https://wamsbayclus001kd-hs.chinacloudapp.cn/HlsHandler.ashx?\n                                            kid=da3813af-55e6-48e7-aa9f-a4d6031f7b4d\"/>\n        </ContentProtection>\n      </ProtectionHeader>\n    </Protection>\n\n对于 HLS，根清单将划分成段文件。\n\n例如，根清单是： http://test001.origin.mediaservices.chinacloudapi.cn/8bfe7d6f-34e3-4d1a-b289-3e48a8762490/BigBuckBunny.ism/manifest(format=m3u8-aapl) ，并且包含段文件名的列表。\n    \n    . . . \n    #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=630133,RESOLUTION=424x240,CODECS=\"avc1.4d4015,mp4a.40.2\",AUDIO=\"audio\"\n    QualityLevels(514369)/Manifest(video,format=m3u8-aapl)\n    #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=965441,RESOLUTION=636x356,CODECS=\"avc1.4d401e,mp4a.40.2\",AUDIO=\"audio\"\n    QualityLevels(842459)/Manifest(video,format=m3u8-aapl)\n    …\n\n如果在文本编辑器中打开某个段文件（例如 http://test001.origin.mediaservices.chinacloudapi.cn/8bfe7d6f-34e3-4d1a-b289-3e48a8762490/BigBuckBunny.ism/QualityLevels(514369)/Manifest(video,format=m3u8-aapl) ），它应包含 #EXT-X-KEY，指示文件已加密。\n    \n    #EXTM3U\n    #EXT-X-VERSION:4\n    #EXT-X-ALLOW-CACHE:NO\n    #EXT-X-MEDIA-SEQUENCE:0\n    #EXT-X-TARGETDURATION:9\n    #EXT-X-KEY:METHOD=AES-128,\n    URI=\"https://wamsbayclus001kd-hs.chinacloudapp.cn/HlsHandler.ashx?\n         kid=da3813af-55e6-48e7-aa9f-a4d6031f7b4d\",\n            IV=0XD7D7D7D7D7D7D7D7D7D7D7D7D7D7D7D7\n    #EXT-X-PROGRAM-DATE-TIME:1970-01-01T00:00:00.000+00:00\n    #EXTINF:8.425708,no-desc\n    Fragments(video=0,format=m3u8-aapl)\n    #EXT-X-ENDLIST\n    \n###从密钥传送服务请求密钥\n\n以下代码演示如何使用密钥传送 Uri（从清单提取）和令牌（本主题不讨论如何从安全令牌服务获取简单 Web 令牌），向媒体服务密钥传送服务发送请求。\n\n    private byte[] GetDeliveryKey(Uri keyDeliveryUri, string token)\n    {\n        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(keyDeliveryUri);\n                \n        request.Method = \"POST\";\n        request.ContentType = \"text/xml\";\n        if (!string.IsNullOrEmpty(token))\n        {\n            request.Headers[AuthorizationHeader] = token;\n        }\n        request.ContentLength = 0;\n    \n        var response = request.GetResponse();\n     \n        var stream = response.GetResponseStream();\n        if (stream == null)\n        {\n            throw new NullReferenceException(\"Response stream is null\");\n        }\n    \n        var buffer = new byte[256];\n        var length = 0;\n        while (stream.CanRead && length <= buffer.Length)\n        {\n            var nexByte = stream.ReadByte();\n            if (nexByte == -1)\n            {\n                break;\n            }\n            buffer[length] = (byte)nexByte;\n            length++;\n        }\n        response.Close();\n    \n        // AES keys must be exactly 16 bytes (128 bits).\n        var key = new byte[length];\n        Array.Copy(buffer, key, length);\n        return key;\n    }\n    \n##<a name=\"example\"></a>示例\n\n1. 创建新的控制台项目。\n1. 使用 NuGet 安装和添加 Azure 媒体服务.NET SDK Extensions。安装此包也会安装适用于 .NET 的媒体服务 SDK 并添加所有其他必需的依赖项。\n2. 添加包含帐户名称和密钥信息的配置文件：\n\n    \n        <?xml version=\"1.0\" encoding=\"utf-8\"?>\n        <configuration>\n            <startup> \n                <supportedRuntime version=\"v4.0\" sku=\".NETFramework,Version=v4.5\" />\n            </startup>\n              <appSettings>\n            \n                <add key=\"MediaServicesAccountName\" value=\"AccountName\"/>\n                <add key=\"MediaServicesAccountKey\" value=\"AccountKey\"/>\n            \n                <add key=\"Issuer\" value=\"http://testacs.com\"/>\n                <add key=\"Audience\" value=\"urn:test\"/>\n              </appSettings>\n        </configuration>\n\n1. 使用本部分中所示的代码覆盖 Program.cs 文件中的代码。\n    \n    请务必将变量更新为指向输入文件所在的文件夹。\n            \n        \n        using System;\n        using System.Collections.Generic;\n        using System.Configuration;\n        using System.IO;\n        using System.Linq;\n        using System.Net;\n        using System.Security.Cryptography;\n        using System.Text;\n        using System.Threading.Tasks;\n        using Microsoft.WindowsAzure.MediaServices.Client;\n        using Newtonsoft.Json.Linq;\n        using System.Threading;\n        using Microsoft.WindowsAzure.MediaServices.Client.ContentKeyAuthorization;\n        using Microsoft.WindowsAzure.MediaServices.Client.DynamicEncryption;\n        using System.Web;\n        using System.Globalization;\n        \n        namespace AESDynamicEncryptionAndKeyDeliverySvc\n        {\n            class Program\n            {\n                // Read values from the App.config file.\n                private static readonly string _mediaServicesAccountName =\n                    ConfigurationManager.AppSettings[\"MediaServicesAccountName\"];\n                private static readonly string _mediaServicesAccountKey =\n                    ConfigurationManager.AppSettings[\"MediaServicesAccountKey\"];\n\n                private static readonly String _defaultScope = \"urn:WindowsAzureMediaServices\";\n\n                // Azure China uses a different API server and a different ACS Base Address from the Global.\n                private static readonly String _chinaApiServerUrl = \"https://wamsshaclus001rest-hs.chinacloudapp.cn/API/\";\n                private static readonly String _chinaAcsBaseAddressUrl = \"https://wamsprodglobal001acs.accesscontrol.chinacloudapi.cn\";\n\n                // A Uri describing the issuer of the token.  \n                // Must match the value in the token for the token to be considered valid.\n                private static readonly Uri _sampleIssuer =\n                    new Uri(ConfigurationManager.AppSettings[\"Issuer\"]);\n                // The Audience or Scope of the token.  \n                // Must match the value in the token for the token to be considered valid.\n                private static readonly Uri _sampleAudience =\n                    new Uri(ConfigurationManager.AppSettings[\"Audience\"]);\n        \n                // Field for service context.\n                private static CloudMediaContext _context = null;\n                private static MediaServicesCredentials _cachedCredentials = null;\n        \n                private static readonly string _mediaFiles =\n                    Path.GetFullPath(@\"../..\\Media\");\n        \n                private static readonly string _singleMP4File =\n                    Path.Combine(_mediaFiles, @\"BigBuckBunny.mp4\");\n        \n        \n                static void Main(string[] args)\n                {\n                    // Create and cache the Media Services credentials in a static class variable.\n                    _cachedCredentials = new MediaServicesCredentials(\n                                    _mediaServicesAccountName,\n                                    _mediaServicesAccountKey,\n                                    _defaultScope,\n                                    _chinaAcsBaseAddressUrl);\n\n                    // Create the API server Uri\n                    _apiServer = new Uri(_chinaApiServerUrl);\n\n                    // Used the chached credentials to create CloudMediaContext.\n                    _context = new CloudMediaContext(_apiServer, _cachedCredentials);\n        \n                    bool tokenRestriction = false;\n                    string tokenTemplateString = null;\n        \n                    IAsset asset = UploadFileAndCreateAsset(_singleMP4File);\n                    Console.WriteLine(\"Uploaded asset: {0}\", asset.Id);\n        \n                    IAsset encodedAsset = EncodeToAdaptiveBitrateMP4Set(asset);\n                    Console.WriteLine(\"Encoded asset: {0}\", encodedAsset.Id);\n        \n                    IContentKey key = CreateEnvelopeTypeContentKey(encodedAsset);\n                    Console.WriteLine(\"Created key {0} for the asset {1} \", key.Id, encodedAsset.Id);\n                    Console.WriteLine();\n        \n                    if (tokenRestriction)\n                        tokenTemplateString = AddTokenRestrictedAuthorizationPolicy(key);\n                    else\n                        AddOpenAuthorizationPolicy(key);\n        \n                    Console.WriteLine(\"Added authorization policy: {0}\", key.AuthorizationPolicyId);\n                    Console.WriteLine();\n        \n                    CreateAssetDeliveryPolicy(encodedAsset, key);\n                    Console.WriteLine(\"Created asset delivery policy. \\n\");\n                    Console.WriteLine();\n        \n                    if (tokenRestriction && !String.IsNullOrEmpty(tokenTemplateString))\n                    {\n                        // Deserializes a string containing an Xml representation of a TokenRestrictionTemplate\n                        // back into a TokenRestrictionTemplate class instance.\n                        TokenRestrictionTemplate tokenTemplate =\n                            TokenRestrictionTemplateSerializer.Deserialize(tokenTemplateString);\n        \n                        // Generate a test token based on the data in the given TokenRestrictionTemplate.\n                        // Note, you need to pass the key id Guid because we specified \n                        // TokenClaim.ContentKeyIdentifierClaim in during the creation of TokenRestrictionTemplate.\n                        Guid rawkey = EncryptionUtils.GetKeyIdAsGuid(key.Id);\n        \n                        //The GenerateTestToken method returns the token without the word “Bearer” in front\n                        //so you have to add it in front of the token string. \n                        string testToken = TokenRestrictionTemplateSerializer.GenerateTestToken(tokenTemplate, null, rawkey);\n                        Console.WriteLine(\"The authorization token is:\\nBearer {0}\", testToken);\n                        Console.WriteLine();\n                    }\n        \n                    // You can use the bit.ly/aesplayer Flash player to test the URL \n                    // (with open authorization policy). \n                    // Paste the URL and click the Update button to play the video. \n                    //\n                    string URL = GetStreamingOriginLocator(encodedAsset);\n                    Console.WriteLine(\"Smooth Streaming Url: {0}/manifest\", URL);\n                    Console.WriteLine();\n                    Console.WriteLine(\"HLS Url: {0}/manifest(format=m3u8-aapl)\", URL);\n                    Console.WriteLine();\n        \n                    Console.ReadLine();\n                }\n        \n                static public IAsset UploadFileAndCreateAsset(string singleFilePath)\n                {\n                    if (!File.Exists(singleFilePath))\n                    {\n                        Console.WriteLine(\"File does not exist.\");\n                        return null;\n                    }\n        \n                    var assetName = Path.GetFileNameWithoutExtension(singleFilePath);\n                    IAsset inputAsset = _context.Assets.Create(assetName, AssetCreationOptions.StorageEncrypted);\n        \n                    var assetFile = inputAsset.AssetFiles.Create(Path.GetFileName(singleFilePath));\n        \n                    Console.WriteLine(\"Created assetFile {0}\", assetFile.Name);\n        \n                    var policy = _context.AccessPolicies.Create(\n                                            assetName,\n                                            TimeSpan.FromDays(30),\n                                            AccessPermissions.Write | AccessPermissions.List);\n        \n                    var locator = _context.Locators.CreateLocator(LocatorType.Sas, inputAsset, policy);\n        \n                    Console.WriteLine(\"Upload {0}\", assetFile.Name);\n        \n                    assetFile.Upload(singleFilePath);\n                    Console.WriteLine(\"Done uploading {0}\", assetFile.Name);\n        \n                    locator.Delete();\n                    policy.Delete();\n        \n                    return inputAsset;\n                }\n        \n                static public IAsset EncodeToAdaptiveBitrateMP4Set(IAsset asset)\n                {\n                    // Declare a new job.\n                    IJob job = _context.Jobs.Create(\"Media Encoder Standard Job\");\n                    // Get a media processor reference, and pass to it the name of the \n                    // processor to use for the specific task.\n                    IMediaProcessor processor = GetLatestMediaProcessorByName(\"Media Encoder Standard\");\n        \n                    // Create a task with the encoding details, using a string preset.\n                    // In this case \"H264 Multiple Bitrate 720p\" preset is used.\n                    ITask task = job.Tasks.AddNew(\"My encoding task\",\n                        processor,\n                        \"H264 Multiple Bitrate 720p\",\n                        TaskOptions.None);\n        \n                    // Specify the input asset to be encoded.\n                    task.InputAssets.Add(asset);\n                    // Add an output asset to contain the results of the job. \n                    // This output is specified as AssetCreationOptions.None, which \n                    // means the output asset is not encrypted. \n                    task.OutputAssets.AddNew(\"Output asset\",\n                        AssetCreationOptions.None);\n        \n                    job.StateChanged += new EventHandler<JobStateChangedEventArgs>(JobStateChanged);\n                    job.Submit();\n                    job.GetExecutionProgressTask(CancellationToken.None).Wait();\n        \n                    return job.OutputMediaAssets[0];\n                }\n        \n                private static IMediaProcessor GetLatestMediaProcessorByName(string mediaProcessorName)\n                {\n                    var processor = _context.MediaProcessors.Where(p => p.Name == mediaProcessorName).\n                    ToList().OrderBy(p => new Version(p.Version)).LastOrDefault();\n        \n                    if (processor == null)\n                        throw new ArgumentException(string.Format(\"Unknown media processor\", mediaProcessorName));\n        \n                    return processor;\n                }\n        \n                static public IContentKey CreateEnvelopeTypeContentKey(IAsset asset)\n                {\n                    // Create envelope encryption content key\n                    Guid keyId = Guid.NewGuid();\n                    byte[] contentKey = GetRandomBuffer(16);\n        \n                    IContentKey key = _context.ContentKeys.Create(\n                                            keyId,\n                                            contentKey,\n                                            \"ContentKey\",\n                                            ContentKeyType.EnvelopeEncryption);\n        \n                    // Associate the key with the asset.\n                    asset.ContentKeys.Add(key);\n        \n                    return key;\n                }\n        \n                static public void AddOpenAuthorizationPolicy(IContentKey contentKey)\n                {\n                    // Create ContentKeyAuthorizationPolicy with Open restrictions \n                    // and create authorization policy             \n                    IContentKeyAuthorizationPolicy policy = _context.\n                                            ContentKeyAuthorizationPolicies.\n                                            CreateAsync(\"Open Authorization Policy\").Result;\n        \n                    List<ContentKeyAuthorizationPolicyRestriction> restrictions =\n                        new List<ContentKeyAuthorizationPolicyRestriction>();\n        \n                    ContentKeyAuthorizationPolicyRestriction restriction =\n                        new ContentKeyAuthorizationPolicyRestriction\n                        {\n                            Name = \"HLS Open Authorization Policy\",\n                            KeyRestrictionType = (int)ContentKeyRestrictionType.Open,\n                            Requirements = null // no requirements needed for HLS\n                                };\n        \n                    restrictions.Add(restriction);\n        \n                    IContentKeyAuthorizationPolicyOption policyOption =\n                        _context.ContentKeyAuthorizationPolicyOptions.Create(\n                        \"policy\",\n                        ContentKeyDeliveryType.BaselineHttp,\n                        restrictions,\n                        \"\");\n        \n                    policy.Options.Add(policyOption);\n        \n                    // Add ContentKeyAutorizationPolicy to ContentKey\n                    contentKey.AuthorizationPolicyId = policy.Id;\n                    IContentKey updatedKey = contentKey.UpdateAsync().Result;\n                    Console.WriteLine(\"Adding Key to Asset: Key ID is \" + updatedKey.Id);\n                }\n        \n                public static string AddTokenRestrictedAuthorizationPolicy(IContentKey contentKey)\n                {\n                    string tokenTemplateString = GenerateTokenRequirements();\n        \n                    IContentKeyAuthorizationPolicy policy = _context.\n                                            ContentKeyAuthorizationPolicies.\n                                            CreateAsync(\"HLS token restricted authorization policy\").Result;\n        \n                    List<ContentKeyAuthorizationPolicyRestriction> restrictions =\n                            new List<ContentKeyAuthorizationPolicyRestriction>();\n        \n                    ContentKeyAuthorizationPolicyRestriction restriction =\n                            new ContentKeyAuthorizationPolicyRestriction\n                            {\n                                Name = \"Token Authorization Policy\",\n                                KeyRestrictionType = (int)ContentKeyRestrictionType.TokenRestricted,\n                                Requirements = tokenTemplateString\n                            };\n        \n                    restrictions.Add(restriction);\n        \n                    //You could have multiple options \n                    IContentKeyAuthorizationPolicyOption policyOption =\n                        _context.ContentKeyAuthorizationPolicyOptions.Create(\n                            \"Token option for HLS\",\n                            ContentKeyDeliveryType.BaselineHttp,\n                            restrictions,\n                            null  // no key delivery data is needed for HLS\n                            );\n        \n                    policy.Options.Add(policyOption);\n        \n                    // Add ContentKeyAutorizationPolicy to ContentKey\n                    contentKey.AuthorizationPolicyId = policy.Id;\n                    IContentKey updatedKey = contentKey.UpdateAsync().Result;\n                    Console.WriteLine(\"Adding Key to Asset: Key ID is \" + updatedKey.Id);\n        \n                    return tokenTemplateString;\n                }\n        \n                static public void CreateAssetDeliveryPolicy(IAsset asset, IContentKey key)\n                {\n                    Uri keyAcquisitionUri = key.GetKeyDeliveryUrl(ContentKeyDeliveryType.BaselineHttp);\n        \n                    string envelopeEncryptionIV = Convert.ToBase64String(GetRandomBuffer(16));\n        \n                    // The following policy configuration specifies: \n                    //   key url that will have KID=<Guid> appended to the envelope and\n                    //   the Initialization Vector (IV) to use for the envelope encryption.\n                    Dictionary<AssetDeliveryPolicyConfigurationKey, string> assetDeliveryPolicyConfiguration =\n                        new Dictionary<AssetDeliveryPolicyConfigurationKey, string>\n                    {\n                                {AssetDeliveryPolicyConfigurationKey.EnvelopeKeyAcquisitionUrl, keyAcquisitionUri.ToString()},\n                                {AssetDeliveryPolicyConfigurationKey.EnvelopeEncryptionIVAsBase64, envelopeEncryptionIV}\n                    };\n        \n                    IAssetDeliveryPolicy assetDeliveryPolicy =\n                        _context.AssetDeliveryPolicies.Create(\n                                    \"AssetDeliveryPolicy\",\n                                    AssetDeliveryPolicyType.DynamicEnvelopeEncryption,\n                                    AssetDeliveryProtocol.SmoothStreaming | AssetDeliveryProtocol.HLS,\n                                    assetDeliveryPolicyConfiguration);\n        \n                    // Add AssetDelivery Policy to the asset\n                    asset.DeliveryPolicies.Add(assetDeliveryPolicy);\n                    Console.WriteLine();\n                    Console.WriteLine(\"Adding Asset Delivery Policy: \" +\n                        assetDeliveryPolicy.AssetDeliveryPolicyType);\n                }\n        \n                static public string GetStreamingOriginLocator(IAsset asset)\n                {\n        \n                    // Get a reference to the streaming manifest file from the  \n                    // collection of files in the asset. \n        \n                    var assetFile = asset.AssetFiles.Where(f => f.Name.ToLower().\n                                                EndsWith(\".ism\")).\n                                                FirstOrDefault();\n        \n                    // Create a 30-day readonly access policy. \n                    // You cannot create a streaming locator using an AccessPolicy that includes write or delete permissions.            \n                    IAccessPolicy policy = _context.AccessPolicies.Create(\"Streaming policy\",\n                        TimeSpan.FromDays(30),\n                        AccessPermissions.Read);\n        \n                    // Create a locator to the streaming content on an origin. \n                    ILocator originLocator = _context.Locators.CreateLocator(LocatorType.OnDemandOrigin, asset,\n                        policy,\n                        DateTime.UtcNow.AddMinutes(-5));\n        \n                    // Create a URL to the manifest file. \n                    return originLocator.Path + assetFile.Name;\n                }\n        \n                static private string GenerateTokenRequirements()\n                {\n                    TokenRestrictionTemplate template = new TokenRestrictionTemplate(TokenType.SWT);\n        \n                    template.PrimaryVerificationKey = new SymmetricVerificationKey();\n                    template.AlternateVerificationKeys.Add(new SymmetricVerificationKey());\n                    template.Audience = _sampleAudience.ToString();\n                    template.Issuer = _sampleIssuer.ToString();\n        \n                    template.RequiredClaims.Add(TokenClaim.ContentKeyIdentifierClaim);\n        \n                    return TokenRestrictionTemplateSerializer.Serialize(template);\n                }\n        \n                static private void JobStateChanged(object sender, JobStateChangedEventArgs e)\n                {\n                    Console.WriteLine(string.Format(\"{0}\\n  State: {1}\\n  Time: {2}\\n\\n\",\n                        ((IJob)sender).Name,\n                        e.CurrentState,\n                        DateTime.UtcNow.ToString(@\"yyyy_M_d__hh_mm_ss\")));\n                }\n        \n                static private byte[] GetRandomBuffer(int size)\n                {\n                    byte[] randomBytes = new byte[size];\n                    using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())\n                    {\n                        rng.GetBytes(randomBytes);\n                    }\n        \n                    return randomBytes;\n                }\n            }\n        }\n\n<!---HONumber=Mooncake_0314_2016-->"
+}

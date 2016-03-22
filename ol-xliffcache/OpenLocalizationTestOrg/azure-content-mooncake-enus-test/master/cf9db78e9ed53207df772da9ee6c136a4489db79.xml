@@ -1,0 +1,222 @@
+{
+  "nodes": [
+    {
+      "content": "通过 C 和 C# 使用事件中心入门 | Azure",
+      "pos": [
+        27,
+        53
+      ]
+    },
+    {
+      "content": "遵循本教程开始使用 Azure 事件中心，以通过 C 发送事件，并使用 EventProcessorHost 通过 C# 接收事件。",
+      "pos": [
+        72,
+        138
+      ]
+    },
+    {
+      "content": "事件中心入门",
+      "pos": [
+        346,
+        352
+      ]
+    },
+    {
+      "content": "介绍",
+      "pos": [
+        458,
+        460
+      ]
+    },
+    {
+      "content": "事件中心是一个具备高度可伸缩性的引入系统，每秒可收入大量事件，从而使应用程序能够处理和分析你连接的设备和应用程序所产生的海量数据。将数据采集到事件中心后，你可以使用任何实时分析提供程序或存储群集来转换和存储数据。",
+      "pos": [
+        462,
+        568
+      ]
+    },
+    {
+      "pos": [
+        570,
+        589
+      ],
+      "content": "有关详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">事件中心概述]</ept>。"
+    },
+    {
+      "pos": [
+        591,
+        659
+      ],
+      "content": "在本教程中，你将学习如何使用用 C 编写的控制台应用程序将消息引入事件中心，以及如何使用 C# <bpt id=\"p1\">[</bpt><ept id=\"p1\">事件处理程序主机]</ept>库并行检索这些消息。"
+    },
+    {
+      "content": "为了完成本教程，你将需要以下内容：",
+      "pos": [
+        661,
+        678
+      ]
+    },
+    {
+      "pos": [
+        682,
+        834
+      ],
+      "content": "C 语言开发环境。对于本教程，我们假设 gcc 堆栈位于使用 Ubuntu 14.04 的 <bpt id=\"p1\">[</bpt>Azure Linux VM<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-tutorial-portal-rm)</ept> 上。有关其他环境的说明，将在外部链接中提供。"
+    },
+    {
+      "content": "Microsoft Visual Studio Express 2013 for Windows",
+      "pos": [
+        838,
+        886
+      ]
+    },
+    {
+      "content": "有效的 Azure 帐户。",
+      "pos": [
+        890,
+        903
+      ]
+    },
+    {
+      "content": "如果你没有帐户，只需花费几分钟就能创建一个免费试用帐户。有关详细信息，请参阅 <ph id=\"ph1\">&lt;a href=\"/pricing/1rmb-trial\" target=\"_blank\"&gt;</ph>Azure 试用<ph id=\"ph2\">&lt;/a&gt;</ph>。",
+      "pos": [
+        908,
+        1006
+      ]
+    },
+    {
+      "content": "创建事件中心",
+      "pos": [
+        1011,
+        1017
+      ]
+    },
+    {
+      "pos": [
+        1022,
+        1053
+      ],
+      "content": "登录到 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 管理门户]</ept>，然后单击屏幕底部的“新建”。"
+    },
+    {
+      "content": "依次单击“App Service”、“服务总线”、“事件中心”、“快速创建”。",
+      "pos": [
+        1058,
+        1097
+      ]
+    },
+    {
+      "content": "为你的事件中心键入名称，选择所需区域，然后单击“创建新事件中心”。",
+      "pos": [
+        1114,
+        1147
+      ]
+    },
+    {
+      "pos": [
+        1164,
+        1197
+      ],
+      "content": "单击你刚创建的命名空间（通常为 <bpt id=\"p1\">**</bpt><bpt id=\"p2\">*</bpt>事件中心名称<ept id=\"p2\">*</ept>-ns<ept id=\"p1\">**</ept>）。"
+    },
+    {
+      "content": "单击页面顶部的“事件中心”选项卡，然后单击你刚创建的事件中心。",
+      "pos": [
+        1214,
+        1245
+      ]
+    },
+    {
+      "content": "单击页面顶部的“配置”选项卡，添加具有“发送”权限的名为“SendRule”的规则，添加另一具有“管理、发送、侦听”权限的名为“ReceiveRule”的规则，然后单击“保存”。",
+      "pos": [
+        1262,
+        1351
+      ]
+    },
+    {
+      "pos": [
+        1368,
+        1397
+      ],
+      "content": "在同一页上，记下为 <bpt id=\"p1\">**</bpt>SendRule<ept id=\"p1\">**</ept> 生成的密钥。"
+    },
+    {
+      "content": "单击页面顶部的“仪表板”选项卡，然后单击“连接信息”。记下两个连接字符串。",
+      "pos": [
+        1415,
+        1452
+      ]
+    },
+    {
+      "content": "现在，你的事件中心就创建好了，你已经有了收发事件所需的连接字符串。",
+      "pos": [
+        1466,
+        1499
+      ]
+    },
+    {
+      "content": "运行应用程序",
+      "pos": [
+        1757,
+        1763
+      ]
+    },
+    {
+      "content": "现在，你已准备就绪，可以运行应用程序了。",
+      "pos": [
+        1765,
+        1785
+      ]
+    },
+    {
+      "pos": [
+        1791,
+        1843
+      ],
+      "content": "从 Visual Studio 中运行 <bpt id=\"p1\">**</bpt>Receiver<ept id=\"p1\">**</ept> 项目，然后等待它为所有分区启动接收方。"
+    },
+    {
+      "pos": [
+        1862,
+        1897
+      ],
+      "content": "运行 <bpt id=\"p1\">**</bpt>sender<ept id=\"p1\">**</ept> 程序，然后就会看到事件出现在接收方窗口中。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        1915,
+        1919
+      ]
+    },
+    {
+      "content": "现在，你已生成了一个可以创建事件中心以及发送和接收数据的有效应用程序，接下来请继续学习以下方案：",
+      "pos": [
+        1921,
+        1969
+      ]
+    },
+    {
+      "pos": [
+        1973,
+        1991
+      ],
+      "content": "<bpt id=\"p1\">[</bpt><ept id=\"p1\">使用事件中心的完整示例应用程序]</ept>。"
+    },
+    {
+      "pos": [
+        1994,
+        2011
+      ],
+      "content": "<bpt id=\"p1\">[</bpt><ept id=\"p1\">使用事件中心扩大事件处理]</ept>示例。"
+    },
+    {
+      "content": "事件中心概述",
+      "pos": [
+        2045,
+        2051
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"通过 C 和 C# 使用事件中心入门 | Azure\"\n    description=\"遵循本教程开始使用 Azure 事件中心，以通过 C 发送事件，并使用 EventProcessorHost 通过 C# 接收事件。\"\n    services=\"event-hubs\"\n    documentationCenter=\"\"\n    authors=\"fsautomata\"\n    manager=\"timlt\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"event-hubs\"\n    ms.date=\"09/01/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n# 事件中心入门\n\n[AZURE.INCLUDE [service-bus-selector-get-started](../includes/service-bus-selector-get-started.md)]\n\n## 介绍\n\n事件中心是一个具备高度可伸缩性的引入系统，每秒可收入大量事件，从而使应用程序能够处理和分析你连接的设备和应用程序所产生的海量数据。将数据采集到事件中心后，你可以使用任何实时分析提供程序或存储群集来转换和存储数据。\n\n有关详细信息，请参阅[事件中心概述]。\n\n在本教程中，你将学习如何使用用 C 编写的控制台应用程序将消息引入事件中心，以及如何使用 C# [事件处理程序主机]库并行检索这些消息。\n\n为了完成本教程，你将需要以下内容：\n\n+ C 语言开发环境。对于本教程，我们假设 gcc 堆栈位于使用 Ubuntu 14.04 的 [Azure Linux VM](/documentation/articles/virtual-machines-linux-tutorial-portal-rm) 上。有关其他环境的说明，将在外部链接中提供。\n\n+ Microsoft Visual Studio Express 2013 for Windows\n\n+ 有效的 Azure 帐户。<br/>如果你没有帐户，只需花费几分钟就能创建一个免费试用帐户。有关详细信息，请参阅 <a href=\"/pricing/1rmb-trial\" target=\"_blank\">Azure 试用</a>。\n\n## 创建事件中心\n\n1. 登录到 [Azure 管理门户]，然后单击屏幕底部的“新建”。\n\n2. 依次单击“App Service”、“服务总线”、“事件中心”、“快速创建”。\n\n    ![][1]\n\n3. 为你的事件中心键入名称，选择所需区域，然后单击“创建新事件中心”。\n\n    ![][2]\n\n4. 单击你刚创建的命名空间（通常为 ***事件中心名称*-ns**）。\n\n    ![][3]\n\n5. 单击页面顶部的“事件中心”选项卡，然后单击你刚创建的事件中心。\n\n    ![][4]\n\n6. 单击页面顶部的“配置”选项卡，添加具有“发送”权限的名为“SendRule”的规则，添加另一具有“管理、发送、侦听”权限的名为“ReceiveRule”的规则，然后单击“保存”。\n\n    ![][5]\n\n7. 在同一页上，记下为 **SendRule** 生成的密钥。\n\n    ![][6b]\n\n8. 单击页面顶部的“仪表板”选项卡，然后单击“连接信息”。记下两个连接字符串。\n\n    ![][6]\n\n现在，你的事件中心就创建好了，你已经有了收发事件所需的连接字符串。\n\n[AZURE.INCLUDE [service-bus-event-hubs-get-started-send-c](../includes/service-bus-event-hubs-get-started-send-c.md)]\n\n\n[AZURE.INCLUDE [service-bus-event-hubs-get-started-receive-ephcs](../includes/service-bus-event-hubs-get-started-receive-ephcs.md)]\n\n## 运行应用程序\n\n现在，你已准备就绪，可以运行应用程序了。\n\n1.  从 Visual Studio 中运行 **Receiver** 项目，然后等待它为所有分区启动接收方。\n\n    ![][21]\n\n2.  运行 **sender** 程序，然后就会看到事件出现在接收方窗口中。\n\n    ![][24]\n\n## 后续步骤\n\n现在，你已生成了一个可以创建事件中心以及发送和接收数据的有效应用程序，接下来请继续学习以下方案：\n\n- [使用事件中心的完整示例应用程序]。\n- [使用事件中心扩大事件处理]示例。\n<!--- 使用服务总线队列的[队列消息解决方案]。-->\n- [事件中心概述]\n\n<!-- Images. -->\n[1]: ./media/event-hubs-c-ephcs-getstarted/create-event-hub1.png\n[2]: ./media/event-hubs-c-ephcs-getstarted/create-event-hub2.png\n[3]: ./media/event-hubs-c-ephcs-getstarted/create-event-hub3.png\n[4]: ./media/event-hubs-c-ephcs-getstarted/create-event-hub4.png\n[5]: ./media/event-hubs-c-ephcs-getstarted/create-event-hub5.png\n[6]: ./media/event-hubs-c-ephcs-getstarted/create-event-hub6.png\n[6b]: ./media/event-hubs-c-ephcs-getstarted/create-event-hub6b.png\n\n\n[21]: ./media/event-hubs-c-ephcs-getstarted/run-csharp-ephcs1.png\n[24]: ./media/event-hubs-c-ephcs-getstarted/receive-eph-c.png\n\n<!-- Links -->\n[Azure 管理门户]: https://manage.windowsazure.cn/\n[事件处理程序主机]: https://www.nuget.org/packages/Microsoft.Azure.ServiceBus.EventProcessorHost\n[事件中心概述]: /documentation/articles/event-hubs-overview\n[使用事件中心的完整示例应用程序]: https://code.msdn.microsoft.com/windowsazure/Service-Bus-Event-Hub-286fd097\n[使用事件中心扩大事件处理]: https://code.msdn.microsoft.com/windowsazure/Service-Bus-Event-Hub-45f43fc3\n[队列消息解决方案]: /documentation/articles/service-bus-dotnet-multi-tier-app-using-service-bus-queues\n\n<!---HONumber=Mooncake_1207_2015-->"
+}

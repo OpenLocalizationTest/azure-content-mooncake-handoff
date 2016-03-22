@@ -1,0 +1,502 @@
+{
+  "nodes": [
+    {
+      "content": "如何使用 PowerShell 为经典部署模型的 ExpressRoute 线路配置路由 | Microsoft Azure",
+      "pos": [
+        26,
+        88
+      ]
+    },
+    {
+      "content": "本文将指导你完成创建和预配 ExpressRoute 线路的专用、公共互连的步骤。本文还介绍了如何检查状态，以及如何更新或删除线路的对等互连。",
+      "pos": [
+        106,
+        177
+      ]
+    },
+    {
+      "content": "使用 PowerShell 创建和修改 ExpressRoute 线路的路由",
+      "pos": [
+        416,
+        454
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        458,
+        474
+      ]
+    },
+    {
+      "content": "PowerShell - Classic",
+      "pos": [
+        476,
+        496
+      ]
+    },
+    {
+      "content": "PowerShell - Resource Manager",
+      "pos": [
+        559,
+        588
+      ]
+    },
+    {
+      "content": "本文将指导你执行相关步骤，以便使用 PowerShell cmdlet 和经典部署模型创建和管理 ExpressRoute 线路的路由配置。下面的步骤还将说明如何查看状态，以及如何更新、删除和取消预配 ExpressRoute 线路的对等互连。",
+      "pos": [
+        647,
+        769
+      ]
+    },
+    {
+      "content": "配置先决条件",
+      "pos": [
+        854,
+        860
+      ]
+    },
+    {
+      "pos": [
+        864,
+        1089
+      ],
+      "content": "你将需要最新版本的 Azure PowerShell 模块。可以从 <bpt id=\"p1\">[</bpt>Azure 下载页<ept id=\"p1\">](/downloads/)</ept>的 PowerShell 部分下载最新 PowerShell 模块。按照<bpt id=\"p2\">[</bpt>如何安装和配置 Azure PowerShell<ept id=\"p2\">](/documentation/articles/powershell-install-configure)</ept> 页上的说明操作，以便获取有关如何配置计算机以使用 Azure PowerShell 模块的分步指导。"
+    },
+    {
+      "pos": [
+        1093,
+        1275
+      ],
+      "content": "在开始配置之前，请务必查看<bpt id=\"p1\">[</bpt>先决条件<ept id=\"p1\">](/documentation/articles/expressroute-prerequisites)</ept>页、<bpt id=\"p2\">[</bpt>路由要求<ept id=\"p2\">](/documentation/articles/expressroute-routing)</ept>页和<bpt id=\"p3\">[</bpt>工作流<ept id=\"p3\">](/documentation/articles/expressroute-workflows)</ept>页。"
+    },
+    {
+      "pos": [
+        1278,
+        1456
+      ],
+      "content": "你必须有一个活动的 ExpressRoute 线路。在继续下一步之前，请按说明<bpt id=\"p1\">[</bpt>创建 ExpressRoute 线路<ept id=\"p1\">](/documentation/articles/expressroute-howto-circuit-classic)</ept>，并通过连接提供商启用该线路。ExpressRoute 线路必须处于已预配和已启用状态，你才能运行下述 cmdlet。"
+    },
+    {
+      "pos": [
+        1459,
+        1585
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>这些说明只适用于由提供第 2 层连接服务的服务提供商创建的线路。如果你的服务提供商提供第 3 层托管服务（通常是 IPVPN，如 MPLS），则连接服务提供商将为你设置和管理路由。在此情况下，你无法创建或管理对等互连。"
+    },
+    {
+      "content": "你可以为 ExpressRoute 线路配置一到两个对等互连（Azure 专用和Azure 公共）。可以按照所选的任意顺序配置对等互连。但是，你必须确保一次只完成一个对等互连的配置。",
+      "pos": [
+        1587,
+        1678
+      ]
+    },
+    {
+      "content": "Azure 专用对等互连",
+      "pos": [
+        1683,
+        1695
+      ]
+    },
+    {
+      "content": "本部分说明如何为 ExpressRoute 线路创建、获取、更新和删除 Azure 专用对等互连配置。",
+      "pos": [
+        1697,
+        1748
+      ]
+    },
+    {
+      "content": "创建 Azure 专用对等互连",
+      "pos": [
+        1754,
+        1769
+      ]
+    },
+    {
+      "content": "为 ExpressRoute 导入 PowerShell 模块。",
+      "pos": [
+        1776,
+        1808
+      ]
+    },
+    {
+      "content": "在开始使用 ExpressRoute cmdlet 之前，必须将 Azure 和 ExpressRoute 模块导入 PowerShell 会话。运行以下命令，将 Azure 和 ExpressRoute 模块导入 PowerShell 会话。",
+      "pos": [
+        1820,
+        1942
+      ]
+    },
+    {
+      "content": "创建 ExpressRoute 线路。",
+      "pos": [
+        2198,
+        2217
+      ]
+    },
+    {
+      "pos": [
+        2229,
+        2441
+      ],
+      "content": "请按说明创建 <bpt id=\"p1\">[</bpt>ExpressRoute 线路<ept id=\"p1\">](/documentation/articles/expressroute-howto-circuit-classic)</ept>，并由连接服务提供商进行预配。如果你的连接服务提供商提供第 3 层托管服务，你可以请求连接服务提供商为你启用 Azure 专用对等互连。在此情况下，你不需要遵循后续部分中所列的说明。但是，如果你的连接服务提供商不为你管理路由，请在创建线路之后遵循以下说明。"
+    },
+    {
+      "content": "检查 ExpressRoute 线路以确保它已预配。",
+      "pos": [
+        2448,
+        2474
+      ]
+    },
+    {
+      "content": "首先必须检查 ExpressRoute 线路是否已预配并已启用。请参阅以下示例。",
+      "pos": [
+        2482,
+        2522
+      ]
+    },
+    {
+      "content": "确保线路显示为已预配并已启用。否则，请与连接服务提供商合作，使线路变为所需的状态。",
+      "pos": [
+        3068,
+        3109
+      ]
+    },
+    {
+      "content": "配置线路的 Azure 专用对等互连。",
+      "pos": [
+        3224,
+        3243
+      ]
+    },
+    {
+      "content": "在继续执行后续步骤之前，请确保已准备好以下各项：",
+      "pos": [
+        3251,
+        3275
+      ]
+    },
+    {
+      "content": "主链路的 /30 子网。它不能是保留给虚拟网络使用的任何地址空间的一部分。",
+      "pos": [
+        3283,
+        3320
+      ]
+    },
+    {
+      "content": "辅助链路的 /30 子网。它不能是保留给虚拟网络使用的任何地址空间的一部分。",
+      "pos": [
+        3327,
+        3365
+      ]
+    },
+    {
+      "content": "用于建立此对等互连的有效 VLAN ID。请确保线路中没有其他对等互连使用同一个 VLAN ID。",
+      "pos": [
+        3372,
+        3421
+      ]
+    },
+    {
+      "content": "对等互连的 AS 编号。可以使用 2 字节和 4 字节 AS 编号。可以将专用 AS 编号用于此对等互连。请务必不要使用 65515。",
+      "pos": [
+        3428,
+        3495
+      ]
+    },
+    {
+      "pos": [
+        3502,
+        3527
+      ],
+      "content": "MD5 哈希（如果选择使用）。<bpt id=\"p1\">**</bpt>这是可选的<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "可以运行以下 cmdlet 来为线路配置 Azure 专用对等互连。",
+      "pos": [
+        3537,
+        3571
+      ]
+    },
+    {
+      "content": "如果选择使用 MD5 哈希，则可以使用以下 cmdlet。",
+      "pos": [
+        3768,
+        3797
+      ]
+    },
+    {
+      "pos": [
+        4017,
+        4066
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>请确保将 AS 编号指定为对等互连 ASN 而不是客户 ASN。"
+    },
+    {
+      "content": "获取 Azure 专用对等互连详细信息",
+      "pos": [
+        4072,
+        4091
+      ]
+    },
+    {
+      "content": "可以使用以下 cmdlet 来获取配置详细信息",
+      "pos": [
+        4093,
+        4116
+      ]
+    },
+    {
+      "content": "更新 Azure 专用对等互连配置",
+      "pos": [
+        4728,
+        4745
+      ]
+    },
+    {
+      "content": "可以使用以下 cmdlet 来更新配置的任何部分。在以下示例中，线路的 VLAN ID 将从 100 更新为 500。",
+      "pos": [
+        4747,
+        4806
+      ]
+    },
+    {
+      "content": "删除 Azure 专用对等互连",
+      "pos": [
+        5021,
+        5036
+      ]
+    },
+    {
+      "content": "可以运行以下 cmdlet 来删除对等互连配置。",
+      "pos": [
+        5038,
+        5062
+      ]
+    },
+    {
+      "pos": [
+        5065,
+        5127
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.WARNING]</ph>运行此 cmdlet 之前，必须确保已从 ExpressRoute 线路取消链接所有虚拟网络。"
+    },
+    {
+      "content": "Azure 公共对等互连",
+      "pos": [
+        5229,
+        5241
+      ]
+    },
+    {
+      "content": "本部分说明如何为 ExpressRoute 线路创建、获取、更新和删除 Azure 公共对等互连配置。",
+      "pos": [
+        5243,
+        5294
+      ]
+    },
+    {
+      "content": "创建 Azure 公共对等互连",
+      "pos": [
+        5300,
+        5315
+      ]
+    },
+    {
+      "content": "为 ExpressRoute 导入 PowerShell 模块。",
+      "pos": [
+        5322,
+        5354
+      ]
+    },
+    {
+      "content": "在开始使用 ExpressRoute cmdlet 之前，必须将 Azure 和 ExpressRoute 模块导入 PowerShell 会话。运行以下命令，将 Azure 和 ExpressRoute 模块导入 PowerShell 会话。",
+      "pos": [
+        5366,
+        5488
+      ]
+    },
+    {
+      "content": "创建 ExpressRoute 线路",
+      "pos": [
+        5744,
+        5762
+      ]
+    },
+    {
+      "pos": [
+        5774,
+        5986
+      ],
+      "content": "请按说明创建 <bpt id=\"p1\">[</bpt>ExpressRoute 线路<ept id=\"p1\">](/documentation/articles/expressroute-howto-circuit-classic)</ept>，并由连接服务提供商进行预配。如果你的连接服务提供商提供第 3 层托管服务，你可以请求连接服务提供商为你启用 Azure 专用对等互连。在此情况下，你不需要遵循后续部分中所列的说明。但是，如果你的连接服务提供商不为你管理路由，请在创建线路之后遵循以下说明。"
+    },
+    {
+      "content": "检查 ExpressRoute 线路以确保它已预配",
+      "pos": [
+        5993,
+        6018
+      ]
+    },
+    {
+      "content": "首先必须检查 ExpressRoute 线路是否已预配并已启用。请参阅以下示例。",
+      "pos": [
+        6026,
+        6066
+      ]
+    },
+    {
+      "content": "确保线路显示为已预配并已启用。否则，请与连接服务提供商合作，使线路变为所需的状态。",
+      "pos": [
+        6612,
+        6653
+      ]
+    },
+    {
+      "content": "配置线路的 Azure 公共对等互连",
+      "pos": [
+        6773,
+        6791
+      ]
+    },
+    {
+      "content": "在继续下一步之前，请确保已准备好以下信息。",
+      "pos": [
+        6799,
+        6820
+      ]
+    },
+    {
+      "content": "主链路的 /30 子网。这必须是有效的公共 IPv4 前缀。",
+      "pos": [
+        6828,
+        6858
+      ]
+    },
+    {
+      "content": "辅助链路的 /30 子网。这必须是有效的公共 IPv4 前缀。",
+      "pos": [
+        6865,
+        6896
+      ]
+    },
+    {
+      "content": "用于建立此对等互连的有效 VLAN ID。请确保线路中没有其他对等互连使用同一个 VLAN ID。",
+      "pos": [
+        6903,
+        6952
+      ]
+    },
+    {
+      "content": "对等互连的 AS 编号。可以使用 2 字节和 4 字节 AS 编号。必须将公共 AS 编号用于此对等互连。",
+      "pos": [
+        6959,
+        7012
+      ]
+    },
+    {
+      "pos": [
+        7019,
+        7044
+      ],
+      "content": "MD5 哈希（如果选择使用）。<bpt id=\"p1\">**</bpt>这是可选的<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "可以运行以下 cmdlet 来为线路配置 Azure 专用对等互连",
+      "pos": [
+        7054,
+        7087
+      ]
+    },
+    {
+      "content": "如果选择使用 MD5 哈希，则可以使用以下 cmdlet",
+      "pos": [
+        7289,
+        7317
+      ]
+    },
+    {
+      "pos": [
+        7542,
+        7591
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>请确保将 AS 编号指定为对等互连 ASN 而不是客户 ASN。"
+    },
+    {
+      "content": "获取 Azure 公共对等互连详细信息",
+      "pos": [
+        7597,
+        7616
+      ]
+    },
+    {
+      "content": "可以使用以下 cmdlet 来获取配置详细信息",
+      "pos": [
+        7618,
+        7641
+      ]
+    },
+    {
+      "content": "更新 Azure 公共对等互连配置",
+      "pos": [
+        8258,
+        8275
+      ]
+    },
+    {
+      "content": "可以使用以下 cmdlet 来更新配置的任何部分",
+      "pos": [
+        8277,
+        8301
+      ]
+    },
+    {
+      "content": "在上面的示例中，线路的 VLAN ID 将从 200 更新为 600。",
+      "pos": [
+        8517,
+        8552
+      ]
+    },
+    {
+      "content": "删除 Azure 公共对等互连",
+      "pos": [
+        8558,
+        8573
+      ]
+    },
+    {
+      "content": "可以运行以下 cmdlet 来删除对等互连配置",
+      "pos": [
+        8575,
+        8598
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        8698,
+        8702
+      ]
+    },
+    {
+      "pos": [
+        8704,
+        8798
+      ],
+      "content": "下一步，<bpt id=\"p1\">[</bpt>将 VNet 链接到 ExpressRoute 线路<ept id=\"p1\">](/documentation/articles/expressroute-howto-linkvnet-classic)</ept>。"
+    },
+    {
+      "pos": [
+        8801,
+        8883
+      ],
+      "content": "有关工作流的详细信息，请参阅 <bpt id=\"p1\">[</bpt>ExpressRoute 工作流<ept id=\"p1\">](/documentation/articles/expressroute-workflows)</ept>。"
+    },
+    {
+      "pos": [
+        8886,
+        8981
+      ],
+      "content": "有关线路对等互连的详细信息，请参阅 <bpt id=\"p1\">[</bpt>ExpressRoute 线路和路由域<ept id=\"p1\">](/documentation/articles/expressroute-circuit-peerings)</ept>。"
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"如何使用 PowerShell 为经典部署模型的 ExpressRoute 线路配置路由 | Microsoft Azure\"\n   description=\"本文将指导你完成创建和预配 ExpressRoute 线路的专用、公共互连的步骤。本文还介绍了如何检查状态，以及如何更新或删除线路的对等互连。\"\n   documentationCenter=\"na\"\n   services=\"expressroute\"\n   authors=\"cherylmc\"\n   manager=\"carolz\"\n   editor=\"\"\n   tags=\"azure-service-management\"/>\n<tags\n   ms.service=\"expressroute\"\n   ms.date=\"01/16/2016\"\n   wacn.date=\"03/17/2016\"/>\n\n# 使用 PowerShell 创建和修改 ExpressRoute 线路的路由\n\n> [AZURE.SELECTOR]\n[PowerShell - Classic](/documentation/articles/expressroute-howto-routing-classic)\n[PowerShell - Resource Manager](/documentation/articles/expressroute-howto-routing-arm)\n\n本文将指导你执行相关步骤，以便使用 PowerShell cmdlet 和经典部署模型创建和管理 ExpressRoute 线路的路由配置。下面的步骤还将说明如何查看状态，以及如何更新、删除和取消预配 ExpressRoute 线路的对等互连。\n\n[AZURE.INCLUDE [vpn-gateway-sm-rm](../includes/vpn-gateway-sm-rm-include.md)] \n\n## 配置先决条件\n\n- 你将需要最新版本的 Azure PowerShell 模块。可以从 [Azure 下载页](/downloads/)的 PowerShell 部分下载最新 PowerShell 模块。按照[如何安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure) 页上的说明操作，以便获取有关如何配置计算机以使用 Azure PowerShell 模块的分步指导。 \n- 在开始配置之前，请务必查看[先决条件](/documentation/articles/expressroute-prerequisites)页、[路由要求](/documentation/articles/expressroute-routing)页和[工作流](/documentation/articles/expressroute-workflows)页。\n- 你必须有一个活动的 ExpressRoute 线路。在继续下一步之前，请按说明[创建 ExpressRoute 线路](/documentation/articles/expressroute-howto-circuit-classic)，并通过连接提供商启用该线路。ExpressRoute 线路必须处于已预配和已启用状态，你才能运行下述 cmdlet。\n\n>[AZURE.IMPORTANT]这些说明只适用于由提供第 2 层连接服务的服务提供商创建的线路。如果你的服务提供商提供第 3 层托管服务（通常是 IPVPN，如 MPLS），则连接服务提供商将为你设置和管理路由。在此情况下，你无法创建或管理对等互连。\n\n你可以为 ExpressRoute 线路配置一到两个对等互连（Azure 专用和Azure 公共）。可以按照所选的任意顺序配置对等互连。但是，你必须确保一次只完成一个对等互连的配置。\n\n## Azure 专用对等互连\n\n本部分说明如何为 ExpressRoute 线路创建、获取、更新和删除 Azure 专用对等互连配置。\n\n### 创建 Azure 专用对等互连\n\n1. **为 ExpressRoute 导入 PowerShell 模块。**\n    \n    在开始使用 ExpressRoute cmdlet 之前，必须将 Azure 和 ExpressRoute 模块导入 PowerShell 会话。运行以下命令，将 Azure 和 ExpressRoute 模块导入 PowerShell 会话。\n\n        Import-Module 'C:\\Program Files (x86)\\Microsoft SDKs\\Azure\\PowerShell\\ServiceManagement\\Azure\\Azure.psd1'\n        Import-Module 'C:\\Program Files (x86)\\Microsoft SDKs\\Azure\\PowerShell\\ServiceManagement\\Azure\\ExpressRoute\\ExpressRoute.psd1'\n\n2. **创建 ExpressRoute 线路。**\n    \n    请按说明创建 [ExpressRoute 线路](/documentation/articles/expressroute-howto-circuit-classic)，并由连接服务提供商进行预配。如果你的连接服务提供商提供第 3 层托管服务，你可以请求连接服务提供商为你启用 Azure 专用对等互连。在此情况下，你不需要遵循后续部分中所列的说明。但是，如果你的连接服务提供商不为你管理路由，请在创建线路之后遵循以下说明。\n\n3. **检查 ExpressRoute 线路以确保它已预配。**\n\n    首先必须检查 ExpressRoute 线路是否已预配并已启用。请参阅以下示例。\n\n        PS C:\\> Get-AzureDedicatedCircuit -ServiceKey \"*********************************\"\n\n        Bandwidth                        : 200\n        CircuitName                      : MyTestCircuit\n        Location                         : Silicon Valley\n        ServiceKey                       : *********************************\n        ServiceProviderName              : equinix\n        ServiceProviderProvisioningState : Provisioned\n        Sku                              : Standard\n        Status                           : Enabled\n\n    确保线路显示为已预配并已启用。否则，请与连接服务提供商合作，使线路变为所需的状态。\n\n        ServiceProviderProvisioningState : Provisioned\n        Status                           : Enabled\n\n\n4. **配置线路的 Azure 专用对等互连。**\n\n    在继续执行后续步骤之前，请确保已准备好以下各项：\n\n    - 主链路的 /30 子网。它不能是保留给虚拟网络使用的任何地址空间的一部分。\n    - 辅助链路的 /30 子网。它不能是保留给虚拟网络使用的任何地址空间的一部分。\n    - 用于建立此对等互连的有效 VLAN ID。请确保线路中没有其他对等互连使用同一个 VLAN ID。\n    - 对等互连的 AS 编号。可以使用 2 字节和 4 字节 AS 编号。可以将专用 AS 编号用于此对等互连。请务必不要使用 65515。\n    - MD5 哈希（如果选择使用）。**这是可选的**。\n    \n    可以运行以下 cmdlet 来为线路配置 Azure 专用对等互连。\n\n        New-AzureBGPPeering -AccessType Private -ServiceKey \"*********************************\" -PrimaryPeerSubnet \"10.0.0.0/30\" -SecondaryPeerSubnet \"10.0.0.4/30\" -PeerAsn 1234 -VlanId 100\n\n    如果选择使用 MD5 哈希，则可以使用以下 cmdlet。\n\n        New-AzureBGPPeering -AccessType Private -ServiceKey \"*********************************\" -PrimaryPeerSubnet \"10.0.0.0/30\" -SecondaryPeerSubnet \"10.0.0.4/30\" -PeerAsn 1234 -VlanId 100 -SharedKey \"A1B2C3D4\"\n\n    >[AZURE.IMPORTANT]请确保将 AS 编号指定为对等互连 ASN 而不是客户 ASN。\n\n### 获取 Azure 专用对等互连详细信息\n\n可以使用以下 cmdlet 来获取配置详细信息\n\n    Get-AzureBGPPeering -AccessType Private -ServiceKey \"*********************************\"\n    \n    AdvertisedPublicPrefixes       : \n    AdvertisedPublicPrefixesState  : Configured\n    AzureAsn                       : 12076\n    CustomerAutonomousSystemNumber : \n    PeerAsn                        : 1234\n    PrimaryAzurePort               : \n    PrimaryPeerSubnet              : 10.0.0.0/30\n    RoutingRegistryName            : \n    SecondaryAzurePort             : \n    SecondaryPeerSubnet            : 10.0.0.4/30\n    State                          : Enabled\n    VlanId                         : 100\n\n\n### 更新 Azure 专用对等互连配置\n\n可以使用以下 cmdlet 来更新配置的任何部分。在以下示例中，线路的 VLAN ID 将从 100 更新为 500。\n\n    Set-AzureBGPPeering -AccessType Private -ServiceKey \"*********************************\" -PrimaryPeerSubnet \"10.0.0.0/30\" -SecondaryPeerSubnet \"10.0.0.4/30\" -PeerAsn 1234 -VlanId 500 -SharedKey \"A1B2C3D4\"\n\n### 删除 Azure 专用对等互连\n\n可以运行以下 cmdlet 来删除对等互连配置。\n\n>[AZURE.WARNING]运行此 cmdlet 之前，必须确保已从 ExpressRoute 线路取消链接所有虚拟网络。\n\n    Remove-AzureBGPPeering -AccessType Private -ServiceKey \"*********************************\"\n\n\n## Azure 公共对等互连\n\n本部分说明如何为 ExpressRoute 线路创建、获取、更新和删除 Azure 公共对等互连配置。\n\n### 创建 Azure 公共对等互连\n\n1. **为 ExpressRoute 导入 PowerShell 模块。**\n    \n    在开始使用 ExpressRoute cmdlet 之前，必须将 Azure 和 ExpressRoute 模块导入 PowerShell 会话。运行以下命令，将 Azure 和 ExpressRoute 模块导入 PowerShell 会话。\n\n        Import-Module 'C:\\Program Files (x86)\\Microsoft SDKs\\Azure\\PowerShell\\ServiceManagement\\Azure\\Azure.psd1'\n        Import-Module 'C:\\Program Files (x86)\\Microsoft SDKs\\Azure\\PowerShell\\ServiceManagement\\Azure\\ExpressRoute\\ExpressRoute.psd1'\n\n2. **创建 ExpressRoute 线路**\n    \n    请按说明创建 [ExpressRoute 线路](/documentation/articles/expressroute-howto-circuit-classic)，并由连接服务提供商进行预配。如果你的连接服务提供商提供第 3 层托管服务，你可以请求连接服务提供商为你启用 Azure 专用对等互连。在此情况下，你不需要遵循后续部分中所列的说明。但是，如果你的连接服务提供商不为你管理路由，请在创建线路之后遵循以下说明。\n\n3. **检查 ExpressRoute 线路以确保它已预配**\n\n    首先必须检查 ExpressRoute 线路是否已预配并已启用。请参阅以下示例。\n\n        PS C:\\> Get-AzureDedicatedCircuit -ServiceKey \"*********************************\"\n\n        Bandwidth                        : 200\n        CircuitName                      : MyTestCircuit\n        Location                         : Silicon Valley\n        ServiceKey                       : *********************************\n        ServiceProviderName              : equinix\n        ServiceProviderProvisioningState : Provisioned\n        Sku                              : Standard\n        Status                           : Enabled\n\n    确保线路显示为已预配并已启用。否则，请与连接服务提供商合作，使线路变为所需的状态。\n\n        ServiceProviderProvisioningState : Provisioned\n        Status                           : Enabled\n\n    \n\n4. **配置线路的 Azure 公共对等互连**\n\n    在继续下一步之前，请确保已准备好以下信息。\n\n    - 主链路的 /30 子网。这必须是有效的公共 IPv4 前缀。\n    - 辅助链路的 /30 子网。这必须是有效的公共 IPv4 前缀。\n    - 用于建立此对等互连的有效 VLAN ID。请确保线路中没有其他对等互连使用同一个 VLAN ID。\n    - 对等互连的 AS 编号。可以使用 2 字节和 4 字节 AS 编号。必须将公共 AS 编号用于此对等互连。\n    - MD5 哈希（如果选择使用）。**这是可选的**。\n    \n    可以运行以下 cmdlet 来为线路配置 Azure 专用对等互连\n\n        New-AzureBGPPeering -AccessType Public -ServiceKey \"*********************************\" -PrimaryPeerSubnet \"131.107.0.0/30\" -SecondaryPeerSubnet \"131.107.0.4/30\" -PeerAsn 1234 -VlanId 200\n\n    如果选择使用 MD5 哈希，则可以使用以下 cmdlet\n\n        New-AzureBGPPeering -AccessType Public -ServiceKey \"*********************************\" -PrimaryPeerSubnet \"131.107.0.0/30\" -SecondaryPeerSubnet \"131.107.0.4/30\" -PeerAsn 1234 -VlanId 200 -SharedKey \"A1B2C3D4\"\n\n    >[AZURE.IMPORTANT]请确保将 AS 编号指定为对等互连 ASN 而不是客户 ASN。\n\n### 获取 Azure 公共对等互连详细信息\n\n可以使用以下 cmdlet 来获取配置详细信息\n\n    Get-AzureBGPPeering -AccessType Public -ServiceKey \"*********************************\"\n    \n    AdvertisedPublicPrefixes       : \n    AdvertisedPublicPrefixesState  : Configured\n    AzureAsn                       : 12076\n    CustomerAutonomousSystemNumber : \n    PeerAsn                        : 1234\n    PrimaryAzurePort               : \n    PrimaryPeerSubnet              : 131.107.0.0/30\n    RoutingRegistryName            : \n    SecondaryAzurePort             : \n    SecondaryPeerSubnet            : 131.107.0.4/30\n    State                          : Enabled\n    VlanId                         : 200\n\n\n### 更新 Azure 公共对等互连配置\n\n可以使用以下 cmdlet 来更新配置的任何部分\n\n    Set-AzureBGPPeering -AccessType Public -ServiceKey \"*********************************\" -PrimaryPeerSubnet \"131.107.0.0/30\" -SecondaryPeerSubnet \"131.107.0.4/30\" -PeerAsn 1234 -VlanId 600 -SharedKey \"A1B2C3D4\"\n\n在上面的示例中，线路的 VLAN ID 将从 200 更新为 600。\n\n### 删除 Azure 公共对等互连\n\n可以运行以下 cmdlet 来删除对等互连配置\n\n    Remove-AzureBGPPeering -AccessType Public -ServiceKey \"*********************************\"\n\n## 后续步骤\n\n下一步，[将 VNet 链接到 ExpressRoute 线路](/documentation/articles/expressroute-howto-linkvnet-classic)。\n- 有关工作流的详细信息，请参阅 [ExpressRoute 工作流](/documentation/articles/expressroute-workflows)。\n- 有关线路对等互连的详细信息，请参阅 [ExpressRoute 线路和路由域](/documentation/articles/expressroute-circuit-peerings)。\n\n<!---HONumber=Mooncake_1207_2015-->"
+}

@@ -1,0 +1,1080 @@
+{
+  "nodes": [
+    {
+      "content": "在虚拟网络上预配 HBase 群集 | Azure",
+      "pos": [
+        27,
+        52
+      ]
+    },
+    {
+      "content": "开始在 Azure HDInsight 中使用 HBase。了解如何在 Azure 虚拟网络上创建 HDInsight HBase 群集。",
+      "pos": [
+        71,
+        140
+      ]
+    },
+    {
+      "content": "在 Azure 虚拟网络上设置 HBase 群集",
+      "pos": [
+        385,
+        409
+      ]
+    },
+    {
+      "pos": [
+        411,
+        461
+      ],
+      "content": "了解如何在 <bpt id=\"p1\">[</bpt>Azure 虚拟网络<ept id=\"p1\">][1]</ept>上创建 Azure HDInsight HBase 群集。"
+    },
+    {
+      "content": "通过虚拟网络集成，可以将 HBase 群集部署到应用程序所在的虚拟网络，以便应用程序直接与 HBase 进行通信。优点包括：",
+      "pos": [
+        463,
+        525
+      ]
+    },
+    {
+      "content": "将 Web 应用直接连接到 HBase 群集节点，以通过 HBase Java 远程过程调用 (RPC) API 实现通信。",
+      "pos": [
+        529,
+        591
+      ]
+    },
+    {
+      "content": "提高性能，因为流量不必通过多个网关和负载平衡器。",
+      "pos": [
+        594,
+        618
+      ]
+    },
+    {
+      "content": "能够以更安全的方式处理敏感信息，而无需公开公共终结点。",
+      "pos": [
+        621,
+        648
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        652,
+        656
+      ]
+    },
+    {
+      "content": "在开始阅读本教程前，你必须具有：",
+      "pos": [
+        657,
+        673
+      ]
+    },
+    {
+      "pos": [
+        677,
+        735
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>一个 Azure 订阅<ept id=\"p1\">**</ept>。请参阅<bpt id=\"p2\">[</bpt>获取 Azure 免费试用版<ept id=\"p2\">](/pricing/1rmb-trial/)</ept>。"
+    },
+    {
+      "pos": [
+        739,
+        768
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>配备 Azure PowerShell 的工作站<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "在运行 Azure PowerShell 脚本之前，请确保你已通过使用以下 cmdlet 连接到 Azure 订阅：",
+      "pos": [
+        774,
+        832
+      ]
+    },
+    {
+      "content": "如果你有多个 Azure 订阅，请使用以下 cmdlet 来设置当前订阅：",
+      "pos": [
+        893,
+        930
+      ]
+    },
+    {
+      "content": "在虚拟网络中设置 HBase 群集",
+      "pos": [
+        993,
+        1010
+      ]
+    },
+    {
+      "content": "在设置 HBase 群集前，你需要拥有 Azure 虚拟网络。",
+      "pos": [
+        1012,
+        1043
+      ]
+    },
+    {
+      "content": "通过使用 Azure 门户创建虚拟网络",
+      "pos": [
+        1047,
+        1066
+      ]
+    },
+    {
+      "pos": [
+        1073,
+        1102
+      ],
+      "content": "登录到 <bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">][azure-portal]</ept>。"
+    },
+    {
+      "content": "单击左下角的“新建”，然后依次单击“网络服务”、“虚拟网络”和“快速创建”。",
+      "pos": [
+        1106,
+        1144
+      ]
+    },
+    {
+      "content": "键入或选择以下值：",
+      "pos": [
+        1148,
+        1157
+      ]
+    },
+    {
+      "pos": [
+        1165,
+        1182
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>名称<ept id=\"p1\">**</ept> - 虚拟网络的名称。"
+    },
+    {
+      "pos": [
+        1189,
+        1261
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>地址空间<ept id=\"p1\">**</ept> - 为虚拟网络提供大到足以为群集中的所有节点提供地址的地址空间。否则，设置将失败。为了完成本教程，你可以选取以下三个选项之一。"
+    },
+    {
+      "pos": [
+        1268,
+        1362
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>最大 VM 计数<ept id=\"p1\">**</ept> - 选择最大虚拟机 (VM) 计数之一。此值确定可以在地址空间下创建的可能主机 (VM) 数。为了完成本教程，<bpt id=\"p2\">**</bpt>4096 [CIDR: /20]<ept id=\"p2\">**</ept> 便已足够。"
+    },
+    {
+      "pos": [
+        1369,
+        1400
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>位置<ept id=\"p1\">**</ept> - 位置必须与你要创建的 HBase 群集相同。"
+    },
+    {
+      "pos": [
+        1407,
+        1600
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>DNS 服务器<ept id=\"p1\">**</ept> - 本教程使用 Azure 提供的内部域名系统 (DNS) 服务器，因此，你可以选择“无”。此外，也支持使用自定义 DNS 服务器的高级网络配置。有关详细指导，请参阅<bpt id=\"p2\">[</bpt>名称解析 (DNS)<ept id=\"p2\">](/documentation/articles/virtual-networks-name-resolution-for-vms-and-role-instances)</ept>。"
+    },
+    {
+      "content": "单击右下角的“创建虚拟网络”。新虚拟网络名称将显示在列表中。等到“状态”列显示“已创建”。",
+      "pos": [
+        1604,
+        1649
+      ]
+    },
+    {
+      "content": "在主窗格中，单击刚创建的虚拟网络。",
+      "pos": [
+        1653,
+        1670
+      ]
+    },
+    {
+      "content": "单击该页顶部的“仪表板”。",
+      "pos": [
+        1674,
+        1687
+      ]
+    },
+    {
+      "content": "在“速览”下，记住虚拟网络 ID。在设置 HBase 群集时将要用到它。",
+      "pos": [
+        1691,
+        1727
+      ]
+    },
+    {
+      "content": "单击该页顶部的“配置”。",
+      "pos": [
+        1731,
+        1743
+      ]
+    },
+    {
+      "pos": [
+        1747,
+        1823
+      ],
+      "content": "在该页底部，默认子网名称为 <bpt id=\"p1\">**</bpt>Subnet-1<ept id=\"p1\">**</ept>。你可以选择重命名子网或者向 HBase 群集添加一个新子网。记下子网名称；在设置群集时将要用到它。"
+    },
+    {
+      "content": "验证要用于群集的子网的“CIDR(地址计数)”。地址数必须大于辅助节点数加上七（网关：2，头节点：2，ZooKeeper：3）。例如，如果需要一个 10 节点 HBase 群集，则子网的地址计数必须大于 17 (10+7)。否则，部署将失败。",
+      "pos": [
+        1828,
+        1949
+      ]
+    },
+    {
+      "content": "如果更新了子网值，请单击该页底部的“保存”。",
+      "pos": [
+        1954,
+        1976
+      ]
+    },
+    {
+      "content": "向虚拟网络添加 DNS 服务器虚拟机",
+      "pos": [
+        1981,
+        1999
+      ]
+    },
+    {
+      "pos": [
+        2003,
+        2109
+      ],
+      "content": "DNS 服务器是可选的，但在某些情况下又是必需的。<bpt id=\"p1\">[</bpt>在两个 Azure 虚拟网络之间配置 DNS<ept id=\"p1\">][hdinsight-hbase-replication-dns]</ept> 中记录了该过程。基本上，你将需要执行以下步骤："
+    },
+    {
+      "content": "向虚拟网络添加 Azure 虚拟机",
+      "pos": [
+        2114,
+        2131
+      ]
+    },
+    {
+      "content": "为虚拟机设置静态 IP 地址",
+      "pos": [
+        2135,
+        2149
+      ]
+    },
+    {
+      "content": "向虚拟网络添加 DNS 服务器角色",
+      "pos": [
+        2153,
+        2170
+      ]
+    },
+    {
+      "content": "将 DNS 服务器分配到虚拟网络",
+      "pos": [
+        2174,
+        2190
+      ]
+    },
+    {
+      "content": "创建群集要使用的 Azure 存储帐户和 Blob 存储容器",
+      "pos": [
+        2195,
+        2225
+      ]
+    },
+    {
+      "pos": [
+        2231,
+        2432
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>HDInsight 群集使用 Azure Blob 存储来存储数据。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>在 HDInsight 中将 Azure Blob 存储与 Hadoop 配合使用<ept id=\"p1\">](/documentation/articles/hdinsight-hadoop-use-blob-storage)</ept>。你需要存储帐户和 Blob 存储容器。存储帐户位置必须与虚拟网络位置和群集位置匹配。"
+    },
+    {
+      "pos": [
+        2434,
+        2657
+      ],
+      "content": "像其他 HDInsight 群集，HBase 群集要求将 Azure 存储帐户和 Blob 存储容器作为默认文件系统。存储帐户位置必须与虚拟网络位置和群集位置匹配。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>在 HDInsight 中将 Azure Blob 存储与 Hadoop 配合使用<ept id=\"p1\">][hdinsight-storage]</ept>。在设置 HBase 群集时，你可以选择创建新群集或使用现有群集。此过程演示如何使用 Azure 门户创建存储帐户和 Blob 存储容器。"
+    },
+    {
+      "pos": [
+        2662,
+        2691
+      ],
+      "content": "登录到 <bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">][azure-portal]</ept>。"
+    },
+    {
+      "content": "单击左下角的“新建”，依次指向“数据服务”和“存储”，然后单击“快速创建”。",
+      "pos": [
+        2695,
+        2733
+      ]
+    },
+    {
+      "content": "键入或选择以下值：",
+      "pos": [
+        2738,
+        2747
+      ]
+    },
+    {
+      "pos": [
+        2755,
+        2773
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>URL<ept id=\"p1\">**</ept> - 存储帐户的名称。"
+    },
+    {
+      "pos": [
+        2780,
+        2817
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>位置<ept id=\"p1\">**</ept> - 存储帐户的位置。确保其与虚拟网络位置匹配。不支持地缘组。"
+    },
+    {
+      "pos": [
+        2824,
+        2854
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>复制<ept id=\"p1\">**</ept> - 出于测试目的，使用“本地冗余”来降低成本。"
+    },
+    {
+      "content": "单击“创建存储帐户”。你将在存储列表中看到新的存储帐户。",
+      "pos": [
+        2859,
+        2887
+      ]
+    },
+    {
+      "content": "等到新存储帐户的“状态”更改为“联机”。",
+      "pos": [
+        2891,
+        2911
+      ]
+    },
+    {
+      "content": "单击该列表中的新存储帐户以将其选定。",
+      "pos": [
+        2915,
+        2933
+      ]
+    },
+    {
+      "content": "在该页的底部，单击“管理访问密钥”。",
+      "pos": [
+        2937,
+        2955
+      ]
+    },
+    {
+      "content": "记下存储帐户名称和主访问密钥（或辅助访问密钥；两个密钥之一起作用）。本教程后面的步骤中将会用到它们。",
+      "pos": [
+        2959,
+        3009
+      ]
+    },
+    {
+      "content": "在该页的顶部，单击“容器”。",
+      "pos": [
+        3013,
+        3027
+      ]
+    },
+    {
+      "content": "在该页的底部，单击“添加”。",
+      "pos": [
+        3032,
+        3046
+      ]
+    },
+    {
+      "content": "输入容器名称。该容器将用作 HBase 群集的默认容器。默认情况下，默认容器名称与群集名称匹配。将“访问”字段保留为“私有”。",
+      "pos": [
+        3051,
+        3114
+      ]
+    },
+    {
+      "content": "单击复选标记以创建容器。",
+      "pos": [
+        3121,
+        3133
+      ]
+    },
+    {
+      "content": "通过使用 Azure 门户设置 HBase 群集",
+      "pos": [
+        3137,
+        3161
+      ]
+    },
+    {
+      "pos": [
+        3167,
+        3269
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>有关通过使用 Azure PowerShell 预配新 HBase 群集的信息，请参阅<bpt id=\"p1\">[</bpt>使用 Azure PowerShell 预配 HBase 群集<ept id=\"p1\">](#powershell)</ept>。"
+    },
+    {
+      "pos": [
+        3274,
+        3303
+      ],
+      "content": "登录到 <bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">][azure-portal]</ept>。"
+    },
+    {
+      "content": "单击左下角的“新建”，依次指向“数据服务”和“HDINSIGHT”，然后单击“自定义创建”。",
+      "pos": [
+        3308,
+        3354
+      ]
+    },
+    {
+      "content": "输入群集名称，选择 HBase 作为群集类型，选择 Windows Server 2012 操作系统，选择 HDInsight 版本，然后单击右侧按钮。",
+      "pos": [
+        3359,
+        3435
+      ]
+    },
+    {
+      "content": "提供 HBase 群集的详细信息",
+      "pos": [
+        3443,
+        3459
+      ]
+    },
+    {
+      "pos": [
+        3498,
+        3550
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>对于 HBase 群集，Windows Server 是唯一可用的 OS 选项。"
+    },
+    {
+      "content": "在“配置群集”页上，输入或选择以下内容：",
+      "pos": [
+        3555,
+        3575
+      ]
+    },
+    {
+      "content": "提供 HBase 群集的详细信息",
+      "pos": [
+        3583,
+        3599
+      ]
+    },
+    {
+      "pos": [
+        3666,
+        4156
+      ],
+      "content": "<table border='1'>\n <tr><th>属性</th><th>值</th></tr>\n <tr><td>数据节点</td><td>选择要部署的数据节点数。出于测试目的，创建一个单节点群集。<br />群集大小限制因 Azure 订阅而异。若要提高限制的大小，请联系 Azure 计费支持。</td></tr>\n <tr><td>区域/虚拟网络</td><td><p>选择区域或 Azure 虚拟网络（如果已创建）。对于本教程，选择你以前创建的网络，然后选择相应的子网。默认名称为 <b>Subnet-1</b>。</p></td></tr>\n <tr><td>头节点大小</td><td><p>为头节点选择 VM 大小。</p></td></tr>\n <tr><td>数据节点大小</td><td><p>为数据节点选择 VM 大小。</p></td></tr>\n <tr><td>Zookeeper 大小</td><td><p>为 Zookeeper 节点选择 VM 大小。</p></td></tr>\n </table>",
+      "leadings": [
+        "",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   "
+      ],
+      "nodes": [
+        {
+          "content": "属性",
+          "pos": [
+            28,
+            30
+          ]
+        },
+        {
+          "content": "值",
+          "pos": [
+            39,
+            40
+          ]
+        },
+        {
+          "content": "数据节点",
+          "pos": [
+            60,
+            64
+          ]
+        },
+        {
+          "content": "选择要部署的数据节点数。出于测试目的，创建一个单节点群集。",
+          "pos": [
+            73,
+            102
+          ]
+        },
+        {
+          "content": "群集大小限制因 Azure 订阅而异。若要提高限制的大小，请联系 Azure 计费支持。",
+          "pos": [
+            108,
+            152
+          ]
+        },
+        {
+          "content": "区域/虚拟网络",
+          "pos": [
+            172,
+            179
+          ]
+        },
+        {
+          "content": "选择区域或 Azure 虚拟网络（如果已创建）。对于本教程，选择你以前创建的网络，然后选择相应的子网。默认名称为 <ph id=\"ph1\">&lt;b&gt;</ph>Subnet-1<ph id=\"ph2\">&lt;/b&gt;</ph>。",
+          "pos": [
+            191,
+            264
+          ]
+        },
+        {
+          "content": "头节点大小",
+          "pos": [
+            288,
+            293
+          ]
+        },
+        {
+          "content": "为头节点选择 VM 大小。",
+          "pos": [
+            305,
+            318
+          ]
+        },
+        {
+          "content": "数据节点大小",
+          "pos": [
+            342,
+            348
+          ]
+        },
+        {
+          "content": "为数据节点选择 VM 大小。",
+          "pos": [
+            360,
+            374
+          ]
+        },
+        {
+          "content": "Zookeeper 大小",
+          "pos": [
+            398,
+            410
+          ]
+        },
+        {
+          "content": "为 Zookeeper 节点选择 VM 大小。",
+          "pos": [
+            422,
+            445
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        4162,
+        4318
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>根据所选的 VM，你的成本可能会有所不同。HDInsight 对群集节点使用所有标准层 VM。有关 VM 大小如何影响价格的信息，请参阅 <ph id=\"ph2\">&lt;a href=\"/home/features/hdinsight/#price\" target=\"_blank\"&gt;</ph>HDInsight 价格<ph id=\"ph3\">&lt;/a&gt;</ph>。"
+    },
+    {
+      "content": "单击右侧按钮。",
+      "pos": [
+        4324,
+        4331
+      ]
+    },
+    {
+      "content": "输入要用于此群集的 Hadoop 用户名和密码，然后单击右侧按钮。",
+      "pos": [
+        4336,
+        4369
+      ]
+    },
+    {
+      "content": "提供 Hadoop HDInsight 群集的存储帐户",
+      "pos": [
+        4377,
+        4404
+      ]
+    },
+    {
+      "pos": [
+        4471,
+        4907
+      ],
+      "content": "<table border='1'>\n <tr><th>属性</th><th>值</th></tr>\n <tr><td>HTTP 用户名</td>\n     <td>指定 HDInsight 群集用户名。</td></tr>\n <tr><td>HTTP 密码/确认密码</td>\n     <td>指定 HDInsight 群集用户密码。</td></tr>\n <tr><td>为群集启用远程桌面</td>\n     <td>在设置后，选中此复选框，以为可远程连接到群集节点的远程桌面用户指定用户名、密码和到期日期。稍后，你还可以在设置了群集后启用远程桌面。有关说明，请参阅<a href=\"hdinsight-administer-use-management-portal-v1/#rdp\" target=\"_blank\">使用 RDP 连接到 HDInsight 群集</a>。</td></tr>\n </table>",
+      "leadings": [
+        "",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   "
+      ],
+      "nodes": [
+        {
+          "content": "属性",
+          "pos": [
+            28,
+            30
+          ]
+        },
+        {
+          "content": "值",
+          "pos": [
+            39,
+            40
+          ]
+        },
+        {
+          "content": "HTTP 用户名",
+          "pos": [
+            60,
+            68
+          ]
+        },
+        {
+          "content": "指定 HDInsight 群集用户名。",
+          "pos": [
+            83,
+            102
+          ]
+        },
+        {
+          "content": "HTTP 密码/确认密码",
+          "pos": [
+            122,
+            134
+          ]
+        },
+        {
+          "content": "指定 HDInsight 群集用户密码。",
+          "pos": [
+            149,
+            169
+          ]
+        },
+        {
+          "content": "为群集启用远程桌面",
+          "pos": [
+            189,
+            198
+          ]
+        },
+        {
+          "content": "在设置后，选中此复选框，以为可远程连接到群集节点的远程桌面用户指定用户名、密码和到期日期。稍后，你还可以在设置了群集后启用远程桌面。有关说明，请参阅<ph id=\"ph1\">&lt;a href=\"hdinsight-administer-use-management-portal-v1/#rdp\" target=\"_blank\"&gt;</ph>使用 RDP 连接到 HDInsight 群集<ph id=\"ph2\">&lt;/a&gt;</ph>。",
+          "pos": [
+            213,
+            392
+          ]
+        }
+      ]
+    },
+    {
+      "content": "在“存储帐户”页上提供以下值：",
+      "pos": [
+        4912,
+        4927
+      ]
+    },
+    {
+      "content": "提供 Hadoop HDInsight 群集的存储帐户",
+      "pos": [
+        4935,
+        4962
+      ]
+    },
+    {
+      "pos": [
+        5029,
+        6309
+      ],
+      "content": "<table border='1'>\n <tr><th>属性</th><th>值</th></tr>\n <tr><td>存储帐户</td>\n     <td>为 HDInsight 群集指定将用作默认文件系统的 Azure 存储帐户。可以选择以下三个选项之一：\n     <ul>\n         <li><strong>使用现有存储</strong></li>\n         <li><strong>创建新存储</strong></li>\n         <li><strong>使用其他订阅中的存储</strong></li>\n     </ul>\n     </td></tr>\n <tr><td>帐户名</td>\n     <td><ul>\n         <li>如果选择了使用现有存储，请为“帐户名”选择现有的存储帐户。<strong></strong>下拉列表仅列出你选择设置群集的相同数据中心内的存储帐户。</li>\n         <li>如果选择了“创建新存储”或“使用其他订阅中的存储”选项，则必须提供存储帐户名。<strong></strong><strong></strong></li>\n     </ul></td></tr>\n <tr><td>帐户密钥</td>\n     <td>如果选择了“使用其他订阅中的存储”选项，请指定该存储帐户的帐户密钥。<strong></strong></td></tr>\n <tr><td>默认容器</td>\n     <td><p>指定存储帐户上用作 HDInsight 群集默认文件系统的默认容器。如果为“存储帐户”字段选择了“使用现有存储”，并且该帐户中不存在现有容器，则默认情况下，将创建与群集同名的容器<strong></strong><strong></strong>。如果已存在与群集同名的容器，则将在容器名称后追加一个序列号。例如，mycontainer1、mycontainer2，等等。但是，如果现有存储帐户的容器名称与你指定的群集名称不同，则你也可以使用该容器。</p>\n     <p>如果选择创建新存储或使用其他 Azure 订阅中的存储，则必须指定默认容器名称</p>\n </td></tr>\n <tr><td>其他存储帐户</td>\n     <td>如果需要，请为群集指定其他存储帐户。HDInsight 支持多个存储帐户。一个群集可以使用的其他存储帐户数没有限制。但是，如果你通过使用 Azure 门户创建群集，则由于 UI 限制，你最多只能创建七个存储帐户。指定的每个其他存储帐户将在向导中添加一个额外的“存储帐户”页，以便你在此指定帐户信息。<strong></strong>例如，在以上屏幕截图中，未选择其他存储帐户，因此，不会将额外的页添加到向导中。</td></tr>\n </table>单击右箭头。",
+      "leadings": [
+        "",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   "
+      ],
+      "nodes": [
+        {
+          "content": "属性",
+          "pos": [
+            28,
+            30
+          ]
+        },
+        {
+          "content": "值",
+          "pos": [
+            39,
+            40
+          ]
+        },
+        {
+          "content": "存储帐户",
+          "pos": [
+            60,
+            64
+          ]
+        },
+        {
+          "content": "为 HDInsight 群集指定将用作默认文件系统的 Azure 存储帐户。可以选择以下三个选项之一：",
+          "pos": [
+            79,
+            130
+          ]
+        },
+        {
+          "content": "<ph id=\"ph1\">&lt;strong&gt;</ph>使用现有存储<ph id=\"ph2\">&lt;/strong&gt;</ph>",
+          "pos": [
+            154,
+            177
+          ]
+        },
+        {
+          "content": "<ph id=\"ph1\">&lt;strong&gt;</ph>创建新存储<ph id=\"ph2\">&lt;/strong&gt;</ph>",
+          "pos": [
+            196,
+            218
+          ]
+        },
+        {
+          "content": "<ph id=\"ph1\">&lt;strong&gt;</ph>使用其他订阅中的存储<ph id=\"ph2\">&lt;/strong&gt;</ph>",
+          "pos": [
+            237,
+            264
+          ]
+        },
+        {
+          "content": "帐户名",
+          "pos": [
+            306,
+            309
+          ]
+        },
+        {
+          "content": "如果选择了使用现有存储，请为“帐户名”选择现有的存储帐户。<ph id=\"ph1\">&lt;strong&gt;</ph><ph id=\"ph2\">&lt;/strong&gt;</ph>下拉列表仅列出你选择设置群集的相同数据中心内的存储帐户。",
+          "pos": [
+            342,
+            416
+          ]
+        },
+        {
+          "content": "如果选择了“创建新存储”或“使用其他订阅中的存储”选项，则必须提供存储帐户名。<ph id=\"ph1\">&lt;strong&gt;</ph><ph id=\"ph2\">&lt;/strong&gt;</ph><ph id=\"ph3\">&lt;strong&gt;</ph><ph id=\"ph4\">&lt;/strong&gt;</ph>",
+          "pos": [
+            435,
+            508
+          ]
+        },
+        {
+          "content": "帐户密钥",
+          "pos": [
+            544,
+            548
+          ]
+        },
+        {
+          "content": "如果选择了“使用其他订阅中的存储”选项，请指定该存储帐户的帐户密钥。<ph id=\"ph1\">&lt;strong&gt;</ph><ph id=\"ph2\">&lt;/strong&gt;</ph>",
+          "pos": [
+            563,
+            614
+          ]
+        },
+        {
+          "content": "默认容器",
+          "pos": [
+            634,
+            638
+          ]
+        },
+        {
+          "content": "指定存储帐户上用作 HDInsight 群集默认文件系统的默认容器。如果为“存储帐户”字段选择了“使用现有存储”，并且该帐户中不存在现有容器，则默认情况下，将创建与群集同名的容器<ph id=\"ph1\">&lt;strong&gt;</ph><ph id=\"ph2\">&lt;/strong&gt;</ph><ph id=\"ph3\">&lt;strong&gt;</ph><ph id=\"ph4\">&lt;/strong&gt;</ph>。如果已存在与群集同名的容器，则将在容器名称后追加一个序列号。例如，mycontainer1、mycontainer2，等等。但是，如果现有存储帐户的容器名称与你指定的群集名称不同，则你也可以使用该容器。",
+          "pos": [
+            656,
+            881
+          ]
+        },
+        {
+          "content": "如果选择创建新存储或使用其他 Azure 订阅中的存储，则必须指定默认容器名称",
+          "pos": [
+            894,
+            933
+          ]
+        },
+        {
+          "content": "其他存储帐户",
+          "pos": [
+            959,
+            965
+          ]
+        },
+        {
+          "content": "如果需要，请为群集指定其他存储帐户。HDInsight 支持多个存储帐户。一个群集可以使用的其他存储帐户数没有限制。但是，如果你通过使用 Azure 门户创建群集，则由于 UI 限制，你最多只能创建七个存储帐户。指定的每个其他存储帐户将在向导中添加一个额外的“存储帐户”页，以便你在此指定帐户信息。<ph id=\"ph1\">&lt;strong&gt;</ph><ph id=\"ph2\">&lt;/strong&gt;</ph>例如，在以上屏幕截图中，未选择其他存储帐户，因此，不会将额外的页添加到向导中。",
+          "pos": [
+            980,
+            1185
+          ]
+        },
+        {
+          "content": "单击右箭头。",
+          "pos": [
+            1205,
+            1211
+          ]
+        }
+      ]
+    },
+    {
+      "content": "在“脚本操作”页上，选中右下角的复选标记。请勿单击“添加脚本操作”按钮，因为本教程不需要自定义群集安装程序。",
+      "pos": [
+        6314,
+        6368
+      ]
+    },
+    {
+      "content": "配置脚本操作以自定义 HDInsight HBase 群集",
+      "pos": [
+        6376,
+        6405
+      ]
+    },
+    {
+      "pos": [
+        6443,
+        6570
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>此页可用于在安装过程中自定义群集。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>使用脚本操作自定义 HDInsight 群集<ept id=\"p1\">](/documentation/articles/hdinsight-hadoop-customize-cluster-v1)</ept>。"
+    },
+    {
+      "pos": [
+        6572,
+        6702
+      ],
+      "content": "要开始处理新 HBase 群集，可以按照<bpt id=\"p1\">[</bpt>开始在 HDInsight 中将 HBase 与 Hadoop 配合使用<ept id=\"p1\">](/documentation/articles/hdinsight-hbase-tutorial-get-started-v1)</ept>中的步骤操作。"
+    },
+    {
+      "content": "通过使用 HBase Java RPC API 连接到虚拟网络中设置的 HBase 群集",
+      "pos": [
+        6706,
+        6750
+      ]
+    },
+    {
+      "pos": [
+        6756,
+        7013
+      ],
+      "content": "将基础结构即服务 (IaaS) 虚拟机设置到相同的 Azure 虚拟网络和子网中。因此，虚拟机和 HBase 群集使用相同的内部 DNS 服务器来解析主机名。为此，你必须选择“从库中”选项，然后选择虚拟网络而不是数据中心。有关说明，请参阅<bpt id=\"p1\">[</bpt>创建运行 Windows Server 的虚拟机<ept id=\"p1\">](/documentation/articles/virtual-machines-windows-tutorial-classic-portal)</ept>。具有小型虚拟机的标准 Windows Server 2012 映像已足够。"
+    },
+    {
+      "content": "使用 Java 应用程序远程连接到 HBase 时，必须使用完全限定域名 (FQDN)。若要确定这一点，你必须获取 HBase 群集的连接特定的 DNS 后缀。为此，请使用 Curl 查询 Ambari，或使用远程桌面来连接到群集。",
+      "pos": [
+        7019,
+        7135
+      ]
+    },
+    {
+      "pos": [
+        7143,
+        7161
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Curl<ept id=\"p1\">**</ept> - 使用以下命令："
+    },
+    {
+      "content": "在返回的 JavaScript 对象表示法 (JSON) 数据中，找到“host_name”条目。这将包含群集中的节点的 FQDN。例如：",
+      "pos": [
+        7345,
+        7414
+      ]
+    },
+    {
+      "content": "以群集名称开头的域名的部分是 DNS 后缀。例如，mycluster.b1.chinacloudapp.cn。",
+      "pos": [
+        7530,
+        7585
+      ]
+    },
+    {
+      "pos": [
+        7593,
+        7684
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Azure PowerShell<ept id=\"p1\">**</ept> - 使用以下 Azure PowerShell 脚本注册 <bpt id=\"p2\">**</bpt>Get-ClusterDetail<ept id=\"p2\">**</ept> 函数，该函数可用于返回 DNS 后缀："
+    },
+    {
+      "pos": [
+        13069,
+        13182
+      ],
+      "content": "运行 Azure PowerShell 脚本后，使用以下命令通过 <bpt id=\"p1\">**</bpt>Get-ClusterDetail<ept id=\"p1\">**</ept> 函数来返回 DNS 后缀。使用此命令时，指定你的 HDInsight HBase 群集名称、管理员名称和管理员密码。"
+    },
+    {
+      "pos": [
+        13340,
+        13404
+      ],
+      "content": "这将返回 DNS 后缀。例如 <bpt id=\"p1\">**</bpt>yourclustername.b4.internal.chinacloudapp.cn<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        13412,
+        13592
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>你还可以使用远程桌面来连接到 HBase 群集（你将连接到头节点），并从命令提示符运行 <bpt id=\"p1\">**</bpt>ipconfig<ept id=\"p1\">**</ept> 来获取 DNS 后缀。有关启用远程桌面协议 (RDP) 并使用 RDP 连接到群集的说明，请参阅<bpt id=\"p2\">[</bpt>使用 Azure 门户在 HDInsight 中管理 Hadoop 群集<ept id=\"p2\">][hdinsight-admin-portal]</ept>。"
+    },
+    {
+      "content": "![hdinsight.hbase.dns.surffix][img-dns-surffix]",
+      "pos": [
+        13602,
+        13649
+      ]
+    },
+    {
+      "pos": [
+        14451,
+        14565
+      ],
+      "content": "若要验证虚拟机是否可与 HBase 群集进行通信，请从虚拟机使用 <ph id=\"ph1\">`ping headnode0.&lt;dns suffix&gt;`</ph> 命令。例如，ping headnode0.mycluster.b1.chinacloudapp.cn。"
+    },
+    {
+      "pos": [
+        14567,
+        14796
+      ],
+      "content": "若要在 Java 应用程序中使用此信息，可以按照<bpt id=\"p1\">[</bpt>使用 Maven 构建将 HBase 与 HDInsight (Hadoop) 配合使用的 Java 应用程序<ept id=\"p1\">](/documentation/articles/hdinsight-hbase-build-java-maven)</ept>中的步骤来创建应用程序。若要让应用程序连接到远程 HBase 服务器，请修改本示例中的 <bpt id=\"p2\">**</bpt>hbase-site.xml<ept id=\"p2\">**</ept> 文件，以对 Zookeeper 使用 FQDN。例如："
+    },
+    {
+      "pos": [
+        14971,
+        15127
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>有关 Azure 虚拟网络中的名称解析的详细信息，包括如何使用自己的 DNS 服务器，请参阅<bpt id=\"p1\">[</bpt>名称解析 (DNS)<ept id=\"p1\">](/documentation/articles/virtual-networks-name-resolution-for-vms-and-role-instances)</ept>。"
+    },
+    {
+      "pos": [
+        15131,
+        15189
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"powershell\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>通过使用 Azure PowerShell 设置 HBase 群集"
+    },
+    {
+      "content": "通过使用 Azure PowerShell 设置 HBase 群集",
+      "pos": [
+        15193,
+        15226
+      ]
+    },
+    {
+      "content": "打开 Azure PowerShell 集成脚本环境 (ISE)。",
+      "pos": [
+        15233,
+        15266
+      ]
+    },
+    {
+      "content": "将以下命令复制并粘贴到脚本窗格中：",
+      "pos": [
+        15270,
+        15287
+      ]
+    },
+    {
+      "pos": [
+        16799,
+        16818
+      ],
+      "content": "单击“运行脚本”，或按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "若要验证群集，可以在 Azure 门户中检查该群集，也可以在底部窗格中运行以下 Azure PowerShell cmdlet：",
+      "pos": [
+        16822,
+        16886
+      ]
+    },
+    {
+      "content": "Get-AzureHDInsightCluster",
+      "pos": [
+        16892,
+        16917
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        16921,
+        16925
+      ]
+    },
+    {
+      "content": "在本教程中，你已学习了如何设置 HBase 群集。若要了解更多信息，请参阅以下文章：",
+      "pos": [
+        16927,
+        16969
+      ]
+    },
+    {
+      "content": "开始使用 HDInsight",
+      "pos": [
+        16974,
+        16988
+      ]
+    },
+    {
+      "content": "在 HDInsight 中配置 HBase 复制",
+      "pos": [
+        17067,
+        17091
+      ]
+    },
+    {
+      "content": "在 HDInsight 中设置 Hadoop 群集",
+      "pos": [
+        17153,
+        17178
+      ]
+    },
+    {
+      "content": "开始在 HDInsight 中将 HBase 与 Hadoop 配合使用",
+      "pos": [
+        17240,
+        17276
+      ]
+    },
+    {
+      "content": "虚拟网络概述",
+      "pos": [
+        17346,
+        17352
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"在虚拟网络上预配 HBase 群集 | Azure\"\n    description=\"开始在 Azure HDInsight 中使用 HBase。了解如何在 Azure 虚拟网络上创建 HDInsight HBase 群集。\"\n    keywords=\"\"\n    services=\"hdinsight,virtual-network\"\n    documentationCenter=\"\"\n    authors=\"mumian\"\n    manager=\"paulettm\"\n    editor=\"cgronlun\"/>\n\n<tags\n    ms.service=\"hdinsight\"\n    ms.date=\"12/02/2015\"\n    wacn.date=\"01/21/2016\"/>\n\n# 在 Azure 虚拟网络上设置 HBase 群集\n\n了解如何在 [Azure 虚拟网络][1]上创建 Azure HDInsight HBase 群集。\n\n通过虚拟网络集成，可以将 HBase 群集部署到应用程序所在的虚拟网络，以便应用程序直接与 HBase 进行通信。优点包括：\n\n- 将 Web 应用直接连接到 HBase 群集节点，以通过 HBase Java 远程过程调用 (RPC) API 实现通信。\n- 提高性能，因为流量不必通过多个网关和负载平衡器。\n- 能够以更安全的方式处理敏感信息，而无需公开公共终结点。\n\n##先决条件\n在开始阅读本教程前，你必须具有：\n\n- **一个 Azure 订阅**。请参阅[获取 Azure 免费试用版](/pricing/1rmb-trial/)。\n\n- **配备 Azure PowerShell 的工作站**。\n\n    在运行 Azure PowerShell 脚本之前，请确保你已通过使用以下 cmdlet 连接到 Azure 订阅：\n\n        Add-AzureAccount -Environment AzureChinaCloud\n\n    如果你有多个 Azure 订阅，请使用以下 cmdlet 来设置当前订阅：\n\n        Select-AzureSubscription <AzureSubscriptionName>\n\n\n##在虚拟网络中设置 HBase 群集\n\n在设置 HBase 群集前，你需要拥有 Azure 虚拟网络。\n\n**通过使用 Azure 门户创建虚拟网络**\n\n1. 登录到 [Azure 门户][azure-portal]。\n2. 单击左下角的“新建”，然后依次单击“网络服务”、“虚拟网络”和“快速创建”。\n3. 键入或选择以下值：\n\n    - **名称** - 虚拟网络的名称。\n    - **地址空间** - 为虚拟网络提供大到足以为群集中的所有节点提供地址的地址空间。否则，设置将失败。为了完成本教程，你可以选取以下三个选项之一。\n    - **最大 VM 计数** - 选择最大虚拟机 (VM) 计数之一。此值确定可以在地址空间下创建的可能主机 (VM) 数。为了完成本教程，**4096 [CIDR: /20]** 便已足够。\n    - **位置** - 位置必须与你要创建的 HBase 群集相同。\n    - **DNS 服务器** - 本教程使用 Azure 提供的内部域名系统 (DNS) 服务器，因此，你可以选择“无”。此外，也支持使用自定义 DNS 服务器的高级网络配置。有关详细指导，请参阅[名称解析 (DNS)](/documentation/articles/virtual-networks-name-resolution-for-vms-and-role-instances)。\n4. 单击右下角的“创建虚拟网络”。新虚拟网络名称将显示在列表中。等到“状态”列显示“已创建”。\n5. 在主窗格中，单击刚创建的虚拟网络。\n6. 单击该页顶部的“仪表板”。\n7. 在“速览”下，记住虚拟网络 ID。在设置 HBase 群集时将要用到它。\n8. 单击该页顶部的“配置”。\n9. 在该页底部，默认子网名称为 **Subnet-1**。你可以选择重命名子网或者向 HBase 群集添加一个新子网。记下子网名称；在设置群集时将要用到它。\n10. 验证要用于群集的子网的“CIDR(地址计数)”。地址数必须大于辅助节点数加上七（网关：2，头节点：2，ZooKeeper：3）。例如，如果需要一个 10 节点 HBase 群集，则子网的地址计数必须大于 17 (10+7)。否则，部署将失败。\n11. 如果更新了子网值，请单击该页底部的“保存”。\n\n\n**向虚拟网络添加 DNS 服务器虚拟机**\n\nDNS 服务器是可选的，但在某些情况下又是必需的。[在两个 Azure 虚拟网络之间配置 DNS][hdinsight-hbase-replication-dns] 中记录了该过程。基本上，你将需要执行以下步骤：\n\n1. 向虚拟网络添加 Azure 虚拟机\n2. 为虚拟机设置静态 IP 地址\n3. 向虚拟网络添加 DNS 服务器角色\n4. 将 DNS 服务器分配到虚拟网络\n\n\n**创建群集要使用的 Azure 存储帐户和 Blob 存储容器**\n\n> [AZURE.NOTE]HDInsight 群集使用 Azure Blob 存储来存储数据。有关详细信息，请参阅[在 HDInsight 中将 Azure Blob 存储与 Hadoop 配合使用](/documentation/articles/hdinsight-hadoop-use-blob-storage)。你需要存储帐户和 Blob 存储容器。存储帐户位置必须与虚拟网络位置和群集位置匹配。\n\n像其他 HDInsight 群集，HBase 群集要求将 Azure 存储帐户和 Blob 存储容器作为默认文件系统。存储帐户位置必须与虚拟网络位置和群集位置匹配。有关详细信息，请参阅[在 HDInsight 中将 Azure Blob 存储与 Hadoop 配合使用][hdinsight-storage]。在设置 HBase 群集时，你可以选择创建新群集或使用现有群集。此过程演示如何使用 Azure 门户创建存储帐户和 Blob 存储容器。\n\n1. 登录到 [Azure 门户][azure-portal]。\n2. 单击左下角的“新建”，依次指向“数据服务”和“存储”，然后单击“快速创建”。\n\n3. 键入或选择以下值：\n\n    - **URL** - 存储帐户的名称。\n    - **位置** - 存储帐户的位置。确保其与虚拟网络位置匹配。不支持地缘组。\n    - **复制** - 出于测试目的，使用“本地冗余”来降低成本。\n\n4. 单击“创建存储帐户”。你将在存储列表中看到新的存储帐户。\n5. 等到新存储帐户的“状态”更改为“联机”。\n6. 单击该列表中的新存储帐户以将其选定。\n7. 在该页的底部，单击“管理访问密钥”。\n8. 记下存储帐户名称和主访问密钥（或辅助访问密钥；两个密钥之一起作用）。本教程后面的步骤中将会用到它们。\n9. 在该页的顶部，单击“容器”。\n10. 在该页的底部，单击“添加”。\n11. 输入容器名称。该容器将用作 HBase 群集的默认容器。默认情况下，默认容器名称与群集名称匹配。将“访问”字段保留为“私有”。  \n12. 单击复选标记以创建容器。\n\n**通过使用 Azure 门户设置 HBase 群集**\n\n> [AZURE.NOTE]有关通过使用 Azure PowerShell 预配新 HBase 群集的信息，请参阅[使用 Azure PowerShell 预配 HBase 群集](#powershell)。\n\n1. 登录到 [Azure 门户][azure-portal]。\n\n2. 单击左下角的“新建”，依次指向“数据服务”和“HDINSIGHT”，然后单击“自定义创建”。\n\n3. 输入群集名称，选择 HBase 作为群集类型，选择 Windows Server 2012 操作系统，选择 HDInsight 版本，然后单击右侧按钮。\n\n    ![提供 HBase 群集的详细信息][img-provision-cluster-page1]\n\n\n    > [AZURE.NOTE]对于 HBase 群集，Windows Server 是唯一可用的 OS 选项。\n\n4. 在“配置群集”页上，输入或选择以下内容：\n\n    ![提供 HBase 群集的详细信息](./media/hdinsight-hbase-provision-vnet-v1/hbasewizard2.png)\n\n    <table border='1'>\n    <tr><th>属性</th><th>值</th></tr>\n    <tr><td>数据节点</td><td>选择要部署的数据节点数。出于测试目的，创建一个单节点群集。<br />群集大小限制因 Azure 订阅而异。若要提高限制的大小，请联系 Azure 计费支持。</td></tr>\n    <tr><td>区域/虚拟网络</td><td><p>选择区域或 Azure 虚拟网络（如果已创建）。对于本教程，选择你以前创建的网络，然后选择相应的子网。默认名称为 <b>Subnet-1</b>。</p></td></tr>\n    <tr><td>头节点大小</td><td><p>为头节点选择 VM 大小。</p></td></tr>\n    <tr><td>数据节点大小</td><td><p>为数据节点选择 VM 大小。</p></td></tr>\n    <tr><td>Zookeeper 大小</td><td><p>为 Zookeeper 节点选择 VM 大小。</p></td></tr>\n    </table>\n    >[AZURE.NOTE]根据所选的 VM，你的成本可能会有所不同。HDInsight 对群集节点使用所有标准层 VM。有关 VM 大小如何影响价格的信息，请参阅 <a href=\"/home/features/hdinsight/#price\" target=\"_blank\">HDInsight 价格</a>。\n\n    单击右侧按钮。\n\n5. 输入要用于此群集的 Hadoop 用户名和密码，然后单击右侧按钮。\n\n    ![提供 Hadoop HDInsight 群集的存储帐户](./media/hdinsight-hbase-provision-vnet-v1/hbasewizard3.png)\n\n    <table border='1'>\n    <tr><th>属性</th><th>值</th></tr>\n    <tr><td>HTTP 用户名</td>\n        <td>指定 HDInsight 群集用户名。</td></tr>\n    <tr><td>HTTP 密码/确认密码</td>\n        <td>指定 HDInsight 群集用户密码。</td></tr>\n    <tr><td>为群集启用远程桌面</td>\n        <td>在设置后，选中此复选框，以为可远程连接到群集节点的远程桌面用户指定用户名、密码和到期日期。稍后，你还可以在设置了群集后启用远程桌面。有关说明，请参阅<a href=\"hdinsight-administer-use-management-portal-v1/#rdp\" target=\"_blank\">使用 RDP 连接到 HDInsight 群集</a>。</td></tr>\n    </table>\n\n6. 在“存储帐户”页上提供以下值：\n\n    ![提供 Hadoop HDInsight 群集的存储帐户](./media/hdinsight-hbase-provision-vnet-v1/hbasewizard4.png)\n\n    <table border='1'>\n    <tr><th>属性</th><th>值</th></tr>\n    <tr><td>存储帐户</td>\n        <td>为 HDInsight 群集指定将用作默认文件系统的 Azure 存储帐户。可以选择以下三个选项之一：\n        <ul>\n            <li><strong>使用现有存储</strong></li>\n            <li><strong>创建新存储</strong></li>\n            <li><strong>使用其他订阅中的存储</strong></li>\n        </ul>\n        </td></tr>\n    <tr><td>帐户名</td>\n        <td><ul>\n            <li>如果选择了使用现有存储，请为“帐户名”选择现有的存储帐户。<strong></strong>下拉列表仅列出你选择设置群集的相同数据中心内的存储帐户。</li>\n            <li>如果选择了“创建新存储”或“使用其他订阅中的存储”选项，则必须提供存储帐户名。<strong></strong><strong></strong></li>\n        </ul></td></tr>\n    <tr><td>帐户密钥</td>\n        <td>如果选择了“使用其他订阅中的存储”选项，请指定该存储帐户的帐户密钥。<strong></strong></td></tr>\n    <tr><td>默认容器</td>\n        <td><p>指定存储帐户上用作 HDInsight 群集默认文件系统的默认容器。如果为“存储帐户”字段选择了“使用现有存储”，并且该帐户中不存在现有容器，则默认情况下，将创建与群集同名的容器<strong></strong><strong></strong>。如果已存在与群集同名的容器，则将在容器名称后追加一个序列号。例如，mycontainer1、mycontainer2，等等。但是，如果现有存储帐户的容器名称与你指定的群集名称不同，则你也可以使用该容器。</p>\n        <p>如果选择创建新存储或使用其他 Azure 订阅中的存储，则必须指定默认容器名称</p>\n    </td></tr>\n    <tr><td>其他存储帐户</td>\n        <td>如果需要，请为群集指定其他存储帐户。HDInsight 支持多个存储帐户。一个群集可以使用的其他存储帐户数没有限制。但是，如果你通过使用 Azure 门户创建群集，则由于 UI 限制，你最多只能创建七个存储帐户。指定的每个其他存储帐户将在向导中添加一个额外的“存储帐户”页，以便你在此指定帐户信息。<strong></strong>例如，在以上屏幕截图中，未选择其他存储帐户，因此，不会将额外的页添加到向导中。</td></tr>\n    </table>单击右箭头。\n\n7. 在“脚本操作”页上，选中右下角的复选标记。请勿单击“添加脚本操作”按钮，因为本教程不需要自定义群集安装程序。\n\n    ![配置脚本操作以自定义 HDInsight HBase 群集][img-provision-cluster-page5]\n\n    > [AZURE.NOTE]此页可用于在安装过程中自定义群集。有关详细信息，请参阅[使用脚本操作自定义 HDInsight 群集](/documentation/articles/hdinsight-hadoop-customize-cluster-v1)。\n\n要开始处理新 HBase 群集，可以按照[开始在 HDInsight 中将 HBase 与 Hadoop 配合使用](/documentation/articles/hdinsight-hbase-tutorial-get-started-v1)中的步骤操作。\n\n##通过使用 HBase Java RPC API 连接到虚拟网络中设置的 HBase 群集\n\n1.  将基础结构即服务 (IaaS) 虚拟机设置到相同的 Azure 虚拟网络和子网中。因此，虚拟机和 HBase 群集使用相同的内部 DNS 服务器来解析主机名。为此，你必须选择“从库中”选项，然后选择虚拟网络而不是数据中心。有关说明，请参阅[创建运行 Windows Server 的虚拟机](/documentation/articles/virtual-machines-windows-tutorial-classic-portal)。具有小型虚拟机的标准 Windows Server 2012 映像已足够。\n\n2.  使用 Java 应用程序远程连接到 HBase 时，必须使用完全限定域名 (FQDN)。若要确定这一点，你必须获取 HBase 群集的连接特定的 DNS 后缀。为此，请使用 Curl 查询 Ambari，或使用远程桌面来连接到群集。\n\n    * **Curl** - 使用以下命令：\n\n            curl -u <username>:<password> -k https://<clustername>.azurehdinsight.cn/ambari/api/v1/clusters/<clustername>.azurehdinsight.cn/services/hbase/components/hbrest\n\n        在返回的 JavaScript 对象表示法 (JSON) 数据中，找到“host_name”条目。这将包含群集中的节点的 FQDN。例如：\n\n            ...\n            \"host_name\": \"wordkernode0.<clustername>.b1.chinacloudapp.cn\n            ...\n\n        以群集名称开头的域名的部分是 DNS 后缀。例如，mycluster.b1.chinacloudapp.cn。\n\n    * **Azure PowerShell** - 使用以下 Azure PowerShell 脚本注册 **Get-ClusterDetail** 函数，该函数可用于返回 DNS 后缀：\n\n            function Get-ClusterDetail(\n                [String]\n                [Parameter( Position=0, Mandatory=$true )]\n                $ClusterDnsName,\n                [String]\n                [Parameter( Position=1, Mandatory=$true )]\n                $Username,\n                [String]\n                [Parameter( Position=2, Mandatory=$true )]\n                $Password,\n                [String]\n                [Parameter( Position=3, Mandatory=$true )]\n                $PropertyName\n                )\n            {\n            <#\n                .SYNOPSIS\n                 Displays information to facilitate an HDInsight cluster-to-cluster scenario within the same virtual network.\n                .Description\n                 This command shows the following 4 properties of an HDInsight cluster:\n                 1. ZookeeperQuorum (supports only HBase type cluster)\n                    Shows the value of HBase property \"hbase.zookeeper.quorum\".\n                 2. ZookeeperClientPort (supports only HBase type cluster)\n                    Shows the value of HBase property \"hbase.zookeeper.property.clientPort\".\n                 3. HBaseRestServers (supports only HBase type cluster)\n                    Shows a list of host FQDNs that run the HBase REST server.\n                 4. FQDNSuffix (supports all cluster types)\n                    Shows the FQDN suffix of hosts in the cluster.\n                .EXAMPLE\n                 Get-ClusterDetail -ClusterDnsName {clusterDnsName} -Username {username} -Password {password} -PropertyName ZookeeperQuorum\n                 This command shows the value of HBase property \"hbase.zookeeper.quorum\".\n                .EXAMPLE\n                 Get-ClusterDetail -ClusterDnsName {clusterDnsName} -Username {username} -Password {password} -PropertyName ZookeeperClientPort\n                 This command shows the value of HBase property \"hbase.zookeeper.property.clientPort\".\n                .EXAMPLE\n                 Get-ClusterDetail -ClusterDnsName {clusterDnsName} -Username {username} -Password {password} -PropertyName HBaseRestServers\n                 This command shows a list of host FQDNs that run the HBase REST server.\n                .EXAMPLE\n                 Get-ClusterDetail -ClusterDnsName {clusterDnsName} -Username {username} -Password {password} -PropertyName FQDNSuffix\n                 This command shows the FQDN suffix of hosts in the cluster.\n            #>\n\n                $DnsSuffix = \".azurehdinsight.cn\"\n\n                $ClusterFQDN = $ClusterDnsName + $DnsSuffix\n                $webclient = new-object System.Net.WebClient\n                $webclient.Credentials = new-object System.Net.NetworkCredential($Username, $Password)\n\n                if($PropertyName -eq \"ZookeeperQuorum\")\n                {\n                    $Url = \"https://\" + $ClusterFQDN + \"/ambari/api/v1/clusters/\" + $ClusterFQDN + \"/configurations?type=hbase-site&tag=default&fields=items/properties/hbase.zookeeper.quorum\"\n                    $Response = $webclient.DownloadString($Url)\n                    $JsonObject = $Response | ConvertFrom-Json\n                    Write-host $JsonObject.items[0].properties.'hbase.zookeeper.quorum'\n                }\n                if($PropertyName -eq \"ZookeeperClientPort\")\n                {\n                    $Url = \"https://\" + $ClusterFQDN + \"/ambari/api/v1/clusters/\" + $ClusterFQDN + \"/configurations?type=hbase-site&tag=default&fields=items/properties/hbase.zookeeper.property.clientPort\"\n                    $Response = $webclient.DownloadString($Url)\n                    $JsonObject = $Response | ConvertFrom-Json\n                    Write-host $JsonObject.items[0].properties.'hbase.zookeeper.property.clientPort'\n                }\n                if($PropertyName -eq \"HBaseRestServers\")\n                {\n                    $Url1 = \"https://\" + $ClusterFQDN + \"/ambari/api/v1/clusters/\" + $ClusterFQDN + \"/configurations?type=hbase-site&tag=default&fields=items/properties/hbase.rest.port\"\n                    $Response1 = $webclient.DownloadString($Url1)\n                    $JsonObject1 = $Response1 | ConvertFrom-Json\n                    $PortNumber = $JsonObject1.items[0].properties.'hbase.rest.port'\n\n                    $Url2 = \"https://\" + $ClusterFQDN + \"/ambari/api/v1/clusters/\" + $ClusterFQDN + \"/services/hbase/components/hbrest\"\n                    $Response2 = $webclient.DownloadString($Url2)\n                    $JsonObject2 = $Response2 | ConvertFrom-Json\n                    foreach ($host_component in $JsonObject2.host_components)\n                    {\n                        $ConnectionString = $host_component.HostRoles.host_name + \":\" + $PortNumber\n                        Write-host $ConnectionString\n                    }\n                }\n                if($PropertyName -eq \"FQDNSuffix\")\n                {\n                    $Url = \"https://\" + $ClusterFQDN + \"/ambari/api/v1/clusters/\" + $ClusterFQDN + \"/services/yarn/components/resourcemanager\"\n                    $Response = $webclient.DownloadString($Url)\n                    $JsonObject = $Response | ConvertFrom-Json\n                    $FQDN = $JsonObject.host_components[0].HostRoles.host_name\n                    $pos = $FQDN.IndexOf(\".\")\n                    $Suffix = $FQDN.Substring($pos + 1)\n                    Write-host $Suffix\n                }\n            }\n\n        运行 Azure PowerShell 脚本后，使用以下命令通过 **Get-ClusterDetail** 函数来返回 DNS 后缀。使用此命令时，指定你的 HDInsight HBase 群集名称、管理员名称和管理员密码。\n\n            Get-ClusterDetail -ClusterDnsName <yourclustername> -PropertyName FQDNSuffix -Username <clusteradmin> -Password <clusteradminpassword>\n\n        这将返回 DNS 后缀。例如 **yourclustername.b4.internal.chinacloudapp.cn**。\n\n    > [AZURE.NOTE]你还可以使用远程桌面来连接到 HBase 群集（你将连接到头节点），并从命令提示符运行 **ipconfig** 来获取 DNS 后缀。有关启用远程桌面协议 (RDP) 并使用 RDP 连接到群集的说明，请参阅[使用 Azure 门户在 HDInsight 中管理 Hadoop 群集][hdinsight-admin-portal]。\n    > <p>![hdinsight.hbase.dns.surffix][img-dns-surffix]\n\n\n<!--\n3.  Change the primary DNS suffix configuration of the virtual machine. This enables the virtual machine to automatically resolve the host name of the HBase cluster without explicit specification of the suffix. For example, the *workernode0* host name will be correctly resolved to workernode0 of the HBase cluster.\n\n    To make the configuration change:\n\n    1. RDP into the virtual machine.\n    2. Open **Local Group Policy Editor**. The executable is gpedit.msc.\n    3. Expand **Computer Configuration**, expand **Administrative Templates**, expand **Network**, and then click **DNS Client**.\n    - Set **Primary DNS Suffix** to the value obtained in step 2:\n\n        ![hdinsight.hbase.primary.dns.suffix][img-primary-dns-suffix]\n    4. Click **OK**.\n    5. Reboot the virtual machine.\n-->\n\n若要验证虚拟机是否可与 HBase 群集进行通信，请从虚拟机使用 `ping headnode0.<dns suffix>` 命令。例如，ping headnode0.mycluster.b1.chinacloudapp.cn。\n\n若要在 Java 应用程序中使用此信息，可以按照[使用 Maven 构建将 HBase 与 HDInsight (Hadoop) 配合使用的 Java 应用程序](/documentation/articles/hdinsight-hbase-build-java-maven)中的步骤来创建应用程序。若要让应用程序连接到远程 HBase 服务器，请修改本示例中的 **hbase-site.xml** 文件，以对 Zookeeper 使用 FQDN。例如：\n\n    <property>\n        <name>hbase.zookeeper.quorum</name>\n        <value>zookeeper0.<dns suffix>,zookeeper1.<dns suffix>,zookeeper2.<dns suffix></value>\n    </property>\n\n> [AZURE.NOTE]有关 Azure 虚拟网络中的名称解析的详细信息，包括如何使用自己的 DNS 服务器，请参阅[名称解析 (DNS)](/documentation/articles/virtual-networks-name-resolution-for-vms-and-role-instances)。\n\n##<a name=\"powershell\"></a>通过使用 Azure PowerShell 设置 HBase 群集\n\n**通过使用 Azure PowerShell 设置 HBase 群集**\n\n1. 打开 Azure PowerShell 集成脚本环境 (ISE)。\n2. 将以下命令复制并粘贴到脚本窗格中：\n\n        $hbaseClusterName = \"<HBaseClusterName>\"\n        $hadoopUserName = \"<HBaseClusterUsername>\"\n        $hadoopUserPassword = \"<HBaseClusterUserPassword>\"\n        $location = \"<HBaseClusterLocation>\"  #i.e. \"China North\"\n        $clusterSize = <HBaseClusterSize>  \n        $vnetID = \"<AzureVirtualNetworkID>\"\n        $subNetName = \"<AzureVirtualNetworkSubNetName>\"\n        $storageAccountName = \"<AzureStorageAccountName>\" # Do not use the full name here\n        $storageAccountKey = \"<AzureStorageAccountKey>\"\n        $storageContainerName = \"<AzureBlobStorageContainer>\"\n\n        $password = ConvertTo-SecureString $hadoopUserPassword -AsPlainText -Force\n        $creds = New-Object System.Management.Automation.PSCredential ($hadoopUserName, $password)\n\n        New-AzureHDInsightCluster -Name $hbaseClusterName `\n                                  -ClusterType HBase `\n                                  -Version 3.1 `\n                                  -Location $location `\n                                  -ClusterSizeInNodes $clusterSize `\n                                  -Credential $creds `\n                                  -VirtualNetworkId $vnetID `\n                                  -SubnetName $subNetName `\n                                  -DefaultStorageAccountName \"$storageAccountName.blob.core.chinacloudapi.cn\" `\n                                  -DefaultStorageAccountKey $storageAccountKey `\n                                  -DefaultStorageContainerName $storageContainerName\n\n\n3. 单击“运行脚本”，或按 **F5**。\n4. 若要验证群集，可以在 Azure 门户中检查该群集，也可以在底部窗格中运行以下 Azure PowerShell cmdlet：\n\n    Get-AzureHDInsightCluster\n\n##后续步骤\n\n在本教程中，你已学习了如何设置 HBase 群集。若要了解更多信息，请参阅以下文章：\n\n- [开始使用 HDInsight](/documentation/articles/hdinsight-hadoop-tutorial-get-started-windows-v1)\n- [在 HDInsight 中配置 HBase 复制](/documentation/articles/hdinsight-hbase-geo-replication)\n- [在 HDInsight 中设置 Hadoop 群集](/documentation/articles/hdinsight-provision-clusters-v1)\n- [开始在 HDInsight 中将 HBase 与 Hadoop 配合使用](/documentation/articles/hdinsight-hbase-tutorial-get-started-v1)\n- [虚拟网络概述][vnet-overview]\n\n\n[1]:/home/features/networking/\n[2]: http://technet.microsoft.com/zh-cn/library/ee176961.aspx\n[3]: http://technet.microsoft.com/zh-cn/library/hh847889.aspx\n\n[hbase-get-started]: /documentation/articles/hdinsight-hbase-tutorial-get-started-v1\n[vnet-overview]: /documentation/services/networking\n[vm-create]: /documentation/articles/virtual-machines-windows-tutorial-classic-portal\n[azure-portal]: https://manage.windowsazure.cn\n[azure-create-storageaccount]: /documentation/articles/storage-create-storage-account\n[azure-purchase-options]: /pricing/overview/\n[azure-member-offers]: /pricing/member-offers/\n[azure-trial]: /pricing/1rmb-trial/\n\n[hdinsight-admin-powershell]: /documentation/articles/hdinsight-administer-use-powershell\n[hdinsight-admin-portal]: /documentation/articles/hdinsight-administer-use-management-portal-v1#rdp\n\n[hdinsight-powershell-reference]: https://msdn.microsoft.com/zh-cn/library/dn858087.aspx\n\n\n[twitter-streaming-api]: https://dev.twitter.com/docs/streaming-apis\n[twitter-statuses-filter]: https://dev.twitter.com/docs/api/1.1/post/statuses/filter\n\n\n[powershell-install]: /documentation/articles/powershell-install-configure\n[hdinsight-customize-cluster]: /documentation/articles/hdinsight-hadoop-customize-cluster-v1\n[hdinsight-provision]: /documentation/articles/hdinsight-provision-clusters-v1\n[hdinsight-get-started]: /documentation/articles/hdinsight-get-started\n[hdinsight-storage-powershell]: /documentation/articles/hdinsight-hadoop-use-blob-storage#powershell\n[hdinsight-analyze-flight-delay-data]: /documentation/articles/hdinsight-analyze-flight-delay-data\n[hdinsight-storage]: /documentation/articles/hdinsight-hadoop-use-blob-storage\n[hdinsight-use-sqoop]: /documentation/articles/hdinsight-use-sqoop\n[hdinsight-power-query]: /documentation/articles/hdinsight-connect-excel-power-query\n[hdinsight-hive-odbc]: /documentation/articles/hdinsight-connect-excel-hive-ODBC-driver\n[hdinsight-hbase-replication-dns]: /documentation/articles/hdinsight-hbase-geo-replication-configure-DNS\n[img-dns-surffix]: ./media/hdinsight-hbase-provision-vnet-v1/DNSSuffix.png\n[img-primary-dns-suffix]: ./media/hdinsight-hbase-provision-vnet-v1/PrimaryDNSSuffix.png\n[img-provision-cluster-page1]: ./media/hdinsight-hbase-provision-vnet-v1/hbasewizard1.png \"预配新 HBase 群集的详细信息\"\n[img-provision-cluster-page5]: ./media/hdinsight-hbase-provision-vnet-v1/hbasewizard5.png \"使用脚本操作来自定义 HBase 群集\"\n\n<!---HONumber=71-->"
+}

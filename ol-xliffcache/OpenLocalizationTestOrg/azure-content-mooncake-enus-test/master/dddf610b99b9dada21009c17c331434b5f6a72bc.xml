@@ -1,0 +1,369 @@
+{
+  "nodes": [
+    {
+      "content": "为云服务配置 SSL（经典）| Azure",
+      "pos": [
+        28,
+        49
+      ]
+    },
+    {
+      "content": "了解如何为 Web 角色指定 HTTPS 终结点以及如何上载 SSL 证书来保护您的应用程序。",
+      "pos": [
+        69,
+        116
+      ]
+    },
+    {
+      "content": "在 Azure 中为应用程序配置 SSL",
+      "pos": [
+        342,
+        362
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        366,
+        382
+      ]
+    },
+    {
+      "content": "Azure portal",
+      "pos": [
+        386,
+        398
+      ]
+    },
+    {
+      "content": "Azure classic portal",
+      "pos": [
+        476,
+        496
+      ]
+    },
+    {
+      "content": "安全套接字层 (SSL) 加密是用于保护通过 Internet 发送的数据的最常见方法。此常见任务讨论了如何为 Web 角色指定 HTTPS 终结点以及如何上载 SSL 证书来保护你的应用程序。",
+      "pos": [
+        565,
+        662
+      ]
+    },
+    {
+      "pos": [
+        666,
+        779
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 本任务中的过程适用于 Azure 云服务；对于应用程序服务，请参阅<bpt id=\"p1\">[</bpt>此文章<ept id=\"p1\">](/documentation/articles/web-sites-configure-ssl-certificate)</ept>。"
+    },
+    {
+      "content": "此任务将使用生产部署；本主题的末尾提供了有关如何使用过渡部署的信息。",
+      "pos": [
+        781,
+        815
+      ]
+    },
+    {
+      "pos": [
+        817,
+        899
+      ],
+      "content": "如果尚未创建云服务，请首先阅读<bpt id=\"p1\">[</bpt>本信息<ept id=\"p1\">](/documentation/articles/cloud-services-how-to-create-deploy)</ept>。"
+    },
+    {
+      "content": "步骤 1：获取 SSL 证书",
+      "pos": [
+        1034,
+        1048
+      ]
+    },
+    {
+      "content": "若要为应用程序配置 SSL，你首先需要获取已由证书颁发机构 (CA)（出于此目的颁发证书的受信任的第三方）签署的 SSL 证书。如果您尚未获取 SSL 证书，将需要从销售 SSL 证书的公司购买一个 SSL 证书。",
+      "pos": [
+        1050,
+        1157
+      ]
+    },
+    {
+      "content": "该证书必须满足 Azure 中的以下 SSL 证书要求：",
+      "pos": [
+        1159,
+        1187
+      ]
+    },
+    {
+      "content": "证书必须包含私钥。",
+      "pos": [
+        1193,
+        1202
+      ]
+    },
+    {
+      "content": "必须为密钥交换创建证书，并且该证书可导出到个人信息交换 (.pfx) 文件。",
+      "pos": [
+        1207,
+        1245
+      ]
+    },
+    {
+      "pos": [
+        1250,
+        1471
+      ],
+      "content": "证书的使用者名称必须与用于访问云服务的域匹配。你无法从证书颁发机构 (CA) 处获取针对 chinacloudapp.cn 域的 SSL 证书。你必须获取在访问服务时要使用的自定义域名。在从 CA 处请求证书时，该证书的使用者名称必须与用于访问应用程序的自定义域名匹配。例如，如果自定义域名为 <bpt id=\"p1\">**</bpt>contoso.com<ept id=\"p1\">**</ept>，则将要从 CA 处请求用于 *<bpt id=\"p2\">**</bpt>.contoso.com<ept id=\"p2\">**</ept> 或 <bpt id=\"p3\">**</bpt>www.contoso.com<ept id=\"p3\">**</ept> 的证书。"
+    },
+    {
+      "content": "该证书必须使用至少 2048 位加密。",
+      "pos": [
+        1476,
+        1495
+      ]
+    },
+    {
+      "pos": [
+        1497,
+        1687
+      ],
+      "content": "出于测试目的，可以<bpt id=\"p1\">[</bpt>创建<ept id=\"p1\">](/documentation/articles/cloud-services-certs-create)</ept>并使用自签名证书。自签名证书不通过 CA 进行身份验证并可使用 chinacloudapp.cn 域作为 Web 应用 URL。例如，以下任务使用其公用名 (CN) 为 <bpt id=\"p2\">**</bpt>sslexample.chinacloudapp.cn<ept id=\"p2\">**</ept> 的自签名证书。"
+    },
+    {
+      "content": "接下来，你必须在服务定义和服务配置文件中包含有关此证书的信息。",
+      "pos": [
+        1689,
+        1720
+      ]
+    },
+    {
+      "content": "步骤 2：修改服务定义和配置文件",
+      "pos": [
+        1725,
+        1741
+      ]
+    },
+    {
+      "content": "必须将应用程序配置为使用此证书，并且必须添加 HTTPS 终结点。因此，需要更新服务定义和服务配置文件。",
+      "pos": [
+        1743,
+        1795
+      ]
+    },
+    {
+      "pos": [
+        1801,
+        1877
+      ],
+      "content": "在你的开发环境中，打开服务定义文件 (CSDEF)，在 <bpt id=\"p1\">**</bpt>WebRole<ept id=\"p1\">**</ept> 节中添加 <bpt id=\"p2\">**</bpt>Certificates<ept id=\"p2\">**</ept> 节，并包含以下证书相关信息："
+    },
+    {
+      "pos": [
+        2202,
+        2245
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Certificates<ept id=\"p1\">**</ept> 节定义了我们的证书的名称、其位置及其所在存储的名称。"
+    },
+    {
+      "pos": [
+        2251,
+        2313
+      ],
+      "content": "在你的服务定义文件中，在 <bpt id=\"p1\">**</bpt>Endpoints<ept id=\"p1\">**</ept> 节中添加 <bpt id=\"p2\">**</bpt>InputEndpoint<ept id=\"p2\">**</ept> 元素以启用 HTTPS："
+    },
+    {
+      "pos": [
+        2601,
+        2675
+      ],
+      "content": "在你的服务定义文件中，在 <bpt id=\"p1\">**</bpt>Sites<ept id=\"p1\">**</ept> 节中添加 <bpt id=\"p2\">**</bpt>Binding<ept id=\"p2\">**</ept> 元素。这将添加 HTTPS 绑定以将终结点映射到您的 Web 应用："
+    },
+    {
+      "content": "对服务定义文件进行的所有必需更改已完成，但您仍需要将证书信息添加到服务配置文件中。",
+      "pos": [
+        3020,
+        3061
+      ]
+    },
+    {
+      "pos": [
+        3067,
+        3179
+      ],
+      "content": "在你的服务配置文件 (CSCFG) ServiceConfiguration.Cloud.cscfg 中，在 <bpt id=\"p1\">**</bpt>Role<ept id=\"p1\">**</ept> 节中添加 <bpt id=\"p2\">**</bpt>Certificates<ept id=\"p2\">**</ept> 节，并将下面显示的示例指纹值替换为你的证书的指纹值："
+    },
+    {
+      "pos": [
+        3490,
+        3531
+      ],
+      "content": "（上面的示例将 <bpt id=\"p1\">**</bpt>sha1<ept id=\"p1\">**</ept> 用于指纹算法。请为证书的指纹算法指定适当的值。）"
+    },
+    {
+      "pos": [
+        3533,
+        3643
+      ],
+      "content": "现在已更新服务定义和服务配置文件，请打包部署以上载到 Azure。如果你使用的是 <bpt id=\"p1\">**</bpt>cspack<ept id=\"p1\">**</ept>，请务必不要使用 <bpt id=\"p2\">**</bpt>/generateConfigurationFile<ept id=\"p2\">**</ept> 标志，因为这将覆盖你刚插入的证书信息。"
+    },
+    {
+      "content": "步骤 3：上载证书",
+      "pos": [
+        3648,
+        3657
+      ]
+    },
+    {
+      "content": "已将部署包更新为使用此证书，并且已添加 HTTPS 终结点。现在你可以使用 Azure 经典门户将包和证书上载到 Azure。",
+      "pos": [
+        3659,
+        3722
+      ]
+    },
+    {
+      "pos": [
+        3727,
+        3746
+      ],
+      "content": "登录到 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">][]</ept>。"
+    },
+    {
+      "content": "在左侧导航窗格中单击“云服务”。",
+      "pos": [
+        3751,
+        3767
+      ]
+    },
+    {
+      "content": "单击所需的云服务。",
+      "pos": [
+        3771,
+        3780
+      ]
+    },
+    {
+      "content": "单击“证书”选项卡。",
+      "pos": [
+        3784,
+        3794
+      ]
+    },
+    {
+      "content": "单击“证书”选项卡",
+      "pos": [
+        3802,
+        3811
+      ]
+    },
+    {
+      "content": "单击“上载”按钮。",
+      "pos": [
+        3882,
+        3891
+      ]
+    },
+    {
+      "content": "上载",
+      "pos": [
+        3899,
+        3901
+      ]
+    },
+    {
+      "content": "指定“文件”和“密码”，然后单击“完成”（复选标记）。",
+      "pos": [
+        3979,
+        4006
+      ]
+    },
+    {
+      "content": "步骤 4：使用 HTTPS 连接到角色实例",
+      "pos": [
+        4011,
+        4032
+      ]
+    },
+    {
+      "content": "在 Azure 中启动并运行部署后，便可以使用 HTTPS 连接到该部署。",
+      "pos": [
+        4034,
+        4071
+      ]
+    },
+    {
+      "content": "在 Azure 经典门户中选择你的部署，然后单击“站点 URL”下的链接。",
+      "pos": [
+        4077,
+        4114
+      ]
+    },
+    {
+      "content": "确定 Web 应用 URL",
+      "pos": [
+        4122,
+        4135
+      ]
+    },
+    {
+      "pos": [
+        4145,
+        4194
+      ],
+      "content": "在 Web 浏览器中，修改链接以使用 <bpt id=\"p1\">**</bpt>https<ept id=\"p1\">**</ept> 而不是 <bpt id=\"p2\">**</bpt>http<ept id=\"p2\">**</ept>，然后访问该页。"
+    },
+    {
+      "pos": [
+        4200,
+        4333
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>如果你使用的是自签名证书，则当你浏览到与自签名证书关联的 HTTPS 终结点时，浏览器中将显示一个证书错误。使用由受信任的证书颁发机构签名的证书可避免此问题；同时，您可以忽略此错误。（另一个选项是将自签名证书添加到用户的受信任证书颁发机构证书存储中。）"
+    },
+    {
+      "content": "SSL 示例 Web 应用",
+      "pos": [
+        4341,
+        4354
+      ]
+    },
+    {
+      "pos": [
+        4360,
+        4677
+      ],
+      "content": "若要对过渡部署而非生产部署使用 SSL，你首先需要确定用于过渡部署的 URL。将云服务部署到过渡环境，而不包括证书或任何证书信息。部署后，你可以确定基于 GUID 的 URL，此 URL 将在 Azure 经典门户的“Web 应用 URL”字段中列出。使用等效于基于 GUID 的 URL（例如，<bpt id=\"p1\">**</bpt>32818777-6e77-4ced-a8fc-57609d404462.chinacloudapp.cn<ept id=\"p1\">**</ept>）的公用名 (CN) 创建一个证书，再使用 Azure 经典门户将该证书添加到过渡云服务，将该证书的信息添加到你的 CSDEF 和 CSCFG 文件，重新打包你的应用程序，然后将过渡部署更新为使用新的包和 CSCFG 文件。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        4682,
+        4686
+      ]
+    },
+    {
+      "pos": [
+        4690,
+        4758
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>云服务的常规配置<ept id=\"p1\">](/documentation/articles/cloud-services-how-to-configure)</ept>。"
+    },
+    {
+      "pos": [
+        4761,
+        4834
+      ],
+      "content": "了解如何<bpt id=\"p1\">[</bpt>部署云服务<ept id=\"p1\">](/documentation/articles/cloud-services-how-to-create-deploy)</ept>。"
+    },
+    {
+      "pos": [
+        4837,
+        4906
+      ],
+      "content": "配置<bpt id=\"p1\">[</bpt>自定义域名<ept id=\"p1\">](/documentation/articles/cloud-services-custom-domain-name)</ept>。"
+    },
+    {
+      "pos": [
+        4909,
+        4971
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>管理云服务<ept id=\"p1\">](/documentation/articles/cloud-services-how-to-manage)</ept>。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"为云服务配置 SSL（经典）| Azure\" \n    description=\"了解如何为 Web 角色指定 HTTPS 终结点以及如何上载 SSL 证书来保护您的应用程序。\" \n    services=\"cloud-services\" \n    documentationCenter=\".net\" \n    authors=\"Thraka\" \n    manager=\"timlt\" \n    editor=\"\"/>\n\n<tags \n    ms.service=\"cloud-services\" \n    ms.date=\"01/15/2016\"\n    wacn.date=\"02/26/2016\"/>\n\n\n\n\n# 在 Azure 中为应用程序配置 SSL\n\n> [AZURE.SELECTOR]\n- [Azure portal](/documentation/articles/cloud-services-configure-ssl-certificate-portal)\n- [Azure classic portal](/documentation/articles/cloud-services-configure-ssl-certificate)\n\n安全套接字层 (SSL) 加密是用于保护通过 Internet 发送的数据的最常见方法。此常见任务讨论了如何为 Web 角色指定 HTTPS 终结点以及如何上载 SSL 证书来保护你的应用程序。\n\n> [AZURE.NOTE] 本任务中的过程适用于 Azure 云服务；对于应用程序服务，请参阅[此文章](/documentation/articles/web-sites-configure-ssl-certificate)。\n\n此任务将使用生产部署；本主题的末尾提供了有关如何使用过渡部署的信息。\n\n如果尚未创建云服务，请首先阅读[本信息](/documentation/articles/cloud-services-how-to-create-deploy)。\n\n[AZURE.INCLUDE [websites-cloud-services-css-guided-walkthrough](../includes/websites-cloud-services-css-guided-walkthrough.md)]\n\n\n## 步骤 1：获取 SSL 证书\n\n若要为应用程序配置 SSL，你首先需要获取已由证书颁发机构 (CA)（出于此目的颁发证书的受信任的第三方）签署的 SSL 证书。如果您尚未获取 SSL 证书，将需要从销售 SSL 证书的公司购买一个 SSL 证书。\n\n该证书必须满足 Azure 中的以下 SSL 证书要求：\n\n-   证书必须包含私钥。\n-   必须为密钥交换创建证书，并且该证书可导出到个人信息交换 (.pfx) 文件。\n-   证书的使用者名称必须与用于访问云服务的域匹配。你无法从证书颁发机构 (CA) 处获取针对 chinacloudapp.cn 域的 SSL 证书。你必须获取在访问服务时要使用的自定义域名。在从 CA 处请求证书时，该证书的使用者名称必须与用于访问应用程序的自定义域名匹配。例如，如果自定义域名为 **contoso.com**，则将要从 CA 处请求用于 ***.contoso.com** 或 **www.contoso.com** 的证书。\n-   该证书必须使用至少 2048 位加密。\n\n出于测试目的，可以[创建](/documentation/articles/cloud-services-certs-create)并使用自签名证书。自签名证书不通过 CA 进行身份验证并可使用 chinacloudapp.cn 域作为 Web 应用 URL。例如，以下任务使用其公用名 (CN) 为 **sslexample.chinacloudapp.cn** 的自签名证书。\n\n接下来，你必须在服务定义和服务配置文件中包含有关此证书的信息。\n\n## 步骤 2：修改服务定义和配置文件\n\n必须将应用程序配置为使用此证书，并且必须添加 HTTPS 终结点。因此，需要更新服务定义和服务配置文件。\n\n1.  在你的开发环境中，打开服务定义文件 (CSDEF)，在 **WebRole** 节中添加 **Certificates** 节，并包含以下证书相关信息：\n\n        <WebRole name=\"CertificateTesting\" vmsize=\"Small\">\n        ...\n            <Certificates>\n                <Certificate name=\"SampleCertificate\" \n                             storeLocation=\"LocalMachine\" \n                             storeName=\"CA\" />\n            </Certificates>\n        ...\n        </WebRole>\n\n    **Certificates** 节定义了我们的证书的名称、其位置及其所在存储的名称。\n\n2.  在你的服务定义文件中，在 **Endpoints** 节中添加 **InputEndpoint** 元素以启用 HTTPS：\n\n        <WebRole name=\"CertificateTesting\" vmsize=\"Small\">\n        ...\n            <Endpoints>\n                <InputEndpoint name=\"HttpsIn\" protocol=\"https\" port=\"443\" \n                    certificate=\"SampleCertificate\" />\n            </Endpoints>\n        ...\n        </WebRole>\n\n3.  在你的服务定义文件中，在 **Sites** 节中添加 **Binding** 元素。这将添加 HTTPS 绑定以将终结点映射到您的 Web 应用：\n\n        <WebRole name=\"CertificateTesting\" vmsize=\"Small\">\n        ...\n            <Sites>\n                <Site name=\"Web\">\n                    <Bindings>\n                        <Binding name=\"HttpsIn\" endpointName=\"HttpsIn\" />\n                    </Bindings>\n                </Site>\n            </Sites>\n        ...\n        </WebRole>\n\n    对服务定义文件进行的所有必需更改已完成，但您仍需要将证书信息添加到服务配置文件中。\n\n4.  在你的服务配置文件 (CSCFG) ServiceConfiguration.Cloud.cscfg 中，在 **Role** 节中添加 **Certificates** 节，并将下面显示的示例指纹值替换为你的证书的指纹值：\n\n        <Role name=\"Deployment\">\n        ...\n            <Certificates>\n                <Certificate name=\"SampleCertificate\" \n                    thumbprint=\"9427befa18ec6865a9ebdc79d4c38de50e6316ff\" \n                    thumbprintAlgorithm=\"sha1\" />\n            </Certificates>\n        ...\n        </Role>\n\n（上面的示例将 **sha1** 用于指纹算法。请为证书的指纹算法指定适当的值。）\n\n现在已更新服务定义和服务配置文件，请打包部署以上载到 Azure。如果你使用的是 **cspack**，请务必不要使用 **/generateConfigurationFile** 标志，因为这将覆盖你刚插入的证书信息。\n\n## 步骤 3：上载证书\n\n已将部署包更新为使用此证书，并且已添加 HTTPS 终结点。现在你可以使用 Azure 经典门户将包和证书上载到 Azure。\n\n1. 登录到 [Azure 经典门户][]。 \n2. 在左侧导航窗格中单击“云服务”。\n3. 单击所需的云服务。\n4. 单击“证书”选项卡。\n\n    ![单击“证书”选项卡](./media/cloud-services-configure-ssl-certificate/click-cert.png)\n\n5. 单击“上载”按钮。\n\n    ![上载](./media/cloud-services-configure-ssl-certificate/upload-button.png)\n    \n6. 指定“文件”和“密码”，然后单击“完成”（复选标记）。\n\n## 步骤 4：使用 HTTPS 连接到角色实例\n\n在 Azure 中启动并运行部署后，便可以使用 HTTPS 连接到该部署。\n\n1.  在 Azure 经典门户中选择你的部署，然后单击“站点 URL”下的链接。\n\n    ![确定 Web 应用 URL][2]\n\n2.  在 Web 浏览器中，修改链接以使用 **https** 而不是 **http**，然后访问该页。\n\n    **注意：**如果你使用的是自签名证书，则当你浏览到与自签名证书关联的 HTTPS 终结点时，浏览器中将显示一个证书错误。使用由受信任的证书颁发机构签名的证书可避免此问题；同时，您可以忽略此错误。（另一个选项是将自签名证书添加到用户的受信任证书颁发机构证书存储中。）\n\n    ![SSL 示例 Web 应用][3]\n\n若要对过渡部署而非生产部署使用 SSL，你首先需要确定用于过渡部署的 URL。将云服务部署到过渡环境，而不包括证书或任何证书信息。部署后，你可以确定基于 GUID 的 URL，此 URL 将在 Azure 经典门户的“Web 应用 URL”字段中列出。使用等效于基于 GUID 的 URL（例如，**32818777-6e77-4ced-a8fc-57609d404462.chinacloudapp.cn**）的公用名 (CN) 创建一个证书，再使用 Azure 经典门户将该证书添加到过渡云服务，将该证书的信息添加到你的 CSDEF 和 CSCFG 文件，重新打包你的应用程序，然后将过渡部署更新为使用新的包和 CSCFG 文件。\n\n## 后续步骤\n\n* [云服务的常规配置](/documentation/articles/cloud-services-how-to-configure)。\n* 了解如何[部署云服务](/documentation/articles/cloud-services-how-to-create-deploy)。\n* 配置[自定义域名](/documentation/articles/cloud-services-custom-domain-name)。\n* [管理云服务](/documentation/articles/cloud-services-how-to-manage)。\n\n\n  [Azure 经典门户]: http://manage.windowsazure.cn\n  [0]: ./media/cloud-services-configure-ssl-certificate/CreateCloudService.png\n  [1]: ./media/cloud-services-configure-ssl-certificate/AddCertificate.png\n  [2]: ./media/cloud-services-configure-ssl-certificate/CopyURL.png\n  [3]: ./media/cloud-services-configure-ssl-certificate/SSLCloudService.png\n  [4]: ./media/cloud-services-configure-ssl-certificate/AddCertificateComplete.png\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

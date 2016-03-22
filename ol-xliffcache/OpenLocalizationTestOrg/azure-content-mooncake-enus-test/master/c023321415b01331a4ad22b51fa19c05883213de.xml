@@ -1,0 +1,4639 @@
+{
+  "nodes": [
+    {
+      "content": "Troubleshooting in Azure",
+      "pos": [
+        1,
+        25
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">*</bpt>Troubleshooting<ept id=\"p1\">*</ept> refers to the general task of locating and",
+      "pos": [
+        27,
+        87
+      ]
+    },
+    {
+      "content": "understanding unexpected application behavior and correcting it.",
+      "pos": [
+        88,
+        152
+      ]
+    },
+    {
+      "content": "When developing applications, developers test, run, and debug",
+      "pos": [
+        153,
+        214
+      ]
+    },
+    {
+      "content": "their applications before deploying them into a production",
+      "pos": [
+        215,
+        273
+      ]
+    },
+    {
+      "content": "environment.",
+      "pos": [
+        274,
+        286
+      ]
+    },
+    {
+      "content": "This fact is true whether the application runs on a desktop",
+      "pos": [
+        287,
+        346
+      ]
+    },
+    {
+      "content": "computer or a server in the cloud.",
+      "pos": [
+        347,
+        381
+      ]
+    },
+    {
+      "content": "However, a widely distributed,",
+      "pos": [
+        382,
+        412
+      ]
+    },
+    {
+      "content": "multi-instance application designed for scale-out can be hard to debug,",
+      "pos": [
+        413,
+        484
+      ]
+    },
+    {
+      "content": "requiring more than standard tools and approaches.",
+      "pos": [
+        485,
+        535
+      ]
+    },
+    {
+      "content": "For this reason, cloud applications should be designed with",
+      "pos": [
+        537,
+        596
+      ]
+    },
+    {
+      "content": "troubleshooting in mind.",
+      "pos": [
+        597,
+        621
+      ]
+    },
+    {
+      "content": "How you design troubleshooting support into",
+      "pos": [
+        622,
+        665
+      ]
+    },
+    {
+      "content": "your application depends first on where your application runs, and",
+      "pos": [
+        666,
+        732
+      ]
+    },
+    {
+      "content": "second on which languages or runtimes your application is built with or",
+      "pos": [
+        733,
+        804
+      ]
+    },
+    {
+      "content": "uses.",
+      "pos": [
+        805,
+        810
+      ]
+    },
+    {
+      "content": "If you are building an application that runs on an Azure",
+      "pos": [
+        813,
+        869
+      ]
+    },
+    {
+      "content": "Virtual Machine, in many cases, you can approach troubleshooting design as well",
+      "pos": [
+        870,
+        949
+      ]
+    },
+    {
+      "content": "as debugging as you would on the operating system if it were running on",
+      "pos": [
+        950,
+        1021
+      ]
+    },
+    {
+      "content": "your own servers.",
+      "pos": [
+        1022,
+        1039
+      ]
+    },
+    {
+      "content": "Applications running on Azure are widely distributed,",
+      "pos": [
+        1041,
+        1094
+      ]
+    },
+    {
+      "content": "multi-instance applications that can be hard to debug.",
+      "pos": [
+        1095,
+        1149
+      ]
+    },
+    {
+      "content": "These types of",
+      "pos": [
+        1150,
+        1164
+      ]
+    },
+    {
+      "content": "applications require more than standard tools and approaches to troubleshooting.",
+      "pos": [
+        1165,
+        1245
+      ]
+    },
+    {
+      "content": "This topic",
+      "pos": [
+        1246,
+        1256
+      ]
+    },
+    {
+      "content": "discusses some proven troubleshooting practices and contains links to",
+      "pos": [
+        1257,
+        1326
+      ]
+    },
+    {
+      "content": "more intensive information on the practices described.",
+      "pos": [
+        1327,
+        1381
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>Note<ept id=\"p1\">**</ept>: This topic assumes you are either designing your application",
+      "pos": [
+        1383,
+        1453
+      ]
+    },
+    {
+      "content": "or have successfully deployed your Azure application and that",
+      "pos": [
+        1454,
+        1515
+      ]
+    },
+    {
+      "content": "something unexpected is now occurring.",
+      "pos": [
+        1516,
+        1554
+      ]
+    },
+    {
+      "content": "It does not discuss how to deploy",
+      "pos": [
+        1555,
+        1588
+      ]
+    },
+    {
+      "content": "an application on Azure.",
+      "pos": [
+        1589,
+        1613
+      ]
+    },
+    {
+      "content": "For more information about developing",
+      "pos": [
+        1614,
+        1651
+      ]
+    },
+    {
+      "content": "and deploying your Azure application, see <ph id=\"ph1\">&lt;a href=\"/zh-cn/documentation/\"&gt;</ph>/zh-cn/documentation/<ph id=\"ph2\">&lt;/a&gt;</ph>.",
+      "pos": [
+        1652,
+        1752
+      ]
+    },
+    {
+      "content": "This topic first describes some best practices that will help you design",
+      "pos": [
+        1754,
+        1826
+      ]
+    },
+    {
+      "content": "your application so that you can troubleshoot effectively when problems",
+      "pos": [
+        1827,
+        1898
+      ]
+    },
+    {
+      "content": "occur.",
+      "pos": [
+        1899,
+        1905
+      ]
+    },
+    {
+      "content": "(If you do not design your application to enable you to follow",
+      "pos": [
+        1906,
+        1968
+      ]
+    },
+    {
+      "content": "the code flow in advance, it can be very hard to locate problems when",
+      "pos": [
+        1969,
+        2038
+      ]
+    },
+    {
+      "content": "they do occur.) These best practices are valid for all types of",
+      "pos": [
+        2039,
+        2102
+      ]
+    },
+    {
+      "content": "applications running on Azure, regardless of the application",
+      "pos": [
+        2103,
+        2163
+      ]
+    },
+    {
+      "content": "model or language used.",
+      "pos": [
+        2164,
+        2187
+      ]
+    },
+    {
+      "content": "The following sections describe specific approaches for developing",
+      "pos": [
+        2189,
+        2255
+      ]
+    },
+    {
+      "content": "supportable Azure applications regardless of the type of",
+      "pos": [
+        2256,
+        2312
+      ]
+    },
+    {
+      "content": "application: Web Sites, Cloud Services, or Virtual Machines.",
+      "pos": [
+        2313,
+        2373
+      ]
+    },
+    {
+      "content": "Each section describes best practices at a high level, and contains",
+      "pos": [
+        2375,
+        2442
+      ]
+    },
+    {
+      "content": "pointers to resources that demonstrate best practices in detail or",
+      "pos": [
+        2443,
+        2509
+      ]
+    },
+    {
+      "content": "describe how to implement them.",
+      "pos": [
+        2510,
+        2541
+      ]
+    },
+    {
+      "content": "In this Document",
+      "pos": [
+        2546,
+        2562
+      ]
+    },
+    {
+      "content": "Best Practices for Troubleshooting in Azure",
+      "pos": [
+        2567,
+        2610
+      ]
+    },
+    {
+      "content": "Azure Web Sites",
+      "pos": [
+        2631,
+        2646
+      ]
+    },
+    {
+      "content": "Azure Cloud Services",
+      "pos": [
+        2662,
+        2682
+      ]
+    },
+    {
+      "content": "Azure Virtual Machines",
+      "pos": [
+        2703,
+        2725
+      ]
+    },
+    {
+      "content": "Azure Services",
+      "pos": [
+        2736,
+        2750
+      ]
+    },
+    {
+      "content": "SQL数据库 Troubleshooting",
+      "pos": [
+        2774,
+        2796
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a id=\"BestPractices\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>Best Practices for Troubleshooting in Azure",
+      "pos": [
+        2824,
+        2893
+      ]
+    },
+    {
+      "content": "This section describes best practices that apply to Azure",
+      "pos": [
+        2900,
+        2957
+      ]
+    },
+    {
+      "content": "applications no matter which hosting model or language you use.",
+      "pos": [
+        2958,
+        3021
+      ]
+    },
+    {
+      "content": "It",
+      "pos": [
+        3022,
+        3024
+      ]
+    },
+    {
+      "content": "contains resources for more in-depth discussion of those practices.",
+      "pos": [
+        3025,
+        3092
+      ]
+    },
+    {
+      "content": "To build the foundation for efficient troubleshooting in Azure,",
+      "pos": [
+        3094,
+        3157
+      ]
+    },
+    {
+      "content": "concentrate your efforts in these three main areas:",
+      "pos": [
+        3158,
+        3209
+      ]
+    },
+    {
+      "pos": [
+        3215,
+        3350
+      ],
+      "content": "Handling Failures Gracefully - <bpt id=\"p1\">*</bpt>Each component service must be able\nto endure the failure of dependent services or infrastructure<ept id=\"p1\">*</ept>.",
+      "leadings": [
+        "",
+        "    "
+      ]
+    },
+    {
+      "pos": [
+        3355,
+        3484
+      ],
+      "content": "Tracing, Logging and Monitoring - <bpt id=\"p1\">*</bpt>Each component service must have the proper\ndebugging, tracing, event, and error logging.<ept id=\"p1\">*</ept>",
+      "leadings": [
+        "",
+        "    "
+      ]
+    },
+    {
+      "pos": [
+        3489,
+        3614
+      ],
+      "content": "Debug errors where you can - <bpt id=\"p1\">*</bpt>Before promoting for production, but\nalso at the component and network level when running.<ept id=\"p1\">*</ept>",
+      "leadings": [
+        "",
+        "    "
+      ]
+    },
+    {
+      "content": "Designing an application with these ideas in mind allows the application",
+      "pos": [
+        3616,
+        3688
+      ]
+    },
+    {
+      "content": "to provide you with the information necessary to track down unexpected",
+      "pos": [
+        3689,
+        3759
+      ]
+    },
+    {
+      "content": "behavior when it occurs.",
+      "pos": [
+        3760,
+        3784
+      ]
+    },
+    {
+      "content": "Design to Handle Errors Gracefully",
+      "pos": [
+        3789,
+        3823
+      ]
+    },
+    {
+      "content": "Applications should handle error conditions gracefully if they can.",
+      "pos": [
+        3825,
+        3892
+      ]
+    },
+    {
+      "content": "This",
+      "pos": [
+        3893,
+        3897
+      ]
+    },
+    {
+      "content": "is even more important given the distributed nature of Azure.",
+      "pos": [
+        3898,
+        3959
+      ]
+    },
+    {
+      "content": "Effective troubleshooting begins with a good transient-failure handling",
+      "pos": [
+        3960,
+        4031
+      ]
+    },
+    {
+      "content": "design.",
+      "pos": [
+        4032,
+        4039
+      ]
+    },
+    {
+      "content": "Transient errors are one of the main areas in which cloud",
+      "pos": [
+        4040,
+        4097
+      ]
+    },
+    {
+      "content": "applications fail to behave as expected due to transient error",
+      "pos": [
+        4098,
+        4160
+      ]
+    },
+    {
+      "content": "conditions inherent to internet applications.",
+      "pos": [
+        4161,
+        4206
+      ]
+    },
+    {
+      "content": "Transient errors are failures related to latencies and intermittent",
+      "pos": [
+        4209,
+        4276
+      ]
+    },
+    {
+      "content": "network connections inherent in shared resources on the internet.",
+      "pos": [
+        4277,
+        4342
+      ]
+    },
+    {
+      "content": "Some",
+      "pos": [
+        4343,
+        4347
+      ]
+    },
+    {
+      "content": "examples are:",
+      "pos": [
+        4348,
+        4361
+      ]
+    },
+    {
+      "pos": [
+        4367,
+        4526
+      ],
+      "content": "Shared computer resources such as Azure Cloud Services and\nSQL数据库 (to give two examples) can be slightly less or more\nresponsive from moment to moment.",
+      "leadings": [
+        "",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Shared computer resources such as Azure Cloud Services and",
+          "pos": [
+            0,
+            58
+          ]
+        },
+        {
+          "content": "SQL数据库 (to give two examples) can be slightly less or more",
+          "pos": [
+            59,
+            117
+          ]
+        },
+        {
+          "content": "responsive from moment to moment.",
+          "pos": [
+            118,
+            151
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        4531,
+        4741
+      ],
+      "content": "Responsiveness delays due to providing durability for services. For example, SQL\nAzure keeps multiple copies of databases consistent in order to\nprovide durability, this has an impact on responsiveness.",
+      "leadings": [
+        "",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Responsiveness delays due to providing durability for services. For example, SQL",
+          "pos": [
+            0,
+            80
+          ],
+          "nodes": [
+            {
+              "content": "Responsiveness delays due to providing durability for services.",
+              "pos": [
+                0,
+                63
+              ]
+            },
+            {
+              "content": "For example, SQL",
+              "pos": [
+                64,
+                80
+              ]
+            }
+          ]
+        },
+        {
+          "content": "Azure keeps multiple copies of databases consistent in order to",
+          "pos": [
+            81,
+            144
+          ]
+        },
+        {
+          "content": "provide durability, this has an impact on responsiveness.",
+          "pos": [
+            145,
+            202
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        4746,
+        4933
+      ],
+      "content": "Delays caused by HTTP or other protocol connections ending prior to\ncompleting work. For example, HTTP requests may not reach an\nendpoint and return prior to their timeout period.",
+      "leadings": [
+        "",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Delays caused by HTTP or other protocol connections ending prior to",
+          "pos": [
+            0,
+            67
+          ]
+        },
+        {
+          "content": "completing work. For example, HTTP requests may not reach an",
+          "pos": [
+            68,
+            128
+          ],
+          "nodes": [
+            {
+              "content": "completing work.",
+              "pos": [
+                0,
+                16
+              ]
+            },
+            {
+              "content": "For example, HTTP requests may not reach an",
+              "pos": [
+                17,
+                60
+              ]
+            }
+          ]
+        },
+        {
+          "content": "endpoint and return prior to their timeout period.",
+          "pos": [
+            129,
+            179
+          ]
+        }
+      ]
+    },
+    {
+      "content": "To help alleviate the impact of transient errors, Azure",
+      "pos": [
+        4936,
+        4991
+      ]
+    },
+    {
+      "content": "applications should:",
+      "pos": [
+        4992,
+        5012
+      ]
+    },
+    {
+      "pos": [
+        5018,
+        5153
+      ],
+      "content": "Be loosely coupled so that components are not locally dependent upon\nservices that fail more often than in on-premise environments.",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Be loosely coupled so that components are not locally dependent upon",
+          "pos": [
+            0,
+            68
+          ]
+        },
+        {
+          "content": "services that fail more often than in on-premise environments.",
+          "pos": [
+            69,
+            131
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        5158,
+        5269
+      ],
+      "content": "Make asynchronous calls whenever possible to keep processes from\nbecoming dependent on immediate responses.",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Make asynchronous calls whenever possible to keep processes from",
+          "pos": [
+            0,
+            64
+          ]
+        },
+        {
+          "content": "becoming dependent on immediate responses.",
+          "pos": [
+            65,
+            107
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        5274,
+        5458
+      ],
+      "content": "Use a transient error handling approach that detects certain\ncategories of failures and can implement retry behavior for those\nfailures based on some configurable retry policy.",
+      "leadings": [
+        "",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Use a transient error handling approach that detects certain",
+          "pos": [
+            0,
+            60
+          ]
+        },
+        {
+          "content": "categories of failures and can implement retry behavior for those",
+          "pos": [
+            61,
+            126
+          ]
+        },
+        {
+          "content": "failures based on some configurable retry policy.",
+          "pos": [
+            127,
+            176
+          ]
+        }
+      ]
+    },
+    {
+      "content": "Calls to services should either build or use a transient error handling layer to detect common failure scenarios and retry the call based upon a configuration setting.",
+      "pos": [
+        5460,
+        5627
+      ]
+    },
+    {
+      "content": "For .NET developers, one recommended library is the <bpt id=\"p1\">[</bpt><ept id=\"p1\">Microsoft Enterprise Library 5.0 Integration Pack for Azure]</ept>.",
+      "pos": [
+        5628,
+        5742
+      ]
+    },
+    {
+      "content": "Microsoft Enterprise Library is a collection of reusable application",
+      "pos": [
+        5743,
+        5811
+      ]
+    },
+    {
+      "content": "blocks that address common cross-cutting concerns in enterprise software",
+      "pos": [
+        5812,
+        5884
+      ]
+    },
+    {
+      "content": "development.",
+      "pos": [
+        5885,
+        5897
+      ]
+    },
+    {
+      "content": "The Microsoft Enterprise Library Integration Pack for",
+      "pos": [
+        5898,
+        5951
+      ]
+    },
+    {
+      "content": "Azure is an extension to Microsoft Enterprise Library 5.0 that",
+      "pos": [
+        5952,
+        6014
+      ]
+    },
+    {
+      "content": "can be used with Azure.",
+      "pos": [
+        6015,
+        6038
+      ]
+    },
+    {
+      "content": "It includes the",
+      "pos": [
+        6039,
+        6054
+      ]
+    },
+    {
+      "content": "Autoscaling Application Block, Transient Fault Handling Application",
+      "pos": [
+        6055,
+        6122
+      ]
+    },
+    {
+      "content": "Block, blob configuration source, protected configuration provider, and",
+      "pos": [
+        6123,
+        6194
+      ]
+    },
+    {
+      "content": "learning materials.",
+      "pos": [
+        6195,
+        6214
+      ]
+    },
+    {
+      "content": "Another, simpler .NET library with fewer features is the",
+      "pos": [
+        6215,
+        6271
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">[</bpt><ept id=\"p1\">Cloud Application Framework &amp; Extensions (CloudFx)]</ept>.",
+      "pos": [
+        6272,
+        6325
+      ]
+    },
+    {
+      "content": "CloudFx offers a set",
+      "pos": [
+        6326,
+        6346
+      ]
+    },
+    {
+      "content": "of production quality components and building blocks intended to",
+      "pos": [
+        6347,
+        6411
+      ]
+    },
+    {
+      "content": "jump-start the implementation of feature-rich, reliable, and extensible",
+      "pos": [
+        6412,
+        6483
+      ]
+    },
+    {
+      "content": "Azure-based solutions and services.",
+      "pos": [
+        6484,
+        6519
+      ]
+    },
+    {
+      "content": "Perform Appropriate Tracing and Logging",
+      "pos": [
+        6524,
+        6563
+      ]
+    },
+    {
+      "content": "Because the complexity of distributed, scale-out applications,",
+      "pos": [
+        6565,
+        6627
+      ]
+    },
+    {
+      "content": "traditional debuggers that work against one process are of much less use",
+      "pos": [
+        6628,
+        6700
+      ]
+    },
+    {
+      "content": "when investigating issues that occur while your application is running.",
+      "pos": [
+        6702,
+        6773
+      ]
+    },
+    {
+      "content": "Therefore tracing and logging are of upmost importance.",
+      "pos": [
+        6774,
+        6829
+      ]
+    },
+    {
+      "content": "The execution of",
+      "pos": [
+        6830,
+        6846
+      ]
+    },
+    {
+      "content": "your app and its data is shared across many services, which are hosted",
+      "pos": [
+        6847,
+        6917
+      ]
+    },
+    {
+      "content": "on many different machines.",
+      "pos": [
+        6918,
+        6945
+      ]
+    },
+    {
+      "content": "In a large scale distributed application, it",
+      "pos": [
+        6946,
+        6990
+      ]
+    },
+    {
+      "content": "is difficult, if not impossible to determine which service instance to",
+      "pos": [
+        6991,
+        7061
+      ]
+    },
+    {
+      "content": "attach to and debug.",
+      "pos": [
+        7062,
+        7082
+      ]
+    },
+    {
+      "content": "Tracing and logging allow you to follow application",
+      "pos": [
+        7083,
+        7134
+      ]
+    },
+    {
+      "content": "execution and data flow giving you a better understanding of the state",
+      "pos": [
+        7135,
+        7205
+      ]
+    },
+    {
+      "content": "of your application.",
+      "pos": [
+        7206,
+        7226
+      ]
+    },
+    {
+      "content": "Successful Azure applications have a logging and tracing",
+      "pos": [
+        7228,
+        7284
+      ]
+    },
+    {
+      "content": "strategy designed in to the application from the beginning.",
+      "pos": [
+        7285,
+        7344
+      ]
+    },
+    {
+      "content": "This reduces",
+      "pos": [
+        7345,
+        7357
+      ]
+    },
+    {
+      "content": "the time and effort required to locate any issues and repair them",
+      "pos": [
+        7358,
+        7423
+      ]
+    },
+    {
+      "content": "quickly without having to call Microsoft for support.",
+      "pos": [
+        7424,
+        7477
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>Note<ept id=\"p1\">**</ept>: Writing traces and logging extensively has a performance",
+      "pos": [
+        7479,
+        7545
+      ]
+    },
+    {
+      "content": "impact; doing so intensively has a more profound one.",
+      "pos": [
+        7546,
+        7599
+      ]
+    },
+    {
+      "content": "Therefore the",
+      "pos": [
+        7600,
+        7613
+      ]
+    },
+    {
+      "content": "design of your application should include a configurable tracing and",
+      "pos": [
+        7614,
+        7682
+      ]
+    },
+    {
+      "content": "logging policy that can be adjusted at need.",
+      "pos": [
+        7683,
+        7727
+      ]
+    },
+    {
+      "content": "Ideally, the level of",
+      "pos": [
+        7728,
+        7749
+      ]
+    },
+    {
+      "content": "logging should be adjustable from the <bpt id=\"p1\">**</bpt>ServiceConfiguration.cscfg<ept id=\"p1\">**</ept>",
+      "pos": [
+        7750,
+        7818
+      ]
+    },
+    {
+      "content": "file so that it can be changed without having to redeploy.",
+      "pos": [
+        7820,
+        7878
+      ]
+    },
+    {
+      "content": "Having volumes of logs does not guarantee speedy bug detection and",
+      "pos": [
+        7880,
+        7946
+      ]
+    },
+    {
+      "content": "repair; a large amount of data takes a long time to decipher, and",
+      "pos": [
+        7947,
+        8012
+      ]
+    },
+    {
+      "content": "collecting it impacts the performance of your application.",
+      "pos": [
+        8013,
+        8071
+      ]
+    },
+    {
+      "content": "Adjustable",
+      "pos": [
+        8072,
+        8082
+      ]
+    },
+    {
+      "content": "logging controls both the size and storage cost of log data.",
+      "pos": [
+        8083,
+        8143
+      ]
+    },
+    {
+      "content": "In the MSDN Magazine article <bpt id=\"p1\">[</bpt><ept id=\"p1\">Take Control of Logging and Tracing in Azure]</ept>, Mike Kelly describes four types of diagnostic output to",
+      "pos": [
+        8145,
+        8277
+      ]
+    },
+    {
+      "content": "consider:",
+      "pos": [
+        8278,
+        8287
+      ]
+    },
+    {
+      "content": "Debug Output - Only in debug build, includes asserts",
+      "pos": [
+        8293,
+        8345
+      ]
+    },
+    {
+      "content": "Tracing - Tracks the flow of control during execution",
+      "pos": [
+        8350,
+        8403
+      ]
+    },
+    {
+      "content": "Event Logging - Major events in program execution",
+      "pos": [
+        8408,
+        8457
+      ]
+    },
+    {
+      "content": "Error Logging - Exceptional or dangerous situation",
+      "pos": [
+        8462,
+        8512
+      ]
+    },
+    {
+      "content": "Other languages, application platforms, and operating systems",
+      "pos": [
+        8514,
+        8575
+      ]
+    },
+    {
+      "content": "may have different terminology for tracing and logging.",
+      "pos": [
+        8576,
+        8631
+      ]
+    },
+    {
+      "content": "If you are using",
+      "pos": [
+        8632,
+        8648
+      ]
+    },
+    {
+      "content": "one of these development platforms on Azure, use the equivalent",
+      "pos": [
+        8649,
+        8712
+      ]
+    },
+    {
+      "content": "strategy and tools for the language or the platform you are using.",
+      "pos": [
+        8714,
+        8780
+      ]
+    },
+    {
+      "content": "Mixed mode applications are applications executing in a combination of",
+      "pos": [
+        8782,
+        8852
+      ]
+    },
+    {
+      "content": "Azure Virtual Machines, Web Sites, and Cloud Services.",
+      "pos": [
+        8853,
+        8907
+      ]
+    },
+    {
+      "content": "When",
+      "pos": [
+        8908,
+        8912
+      ]
+    },
+    {
+      "content": "building applications of this type, tracing and logging become even more",
+      "pos": [
+        8913,
+        8985
+      ]
+    },
+    {
+      "content": "important because they are more widely distributed.",
+      "pos": [
+        8986,
+        9037
+      ]
+    },
+    {
+      "content": "To troubleshoot",
+      "pos": [
+        9038,
+        9053
+      ]
+    },
+    {
+      "content": "these mixed-mode applications the overall data and execution flow must",
+      "pos": [
+        9054,
+        9124
+      ]
+    },
+    {
+      "content": "be followed in order to identify any problems.",
+      "pos": [
+        9125,
+        9171
+      ]
+    },
+    {
+      "content": "The mechanics of tracing and logging a mixed mode application depends upon the hosting model of the component.",
+      "pos": [
+        9172,
+        9282
+      ]
+    },
+    {
+      "content": "Monitor Your Application",
+      "pos": [
+        9288,
+        9312
+      ]
+    },
+    {
+      "content": "Tracing and logging fit in to the bigger area of monitoring.",
+      "pos": [
+        9314,
+        9374
+      ]
+    },
+    {
+      "content": "Monitoring",
+      "pos": [
+        9375,
+        9385
+      ]
+    },
+    {
+      "content": "allows you to:",
+      "pos": [
+        9386,
+        9400
+      ]
+    },
+    {
+      "content": "Discover Azure applications",
+      "pos": [
+        9406,
+        9433
+      ]
+    },
+    {
+      "content": "Determine status of each role instance",
+      "pos": [
+        9438,
+        9476
+      ]
+    },
+    {
+      "pos": [
+        9481,
+        9561
+      ],
+      "content": "Collect and monitor performance information including latency and\nthroughput",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Collect and monitor performance information including latency and",
+          "pos": [
+            0,
+            65
+          ]
+        },
+        {
+          "content": "throughput",
+          "pos": [
+            66,
+            76
+          ]
+        }
+      ]
+    },
+    {
+      "content": "Collect and monitor events",
+      "pos": [
+        9566,
+        9592
+      ]
+    },
+    {
+      "content": "Collect and monitor trace messages",
+      "pos": [
+        9597,
+        9631
+      ]
+    },
+    {
+      "content": "Monitor resource usage",
+      "pos": [
+        9636,
+        9658
+      ]
+    },
+    {
+      "content": "Monitor quality of service metrics",
+      "pos": [
+        9663,
+        9697
+      ]
+    },
+    {
+      "content": "Perform capacity planning",
+      "pos": [
+        9702,
+        9727
+      ]
+    },
+    {
+      "content": "Perform traffic analysis (users, views, peak times)",
+      "pos": [
+        9732,
+        9783
+      ]
+    },
+    {
+      "content": "Estimate billing",
+      "pos": [
+        9788,
+        9804
+      ]
+    },
+    {
+      "content": "Perform auditing",
+      "pos": [
+        9809,
+        9825
+      ]
+    },
+    {
+      "content": "Monitoring is accomplished with a tool or set of tools.",
+      "pos": [
+        9827,
+        9882
+      ]
+    },
+    {
+      "content": "Which tool you",
+      "pos": [
+        9883,
+        9897
+      ]
+    },
+    {
+      "content": "use depends on the platform and/or languages your application uses and on your monitoring goals and requirements.",
+      "pos": [
+        9898,
+        10011
+      ]
+    },
+    {
+      "content": "Microsoft System Center Monitoring Pack for Azure Applications",
+      "pos": [
+        10015,
+        10077
+      ]
+    },
+    {
+      "content": "This <bpt id=\"p1\">[</bpt><ept id=\"p1\">Monitoring Pack]</ept> allows you to use <bpt id=\"p2\">[</bpt><ph id=\"ph1\">Microsoft System Center</ph>\nOperations Manager<ept id=\"p2\">]</ept> to monitor the availability and performance of",
+      "pos": [
+        10081,
+        10213
+      ]
+    },
+    {
+      "content": "Azure Applications.",
+      "pos": [
+        10214,
+        10233
+      ]
+    },
+    {
+      "content": "Using Microsoft System Center Operations Manager 2012 is the best way to",
+      "pos": [
+        10235,
+        10307
+      ]
+    },
+    {
+      "content": "monitor the health of your Azure application.",
+      "pos": [
+        10308,
+        10353
+      ]
+    },
+    {
+      "content": "Azure Platform Management Tool",
+      "pos": [
+        10357,
+        10387
+      ]
+    },
+    {
+      "content": "Another tool is the <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure Platform Management Tool (MMC)]</ept>, which",
+      "pos": [
+        10391,
+        10456
+      ]
+    },
+    {
+      "content": "enables you to manage your Azure hosted services and storage",
+      "pos": [
+        10457,
+        10517
+      ]
+    },
+    {
+      "content": "accounts.",
+      "pos": [
+        10518,
+        10527
+      ]
+    },
+    {
+      "content": "This tool is provided as a sample with complete source code so",
+      "pos": [
+        10528,
+        10590
+      ]
+    },
+    {
+      "content": "you can see how to perform various management and configuration tasks",
+      "pos": [
+        10591,
+        10660
+      ]
+    },
+    {
+      "content": "using the Azure Management and Diagnostics APIs.",
+      "pos": [
+        10661,
+        10709
+      ]
+    },
+    {
+      "content": "Cerebrata Tools",
+      "pos": [
+        10713,
+        10728
+      ]
+    },
+    {
+      "content": "Cerebrata provides a number of tools that allow you to monitor and",
+      "pos": [
+        10732,
+        10798
+      ]
+    },
+    {
+      "content": "manage your Azure applications.",
+      "pos": [
+        10799,
+        10830
+      ]
+    },
+    {
+      "content": "These include <bpt id=\"p1\">[</bpt><ph id=\"ph1\">Azure Diagnostics</ph>\nManager<ept id=\"p1\">]</ept>, <bpt id=\"p2\">[</bpt><ept id=\"p2\">Cloud Storage Studio]</ept>, and <bpt id=\"p3\">[</bpt><ept id=\"p3\">Azure Management Cmdlets]</ept>.",
+      "pos": [
+        10831,
+        10929
+      ]
+    },
+    {
+      "content": "Azure Diagnostics Manager 2 is a Windows (WPF) based client for managing",
+      "pos": [
+        10931,
+        11003
+      ]
+    },
+    {
+      "content": "Azure Diagnostics.",
+      "pos": [
+        11004,
+        11022
+      ]
+    },
+    {
+      "content": "It lets you view, download, and manage the",
+      "pos": [
+        11023,
+        11065
+      ]
+    },
+    {
+      "content": "diagnostics data collected by applications running in Azure.",
+      "pos": [
+        11066,
+        11126
+      ]
+    },
+    {
+      "content": "See",
+      "pos": [
+        11127,
+        11130
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">[</bpt>http://www.cerebrata.com<ept id=\"p1\">](http://www.cerebrata.com)</ept> for more information on these products.",
+      "pos": [
+        11131,
+        11223
+      ]
+    },
+    {
+      "content": "Cloud Storage Studio 2 is a Windows (WPF) based client for managing",
+      "pos": [
+        11225,
+        11292
+      ]
+    },
+    {
+      "content": "Azure Storage.",
+      "pos": [
+        11293,
+        11307
+      ]
+    },
+    {
+      "content": "Azure Management Cmdlets is a set of Windows PowerShell cmdlets for managing",
+      "pos": [
+        11309,
+        11385
+      ]
+    },
+    {
+      "content": "Azure Storage, Hosted Services, SQL数据库 instances, and",
+      "pos": [
+        11386,
+        11439
+      ]
+    },
+    {
+      "content": "Diagnostics.",
+      "pos": [
+        11440,
+        11452
+      ]
+    },
+    {
+      "content": "It also provides cmdlets to back up and restore storage",
+      "pos": [
+        11453,
+        11508
+      ]
+    },
+    {
+      "content": "accounts.",
+      "pos": [
+        11509,
+        11518
+      ]
+    },
+    {
+      "content": "Network Monitoring: AlertBot, Gomez, Keynote, Pingdom",
+      "pos": [
+        11522,
+        11575
+      ]
+    },
+    {
+      "content": "Compuware's <bpt id=\"p1\">[</bpt><ept id=\"p1\">Gomez]</ept> Application Performance Management, <bpt id=\"p2\">[</bpt><ept id=\"p2\">Keynote]</ept>, <bpt id=\"p3\">[</bpt><ept id=\"p3\">Pingdom]</ept>,",
+      "pos": [
+        11579,
+        11656
+      ]
+    },
+    {
+      "content": "and <bpt id=\"p1\">[</bpt><ept id=\"p1\">AlertBot]</ept> are solutions for monitoring your Azure application",
+      "pos": [
+        11657,
+        11723
+      ]
+    },
+    {
+      "content": "remotely.",
+      "pos": [
+        11724,
+        11733
+      ]
+    },
+    {
+      "content": "They allow you to monitor the availability of your application",
+      "pos": [
+        11734,
+        11796
+      ]
+    },
+    {
+      "content": "and optimize performance.",
+      "pos": [
+        11797,
+        11822
+      ]
+    },
+    {
+      "content": "Some services, such as Pingdom, enable",
+      "pos": [
+        11823,
+        11861
+      ]
+    },
+    {
+      "content": "notification by email, SMS, or a desktop application when an error is",
+      "pos": [
+        11862,
+        11931
+      ]
+    },
+    {
+      "content": "detected.",
+      "pos": [
+        11932,
+        11941
+      ]
+    },
+    {
+      "content": "This type of monitoring simulates what an end user does to",
+      "pos": [
+        11942,
+        12000
+      ]
+    },
+    {
+      "content": "successfully monitor an application.",
+      "pos": [
+        12001,
+        12037
+      ]
+    },
+    {
+      "content": "Apica Tools",
+      "pos": [
+        12041,
+        12052
+      ]
+    },
+    {
+      "content": "Apica provides tools that monitors your Azure WEB application \"from outside.\"",
+      "pos": [
+        12056,
+        12133
+      ]
+    },
+    {
+      "content": "For more information, see <ph id=\"ph1\">&lt;a href=\"http://www.apicasystem.com/integration-partners/\"&gt;</ph>http://www.apicasystem.com/integration-partners/<ph id=\"ph2\">&lt;/a&gt;</ph>.",
+      "pos": [
+        12134,
+        12272
+      ]
+    },
+    {
+      "content": "AVIcode",
+      "pos": [
+        12277,
+        12284
+      ]
+    },
+    {
+      "content": "Microsoft purchased AVIcode and it is now part of Microsoft System",
+      "pos": [
+        12288,
+        12354
+      ]
+    },
+    {
+      "content": "Center.",
+      "pos": [
+        12355,
+        12362
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">[</bpt><ept id=\"p1\">AVIcode]</ept> delivers .NET application performance monitoring",
+      "pos": [
+        12363,
+        12421
+      ]
+    },
+    {
+      "content": "capabilities with a comprehensive suite of application monitoring",
+      "pos": [
+        12422,
+        12487
+      ]
+    },
+    {
+      "content": "capabilities.",
+      "pos": [
+        12488,
+        12501
+      ]
+    },
+    {
+      "content": "Performance Profiling",
+      "pos": [
+        12505,
+        12526
+      ]
+    },
+    {
+      "content": "You can <bpt id=\"p1\">[</bpt><ept id=\"p1\">profile]</ept> your Azure application when it runs in",
+      "pos": [
+        12530,
+        12586
+      ]
+    },
+    {
+      "content": "Azure to determine any performance issues.",
+      "pos": [
+        12588,
+        12630
+      ]
+    },
+    {
+      "content": "When you publish your",
+      "pos": [
+        12631,
+        12652
+      ]
+    },
+    {
+      "content": "Azure application from Visual Studio, you can choose to profile the",
+      "pos": [
+        12654,
+        12721
+      ]
+    },
+    {
+      "content": "application and select the profiling settings that you require.",
+      "pos": [
+        12722,
+        12785
+      ]
+    },
+    {
+      "content": "Azure VM Assistant",
+      "pos": [
+        12789,
+        12807
+      ]
+    },
+    {
+      "content": "The <bpt id=\"p1\">[</bpt><ept id=\"p1\">VM Assistant]</ept> tool is a CodePlex project that collects all the",
+      "pos": [
+        12811,
+        12878
+      ]
+    },
+    {
+      "content": "relevant troubleshooting data in one place when you Remote Desktop into",
+      "pos": [
+        12879,
+        12950
+      ]
+    },
+    {
+      "content": "a virtual machine instance.",
+      "pos": [
+        12951,
+        12978
+      ]
+    },
+    {
+      "content": "The <bpt id=\"p1\">**</bpt>VM Health<ept id=\"p1\">**</ept> button gives the current",
+      "pos": [
+        12979,
+        13021
+      ]
+    },
+    {
+      "content": "status of the instance.",
+      "pos": [
+        13022,
+        13045
+      ]
+    },
+    {
+      "content": "Debugging Errors Where You Can",
+      "pos": [
+        13050,
+        13080
+      ]
+    },
+    {
+      "content": "Before deploying an app to Azure, it is a best practice to debug",
+      "pos": [
+        13082,
+        13146
+      ]
+    },
+    {
+      "content": "your application locally.",
+      "pos": [
+        13147,
+        13172
+      ]
+    },
+    {
+      "content": "The Azure SDK contains emulators that",
+      "pos": [
+        13173,
+        13210
+      ]
+    },
+    {
+      "content": "mimic the Azure cloud environment, allowing you to run your app and",
+      "pos": [
+        13211,
+        13278
+      ]
+    },
+    {
+      "content": "do rudimentary tests without having to deploying your application.",
+      "pos": [
+        13279,
+        13345
+      ]
+    },
+    {
+      "content": "The",
+      "pos": [
+        13346,
+        13349
+      ]
+    },
+    {
+      "content": "debugging tools you use vary depending upon the programming language and the development tools",
+      "pos": [
+        13350,
+        13444
+      ]
+    },
+    {
+      "content": "you are using.",
+      "pos": [
+        13445,
+        13459
+      ]
+    },
+    {
+      "content": "After an application has been deployed, you can debug in the cloud using a debugger like Visual Studio.",
+      "pos": [
+        13461,
+        13564
+      ]
+    },
+    {
+      "content": "This requires creating a debug build and deploying it.",
+      "pos": [
+        13565,
+        13619
+      ]
+    },
+    {
+      "content": "In order to do this,you must connect to a specific role instance.",
+      "pos": [
+        13620,
+        13685
+      ]
+    },
+    {
+      "content": "If you have a complex application with multiple roles and role instances, it can be very difficult to determine to which role instance to connect.",
+      "pos": [
+        13686,
+        13832
+      ]
+    },
+    {
+      "content": "Visual Studio Ultimate supports IntelliTrace, which allows .NET roles to track debug information.",
+      "pos": [
+        13833,
+        13930
+      ]
+    },
+    {
+      "content": "When a problem occurs you can download this information and load it into Visual Studio.",
+      "pos": [
+        13931,
+        14018
+      ]
+    },
+    {
+      "content": "You can look at each role instance's IntelliTrace log to determine where the problem occurred.",
+      "pos": [
+        14019,
+        14113
+      ]
+    },
+    {
+      "content": "While there are some drawbacks to debugging in the cloud, there are some circumstances in which it is required.",
+      "pos": [
+        14114,
+        14225
+      ]
+    },
+    {
+      "content": "Not all Azure Services have an emulator (for example 服务总线) and not all supported development tools (for example Mac and Linux) come with emulators.",
+      "pos": [
+        14226,
+        14373
+      ]
+    },
+    {
+      "content": "Once you have debugged your application locally you will most likely",
+      "pos": [
+        14376,
+        14444
+      ]
+    },
+    {
+      "content": "have to rely on the instrumentation built into your application to",
+      "pos": [
+        14445,
+        14511
+      ]
+    },
+    {
+      "content": "determine where problems are occurring.",
+      "pos": [
+        14512,
+        14551
+      ]
+    },
+    {
+      "content": "Node.js Debugging",
+      "pos": [
+        14555,
+        14572
+      ]
+    },
+    {
+      "content": "For debugging Node.JS applications, you can use the Node-Inspector tool",
+      "pos": [
+        14576,
+        14647
+      ]
+    },
+    {
+      "content": "which is available on <bpt id=\"p1\">[</bpt>GitHub<ept id=\"p1\">](https://github.com/dannycoates/node-inspector)</ept>.",
+      "pos": [
+        14648,
+        14726
+      ]
+    },
+    {
+      "content": "Node-Inspector can be run locally on your",
+      "pos": [
+        14727,
+        14768
+      ]
+    },
+    {
+      "content": "development machine using the Azure storage emulator.",
+      "pos": [
+        14769,
+        14822
+      ]
+    },
+    {
+      "content": "For more",
+      "pos": [
+        14823,
+        14831
+      ]
+    },
+    {
+      "content": "information see Jim Wang's blog: <bpt id=\"p1\">[</bpt><ept id=\"p1\">Debugging Node in the Azure Emulator]</ept>.",
+      "pos": [
+        14832,
+        14904
+      ]
+    },
+    {
+      "content": "If you are debugging your application on Azure, install the full version",
+      "pos": [
+        14906,
+        14978
+      ]
+    },
+    {
+      "content": "of IISNode from <bpt id=\"p1\">[</bpt>GitHub<ept id=\"p1\">](https://github.com/windowsazure/iisnode/downloads)</ept> on your web role, worker role, or VM instance.",
+      "pos": [
+        14979,
+        15101
+      ]
+    },
+    {
+      "content": "As",
+      "pos": [
+        15102,
+        15104
+      ]
+    },
+    {
+      "content": "discussed earlier, this is not a recommended way to debug your",
+      "pos": [
+        15105,
+        15167
+      ]
+    },
+    {
+      "content": "application when it is in production and scaled to multiple instances because you may not know to which role instance or VM to",
+      "pos": [
+        15168,
+        15294
+      ]
+    },
+    {
+      "content": "debug.",
+      "pos": [
+        15295,
+        15301
+      ]
+    },
+    {
+      "content": "To use Node-Inspector on a web role, install the package in the web role",
+      "pos": [
+        15303,
+        15375
+      ]
+    },
+    {
+      "content": "and use the Node-Inspector tool as you normally would.",
+      "pos": [
+        15376,
+        15430
+      ]
+    },
+    {
+      "content": "For more",
+      "pos": [
+        15431,
+        15439
+      ]
+    },
+    {
+      "content": "information about debugging with Node-Inspector, see <bpt id=\"p1\">[</bpt><ph id=\"ph1\">Debugging with</ph>\nNode-Inspector<ept id=\"p1\">]</ept>.",
+      "pos": [
+        15440,
+        15525
+      ]
+    },
+    {
+      "content": "IntelliTrace",
+      "pos": [
+        15529,
+        15541
+      ]
+    },
+    {
+      "content": "Microsoft Visual Studio Ultimate contains <bpt id=\"p1\">[</bpt><ept id=\"p1\">IntelliTrace]</ept>, which can",
+      "pos": [
+        15545,
+        15612
+      ]
+    },
+    {
+      "content": "be enabled to debug applications before deployment into production.",
+      "pos": [
+        15613,
+        15680
+      ]
+    },
+    {
+      "content": "IntelliTrace supports ASP.NET, and WCF applications.",
+      "pos": [
+        15681,
+        15733
+      ]
+    },
+    {
+      "content": "Intellitrace is not",
+      "pos": [
+        15734,
+        15753
+      ]
+    },
+    {
+      "content": "supported when it is enabled in a production service, but can be used to",
+      "pos": [
+        15754,
+        15826
+      ]
+    },
+    {
+      "content": "get exceptions for an application after deployment to Azure.",
+      "pos": [
+        15827,
+        15887
+      ]
+    },
+    {
+      "content": "Jim",
+      "pos": [
+        15888,
+        15891
+      ]
+    },
+    {
+      "content": "Nakashima's blog post describes how to use <bpt id=\"p1\">[</bpt><ph id=\"ph1\">IntelliTrace to debug</ph> \nAzure Cloud Services<ept id=\"p1\">]</ept>.",
+      "pos": [
+        15892,
+        15981
+      ]
+    },
+    {
+      "content": "Fiddler",
+      "pos": [
+        15985,
+        15992
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">[</bpt><ept id=\"p1\">Fiddler]</ept> is a Web Debugging Proxy that logs all HTTP(S) traffic between",
+      "pos": [
+        15996,
+        16068
+      ]
+    },
+    {
+      "content": "your computer and the Internet.",
+      "pos": [
+        16069,
+        16100
+      ]
+    },
+    {
+      "content": "Fiddler allows you to inspect traffic,",
+      "pos": [
+        16101,
+        16139
+      ]
+    },
+    {
+      "content": "set breakpoints, and \"fiddle\" with incoming or outgoing data.",
+      "pos": [
+        16140,
+        16201
+      ]
+    },
+    {
+      "content": "Fiddler is",
+      "pos": [
+        16202,
+        16212
+      ]
+    },
+    {
+      "content": "especially helpful for troubleshooting Azure Storage.",
+      "pos": [
+        16213,
+        16266
+      ]
+    },
+    {
+      "content": "To use Fiddler against the local development fabric, use ipv4.fiddler",
+      "pos": [
+        16268,
+        16337
+      ]
+    },
+    {
+      "content": "instead of 127.0.0.1:",
+      "pos": [
+        16338,
+        16359
+      ]
+    },
+    {
+      "content": "Launch Fiddler.",
+      "pos": [
+        16365,
+        16380
+      ]
+    },
+    {
+      "content": "Launch your service in the development fabric.",
+      "pos": [
+        16385,
+        16431
+      ]
+    },
+    {
+      "content": "Browse to http://ipv4.fiddler:/.",
+      "pos": [
+        16436,
+        16468
+      ]
+    },
+    {
+      "content": "Fiddler should trace the request.",
+      "pos": [
+        16469,
+        16502
+      ]
+    },
+    {
+      "content": "To use Fiddler against the local development storage, modify the service",
+      "pos": [
+        16504,
+        16576
+      ]
+    },
+    {
+      "content": "configuration file to point to Fiddler:",
+      "pos": [
+        16577,
+        16616
+      ]
+    },
+    {
+      "content": "Open the ServiceConfiguration.cscfg file and change the connection",
+      "pos": [
+        16618,
+        16684
+      ]
+    },
+    {
+      "content": "string to:",
+      "pos": [
+        16685,
+        16695
+      ]
+    },
+    {
+      "content": "Launch Fiddler.",
+      "pos": [
+        16788,
+        16803
+      ]
+    },
+    {
+      "content": "Launch your service.",
+      "pos": [
+        16808,
+        16828
+      ]
+    },
+    {
+      "content": "Fiddler should trace any storage requests.",
+      "pos": [
+        16829,
+        16871
+      ]
+    },
+    {
+      "content": "Troubleshooting and the Azure Hosting Models",
+      "pos": [
+        16875,
+        16919
+      ]
+    },
+    {
+      "content": "This section discusses best practices for debugging applications using the different Azure hosting models.",
+      "pos": [
+        16922,
+        17028
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a id=\"Websites\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>Azure Web Sites",
+      "pos": [
+        17033,
+        17069
+      ]
+    },
+    {
+      "content": "When designing a supportable Azure web site, follow the",
+      "pos": [
+        17076,
+        17131
+      ]
+    },
+    {
+      "content": "recommendations made earlier in this document when possible.",
+      "pos": [
+        17132,
+        17192
+      ]
+    },
+    {
+      "content": "This",
+      "pos": [
+        17193,
+        17197
+      ]
+    },
+    {
+      "content": "includes checking for and handling errors, applying transient fault",
+      "pos": [
+        17198,
+        17265
+      ]
+    },
+    {
+      "content": "retry logic, tracing, and logging.",
+      "pos": [
+        17266,
+        17300
+      ]
+    },
+    {
+      "content": "Troubleshooting Azure",
+      "pos": [
+        17301,
+        17322
+      ]
+    },
+    {
+      "content": "web sites is accomplished by configuring web sites to display application",
+      "pos": [
+        17323,
+        17396
+      ]
+    },
+    {
+      "content": "errors, configuring diagnostics for a web site, collecting diagnostic",
+      "pos": [
+        17397,
+        17466
+      ]
+    },
+    {
+      "content": "data and then analyzing the collected data to identify and resolve",
+      "pos": [
+        17467,
+        17533
+      ]
+    },
+    {
+      "content": "problems.",
+      "pos": [
+        17534,
+        17543
+      ]
+    },
+    {
+      "content": "Azure web sites enable configuration of the following diagnostic",
+      "pos": [
+        17545,
+        17609
+      ]
+    },
+    {
+      "content": "options:",
+      "pos": [
+        17610,
+        17618
+      ]
+    },
+    {
+      "content": "Web Server Logging",
+      "pos": [
+        17624,
+        17642
+      ]
+    },
+    {
+      "content": "Detailed Error Messages",
+      "pos": [
+        17647,
+        17670
+      ]
+    },
+    {
+      "content": "Failed Request Tracing",
+      "pos": [
+        17675,
+        17697
+      ]
+    },
+    {
+      "pos": [
+        17699,
+        17777
+      ],
+      "content": "For more information on these topics see: <bpt id=\"p1\">[</bpt><ept id=\"p1\">Troubleshooting an Azure web site]</ept>."
+    },
+    {
+      "content": "When web server logs for Azure web sites are enabled, the web site",
+      "pos": [
+        17779,
+        17845
+      ]
+    },
+    {
+      "content": "will record all HTTP transactions into a log file using the <bpt id=\"p1\">[</bpt><ept id=\"p1\">W3C extended log file format]</ept>.",
+      "pos": [
+        17846,
+        17937
+      ]
+    },
+    {
+      "content": "You can then use <bpt id=\"p1\">[</bpt><ept id=\"p1\">Log Parser]</ept> to query the log file.",
+      "pos": [
+        17938,
+        17990
+      ]
+    },
+    {
+      "content": "Some",
+      "pos": [
+        17991,
+        17995
+      ]
+    },
+    {
+      "content": "example log parser queries are available on <bpt id=\"p1\">[</bpt><ept id=\"p1\">Log Parser Plus]</ept> and <bpt id=\"p2\">[</bpt><ph id=\"ph1\">TechNet</ph>\nLog Parser Examples<ept id=\"p2\">]</ept>.",
+      "pos": [
+        17996,
+        18092
+      ]
+    },
+    {
+      "content": "If you want to generate the CHART output type on a",
+      "pos": [
+        18093,
+        18143
+      ]
+    },
+    {
+      "content": "computer that is running Office 2007/2010, install <bpt id=\"p1\">[</bpt><ph id=\"ph1\">Office 2003 Web</ph>\nComponents<ept id=\"p1\">]</ept> following the instructions on <bpt id=\"p2\">[</bpt>Log Parser Plus<ept id=\"p2\">](http://logparserplus.com/article/2)</ept>.",
+      "pos": [
+        18144,
+        18308
+      ]
+    },
+    {
+      "content": "Azure web sites uses the same failed request tracing",
+      "pos": [
+        18310,
+        18362
+      ]
+    },
+    {
+      "content": "functionality that has been available with IIS 7.0 and later.",
+      "pos": [
+        18363,
+        18424
+      ]
+    },
+    {
+      "content": "It is not,",
+      "pos": [
+        18425,
+        18435
+      ]
+    },
+    {
+      "content": "however, configurable like IIS failed request tracing.",
+      "pos": [
+        18436,
+        18490
+      ]
+    },
+    {
+      "content": "When you enable",
+      "pos": [
+        18491,
+        18506
+      ]
+    },
+    {
+      "content": "failed request tracing for Azure web sites, <bpt id=\"p1\">**</bpt>all<ept id=\"p1\">**</ept> failed",
+      "pos": [
+        18507,
+        18565
+      ]
+    },
+    {
+      "content": "requests are captured.",
+      "pos": [
+        18566,
+        18588
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a id=\"Cloudservices\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>Azure Cloud Services",
+      "pos": [
+        18595,
+        18641
+      ]
+    },
+    {
+      "content": "Because of the distributed nature of Azure Cloud Services, it's",
+      "pos": [
+        18648,
+        18711
+      ]
+    },
+    {
+      "content": "important to defend your application by making calls asynchronously and",
+      "pos": [
+        18712,
+        18783
+      ]
+    },
+    {
+      "content": "handling retries for transient failures, as described previously.",
+      "pos": [
+        18784,
+        18849
+      ]
+    },
+    {
+      "content": "The debugging technique used for Azure Cloud Services depends on the type of problem you are experiencing.",
+      "pos": [
+        18851,
+        18957
+      ]
+    },
+    {
+      "content": "Problems involving a specific role or role instance, for example a role failing to start or cycling, are best investigated using Remote Desktop.",
+      "pos": [
+        18958,
+        19102
+      ]
+    },
+    {
+      "content": "In these cases you will know which role or role instance is problematic and you can connect to the affected role.",
+      "pos": [
+        19103,
+        19216
+      ]
+    },
+    {
+      "content": "When a problem occurs and you are not sure what role instance is causing the problem, tracing and logging is a better method for troubleshooting.",
+      "pos": [
+        19217,
+        19362
+      ]
+    },
+    {
+      "content": "Azure Diagnostics provides a mechanism to collect and manage trace and log information.",
+      "pos": [
+        19363,
+        19450
+      ]
+    },
+    {
+      "content": "Some new debugging features have been added to the Azure SDK 1.7 including making it easier to find stack traces when exceptions occur and improvements in Remote Desktop connectivity.",
+      "pos": [
+        19452,
+        19635
+      ]
+    },
+    {
+      "content": "Stack traces are now included in the Windows Event Log, making it easier to see exactly what went wrong.",
+      "pos": [
+        19636,
+        19740
+      ]
+    },
+    {
+      "content": "In addition Remote Desktop connectivity has been improved.",
+      "pos": [
+        19741,
+        19799
+      ]
+    },
+    {
+      "content": "If your role is cycling or aborted you will be able to use Remote Desktop to connect to the problematic role and investigate the problem.",
+      "pos": [
+        19800,
+        19937
+      ]
+    },
+    {
+      "content": "The Azure Portal provides access to monitoring data that helps IT professionals and developers anticipate and diagnose problems in Azure Cloud Services.",
+      "pos": [
+        19940,
+        20092
+      ]
+    },
+    {
+      "content": "By default values such as \"CPU Percentage\", \"Data In\", \"Data Out\", \"Disk Read Throughput\" and \"Disk Write Throughput\" are collected by the host VM.",
+      "pos": [
+        20093,
+        20240
+      ]
+    },
+    {
+      "content": "There is no configuration needed to enable these metrics for role instances and there is no cost impact to customers.",
+      "pos": [
+        20241,
+        20358
+      ]
+    },
+    {
+      "content": "Additional performance information can also be collected.",
+      "pos": [
+        20359,
+        20416
+      ]
+    },
+    {
+      "content": "To collect verbose diagnostic information you must have a valid diagnostics connection string as this information will be stored in Azure Storage and will therefore incur additional storage costs.",
+      "pos": [
+        20417,
+        20613
+      ]
+    },
+    {
+      "content": "When user enables verbose monitoring, the portal will remotely configure role instances to collect the default set of performance counters.",
+      "pos": [
+        20614,
+        20753
+      ]
+    },
+    {
+      "content": "Azure Diagnostics",
+      "pos": [
+        20759,
+        20776
+      ]
+    },
+    {
+      "content": "The original Azure SDK 1.0 included functionality to collect",
+      "pos": [
+        20779,
+        20839
+      ]
+    },
+    {
+      "content": "diagnostics data and store them in Azure storage collectively known",
+      "pos": [
+        20840,
+        20907
+      ]
+    },
+    {
+      "content": "as Azure Diagnostics.",
+      "pos": [
+        20908,
+        20929
+      ]
+    },
+    {
+      "content": "This software, built upon the Event",
+      "pos": [
+        20930,
+        20965
+      ]
+    },
+    {
+      "content": "Tracing for Windows (ETW) framework, fulfills two design requirements",
+      "pos": [
+        20966,
+        21035
+      ]
+    },
+    {
+      "content": "introduced by Azure scale-out architecture:",
+      "pos": [
+        21036,
+        21079
+      ]
+    },
+    {
+      "pos": [
+        21085,
+        21164
+      ],
+      "content": "Save diagnostic data that would be lost during a reimaging of the\ninstance.",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Save diagnostic data that would be lost during a reimaging of the",
+          "pos": [
+            0,
+            65
+          ]
+        },
+        {
+          "content": "instance.",
+          "pos": [
+            66,
+            75
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        21169,
+        21242
+      ],
+      "content": "Provide a central repository for diagnostics from multiple\ninstances.",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Provide a central repository for diagnostics from multiple",
+          "pos": [
+            0,
+            58
+          ]
+        },
+        {
+          "content": "instances.",
+          "pos": [
+            59,
+            69
+          ]
+        }
+      ]
+    },
+    {
+      "content": "After configuring Diagnostics in the role, Diagnostics collects",
+      "pos": [
+        21244,
+        21307
+      ]
+    },
+    {
+      "content": "diagnostic data from all the instances of that particular role.",
+      "pos": [
+        21308,
+        21371
+      ]
+    },
+    {
+      "content": "The",
+      "pos": [
+        21372,
+        21375
+      ]
+    },
+    {
+      "content": "diagnostic data can be used for debugging and troubleshooting, measuring",
+      "pos": [
+        21376,
+        21448
+      ]
+    },
+    {
+      "content": "performance, monitoring resource usage, traffic analysis and capacity",
+      "pos": [
+        21449,
+        21518
+      ]
+    },
+    {
+      "content": "planning, and auditing.",
+      "pos": [
+        21519,
+        21542
+      ]
+    },
+    {
+      "content": "Transfers to Azure storage account for",
+      "pos": [
+        21543,
+        21581
+      ]
+    },
+    {
+      "content": "persistence can either be scheduled or on-demand.",
+      "pos": [
+        21582,
+        21631
+      ]
+    },
+    {
+      "content": "Azure Diagnostics changes the server paradigm in four important",
+      "pos": [
+        21633,
+        21696
+      ]
+    },
+    {
+      "content": "ways:",
+      "pos": [
+        21697,
+        21702
+      ]
+    },
+    {
+      "content": "Diagnostics must be enabled at application creation time.",
+      "pos": [
+        21708,
+        21765
+      ]
+    },
+    {
+      "content": "Specific tools/steps are needed to visualize diagnostic results.",
+      "pos": [
+        21770,
+        21834
+      ]
+    },
+    {
+      "pos": [
+        21839,
+        21987
+      ],
+      "content": "Crashes will cause the loss of diagnostic data unless it is written\nto durable storage (Azure Storage as opposed to being on\neach instance).",
+      "leadings": [
+        "",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Crashes will cause the loss of diagnostic data unless it is written",
+          "pos": [
+            0,
+            67
+          ]
+        },
+        {
+          "content": "to durable storage (Azure Storage as opposed to being on",
+          "pos": [
+            68,
+            124
+          ]
+        },
+        {
+          "content": "each instance).",
+          "pos": [
+            125,
+            140
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        21992,
+        22076
+      ],
+      "content": "Diagnostic storage incurs a monthly cost when stored in Microsoft\nAzure storage.",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Diagnostic storage incurs a monthly cost when stored in Microsoft",
+          "pos": [
+            0,
+            65
+          ]
+        },
+        {
+          "content": "Azure storage.",
+          "pos": [
+            66,
+            80
+          ]
+        }
+      ]
+    },
+    {
+      "content": "Cost is of particular importance because one of the key benefits of",
+      "pos": [
+        22078,
+        22145
+      ]
+    },
+    {
+      "content": "Azure is cost reduction.",
+      "pos": [
+        22146,
+        22170
+      ]
+    },
+    {
+      "content": "The only way to eliminate the",
+      "pos": [
+        22171,
+        22200
+      ]
+    },
+    {
+      "content": "cost of using Diagnostics today is to leave the data on the virtual machine.",
+      "pos": [
+        22201,
+        22277
+      ]
+    },
+    {
+      "content": "This may work in a small deployment, but is impractical where there are",
+      "pos": [
+        22278,
+        22349
+      ]
+    },
+    {
+      "content": "many instances.",
+      "pos": [
+        22350,
+        22365
+      ]
+    },
+    {
+      "content": "Here are a few ways to minimize the financial impact:",
+      "pos": [
+        22366,
+        22419
+      ]
+    },
+    {
+      "pos": [
+        22425,
+        22792
+      ],
+      "content": "Make sure that the storage account is in the same data center as\nyour application. If for some reason they are not in the same data\ncenter, choose the interval of scheduled transfers wisely. Shorter\ntransfer times will increase data relevance, but that trade off may\nnot be great enough to justify the additional bandwidth and\nprocessing overhead.",
+      "leadings": [
+        "",
+        "    ",
+        "    ",
+        "    ",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Make sure that the storage account is in the same data center as",
+          "pos": [
+            0,
+            64
+          ]
+        },
+        {
+          "content": "your application. If for some reason they are not in the same data",
+          "pos": [
+            65,
+            131
+          ],
+          "nodes": [
+            {
+              "content": "your application.",
+              "pos": [
+                0,
+                17
+              ]
+            },
+            {
+              "content": "If for some reason they are not in the same data",
+              "pos": [
+                18,
+                66
+              ]
+            }
+          ]
+        },
+        {
+          "content": "center, choose the interval of scheduled transfers wisely. Shorter",
+          "pos": [
+            132,
+            198
+          ],
+          "nodes": [
+            {
+              "content": "center, choose the interval of scheduled transfers wisely.",
+              "pos": [
+                0,
+                58
+              ]
+            },
+            {
+              "content": "Shorter",
+              "pos": [
+                59,
+                66
+              ]
+            }
+          ]
+        },
+        {
+          "content": "transfer times will increase data relevance, but that trade off may",
+          "pos": [
+            199,
+            266
+          ]
+        },
+        {
+          "content": "not be great enough to justify the additional bandwidth and",
+          "pos": [
+            267,
+            326
+          ]
+        },
+        {
+          "content": "processing overhead.",
+          "pos": [
+            327,
+            347
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        22797,
+        23126
+      ],
+      "content": "Periodically copy and clear the diagnostic data from Azure\nStorage. The diagnostic data will transit through Azure\nstorage, but not reside there unnecessarily. There are a number of\ntools to do this: System Center Monitoring Pack for Azure,\nCerebrata's Azure Diagnostics Manager, and Azure PowerShell\ncmdlets.",
+      "leadings": [
+        "",
+        "    ",
+        "    ",
+        "    ",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Periodically copy and clear the diagnostic data from Azure",
+          "pos": [
+            0,
+            58
+          ]
+        },
+        {
+          "content": "Storage. The diagnostic data will transit through Azure",
+          "pos": [
+            59,
+            114
+          ],
+          "nodes": [
+            {
+              "content": "Storage.",
+              "pos": [
+                0,
+                8
+              ]
+            },
+            {
+              "content": "The diagnostic data will transit through Azure",
+              "pos": [
+                9,
+                55
+              ]
+            }
+          ]
+        },
+        {
+          "content": "storage, but not reside there unnecessarily. There are a number of",
+          "pos": [
+            115,
+            181
+          ],
+          "nodes": [
+            {
+              "content": "storage, but not reside there unnecessarily.",
+              "pos": [
+                0,
+                44
+              ]
+            },
+            {
+              "content": "There are a number of",
+              "pos": [
+                45,
+                66
+              ]
+            }
+          ]
+        },
+        {
+          "content": "tools to do this: System Center Monitoring Pack for Azure,",
+          "pos": [
+            182,
+            240
+          ]
+        },
+        {
+          "content": "Cerebrata's Azure Diagnostics Manager, and Azure PowerShell",
+          "pos": [
+            241,
+            300
+          ]
+        },
+        {
+          "content": "cmdlets.",
+          "pos": [
+            301,
+            309
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        23131,
+        23337
+      ],
+      "content": "Choose only the diagnostic data that you will need to troubleshoot\nand monitor your application. Capturing too much data may make it\nharder to troubleshoot in addition to costing significantly more.",
+      "leadings": [
+        "",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Choose only the diagnostic data that you will need to troubleshoot",
+          "pos": [
+            0,
+            66
+          ]
+        },
+        {
+          "content": "and monitor your application. Capturing too much data may make it",
+          "pos": [
+            67,
+            132
+          ],
+          "nodes": [
+            {
+              "content": "and monitor your application.",
+              "pos": [
+                0,
+                29
+              ]
+            },
+            {
+              "content": "Capturing too much data may make it",
+              "pos": [
+                30,
+                65
+              ]
+            }
+          ]
+        },
+        {
+          "content": "harder to troubleshoot in addition to costing significantly more.",
+          "pos": [
+            133,
+            198
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        23342,
+        23455
+      ],
+      "content": "Control the collection and extent of diagnostic data by implementing\nan on-demand switch in your application.",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Control the collection and extent of diagnostic data by implementing",
+          "pos": [
+            0,
+            68
+          ]
+        },
+        {
+          "content": "an on-demand switch in your application.",
+          "pos": [
+            69,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        23460,
+        23639
+      ],
+      "content": "Utilize the logging level (Verbose, Info, Warning, Error) so that\nall information is available, then utilize the post-deploy Diagnostics\nconfig to selectively gather data.",
+      "leadings": [
+        "",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Utilize the logging level (Verbose, Info, Warning, Error) so that",
+          "pos": [
+            0,
+            65
+          ]
+        },
+        {
+          "content": "all information is available, then utilize the post-deploy Diagnostics",
+          "pos": [
+            66,
+            136
+          ]
+        },
+        {
+          "content": "config to selectively gather data.",
+          "pos": [
+            137,
+            171
+          ]
+        }
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a id=\"Vms\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>Azure Virtual Machines",
+      "pos": [
+        23645,
+        23683
+      ]
+    },
+    {
+      "content": "Troubleshooting applications running on Azure Virtual Machines",
+      "pos": [
+        23690,
+        23752
+      ]
+    },
+    {
+      "content": "typically involve the same troubleshooting techniques that you would use",
+      "pos": [
+        23753,
+        23825
+      ]
+    },
+    {
+      "content": "with the operating systems and platforms in use.",
+      "pos": [
+        23826,
+        23874
+      ]
+    },
+    {
+      "content": "For example:",
+      "pos": [
+        23875,
+        23887
+      ]
+    },
+    {
+      "pos": [
+        23893,
+        24113
+      ],
+      "content": "Windows Server 2008 R2 x64 (RTM and SP1); Windows 8 Service x64\n(Datacenter and Core). There is a large amount of information\navailable on the subject, and many tools available to help you do\nthe job quickly.",
+      "leadings": [
+        "",
+        "    ",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Windows Server 2008 R2 x64 (RTM and SP1); Windows 8 Service x64",
+          "pos": [
+            0,
+            63
+          ]
+        },
+        {
+          "content": "(Datacenter and Core). There is a large amount of information",
+          "pos": [
+            64,
+            125
+          ],
+          "nodes": [
+            {
+              "content": "(Datacenter and Core).",
+              "pos": [
+                0,
+                22
+              ]
+            },
+            {
+              "content": "There is a large amount of information",
+              "pos": [
+                23,
+                61
+              ]
+            }
+          ]
+        },
+        {
+          "content": "available on the subject, and many tools available to help you do",
+          "pos": [
+            126,
+            191
+          ]
+        },
+        {
+          "content": "the job quickly.",
+          "pos": [
+            192,
+            208
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        24119,
+        24211
+      ],
+      "content": "For more information about the approaches, see <bpt id=\"p1\">[</bpt><ept id=\"p1\">How to: Debug Windows Service Applications]</ept>."
+    },
+    {
+      "pos": [
+        24217,
+        24337
+      ],
+      "content": "For a video illustrating the best approaches, see <bpt id=\"p1\">[</bpt><ept id=\"p1\">Daniel Pearson's presentation Windows Debugging and Troubleshooting]</ept>."
+    },
+    {
+      "pos": [
+        24343,
+        24532
+      ],
+      "content": "Open Suse Linux. There is also a tremendous amount of resources\navailable for troubleshooting applications on Suse Linux, both in\nthe [Suse Linux documentation] and on the internet.",
+      "leadings": [
+        "",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Open Suse Linux. There is also a tremendous amount of resources",
+          "pos": [
+            0,
+            63
+          ],
+          "nodes": [
+            {
+              "content": "Open Suse Linux.",
+              "pos": [
+                0,
+                16
+              ]
+            },
+            {
+              "content": "There is also a tremendous amount of resources",
+              "pos": [
+                17,
+                63
+              ]
+            }
+          ]
+        },
+        {
+          "content": "available for troubleshooting applications on Suse Linux, both in",
+          "pos": [
+            64,
+            129
+          ]
+        },
+        {
+          "content": "the <bpt id=\"p1\">[</bpt><ept id=\"p1\">Suse Linux documentation]</ept> and on the internet.",
+          "pos": [
+            130,
+            181
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        24537,
+        24697
+      ],
+      "content": "Ubuntu Linux. Again, a large amount of information exists. To\nstart with the product documentation, see [https://help.ubuntu.com/](https://help.ubuntu.com).",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Ubuntu Linux. Again, a large amount of information exists. To",
+          "pos": [
+            0,
+            61
+          ],
+          "nodes": [
+            {
+              "content": "Ubuntu Linux.",
+              "pos": [
+                0,
+                13
+              ]
+            },
+            {
+              "content": "Again, a large amount of information exists.",
+              "pos": [
+                14,
+                58
+              ]
+            },
+            {
+              "content": "To",
+              "pos": [
+                59,
+                61
+              ]
+            }
+          ]
+        },
+        {
+          "content": "start with the product documentation, see <bpt id=\"p1\">[</bpt>https://help.ubuntu.com/<ept id=\"p1\">](https://help.ubuntu.com)</ept>.",
+          "pos": [
+            62,
+            156
+          ]
+        }
+      ]
+    },
+    {
+      "content": "CentOS Linux.",
+      "pos": [
+        24702,
+        24715
+      ]
+    },
+    {
+      "content": "For more information, see <bpt id=\"p1\">[</bpt>http://centos.org/<ept id=\"p1\">](http://centos.org)</ept>.",
+      "pos": [
+        24716,
+        24782
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a id=\"PlatformServices\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>Troubleshooting Azure Services",
+      "pos": [
+        24788,
+        24847
+      ]
+    },
+    {
+      "content": "Many of the Azure services such as Azure SQL数据库, Azure",
+      "pos": [
+        24854,
+        24908
+      ]
+    },
+    {
+      "content": "Active Directory, and Azure storage have troubleshooting advice",
+      "pos": [
+        24909,
+        24972
+      ]
+    },
+    {
+      "content": "that is specific to their use, regardless whether the application is",
+      "pos": [
+        24973,
+        25041
+      ]
+    },
+    {
+      "content": "executing on Azure, what programming language or libraries it was built",
+      "pos": [
+        25042,
+        25113
+      ]
+    },
+    {
+      "content": "with, or executing on a non-Microsoft operating system.",
+      "pos": [
+        25114,
+        25169
+      ]
+    },
+    {
+      "content": "The following",
+      "pos": [
+        25170,
+        25183
+      ]
+    },
+    {
+      "content": "information provides best practices specific to some of these services.",
+      "pos": [
+        25184,
+        25255
+      ]
+    },
+    {
+      "content": "There are many supported libraries that implement best practices for",
+      "pos": [
+        25257,
+        25325
+      ]
+    },
+    {
+      "content": "asynchronous calls, traces, and event logging as outlined in the design",
+      "pos": [
+        25326,
+        25397
+      ]
+    },
+    {
+      "content": "portion of this document.",
+      "pos": [
+        25398,
+        25423
+      ]
+    },
+    {
+      "content": "Azure Storage Troubleshooting",
+      "pos": [
+        25429,
+        25458
+      ]
+    },
+    {
+      "content": "The following links discuss either designs or practices to mitigate",
+      "pos": [
+        25460,
+        25527
+      ]
+    },
+    {
+      "content": "problems requiring troubleshooting or locations in which you should add",
+      "pos": [
+        25528,
+        25599
+      ]
+    },
+    {
+      "content": "tracing or logging work.",
+      "pos": [
+        25600,
+        25624
+      ]
+    },
+    {
+      "pos": [
+        25628,
+        25796
+      ],
+      "content": "Storage status and error codes: <bpt id=\"p1\">[</bpt>http://msdn.microsoft.com/zh-cn/library/windowsazure/dd179382.aspx<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/windowsazure/dd179382.aspx)</ept>"
+    },
+    {
+      "pos": [
+        25800,
+        26081
+      ],
+      "content": "Storage analytics: <bpt id=\"p1\">[</bpt>http://blogs.msdn.com/b/windowsazurestorage/archive/2011/08/03/windows-azure-storage-analytics.aspx<ept id=\"p1\">](http://blogs.msdn.com/b/windowsazurestorage/archive/2011/08/03/windows-azure-storage-analytics.aspx)</ept> (see the three \"for more information\" links at the bottom.)"
+    },
+    {
+      "pos": [
+        26085,
+        26429
+      ],
+      "content": "Overview of retry policies in the Azure Storage Client Library: <bpt id=\"p1\">[</bpt>http://blogs.msdn.com/b/windowsazurestorage/archive/2011/02/03/overview-of-retry-policies-in-the-windows-azure-storage-client-library.aspx<ept id=\"p1\">](http://blogs.msdn.com/b/windowsazurestorage/archive/2011/02/03/overview-of-retry-policies-in-the-windows-azure-storage-client-library.aspx)</ept>"
+    },
+    {
+      "pos": [
+        26433,
+        26700
+      ],
+      "content": "How to get the most out of Azure Tables: <bpt id=\"p1\">[</bpt>http://blogs.msdn.com/b/windowsazurestorage/archive/2010/11/06/how-to-get-most-out-of-windows-azure-tables.aspx<ept id=\"p1\">](http://blogs.msdn.com/b/windowsazurestorage/archive/2010/11/06/how-to-get-most-out-of-windows-azure-tables.aspx)</ept>"
+    },
+    {
+      "content": "See these sections: Best Practices; Tips for Programming Azure; and Timeouts and ServerBusy - Is it normal?",
+      "pos": [
+        26708,
+        26815
+      ]
+    },
+    {
+      "pos": [
+        26819,
+        27105
+      ],
+      "content": "Protecting your Blobs against application errors: <bpt id=\"p1\">[</bpt>http://blogs.msdn.com/b/windowsazurestorage/archive/2010/04/30/protecting-your-blobs-against-application-errors.aspx<ept id=\"p1\">](http://blogs.msdn.com/b/windowsazurestorage/archive/2010/04/30/protecting-your-blobs-against-application-errors.aspx)</ept>"
+    },
+    {
+      "content": "Azure Storage Explorers",
+      "pos": [
+        27109,
+        27132
+      ]
+    },
+    {
+      "content": "There are a number of ways to explore Azure storage.",
+      "pos": [
+        27136,
+        27188
+      ]
+    },
+    {
+      "content": "The",
+      "pos": [
+        27189,
+        27192
+      ]
+    },
+    {
+      "content": "Azure Storage team came up with a <bpt id=\"p1\">[</bpt><ept id=\"p1\">list of storage explorers]</ept>.",
+      "pos": [
+        27194,
+        27256
+      ]
+    },
+    {
+      "content": "Any of",
+      "pos": [
+        27257,
+        27263
+      ]
+    },
+    {
+      "content": "these will allow you to see Diagnostics files and Azure Storage",
+      "pos": [
+        27264,
+        27327
+      ]
+    },
+    {
+      "content": "Analytics files.",
+      "pos": [
+        27328,
+        27344
+      ]
+    },
+    {
+      "content": "Cloudberry Lab's <bpt id=\"p1\">[</bpt><ept id=\"p1\">Explorer for Azure Blob Storage]</ept> provides a user interface to enable Storage Analytics directly in the",
+      "pos": [
+        27345,
+        27465
+      ]
+    },
+    {
+      "content": "application by clicking <bpt id=\"p1\">**</bpt>Storage Settings<ept id=\"p1\">**</ept>.",
+      "pos": [
+        27466,
+        27511
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a id=\"Misc\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>Azure 服务总线 Troubleshooting",
+      "pos": [
+        27517,
+        27560
+      ]
+    },
+    {
+      "content": "This section provides high-level guidance about how to develop an",
+      "pos": [
+        27567,
+        27632
+      ]
+    },
+    {
+      "content": "application that uses the Azure 服务总线 in a robust and",
+      "pos": [
+        27633,
+        27685
+      ]
+    },
+    {
+      "content": "maintainable way that will minimize common issues.",
+      "pos": [
+        27686,
+        27736
+      ]
+    },
+    {
+      "content": "It also provides",
+      "pos": [
+        27737,
+        27753
+      ]
+    },
+    {
+      "content": "details about how to identify and address common 服务总线 errors.",
+      "pos": [
+        27754,
+        27815
+      ]
+    },
+    {
+      "content": "General Guidance",
+      "pos": [
+        27820,
+        27836
+      ]
+    },
+    {
+      "content": "The 服务总线 is an internet-scale <bpt id=\"p1\">[</bpt><ept id=\"p1\">enterprise 服务总线]</ept> that",
+      "pos": [
+        27838,
+        27890
+      ]
+    },
+    {
+      "content": "supports relayed and brokered messaging capabilities.",
+      "pos": [
+        27891,
+        27944
+      ]
+    },
+    {
+      "content": "The 服务总线",
+      "pos": [
+        27945,
+        27953
+      ]
+    },
+    {
+      "content": "implements quotas and thresholds at a system level for both types of",
+      "pos": [
+        27954,
+        28022
+      ]
+    },
+    {
+      "content": "messaging.",
+      "pos": [
+        28023,
+        28033
+      ]
+    },
+    {
+      "content": "If your application exceeds these quotas, it will be",
+      "pos": [
+        28034,
+        28086
+      ]
+    },
+    {
+      "content": "throttled or your requests or messages will be rejected.",
+      "pos": [
+        28087,
+        28143
+      ]
+    },
+    {
+      "content": "For full",
+      "pos": [
+        28144,
+        28152
+      ]
+    },
+    {
+      "content": "details about 服务总线 quotas and the behavior you will see when they",
+      "pos": [
+        28153,
+        28218
+      ]
+    },
+    {
+      "content": "are exceeded, see <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 服务总线 Quotas]</ept>.",
+      "pos": [
+        28219,
+        28257
+      ]
+    },
+    {
+      "content": "Some quotas are user",
+      "pos": [
+        28258,
+        28278
+      ]
+    },
+    {
+      "content": "defined, for example the size of a queue or topic, which is defined when",
+      "pos": [
+        28279,
+        28351
+      ]
+    },
+    {
+      "content": "the entity is created.",
+      "pos": [
+        28352,
+        28374
+      ]
+    },
+    {
+      "content": "To get a view into the data in your 服务总线 messaging entity and how",
+      "pos": [
+        28376,
+        28441
+      ]
+    },
+    {
+      "content": "it is being processed, you can use <bpt id=\"p1\">[</bpt><ept id=\"p1\">服务总线 Explorer]</ept> or the Server",
+      "pos": [
+        28442,
+        28506
+      ]
+    },
+    {
+      "content": "Explorer in the Azure Tools for Visual Studio (version 1.7 or higher,) to create, delete, and test queues, topics, subscriptions, and rules.",
+      "pos": [
+        28507,
+        28647
+      ]
+    },
+    {
+      "content": "This",
+      "pos": [
+        28648,
+        28652
+      ]
+    },
+    {
+      "content": "is an excellent way to troubleshoot an application that is running but",
+      "pos": [
+        28653,
+        28723
+      ]
+    },
+    {
+      "content": "not processing data the way you expect.",
+      "pos": [
+        28724,
+        28763
+      ]
+    },
+    {
+      "content": "These tools include",
+      "pos": [
+        28764,
+        28783
+      ]
+    },
+    {
+      "content": "functionality that enables you to test queues, topics, and relay",
+      "pos": [
+        28784,
+        28848
+      ]
+    },
+    {
+      "content": "entities, trace the operations performed by individual sender and",
+      "pos": [
+        28849,
+        28914
+      ]
+    },
+    {
+      "content": "receiver tasks, monitor progress and performance of an ongoing test run,",
+      "pos": [
+        28915,
+        28987
+      ]
+    },
+    {
+      "content": "and generate detailed logs of the results, including any error messages.",
+      "pos": [
+        28988,
+        29060
+      ]
+    },
+    {
+      "content": "服务总线 Relay",
+      "pos": [
+        29065,
+        29075
+      ]
+    },
+    {
+      "content": "The 服务总线 \"relay\" service runs in the cloud and supports a",
+      "pos": [
+        29077,
+        29134
+      ]
+    },
+    {
+      "content": "variety of different transport protocols and Web services standards,",
+      "pos": [
+        29135,
+        29203
+      ]
+    },
+    {
+      "content": "including SOAP, WS-\\*, and REST.",
+      "pos": [
+        29204,
+        29236
+      ]
+    },
+    {
+      "content": "You can use the 服务总线 relay as a",
+      "pos": [
+        29237,
+        29268
+      ]
+    },
+    {
+      "content": "delegate to listen for incoming sessions and requests sent to a WCF",
+      "pos": [
+        29269,
+        29336
+      ]
+    },
+    {
+      "content": "service.",
+      "pos": [
+        29337,
+        29345
+      ]
+    },
+    {
+      "content": "In the relayed messaging pattern, an on-premises or cloud-based",
+      "pos": [
+        29346,
+        29409
+      ]
+    },
+    {
+      "content": "service connects to the relay service through an outbound port and",
+      "pos": [
+        29410,
+        29476
+      ]
+    },
+    {
+      "content": "creates a bi-directional socket for communication tied to a particular",
+      "pos": [
+        29477,
+        29547
+      ]
+    },
+    {
+      "content": "rendezvous address.",
+      "pos": [
+        29548,
+        29567
+      ]
+    },
+    {
+      "content": "The client does not have to know where the service",
+      "pos": [
+        29568,
+        29618
+      ]
+    },
+    {
+      "content": "resides, and the on-premises service does not need any inbound ports",
+      "pos": [
+        29619,
+        29687
+      ]
+    },
+    {
+      "content": "open on the firewall.",
+      "pos": [
+        29688,
+        29709
+      ]
+    },
+    {
+      "content": "However, depending on your network configuration,",
+      "pos": [
+        29710,
+        29759
+      ]
+    },
+    {
+      "content": "you may encounter problems when connecting to the 服务总线 relay from",
+      "pos": [
+        29760,
+        29825
+      ]
+    },
+    {
+      "content": "behind a firewall or through a proxy server.",
+      "pos": [
+        29826,
+        29870
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">[</bpt><ph id=\"ph1\">Hosting Behind a Firewall</ph>\nwith the 服务总线<ept id=\"p1\">]</ept> describes how to troubleshoot and resolve such",
+      "pos": [
+        29871,
+        29959
+      ]
+    },
+    {
+      "content": "connection issues.",
+      "pos": [
+        29960,
+        29978
+      ]
+    },
+    {
+      "content": "服务总线 Queues and Topics",
+      "pos": [
+        29983,
+        30005
+      ]
+    },
+    {
+      "content": "服务总线 queues and topics provide brokered messaging",
+      "pos": [
+        30007,
+        30056
+      ]
+    },
+    {
+      "content": "functionality-messages are pushed to the 服务总线 queue or topic",
+      "pos": [
+        30057,
+        30117
+      ]
+    },
+    {
+      "content": "where they are reliably retained until the receiver is ready to consume",
+      "pos": [
+        30118,
+        30189
+      ]
+    },
+    {
+      "content": "them.",
+      "pos": [
+        30190,
+        30195
+      ]
+    },
+    {
+      "content": "Message senders and receivers do not have to be online at the same",
+      "pos": [
+        30196,
+        30262
+      ]
+    },
+    {
+      "content": "time; the messaging infrastructure reliably stores messages until the",
+      "pos": [
+        30263,
+        30332
+      ]
+    },
+    {
+      "content": "consuming party is ready to receive them.",
+      "pos": [
+        30333,
+        30374
+      ]
+    },
+    {
+      "content": "The messaging API can",
+      "pos": [
+        30375,
+        30396
+      ]
+    },
+    {
+      "content": "encounter a variety of errors that might impact your application.",
+      "pos": [
+        30397,
+        30462
+      ]
+    },
+    {
+      "content": "These",
+      "pos": [
+        30463,
+        30468
+      ]
+    },
+    {
+      "content": "can be broadly grouped into the following categories:",
+      "pos": [
+        30469,
+        30522
+      ]
+    },
+    {
+      "pos": [
+        30528,
+        30657
+      ],
+      "content": "User error-for example, a code indicating an argument was invalid.\nRecommended action: Try to fix the code before proceeding.",
+      "leadings": [
+        "",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "User error-for example, a code indicating an argument was invalid.",
+          "pos": [
+            0,
+            66
+          ]
+        },
+        {
+          "content": "Recommended action: Try to fix the code before proceeding.",
+          "pos": [
+            67,
+            125
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        30662,
+        30862
+      ],
+      "content": "Setup/configuration error-for example, a queue or topic associated\nwith the action does not exist or has been deleted. Recommended\naction: Review your configuration and change it if necessary.",
+      "leadings": [
+        "",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Setup/configuration error-for example, a queue or topic associated",
+          "pos": [
+            0,
+            66
+          ]
+        },
+        {
+          "content": "with the action does not exist or has been deleted. Recommended",
+          "pos": [
+            67,
+            130
+          ],
+          "nodes": [
+            {
+              "content": "with the action does not exist or has been deleted.",
+              "pos": [
+                0,
+                51
+              ]
+            },
+            {
+              "content": "Recommended",
+              "pos": [
+                52,
+                63
+              ]
+            }
+          ]
+        },
+        {
+          "content": "action: Review your configuration and change it if necessary.",
+          "pos": [
+            131,
+            192
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        30867,
+        31129
+      ],
+      "content": "Transient error-for example, a response indicating that the service\nwas not able to process the request at the current time. Recommended\naction: Retry the operation or notify users. For more information,\nsee [Handling Transient Communication Errors].",
+      "leadings": [
+        "",
+        "    ",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Transient error-for example, a response indicating that the service",
+          "pos": [
+            0,
+            67
+          ]
+        },
+        {
+          "content": "was not able to process the request at the current time. Recommended",
+          "pos": [
+            68,
+            136
+          ],
+          "nodes": [
+            {
+              "content": "was not able to process the request at the current time.",
+              "pos": [
+                0,
+                56
+              ]
+            },
+            {
+              "content": "Recommended",
+              "pos": [
+                57,
+                68
+              ]
+            }
+          ]
+        },
+        {
+          "content": "action: Retry the operation or notify users. For more information,",
+          "pos": [
+            137,
+            203
+          ],
+          "nodes": [
+            {
+              "content": "action: Retry the operation or notify users.",
+              "pos": [
+                0,
+                44
+              ]
+            },
+            {
+              "content": "For more information,",
+              "pos": [
+                45,
+                66
+              ]
+            }
+          ]
+        },
+        {
+          "content": "see <bpt id=\"p1\">[</bpt><ept id=\"p1\">Handling Transient Communication Errors]</ept>.",
+          "pos": [
+            204,
+            250
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        31134,
+        31365
+      ],
+      "content": "Other errors-for example, timeout errors or errors indicating that a\nmessage lock was lost. Recommended action: You generally do not\nhandle these exceptions to perform cleanups or aborts. They might be\nused for tracing.",
+      "leadings": [
+        "",
+        "    ",
+        "    ",
+        "    "
+      ],
+      "nodes": [
+        {
+          "content": "Other errors-for example, timeout errors or errors indicating that a",
+          "pos": [
+            0,
+            68
+          ]
+        },
+        {
+          "content": "message lock was lost. Recommended action: You generally do not",
+          "pos": [
+            69,
+            132
+          ],
+          "nodes": [
+            {
+              "content": "message lock was lost.",
+              "pos": [
+                0,
+                22
+              ]
+            },
+            {
+              "content": "Recommended action: You generally do not",
+              "pos": [
+                23,
+                63
+              ]
+            }
+          ]
+        },
+        {
+          "content": "handle these exceptions to perform cleanups or aborts. They might be",
+          "pos": [
+            133,
+            201
+          ],
+          "nodes": [
+            {
+              "content": "handle these exceptions to perform cleanups or aborts.",
+              "pos": [
+                0,
+                54
+              ]
+            },
+            {
+              "content": "They might be",
+              "pos": [
+                55,
+                68
+              ]
+            }
+          ]
+        },
+        {
+          "content": "used for tracing.",
+          "pos": [
+            202,
+            219
+          ]
+        }
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">[</bpt><ept id=\"p1\">Messaging Exceptions]</ept> provides an overview of exceptions that users of",
+      "pos": [
+        31367,
+        31438
+      ]
+    },
+    {
+      "content": "the 服务总线 client libraries for .NET might encounter, along with",
+      "pos": [
+        31439,
+        31501
+      ]
+    },
+    {
+      "content": "recommendations about how to handle each type of exception.",
+      "pos": [
+        31502,
+        31561
+      ]
+    },
+    {
+      "content": "Because the",
+      "pos": [
+        31562,
+        31573
+      ]
+    },
+    {
+      "content": "client libraries for .NET align closely to the structure of the Service",
+      "pos": [
+        31574,
+        31645
+      ]
+    },
+    {
+      "content": "Bus libraries for other languages, this guidance may be useful even if",
+      "pos": [
+        31646,
+        31716
+      ]
+    },
+    {
+      "content": "you are not programming in a .NET language.",
+      "pos": [
+        31717,
+        31760
+      ]
+    },
+    {
+      "content": "In some cases, for example",
+      "pos": [
+        31761,
+        31787
+      ]
+    },
+    {
+      "content": "with transient errors, you can retry the action.",
+      "pos": [
+        31788,
+        31836
+      ]
+    },
+    {
+      "content": "You can follow the",
+      "pos": [
+        31837,
+        31855
+      ]
+    },
+    {
+      "content": "transient error handling guidelines outlined earlier in this article to",
+      "pos": [
+        31856,
+        31927
+      ]
+    },
+    {
+      "content": "efficiently handle transient errors.",
+      "pos": [
+        31928,
+        31964
+      ]
+    },
+    {
+      "content": "In addition, for more details, best",
+      "pos": [
+        31965,
+        32000
+      ]
+    },
+    {
+      "content": "practices, and sample code that demonstrates how to handle transient",
+      "pos": [
+        32001,
+        32069
+      ]
+    },
+    {
+      "content": "服务总线 errors in a .NET application, see the <bpt id=\"p1\">[</bpt><ept id=\"p1\">Handling Transient Communication Errors]</ept> section in the Azure Developer Guidance",
+      "pos": [
+        32070,
+        32194
+      ]
+    },
+    {
+      "content": "article <bpt id=\"p1\">[</bpt><ept id=\"p1\">Best Practices for Leveraging Azure 服务总线 Brokered Messaging API]</ept>.",
+      "pos": [
+        32195,
+        32269
+      ]
+    },
+    {
+      "content": "Another area to focus on when developing an application that uses",
+      "pos": [
+        32271,
+        32336
+      ]
+    },
+    {
+      "content": "brokered messaging is to ensure you implement reliable message receiving",
+      "pos": [
+        32337,
+        32409
+      ]
+    },
+    {
+      "content": "logic that can accurately and efficiently handle anomalies in messages.",
+      "pos": [
+        32410,
+        32481
+      ]
+    },
+    {
+      "content": "The \"Implementing Reliable Message Receive Loops\" section of the <bpt id=\"p1\">[</bpt><ept id=\"p1\">Best Practices for Leveraging Azure 服务总线 Brokered Messaging API]</ept> article describes a number of techniques for using the <bpt id=\"p2\">**</bpt>PeekLock<ept id=\"p2\">**</ept> receive mode, which is the mode that supports multiple message",
+      "pos": [
+        32482,
+        32743
+      ]
+    },
+    {
+      "content": "deliveries if the message isn't delivered successfully on the first try.",
+      "pos": [
+        32744,
+        32816
+      ]
+    },
+    {
+      "content": "The article recommends best practices that will help ensure your",
+      "pos": [
+        32817,
+        32881
+      ]
+    },
+    {
+      "content": "application does not process duplicate messages.",
+      "pos": [
+        32882,
+        32930
+      ]
+    },
+    {
+      "content": "It also helps avoid",
+      "pos": [
+        32931,
+        32950
+      ]
+    },
+    {
+      "content": "problems that can occur due to lock timeouts, and improve overall",
+      "pos": [
+        32951,
+        33016
+      ]
+    },
+    {
+      "content": "performance in <bpt id=\"p1\">**</bpt>PeekLock<ept id=\"p1\">**</ept> mode by ensuring that you process messages",
+      "pos": [
+        33017,
+        33087
+      ]
+    },
+    {
+      "content": "promptly.",
+      "pos": [
+        33088,
+        33097
+      ]
+    },
+    {
+      "content": "The article also provides sample code that uses the Service",
+      "pos": [
+        33098,
+        33157
+      ]
+    },
+    {
+      "content": "Bus client libraries for .NET.",
+      "pos": [
+        33158,
+        33188
+      ]
+    },
+    {
+      "content": "Additional Troubleshooting Resources",
+      "pos": [
+        33193,
+        33229
+      ]
+    },
+    {
+      "content": "For additional details about common 服务总线 errors and ways to",
+      "pos": [
+        33231,
+        33290
+      ]
+    },
+    {
+      "content": "investigate and address them, see <bpt id=\"p1\">[</bpt><ept id=\"p1\">Troubleshooting the 服务总线]</ept>.",
+      "pos": [
+        33291,
+        33352
+      ]
+    }
+  ],
+  "content": "#Troubleshooting in Azure\n\n*Troubleshooting* refers to the general task of locating and\nunderstanding unexpected application behavior and correcting it. When developing applications, developers test, run, and debug\ntheir applications before deploying them into a production\nenvironment. This fact is true whether the application runs on a desktop\ncomputer or a server in the cloud. However, a widely distributed,\nmulti-instance application designed for scale-out can be hard to debug,\nrequiring more than standard tools and approaches.\n\nFor this reason, cloud applications should be designed with\ntroubleshooting in mind. How you design troubleshooting support into\nyour application depends first on where your application runs, and\nsecond on which languages or runtimes your application is built with or\nuses. \n\nIf you are building an application that runs on an Azure\nVirtual Machine, in many cases, you can approach troubleshooting design as well\nas debugging as you would on the operating system if it were running on\nyour own servers.\n\nApplications running on Azure are widely distributed,\nmulti-instance applications that can be hard to debug. These types of\napplications require more than standard tools and approaches to troubleshooting. This topic\ndiscusses some proven troubleshooting practices and contains links to\nmore intensive information on the practices described.\n\n**Note**: This topic assumes you are either designing your application\nor have successfully deployed your Azure application and that\nsomething unexpected is now occurring. It does not discuss how to deploy\nan application on Azure. For more information about developing\nand deploying your Azure application, see <a href=\"/zh-cn/documentation/\">/zh-cn/documentation/</a>.\n\nThis topic first describes some best practices that will help you design\nyour application so that you can troubleshoot effectively when problems\noccur. (If you do not design your application to enable you to follow\nthe code flow in advance, it can be very hard to locate problems when\nthey do occur.) These best practices are valid for all types of\napplications running on Azure, regardless of the application\nmodel or language used.\n\nThe following sections describe specific approaches for developing\nsupportable Azure applications regardless of the type of\napplication: Web Sites, Cloud Services, or Virtual Machines.\n\nEach section describes best practices at a high level, and contains\npointers to resources that demonstrate best practices in detail or\ndescribe how to implement them.\n\n\n##In this Document\n\n* [Best Practices for Troubleshooting in Azure](#BestPractices)\n* [Azure Web Sites](#Websites)\n* [Azure Cloud Services](#CloudServices)\n* [Azure Virtual Machines](#Vms)\n* [Azure Services](#PlatformServices)\n* [SQL数据库 Troubleshooting](#SQLTroubleshooting)\n\n<h2><a id=\"BestPractices\"></a>Best Practices for Troubleshooting in Azure</h2>\n\nThis section describes best practices that apply to Azure\napplications no matter which hosting model or language you use. It\ncontains resources for more in-depth discussion of those practices.\n\nTo build the foundation for efficient troubleshooting in Azure,\nconcentrate your efforts in these three main areas:\n\n-   Handling Failures Gracefully - *Each component service must be able\n    to endure the failure of dependent services or infrastructure*.\n-   Tracing, Logging and Monitoring - *Each component service must have the proper\n    debugging, tracing, event, and error logging.*\n-   Debug errors where you can - *Before promoting for production, but\n    also at the component and network level when running.*\n\nDesigning an application with these ideas in mind allows the application\nto provide you with the information necessary to track down unexpected\nbehavior when it occurs.\n\n###Design to Handle Errors Gracefully\n\nApplications should handle error conditions gracefully if they can. This\nis even more important given the distributed nature of Azure.\nEffective troubleshooting begins with a good transient-failure handling\ndesign. Transient errors are one of the main areas in which cloud\napplications fail to behave as expected due to transient error\nconditions inherent to internet applications. \n\nTransient errors are failures related to latencies and intermittent\nnetwork connections inherent in shared resources on the internet. Some\nexamples are:\n\n-   Shared computer resources such as Azure Cloud Services and\n    SQL数据库 (to give two examples) can be slightly less or more\n    responsive from moment to moment.\n-   Responsiveness delays due to providing durability for services. For example, SQL\n    Azure keeps multiple copies of databases consistent in order to\n    provide durability, this has an impact on responsiveness.\n-   Delays caused by HTTP or other protocol connections ending prior to\n    completing work. For example, HTTP requests may not reach an\n    endpoint and return prior to their timeout period.\n\n\nTo help alleviate the impact of transient errors, Azure\napplications should:\n\n-   Be loosely coupled so that components are not locally dependent upon\n    services that fail more often than in on-premise environments.\n-   Make asynchronous calls whenever possible to keep processes from\n    becoming dependent on immediate responses.\n-   Use a transient error handling approach that detects certain\n    categories of failures and can implement retry behavior for those\n    failures based on some configurable retry policy.\n\nCalls to services should either build or use a transient error handling layer to detect common failure scenarios and retry the call based upon a configuration setting. For .NET developers, one recommended library is the [Microsoft Enterprise Library 5.0 Integration Pack for Azure].\nMicrosoft Enterprise Library is a collection of reusable application\nblocks that address common cross-cutting concerns in enterprise software\ndevelopment. The Microsoft Enterprise Library Integration Pack for\nAzure is an extension to Microsoft Enterprise Library 5.0 that\ncan be used with Azure. It includes the\nAutoscaling Application Block, Transient Fault Handling Application\nBlock, blob configuration source, protected configuration provider, and\nlearning materials. Another, simpler .NET library with fewer features is the\n[Cloud Application Framework & Extensions (CloudFx)]. CloudFx offers a set\nof production quality components and building blocks intended to\njump-start the implementation of feature-rich, reliable, and extensible\nAzure-based solutions and services.\n\n###Perform Appropriate Tracing and Logging\n\nBecause the complexity of distributed, scale-out applications,\ntraditional debuggers that work against one process are of much less use \nwhen investigating issues that occur while your application is running.\nTherefore tracing and logging are of upmost importance. The execution of\nyour app and its data is shared across many services, which are hosted\non many different machines. In a large scale distributed application, it\nis difficult, if not impossible to determine which service instance to\nattach to and debug. Tracing and logging allow you to follow application\nexecution and data flow giving you a better understanding of the state\nof your application.\n\nSuccessful Azure applications have a logging and tracing\nstrategy designed in to the application from the beginning. This reduces\nthe time and effort required to locate any issues and repair them\nquickly without having to call Microsoft for support.\n\n**Note**: Writing traces and logging extensively has a performance\nimpact; doing so intensively has a more profound one. Therefore the\ndesign of your application should include a configurable tracing and\nlogging policy that can be adjusted at need. Ideally, the level of\nlogging should be adjustable from the **ServiceConfiguration.cscfg** \nfile so that it can be changed without having to redeploy.\n\nHaving volumes of logs does not guarantee speedy bug detection and\nrepair; a large amount of data takes a long time to decipher, and\ncollecting it impacts the performance of your application. Adjustable\nlogging controls both the size and storage cost of log data.\n\nIn the MSDN Magazine article [Take Control of Logging and Tracing in Azure], Mike Kelly describes four types of diagnostic output to\nconsider:\n\n-   Debug Output - Only in debug build, includes asserts\n-   Tracing - Tracks the flow of control during execution\n-   Event Logging - Major events in program execution\n-   Error Logging - Exceptional or dangerous situation\n\nOther languages, application platforms, and operating systems\nmay have different terminology for tracing and logging. If you are using\none of these development platforms on Azure, use the equivalent \nstrategy and tools for the language or the platform you are using.\n\nMixed mode applications are applications executing in a combination of\nAzure Virtual Machines, Web Sites, and Cloud Services. When\nbuilding applications of this type, tracing and logging become even more\nimportant because they are more widely distributed. To troubleshoot\nthese mixed-mode applications the overall data and execution flow must\nbe followed in order to identify any problems. The mechanics of tracing and logging a mixed mode application depends upon the hosting model of the component. \n\n###Monitor Your Application\n\nTracing and logging fit in to the bigger area of monitoring. Monitoring\nallows you to:\n\n-   Discover Azure applications\n-   Determine status of each role instance\n-   Collect and monitor performance information including latency and\n    throughput\n-   Collect and monitor events\n-   Collect and monitor trace messages\n-   Monitor resource usage\n-   Monitor quality of service metrics\n-   Perform capacity planning\n-   Perform traffic analysis (users, views, peak times)\n-   Estimate billing\n-   Perform auditing\n\nMonitoring is accomplished with a tool or set of tools. Which tool you\nuse depends on the platform and/or languages your application uses and on your monitoring goals and requirements.\n\n**Microsoft System Center Monitoring Pack for Azure Applications**\n\nThis [Monitoring Pack] allows you to use [Microsoft System Center\nOperations Manager] to monitor the availability and performance of\nAzure Applications.\n\nUsing Microsoft System Center Operations Manager 2012 is the best way to\nmonitor the health of your Azure application.\n\n**Azure Platform Management Tool**\n\nAnother tool is the [Azure Platform Management Tool (MMC)], which\nenables you to manage your Azure hosted services and storage\naccounts. This tool is provided as a sample with complete source code so\nyou can see how to perform various management and configuration tasks\nusing the Azure Management and Diagnostics APIs.\n\n**Cerebrata Tools**\n\nCerebrata provides a number of tools that allow you to monitor and\nmanage your Azure applications. These include [Azure Diagnostics\nManager], [Cloud Storage Studio], and [Azure Management Cmdlets].\n\nAzure Diagnostics Manager 2 is a Windows (WPF) based client for managing\nAzure Diagnostics. It lets you view, download, and manage the\ndiagnostics data collected by applications running in Azure. See\n[http://www.cerebrata.com](http://www.cerebrata.com) for more information on these products.\n\nCloud Storage Studio 2 is a Windows (WPF) based client for managing\nAzure Storage.\n\nAzure Management Cmdlets is a set of Windows PowerShell cmdlets for managing\nAzure Storage, Hosted Services, SQL数据库 instances, and\nDiagnostics. It also provides cmdlets to back up and restore storage\naccounts.\n\n**Network Monitoring: AlertBot, Gomez, Keynote, Pingdom**\n\nCompuware's [Gomez] Application Performance Management, [Keynote], [Pingdom],\nand [AlertBot] are solutions for monitoring your Azure application\nremotely. They allow you to monitor the availability of your application\nand optimize performance. Some services, such as Pingdom, enable\nnotification by email, SMS, or a desktop application when an error is\ndetected. This type of monitoring simulates what an end user does to\nsuccessfully monitor an application.\n\n**Apica Tools**\n\nApica provides tools that monitors your Azure WEB application \"from outside.\" For more information, see <a href=\"http://www.apicasystem.com/integration-partners/\">http://www.apicasystem.com/integration-partners/</a>.\n\n\n**AVIcode**\n\nMicrosoft purchased AVIcode and it is now part of Microsoft System\nCenter. [AVIcode] delivers .NET application performance monitoring\ncapabilities with a comprehensive suite of application monitoring\ncapabilities.\n\n**Performance Profiling**\n\nYou can [profile] your Azure application when it runs in \nAzure to determine any performance issues. When you publish your \nAzure application from Visual Studio, you can choose to profile the\napplication and select the profiling settings that you require.\n\n**Azure VM Assistant**\n\nThe [VM Assistant] tool is a CodePlex project that collects all the\nrelevant troubleshooting data in one place when you Remote Desktop into\na virtual machine instance. The **VM Health** button gives the current\nstatus of the instance.\n\n###Debugging Errors Where You Can\n\nBefore deploying an app to Azure, it is a best practice to debug\nyour application locally. The Azure SDK contains emulators that\nmimic the Azure cloud environment, allowing you to run your app and\ndo rudimentary tests without having to deploying your application. The\ndebugging tools you use vary depending upon the programming language and the development tools\nyou are using.\n\nAfter an application has been deployed, you can debug in the cloud using a debugger like Visual Studio. This requires creating a debug build and deploying it. In order to do this,you must connect to a specific role instance. If you have a complex application with multiple roles and role instances, it can be very difficult to determine to which role instance to connect. Visual Studio Ultimate supports IntelliTrace, which allows .NET roles to track debug information. When a problem occurs you can download this information and load it into Visual Studio. You can look at each role instance's IntelliTrace log to determine where the problem occurred. While there are some drawbacks to debugging in the cloud, there are some circumstances in which it is required. Not all Azure Services have an emulator (for example 服务总线) and not all supported development tools (for example Mac and Linux) come with emulators. \n\nOnce you have debugged your application locally you will most likely\nhave to rely on the instrumentation built into your application to\ndetermine where problems are occurring.\n\n**Node.js Debugging**\n\nFor debugging Node.JS applications, you can use the Node-Inspector tool\nwhich is available on [GitHub](https://github.com/dannycoates/node-inspector). Node-Inspector can be run locally on your\ndevelopment machine using the Azure storage emulator. For more\ninformation see Jim Wang's blog: [Debugging Node in the Azure Emulator].\n\nIf you are debugging your application on Azure, install the full version\nof IISNode from [GitHub](https://github.com/windowsazure/iisnode/downloads) on your web role, worker role, or VM instance. As\ndiscussed earlier, this is not a recommended way to debug your\napplication when it is in production and scaled to multiple instances because you may not know to which role instance or VM to\ndebug.\n\nTo use Node-Inspector on a web role, install the package in the web role\nand use the Node-Inspector tool as you normally would. For more\ninformation about debugging with Node-Inspector, see [Debugging with\nNode-Inspector].\n\n**IntelliTrace**\n\nMicrosoft Visual Studio Ultimate contains [IntelliTrace], which can\nbe enabled to debug applications before deployment into production.\nIntelliTrace supports ASP.NET, and WCF applications. Intellitrace is not\nsupported when it is enabled in a production service, but can be used to\nget exceptions for an application after deployment to Azure. Jim\nNakashima's blog post describes how to use [IntelliTrace to debug \nAzure Cloud Services].\n\n**Fiddler**\n\n[Fiddler] is a Web Debugging Proxy that logs all HTTP(S) traffic between\nyour computer and the Internet. Fiddler allows you to inspect traffic,\nset breakpoints, and \"fiddle\" with incoming or outgoing data. Fiddler is\nespecially helpful for troubleshooting Azure Storage.\n\nTo use Fiddler against the local development fabric, use ipv4.fiddler\ninstead of 127.0.0.1:\n\n-   Launch Fiddler.\n-   Launch your service in the development fabric.\n-   Browse to http://ipv4.fiddler:/. Fiddler should trace the request.\n\nTo use Fiddler against the local development storage, modify the service\nconfiguration file to point to Fiddler:\n\nOpen the ServiceConfiguration.cscfg file and change the connection\nstring to:\n\n    Value=\"UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://ipv4.fiddler\"\n\n-   Launch Fiddler.\n-   Launch your service. Fiddler should trace any storage requests.\n\n##Troubleshooting and the Azure Hosting Models##\nThis section discusses best practices for debugging applications using the different Azure hosting models.\n<h2><a id=\"Websites\"></a>Azure Web Sites</h2>\n\nWhen designing a supportable Azure web site, follow the\nrecommendations made earlier in this document when possible. This\nincludes checking for and handling errors, applying transient fault\nretry logic, tracing, and logging. Troubleshooting Azure\nweb sites is accomplished by configuring web sites to display application\nerrors, configuring diagnostics for a web site, collecting diagnostic\ndata and then analyzing the collected data to identify and resolve\nproblems.\n\nAzure web sites enable configuration of the following diagnostic\noptions:\n\n-   Web Server Logging\n-   Detailed Error Messages\n-   Failed Request Tracing\n\nFor more information on these topics see: [Troubleshooting an Azure web site].\n\nWhen web server logs for Azure web sites are enabled, the web site\nwill record all HTTP transactions into a log file using the [W3C extended log file format]. You can then use [Log Parser] to query the log file. Some\nexample log parser queries are available on [Log Parser Plus] and [TechNet\nLog Parser Examples]. If you want to generate the CHART output type on a\ncomputer that is running Office 2007/2010, install [Office 2003 Web\nComponents] following the instructions on [Log Parser Plus](http://logparserplus.com/article/2).\n\nAzure web sites uses the same failed request tracing\nfunctionality that has been available with IIS 7.0 and later. It is not,\nhowever, configurable like IIS failed request tracing. When you enable\nfailed request tracing for Azure web sites, **all** failed\nrequests are captured. \n\n<h2><a id=\"Cloudservices\"></a>Azure Cloud Services</h2>\n\nBecause of the distributed nature of Azure Cloud Services, it's\nimportant to defend your application by making calls asynchronously and\nhandling retries for transient failures, as described previously.\n\nThe debugging technique used for Azure Cloud Services depends on the type of problem you are experiencing. Problems involving a specific role or role instance, for example a role failing to start or cycling, are best investigated using Remote Desktop. In these cases you will know which role or role instance is problematic and you can connect to the affected role. When a problem occurs and you are not sure what role instance is causing the problem, tracing and logging is a better method for troubleshooting. Azure Diagnostics provides a mechanism to collect and manage trace and log information.\n\nSome new debugging features have been added to the Azure SDK 1.7 including making it easier to find stack traces when exceptions occur and improvements in Remote Desktop connectivity. Stack traces are now included in the Windows Event Log, making it easier to see exactly what went wrong. In addition Remote Desktop connectivity has been improved. If your role is cycling or aborted you will be able to use Remote Desktop to connect to the problematic role and investigate the problem. \n\nThe Azure Portal provides access to monitoring data that helps IT professionals and developers anticipate and diagnose problems in Azure Cloud Services. By default values such as \"CPU Percentage\", \"Data In\", \"Data Out\", \"Disk Read Throughput\" and \"Disk Write Throughput\" are collected by the host VM. There is no configuration needed to enable these metrics for role instances and there is no cost impact to customers. Additional performance information can also be collected. To collect verbose diagnostic information you must have a valid diagnostics connection string as this information will be stored in Azure Storage and will therefore incur additional storage costs. When user enables verbose monitoring, the portal will remotely configure role instances to collect the default set of performance counters. \n\n###Azure Diagnostics \n\nThe original Azure SDK 1.0 included functionality to collect\ndiagnostics data and store them in Azure storage collectively known\nas Azure Diagnostics. This software, built upon the Event\nTracing for Windows (ETW) framework, fulfills two design requirements\nintroduced by Azure scale-out architecture:\n\n-   Save diagnostic data that would be lost during a reimaging of the\n    instance.\n-   Provide a central repository for diagnostics from multiple\n    instances.\n\nAfter configuring Diagnostics in the role, Diagnostics collects\ndiagnostic data from all the instances of that particular role. The\ndiagnostic data can be used for debugging and troubleshooting, measuring\nperformance, monitoring resource usage, traffic analysis and capacity\nplanning, and auditing. Transfers to Azure storage account for\npersistence can either be scheduled or on-demand.\n\nAzure Diagnostics changes the server paradigm in four important\nways:\n\n-   Diagnostics must be enabled at application creation time.\n-   Specific tools/steps are needed to visualize diagnostic results.\n-   Crashes will cause the loss of diagnostic data unless it is written\n    to durable storage (Azure Storage as opposed to being on\n    each instance).\n-   Diagnostic storage incurs a monthly cost when stored in Microsoft\n    Azure storage.\n\nCost is of particular importance because one of the key benefits of\nAzure is cost reduction. The only way to eliminate the\ncost of using Diagnostics today is to leave the data on the virtual machine.\nThis may work in a small deployment, but is impractical where there are\nmany instances. Here are a few ways to minimize the financial impact:\n\n-   Make sure that the storage account is in the same data center as\n    your application. If for some reason they are not in the same data\n    center, choose the interval of scheduled transfers wisely. Shorter\n    transfer times will increase data relevance, but that trade off may\n    not be great enough to justify the additional bandwidth and\n    processing overhead.\n-   Periodically copy and clear the diagnostic data from Azure\n    Storage. The diagnostic data will transit through Azure\n    storage, but not reside there unnecessarily. There are a number of\n    tools to do this: System Center Monitoring Pack for Azure,\n    Cerebrata's Azure Diagnostics Manager, and Azure PowerShell\n    cmdlets.\n-   Choose only the diagnostic data that you will need to troubleshoot\n    and monitor your application. Capturing too much data may make it\n    harder to troubleshoot in addition to costing significantly more.\n-   Control the collection and extent of diagnostic data by implementing\n    an on-demand switch in your application.\n-   Utilize the logging level (Verbose, Info, Warning, Error) so that\n    all information is available, then utilize the post-deploy Diagnostics\n    config to selectively gather data.\n\n<h2><a id=\"Vms\"></a>Azure Virtual Machines</h2>\n\nTroubleshooting applications running on Azure Virtual Machines\ntypically involve the same troubleshooting techniques that you would use\nwith the operating systems and platforms in use. For example:\n\n-   Windows Server 2008 R2 x64 (RTM and SP1); Windows 8 Service x64\n    (Datacenter and Core). There is a large amount of information\n    available on the subject, and many tools available to help you do\n    the job quickly.\n\n-   For more information about the approaches, see [How to: Debug Windows Service Applications].\n\n-   For a video illustrating the best approaches, see [Daniel Pearson's presentation Windows Debugging and Troubleshooting].\n\n-   Open Suse Linux. There is also a tremendous amount of resources\n    available for troubleshooting applications on Suse Linux, both in\n    the [Suse Linux documentation] and on the internet.\n-   Ubuntu Linux. Again, a large amount of information exists. To\n    start with the product documentation, see [https://help.ubuntu.com/](https://help.ubuntu.com).\n-   CentOS Linux. For more information, see [http://centos.org/](http://centos.org).\n\n<h2><a id=\"PlatformServices\"></a>Troubleshooting Azure Services</h2>\n\nMany of the Azure services such as Azure SQL数据库, Azure\nActive Directory, and Azure storage have troubleshooting advice\nthat is specific to their use, regardless whether the application is\nexecuting on Azure, what programming language or libraries it was built\nwith, or executing on a non-Microsoft operating system. The following\ninformation provides best practices specific to some of these services.\n\nThere are many supported libraries that implement best practices for\nasynchronous calls, traces, and event logging as outlined in the design\nportion of this document.\n\n####Azure Storage Troubleshooting\n\nThe following links discuss either designs or practices to mitigate\nproblems requiring troubleshooting or locations in which you should add\ntracing or logging work.\n\n- Storage status and error codes: [http://msdn.microsoft.com/zh-cn/library/windowsazure/dd179382.aspx](http://msdn.microsoft.com/zh-cn/library/windowsazure/dd179382.aspx)\n\n- Storage analytics: [http://blogs.msdn.com/b/windowsazurestorage/archive/2011/08/03/windows-azure-storage-analytics.aspx](http://blogs.msdn.com/b/windowsazurestorage/archive/2011/08/03/windows-azure-storage-analytics.aspx) (see the three \"for more information\" links at the bottom.)\n\n- Overview of retry policies in the Azure Storage Client Library: [http://blogs.msdn.com/b/windowsazurestorage/archive/2011/02/03/overview-of-retry-policies-in-the-windows-azure-storage-client-library.aspx](http://blogs.msdn.com/b/windowsazurestorage/archive/2011/02/03/overview-of-retry-policies-in-the-windows-azure-storage-client-library.aspx)\n\n- How to get the most out of Azure Tables: [http://blogs.msdn.com/b/windowsazurestorage/archive/2010/11/06/how-to-get-most-out-of-windows-azure-tables.aspx](http://blogs.msdn.com/b/windowsazurestorage/archive/2010/11/06/how-to-get-most-out-of-windows-azure-tables.aspx)\n\n    - See these sections: Best Practices; Tips for Programming Azure; and Timeouts and ServerBusy - Is it normal?\n\n- Protecting your Blobs against application errors: [http://blogs.msdn.com/b/windowsazurestorage/archive/2010/04/30/protecting-your-blobs-against-application-errors.aspx](http://blogs.msdn.com/b/windowsazurestorage/archive/2010/04/30/protecting-your-blobs-against-application-errors.aspx)\n\n**Azure Storage Explorers**\n\nThere are a number of ways to explore Azure storage. The \nAzure Storage team came up with a [list of storage explorers]. Any of\nthese will allow you to see Diagnostics files and Azure Storage\nAnalytics files. Cloudberry Lab's [Explorer for Azure Blob Storage] provides a user interface to enable Storage Analytics directly in the\napplication by clicking **Storage Settings**.\n\n<h2><a id=\"Misc\"></a>Azure 服务总线 Troubleshooting</h2>\n\nThis section provides high-level guidance about how to develop an\napplication that uses the Azure 服务总线 in a robust and\nmaintainable way that will minimize common issues. It also provides\ndetails about how to identify and address common 服务总线 errors.\n\n###General Guidance\n\nThe 服务总线 is an internet-scale [enterprise 服务总线] that\nsupports relayed and brokered messaging capabilities. The 服务总线\nimplements quotas and thresholds at a system level for both types of\nmessaging. If your application exceeds these quotas, it will be\nthrottled or your requests or messages will be rejected. For full\ndetails about 服务总线 quotas and the behavior you will see when they\nare exceeded, see [Azure 服务总线 Quotas]. Some quotas are user\ndefined, for example the size of a queue or topic, which is defined when\nthe entity is created.\n\nTo get a view into the data in your 服务总线 messaging entity and how\nit is being processed, you can use [服务总线 Explorer] or the Server\nExplorer in the Azure Tools for Visual Studio (version 1.7 or higher,) to create, delete, and test queues, topics, subscriptions, and rules. This\nis an excellent way to troubleshoot an application that is running but\nnot processing data the way you expect. These tools include\nfunctionality that enables you to test queues, topics, and relay\nentities, trace the operations performed by individual sender and\nreceiver tasks, monitor progress and performance of an ongoing test run,\nand generate detailed logs of the results, including any error messages.\n\n###服务总线 Relay\n\nThe 服务总线 \"relay\" service runs in the cloud and supports a\nvariety of different transport protocols and Web services standards,\nincluding SOAP, WS-\\*, and REST. You can use the 服务总线 relay as a\ndelegate to listen for incoming sessions and requests sent to a WCF\nservice. In the relayed messaging pattern, an on-premises or cloud-based\nservice connects to the relay service through an outbound port and\ncreates a bi-directional socket for communication tied to a particular\nrendezvous address. The client does not have to know where the service\nresides, and the on-premises service does not need any inbound ports\nopen on the firewall. However, depending on your network configuration,\nyou may encounter problems when connecting to the 服务总线 relay from\nbehind a firewall or through a proxy server. [Hosting Behind a Firewall\nwith the 服务总线] describes how to troubleshoot and resolve such\nconnection issues.\n\n###服务总线 Queues and Topics\n\n服务总线 queues and topics provide brokered messaging\nfunctionality-messages are pushed to the 服务总线 queue or topic\nwhere they are reliably retained until the receiver is ready to consume\nthem. Message senders and receivers do not have to be online at the same\ntime; the messaging infrastructure reliably stores messages until the\nconsuming party is ready to receive them. The messaging API can\nencounter a variety of errors that might impact your application. These\ncan be broadly grouped into the following categories:\n\n-   User error-for example, a code indicating an argument was invalid.\n    Recommended action: Try to fix the code before proceeding.\n-   Setup/configuration error-for example, a queue or topic associated\n    with the action does not exist or has been deleted. Recommended\n    action: Review your configuration and change it if necessary.\n-   Transient error-for example, a response indicating that the service\n    was not able to process the request at the current time. Recommended\n    action: Retry the operation or notify users. For more information,\n    see [Handling Transient Communication Errors].\n-   Other errors-for example, timeout errors or errors indicating that a\n    message lock was lost. Recommended action: You generally do not\n    handle these exceptions to perform cleanups or aborts. They might be\n    used for tracing.\n\n[Messaging Exceptions] provides an overview of exceptions that users of\nthe 服务总线 client libraries for .NET might encounter, along with\nrecommendations about how to handle each type of exception. Because the\nclient libraries for .NET align closely to the structure of the Service\nBus libraries for other languages, this guidance may be useful even if\nyou are not programming in a .NET language. In some cases, for example\nwith transient errors, you can retry the action. You can follow the\ntransient error handling guidelines outlined earlier in this article to\nefficiently handle transient errors. In addition, for more details, best\npractices, and sample code that demonstrates how to handle transient\n服务总线 errors in a .NET application, see the [Handling Transient Communication Errors] section in the Azure Developer Guidance\narticle [Best Practices for Leveraging Azure 服务总线 Brokered Messaging API].\n\nAnother area to focus on when developing an application that uses\nbrokered messaging is to ensure you implement reliable message receiving\nlogic that can accurately and efficiently handle anomalies in messages.\nThe \"Implementing Reliable Message Receive Loops\" section of the [Best Practices for Leveraging Azure 服务总线 Brokered Messaging API] article describes a number of techniques for using the **PeekLock** receive mode, which is the mode that supports multiple message\ndeliveries if the message isn't delivered successfully on the first try.\nThe article recommends best practices that will help ensure your\napplication does not process duplicate messages. It also helps avoid\nproblems that can occur due to lock timeouts, and improve overall\nperformance in **PeekLock** mode by ensuring that you process messages\npromptly. The article also provides sample code that uses the Service\nBus client libraries for .NET.\n\n###Additional Troubleshooting Resources\n\nFor additional details about common 服务总线 errors and ways to\ninvestigate and address them, see [Troubleshooting the 服务总线].\n\n<!--\n##Azure Active Directory Access Control Service (ACS)\nTroubleshooting\n\n-   Error codes:\n    [http://msdn.microsoft.com/zh-cn/library/windowsazure/gg185949.aspx](http://msdn.microsoft.com/zh-cn/library/windowsazure/gg185949.aspx)\n-   ACS Service limitations:\n    [http://msdn.microsoft.com/zh-cn/library/windowsazure/gg185909.aspx](http://msdn.microsoft.com/zh-cn/library/windowsazure/gg185909.aspx)\n\n<h2><a id=\"SQLTroubleshooting\"></a>Azure SQL数据库 Troubleshooting</h2>\n\nWhen interacting with an Azure SQL数据库 extra care must be taken to\ndeal with the distributed nature of Azure SQL数据库 applications. This\nsection discusses several areas that warrant attention. This is by no\nmeans an exhaustive list. The key to writing supportable Azure SQL数据库 code\nis to examine the return codes and make sure that you have solid retry\ncode to handle failures.\n\nYour application must handle login failures gracefully. SQL数据库\ninstances require the use of SQL Authentication. If you cannot\nsuccessfully log in, either your credentials are not valid or the\ndatabase you requested is not available.\n\nYour application must handle the service being inaccessible. If the\nserver is already provisioned and the Azure SQL数据库 service is\navailable (you can check this using the [Azure Health Status] page), the\nlikely cause is configuration issues in your on-site installation. For\ninstance, you may be unable to resolve the name (which can be tested\nwith tools such as tracert), you may have a firewall blocking port 1433\nthat is used by SQL数据库, or you may be using a proxy server that is\nnot configured properly. Use the same techniques to troubleshoot these\ndifficulties that you would for SQL Server. For more information, see [SQL数据库 Connectivity Troubleshooting Guide] and [Troubleshooting SQL数据库].\n\nYour application must handle general network errors. You may receive\ngeneral network errors because Azure SQL数据库 might disconnect users\nunder these circumstances:\n\n-   When a connection is idle for an extended period of time\n-   When a connection consumes an excessive amount of resources or holds\n    onto a transaction for an extended period of time\n-   If the server is too busy\n\nTo improve performance in Azure SQL数据库, use the same techniques\nyou would use with SQL Server. For more information, see the following\ntopics:\n\n-   [Troubleshooting Queries] in SQL Server Books Online\n-   [Troubleshoot and Optimize Queries with SQL数据库]\n-   [SQL数据库 Performance Considerations and Troubleshooting]\n-   [Improving Your I/O Performance]\n-   [System Center Monitoring Pack for SQL数据库]\n\nAzure SQL数据库 uses a subset of SQL Server error messages. For more\ninformation about SQL Server errors, see [Errors and Events Reference\n(Database Engine)] in SQL Server Books Online\n\nIf you need to recover login names or passwords, contact your service\nadministrator, who can grant you proper access to the server and\ndatabase. Service administrators can also reset their own passwords\nusing the Azure Management Portal.\n\nSQL数据库 queries can fail for various reasons - a malformed query,\nnetwork issues, and so on. Some errors are transient, meaning the\nproblem often goes away by itself. For this subset of errors, it makes\nsense to retry the query after a short interval. If the query still\nfails after several retries, you would report an error. Of course, not\nall errors are transient. SQL Error 102, \"Incorrect syntax,\" won't go\naway no matter how many times you submit the same query. In short,\nimplementing robust retry logic requires some thought. A tabular data\nstream (TDS) error token is sent prior to disconnecting users, when\npossible. To improve application experience, we recommend that you\nimplement the retry logic in your SQL数据库 applications to catch these\nerrors. When an error occurs, re-establish the connection, and then\nre-execute the failed commands or the query. For more information, see\nthe following links:\n\n-   [Retry Logic for Transient Failures in SQL数据库]\n-   [SQL数据库 Retry Logic Sample]\n-   [The Transient Fault Handling Application Block]\n\n###Azure SQL Backup and Restore Strategy\n\nAzure SQL数据库 requires its own backup-and-restore strategy because of the\nenvironment and tools available. In many ways the risks have been\nmediated by the database being in the Microsoft data centers. The tools\nthat we have today cover the other risk factors, however better tools\nare coming to make the job much easier. Red-gate recently published a\nfree tool for SQL数据库 backup and restore which can be found here: [http://www.red-gate.com/products/dba/sql-azure-backup/](http://www.red-gate.com/products/dba/sql-azure-backup).\n\nSQL Data Sync enables you to easily create and schedule\nbi-directional synchronizations from within the Data Sync web site\nwithout the need to write a single line of code. You can find more\ninformation here:\n[http://msdn.microsoft.com/zh-cn/library/windowsazure/hh456371.aspx](http://msdn.microsoft.com/zh-cn/library/windowsazure/hh456371.aspx).\n\nFor more information on SQL数据库 backup and Restore strategies see the\nfollowing articles:\n\n-   This topic gives an overview of SQL数据库 Backup and Restore\n    Strategies:\n    [http://social.technet.microsoft.com/wiki/contents/articles/1792.sql-azure-backup-and-restore-strategy.aspx](http://social.technet.microsoft.com/wiki/contents/articles/1792.sql-azure-backup-and-restore-strategy.aspx)\n-   This topic explains how to back up a database to another database on\n    the same server:\n    [http://msdn.microsoft.com/zh-cn/library/windowsazure/ff951631.aspx](http://msdn.microsoft.com/zh-cn/library/windowsazure/ff951631.aspx)\n-   This topic explains how to export an existing SQL数据库 instance to\n    a blob on a given storage account:\n    [http://msdn.microsoft.com/zh-cn/library/windowsazure/hh335292.aspx](http://msdn.microsoft.com/zh-cn/library/windowsazure/hh335292.aspx)\n-   This topic explains how to import an existing SQL数据库 instance\n    from a bacpac file stored in a blob:\n    [http://msdn.microsoft.com/zh-cn/library/windowsazure/hh335291.aspx](http://msdn.microsoft.com/zh-cn/library/windowsazure/hh335291.aspx)\n-   This topic describes the business continuity capabilities provided\n    by SQL数据库:\n    [http://msdn.microsoft.com/zh-cn/library/windowsazure/hh852669.aspx](http://msdn.microsoft.com/zh-cn/library/windowsazure/hh852669.aspx)\n\n<h2><a id=\"Cache\"></a>Azure Caching</h2>\nAzure Caching comes in two flavors: the Azure Shared Caching and role-based Azure Caching (Preview). Shared Caching is a multitenent Azure service that provides caching services. Azure Caching (Preview) hosts caching on a role by using a portion of the memory from the virtual machines that host your role instances. To troubleshoot Azure Caching, observe the behavior of the cache by checking error codes and catching exceptions. When using role-based Caching (Preview),you can also use performance counters. Caching problems generally fall into one of the following categories:\n\n-   Quota-related errors - a quota has been exceeded (Shared Caching)\n-   Throttling - occurs when there is not enough physical memory to support additional cached items\n-   Eviction - items are forcibly evicted to make room for new items in a way that hurts application performance\n-   Expiration - expiration times are set too short or long\n\nFor more information on quota-related errors, see [Understanding Quotas].\n-->\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n[Monitoring Pack]: http://www.microsoft.com/download/en/details.aspx?id=11324\n[Microsoft System Center Operations Manager]: http://www.microsoft.com/zh-cn/server-cloud/products/system-center-2012-r2/default.aspx#fbid=9ZH5wGSDgf0\n[Azure Platform Management Tool (MMC)]: http://wapmmc.codeplex.com/\n[Azure Diagnostics Manager]: http://cerebrata.com/Products/AzureDiagnosticsManager/\n[Cloud Storage Studio]: http://cerebrata.com/Products/CloudStorageStudio/\n[Azure Management Cmdlets]: http://cerebrata.com/Products/AzureManagementCmdlets/\n[Gomez]: http://www.compuware.com/application-performance-management/\n[Keynote]: http://www.keynote.com/solutions/\n[Pingdom]: http://pingdom.com/\n[AlertBot]: http://www.alertbot.com/products/website-monitoring/default.aspx\n[IntelliTrace]: http://msdn.microsoft.com/zh-cn/library/dd264915.aspx\n[startup task]: http://msdn.microsoft.com/zh-cn/library/gg456327.aspx\n[AVIcode]: http://www.microsoft.com/zh-cn/server-cloud/system-center/avicode.aspx\n[profile]: http://msdn.microsoft.com/zh-cn/library/windowsazure/hh369930.aspx\n[VM Assistant]: http://azurevmassist.codeplex.com/\n[Debugging Node in the Azure Emulator]: http://weblogs.asp.net/jimwang/archive/2012/04/17/debugging-node-node-inspector-in-the-azure-emulator.aspx\n[Debugging with Node-Inspector]: http://howtonode.org/debugging-with-node-inspector\n\n[IntelliTrace to debug Azure Cloud Services]: http://blogs.msdn.com/b/jnak/archive/2010/06/07/using-intellitrace-to-debug-windows-azure-cloud-services.aspx\n\n[Troubleshooting an Azure web site]: /develop/net/best-practices/troubleshooting-web-sites/\n[W3C extended log file format]: http://go.microsoft.com/fwlink/?LinkID=90561\n[Log Parser]: http://go.microsoft.com/fwlink/?LinkId=246619\n[Log Parser Plus]: http://logparserplus.com/Examples\n[TechNet Log Parser Examples]: http://technet.microsoft.com/zh-cn/library/ee692659.aspx\n[Office 2003 Web Components]: http://www.microsoft.com/zh-cn/download/details.aspx?id=22276\n[How to: Debug Windows Service Applications]: http://msdn.microsoft.com/zh-cn/library/7a50syb3%28v=vs.90%29.aspx\n[Daniel Pearson's presentation Windows Debugging and Troubleshooting]: http://technet.microsoft.com/zh-cn/video/Video/hh867800\n[Suse Linux documentation]: https://www.suse.com/documentation/\n[list of storage explorers]: http://blogs.msdn.com/b/windowsazurestorage/archive/2010/04/17/windows-azure-storage-explorers.aspx\n[Explorer for Azure Blob Storage]: http://www.cloudberrylab.com/free-microsoft-azure-explorer.aspx\n[enterprise 服务总线]: http://en.wikipedia.org/wiki/Enterprise_service_bus\n[Azure 服务总线 Quotas]: http://msdn.microsoft.com/zh-cn/library/windowsazure/ee732538.aspx\n[服务总线 Explorer]: http://code.msdn.microsoft.com/Service-Bus-Explorer-f2abca5a\n[Hosting Behind a Firewall with the 服务总线]: http://msdn.microsoft.com/zh-cn/library/windowsazure/ee706729.aspx\n[Handling Transient Communication Errors]: http://msdn.microsoft.com/zh-cn/library/hh851746(VS.103).aspx\n[Messaging Exceptions]: http://msdn.microsoft.com/zh-cn/library/hh418082.aspx\n[Handling Transient Communication Errors]: http://msdn.microsoft.com/zh-cn/library/hh851746(VS.103).aspx\n[Best Practices for Leveraging Azure 服务总线 Brokered Messaging API]: http://msdn.microsoft.com/zh-cn/library/windowsazure/hh545245.aspx\n[Troubleshooting the 服务总线]: http://msdn.microsoft.com/zh-cn/library/windowsazure/ee706702.aspx\n[Azure Health Status]: http://go.microsoft.com/fwlink/p/?LinkId=168847\n[SQL数据库 Connectivity Troubleshooting Guide]: http://social.technet.microsoft.com/wiki/contents/articles/sql-azure-connectivity-troubleshooting-guide.aspx\n[Troubleshooting SQL数据库]: http://msdn.microsoft.com/zh-cn/library/ee730906.aspx\n[Troubleshooting Queries]: http://msdn.microsoft.com/zh-cn/library/ms186351(SQL.100).aspx\n[Troubleshoot and Optimize Queries with SQL数据库]: http://social.technet.microsoft.com/wiki/contents/articles/1104.troubleshoot-and-optimize-queries-with-sql-azure.aspx\n[SQL数据库 Performance Considerations and Troubleshooting]: http://channel9.msdn.com/Events/TechEd/NorthAmerica/2011/DBI314\n[Improving Your I/O Performance]: http://blogs.msdn.com/b/sqlazure/archive/2010/07/27/10043069.aspx?PageIndex=2#comments\n[System Center Monitoring Pack for SQL数据库]: http://www.microsoft.com/zh-cn/download/details.aspx?id=10631\n[Errors and Events Reference (Database Engine)]: http://go.microsoft.com/fwlink/p/?LinkId=166622\n[Retry Logic for Transient Failures in SQL数据库]: http://social.technet.microsoft.com/wiki/contents/articles/4235.retry-logic-for-transient-failures-in-sql-azure.aspx\n[SQL数据库 Retry Logic Sample]: http://code.msdn.microsoft.com/windowsazure/SQL-Azure-Retry-Logic-2d0a8401\n[The Transient Fault Handling Application Block]: http://msdn.microsoft.com/zh-cn/library/hh680934(PandP.50).aspx\n[Microsoft Enterprise Library 5.0 Integration Pack for Azure]: http://msdn.microsoft.com/zh-cn/library/hh680918%28v=pandp.50%29.aspx\n[Take Control of Logging and Tracing in Azure]: http://msdn.microsoft.com/zh-cn/magazine/ff714589.aspx\n[Cloud Application Framework & Extensions (CloudFx)]: http://nuget.org/packages/Microsoft.Experience.CloudFx\n[Fiddler]: http://www.fiddler2.com/fiddler2/\n[Understanding Quotas]: http://msdn.microsoft.com/zh-cn/library/gg185683.aspx\n[Troubleshooting Cache]: http://go.microsoft.com/fwlink/?LinkId=252730 \n"
+}

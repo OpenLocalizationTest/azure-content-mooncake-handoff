@@ -1,0 +1,551 @@
+{
+  "nodes": [
+    {
+      "content": "将 Azure CLI 用于 Azure 存储服务 | Azure",
+      "pos": [
+        27,
+        60
+      ]
+    },
+    {
+      "content": "了解如何将 Azure 命令行界面 (Azure CLI) 用于 Azure 存储服务，以便创建和管理存储帐户并处理 Azure blob 和文件。Azure CLI 是一个跨平台工具",
+      "pos": [
+        79,
+        171
+      ]
+    },
+    {
+      "content": "&lt;tags",
+      "pos": [
+        269,
+        274
+      ]
+    },
+    {
+      "content": "ms.service=\"storage\"",
+      "pos": [
+        279,
+        299
+      ]
+    },
+    {
+      "content": "将 Azure CLI 用于 Azure 存储服务",
+      "pos": [
+        361,
+        386
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        391,
+        393
+      ]
+    },
+    {
+      "pos": [
+        395,
+        502
+      ],
+      "content": "Azure CLI 提供了一组开源且跨平台的命令，这些命令可以用于 Azure 平台。它提供了<bpt id=\"p1\">[</bpt>管理门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>所提供的很多相同功能，以及各种数据访问功能。"
+    },
+    {
+      "pos": [
+        504,
+        654
+      ],
+      "content": "在本指南中，我们将探讨如何使用 <bpt id=\"p1\">[</bpt>Azure 命令行界面 (Azure CLI)<ept id=\"p1\">](/documentation/articles/xplat-cli-install)</ept>，以便通过 Azure 存储空间执行各种开发和管理任务。在使用本指南之前，我们建议你下载和安装或者升级到最新版 Azure CLI。"
+    },
+    {
+      "content": "本指南假定你了解 Azure 存储服务的基本概念。本指南提供了大量的脚本，用于演示 Azure CLI 与 Azure 存储服务的用法。在运行每个脚本之前，请确保根据配置更新脚本变量。",
+      "pos": [
+        656,
+        748
+      ]
+    },
+    {
+      "pos": [
+        752,
+        1024
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 本指南提供在 Azure 服务管理 (ASM) 模式下运行的 Azure CLI 命令和脚本的示例。若要了解如何使用 Azure CLI 命令在 Azure 资源管理 (ARM) 模式下进行存储，请参阅<bpt id=\"p1\">[</bpt>将适用于 Mac、Linux 和 Windows 的 Azure CLI 与 Azure 资源管理配合使用<ept id=\"p1\">](/documentation/articles/azure-cli-arm-commands#azure-storage-commands-to-manage-your-storage-objects)</ept>。"
+    },
+    {
+      "content": "在 5 分钟内开始使用 Azure 存储服务和 Azure CLI",
+      "pos": [
+        1029,
+        1062
+      ]
+    },
+    {
+      "content": "本指南使用 Ubuntu 作为示例，但其他 OS 平台的操作应与此类似。",
+      "pos": [
+        1064,
+        1100
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>Azure 新用户：<ept id=\"p1\">**</ept>获取一个 Azure 订阅以及与该订阅关联的 Microsoft 帐户。有关 Azure 购买选项的信息，请参阅<bpt id=\"p2\">[</bpt>免费试用<ept id=\"p2\">](/pricing/1rmb-trial/)</ept>、<bpt id=\"p3\">[</bpt>购买选项<ept id=\"p3\">](/pricing/pia/)</ept>",
+      "pos": [
+        1102,
+        1222
+      ]
+    },
+    {
+      "content": "。",
+      "pos": [
+        1346,
+        1347
+      ]
+    },
+    {
+      "pos": [
+        1349,
+        1446
+      ],
+      "content": "有关 Azure 订阅的详细信息，请参阅<bpt id=\"p1\">[</bpt>管理帐户、订阅和管理角色<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/hh531793.aspx)</ept>。"
+    },
+    {
+      "content": "创建 Azure 订阅和帐户之后：",
+      "pos": [
+        1450,
+        1467
+      ]
+    },
+    {
+      "pos": [
+        1474,
+        1557
+      ],
+      "content": "按照<bpt id=\"p1\">[</bpt>安装 Azure CLI<ept id=\"p1\">](/documentation/articles/xplat-cli-install)</ept> 中概述的说明，下载和安装 Azure CLI。"
+    },
+    {
+      "pos": [
+        1561,
+        1655
+      ],
+      "content": "安装了 Azure CLI 之后，你将可以从命令行界面（Bash、终端、命令提示符）使用 azure 命令访问 Azure CLI 命令。输入 <ph id=\"ph1\">`azure`</ph> 命令，你应该会看到以下输出："
+    },
+    {
+      "content": "Azure 命令输出",
+      "pos": [
+        1663,
+        1673
+      ]
+    },
+    {
+      "pos": [
+        1687,
+        1826
+      ],
+      "content": "在命令行界面中，输入 <ph id=\"ph1\">`azure storage`</ph> 即可列出所有 Azure 存储服务命令，并初步了解 Azure CLI 提供的功能。你可以输入带 <bpt id=\"p1\">**</bpt>-h<ept id=\"p1\">**</ept> 参数的命令名称（例如，<ph id=\"ph2\">`azure storage share create -h`</ph>），了解命令语法的详细信息。"
+    },
+    {
+      "content": "现在，我们将提供一个简单的脚本，演示用于访问 Azure 存储服务的基本 Azure CLI 命令。该脚本会首先要求你针对存储帐户和密钥设置两个变量。然后，该脚本将在此新存储帐户中创建新容器，并将现有图像文件 (Blob) 上载到该容器。脚本在列出该容器中的所有 Blob 后，就会将图像文件下载到本地计算机上的目标目录。",
+      "pos": [
+        1830,
+        1991
+      ]
+    },
+    {
+      "content": "在本地计算机中，打开首选的文本编辑器（例如 vim）。在文本编辑器中输入上述脚本。",
+      "pos": [
+        2814,
+        2855
+      ]
+    },
+    {
+      "content": "现在，你需要基于你的环境配置中的设置更新脚本变量。",
+      "pos": [
+        2860,
+        2885
+      ]
+    },
+    {
+      "pos": [
+        2893,
+        2983
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>&lt;storage_account_name&gt;<ept id=\"p1\">**</ept>使用脚本中给定的名称，或输入存储帐户的新名称。<bpt id=\"p2\">**</bpt>重要提示：<ept id=\"p2\">**</ept>在 Azure 中，存储帐户的名称必须是唯一的。而且必须为小写！"
+    },
+    {
+      "pos": [
+        2991,
+        3028
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>&lt;storage_account_key&gt;<ept id=\"p1\">**</ept>你的存储帐户的访问密钥。"
+    },
+    {
+      "pos": [
+        3036,
+        3077
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>&lt;container_name&gt;<ept id=\"p1\">**</ept>使用脚本中给定的名称，或输入容器的新名称。"
+    },
+    {
+      "pos": [
+        3085,
+        3149
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>&lt;image_to_upload&gt;<ept id=\"p1\">**</ept>输入本地计算机上图片的路径，例如：“~/images/HelloWorld.png”。"
+    },
+    {
+      "pos": [
+        3157,
+        3234
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>&lt;destination_folder&gt;<ept id=\"p1\">**</ept>输入用于存储从 Azure 存储服务下载的文件的本地目录路径，例如：“~/downloadImages”。"
+    },
+    {
+      "content": "在 vim 中更新完必需的变量以后，按组合键“Esc, : , wq!”保存脚本。",
+      "pos": [
+        3239,
+        3280
+      ]
+    },
+    {
+      "content": "若要运行此脚本，在 bash 控制台中输入脚本文件名即可。运行此脚本后，应会创建包含已下载图像文件的本地目标文件夹。以下屏幕截图显示了示例输出：",
+      "pos": [
+        3285,
+        3357
+      ]
+    },
+    {
+      "content": "运行脚本后，应会创建包含已下载图像文件的本地目标文件夹。",
+      "pos": [
+        3359,
+        3387
+      ]
+    },
+    {
+      "content": "通过 Azure CLI 管理存储帐户",
+      "pos": [
+        3392,
+        3411
+      ]
+    },
+    {
+      "content": "连接到你的 Azure 订阅",
+      "pos": [
+        3417,
+        3431
+      ]
+    },
+    {
+      "pos": [
+        3433,
+        3618
+      ],
+      "content": "大多数存储命令没有 Azure 订阅也可以使用，不过我们仍建议你通过 Azure CLI 连接到你的订阅。若要配置 Azure CLI 以使用你的订阅，请遵循<bpt id=\"p1\">[</bpt>如何连接到 Azure 订阅<ept id=\"p1\">](/documentation/articles/xplat-cli-install#how-to-connect-to-your-azure-subscription)</ept>中的步骤。"
+    },
+    {
+      "content": "新建存储帐户",
+      "pos": [
+        3624,
+        3630
+      ]
+    },
+    {
+      "content": "若要使用 Azure 存储服务，你需要一个存储帐户。可以在将计算机配置为连接到订阅之后，创建新的 Azure 存储帐户。",
+      "pos": [
+        3632,
+        3692
+      ]
+    },
+    {
+      "content": "存储帐户名称必须为 3 到 24 个字符，并且只能使用数字和小写字母。",
+      "pos": [
+        3747,
+        3782
+      ]
+    },
+    {
+      "content": "在环境变量中设置默认的 Azure 存储帐户",
+      "pos": [
+        3788,
+        3810
+      ]
+    },
+    {
+      "content": "可以在订阅中设置多个存储帐户。你可以选择其中的一个存储帐户，并在环境变量中将其设置为同一会话中所有存储命令的默认存储帐户。这样，你便可以在不显式指定存储帐户和密钥的情况下运行 Azure CLI 存储命令。",
+      "pos": [
+        3812,
+        3915
+      ]
+    },
+    {
+      "content": "若要设置默认存储帐户，另一种方法是使用连接字符串。首先，通过以下命令获取连接字符串：",
+      "pos": [
+        4016,
+        4058
+      ]
+    },
+    {
+      "content": "然后复制输出连接字符串，并将其设置为环境变量：",
+      "pos": [
+        4128,
+        4151
+      ]
+    },
+    {
+      "content": "创建并管理 blob",
+      "pos": [
+        4224,
+        4234
+      ]
+    },
+    {
+      "pos": [
+        4236,
+        4500
+      ],
+      "content": "Azure Blob 存储是用于存储大量非结构化数据（例如文本或二进制数据）的服务，这些数据可通过 HTTP 或 HTTPS 从世界各地进行访问。本部分假设你已熟悉 Azure Blob 存储的概念。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何通过 .NET 使用 Blob 存储<ept id=\"p1\">](/documentation/articles/storage-dotnet-how-to-use-blobs)</ept>和 <bpt id=\"p2\">[</bpt>Blob 服务概念<ept id=\"p2\">](http://msdn.microsoft.com/zh-cn/library/azure/dd179376.aspx)</ept>。"
+    },
+    {
+      "content": "创建容器",
+      "pos": [
+        4506,
+        4510
+      ]
+    },
+    {
+      "pos": [
+        4512,
+        4588
+      ],
+      "content": "Azure 存储服务中的每个 Blob 都必须在容器中。你可以使用 <ph id=\"ph1\">`azure storage container create`</ph> 命令创建专用容器："
+    },
+    {
+      "pos": [
+        4644,
+        5021
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>有三种级别的匿名读取访问权限：<bpt id=\"p1\">**</bpt>Off<ept id=\"p1\">**</ept>、<bpt id=\"p2\">**</bpt>Blob<ept id=\"p2\">**</ept> 和 <bpt id=\"p3\">**</bpt>Container<ept id=\"p3\">**</ept>。若要防止对 Blob 进行匿名访问，请将 Permission 参数设置为 <bpt id=\"p4\">**</bpt>Off<ept id=\"p4\">**</ept>。默认情况下，新容器是专用容器，只能由帐户所有者访问。若要允许对 Blob 资源进行匿名公共读取访问，但不允许访问容器元数据或容器中的 Blob 列表，请将 Permission 参数设置为 <bpt id=\"p5\">**</bpt>Blob<ept id=\"p5\">**</ept>。若要允许对 Blob 资源、容器元数据和容器中的 Blob 列表进行完全公开读取访问，请将 Permission 参数设置为 <bpt id=\"p6\">**</bpt>Container<ept id=\"p6\">**</ept>。有关详细信息，请参阅<bpt id=\"p7\">[</bpt>管理对 Azure 存储资源的访问<ept id=\"p7\">](/documentation/articles/storage-manage-access-to-resources)</ept>。"
+    },
+    {
+      "content": "将 Blob 上载到容器中",
+      "pos": [
+        5027,
+        5040
+      ]
+    },
+    {
+      "pos": [
+        5042,
+        5162
+      ],
+      "content": "Azure Blob 存储支持块 Blob 和页 Blob。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>了解块 Blob 和页 Blob<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/azure/ee691964.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        5164,
+        5271
+      ],
+      "content": "若要将 blob 上载到容器，可使用 <ph id=\"ph1\">`azure storage blob upload`</ph>。默认情况下，此命令会将本地文件上载到块 Blob。若要指定 Blob 的类型，可以使用 <ph id=\"ph2\">`--blobtype`</ph> 参数。"
+    },
+    {
+      "content": "从容器下载 Blob",
+      "pos": [
+        5362,
+        5372
+      ]
+    },
+    {
+      "content": "以下示例演示如何从容器下载 Blob。",
+      "pos": [
+        5374,
+        5393
+      ]
+    },
+    {
+      "content": "复制 blob",
+      "pos": [
+        5494,
+        5501
+      ]
+    },
+    {
+      "content": "你可以在存储帐户和区域内或跨存储帐户和区域异步复制 Blob。",
+      "pos": [
+        5503,
+        5534
+      ]
+    },
+    {
+      "content": "以下示例演示如何将一个存储帐户中的 Blob 复制到另一个存储帐户。在此示例中，我们创建了一个容器，其中的 blob 可以进行公开、匿名的访问。",
+      "pos": [
+        5536,
+        5608
+      ]
+    },
+    {
+      "pos": [
+        5945,
+        6010
+      ],
+      "content": "此示例将执行异步复制。你可以通过运行 <ph id=\"ph1\">`azure storage blob copy show`</ph> 操作来监视每个复制操作的状态。"
+    },
+    {
+      "content": "请注意，所提供的用于复制操作的源 URL 必须可以公开访问，或者必须包括一个 SAS（共享访问签名）令牌。",
+      "pos": [
+        6012,
+        6065
+      ]
+    },
+    {
+      "content": "删除 Blob",
+      "pos": [
+        6071,
+        6078
+      ]
+    },
+    {
+      "content": "若要删除 blob，请使用以下命令：",
+      "pos": [
+        6080,
+        6098
+      ]
+    },
+    {
+      "pos": [
+        6162,
+        6214
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"create-and-manage-file-shares\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 创建和管理文件共享"
+    },
+    {
+      "pos": [
+        6216,
+        6506
+      ],
+      "content": "Azure 文件存储使用标准 SMB 协议为应用程序提供共享存储。Azure 虚拟机和云服务以及本地应用程序可以通过装载的共享来共享文件数据。你可以通过 Azure CLI 管理文件共享和文件数据。有关 Azure 文件存储的详细信息，请参阅<bpt id=\"p1\">[</bpt>如何通过 Windows 使用 Azure 文件存储<ept id=\"p1\">](/documentation/articles/storage-dotnet-how-to-use-files)</ept>或<bpt id=\"p2\">[</bpt>如何通过 Linux 使用 Azure 文件存储<ept id=\"p2\">](/documentation/articles/storage-how-to-use-files-linux)</ept>。"
+    },
+    {
+      "content": "创建文件共享",
+      "pos": [
+        6512,
+        6518
+      ]
+    },
+    {
+      "pos": [
+        6520,
+        6645
+      ],
+      "content": "Azure 文件共享是 Azure 中的 SMB 文件共享。所有目录和文件都必须在文件共享中创建。一个帐户可以包含无限数量的共享，一个共享可以存储无限数量的文件，直到达到存储帐户的容量限制为止。下面的示例创建名为 <bpt id=\"p1\">**</bpt>myshare<ept id=\"p1\">**</ept> 的文件共享。"
+    },
+    {
+      "content": "创建目录",
+      "pos": [
+        6695,
+        6699
+      ]
+    },
+    {
+      "pos": [
+        6701,
+        6759
+      ],
+      "content": "目录提供了进行 Azure 文件共享时可以选择的层次结构。以下示例在文件共享中创建名为 <bpt id=\"p1\">**</bpt>myDir<ept id=\"p1\">**</ept> 的目录。"
+    },
+    {
+      "pos": [
+        6815,
+        6906
+      ],
+      "content": "请注意，目录路径可以包括多个级别，<bpt id=\"p1\">*</bpt>例如<ept id=\"p1\">*</ept> <bpt id=\"p2\">**</bpt>a/b<ept id=\"p2\">**</ept>。但是，你必须确保所有父目录都存在。例如，对于路径 <bpt id=\"p3\">**</bpt>a/b<ept id=\"p3\">**</ept>，你必须先创建目录 <bpt id=\"p4\">**</bpt>a<ept id=\"p4\">**</ept>，然后创建目录 <bpt id=\"p5\">**</bpt>b<ept id=\"p5\">**</ept>。"
+    },
+    {
+      "content": "将本地文件上载到目录",
+      "pos": [
+        6912,
+        6922
+      ]
+    },
+    {
+      "pos": [
+        6924,
+        7001
+      ],
+      "content": "以下示例将文件从 <bpt id=\"p1\">**</bpt>~/temp/samplefile.txt<ept id=\"p1\">**</ept> 上载到 <bpt id=\"p2\">**</bpt>myDir<ept id=\"p2\">**</ept> 目录。请编辑文件路径，使其指向你本地计算机上的有效文件："
+    },
+    {
+      "content": "请注意，共享中的文件最大可以为 1 TB。",
+      "pos": [
+        7076,
+        7097
+      ]
+    },
+    {
+      "content": "列出共享根目录或目录中的文件",
+      "pos": [
+        7103,
+        7117
+      ]
+    },
+    {
+      "content": "可以使用以下命令列出共享根目录或目录中的文件和子目录：",
+      "pos": [
+        7119,
+        7146
+      ]
+    },
+    {
+      "content": "请注意，进行列表操作时，目录名是可选的。如果省略目录名，该命令会列出共享中根目录的内容。",
+      "pos": [
+        7195,
+        7239
+      ]
+    },
+    {
+      "content": "复制文件",
+      "pos": [
+        7245,
+        7249
+      ]
+    },
+    {
+      "content": "从 Azure CLI 的 0.9.8 版开始，可以将一个文件复制到另一个文件，将一个文件复制到一个 Blob，或将一个 Blob 复制到一个文件。下面，我们演示如何使用 CLI 命令执行这些复制操作。若要将文件复制到新目录中：",
+      "pos": [
+        7251,
+        7365
+      ]
+    },
+    {
+      "content": "若要将 blob 复制到一个文件目录中：",
+      "pos": [
+        7606,
+        7626
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        7860,
+        7864
+      ]
+    },
+    {
+      "content": "下面是一些相关的文章和资源，可以让你更多地了解 Azure 存储服务。",
+      "pos": [
+        7866,
+        7901
+      ]
+    },
+    {
+      "content": "Azure 存档文档",
+      "pos": [
+        7906,
+        7916
+      ]
+    },
+    {
+      "content": "Azure 存储 REST API 引用",
+      "pos": [
+        7954,
+        7974
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"将 Azure CLI 用于 Azure 存储服务 | Azure\"\n    description=\"了解如何将 Azure 命令行界面 (Azure CLI) 用于 Azure 存储服务，以便创建和管理存储帐户并处理 Azure blob 和文件。Azure CLI 是一个跨平台工具\"\n    services=\"storage\"\n    documentationCenter=\"na\"\n    authors=\"tamram\"\n    manager=\"jdial\"/>\n\n<tags\n    ms.service=\"storage\"\n   \n    ms.date=\"01/05/2016\"\n    wacn.date=\"02/25/2016\"/>\n\n# 将 Azure CLI 用于 Azure 存储服务\n\n## 概述\n\nAzure CLI 提供了一组开源且跨平台的命令，这些命令可以用于 Azure 平台。它提供了[管理门户](https://manage.windowsazure.cn)所提供的很多相同功能，以及各种数据访问功能。\n\n在本指南中，我们将探讨如何使用 [Azure 命令行界面 (Azure CLI)](/documentation/articles/xplat-cli-install)，以便通过 Azure 存储空间执行各种开发和管理任务。在使用本指南之前，我们建议你下载和安装或者升级到最新版 Azure CLI。\n\n本指南假定你了解 Azure 存储服务的基本概念。本指南提供了大量的脚本，用于演示 Azure CLI 与 Azure 存储服务的用法。在运行每个脚本之前，请确保根据配置更新脚本变量。\n\n> [AZURE.NOTE] 本指南提供在 Azure 服务管理 (ASM) 模式下运行的 Azure CLI 命令和脚本的示例。若要了解如何使用 Azure CLI 命令在 Azure 资源管理 (ARM) 模式下进行存储，请参阅[将适用于 Mac、Linux 和 Windows 的 Azure CLI 与 Azure 资源管理配合使用](/documentation/articles/azure-cli-arm-commands#azure-storage-commands-to-manage-your-storage-objects)。\n\n## 在 5 分钟内开始使用 Azure 存储服务和 Azure CLI\n\n本指南使用 Ubuntu 作为示例，但其他 OS 平台的操作应与此类似。\n\n**Azure 新用户：**获取一个 Azure 订阅以及与该订阅关联的 Microsoft 帐户。有关 Azure 购买选项的信息，请参阅[免费试用](/pricing/1rmb-trial/)、[购买选项](/pricing/pia/)<!--、和[成员优惠](http://azure.microsoft.com/pricing/member-offers/)（适用于 MSDN、Microsoft 合作伙伴网络和 BizSpark 以及其他 Microsoft 计划的成员）-->。\n\n有关 Azure 订阅的详细信息，请参阅[管理帐户、订阅和管理角色](https://msdn.microsoft.com/zh-cn/library/azure/hh531793.aspx)。\n\n**创建 Azure 订阅和帐户之后：**\n\n1. 按照[安装 Azure CLI](/documentation/articles/xplat-cli-install) 中概述的说明，下载和安装 Azure CLI。\n2. 安装了 Azure CLI 之后，你将可以从命令行界面（Bash、终端、命令提示符）使用 azure 命令访问 Azure CLI 命令。输入 `azure` 命令，你应该会看到以下输出：\n\n    ![Azure 命令输出][Image1]\n\n3. 在命令行界面中，输入 `azure storage` 即可列出所有 Azure 存储服务命令，并初步了解 Azure CLI 提供的功能。你可以输入带 **-h** 参数的命令名称（例如，`azure storage share create -h`），了解命令语法的详细信息。\n4. 现在，我们将提供一个简单的脚本，演示用于访问 Azure 存储服务的基本 Azure CLI 命令。该脚本会首先要求你针对存储帐户和密钥设置两个变量。然后，该脚本将在此新存储帐户中创建新容器，并将现有图像文件 (Blob) 上载到该容器。脚本在列出该容器中的所有 Blob 后，就会将图像文件下载到本地计算机上的目标目录。\n\n        #!/bin/bash\n        # A simple Azure storage example\n\n        export AZURE_STORAGE_ACCOUNT=<storage_account_name>\n        export AZURE_STORAGE_ACCESS_KEY=<storage_account_key>\n\n        export container_name=<container_name>\n        export blob_name=<blob_name>\n        export image_to_upload=<image_to_upload>\n        export destination_folder=<destination_folder>\n\n        echo \"Creating the container...\"\n        azure storage container create $container_name\n\n        echo \"Uploading the image...\"\n        azure storage blob upload $image_to_upload $container_name $blob_name\n\n        echo \"Listing the blobs...\"\n        azure storage blob list $container_name\n\n        echo \"Downloading the image...\"\n        azure storage blob download $container_name $blob_name $destination_folder\n\n        echo \"Done\"\n\n5. 在本地计算机中，打开首选的文本编辑器（例如 vim）。在文本编辑器中输入上述脚本。\n\n6. 现在，你需要基于你的环境配置中的设置更新脚本变量。\n\n    - **<storage_account_name>**使用脚本中给定的名称，或输入存储帐户的新名称。**重要提示：**在 Azure 中，存储帐户的名称必须是唯一的。而且必须为小写！\n\n    - **<storage_account_key>**你的存储帐户的访问密钥。\n\n    - **<container_name>**使用脚本中给定的名称，或输入容器的新名称。\n\n    - **<image_to_upload>**输入本地计算机上图片的路径，例如：“~/images/HelloWorld.png”。\n\n    - **<destination_folder>**输入用于存储从 Azure 存储服务下载的文件的本地目录路径，例如：“~/downloadImages”。\n\n7. 在 vim 中更新完必需的变量以后，按组合键“Esc, : , wq!”保存脚本。\n\n8. 若要运行此脚本，在 bash 控制台中输入脚本文件名即可。运行此脚本后，应会创建包含已下载图像文件的本地目标文件夹。以下屏幕截图显示了示例输出：\n\n运行脚本后，应会创建包含已下载图像文件的本地目标文件夹。\n\n## 通过 Azure CLI 管理存储帐户\n\n### 连接到你的 Azure 订阅\n\n大多数存储命令没有 Azure 订阅也可以使用，不过我们仍建议你通过 Azure CLI 连接到你的订阅。若要配置 Azure CLI 以使用你的订阅，请遵循[如何连接到 Azure 订阅](/documentation/articles/xplat-cli-install#how-to-connect-to-your-azure-subscription)中的步骤。\n\n### 新建存储帐户\n\n若要使用 Azure 存储服务，你需要一个存储帐户。可以在将计算机配置为连接到订阅之后，创建新的 Azure 存储帐户。\n\n        azure storage account create <account_name>\n\n存储帐户名称必须为 3 到 24 个字符，并且只能使用数字和小写字母。\n\n### 在环境变量中设置默认的 Azure 存储帐户\n\n可以在订阅中设置多个存储帐户。你可以选择其中的一个存储帐户，并在环境变量中将其设置为同一会话中所有存储命令的默认存储帐户。这样，你便可以在不显式指定存储帐户和密钥的情况下运行 Azure CLI 存储命令。\n\n        export AZURE_STORAGE_ACCOUNT=<account_name>\n        export AZURE_STORAGE_ACCESS_KEY=<key>\n\n若要设置默认存储帐户，另一种方法是使用连接字符串。首先，通过以下命令获取连接字符串：\n\n        azure storage account connectionstring show <account_name>\n\n然后复制输出连接字符串，并将其设置为环境变量：\n\n        export AZURE_STORAGE_CONNECTION_STRING=<connection_string>\n\n## 创建并管理 blob\n\nAzure Blob 存储是用于存储大量非结构化数据（例如文本或二进制数据）的服务，这些数据可通过 HTTP 或 HTTPS 从世界各地进行访问。本部分假设你已熟悉 Azure Blob 存储的概念。有关详细信息，请参阅[如何通过 .NET 使用 Blob 存储](/documentation/articles/storage-dotnet-how-to-use-blobs)和 [Blob 服务概念](http://msdn.microsoft.com/zh-cn/library/azure/dd179376.aspx)。\n\n### 创建容器\n\nAzure 存储服务中的每个 Blob 都必须在容器中。你可以使用 `azure storage container create` 命令创建专用容器：\n\n        azure storage container create mycontainer\n\n> [AZURE.NOTE]有三种级别的匿名读取访问权限：**Off**、**Blob** 和 **Container**。若要防止对 Blob 进行匿名访问，请将 Permission 参数设置为 **Off**。默认情况下，新容器是专用容器，只能由帐户所有者访问。若要允许对 Blob 资源进行匿名公共读取访问，但不允许访问容器元数据或容器中的 Blob 列表，请将 Permission 参数设置为 **Blob**。若要允许对 Blob 资源、容器元数据和容器中的 Blob 列表进行完全公开读取访问，请将 Permission 参数设置为 **Container**。有关详细信息，请参阅[管理对 Azure 存储资源的访问](/documentation/articles/storage-manage-access-to-resources)。\n\n### 将 Blob 上载到容器中\n\nAzure Blob 存储支持块 Blob 和页 Blob。有关详细信息，请参阅[了解块 Blob 和页 Blob](http://msdn.microsoft.com/zh-cn/library/azure/ee691964.aspx)。\n\n若要将 blob 上载到容器，可使用 `azure storage blob upload`。默认情况下，此命令会将本地文件上载到块 Blob。若要指定 Blob 的类型，可以使用 `--blobtype` 参数。\n\n        azure storage blob upload '~/images/HelloWorld.png' mycontainer myBlockBlob\n\n### 从容器下载 Blob\n\n以下示例演示如何从容器下载 Blob。\n\n        azure storage blob download mycontainer myBlockBlob '~/downloadImages/downloaded.png'\n\n### 复制 blob\n\n你可以在存储帐户和区域内或跨存储帐户和区域异步复制 Blob。\n\n以下示例演示如何将一个存储帐户中的 Blob 复制到另一个存储帐户。在此示例中，我们创建了一个容器，其中的 blob 可以进行公开、匿名的访问。\n\n    azure storage container create mycontainer2 -a <accountName2> -k <accountKey2> -p Blob\n\n    azure storage blob upload '~/Images/HelloWorld.png' mycontainer2 myBlockBlob2 -a <accountName2> -k <accountKey2>\n\n    azure storage blob copy start 'https://<accountname2>.blob.core.chinacloudapi.cn/mycontainer2/myBlockBlob2' mycontainer\n\n此示例将执行异步复制。你可以通过运行 `azure storage blob copy show` 操作来监视每个复制操作的状态。\n\n请注意，所提供的用于复制操作的源 URL 必须可以公开访问，或者必须包括一个 SAS（共享访问签名）令牌。\n\n### 删除 Blob\n\n若要删除 blob，请使用以下命令：\n\n        azure storage blob delete mycontainer myBlockBlob2\n\n##<a id=\"create-and-manage-file-shares\"></a> 创建和管理文件共享\n\nAzure 文件存储使用标准 SMB 协议为应用程序提供共享存储。Azure 虚拟机和云服务以及本地应用程序可以通过装载的共享来共享文件数据。你可以通过 Azure CLI 管理文件共享和文件数据。有关 Azure 文件存储的详细信息，请参阅[如何通过 Windows 使用 Azure 文件存储](/documentation/articles/storage-dotnet-how-to-use-files)或[如何通过 Linux 使用 Azure 文件存储](/documentation/articles/storage-how-to-use-files-linux)。\n\n### 创建文件共享\n\nAzure 文件共享是 Azure 中的 SMB 文件共享。所有目录和文件都必须在文件共享中创建。一个帐户可以包含无限数量的共享，一个共享可以存储无限数量的文件，直到达到存储帐户的容量限制为止。下面的示例创建名为 **myshare** 的文件共享。\n\n        azure storage share create myshare\n\n### 创建目录\n\n目录提供了进行 Azure 文件共享时可以选择的层次结构。以下示例在文件共享中创建名为 **myDir** 的目录。\n\n        azure storage directory create myshare myDir\n\n请注意，目录路径可以包括多个级别，*例如* **a/b**。但是，你必须确保所有父目录都存在。例如，对于路径 **a/b**，你必须先创建目录 **a**，然后创建目录 **b**。\n\n### 将本地文件上载到目录\n\n以下示例将文件从 **~/temp/samplefile.txt** 上载到 **myDir** 目录。请编辑文件路径，使其指向你本地计算机上的有效文件：\n\n        azure storage file upload '~/temp/samplefile.txt' myshare myDir\n\n请注意，共享中的文件最大可以为 1 TB。\n\n### 列出共享根目录或目录中的文件\n\n可以使用以下命令列出共享根目录或目录中的文件和子目录：\n\n        azure storage file list myshare myDir\n\n请注意，进行列表操作时，目录名是可选的。如果省略目录名，该命令会列出共享中根目录的内容。\n\n### 复制文件\n\n从 Azure CLI 的 0.9.8 版开始，可以将一个文件复制到另一个文件，将一个文件复制到一个 Blob，或将一个 Blob 复制到一个文件。下面，我们演示如何使用 CLI 命令执行这些复制操作。若要将文件复制到新目录中：\n\n    azure storage file copy start --source-share srcshare --source-path srcdir/hello.txt --dest-share destshare --dest-path destdir/hellocopy.txt --connection-string $srcConnectionString --dest-connection-string $destConnectionString\n    \n若要将 blob 复制到一个文件目录中：\n\n    azure storage file copy start --source-container srcctn --source-blob hello2.txt --dest-share hello --dest-path hellodir/hello2copy.txt --connection-string $srcConnectionString --dest-connection-string $destConnectionString\n\n## 后续步骤\n\n下面是一些相关的文章和资源，可以让你更多地了解 Azure 存储服务。\n\n- [Azure 存档文档](/documentation/services/storage)\n- [Azure 存储 REST API 引用](https://msdn.microsoft.com/zh-cn/library/azure/dd179355.aspx)\n\n\n[Image1]: ./media/storage-azure-cli/azure_command.png\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

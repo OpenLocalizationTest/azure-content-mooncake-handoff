@@ -1,0 +1,264 @@
+{
+  "nodes": [
+    {
+      "content": "在云服务角色上安装 .NET",
+      "pos": [
+        26,
+        40
+      ]
+    },
+    {
+      "content": "本文介绍如何在云服务 Web 角色和辅助角色上手动安装 .NET Framework",
+      "pos": [
+        58,
+        100
+      ]
+    },
+    {
+      "content": "在云服务角色上安装 .NET",
+      "pos": [
+        308,
+        322
+      ]
+    },
+    {
+      "pos": [
+        325,
+        540
+      ],
+      "content": "本文介绍如何在云服务 Web 角色和辅助角色上安装 .NET Framework。可以使用以下步骤在 Azure 来宾 OS 系列 4 上安装 .NET Framework 4.5.2 或 .NET 4.6。有关最新的来宾 OS 版本信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 来宾 OS 版本和 SDK 兼容性对照表<ept id=\"p1\">](/documentation/articles/cloud-services-guestos-update-matrix)</ept>。"
+    },
+    {
+      "content": "在 Web 角色和辅助角色上安装 .NET 的过程涉及到在云项目中添加 .NET 安装包，并在执行角色的启动任务过程中启动安装程序。",
+      "pos": [
+        542,
+        608
+      ]
+    },
+    {
+      "content": "将 .NET 安装程序添加到项目",
+      "pos": [
+        613,
+        629
+      ]
+    },
+    {
+      "content": "下载你要安装的.NET Framework 的 Web 安装程序",
+      "pos": [
+        633,
+        665
+      ]
+    },
+    {
+      "content": ".NET 4.5.2 Web 安装程序",
+      "pos": [
+        673,
+        692
+      ]
+    },
+    {
+      "content": ".NET 4.6 Web 安装程序",
+      "pos": [
+        750,
+        767
+      ]
+    },
+    {
+      "content": ".NET 4.6.1 Web 安装程序",
+      "pos": [
+        823,
+        842
+      ]
+    },
+    {
+      "content": "对于 Web 角色",
+      "pos": [
+        894,
+        903
+      ]
+    },
+    {
+      "pos": [
+        909,
+        980
+      ],
+      "content": "在“解决方案资源管理器”中，于云服务项目中的“角色”下，右键单击你的角色，然后选择“添加 &gt; 新文件夹”。创建一个名为 <bpt id=\"p1\">*</bpt>bin<ept id=\"p1\">*</ept> 的文件夹。"
+    },
+    {
+      "pos": [
+        986,
+        1046
+      ],
+      "content": "右键单击 <bpt id=\"p1\">**</bpt>bin<ept id=\"p1\">**</ept> 文件夹，然后选择“添加 &gt; 现有项”。选择 .NET 安装程序，并将它添加到 bin 文件夹。"
+    },
+    {
+      "content": "对于辅助角色",
+      "pos": [
+        1050,
+        1056
+      ]
+    },
+    {
+      "content": "右键单击你的角色，然后选择“添加 &gt; 现有项”。选择 .NET 安装程序，并将它添加到角色。",
+      "pos": [
+        1062,
+        1108
+      ]
+    },
+    {
+      "content": "以此方式添加到角色内容文件夹的文件会自动添加到云服务包，并部署到虚拟机上的一致位置。对云服务中的所有 Web 和辅助角色重复此过程，使所有角色都有安装程序的副本。",
+      "pos": [
+        1111,
+        1192
+      ]
+    },
+    {
+      "content": "包含安装程序文件的角色内容",
+      "pos": [
+        1196,
+        1209
+      ]
+    },
+    {
+      "content": "为角色定义启动任务",
+      "pos": [
+        1218,
+        1227
+      ]
+    },
+    {
+      "pos": [
+        1228,
+        1403
+      ],
+      "content": "启动任务可让你在启动角色之前执行操作。将 .NET Framework 作为启动任务的一部分安装，可确保在运行任何应用程序代码之前已安装好 Framework。有关启动任务的详细信息，请参阅<bpt id=\"p1\">[</bpt>在 Azure 中运行启动任务<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/hh180155.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        1408,
+        1483
+      ],
+      "content": "将以下内容添加所有角色的 <bpt id=\"p1\">**</bpt>WebRole<ept id=\"p1\">**</ept> <bpt id=\"p2\">**</bpt>或WorkerRole<ept id=\"p2\">**</ept> 节点下的 <bpt id=\"p3\">*</bpt>ServiceDefinition.csdef<ept id=\"p3\">*</ept> 文件："
+    },
+    {
+      "pos": [
+        2017,
+        2298
+      ],
+      "content": "上述配置将使用管理员特权来执行控制台命令<bpt id=\"p1\">*</bpt>install.cmd<ept id=\"p1\">*</ept>，以安装 .NET Framework。该配置还会创建名为 <bpt id=\"p2\">*</bpt>NETFXInstall<ept id=\"p2\">*</ept> 的 LocalStorage。启动脚本会将临时文件夹设置为使用此本地存储资源，以便从此资源下载并安装 .NET Framework 安装程序。必须将此资源的大小设置为至少 1024MB，以确保能够正确安装 Framework。有关详细信息，请参阅：<bpt id=\"p3\">[</bpt>在启动时使用本地存储来存储文件<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/azure/hh974419.aspx)</ept>"
+    },
+    {
+      "pos": [
+        2303,
+        2404
+      ],
+      "content": "创建文件 <bpt id=\"p1\">**</bpt>install.cmd<ept id=\"p1\">**</ept>，然后右键单击角色并选择“添加 &gt; 现有项...”将此文件添加到所有角色。因此，所有角色现在应该都有 .NET 安装程序文件，以及 install.cmd 文件。"
+    },
+    {
+      "content": "包含所有文件的角色内容",
+      "pos": [
+        2416,
+        2427
+      ]
+    },
+    {
+      "pos": [
+        2439,
+        2613
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>使用记事本之类的简单文字编辑器来创建这个文件。如果使用 Visual Studio 来创建文本文件，然后将它重命名为“.cmd”，则此文件可能仍包含 UTF-8 字节顺序标记，并在运行第一行脚本时出现错误。如果你要使用 Visual Studio 来创建文件，请在文件的第一行保留添加 REM（备注），以便在运行时将它忽略。"
+    },
+    {
+      "pos": [
+        2618,
+        2646
+      ],
+      "content": "将以下脚本添加到 <bpt id=\"p1\">**</bpt>install.cmd<ept id=\"p1\">**</ept> 文件："
+    },
+    {
+      "pos": [
+        4913,
+        5095
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>更新脚本中 <bpt id=\"p1\">*</bpt>netfx<ept id=\"p1\">*</ept> 变量的值，使其与你要安装的 Framework 版本匹配。若要安装 .NET 4.5.2，<bpt id=\"p2\">*</bpt>netfx<ept id=\"p2\">*</ept> 变量应设置为 <bpt id=\"p3\">*</bpt>\"NDP452\"<ept id=\"p3\">*</ept>；若要安装 .NET 4.6，<bpt id=\"p4\">*</bpt>netfx<ept id=\"p4\">*</ept> 变量应设置为 <bpt id=\"p5\">*</bpt>\"NDP46\"<ept id=\"p5\">*</ept>；若要安装 .NET 4.6.1，<bpt id=\"p6\">*</bpt>netfx<ept id=\"p6\">*</ept> 变量应设置为 <bpt id=\"p7\">*</bpt>\"NDP461\"<ept id=\"p7\">*</ept>"
+    },
+    {
+      "pos": [
+        5109,
+        5282
+      ],
+      "content": "安装脚本将通过查询注册表来检查指定的 .NET Framework 版本是否已安装在计算机上。如果未安装该 .NET 版本，.Net Web 安装程序将会启动。为帮助排查任何问题，该脚本会将所有活动记录到名为 <bpt id=\"p1\">*</bpt>startuptasklog-(currentdatetime).txt<ept id=\"p1\">*</ept> 的文件（存储在 <bpt id=\"p2\">*</bpt>InstallLogs<ept id=\"p2\">*</ept> 本地存储中）。"
+    },
+    {
+      "content": "配置诊断以将启动任务日志传输到 Blob 存储（可选）",
+      "pos": [
+        5296,
+        5323
+      ]
+    },
+    {
+      "content": "你可以选择性地配置 Azure 诊断，将启动脚本或 .NET 安装程序生成的任何日志文件传输到 Blob 存储。使用这种方法可以从 Blob 存储直接下载日志文件，而无需通过远程桌面访问角色，即可查看日志。",
+      "pos": [
+        5324,
+        5427
+      ]
+    },
+    {
+      "pos": [
+        5429,
+        5491
+      ],
+      "content": "若要配置诊断，请打开 <bpt id=\"p1\">*</bpt>diagnostics.wadcfgx<ept id=\"p1\">*</ept>，并在 <bpt id=\"p2\">**</bpt>Directories<ept id=\"p2\">**</ept> 节点下添加以下内容："
+    },
+    {
+      "pos": [
+        5676,
+        5763
+      ],
+      "content": "这会将 Azure 诊断配置为将 <bpt id=\"p1\">*</bpt>NETFXInstall<ept id=\"p1\">*</ept> 资源下的 <bpt id=\"p2\">*</bpt>log<ept id=\"p2\">*</ept> 目录中的所有文件传输到 <bpt id=\"p3\">*</bpt>netfx-install<ept id=\"p3\">*</ept> Blob 容器中的诊断存储帐户。"
+    },
+    {
+      "content": "部署服务",
+      "pos": [
+        5768,
+        5772
+      ]
+    },
+    {
+      "content": "部署服务时，启动任务将会运行并安装 .NET Framework（如果尚未安装）。安装 Framework 时，角色将处于忙碌状态，而且甚到可能会重新启动（如果 Framework 安装有此要求）。",
+      "pos": [
+        5774,
+        5873
+      ]
+    },
+    {
+      "content": "其他资源",
+      "pos": [
+        5879,
+        5883
+      ]
+    },
+    {
+      "content": "安装 .NET Framework",
+      "pos": [
+        5888,
+        5905
+      ]
+    },
+    {
+      "content": "如何：确定安装的 .NET Framework 版本",
+      "pos": [
+        5912,
+        5938
+      ]
+    },
+    {
+      "content": ".NET Framework 安装疑难解答",
+      "pos": [
+        5945,
+        5966
+      ]
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"在云服务角色上安装 .NET\"\n   description=\"本文介绍如何在云服务 Web 角色和辅助角色上手动安装 .NET Framework\"\n   services=\"cloud-services\"\n   documentationCenter=\".net\"\n   authors=\"sbtron\"\n   manager=\"timlt\"\n   editor=\"\"/>\n\n<tags\n   ms.service=\"cloud-services\"\n   ms.date=\"12/11/2015\"\n   wacn.date=\"01/15/2016\"/>\n\n# 在云服务角色上安装 .NET \n\n本文介绍如何在云服务 Web 角色和辅助角色上安装 .NET Framework。可以使用以下步骤在 Azure 来宾 OS 系列 4 上安装 .NET Framework 4.5.2 或 .NET 4.6。有关最新的来宾 OS 版本信息，请参阅 [Azure 来宾 OS 版本和 SDK 兼容性对照表](/documentation/articles/cloud-services-guestos-update-matrix)。\n\n在 Web 角色和辅助角色上安装 .NET 的过程涉及到在云项目中添加 .NET 安装包，并在执行角色的启动任务过程中启动安装程序。\n\n## 将 .NET 安装程序添加到项目\n1. 下载你要安装的.NET Framework 的 Web 安装程序\n    - [.NET 4.5.2 Web 安装程序](http://go.microsoft.com/fwlink/p/?LinkId=397703)\n    - [.NET 4.6 Web 安装程序](http://go.microsoft.com/fwlink/?LinkId=528259)\n    - [.NET 4.6.1 Web 安装程序](http://go.microsoft.com/fwlink/?LinkId=671729)\n2. 对于 Web 角色\n  1. 在“解决方案资源管理器”中，于云服务项目中的“角色”下，右键单击你的角色，然后选择“添加 > 新文件夹”。创建一个名为 *bin* 的文件夹。\n  2. 右键单击 **bin** 文件夹，然后选择“添加 > 现有项”。选择 .NET 安装程序，并将它添加到 bin 文件夹。\n3. 对于辅助角色\n  1. 右键单击你的角色，然后选择“添加 > 现有项”。选择 .NET 安装程序，并将它添加到角色。 \n\n以此方式添加到角色内容文件夹的文件会自动添加到云服务包，并部署到虚拟机上的一致位置。对云服务中的所有 Web 和辅助角色重复此过程，使所有角色都有安装程序的副本。\n\n![包含安装程序文件的角色内容][1]\n\n## 为角色定义启动任务\n启动任务可让你在启动角色之前执行操作。将 .NET Framework 作为启动任务的一部分安装，可确保在运行任何应用程序代码之前已安装好 Framework。有关启动任务的详细信息，请参阅[在 Azure 中运行启动任务](https://msdn.microsoft.com/zh-cn/library/azure/hh180155.aspx)。\n\n1. 将以下内容添加所有角色的 **WebRole** **或WorkerRole** 节点下的 *ServiceDefinition.csdef* 文件：\n    \n    ```xml\n     <LocalResources>\n      <LocalStorage name=\"NETFXInstall\" sizeInMB=\"1024\" cleanOnRoleRecycle=\"false\" />\n    </LocalResources>\n    <Startup>\n      <Task commandLine=\"install.cmd\" executionContext=\"elevated\" taskType=\"simple\">\n        <Environment>\n          <Variable name=\"PathToNETFXInstall\">\n            <RoleInstanceValue xpath=\"/RoleEnvironment/CurrentInstance/LocalResources/LocalResource[@name='NETFXInstall']/@path\" />\n          </Variable>\n        </Environment>\n      </Task>\n    </Startup>\n    ```\n\n    上述配置将使用管理员特权来执行控制台命令*install.cmd*，以安装 .NET Framework。该配置还会创建名为 *NETFXInstall* 的 LocalStorage。启动脚本会将临时文件夹设置为使用此本地存储资源，以便从此资源下载并安装 .NET Framework 安装程序。必须将此资源的大小设置为至少 1024MB，以确保能够正确安装 Framework。有关详细信息，请参阅：[在启动时使用本地存储来存储文件](https://msdn.microsoft.com/zh-cn/library/azure/hh974419.aspx)\n\n2. 创建文件 **install.cmd**，然后右键单击角色并选择“添加 > 现有项...”将此文件添加到所有角色。因此，所有角色现在应该都有 .NET 安装程序文件，以及 install.cmd 文件。\n    \n    ![包含所有文件的角色内容][2]\n\n    > [AZURE.NOTE]使用记事本之类的简单文字编辑器来创建这个文件。如果使用 Visual Studio 来创建文本文件，然后将它重命名为“.cmd”，则此文件可能仍包含 UTF-8 字节顺序标记，并在运行第一行脚本时出现错误。如果你要使用 Visual Studio 来创建文件，请在文件的第一行保留添加 REM（备注），以便在运行时将它忽略。\n\n3. 将以下脚本添加到 **install.cmd** 文件：\n\n    ```\n    REM Set the value of netfx to install appropriate .NET Framework. \n    REM ***** To install .NET 4.5.2 set the variable netfx to \"NDP452\" *****\n    REM ***** To install .NET 4.6 set the variable netfx to \"NDP46\" *****\n    REM ***** To install .NET 4.6.1 set the variable netfx to \"NDP461\" *****\n    set netfx=\"NDP46\"\n        \n    \n    REM ***** Needed to correctly install .NET 4.6.1, otherwise you may see an out of disk space error *****\n    set TMP=%PathToNETFXInstall%\n    set TEMP=%PathToNETFXInstall%\n    \n        \n    REM ***** Setup .NET filenames and registry keys *****\n    if %netfx%==\"NDP461\" goto NDP461\n    if %netfx%==\"NDP46\" goto NDP46\n        set netfxinstallfile=\"NDP452-KB2901954-Web.exe\"\n        set netfxregkey=\"0x5cbf5\"\n        goto logtimestamp\n        \n    :NDP46\n    set netfxinstallfile=\"NDP46-KB3045560-Web.exe\"\n    set netfxregkey=\"0x60051\"\n    goto logtimestamp\n        \n    :NDP461\n    set netfxinstallfile=\"NDP461-KB3102438-Web.exe\"\n    set netfxregkey=\"0x6041f\"\n        \n    :logtimestamp\n    REM ***** Setup LogFile with timestamp *****\n    set timehour=%time:~0,2%\n    set timestamp=%date:~-4,4%%date:~-10,2%%date:~-7,2%-%timehour: =0%%time:~3,2%\n    md \"%PathToNETFXInstall%\\log\"\n    set startuptasklog=\"%PathToNETFXInstall%log\\startuptasklog-%timestamp%.txt\"\n    set netfxinstallerlog=\"%PathToNETFXInstall%log\\NetFXInstallerLog-%timestamp%\"\n    \n    echo Logfile generated at: %startuptasklog% >> %startuptasklog%\n    echo TMP set to: %TMP% >> %startuptasklog%\n    echo TEMP set to: %TEMP% >> %startuptasklog%\n    \n    REM ***** Check if .NET is installed *****\n    echo Checking if .NET (%netfx%) is installed >> %startuptasklog%\n    reg query \"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full\" /v Release | Find %netfxregkey%\n    if %ERRORLEVEL%== 0 goto end\n        \n    REM ***** Installing .NET *****\n    echo Installing .NET: start /wait %~dp0%netfxinstallfile% /q /serialdownload /log %netfxinstallerlog% >> %startuptasklog%\n    start /wait %~dp0%netfxinstallfile% /q /serialdownload /log %netfxinstallerlog% >> %startuptasklog% 2>>&1\n        \n    :end\n    echo install.cmd completed: %date:~-4,4%%date:~-10,2%%date:~-7,2%-%timehour: =0%%time:~3,2% >> %startuptasklog%\n\n    ```\n    \n    > [AZURE.IMPORTANT]更新脚本中 *netfx* 变量的值，使其与你要安装的 Framework 版本匹配。若要安装 .NET 4.5.2，*netfx* 变量应设置为 *\"NDP452\"*；若要安装 .NET 4.6，*netfx* 变量应设置为 *\"NDP46\"*；若要安装 .NET 4.6.1，*netfx* 变量应设置为 *\"NDP461\"*\n        \n    安装脚本将通过查询注册表来检查指定的 .NET Framework 版本是否已安装在计算机上。如果未安装该 .NET 版本，.Net Web 安装程序将会启动。为帮助排查任何问题，该脚本会将所有活动记录到名为 *startuptasklog-(currentdatetime).txt* 的文件（存储在 *InstallLogs* 本地存储中）。\n \n      \n\n## 配置诊断以将启动任务日志传输到 Blob 存储（可选）\n你可以选择性地配置 Azure 诊断，将启动脚本或 .NET 安装程序生成的任何日志文件传输到 Blob 存储。使用这种方法可以从 Blob 存储直接下载日志文件，而无需通过远程桌面访问角色，即可查看日志。\n\n若要配置诊断，请打开 *diagnostics.wadcfgx*，并在 **Directories** 节点下添加以下内容：\n\n```xml \n<DataSources>\n <DirectoryConfiguration containerName=\"netfx-install\">\n  <LocalResource name=\"NETFXInstall\" relativePath=\"log\"/>\n </DirectoryConfiguration>\n</DataSources>\n```\n\n这会将 Azure 诊断配置为将 *NETFXInstall* 资源下的 *log* 目录中的所有文件传输到 *netfx-install* Blob 容器中的诊断存储帐户。\n\n## 部署服务 \n部署服务时，启动任务将会运行并安装 .NET Framework（如果尚未安装）。安装 Framework 时，角色将处于忙碌状态，而且甚到可能会重新启动（如果 Framework 安装有此要求）。\n\n\n## 其他资源\n\n- [安装 .NET Framework][]\n- [如何：确定安装的 .NET Framework 版本][]\n- [.NET Framework 安装疑难解答][]\n\n[如何：确定安装的 .NET Framework 版本]: https://msdn.microsoft.com/zh-cn/library/hh925568.aspx\n[安装 .NET Framework]: https://msdn.microsoft.com/zh-cn/library/5a4x27ek.aspx\n[.NET Framework 安装疑难解答]: https://msdn.microsoft.com/zh-cn/library/hh925569.aspx\n\n<!--Image references-->\n[1]: ./media/cloud-services-dotnet-install-dotnet/rolecontentwithinstallerfiles.png\n[2]: ./media/cloud-services-dotnet-install-dotnet/rolecontentwithallfiles.png\n\n \n\n<!---HONumber=Mooncake_0104_2016-->\n"
+}

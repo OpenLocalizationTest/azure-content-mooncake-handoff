@@ -1,0 +1,61 @@
+{
+  "nodes": [
+    {
+      "pos": [
+        0,
+        194
+      ],
+      "content": "在本节中，我们将通过添加一个名为 <bpt id=\"p1\">**</bpt>CompleteDate<ept id=\"p1\">**</ept> 的新时间戳字段，修改数据库的模型。此字段将记录上一次完成 Todo 项的时间。实体框架将使用派生自 <bpt id=\"p2\">[</bpt>DropCreateDatabaseIfModelChanges<ept id=\"p2\">](http://go.microsoft.com/fwlink/?LinkId=394621)</ept> 的默认数据库初始程序类，基于我们的模型更改来更新数据库。"
+    },
+    {
+      "pos": [
+        200,
+        288
+      ],
+      "content": "在 Visual Studio 的解决方案资源管理器中，展开 todolist 服务项目中的 <bpt id=\"p1\">**</bpt>App\\_Start<ept id=\"p1\">**</ept> 文件夹。打开 WebApiConfig.cs 文件。"
+    },
+    {
+      "pos": [
+        293,
+        485
+      ],
+      "content": "请注意，在 WebApiConfig.cs 文件中，默认数据库初始值设定项类是从  <ph id=\"ph1\">`DropCreateDatabaseIfModelChanges`</ph> 类派生的。这意味着，对该模型的任何更改将导致表被删除并重新创建，以适应新模型。因此表中的数据将丢失，并且表将重新植入。修改数据库初始值设定项的 Seed 方法，使得种子数据如下所示，然后保存 WebApiConfig.cs 文件。"
+    },
+    {
+      "pos": [
+        492,
+        719
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>使用默认数据库初始值设定项时，只要实体框架在代码优先模型定义中检测到数据模型更改，它就会删除并重新创建数据库。若要进行此数据模型更改并维护数据库中的现有数据，必须使用代码优先迁移。有关更多信息，请参阅<bpt id=\"p1\">[</bpt>如何使用代码优先迁移来更新数据模型<ept id=\"p1\">](/zh-cn/documentation/articles/mobile-services-dotnet-backend-how-to-use-code-first-migrations)</ept>。"
+    },
+    {
+      "pos": [
+        969,
+        1112
+      ],
+      "content": "在 Visual Studio 的解决方案资源管理器中，展开 todolist 服务项目中的 <bpt id=\"p1\">**</bpt>DataObjects<ept id=\"p1\">**</ept> 文件夹。打开 TodoItem.cs 文件并更新 TodoItem 类以包括 CompleteDate 字段，如下所示。然后保存 TodoItem.cs 文件。"
+    },
+    {
+      "pos": [
+        1330,
+        1541
+      ],
+      "content": "在 Visual Studio 的解决方案资源管理器中，展开 todolist 服务项目中的 <bpt id=\"p1\">**</bpt>Controllers<ept id=\"p1\">**</ept> 文件夹。打开 TodoItemController.cs 文件并更新  <ph id=\"ph1\">`PatchTodoItem`</ph> 方法，这样当 <bpt id=\"p2\">**</bpt>Complete<ept id=\"p2\">**</ept> 属性从 false 更改为 true 时，该方法将会设置 <bpt id=\"p3\">**</bpt>CompleteDate<ept id=\"p3\">**</ept>。然后保存 TodoItemController.cs 文件。"
+    },
+    {
+      "content": "重新生成 todolist .NET 后端服务项目，并确认没有生成错误。",
+      "pos": [
+        2005,
+        2041
+      ]
+    },
+    {
+      "pos": [
+        2044,
+        2084
+      ],
+      "content": "接下来，您将更新客户端应用，以显示新的 <bpt id=\"p1\">**</bpt>CompleteDate<ept id=\"p1\">**</ept> 数据。"
+    }
+  ],
+  "content": "在本节中，我们将通过添加一个名为 **CompleteDate** 的新时间戳字段，修改数据库的模型。此字段将记录上一次完成 Todo 项的时间。实体框架将使用派生自 [DropCreateDatabaseIfModelChanges](http://go.microsoft.com/fwlink/?LinkId=394621) 的默认数据库初始程序类，基于我们的模型更改来更新数据库。 \n\n1. 在 Visual Studio 的解决方案资源管理器中，展开 todolist 服务项目中的 **App\\_Start** 文件夹。打开 WebApiConfig.cs 文件。\n\n2. 请注意，在 WebApiConfig.cs 文件中，默认数据库初始值设定项类是从  `DropCreateDatabaseIfModelChanges` 类派生的。这意味着，对该模型的任何更改将导致表被删除并重新创建，以适应新模型。因此表中的数据将丢失，并且表将重新植入。修改数据库初始值设定项的 Seed 方法，使得种子数据如下所示，然后保存 WebApiConfig.cs 文件。\n\n    >[AZURE.NOTE]使用默认数据库初始值设定项时，只要实体框架在代码优先模型定义中检测到数据模型更改，它就会删除并重新创建数据库。若要进行此数据模型更改并维护数据库中的现有数据，必须使用代码优先迁移。有关更多信息，请参阅[如何使用代码优先迁移来更新数据模型](/zh-cn/documentation/articles/mobile-services-dotnet-backend-how-to-use-code-first-migrations)。\n\n        List<TodoItem> todoItems = new List<TodoItem>\n        {\n          new TodoItem { Id = \"1\", Text = \"First seed item\", Complete = false },\n          new TodoItem { Id = \"2\", Text = \"Second seed item\", Complete = false },\n        };\n     \n\n3. 在 Visual Studio 的解决方案资源管理器中，展开 todolist 服务项目中的 **DataObjects** 文件夹。打开 TodoItem.cs 文件并更新 TodoItem 类以包括 CompleteDate 字段，如下所示。然后保存 TodoItem.cs 文件。\n\n        public class TodoItem : EntityData\n        {\n          public string Text { get; set; }\n          public bool Complete { get; set; }\n          public System.DateTime? CompleteDate { get; set; }\n        }\n\n4. 在 Visual Studio 的解决方案资源管理器中，展开 todolist 服务项目中的 **Controllers** 文件夹。打开 TodoItemController.cs 文件并更新  `PatchTodoItem` 方法，这样当 **Complete** 属性从 false 更改为 true 时，该方法将会设置 **CompleteDate**。然后保存 TodoItemController.cs 文件。\n\n        public Task<TodoItem> PatchTodoItem(string id, Delta<TodoItem> patch)\n        {\n            // If complete is being set to true and was false, set CompleteDate\n            if ((patch.GetEntity().Complete == true) &&\n                (GetTodoItem(id).Queryable.Single().Complete == false))\n            {\n                patch.TrySetPropertyValue(\"CompleteDate\", System.DateTime.Now);\n            }\n            return UpdateAsync(id, patch);\n        }\n\n\n5. 重新生成 todolist .NET 后端服务项目，并确认没有生成错误。 \n\n接下来，您将更新客户端应用，以显示新的 **CompleteDate** 数据。\n<!---HONumber=74-->"
+}

@@ -1,0 +1,698 @@
+{
+  "nodes": [
+    {
+      "content": "Azure Batch 中的高效列表查询 | Azure",
+      "pos": [
+        27,
+        55
+      ]
+    },
+    {
+      "content": "在查询 Azure Batch 实体（例如池、作业、任务和计算节点）时通过减少返回的数据量来提高性能。",
+      "pos": [
+        74,
+        125
+      ]
+    },
+    {
+      "content": "有效地查询 Azure 批处理 ( batch ) 服务",
+      "pos": [
+        355,
+        383
+      ]
+    },
+    {
+      "pos": [
+        385,
+        475
+      ],
+      "content": "在本文中，你将了解在使用 <bpt id=\"p1\">[</bpt>Batch .NET<ept id=\"p1\">][api_net]</ept> API 查询 Azure Batch 服务以获取作业、任务、计算节点等项的列表时，如何减少返回的项数和数据量。"
+    },
+    {
+      "content": "Azure Batch 提供大型计算功能 -- 在生产环境中，作业、任务和计算节点等实体的数目成千上万。因此，获取这些项的信息时，可能会生成大量的数据，这些数据在每次查询时都必须进行传输。通过限制每次查询时返回的项数和信息类型，可以提高查询速度，因此也会提高应用程序的性能。",
+      "pos": [
+        477,
+        614
+      ]
+    },
+    {
+      "content": "列出作业、列出任务、列出计算节点 -- 这些是几乎每个使用 Azure Batch 的应用程序都会执行的操作示例，而且这些操作的执行频率很高。常见的用例是监视。例如，若要确定池的容量和状态，必须查询该池中的所有计算节点。另一个示例是查询作业的任务，以便确定是否有任务仍在排队。",
+      "pos": [
+        616,
+        754
+      ]
+    },
+    {
+      "pos": [
+        756,
+        812
+      ],
+      "content": "此 <bpt id=\"p1\">[</bpt>Batch .NET<ept id=\"p1\">][api_net]</ept> API 代码段检索所有与作业关联的任务，以及这些任务的全部属性："
+    },
+    {
+      "pos": [
+        990,
+        1123
+      ],
+      "content": "但是，可以执行高效得多的列表查询。在 <bpt id=\"p1\">[</bpt>JobOperations.ListTasks<ept id=\"p1\">][net_list_tasks]</ept> 方法中提供 <bpt id=\"p2\">[</bpt>ODATADetailLevel<ept id=\"p2\">][odata]</ept> 对象即可实现此目的。此代码段仅返回已完成任务的 ID、命令行和计算节点信息属性："
+    },
+    {
+      "content": "在上面的示例方案中，如果作业中存在数以千计的任务，则通常情况下，第二个查询的结果的返回速度将远远快于第一个查询。下面提供了有关使用 Batch .NET API 列出项时使用 ODATADetailLevel 的详细信息。",
+      "pos": [
+        1549,
+        1660
+      ]
+    },
+    {
+      "content": "强烈建议你 <bpt id=\"p1\">*</bpt>始终<ept id=\"p1\">*</ept> 将 ODATADetailLevel 对象提供给 .NET API 列表调用，以确保最大程度地提高应用程序的效率和性能。指定详细程度有助于缩短 Batch 服务响应时间、提高网络利用率，以及最大程度减少客户端应用程序的内存使用量。",
+      "pos": [
+        1682,
+        1808
+      ]
+    },
+    {
+      "content": "高效查询工具",
+      "pos": [
+        1813,
+        1819
+      ]
+    },
+    {
+      "pos": [
+        1821,
+        1955
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Batch .NET<ept id=\"p1\">][api_net]</ept> 和 <bpt id=\"p2\">[</bpt>Batch REST<ept id=\"p2\">][api_rest]</ept> API 可以减少列表中返回的项数以及针对每个查询返回的信息量。在执行列表查询时可以通过指定 <bpt id=\"p3\">*</bpt>filter<ept id=\"p3\">*</ept> 、 <bpt id=\"p4\">*</bpt>select<ept id=\"p4\">*</ept> 和 <bpt id=\"p5\">*</bpt>expand<ept id=\"p5\">*</ept> 字符串来实现此目的。"
+    },
+    {
+      "pos": [
+        1959,
+        2038
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Filter<ept id=\"p1\">**</ept> -- <bpt id=\"p2\">*</bpt>filter 字符串<ept id=\"p2\">*</ept> 是一个表达式，用于减少返回的项数。例如，只列出作业的运行中任务，或者只列出已做好运行任务准备的计算节点。"
+    },
+    {
+      "content": "filter 字符串包含一个或多个表达式，其中一个表达式包含属性名称、运算符和值。能够指定哪些属性取决于每个 API 调用类型，每个属性所支持的运算符也是这样。",
+      "pos": [
+        2043,
+        2123
+      ]
+    },
+    {
+      "pos": [
+        2128,
+        2163
+      ],
+      "content": "可以使用逻辑运算符 <ph id=\"ph1\">`and`</ph> 和 <ph id=\"ph2\">`or`</ph> 将多个表达式组合到一起。"
+    },
+    {
+      "pos": [
+        2168,
+        2250
+      ],
+      "content": "仅列出正在运行的呈现任务的 filter 字符串示例：<ph id=\"ph1\">`startswith(id, 'renderTask') and (state eq 'running')`</ph>"
+    },
+    {
+      "pos": [
+        2253,
+        2342
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Select<ept id=\"p1\">**</ept> -- <bpt id=\"p2\">*</bpt>select 字符串<ept id=\"p2\">*</ept> 用于限制为每个项返回的属性值。可以在 select 字符串中指定项的属性列表。然后，查询结果中只会针对每个项返回这些属性值。"
+    },
+    {
+      "content": "select 字符串包含逗号分隔的属性名称列表。可以指定列表操作所返回项的任意属性。",
+      "pos": [
+        2347,
+        2389
+      ]
+    },
+    {
+      "pos": [
+        2394,
+        2457
+      ],
+      "content": "示例 select 字符串（仅指定每个任务要返回的三项属性）：<ph id=\"ph1\">`id, state, stateTransitionTime`</ph>"
+    },
+    {
+      "pos": [
+        2460,
+        2568
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Expand<ept id=\"p1\">**</ept> -- <bpt id=\"p2\">*</bpt>expand 字符串<ept id=\"p2\">*</ept> 用于减少获取特定信息所需的 API 调用数。可以通过对单个列表进行 API 调用来获取每个列表项的更多详细信息，不需先获取列表，然后再针对列表中的每个项进行调用。"
+    },
+    {
+      "content": "与 select 字符串类似，expand 字符串用于控制是否允许某些数据包括在列表查询结果中。",
+      "pos": [
+        2573,
+        2621
+      ]
+    },
+    {
+      "content": "expand 字符串只有在列出作业、作业计划、任务和池中使用时才受支持。目前仅支持统计信息。",
+      "pos": [
+        2626,
+        2672
+      ]
+    },
+    {
+      "pos": [
+        2677,
+        2713
+      ],
+      "content": "示例 expand 字符串（指定每个项都应返回统计信息）：<ph id=\"ph1\">`stats`</ph>"
+    },
+    {
+      "pos": [
+        2718,
+        2840
+      ],
+      "content": "当所有属性都是必需属性且没有指定 select 字符串时，<bpt id=\"p1\">*</bpt>必须<ept id=\"p1\">*</ept> 使用 expand 字符串来获取统计信息。如果使用了 select 字符串来获取属性的子集，则可在 select 字符串中指定 <ph id=\"ph1\">`stats`</ph>，不需指定 expand 字符串。"
+    },
+    {
+      "pos": [
+        2844,
+        3204
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>构造这三种查询字符串类型（filter、select、expand）中的任意一种类型时，必须确保属性名称和大小写与其 REST API 元素的对应项相匹配。例如，在使用 .NET <bpt id=\"p1\">[</bpt>CloudTask<ept id=\"p1\">](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudtask)</ept> 时，你必须指定 <bpt id=\"p2\">**</bpt>state<ept id=\"p2\">**</ept> 而非 <bpt id=\"p3\">**</bpt>State<ept id=\"p3\">**</ept>，即使 .NET 属性为 <bpt id=\"p4\">[</bpt>CloudTask.State<ept id=\"p4\">](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudtask.state)</ept>。请参阅下表中 .NET 和 REST API 之间的属性映射。"
+    },
+    {
+      "content": "Filter、select 和 expand 字符串规范",
+      "pos": [
+        3210,
+        3238
+      ]
+    },
+    {
+      "pos": [
+        3242,
+        3353
+      ],
+      "content": "在 filter、select 和 expand 字符串中指定的属性与 <bpt id=\"p1\">[</bpt>Batch REST<ept id=\"p1\">][api_rest]</ept> API 中出现的属性名称等同 -- 即使使用 <bpt id=\"p2\">[</bpt>Batch .NET<ept id=\"p2\">][api_net]</ept> 库时也是如此。"
+    },
+    {
+      "content": "所有属性名称均区分大小写，但属性值不区分大小写。",
+      "pos": [
+        3356,
+        3380
+      ]
+    },
+    {
+      "pos": [
+        3383,
+        3425
+      ],
+      "content": "日期/时间字符串可以采用两种格式中的一种，并且必须在前面加上 <ph id=\"ph1\">`DateTime`</ph>。"
+    },
+    {
+      "pos": [
+        3430,
+        3491
+      ],
+      "content": "W3C-DTF 格式示例：<ph id=\"ph1\">`creationTime gt DateTime'2011-05-08T08:49:37Z'`</ph>"
+    },
+    {
+      "pos": [
+        3496,
+        3567
+      ],
+      "content": "RFC 1123 格式示例：<ph id=\"ph1\">`creationTime gt DateTime'Sun, 08 May 2011 08:49:37 GMT'`</ph>"
+    },
+    {
+      "pos": [
+        3570,
+        3595
+      ],
+      "content": "布尔值字符串为 <ph id=\"ph1\">`true`</ph> 或 <ph id=\"ph2\">`false`</ph>。"
+    },
+    {
+      "pos": [
+        3598,
+        3641
+      ],
+      "content": "如果指定了无效的属性或运算符，则会导致 <ph id=\"ph1\">`400 (Bad Request)`</ph> 错误。"
+    },
+    {
+      "content": "在 Batch .NET 中进行高效查询",
+      "pos": [
+        3646,
+        3666
+      ]
+    },
+    {
+      "pos": [
+        3668,
+        3935
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt>Batch .NET<ept id=\"p1\">][api_net]</ept> API 中，将通过 <bpt id=\"p2\">[</bpt>ODATADetailLevel<ept id=\"p2\">][odata]</ept> 类来提供 filter、select 和 expand 字符串以列出相应操作。一个 ODataDetailLevel 对象有三个公共字符串属性，这些属性可以在构造函数中指定，也可以直接设置。然后，系统会将此对象作为参数传递给不同的列表操作，例如 <bpt id=\"p3\">[</bpt>ListPools<ept id=\"p3\">][net_list_pools]</ept>、<bpt id=\"p4\">[</bpt>ListJobs<ept id=\"p4\">][net_list_jobs]</ept> 和 <bpt id=\"p5\">[</bpt>ListTasks<ept id=\"p5\">][net_list_tasks]</ept>。"
+    },
+    {
+      "pos": [
+        3939,
+        3996
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>ODATADetailLevel.FilterClause<ept id=\"p1\">][odata_filter]</ept> -- 限制返回的项数。"
+    },
+    {
+      "pos": [
+        3999,
+        4063
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>ODATADetailLevel.SelectClause<ept id=\"p1\">][odata_select]</ept> -- 指定随每个项返回的部分属性值。"
+    },
+    {
+      "pos": [
+        4066,
+        4144
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>ODATADetailLevel.ExpandClause<ept id=\"p1\">][odata_expand]</ept> -- 在单个 API 调用中检索项数据，不必针对每个项发出调用。"
+    },
+    {
+      "pos": [
+        4146,
+        4389
+      ],
+      "content": "以下代码段使用 Batch .NET API 对 Batch 服务进行有效的查询，查询其中是否存在特定池集的统计信息。在此方案中，Batch 用户既有测试池又有生产池，测试池 ID 具有“test”前缀，生产池 ID 具有“prod”前缀。在代码段中，<bpt id=\"p1\">*</bpt>myBatchClient<ept id=\"p1\">*</ept> 是正确初始化的 <bpt id=\"p2\">[</bpt>BatchClient<ept id=\"p2\">](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.batchclient)</ept> 实例。"
+    },
+    {
+      "pos": [
+        5637,
+        5851
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.TIP]</ph> 使用 Select 和 Expand 子句配置的 <bpt id=\"p1\">[</bpt>ODATADetailLevel<ept id=\"p1\">][odata]</ept> 实例也可以传递给相应的 Get 方法（例如 <bpt id=\"p2\">[</bpt>PoolOperations.GetPool<ept id=\"p2\">](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.pooloperations.getpool.aspx)</ept>），以便限制返回的数据量。"
+    },
+    {
+      "content": "Batch REST 到 .NET API 映射",
+      "pos": [
+        5856,
+        5880
+      ]
+    },
+    {
+      "pos": [
+        5882,
+        5980
+      ],
+      "content": "filter、select 和 expand 字符串中的属性名称<bpt id=\"p1\">*</bpt>必须<ept id=\"p1\">*</ept>反映其 REST API 对应项，不管是名称本身还是大小写。下表提供了 .NET 和 REST API 的对应项之间的映射。"
+    },
+    {
+      "content": "filter 字符串的映射",
+      "pos": [
+        5986,
+        5999
+      ]
+    },
+    {
+      "pos": [
+        6003,
+        6075
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>.NET 列表方法<ept id=\"p1\">**</ept> -- 此列中的每个 .NET API 方法都接受 <bpt id=\"p2\">[</bpt>ODATADetailLevel<ept id=\"p2\">][odata]</ept> 对象作为参数。"
+    },
+    {
+      "pos": [
+        6078,
+        6217
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>REST 列表请求<ept id=\"p1\">**</ept> -- 此列中的每个 REST API 页面都包含一个表，该表指定了 <bpt id=\"p2\">*</bpt>filter<ept id=\"p2\">*</ept> 字符串中允许的属性和操作。在构造 <bpt id=\"p3\">[</bpt>ODATADetailLevel.FilterClause<ept id=\"p3\">][odata_filter]</ept> 字符串时，你会使用这些属性名称和操作。"
+    },
+    {
+      "content": ".NET 列表方法",
+      "pos": [
+        6221,
+        6230
+      ]
+    },
+    {
+      "content": "REST 列表请求",
+      "pos": [
+        6233,
+        6242
+      ]
+    },
+    {
+      "content": "CertificateOperations.ListCertificates",
+      "pos": [
+        6258,
+        6296
+      ]
+    },
+    {
+      "content": "列出帐户中的证书",
+      "pos": [
+        6317,
+        6325
+      ]
+    },
+    {
+      "content": "CloudTask.ListNodeFiles",
+      "pos": [
+        6347,
+        6370
+      ]
+    },
+    {
+      "content": "列出与任务关联的文件",
+      "pos": [
+        6396,
+        6406
+      ]
+    },
+    {
+      "content": "JobOperations.ListJobPreparationAndReleaseTaskStatus",
+      "pos": [
+        6433,
+        6485
+      ]
+    },
+    {
+      "content": "列出作业准备状态以及作业的作业版本任务",
+      "pos": [
+        6515,
+        6534
+      ]
+    },
+    {
+      "content": "JobOperations.ListJobs",
+      "pos": [
+        6565,
+        6587
+      ]
+    },
+    {
+      "content": "列出帐户中的作业",
+      "pos": [
+        6607,
+        6615
+      ]
+    },
+    {
+      "content": "JobOperations.ListNodeFiles",
+      "pos": [
+        6636,
+        6663
+      ]
+    },
+    {
+      "content": "列出节点上的文件",
+      "pos": [
+        6688,
+        6696
+      ]
+    },
+    {
+      "content": "JobOperations.ListTasks",
+      "pos": [
+        6722,
+        6745
+      ]
+    },
+    {
+      "content": "列出与作业关联的任务",
+      "pos": [
+        6766,
+        6776
+      ]
+    },
+    {
+      "content": "JobScheduleOperations.ListJobSchedules",
+      "pos": [
+        6798,
+        6836
+      ]
+    },
+    {
+      "content": "列出帐户中的作业计划",
+      "pos": [
+        6865,
+        6875
+      ]
+    },
+    {
+      "content": "JobScheduleOperations.ListJobs",
+      "pos": [
+        6905,
+        6935
+      ]
+    },
+    {
+      "content": "列出与作业计划关联的作业",
+      "pos": [
+        6964,
+        6976
+      ]
+    },
+    {
+      "content": "PoolOperations.ListComputeNodes",
+      "pos": [
+        7006,
+        7037
+      ]
+    },
+    {
+      "content": "列出池中的计算节点",
+      "pos": [
+        7066,
+        7075
+      ]
+    },
+    {
+      "content": "PoolOperations.ListPools",
+      "pos": [
+        7105,
+        7129
+      ]
+    },
+    {
+      "content": "列出帐户中的池",
+      "pos": [
+        7150,
+        7157
+      ]
+    },
+    {
+      "content": "select 字符串的映射",
+      "pos": [
+        7181,
+        7194
+      ]
+    },
+    {
+      "pos": [
+        7198,
+        7237
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Batch .NET 类型<ept id=\"p1\">**</ept> -- Batch .NET API 类型。"
+    },
+    {
+      "pos": [
+        7240,
+        7394
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>REST API 实体<ept id=\"p1\">**</ept> -- 此列中的每一页都包含一个或多个表，其中列出了类型的 REST API 属性名称。在构造 <bpt id=\"p2\">*</bpt>select<ept id=\"p2\">*</ept> 字符串时使用这些属性名称。在构造 <bpt id=\"p3\">[</bpt>ODATADetailLevel.SelectClause<ept id=\"p3\">][odata_select]</ept> 字符串时，你会使用这些相同的属性名称。"
+    },
+    {
+      "content": "Batch .NET 类型",
+      "pos": [
+        7398,
+        7411
+      ]
+    },
+    {
+      "content": "REST API 实体",
+      "pos": [
+        7414,
+        7425
+      ]
+    },
+    {
+      "content": "证书",
+      "pos": [
+        7441,
+        7443
+      ]
+    },
+    {
+      "content": "获取有关证书的信息",
+      "pos": [
+        7458,
+        7467
+      ]
+    },
+    {
+      "content": "CloudJob",
+      "pos": [
+        7489,
+        7497
+      ]
+    },
+    {
+      "content": "获取有关作业的信息",
+      "pos": [
+        7511,
+        7520
+      ]
+    },
+    {
+      "content": "CloudJobSchedule",
+      "pos": [
+        7541,
+        7557
+      ]
+    },
+    {
+      "content": "获取有关作业计划的信息",
+      "pos": [
+        7576,
+        7587
+      ]
+    },
+    {
+      "content": "ComputeNode",
+      "pos": [
+        7613,
+        7624
+      ]
+    },
+    {
+      "content": "获取有关节点的信息",
+      "pos": [
+        7639,
+        7648
+      ]
+    },
+    {
+      "content": "CloudPool",
+      "pos": [
+        7670,
+        7679
+      ]
+    },
+    {
+      "content": "获取有关池的信息",
+      "pos": [
+        7694,
+        7702
+      ]
+    },
+    {
+      "content": "CloudTask",
+      "pos": [
+        7724,
+        7733
+      ]
+    },
+    {
+      "content": "获取有关任务的信息",
+      "pos": [
+        7748,
+        7757
+      ]
+    },
+    {
+      "content": "示例：构造 filter 字符串",
+      "pos": [
+        7781,
+        7797
+      ]
+    },
+    {
+      "pos": [
+        7799,
+        8031
+      ],
+      "content": "针对 <bpt id=\"p1\">[</bpt>ODATADetailLevel.FilterClause<ept id=\"p1\">][odata_filter]</ept> 构造 filter 字符串时，请查阅上表，在“filter 字符串的映射”下找到与你所希望执行的列表操作相对应的 REST API 文档页。你会在该页第一个多行表中找到可筛选属性及其支持的运算符。例如，如果你希望检索其退出代码不为零的所有任务，则可查看<bpt id=\"p2\">[</bpt>列出与作业相关联的任务<ept id=\"p2\">][rest_list_tasks]</ept>上的此行，此行指定了相应的属性字符串以及允许的运算符："
+    },
+    {
+      "content": "属性",
+      "pos": [
+        8035,
+        8037
+      ]
+    },
+    {
+      "content": "允许的操作",
+      "pos": [
+        8040,
+        8045
+      ]
+    },
+    {
+      "content": "类型",
+      "pos": [
+        8048,
+        8050
+      ]
+    },
+    {
+      "content": "因此，若要列出退出代码不为零的所有任务，可使用以下 filter 字符串：",
+      "pos": [
+        8138,
+        8175
+      ]
+    },
+    {
+      "content": "示例：构造 select 字符串",
+      "pos": [
+        8247,
+        8263
+      ]
+    },
+    {
+      "pos": [
+        8265,
+        8461
+      ],
+      "content": "若要构造 <bpt id=\"p1\">[</bpt>ODATADetailLevel.SelectClause<ept id=\"p1\">][odata_select]</ept>，请查阅上表，在“select 字符串的映射”下导航到与所列实体类型相对应的 REST API 页。你会在该页第一个多行表中找到可选择属性及其支持的运算符。例如，如果你希望仅检索列表中每个任务的 ID 和命令行，则可在<bpt id=\"p2\">[</bpt>获取有关任务的信息<ept id=\"p2\">][rest_get_task]</ept>的相应表中找到这些行："
+    },
+    {
+      "content": "属性",
+      "pos": [
+        8465,
+        8467
+      ]
+    },
+    {
+      "content": "类型",
+      "pos": [
+        8470,
+        8472
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        8475,
+        8477
+      ]
+    },
+    {
+      "content": "因此，若要只包括每个所列任务的 ID 和命令行，可使用以下 select 字符串：",
+      "pos": [
+        8611,
+        8652
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        8676,
+        8680
+      ]
+    },
+    {
+      "pos": [
+        8682,
+        8917
+      ],
+      "content": "请查看 GitHub 上的 <bpt id=\"p1\">[</bpt>EfficientListQueries<ept id=\"p1\">][efficient_query_sample]</ept> 示例项目，了解列表查询如何有效地影响应用程序的性能。此 C# 控制台应用程序创建大量的任务并将其添加到作业。然后，它对 <bpt id=\"p2\">[</bpt>JobOperations.ListTasks<ept id=\"p2\">][net_list_tasks]</ept> 方法进行多次调用，并传递配置了不同属性值的 <bpt id=\"p3\">[</bpt>ODATADetailLevel<ept id=\"p3\">][odata]</ept> 对象，以改变要返回的数据量。生成的输出如下所示："
+    },
+    {
+      "pos": [
+        9809,
+        9912
+      ],
+      "content": "如所用时间信息中所示，限制返回的属性和项数可以大大缩短查询响应时间。你可以在 GitHub 的 <bpt id=\"p1\">[</bpt>azure-batch-samples<ept id=\"p1\">][github_samples]</ept> 存储库中查找此项目和其他示例项目。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"Azure Batch 中的高效列表查询 | Azure\"\n    description=\"在查询 Azure Batch 实体（例如池、作业、任务和计算节点）时通过减少返回的数据量来提高性能。\"\n    services=\"batch\"\n    documentationCenter=\".net\"\n    authors=\"mmacy\"\n    manager=\"timlt\"\n    editor=\"\"\n    tags=\"azure-resource-manager\"/>\n\n<tags\n    ms.service=\"Batch\"\n    ms.date=\"10/12/2015\"\n    wacn.date=\"02/25/2016\"/>\n# 有效地查询 Azure 批处理 ( batch ) 服务\n\n在本文中，你将了解在使用 [Batch .NET][api_net] API 查询 Azure Batch 服务以获取作业、任务、计算节点等项的列表时，如何减少返回的项数和数据量。\n\nAzure Batch 提供大型计算功能 -- 在生产环境中，作业、任务和计算节点等实体的数目成千上万。因此，获取这些项的信息时，可能会生成大量的数据，这些数据在每次查询时都必须进行传输。通过限制每次查询时返回的项数和信息类型，可以提高查询速度，因此也会提高应用程序的性能。\n\n列出作业、列出任务、列出计算节点 -- 这些是几乎每个使用 Azure Batch 的应用程序都会执行的操作示例，而且这些操作的执行频率很高。常见的用例是监视。例如，若要确定池的容量和状态，必须查询该池中的所有计算节点。另一个示例是查询作业的任务，以便确定是否有任务仍在排队。\n\n此 [Batch .NET][api_net] API 代码段检索所有与作业关联的任务，以及这些任务的全部属性：\n\n```\n// Get a collection of all of the tasks and all of their properties for job-001\nIPagedEnumerable<CloudTask> allTasks = batchClient.JobOperations.ListTasks(\"job-001\");\n```\n\n但是，可以执行高效得多的列表查询。在 [JobOperations.ListTasks][net_list_tasks] 方法中提供 [ODATADetailLevel][odata] 对象即可实现此目的。此代码段仅返回已完成任务的 ID、命令行和计算节点信息属性：\n\n```\n// Configure an ODATADetailLevel specifying a subset of tasks and their properties to return\nODATADetailLevel detailLevel = new ODATADetailLevel();\ndetailLevel.FilterClause = \"state eq 'completed'\";\ndetailLevel.SelectClause = \"id,commandLine,nodeInfo\";\n\n// Supply the ODATADetailLevel to the ListTasks method\nIPagedEnumerable<CloudTask> completedTasks = batchClient.JobOperations.ListTasks(\"job-001\", detailLevel);\n```\n\n在上面的示例方案中，如果作业中存在数以千计的任务，则通常情况下，第二个查询的结果的返回速度将远远快于第一个查询。下面提供了有关使用 Batch .NET API 列出项时使用 ODATADetailLevel 的详细信息。\n\n> [AZURE.IMPORTANT]\n强烈建议你 *始终* 将 ODATADetailLevel 对象提供给 .NET API 列表调用，以确保最大程度地提高应用程序的效率和性能。指定详细程度有助于缩短 Batch 服务响应时间、提高网络利用率，以及最大程度减少客户端应用程序的内存使用量。\n\n## 高效查询工具\n\n[Batch .NET][api_net] 和 [Batch REST][api_rest] API 可以减少列表中返回的项数以及针对每个查询返回的信息量。在执行列表查询时可以通过指定 *filter* 、 *select* 和 *expand* 字符串来实现此目的。\n\n- **Filter** -- *filter 字符串* 是一个表达式，用于减少返回的项数。例如，只列出作业的运行中任务，或者只列出已做好运行任务准备的计算节点。\n  - filter 字符串包含一个或多个表达式，其中一个表达式包含属性名称、运算符和值。能够指定哪些属性取决于每个 API 调用类型，每个属性所支持的运算符也是这样。\n  - 可以使用逻辑运算符 `and` 和 `or` 将多个表达式组合到一起。\n  - 仅列出正在运行的呈现任务的 filter 字符串示例：`startswith(id, 'renderTask') and (state eq 'running')`\n- **Select** -- *select 字符串* 用于限制为每个项返回的属性值。可以在 select 字符串中指定项的属性列表。然后，查询结果中只会针对每个项返回这些属性值。\n  - select 字符串包含逗号分隔的属性名称列表。可以指定列表操作所返回项的任意属性。\n  - 示例 select 字符串（仅指定每个任务要返回的三项属性）：`id, state, stateTransitionTime`\n- **Expand** -- *expand 字符串* 用于减少获取特定信息所需的 API 调用数。可以通过对单个列表进行 API 调用来获取每个列表项的更多详细信息，不需先获取列表，然后再针对列表中的每个项进行调用。\n  - 与 select 字符串类似，expand 字符串用于控制是否允许某些数据包括在列表查询结果中。\n  - expand 字符串只有在列出作业、作业计划、任务和池中使用时才受支持。目前仅支持统计信息。\n  - 示例 expand 字符串（指定每个项都应返回统计信息）：`stats`\n  - 当所有属性都是必需属性且没有指定 select 字符串时，*必须* 使用 expand 字符串来获取统计信息。如果使用了 select 字符串来获取属性的子集，则可在 select 字符串中指定 `stats`，不需指定 expand 字符串。\n\n> [AZURE.NOTE]构造这三种查询字符串类型（filter、select、expand）中的任意一种类型时，必须确保属性名称和大小写与其 REST API 元素的对应项相匹配。例如，在使用 .NET [CloudTask](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudtask) 时，你必须指定 **state** 而非 **State**，即使 .NET 属性为 [CloudTask.State](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudtask.state)。请参阅下表中 .NET 和 REST API 之间的属性映射。\n\n### Filter、select 和 expand 字符串规范\n\n- 在 filter、select 和 expand 字符串中指定的属性与 [Batch REST][api_rest] API 中出现的属性名称等同 -- 即使使用 [Batch .NET][api_net] 库时也是如此。\n- 所有属性名称均区分大小写，但属性值不区分大小写。\n- 日期/时间字符串可以采用两种格式中的一种，并且必须在前面加上 `DateTime`。\n  - W3C-DTF 格式示例：`creationTime gt DateTime'2011-05-08T08:49:37Z'`\n  - RFC 1123 格式示例：`creationTime gt DateTime'Sun, 08 May 2011 08:49:37 GMT'`\n- 布尔值字符串为 `true` 或 `false`。\n- 如果指定了无效的属性或运算符，则会导致 `400 (Bad Request)` 错误。\n\n## 在 Batch .NET 中进行高效查询\n\n在 [Batch .NET][api_net] API 中，将通过 [ODATADetailLevel][odata] 类来提供 filter、select 和 expand 字符串以列出相应操作。一个 ODataDetailLevel 对象有三个公共字符串属性，这些属性可以在构造函数中指定，也可以直接设置。然后，系统会将此对象作为参数传递给不同的列表操作，例如 [ListPools][net_list_pools]、[ListJobs][net_list_jobs] 和 [ListTasks][net_list_tasks]。\n\n- [ODATADetailLevel.FilterClause][odata_filter] -- 限制返回的项数。\n- [ODATADetailLevel.SelectClause][odata_select] -- 指定随每个项返回的部分属性值。\n- [ODATADetailLevel.ExpandClause][odata_expand] -- 在单个 API 调用中检索项数据，不必针对每个项发出调用。\n\n以下代码段使用 Batch .NET API 对 Batch 服务进行有效的查询，查询其中是否存在特定池集的统计信息。在此方案中，Batch 用户既有测试池又有生产池，测试池 ID 具有“test”前缀，生产池 ID 具有“prod”前缀。在代码段中，*myBatchClient* 是正确初始化的 [BatchClient](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.batchclient) 实例。\n\n    // First we need an ODATADetailLevel instance on which to set the expand, filter, and select\n    // clause strings\n    ODATADetailLevel detailLevel = new ODATADetailLevel();\n\n    // We want to pull only the \"test\" pools, so we limit the number of items returned by using a\n    // FilterClause and specifying that the pool IDs must start with \"test\"\n    detailLevel.FilterClause = \"startswith(id, 'test')\";\n\n    // To further limit the data that crosses the wire, configure the SelectClause to limit the\n    // properties that are returned on each CloudPool object to only CloudPool.Id and CloudPool.Statistics\n    detailLevel.SelectClause = \"id, stats\";\n\n    // Specify the ExpandClause so that the .NET API pulls the statistics for the CloudPools in a single\n    // underlying REST API call. Note that we use the pool's REST API element name \"stats\" here as opposed\n    // to \"Statistics\" as it appears in the .NET API (CloudPool.Statistics)\n    detailLevel.ExpandClause = \"stats\";\n\n    // Now get our collection of pools, minimizing the amount of data that is returned by specifying the\n    // detail level that we configured above\n    List<CloudPool> testPools = await myBatchClient.PoolOperations.ListPools(detailLevel).ToListAsync();\n\n> [AZURE.TIP] 使用 Select 和 Expand 子句配置的 [ODATADetailLevel][odata] 实例也可以传递给相应的 Get 方法（例如 [PoolOperations.GetPool](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.pooloperations.getpool.aspx)），以便限制返回的数据量。\n\n## Batch REST 到 .NET API 映射\n\nfilter、select 和 expand 字符串中的属性名称*必须*反映其 REST API 对应项，不管是名称本身还是大小写。下表提供了 .NET 和 REST API 的对应项之间的映射。\n\n### filter 字符串的映射\n\n- **.NET 列表方法** -- 此列中的每个 .NET API 方法都接受 [ODATADetailLevel][odata] 对象作为参数。\n- **REST 列表请求** -- 此列中的每个 REST API 页面都包含一个表，该表指定了 *filter* 字符串中允许的属性和操作。在构造 [ODATADetailLevel.FilterClause][odata_filter] 字符串时，你会使用这些属性名称和操作。\n\n| .NET 列表方法 | REST 列表请求 |\n|---|---|\n| [CertificateOperations.ListCertificates][net_list_certs] | [列出帐户中的证书][rest_list_certs]\n| [CloudTask.ListNodeFiles][net_list_task_files] | [列出与任务关联的文件][rest_list_task_files]\n| [JobOperations.ListJobPreparationAndReleaseTaskStatus][net_list_jobprep_status] | [列出作业准备状态以及作业的作业版本任务][rest_list_jobprep_status]\n| [JobOperations.ListJobs][net_list_jobs] | [列出帐户中的作业][rest_list_jobs]\n| [JobOperations.ListNodeFiles][net_list_nodefiles] | [列出节点上的文件][rest_list_nodefiles]\n| [JobOperations.ListTasks][net_list_tasks] | [列出与作业关联的任务][rest_list_tasks]\n| [JobScheduleOperations.ListJobSchedules][net_list_job_schedules] | [列出帐户中的作业计划][rest_list_job_schedules]\n| [JobScheduleOperations.ListJobs][net_list_schedule_jobs] | [列出与作业计划关联的作业][rest_list_schedule_jobs]\n| [PoolOperations.ListComputeNodes][net_list_compute_nodes] | [列出池中的计算节点][rest_list_compute_nodes]\n| [PoolOperations.ListPools][net_list_pools] | [列出帐户中的池][rest_list_pools]\n\n### select 字符串的映射\n\n- **Batch .NET 类型** -- Batch .NET API 类型。\n- **REST API 实体** -- 此列中的每一页都包含一个或多个表，其中列出了类型的 REST API 属性名称。在构造 *select* 字符串时使用这些属性名称。在构造 [ODATADetailLevel.SelectClause][odata_select] 字符串时，你会使用这些相同的属性名称。\n\n| Batch .NET 类型 | REST API 实体 |\n|---|---|\n| [证书][net_cert] | [获取有关证书的信息][rest_get_cert] |\n| [CloudJob][net_job] | [获取有关作业的信息][rest_get_job] |\n| [CloudJobSchedule][net_schedule] | [获取有关作业计划的信息][rest_get_schedule] |\n| [ComputeNode][net_node] | [获取有关节点的信息][rest_get_node] |\n| [CloudPool][net_pool] | [获取有关池的信息][rest_get_pool] |\n| [CloudTask][net_task] | [获取有关任务的信息][rest_get_task] |\n\n### 示例：构造 filter 字符串\n\n针对 [ODATADetailLevel.FilterClause][odata_filter] 构造 filter 字符串时，请查阅上表，在“filter 字符串的映射”下找到与你所希望执行的列表操作相对应的 REST API 文档页。你会在该页第一个多行表中找到可筛选属性及其支持的运算符。例如，如果你希望检索其退出代码不为零的所有任务，则可查看[列出与作业相关联的任务][rest_list_tasks]上的此行，此行指定了相应的属性字符串以及允许的运算符：\n\n| 属性 | 允许的操作 | 类型 |\n| :--- | :--- | :--- |\n| `executionInfo/exitCode` | `eq, ge, gt, le , lt` | `Int` |\n\n因此，若要列出退出代码不为零的所有任务，可使用以下 filter 字符串：\n\n`(executionInfo/exitCode lt 0) or (executionInfo/exitCode gt 0)`\n\n### 示例：构造 select 字符串\n\n若要构造 [ODATADetailLevel.SelectClause][odata_select]，请查阅上表，在“select 字符串的映射”下导航到与所列实体类型相对应的 REST API 页。你会在该页第一个多行表中找到可选择属性及其支持的运算符。例如，如果你希望仅检索列表中每个任务的 ID 和命令行，则可在[获取有关任务的信息][rest_get_task]的相应表中找到这些行：\n\n| 属性 | 类型 | 说明 |\n| :--- | :--- | :--- |\n| `id` | `String` | `The ID of the task.` |\n| `commandLine` | `String` | `The command line of the task.` |\n\n因此，若要只包括每个所列任务的 ID 和命令行，可使用以下 select 字符串：\n\n`id, commandLine`\n\n## 后续步骤\n\n请查看 GitHub 上的 [EfficientListQueries][efficient_query_sample] 示例项目，了解列表查询如何有效地影响应用程序的性能。此 C# 控制台应用程序创建大量的任务并将其添加到作业。然后，它对 [JobOperations.ListTasks][net_list_tasks] 方法进行多次调用，并传递配置了不同属性值的 [ODATADetailLevel][odata] 对象，以改变要返回的数据量。生成的输出如下所示：\n\n        Adding 5000 tasks to job jobEffQuery...\n        5000 tasks added in 00:00:47.3467587, hit ENTER to query tasks...\n\n        4943 tasks retrieved in 00:00:04.3408081 (ExpandClause:  | FilterClause: state eq 'active' | SelectClause: id,state)\n        0 tasks retrieved in 00:00:00.2662920 (ExpandClause:  | FilterClause: state eq 'running' | SelectClause: id,state)\n        59 tasks retrieved in 00:00:00.3337760 (ExpandClause:  | FilterClause: state eq 'completed' | SelectClause: id,state)\n        5000 tasks retrieved in 00:00:04.1429881 (ExpandClause:  | FilterClause:  | SelectClause: id,state)\n        5000 tasks retrieved in 00:00:15.1016127 (ExpandClause:  | FilterClause:  | SelectClause: id,state,environmentSettings)\n        5000 tasks retrieved in 00:00:17.0548145 (ExpandClause: stats | FilterClause:  | SelectClause: )\n\n        Sample complete, hit ENTER to continue...\n\n如所用时间信息中所示，限制返回的属性和项数可以大大缩短查询响应时间。你可以在 GitHub 的 [azure-batch-samples][github_samples] 存储库中查找此项目和其他示例项目。\n\n[api_net]: http://msdn.microsoft.com/library/azure/mt348682.aspx\n[api_net_listjobs]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.joboperations.listjobs.aspx\n[api_rest]: http://msdn.microsoft.com/library/azure/dn820158.aspx\n[efficient_query_sample]: https://github.com/Azure/azure-batch-samples/tree/master/CSharp/ArticleProjects/EfficientListQueries\n[github_samples]: https://github.com/Azure/azure-batch-samples\n[odata]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.odatadetaillevel.aspx\n[odata_ctor]: https://msdn.microsoft.com/library/azure/dn866178.aspx\n[odata_expand]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.odatadetaillevel.expandclause.aspx\n[odata_filter]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.odatadetaillevel.filterclause.aspx\n[odata_select]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.odatadetaillevel.selectclause.aspx\n\n[net_list_certs]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.certificateoperations.listcertificates.aspx\n[net_list_compute_nodes]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.pooloperations.listcomputenodes.aspx\n[net_list_job_schedules]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.jobscheduleoperations.listjobschedules.aspx\n[net_list_jobprep_status]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.joboperations.listjobpreparationandreleasetaskstatus.aspx\n[net_list_jobs]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.joboperations.listjobs.aspx\n[net_list_nodefiles]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.joboperations.listnodefiles.aspx\n[net_list_pools]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.pooloperations.listpools.aspx\n[net_list_schedule_jobs]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.jobscheduleoperations.listjobs.aspx\n[net_list_task_files]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudtask.listnodefiles.aspx\n[net_list_tasks]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.joboperations.listtasks.aspx\n\n[rest_list_certs]: https://msdn.microsoft.com/library/azure/dn820154.aspx\n[rest_list_compute_nodes]: https://msdn.microsoft.com/library/azure/dn820159.aspx\n[rest_list_job_schedules]: https://msdn.microsoft.com/library/azure/mt282174.aspx\n[rest_list_jobprep_status]: https://msdn.microsoft.com/library/azure/mt282170.aspx\n[rest_list_jobs]: https://msdn.microsoft.com/library/azure/dn820117.aspx\n[rest_list_nodefiles]: https://msdn.microsoft.com/library/azure/dn820151.aspx\n[rest_list_pools]: https://msdn.microsoft.com/library/azure/dn820101.aspx\n[rest_list_schedule_jobs]: https://msdn.microsoft.com/library/azure/mt282169.aspx\n[rest_list_task_files]: https://msdn.microsoft.com/library/azure/dn820142.aspx\n[rest_list_tasks]: https://msdn.microsoft.com/library/azure/dn820187.aspx\n\n[rest_get_cert]: https://msdn.microsoft.com/library/azure/dn820176.aspx\n[rest_get_job]: https://msdn.microsoft.com/library/azure/dn820106.aspx\n[rest_get_node]: https://msdn.microsoft.com/library/azure/dn820168.aspx\n[rest_get_pool]: https://msdn.microsoft.com/library/azure/dn820165.aspx\n[rest_get_schedule]: https://msdn.microsoft.com/library/azure/mt282171.aspx\n[rest_get_task]: https://msdn.microsoft.com/library/azure/dn820133.aspx\n\n[net_cert]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.certificate.aspx\n[net_job]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudjob.aspx\n[net_node]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.computenode.aspx\n[net_pool]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudpool.aspx\n[net_schedule]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudjobschedule.aspx\n[net_task]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudtask.aspx\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

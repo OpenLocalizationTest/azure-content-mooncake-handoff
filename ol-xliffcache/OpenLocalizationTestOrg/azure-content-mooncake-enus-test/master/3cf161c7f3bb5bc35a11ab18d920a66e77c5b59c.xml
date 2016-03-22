@@ -1,0 +1,684 @@
+{
+  "nodes": [
+    {
+      "content": "通过 Azure CLI 重置 Linux VM 密码并添加用户 | Azure",
+      "pos": [
+        27,
+        67
+      ]
+    },
+    {
+      "content": "如何从 Azure 管理门户或 CLI 使用 VMAccess 扩展重置 Linux VM 密码、SSH 密钥和 SSH 配置，添加或删除用户帐户，以及检查磁盘一致性。",
+      "pos": [
+        86,
+        170
+      ]
+    },
+    {
+      "content": "如何使用 Linux 版 Azure VMAccess 扩展来重置访问权限、管理用户和检查磁盘",
+      "pos": [
+        422,
+        469
+      ]
+    },
+    {
+      "pos": [
+        472,
+        558
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]"
+    },
+    {
+      "content": "如果因为忘记密码、安全外壳 (SSH) 密钥不正确或 SSH 配置出现问题而不能连接到 Azure 上的 Linux 虚拟机，请使用 Azure 管理门户或 VMAccessForLinux 扩展通过 Azure CLI 重置密码或 SSH 密钥、修复 SSH 配置以及检查磁盘一致性。",
+      "pos": [
+        561,
+        704
+      ]
+    },
+    {
+      "content": "Azure CLI 和 PowerShell",
+      "pos": [
+        710,
+        732
+      ]
+    },
+    {
+      "content": "你将需要以下各项：",
+      "pos": [
+        734,
+        743
+      ]
+    },
+    {
+      "pos": [
+        747,
+        879
+      ],
+      "content": "Azure Linux 代理 2.0.5 版或更高版本。虚拟机库中的大多数 Linux 映像都包含版本 2.0.5。若要了解所安装的版本，请运行 <bpt id=\"p1\">**</bpt>waagent -version<ept id=\"p1\">**</ept>。若要更新代理，请按照 <bpt id=\"p2\">[</bpt><ept id=\"p2\">Azure Linux 代理用户指南]</ept>中的说明操作。"
+    },
+    {
+      "pos": [
+        882,
+        987
+      ],
+      "content": "Azure 命令行界面 (CLI)。有关设置 Azure CLI 的详细信息，请参阅<bpt id=\"p1\">[</bpt>安装和配置 Azure 命令行界面<ept id=\"p1\">](/documentation/articles/xplat-cli-install)</ept>。"
+    },
+    {
+      "pos": [
+        990,
+        1130
+      ],
+      "content": "Azure PowerShell。你将使用 Set-AzureVMExtension cmdlet 中的命令自动加载和配置 VMAccessForLinux 扩展。有关设置 Azure PowerShell 的详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">如何安装和配置 Azure PowerShell]</ept>。"
+    },
+    {
+      "content": "一个新密码或一组新 SSH 密钥（如果想要重置任一项）。如果想要重置 SSH 配置，则不需要这些。",
+      "pos": [
+        1133,
+        1182
+      ]
+    },
+    {
+      "content": "无需安装",
+      "pos": [
+        1188,
+        1192
+      ]
+    },
+    {
+      "pos": [
+        1194,
+        1306
+      ],
+      "content": "VMAccess 扩展无需安装就可使用它。只要在虚拟机上安装了 Linux 代理，就会在你运行使用 <bpt id=\"p1\">**</bpt>Set-AzureVMExtension<ept id=\"p1\">**</ept> cmdlet 的 Azure PowerShell 命令时自动加载该扩展。"
+    },
+    {
+      "content": "使用 Azure CLI",
+      "pos": [
+        1311,
+        1323
+      ]
+    },
+    {
+      "pos": [
+        1325,
+        1427
+      ],
+      "content": "借助 Azure CLI，你将可以从命令行界面（Bash、终端、命令提示符）使用 <bpt id=\"p1\">**</bpt>azure<ept id=\"p1\">**</ept> 命令访问命令。运行 azure vm extension set -help 了解详细的扩展使用情况。"
+    },
+    {
+      "content": "借助 Azure CLI，你可以执行以下任务：",
+      "pos": [
+        1429,
+        1452
+      ]
+    },
+    {
+      "content": "重置密码",
+      "pos": [
+        1457,
+        1461
+      ]
+    },
+    {
+      "content": "重置 SSH 密钥",
+      "pos": [
+        1479,
+        1488
+      ]
+    },
+    {
+      "content": "重置密码和 SSH 密钥",
+      "pos": [
+        1510,
+        1522
+      ]
+    },
+    {
+      "content": "创建新的 sudo 用户帐户",
+      "pos": [
+        1542,
+        1556
+      ]
+    },
+    {
+      "content": "重置 SSH 配置",
+      "pos": [
+        1580,
+        1589
+      ]
+    },
+    {
+      "content": "删除用户",
+      "pos": [
+        1614,
+        1618
+      ]
+    },
+    {
+      "content": "显示 VMAccess 扩展的状态",
+      "pos": [
+        1635,
+        1652
+      ]
+    },
+    {
+      "content": "检查所添加磁盘的一致性",
+      "pos": [
+        1669,
+        1680
+      ]
+    },
+    {
+      "content": "修复在 Linux VM 中添加的磁盘",
+      "pos": [
+        1697,
+        1716
+      ]
+    },
+    {
+      "pos": [
+        1736,
+        1765
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"pwresetcli\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>重置密码"
+    },
+    {
+      "content": "步骤 1：使用以下内容创建名为 PrivateConf.json 的文件，并替换占位符值。",
+      "pos": [
+        1767,
+        1812
+      ]
+    },
+    {
+      "content": "步骤 2：运行以下命令，并将虚拟机的名称替换为“vmname”。",
+      "pos": [
+        1921,
+        1953
+      ]
+    },
+    {
+      "pos": [
+        2079,
+        2117
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"sshkeyresetcli\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>重置 SSH 密钥"
+    },
+    {
+      "content": "步骤 1：使用以下内容创建名为 PrivateConf.json 的文件，并替换占位符值。",
+      "pos": [
+        2119,
+        2164
+      ]
+    },
+    {
+      "content": "步骤 2：运行以下命令，并将虚拟机的名称替换为“vmname”。",
+      "pos": [
+        2245,
+        2277
+      ]
+    },
+    {
+      "pos": [
+        2403,
+        2442
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"resetbothcli\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>重置密码和 SSH 密钥"
+    },
+    {
+      "content": "步骤 1：使用以下内容创建名为 PrivateConf.json 的文件，并替换占位符值。",
+      "pos": [
+        2444,
+        2489
+      ]
+    },
+    {
+      "content": "步骤 2：运行以下命令，并将虚拟机的名称替换为“vmname”。",
+      "pos": [
+        2600,
+        2632
+      ]
+    },
+    {
+      "pos": [
+        2758,
+        2803
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"createnewsudocli\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>创建新的 sudo 用户帐户"
+    },
+    {
+      "content": "如果忘记了用户名，可以使用 VMAccess 创建一个具有 sudo 授权的新用户帐户。在这种情况下，不会修改现有的用户名和密码。",
+      "pos": [
+        2805,
+        2870
+      ]
+    },
+    {
+      "pos": [
+        2872,
+        2931
+      ],
+      "content": "若要创建具有密码访问权限的新 sudo 用户，请使用<bpt id=\"p1\">[</bpt>“重置密码”<ept id=\"p1\">](#pwresetcli)</ept>中的脚本并指定新用户名。"
+    },
+    {
+      "pos": [
+        2933,
+        3006
+      ],
+      "content": "若要创建具有 SSH 密钥访问权限的新 sudo 用户，请使用<bpt id=\"p1\">[</bpt>“重置 SSH 密钥”<ept id=\"p1\">](#sshkeyresetcli)</ept>中的脚本并指定新用户名。"
+    },
+    {
+      "pos": [
+        3008,
+        3071
+      ],
+      "content": "你还可以使用<bpt id=\"p1\">[</bpt>“重置密码和 SSH 密钥”<ept id=\"p1\">](#resetbothcli)</ept>来创建同时具有密码和 SSH 密钥访问权限的新用户。"
+    },
+    {
+      "pos": [
+        3077,
+        3118
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"sshconfigresetcli\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>重置 SSH 配置"
+    },
+    {
+      "content": "如果 SSH 配置处于某种意外状态，你可能会丢失对 VM 的访问权限。可以使用 VMAccess 扩展将配置重置为其默认状态。为此，只需将“reset\\_ssh”键设置为“True”。该扩展将重新启动 SSH 服务器，打开 VM 上的 SSH 端口，然后将 SSH 配置重置为默认值。将不会更改用户帐户（名称、密码或 SSH 密钥）。",
+      "pos": [
+        3120,
+        3287
+      ]
+    },
+    {
+      "pos": [
+        3291,
+        3344
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 重置后的 SSH 配置文件位于 /etc/ssh/sshd\\_config 中。"
+    },
+    {
+      "content": "步骤 1：使用以下内容创建一个名为 PrivateConf.json 的文件。",
+      "pos": [
+        3346,
+        3385
+      ]
+    },
+    {
+      "content": "步骤 2：运行以下命令，并将虚拟机的名称替换为“vmname”。",
+      "pos": [
+        3423,
+        3455
+      ]
+    },
+    {
+      "pos": [
+        3581,
+        3609
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"deletecli\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>删除用户"
+    },
+    {
+      "content": "如果想要不登录 VM 就直接删除用户帐户，可以使用此脚本。",
+      "pos": [
+        3611,
+        3640
+      ]
+    },
+    {
+      "content": "步骤 1：使用以下内容创建名为 PrivateConf.json 的文件，并替换占位符值。",
+      "pos": [
+        3642,
+        3687
+      ]
+    },
+    {
+      "content": "步骤 2：运行以下命令，并将虚拟机的名称替换为“vmname”。",
+      "pos": [
+        3739,
+        3771
+      ]
+    },
+    {
+      "pos": [
+        3897,
+        3938
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"statuscli\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>显示 VMAccess 扩展的状态"
+    },
+    {
+      "content": "若要显示 VMAccess 扩展的状态，请运行以下命令。",
+      "pos": [
+        3940,
+        3968
+      ]
+    },
+    {
+      "pos": [
+        4002,
+        4037
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name='checkdisk'&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>检查所添加磁盘的一致性"
+    },
+    {
+      "content": "若要在 Linux 虚拟机的所有磁盘上运行 fsck，需执行以下操作：",
+      "pos": [
+        4039,
+        4074
+      ]
+    },
+    {
+      "content": "步骤 1：使用以下内容创建一个名为 PublicConf.json 的文件。Check Disk 采用的布尔值表示是否检查附加到虚拟机的磁盘。",
+      "pos": [
+        4076,
+        4147
+      ]
+    },
+    {
+      "content": "步骤 2：运行需要执行的以下命令，替换占位符值。",
+      "pos": [
+        4190,
+        4214
+      ]
+    },
+    {
+      "content": "azure vm extension set vm-name VMAccessForLinux Microsoft.OSTCExtensions 1.* --public-config-path PublicConf.json",
+      "pos": [
+        4219,
+        4332
+      ]
+    },
+    {
+      "pos": [
+        4338,
+        4382
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name='repairdisk'&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>修复在 Linux 虚拟机中添加的磁盘"
+    },
+    {
+      "content": "若要修复无法装入或存在装入配置错误的磁盘，请使用 VMAccess 扩展重置 Linux 虚拟机上的装入配置。",
+      "pos": [
+        4384,
+        4439
+      ]
+    },
+    {
+      "content": "步骤 1：使用以下内容创建一个名为 PublicConf.json 的文件。",
+      "pos": [
+        4441,
+        4479
+      ]
+    },
+    {
+      "content": "步骤 2：运行需要执行的以下命令，替换占位符值。",
+      "pos": [
+        4547,
+        4571
+      ]
+    },
+    {
+      "content": "使用 Azure PowerShell",
+      "pos": [
+        4695,
+        4714
+      ]
+    },
+    {
+      "pos": [
+        4716,
+        4815
+      ],
+      "content": "你将使用 <bpt id=\"p1\">**</bpt>Set-AzureVMExtension<ept id=\"p1\">**</ept> cmdlet 执行 VMAccess 允许执行的任何更改。在所有情况下，首先使用云服务名称和虚拟机名称来获取虚拟机对象并将其存储在变量中。"
+    },
+    {
+      "content": "填写云服务和虚拟机名称，然后在管理员级别的 Azure PowerShell 命令提示符下运行以下命令。替换引号内的所有内容，包括 &lt; and &gt; 字符。",
+      "pos": [
+        4817,
+        4894
+      ]
+    },
+    {
+      "pos": [
+        5030,
+        5084
+      ],
+      "content": "如果你不知道云服务和虚拟机名称，运行 <bpt id=\"p1\">**</bpt>Get-AzureVM<ept id=\"p1\">**</ept> 可显示当前订阅中所有 VM 的该信息。"
+    },
+    {
+      "pos": [
+        5089,
+        5154
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 以 $ 开头的命令行用于设置 PowerShell 变量，这些变量随后用于 PowerShell 命令。"
+    },
+    {
+      "content": "如果你使用 Azure 管理门户创建了虚拟机，请运行以下附加命令：",
+      "pos": [
+        5156,
+        5189
+      ]
+    },
+    {
+      "content": "此命令可防止在以下节运行 Set-AzureVMExtension 命令时出现“在设置 IaaS VM Access 扩展前，必须对 VM 对象启用预配来宾代理”错误。",
+      "pos": [
+        5242,
+        5326
+      ]
+    },
+    {
+      "content": "接下来，可以执行以下任务：",
+      "pos": [
+        5328,
+        5341
+      ]
+    },
+    {
+      "content": "重置密码",
+      "pos": [
+        5346,
+        5350
+      ]
+    },
+    {
+      "content": "重置 SSH 密钥",
+      "pos": [
+        5366,
+        5375
+      ]
+    },
+    {
+      "content": "重置密码和 SSH 密钥",
+      "pos": [
+        5389,
+        5401
+      ]
+    },
+    {
+      "content": "重置 SSH 配置",
+      "pos": [
+        5413,
+        5422
+      ]
+    },
+    {
+      "content": "删除用户",
+      "pos": [
+        5436,
+        5440
+      ]
+    },
+    {
+      "content": "显示 VMAccess 扩展的状态",
+      "pos": [
+        5454,
+        5471
+      ]
+    },
+    {
+      "content": "检查所添加磁盘的一致性",
+      "pos": [
+        5485,
+        5496
+      ]
+    },
+    {
+      "content": "修复在 Linux VM 中添加的磁盘",
+      "pos": [
+        5513,
+        5532
+      ]
+    },
+    {
+      "pos": [
+        5552,
+        5579
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"password\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>重置密码"
+    },
+    {
+      "content": "填写当前的 Linux 用户名和新密码，然后运行以下命令。",
+      "pos": [
+        5581,
+        5610
+      ]
+    },
+    {
+      "pos": [
+        6048,
+        6138
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 如果想要重置现有用户帐户的密码或 SSH 密钥，务必键入准确的用户名。如果键入其他名称，VMAccess 扩展将创建一个新的用户帐户并将密码分配给该帐户。"
+    },
+    {
+      "pos": [
+        6145,
+        6175
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"SSHkey\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>重置 SSH 密钥"
+    },
+    {
+      "content": "填写当前的 Linux 用户名和包含 SSH 密钥的证书的路径，然后运行以下命令。",
+      "pos": [
+        6177,
+        6218
+      ]
+    },
+    {
+      "pos": [
+        6661,
+        6692
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"both\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>重置密码和 SSH 密钥"
+    },
+    {
+      "content": "填写当前的 Linux 用户名、新密码以及包含 SSH 密钥的证书的路径，然后运行以下命令。",
+      "pos": [
+        6694,
+        6740
+      ]
+    },
+    {
+      "pos": [
+        7250,
+        7280
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"config\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>重置 SSH 配置"
+    },
+    {
+      "content": "SSH 配置中的错误可能会导致你无法访问虚拟机。可以通过将 SSH 配置重置为其默认状态来解决该问题。此操作会删除配置中的所有新访问参数，比如用户名、密码和 SSH 密钥，但不会更改用户帐户的密码或 SSH 密钥。扩展将重新启动 SSH 服务器，打开虚拟机上的 SSH 端口，然后将 SSH 配置重置为默认值。",
+      "pos": [
+        7282,
+        7437
+      ]
+    },
+    {
+      "content": "运行以下命令。",
+      "pos": [
+        7439,
+        7446
+      ]
+    },
+    {
+      "pos": [
+        7759,
+        7807
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> SSH 配置文件位于 /etc/ssh/sshd\\_config 中。"
+    },
+    {
+      "pos": [
+        7813,
+        7839
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"delete\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 删除用户"
+    },
+    {
+      "content": "填写要删除的 Linux 用户名，然后运行以下命令。",
+      "pos": [
+        7841,
+        7867
+      ]
+    },
+    {
+      "pos": [
+        8243,
+        8281
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"status\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>显示 VMAccess 扩展的状态"
+    },
+    {
+      "content": "若要显示 VMAccess 扩展的状态，请运行以下命令。",
+      "pos": [
+        8283,
+        8311
+      ]
+    },
+    {
+      "pos": [
+        8343,
+        8378
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"checkdisk\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>检查所添加磁盘的一致性"
+    },
+    {
+      "content": "若要通过 fsck 实用程序检查磁盘的一致性，请运行以下命令。",
+      "pos": [
+        8380,
+        8411
+      ]
+    },
+    {
+      "pos": [
+        8723,
+        8766
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"checkdisk\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>修复在 Linux VM 中添加的磁盘"
+    },
+    {
+      "content": "若要通过 fsck 实用程序修复磁盘，请运行以下命令。",
+      "pos": [
+        8768,
+        8795
+      ]
+    },
+    {
+      "content": "其他资源",
+      "pos": [
+        9131,
+        9135
+      ]
+    },
+    {
+      "content": "Azure VM 扩展和功能",
+      "pos": [
+        9138,
+        9152
+      ]
+    },
+    {
+      "content": "使用 RDP 或 SSH 连接到 Azure 虚拟机",
+      "pos": [
+        9158,
+        9184
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"通过 Azure CLI 重置 Linux VM 密码并添加用户 | Azure\"\n    description=\"如何从 Azure 管理门户或 CLI 使用 VMAccess 扩展重置 Linux VM 密码、SSH 密钥和 SSH 配置，添加或删除用户帐户，以及检查磁盘一致性。\"\n    services=\"virtual-machines\"\n    documentationCenter=\"\"\n    authors=\"cynthn\"\n    manager=\"timlt\"\n    editor=\"\"\n    tags=\"azure-service-management\"/>\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"12/15/2015\"\n    wacn.date=\"03/21/2016\"/>\n\n# 如何使用 Linux 版 Azure VMAccess 扩展来重置访问权限、管理用户和检查磁盘#\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]\n\n\n如果因为忘记密码、安全外壳 (SSH) 密钥不正确或 SSH 配置出现问题而不能连接到 Azure 上的 Linux 虚拟机，请使用 Azure 管理门户或 VMAccessForLinux 扩展通过 Azure CLI 重置密码或 SSH 密钥、修复 SSH 配置以及检查磁盘一致性。\n\n\n## Azure CLI 和 PowerShell\n\n你将需要以下各项：\n\n- Azure Linux 代理 2.0.5 版或更高版本。虚拟机库中的大多数 Linux 映像都包含版本 2.0.5。若要了解所安装的版本，请运行 **waagent -version**。若要更新代理，请按照 [Azure Linux 代理用户指南]中的说明操作。\n- Azure 命令行界面 (CLI)。有关设置 Azure CLI 的详细信息，请参阅[安装和配置 Azure 命令行界面](/documentation/articles/xplat-cli-install)。\n- Azure PowerShell。你将使用 Set-AzureVMExtension cmdlet 中的命令自动加载和配置 VMAccessForLinux 扩展。有关设置 Azure PowerShell 的详细信息，请参阅[如何安装和配置 Azure PowerShell]。\n- 一个新密码或一组新 SSH 密钥（如果想要重置任一项）。如果想要重置 SSH 配置，则不需要这些。\n\n### 无需安装\n\nVMAccess 扩展无需安装就可使用它。只要在虚拟机上安装了 Linux 代理，就会在你运行使用 **Set-AzureVMExtension** cmdlet 的 Azure PowerShell 命令时自动加载该扩展。\n\n## 使用 Azure CLI\n\n借助 Azure CLI，你将可以从命令行界面（Bash、终端、命令提示符）使用 **azure** 命令访问命令。运行 azure vm extension set -help 了解详细的扩展使用情况。\n\n借助 Azure CLI，你可以执行以下任务：\n\n+ [重置密码](#pwresetcli)\n+ [重置 SSH 密钥](#sshkeyresetcli)\n+ [重置密码和 SSH 密钥](#resetbothcli)\n+ [创建新的 sudo 用户帐户](#createnewsudocli)\n+ [重置 SSH 配置](#sshconfigresetcli)\n+ [删除用户](#deletecli)\n+ [显示 VMAccess 扩展的状态](#statuscli)\n+ [检查所添加磁盘的一致性](#checkdisk)\n+ [修复在 Linux VM 中添加的磁盘](#repairdisk)\n\n### <a name=\"pwresetcli\"></a>重置密码\n\n步骤 1：使用以下内容创建名为 PrivateConf.json 的文件，并替换占位符值。\n\n    {\n    \"username\":\"currentusername\",\n    \"password\":\"newpassword\",\n    \"expiration\":\"2016-01-01\"\n    }\n\n步骤 2：运行以下命令，并将虚拟机的名称替换为“vmname”。\n\n    azure vm extension set vmname VMAccessForLinux Microsoft.OSTCExtensions 1.* --private-config-path PrivateConf.json\n\n### <a name=\"sshkeyresetcli\"></a>重置 SSH 密钥\n\n步骤 1：使用以下内容创建名为 PrivateConf.json 的文件，并替换占位符值。\n\n    {\n    \"username\":\"currentusername\",\n    \"ssh_key\":\"contentofsshkey\"\n    }\n\n步骤 2：运行以下命令，并将虚拟机的名称替换为“vmname”。\n\n    azure vm extension set vmname VMAccessForLinux Microsoft.OSTCExtensions 1.* --private-config-path PrivateConf.json\n\n### <a name=\"resetbothcli\"></a>重置密码和 SSH 密钥\n\n步骤 1：使用以下内容创建名为 PrivateConf.json 的文件，并替换占位符值。\n\n    {\n    \"username\":\"currentusername\",\n    \"ssh_key\":\"contentofsshkey\",\n    \"password\":\"newpassword\"\n    }\n\n步骤 2：运行以下命令，并将虚拟机的名称替换为“vmname”。\n\n    azure vm extension set vmname VMAccessForLinux Microsoft.OSTCExtensions 1.* --private-config-path PrivateConf.json\n\n### <a name=\"createnewsudocli\"></a>创建新的 sudo 用户帐户\n\n如果忘记了用户名，可以使用 VMAccess 创建一个具有 sudo 授权的新用户帐户。在这种情况下，不会修改现有的用户名和密码。\n\n若要创建具有密码访问权限的新 sudo 用户，请使用[“重置密码”](#pwresetcli)中的脚本并指定新用户名。\n\n若要创建具有 SSH 密钥访问权限的新 sudo 用户，请使用[“重置 SSH 密钥”](#sshkeyresetcli)中的脚本并指定新用户名。\n\n你还可以使用[“重置密码和 SSH 密钥”](#resetbothcli)来创建同时具有密码和 SSH 密钥访问权限的新用户。\n\n### <a name=\"sshconfigresetcli\"></a>重置 SSH 配置\n\n如果 SSH 配置处于某种意外状态，你可能会丢失对 VM 的访问权限。可以使用 VMAccess 扩展将配置重置为其默认状态。为此，只需将“reset\\_ssh”键设置为“True”。该扩展将重新启动 SSH 服务器，打开 VM 上的 SSH 端口，然后将 SSH 配置重置为默认值。将不会更改用户帐户（名称、密码或 SSH 密钥）。\n\n> [AZURE.NOTE] 重置后的 SSH 配置文件位于 /etc/ssh/sshd\\_config 中。\n\n步骤 1：使用以下内容创建一个名为 PrivateConf.json 的文件。\n\n    {\n    \"reset_ssh\":\"True\"\n    }\n\n步骤 2：运行以下命令，并将虚拟机的名称替换为“vmname”。\n\n    azure vm extension set vmname VMAccessForLinux Microsoft.OSTCExtensions 1.* --private-config-path PrivateConf.json\n\n### <a name=\"deletecli\"></a>删除用户\n\n如果想要不登录 VM 就直接删除用户帐户，可以使用此脚本。\n\n步骤 1：使用以下内容创建名为 PrivateConf.json 的文件，并替换占位符值。\n\n    {\n    \"remove_user\":\"usernametoremove\"\n    }\n\n步骤 2：运行以下命令，并将虚拟机的名称替换为“vmname”。\n\n    azure vm extension set vmname VMAccessForLinux Microsoft.OSTCExtensions 1.* --private-config-path PrivateConf.json\n\n### <a name=\"statuscli\"></a>显示 VMAccess 扩展的状态\n\n若要显示 VMAccess 扩展的状态，请运行以下命令。\n\n    azure vm extension get\n\n### <a name='checkdisk'></a>检查所添加磁盘的一致性\n\n若要在 Linux 虚拟机的所有磁盘上运行 fsck，需执行以下操作：\n\n步骤 1：使用以下内容创建一个名为 PublicConf.json 的文件。Check Disk 采用的布尔值表示是否检查附加到虚拟机的磁盘。\n\n    {   \n    \"check_disk\": \"true\"\n    }\n\n步骤 2：运行需要执行的以下命令，替换占位符值。\n\n   azure vm extension set vm-name VMAccessForLinux Microsoft.OSTCExtensions 1.* --public-config-path PublicConf.json\n\n### <a name='repairdisk'></a>修复在 Linux 虚拟机中添加的磁盘\n\n若要修复无法装入或存在装入配置错误的磁盘，请使用 VMAccess 扩展重置 Linux 虚拟机上的装入配置。\n\n步骤 1：使用以下内容创建一个名为 PublicConf.json 的文件。\n\n    {\n    \"repair_disk\":\"true\",\n    \"disk_name\":\"yourdisk\"\n    }\n\n步骤 2：运行需要执行的以下命令，替换占位符值。\n\n    azure vm extension set vm-name VMAccessForLinux Microsoft.OSTCExtensions 1.* --public-config-path PublicConf.json\n\n## 使用 Azure PowerShell\n\n你将使用 **Set-AzureVMExtension** cmdlet 执行 VMAccess 允许执行的任何更改。在所有情况下，首先使用云服务名称和虚拟机名称来获取虚拟机对象并将其存储在变量中。\n\n填写云服务和虚拟机名称，然后在管理员级别的 Azure PowerShell 命令提示符下运行以下命令。替换引号内的所有内容，包括 < and > 字符。\n\n    $CSName = \"<cloud service name>\"\n    $VMName = \"<virtual machine name>\"\n    $vm = Get-AzureVM -ServiceName $CSName -Name $VMName\n\n如果你不知道云服务和虚拟机名称，运行 **Get-AzureVM** 可显示当前订阅中所有 VM 的该信息。\n\n\n> [AZURE.NOTE] 以 $ 开头的命令行用于设置 PowerShell 变量，这些变量随后用于 PowerShell 命令。\n\n如果你使用 Azure 管理门户创建了虚拟机，请运行以下附加命令：\n\n    $vm.GetInstance().ProvisionGuestAgent = $true\n\n此命令可防止在以下节运行 Set-AzureVMExtension 命令时出现“在设置 IaaS VM Access 扩展前，必须对 VM 对象启用预配来宾代理”错误。\n\n接下来，可以执行以下任务：\n\n+ [重置密码](#password)\n+ [重置 SSH 密钥](#SSHkey)\n+ [重置密码和 SSH 密钥](#both)\n+ [重置 SSH 配置](#config)\n+ [删除用户](#delete)\n+ [显示 VMAccess 扩展的状态](#status)\n+ [检查所添加磁盘的一致性](#checkdisk)\n+ [修复在 Linux VM 中添加的磁盘](#repairdisk)\n\n### <a name=\"password\"></a>重置密码\n\n填写当前的 Linux 用户名和新密码，然后运行以下命令。\n\n    $UserName = \"<current Linux account name>\"\n    $Password = \"<new password>\"\n    $PrivateConfig = '{\"username\":\"' + $UserName + '\", \"password\": \"' +  $Password + '\"}'\n    $ExtensionName = \"VMAccessForLinux\"\n    $Publisher = \"Microsoft.OSTCExtensions\"\n    $Version =  \"1.*\"\n    Set-AzureVMExtension -ExtensionName $ExtensionName -VM $vm -Publisher $Publisher -Version $Version -PrivateConfiguration $PrivateConfig | Update-AzureVM\n\n> [AZURE.NOTE] 如果想要重置现有用户帐户的密码或 SSH 密钥，务必键入准确的用户名。如果键入其他名称，VMAccess 扩展将创建一个新的用户帐户并将密码分配给该帐户。\n\n\n### <a name=\"SSHkey\"></a>重置 SSH 密钥\n\n填写当前的 Linux 用户名和包含 SSH 密钥的证书的路径，然后运行以下命令。\n\n    $UserName = \"<current Linux user name>\"\n    $Cert = Get-Content \"<certificate path>\"\n    $PrivateConfig = '{\"username\":\"' + $UserName + '\", \"ssh_key\":\"' + $cert + '\"}'\n    $ExtensionName = \"VMAccessForLinux\"\n    $Publisher = \"Microsoft.OSTCExtensions\"\n    $Version =  \"1.*\"\n    Set-AzureVMExtension -ExtensionName $ExtensionName -VM  $vm -Publisher $Publisher -Version $Version -PrivateConfiguration $PrivateConfig | Update-AzureVM\n\n### <a name=\"both\"></a>重置密码和 SSH 密钥\n\n填写当前的 Linux 用户名、新密码以及包含 SSH 密钥的证书的路径，然后运行以下命令。\n\n    $UserName = \"<current Linux user name>\"\n    $Password = \"<new password>\"\n    $Cert = Get-Content \"<certificate path>\"\n    $PrivateConfig = '{\"username\":\"' + $UserName + '\", \"password\": \"' +  $Password + '\", \"ssh_key\":\"' + $cert + '\"}'\n    $ExtensionName = \"VMAccessForLinux\"\n    $Publisher = \"Microsoft.OSTCExtensions\"\n    $Version =  \"1.*\"\n    Set-AzureVMExtension -ExtensionName $ExtensionName -VM  $vm -Publisher $Publisher -Version $Version -PrivateConfiguration $PrivateConfig | Update-AzureVM\n\n### <a name=\"config\"></a>重置 SSH 配置\n\nSSH 配置中的错误可能会导致你无法访问虚拟机。可以通过将 SSH 配置重置为其默认状态来解决该问题。此操作会删除配置中的所有新访问参数，比如用户名、密码和 SSH 密钥，但不会更改用户帐户的密码或 SSH 密钥。扩展将重新启动 SSH 服务器，打开虚拟机上的 SSH 端口，然后将 SSH 配置重置为默认值。\n\n运行以下命令。\n\n    $PrivateConfig = '{\"reset_ssh\": \"True\"}'\n    $ExtensionName = \"VMAccessForLinux\"\n    $Publisher = \"Microsoft.OSTCExtensions\"\n    $Version = \"1.*\"\n    Set-AzureVMExtension -ExtensionName $ExtensionName -VM  $vm -Publisher $Publisher -Version $Version -PrivateConfiguration $PrivateConfig | Update-AzureVM\n\n> [AZURE.NOTE] SSH 配置文件位于 /etc/ssh/sshd\\_config 中。\n\n### <a name=\"delete\"></a> 删除用户\n\n填写要删除的 Linux 用户名，然后运行以下命令。\n\n    $UserName = \"<Linux user name to delete>\"\n    $PrivateConfig = \"{\"remove_user\": \"' + $UserName + '\"}\"\n    $ExtensionName = \"VMAccessForLinux\"\n    $Publisher = \"Microsoft.OSTCExtensions\"\n    $Version = \"1.*\"\n    Set-AzureVMExtension -ExtensionName $ExtensionName -VM $vm -Publisher $Publisher -Version $Version -PrivateConfiguration $PrivateConfig | Update-AzureVM\n\n\n### <a name=\"status\"></a>显示 VMAccess 扩展的状态\n\n若要显示 VMAccess 扩展的状态，请运行以下命令。\n\n    $vm.GuestAgentStatus\n\n### <a name=\"checkdisk\"></a>检查所添加磁盘的一致性\n\n若要通过 fsck 实用程序检查磁盘的一致性，请运行以下命令。\n\n    $PublicConfig = \"{\"check_disk\": \"true\"}\"\n    $ExtensionName = \"VMAccessForLinux\"\n    $Publisher = \"Microsoft.OSTCExtensions\"\n    $Version = \"1.*\"\n    Set-AzureVMExtension -ExtensionName $ExtensionName -VM $vm -Publisher $Publisher -Version $Version -PublicConfiguration $PublicConfig | Update-AzureVM\n\n### <a name=\"checkdisk\"></a>修复在 Linux VM 中添加的磁盘\n\n若要通过 fsck 实用程序修复磁盘，请运行以下命令。\n\n    $PublicConfig = \"{\"repair_disk\": \"true\", \"disk_name\": \"my_disk\"}\"\n    $ExtensionName = \"VMAccessForLinux\"\n    $Publisher = \"Microsoft.OSTCExtensions\"\n    $Version = \"1.*\"\n    Set-AzureVMExtension -ExtensionName $ExtensionName -VM $vm -Publisher $Publisher -Version $Version -PublicConfiguration $PublicConfig | Update-AzureVM\n\n## 其他资源\n\n[Azure VM 扩展和功能][]\n\n[使用 RDP 或 SSH 连接到 Azure 虚拟机][]\n\n\n<!--Link references-->\n[Azure Linux 代理用户指南]: /documentation/articles/virtual-machines-linux-agent-user-guide\n[如何安装和配置 Azure PowerShell]: /documentation/articles/powershell-install-configure\n[Azure VM 扩展和功能]: /documentation/articles/virtual-machines-extensions-features\n[使用 RDP 或 SSH 连接到 Azure 虚拟机]: /documentation/articles/virtual-machines-about\n\n<!---HONumber=Mooncake_0314_2016-->"
+}

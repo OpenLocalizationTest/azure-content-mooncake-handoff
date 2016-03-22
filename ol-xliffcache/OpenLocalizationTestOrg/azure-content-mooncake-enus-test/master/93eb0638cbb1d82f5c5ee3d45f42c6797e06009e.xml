@@ -1,0 +1,495 @@
+{
+  "nodes": [
+    {
+      "content": "创建和上载 Linux VHD | Azure",
+      "pos": [
+        27,
+        50
+      ]
+    },
+    {
+      "content": "使用包含 Linux 操作系统的经典部署模型创建并上载 Azure 虚拟硬盘 (VHD)。",
+      "pos": [
+        69,
+        114
+      ]
+    },
+    {
+      "content": "创建并上载包含 Linux 操作系统的虚拟硬盘",
+      "pos": [
+        374,
+        397
+      ]
+    },
+    {
+      "pos": [
+        399,
+        485
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]"
+    },
+    {
+      "content": "本文介绍如何创建和上载虚拟硬盘 (VHD)，以便可以使用它作为自己的映像在 Azure 中创建虚拟机。你将学习如何准备操作系统，以便使用它来根据该映像创建多个虚拟机。",
+      "pos": [
+        488,
+        571
+      ]
+    },
+    {
+      "pos": [
+        644,
+        848
+      ],
+      "content": "Azure 虚拟机在基于创建过程中选择的映像的操作系统上运行。这些映像以 VHD 格式和 .vhd 文件的形式存储在存储帐户中。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 中的磁盘<ept id=\"p1\">](/documentation/articles/virtual-machines-disks-vhds)</ept>和 <bpt id=\"p2\">[</bpt>Azure 中的映像<ept id=\"p2\">](/documentation/articles/virtual-machines-images)</ept>。"
+    },
+    {
+      "pos": [
+        850,
+        965
+      ],
+      "content": "当你创建虚拟机时，你可以自定义部分操作系统设置，使之适合于要运行的应用程序。有关说明，请参阅<bpt id=\"p1\">[</bpt>如何创建自定义虚拟机<ept id=\"p1\">](/documentation/articles/virtual-machines-create-custom)</ept>。"
+    },
+    {
+      "pos": [
+        967,
+        1179
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>重要说明<ept id=\"p1\">**</ept>：只有在使用某个认可的分发的时候也使用 <bpt id=\"p2\">[</bpt>Azure上的 Linux 认可的分发<ept id=\"p2\">](/documentation/articles/virtual-machines-linux-endorsed-distributions)</ept>中“支持的版本”下指定的配置详细信息时，Azure 平台 SLA 才适用于运行 Linux 操作系统的虚拟机。Azure 映像库中的所有 Linux 分发都是具有所需配置的认可的分发。"
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        1185,
+        1189
+      ]
+    },
+    {
+      "content": "本文假定你拥有以下项目：",
+      "pos": [
+        1190,
+        1202
+      ]
+    },
+    {
+      "pos": [
+        1206,
+        1347
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>管理证书<ept id=\"p1\">**</ept> - 你已为要为其上载 VHD 的订阅创建一个管理证书，并且已将该证书导出到 .cer 文件。有关创建证书的详细信息，请参阅<bpt id=\"p2\">[</bpt>适用于 Azure 的证书概述<ept id=\"p2\">](/documentation/articles/cloud-services-certs-create)</ept>。"
+    },
+    {
+      "pos": [
+        1351,
+        1558
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>安装在 .vhd 文件中的 Linux 操作系统<ept id=\"p1\">**</ept> - 你已将受支持的 Linux 操作系统安装到虚拟硬盘。存在多种工具可创建 .vhd 文件，例如，可以使用虚拟化解决方案（例如 Hyper-V）创建 .vhd 文件并安装操作系统。有关说明，请参阅<bpt id=\"p2\">[</bpt>安装 Hyper-V 角色和配置虚拟机<ept id=\"p2\">](http://technet.microsoft.com/zh-cn/library/hh846766.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        1564,
+        1644
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>重要说明<ept id=\"p1\">**</ept>：Azure 不支持更新的 VHDX 格式。可使用 Hyper-V 管理器或 convert-vhd cmdlet 将磁盘转换为 VHD 格式。"
+    },
+    {
+      "pos": [
+        1650,
+        1864
+      ],
+      "content": "有关认可分发的列表，请参阅 <bpt id=\"p1\">[</bpt>Azure 认可的分发中的 Linux<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-endorsed-distributions)</ept>。有关 Linux 分发的常规列表，请参阅<bpt id=\"p2\">[</bpt>有关非认可分发的信息<ept id=\"p2\">](/documentation/articles/virtual-machines-linux-create-upload-vhd-generic)</ept>。"
+    },
+    {
+      "pos": [
+        1868,
+        1994
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Azure 命令行界面<ept id=\"p1\">**</ept> - 如果你使用 Linux 操作系统来创建映像，则使用 <bpt id=\"p2\">[</bpt>Azure 命令行界面<ept id=\"p2\">](/documentation/articles/virtual-machines-command-line-tools)</ept>来上载 VHD。"
+    },
+    {
+      "pos": [
+        1998,
+        2214
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Azure Powershell 工具<ept id=\"p1\">**</ept> - 还可以使用 <ph id=\"ph1\">`Add-AzureVhd`</ph> cmdlet 来上载 VHD。若要下载 Azure Powershell cmdlet，请参阅 <bpt id=\"p2\">[</bpt>Azure 下载<ept id=\"p2\">](/downloads/)</ept>。有关引用信息，请参阅 <bpt id=\"p3\">[</bpt>Add-AzureVhd<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/azure/dn495173.aspx)</ept>（可能为英文页面）。"
+    },
+    {
+      "pos": [
+        2216,
+        2239
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"prepimage\"&gt;</ph> <ph id=\"ph2\">&lt;/a&gt;</ph>"
+    },
+    {
+      "content": "步骤 1：准备要上载的映像",
+      "pos": [
+        2243,
+        2256
+      ]
+    },
+    {
+      "pos": [
+        2258,
+        2398
+      ],
+      "content": "Azure 支持各种 Linux 分发（请参阅<bpt id=\"p1\">[</bpt>认可的分发<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-endorsed-distributions)</ept>）。以下文章将指导你完成如何准备 Azure 上支持的各种 Linux 分发："
+    },
+    {
+      "content": "基于 CentOS 的分发",
+      "pos": [
+        2405,
+        2418
+      ]
+    },
+    {
+      "content": "Debian Linux",
+      "pos": [
+        2500,
+        2512
+      ]
+    },
+    {
+      "content": "Oracle Linux",
+      "pos": [
+        2594,
+        2606
+      ]
+    },
+    {
+      "content": "Red Hat Enterprise Linux",
+      "pos": [
+        2688,
+        2712
+      ]
+    },
+    {
+      "content": "SLES 和 openSUSE",
+      "pos": [
+        2794,
+        2809
+      ]
+    },
+    {
+      "content": "Ubuntu",
+      "pos": [
+        2889,
+        2895
+      ]
+    },
+    {
+      "content": "其他 - 非认可分发",
+      "pos": [
+        2977,
+        2987
+      ]
+    },
+    {
+      "pos": [
+        3066,
+        3207
+      ],
+      "content": "另请参阅 <bpt id=\"p1\">**</bpt><bpt id=\"p2\">[</bpt>Linux 安装说明<ept id=\"p2\">](/documentation/articles/virtual-machines-linux-create-upload-vhd-generic#linuxinstall)</ept><ept id=\"p1\">**</ept>，以获取更多有关如何为 Azure 准备 Linux 映像的提示。"
+    },
+    {
+      "content": "按照上述指导中的步骤进行操作以后，你应该有了一个可以上载到 Azure 中的 VHD 文件。",
+      "pos": [
+        3209,
+        3255
+      ]
+    },
+    {
+      "pos": [
+        3257,
+        3278
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"connect\"&gt;</ph> <ph id=\"ph2\">&lt;/a&gt;</ph>"
+    },
+    {
+      "content": "步骤 2：准备连接到 Azure",
+      "pos": [
+        3282,
+        3298
+      ]
+    },
+    {
+      "content": "你首先需要在计算机和 Azure 中的订阅之间建立一个安全连接，然后才能上载 .vhd 文件。",
+      "pos": [
+        3300,
+        3347
+      ]
+    },
+    {
+      "content": "如果使用 Azure CLI",
+      "pos": [
+        3354,
+        3368
+      ]
+    },
+    {
+      "content": "最新的 Azure CLI 会默认到资源管理器部署模型中，以确保使用以下命令使你处于经典部署模型中：",
+      "pos": [
+        3370,
+        3420
+      ]
+    },
+    {
+      "content": "接下来，使用以下任意登录方法连接到你的 Azure 订阅。",
+      "pos": [
+        3455,
+        3484
+      ]
+    },
+    {
+      "content": "使用 Azure AD 方法登录：",
+      "pos": [
+        3486,
+        3503
+      ]
+    },
+    {
+      "content": "打开 Azure CLI 窗口",
+      "pos": [
+        3508,
+        3523
+      ]
+    },
+    {
+      "content": "键入：",
+      "pos": [
+        3528,
+        3531
+      ]
+    },
+    {
+      "content": "出现提示时，键入你的用户名和密码。",
+      "pos": [
+        3589,
+        3606
+      ]
+    },
+    {
+      "pos": [
+        3608,
+        3637
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>或者<ept id=\"p1\">**</ept>，改用 PublishSettings 文件："
+    },
+    {
+      "content": "打开 Azure CLI 窗口",
+      "pos": [
+        3642,
+        3657
+      ]
+    },
+    {
+      "content": "键入：",
+      "pos": [
+        3662,
+        3665
+      ]
+    },
+    {
+      "content": "此命令将打开浏览器窗口，并自动下载包含信息的 .publishsettings 文件和 Azure 订阅的证书。",
+      "pos": [
+        3720,
+        3776
+      ]
+    },
+    {
+      "content": "保存 .publishsettings 文件",
+      "pos": [
+        3781,
+        3803
+      ]
+    },
+    {
+      "content": "键入：",
+      "pos": [
+        3808,
+        3811
+      ]
+    },
+    {
+      "pos": [
+        3858,
+        3903
+      ],
+      "content": "其中 <ph id=\"ph1\">`&lt;PathToFile&gt;`</ph> 是 .publishsettings 文件的完整路径。"
+    },
+    {
+      "pos": [
+        3909,
+        3986
+      ],
+      "content": "有关详细信息，请阅读<bpt id=\"p1\">[</bpt>从 Azure CLI 连接到 Azure<ept id=\"p1\">](/documentation/articles/xplat-cli-connect)</ept>。"
+    },
+    {
+      "content": "如果使用 Azure PowerShell",
+      "pos": [
+        3993,
+        4014
+      ]
+    },
+    {
+      "content": "使用 Azure AD 方法登录：",
+      "pos": [
+        4016,
+        4033
+      ]
+    },
+    {
+      "content": "打开 Azure PowerShell 窗口。",
+      "pos": [
+        4038,
+        4061
+      ]
+    },
+    {
+      "content": "键入：",
+      "pos": [
+        4066,
+        4069
+      ]
+    },
+    {
+      "content": "出现提示时，输入你组织提供的用户 ID 和密码。",
+      "pos": [
+        4128,
+        4152
+      ]
+    },
+    {
+      "pos": [
+        4154,
+        4183
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>或者<ept id=\"p1\">**</ept>，改用 PublishSettings 文件："
+    },
+    {
+      "content": "打开 Azure PowerShell 窗口。",
+      "pos": [
+        4188,
+        4211
+      ]
+    },
+    {
+      "content": "键入：",
+      "pos": [
+        4216,
+        4219
+      ]
+    },
+    {
+      "content": "此命令将打开浏览器窗口，并自动下载包含信息的 .publishsettings 文件和 Azure 订阅的证书。",
+      "pos": [
+        4290,
+        4346
+      ]
+    },
+    {
+      "content": "保存 .publishsettings 文件。",
+      "pos": [
+        4351,
+        4374
+      ]
+    },
+    {
+      "content": "键入：",
+      "pos": [
+        4379,
+        4382
+      ]
+    },
+    {
+      "pos": [
+        4469,
+        4514
+      ],
+      "content": "其中 <ph id=\"ph1\">`&lt;PathToFile&gt;`</ph> 是 .publishsettings 文件的完整路径。"
+    },
+    {
+      "pos": [
+        4520,
+        4611
+      ],
+      "content": "有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何安装和配置 Azure PowerShell<ept id=\"p1\">](/documentation/articles/powershell-install-configure)</ept>。"
+    },
+    {
+      "pos": [
+        4615,
+        4717
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 我们建议你使用更新的 Azure Active Directory 方法登录到你的 Azure 订阅，不管是通过 Azure CLI 还是通过 Azure PowerShell。"
+    },
+    {
+      "pos": [
+        4719,
+        4739
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"upload\"&gt;</ph> <ph id=\"ph2\">&lt;/a&gt;</ph>"
+    },
+    {
+      "content": "步骤 3：向 Azure 上载映像",
+      "pos": [
+        4743,
+        4760
+      ]
+    },
+    {
+      "pos": [
+        4762,
+        4887
+      ],
+      "content": "你需要一个存储帐户，以便向其上载你的 VHD 文件。你可以选择现有的存储帐户，也可以创建一个新的。若要创建存储帐户，请参阅<bpt id=\"p1\">[</bpt>创建存储帐户<ept id=\"p1\">](/documentation/articles/storage-create-storage-account)</ept>"
+    },
+    {
+      "pos": [
+        4889,
+        5131
+      ],
+      "content": "在上载 .vhd 文件时，你可以将 .vhd 文件放置在 Blob 存储中的任何位置。在以下命令示例中，<bpt id=\"p1\">**</bpt>BlobStorageURL<ept id=\"p1\">**</ept> 是你计划使用的存储帐户的 URL，<bpt id=\"p2\">**</bpt>YourImagesFolder<ept id=\"p2\">**</ept> 是要在其中存储映像的 Blob 存储中的容器。VHDName 是显示在 <bpt id=\"p3\">[</bpt>Azure 管理门户<ept id=\"p3\">](http://manage.windowsazure.cn)</ept>中用于标识虚拟硬盘的标签。<bpt id=\"p4\">**</bpt>PathToVHDFile<ept id=\"p4\">**</ept> 是 .vhd 文件在计算机上的完整路径和名称。"
+    },
+    {
+      "content": "如果使用 Azure CLI",
+      "pos": [
+        5138,
+        5152
+      ]
+    },
+    {
+      "content": "在 Azure CLI 中使用以下命令来上载映像：",
+      "pos": [
+        5154,
+        5179
+      ]
+    },
+    {
+      "pos": [
+        5308,
+        5409
+      ],
+      "content": "有关详细信息，请参阅<bpt id=\"p1\">[</bpt>用于 Azure 服务管理的 Azure CLI 参考<ept id=\"p1\">](/documentation/articles/virtual-machines-command-line-tools)</ept>。"
+    },
+    {
+      "content": "如果使用 PowerShell",
+      "pos": [
+        5416,
+        5431
+      ]
+    },
+    {
+      "content": "从你在上一步中使用的 Azure PowerShell 窗口中，键入：",
+      "pos": [
+        5433,
+        5468
+      ]
+    },
+    {
+      "pos": [
+        5582,
+        5670
+      ],
+      "content": "有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Add-AzureVhd<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/dn495173.aspx)</ept>。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"创建和上载 Linux VHD | Azure\"\n    description=\"使用包含 Linux 操作系统的经典部署模型创建并上载 Azure 虚拟硬盘 (VHD)。\"\n    services=\"virtual-machines\"\n    documentationCenter=\"\"\n    authors=\"dsk-2015\"\n    manager=\"timlt\"\n    editor=\"tysonn\"\n    tags=\"azure-service-management\"/>\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"01/22/2016\"\n    wacn.date=\"03/21/2016\"/>\n\n# 创建并上载包含 Linux 操作系统的虚拟硬盘\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]\n\n\n本文介绍如何创建和上载虚拟硬盘 (VHD)，以便可以使用它作为自己的映像在 Azure 中创建虚拟机。你将学习如何准备操作系统，以便使用它来根据该映像创建多个虚拟机。\n\n[AZURE.INCLUDE [free-trial-note](../includes/create-account-note.md)]\n\nAzure 虚拟机在基于创建过程中选择的映像的操作系统上运行。这些映像以 VHD 格式和 .vhd 文件的形式存储在存储帐户中。有关详细信息，请参阅 [Azure 中的磁盘](/documentation/articles/virtual-machines-disks-vhds)和 [Azure 中的映像](/documentation/articles/virtual-machines-images)。\n\n当你创建虚拟机时，你可以自定义部分操作系统设置，使之适合于要运行的应用程序。有关说明，请参阅[如何创建自定义虚拟机](/documentation/articles/virtual-machines-create-custom)。\n\n**重要说明**：只有在使用某个认可的分发的时候也使用 [Azure上的 Linux 认可的分发](/documentation/articles/virtual-machines-linux-endorsed-distributions)中“支持的版本”下指定的配置详细信息时，Azure 平台 SLA 才适用于运行 Linux 操作系统的虚拟机。Azure 映像库中的所有 Linux 分发都是具有所需配置的认可的分发。\n\n\n## 先决条件\n本文假定你拥有以下项目：\n\n- **管理证书** - 你已为要为其上载 VHD 的订阅创建一个管理证书，并且已将该证书导出到 .cer 文件。有关创建证书的详细信息，请参阅[适用于 Azure 的证书概述](/documentation/articles/cloud-services-certs-create)。\n\n- **安装在 .vhd 文件中的 Linux 操作系统** - 你已将受支持的 Linux 操作系统安装到虚拟硬盘。存在多种工具可创建 .vhd 文件，例如，可以使用虚拟化解决方案（例如 Hyper-V）创建 .vhd 文件并安装操作系统。有关说明，请参阅[安装 Hyper-V 角色和配置虚拟机](http://technet.microsoft.com/zh-cn/library/hh846766.aspx)。\n\n    **重要说明**：Azure 不支持更新的 VHDX 格式。可使用 Hyper-V 管理器或 convert-vhd cmdlet 将磁盘转换为 VHD 格式。\n\n    有关认可分发的列表，请参阅 [Azure 认可的分发中的 Linux](/documentation/articles/virtual-machines-linux-endorsed-distributions)。有关 Linux 分发的常规列表，请参阅[有关非认可分发的信息](/documentation/articles/virtual-machines-linux-create-upload-vhd-generic)。\n\n- **Azure 命令行界面** - 如果你使用 Linux 操作系统来创建映像，则使用 [Azure 命令行界面](/documentation/articles/virtual-machines-command-line-tools)来上载 VHD。\n\n- **Azure Powershell 工具** - 还可以使用 `Add-AzureVhd` cmdlet 来上载 VHD。若要下载 Azure Powershell cmdlet，请参阅 [Azure 下载](/downloads/)。有关引用信息，请参阅 [Add-AzureVhd](https://msdn.microsoft.com/zh-cn/library/azure/dn495173.aspx)（可能为英文页面）。\n\n<a id=\"prepimage\"> </a>\n## 步骤 1：准备要上载的映像\n\nAzure 支持各种 Linux 分发（请参阅[认可的分发](/documentation/articles/virtual-machines-linux-endorsed-distributions)）。以下文章将指导你完成如何准备 Azure 上支持的各种 Linux 分发：\n\n- **[基于 CentOS 的分发](/documentation/articles/virtual-machines-linux-create-upload-vhd-centos)**\n- **[Debian Linux](/documentation/articles/virtual-machines-linux-create-upload-vhd-debian)**\n- **[Oracle Linux](/documentation/articles/virtual-machines-linux-create-upload-vhd-oracle)**\n- **[Red Hat Enterprise Linux](/documentation/articles/virtual-machines-linux-create-upload-vhd-redhat)**\n- **[SLES 和 openSUSE](/documentation/articles/virtual-machines-linux-create-upload-vhd-suse)**\n- **[Ubuntu](/documentation/articles/virtual-machines-linux-create-upload-vhd-ubuntu)**\n- **[其他 - 非认可分发](/documentation/articles/virtual-machines-linux-create-upload-vhd-generic)**\n\n另请参阅 **[Linux 安装说明](/documentation/articles/virtual-machines-linux-create-upload-vhd-generic#linuxinstall)**，以获取更多有关如何为 Azure 准备 Linux 映像的提示。\n\n按照上述指导中的步骤进行操作以后，你应该有了一个可以上载到 Azure 中的 VHD 文件。\n\n<a id=\"connect\"> </a>\n## 步骤 2：准备连接到 Azure\n\n你首先需要在计算机和 Azure 中的订阅之间建立一个安全连接，然后才能上载 .vhd 文件。\n\n\n### 如果使用 Azure CLI\n\n最新的 Azure CLI 会默认到资源管理器部署模型中，以确保使用以下命令使你处于经典部署模型中：\n\n        azure config mode asm  \n\n接下来，使用以下任意登录方法连接到你的 Azure 订阅。\n\n使用 Azure AD 方法登录：\n\n1. 打开 Azure CLI 窗口\n\n2. 键入：\n\n    `azure login -e AzureChinaCloud -u <username>`\n\n    出现提示时，键入你的用户名和密码。\n\n**或者**，改用 PublishSettings 文件：\n\n1. 打开 Azure CLI 窗口\n\n2. 键入：\n\n    `azure account download -e AzureChinaCloud`\n\n    此命令将打开浏览器窗口，并自动下载包含信息的 .publishsettings 文件和 Azure 订阅的证书。\n\n3. 保存 .publishsettings 文件\n\n4. 键入：\n\n    `azure account import <PathToFile>`\n\n    其中 `<PathToFile>` 是 .publishsettings 文件的完整路径。\n\n    有关详细信息，请阅读[从 Azure CLI 连接到 Azure](/documentation/articles/xplat-cli-connect)。\n\n\n### 如果使用 Azure PowerShell\n\n使用 Azure AD 方法登录：\n\n1. 打开 Azure PowerShell 窗口。\n\n2. 键入：\n\n    `Add-AzureAccount -Environment AzureChinaCloud`\n\n    出现提示时，输入你组织提供的用户 ID 和密码。\n\n**或者**，改用 PublishSettings 文件：\n\n1. 打开 Azure PowerShell 窗口。\n\n2. 键入：\n\n    `Get-AzurePublishSettingsFile -Environment AzureChinaCloud`\n\n    此命令将打开浏览器窗口，并自动下载包含信息的 .publishsettings 文件和 Azure 订阅的证书。\n\n3. 保存 .publishsettings 文件。\n\n4. 键入：\n\n    `Import-AzurePublishSettingsFile -Environment AzureChinaCloud <PathToFile>`\n\n    其中 `<PathToFile>` 是 .publishsettings 文件的完整路径。\n\n    有关详细信息，请参阅[如何安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure)。\n\n> [AZURE.NOTE] 我们建议你使用更新的 Azure Active Directory 方法登录到你的 Azure 订阅，不管是通过 Azure CLI 还是通过 Azure PowerShell。\n\n<a id=\"upload\"> </a>\n## 步骤 3：向 Azure 上载映像\n\n你需要一个存储帐户，以便向其上载你的 VHD 文件。你可以选择现有的存储帐户，也可以创建一个新的。若要创建存储帐户，请参阅[创建存储帐户](/documentation/articles/storage-create-storage-account)\n\n在上载 .vhd 文件时，你可以将 .vhd 文件放置在 Blob 存储中的任何位置。在以下命令示例中，**BlobStorageURL** 是你计划使用的存储帐户的 URL，**YourImagesFolder** 是要在其中存储映像的 Blob 存储中的容器。VHDName 是显示在 [Azure 管理门户](http://manage.windowsazure.cn)中用于标识虚拟硬盘的标签。**PathToVHDFile** 是 .vhd 文件在计算机上的完整路径和名称。\n\n\n### 如果使用 Azure CLI\n\n在 Azure CLI 中使用以下命令来上载映像：\n\n        azure vm image create <ImageName> --blob-url <BlobStorageURL>/<YourImagesFolder>/<VHDName> --os Linux <PathToVHDFile>\n\n有关详细信息，请参阅[用于 Azure 服务管理的 Azure CLI 参考](/documentation/articles/virtual-machines-command-line-tools)。\n\n\n### 如果使用 PowerShell\n\n从你在上一步中使用的 Azure PowerShell 窗口中，键入：\n\n        Add-AzureVhd -Destination <BlobStorageURL>/<YourImagesFolder>/<VHDName> -LocalFilePath <PathToVHDFile>\n\n有关详细信息，请参阅 [Add-AzureVhd](https://msdn.microsoft.com/zh-cn/library/azure/dn495173.aspx)。\n\n\n[Step 1: Prepare the image to be uploaded]: #prepimage\n[Step 2: Prepare the connection to Azure]: #connect\n[Step 3: Upload the image to Azure]: #upload\n\n<!---HONumber=Mooncake_0314_2016-->"
+}

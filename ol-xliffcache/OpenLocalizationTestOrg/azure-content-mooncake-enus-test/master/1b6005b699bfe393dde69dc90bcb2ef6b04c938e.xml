@@ -1,0 +1,292 @@
+{
+  "nodes": [
+    {
+      "content": "在通用 Windows 应用中处理与脱机数据的冲突 | Microsoft Azure",
+      "pos": [
+        28,
+        71
+      ]
+    },
+    {
+      "content": "了解在通用 Windows 应用程序中同步脱机数据时如何使用 Azure 移动服务处理冲突",
+      "pos": [
+        91,
+        136
+      ]
+    },
+    {
+      "content": "在“移动服务”中处理与脱机数据同步的冲突",
+      "pos": [
+        369,
+        389
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        491,
+        497
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        621,
+        623
+      ]
+    },
+    {
+      "content": "本主题演示在使用 Azure 移动服务的脱机功能时如何同步数据和处理冲突。",
+      "pos": [
+        625,
+        662
+      ]
+    },
+    {
+      "content": "在本教程中，你将为支持处理脱机同步冲突的应用下载通用 Windows C# 解决方案。您要将移动服务与应用程序集成，然后再运行的 Windows 应用商店 8.1 和 Windows Phone 8.1 客户端生成同步冲突，并解决冲突。",
+      "pos": [
+        666,
+        784
+      ]
+    },
+    {
+      "pos": [
+        786,
+        841
+      ],
+      "content": "本教程以前一教程<bpt id=\"p1\">[</bpt><ept id=\"p1\">脱机数据处理入门]</ept>中的步骤和示例应用程序为基础。在开始本教程之前，应先完成<bpt id=\"p2\">[</bpt><ept id=\"p2\">脱机数据入门]</ept>。"
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        846,
+        850
+      ]
+    },
+    {
+      "content": "本教程需要运行在 Windows 8.1 上的 Visual Studio 2013。",
+      "pos": [
+        852,
+        895
+      ]
+    },
+    {
+      "content": "下载示例项目",
+      "pos": [
+        900,
+        906
+      ]
+    },
+    {
+      "pos": [
+        916,
+        972
+      ],
+      "content": "本教程逐步介绍 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Todo 脱机移动服务示例]</ept>如何处理本地脱机存储与 Azure 中的移动服务数据库之间的冲突。"
+    },
+    {
+      "pos": [
+        977,
+        1019
+      ],
+      "content": "下载<bpt id=\"p1\">[</bpt><ept id=\"p1\">移动服务示例 GitHub 存储库]</ept>的 zip 文件，并将其解压缩到工作目录。"
+    },
+    {
+      "pos": [
+        1025,
+        1100
+      ],
+      "content": "如果尚未安装<bpt id=\"p1\">[</bpt><ept id=\"p1\">脱机数据入门]</ept>教程中所述的适用于 Windows 8.1 和 Windows Phone 8.1 的 SQLite，请安装这两个运行时。"
+    },
+    {
+      "pos": [
+        1105,
+        1269
+      ],
+      "content": "在 Visual Studio 2013 中，打开 <bpt id=\"p1\">*</bpt>mobile-services-samples\\\\TodoOffline\\\\WindowsUniversal\\\\TodoOffline-Universal.sln<ept id=\"p1\">*</ept> 解决方案文件。按 <bpt id=\"p2\">**</bpt>F5<ept id=\"p2\">**</ept> 键重新生成并运行项目。验证是否还原了 NuGet 包以及是否正确设置了引用。"
+    },
+    {
+      "pos": [
+        1276,
+        1342
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>可能需要删除对 SQLite 运行时的任何旧引用，并将其替换为已更新的引用（如<bpt id=\"p1\">[</bpt><ept id=\"p1\">脱机数据入门]</ept>教程中所述）。"
+    },
+    {
+      "content": "在应用中，在“插入 TodoItem”中键入一些文本，然后单击“保存”将某些 todo 项添加到本地存储中。然后关闭应用程序。",
+      "pos": [
+        1347,
+        1410
+      ]
+    },
+    {
+      "content": "请注意，此应用程序尚未连接到任何移动服务，因此“推送”和“拉取”按钮将引发异常。",
+      "pos": [
+        1412,
+        1452
+      ]
+    },
+    {
+      "content": "针对移动服务测试应用程序",
+      "pos": [
+        1459,
+        1471
+      ]
+    },
+    {
+      "content": "现在可以针对移动服务测试应用程序了。",
+      "pos": [
+        1473,
+        1491
+      ]
+    },
+    {
+      "pos": [
+        1496,
+        1561
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 经典门户]</ept>中，通过单击“仪表板”选项卡的命令栏上的“管理密钥”找到移动服务的应用程序密钥。复制“应用程序密钥”。"
+    },
+    {
+      "pos": [
+        1566,
+        1674
+      ],
+      "content": "在 Visual Studio 的解决方案资源管理器中，打开客户端示例项目中的 App.xaml.cs 文件。更改 <bpt id=\"p1\">**</bpt>MobileServiceClient<ept id=\"p1\">**</ept> 的初始化以使用你的移动服务 URL 和应用程序密钥："
+    },
+    {
+      "pos": [
+        1862,
+        1900
+      ],
+      "content": "在 Visual Studio 中，按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 键重新生成并运行应用。"
+    },
+    {
+      "content": "更新后端中的数据以制造冲突",
+      "pos": [
+        1917,
+        1930
+      ]
+    },
+    {
+      "pos": [
+        1932,
+        2241
+      ],
+      "content": "在实际情况中，当一个应用程序将更新推送到数据库中的一条记录，然后另一个应用程序尝试使用该记录中过时的版本字段将更新推送到同一条记录时，会发生同步冲突。如<bpt id=\"p1\">[</bpt><ept id=\"p1\">脱机数据入门]</ept>中所述，要支持脱机同步功能需要版本系统属性。通过每次数据库更新检查此版本信息。如果应用的实例尝试使用过时版本更新记录，则将发生冲突，并且会在应用中捕获为 <ph id=\"ph1\">`MobileServicePreconditionFailedException`</ph>。如果应用未捕获 <ph id=\"ph2\">`MobileServicePreconditionFailedException`</ph>，则最终将引发 <ph id=\"ph3\">`MobileServicePushFailedException`</ph>，描述遇到了多少同步错误。"
+    },
+    {
+      "pos": [
+        2244,
+        2418
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>若要通过脱机数据同步支持同步已删除的记录，应启用“<bpt id=\"p1\">[</bpt>软删除<ept id=\"p1\">](/documentation/articles/mobile-services-using-soft-delete)</ept>”。否则，必须手动删除本地存储中的记录，或者调用 <ph id=\"ph2\">`IMobileServiceSyncTable::PurgeAsync()`</ph> 以清除本地存储。"
+    },
+    {
+      "content": "下面的步骤演示使用示例同时运行 Windows Phone 8.1 和 Windows 应用商店 8.1 客户端以引发冲突并解决冲突。",
+      "pos": [
+        2421,
+        2488
+      ]
+    },
+    {
+      "pos": [
+        2493,
+        2656
+      ],
+      "content": "在 Visual Studio 中，右键单击 Windows Phone 8.1 项目，然后单击“设为启动项目”。然后按 <bpt id=\"p1\">**</bpt>Ctrl+F5<ept id=\"p1\">**</ept> 键以运行 Windows Phone 8.1 客户端而不进行调试。在模拟器中运行 Windows Phone 8.1 客户端之后，单击“拉取”按钮将本地存储与数据库的当前状态同步。"
+    },
+    {
+      "pos": [
+        2679,
+        2812
+      ],
+      "content": "在 Visual Studio 中，右键单击 Windows 8.1 运行时项目，然后单击“设为启动项目”以将其重设为启动项目。然后按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 运行该项目。在运行 Windows 应用商店 8.1 客户端之后，单击“拉取”按钮将本地存储与数据库的当前状态同步。"
+    },
+    {
+      "content": "此时，两个客户端都将与数据库同步。这两个客户端的代码还使用增量同步，以便仅同步不完整的 todo 项。已完成的 todo 项将被忽略。选择其中的一个项，并在两个客户端中将同一个项的文本编辑为不同的值。单击“推送”按钮将这两个更改与服务器上的数据库同步。",
+      "pos": [
+        2830,
+        2956
+      ]
+    },
+    {
+      "content": "最后执行其推送的客户端会遇到冲突，并让用户决定要将哪个值提交到数据库。该异常提供了用于解决冲突的正确版本值。",
+      "pos": [
+        2986,
+        3040
+      ]
+    },
+    {
+      "content": "查看处理同步冲突的代码",
+      "pos": [
+        3059,
+        3070
+      ]
+    },
+    {
+      "pos": [
+        3072,
+        3136
+      ],
+      "content": "若要使用移动服务脱机功能，必须在本地数据库和数据传输对象中都包括版本列。这是通过更新 <ph id=\"ph1\">`TodoItem`</ph> 类的以下成员实现的："
+    },
+    {
+      "pos": [
+        3201,
+        3271
+      ],
+      "content": "当使用 <ph id=\"ph1\">`TodoItem`</ph> 类来定义本地存储时，<ph id=\"ph2\">`__version`</ph> 列包括在本地数据库的 <ph id=\"ph3\">`OnNavigatedTo()`</ph> 方法中。"
+    },
+    {
+      "pos": [
+        3273,
+        3428
+      ],
+      "content": "若要使用代码处理脱机同步冲突，请创建一个实现 <ph id=\"ph1\">`IMobileServiceSyncHandler`</ph> 的类。调用 <ph id=\"ph2\">`MobileServiceClient.SyncContext.InitializeAsync()`</ph> 时传递这种类型的对象。在示例的 <ph id=\"ph3\">`OnNavigatedTo()`</ph> 方法中也会发生这种情况。"
+    },
+    {
+      "pos": [
+        3532,
+        3731
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>SyncHandler.cs<ept id=\"p1\">**</ept> 中的类 <ph id=\"ph1\">`SyncHandler`</ph> 实现了 <ph id=\"ph2\">`IMobileServiceSyncHandler`</ph>。将每个推送操作发送到服务器时均调用 <ph id=\"ph3\">`ExecuteTableOperationAsync`</ph> 方法。如果引发了 <ph id=\"ph4\">`MobileServicePreconditionFailedException`</ph> 类型的异常，则意味着某个项目的本地版本和远程版本之间存在冲突。"
+    },
+    {
+      "content": "若要在解决冲突时考虑到本地项目，则只需重试该操作。发生冲突后，需更新本地项目版本，使之与服务器版本匹配，因此重新执行该操作将使用本地更改覆盖服务器更改：",
+      "pos": [
+        3733,
+        3809
+      ]
+    },
+    {
+      "pos": [
+        3849,
+        3927
+      ],
+      "content": "若要在解决冲突时考虑到服务器项目，则只需从 <ph id=\"ph1\">`ExecuteTableOperationAsync`</ph> 返回。将放弃该对象的本地版本，将其替换为服务器中的值。"
+    },
+    {
+      "pos": [
+        3929,
+        3969
+      ],
+      "content": "若要停止推送操作（但保留已排队的更改），请使用方法 <ph id=\"ph1\">`AbortPush()`</ph>："
+    },
+    {
+      "pos": [
+        3999,
+        4113
+      ],
+      "content": "这将停止当前的推送操作，但会保留所有挂起的更改，包括当前操作（如果从 <ph id=\"ph1\">`ExecuteTableOperationAsync`</ph> 调用了 <ph id=\"ph2\">`AbortPush`</ph>）。下次调用 <ph id=\"ph3\">`PushAsync()`</ph> 时，这些更改将发送到服务器。"
+    },
+    {
+      "pos": [
+        4115,
+        4251
+      ],
+      "content": "在取消推送时，<ph id=\"ph1\">`PushAsync`</ph> 将引发 <ph id=\"ph2\">`MobileServicePushFailedException`</ph>，而异常属性 <ph id=\"ph3\">`PushResult.Status`</ph> 将具有值 <ph id=\"ph4\">`MobileServicePushStatus.CancelledByOperation`</ph>。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"在通用 Windows 应用中处理与脱机数据的冲突 | Microsoft Azure\" \n    description=\"了解在通用 Windows 应用程序中同步脱机数据时如何使用 Azure 移动服务处理冲突\" \n    documentationCenter=\"windows\" \n    authors=\"wesmc7777\" \n    manager=\"dwrede\" \n    editor=\"\" \n    services=\"mobile-services\"/>\n\n<tags \n    ms.service=\"mobile-services\" \n    ms.date=\"02/11/2016\"\n    wacn.date=\"03/21/2016\"/>\n\n\n# 在“移动服务”中处理与脱机数据同步的冲突\n\n[AZURE.INCLUDE [mobile-service-note-mobile-apps](../includes/mobile-services-note-mobile-apps.md)]\n\n&nbsp;\n[AZURE.INCLUDE [mobile-services-selector-offline-conflicts](../includes/mobile-services-selector-offline-conflicts.md)]\n\n##概述\n\n本主题演示在使用 Azure 移动服务的脱机功能时如何同步数据和处理冲突。\n\n\n\n在本教程中，你将为支持处理脱机同步冲突的应用下载通用 Windows C# 解决方案。您要将移动服务与应用程序集成，然后再运行的 Windows 应用商店 8.1 和 Windows Phone 8.1 客户端生成同步冲突，并解决冲突。\n\n本教程以前一教程[脱机数据处理入门]中的步骤和示例应用程序为基础。在开始本教程之前，应先完成[脱机数据入门]。\n\n\n##先决条件\n\n本教程需要运行在 Windows 8.1 上的 Visual Studio 2013。\n\n\n##下载示例项目\n\n![][0]\n\n本教程逐步介绍 [Todo 脱机移动服务示例]如何处理本地脱机存储与 Azure 中的移动服务数据库之间的冲突。\n\n1. 下载[移动服务示例 GitHub 存储库]的 zip 文件，并将其解压缩到工作目录。 \n\n2. 如果尚未安装[脱机数据入门]教程中所述的适用于 Windows 8.1 和 Windows Phone 8.1 的 SQLite，请安装这两个运行时。\n\n3. 在 Visual Studio 2013 中，打开 *mobile-services-samples\\\\TodoOffline\\\\WindowsUniversal\\\\TodoOffline-Universal.sln* 解决方案文件。按 **F5** 键重新生成并运行项目。验证是否还原了 NuGet 包以及是否正确设置了引用。\n\n    >[AZURE.NOTE]可能需要删除对 SQLite 运行时的任何旧引用，并将其替换为已更新的引用（如[脱机数据入门]教程中所述）。\n\n4. 在应用中，在“插入 TodoItem”中键入一些文本，然后单击“保存”将某些 todo 项添加到本地存储中。然后关闭应用程序。\n\n请注意，此应用程序尚未连接到任何移动服务，因此“推送”和“拉取”按钮将引发异常。\n\n\n\n\n##针对移动服务测试应用程序\n\n现在可以针对移动服务测试应用程序了。\n\n1. 在 [Azure 经典门户]中，通过单击“仪表板”选项卡的命令栏上的“管理密钥”找到移动服务的应用程序密钥。复制“应用程序密钥”。\n\n2. 在 Visual Studio 的解决方案资源管理器中，打开客户端示例项目中的 App.xaml.cs 文件。更改 **MobileServiceClient** 的初始化以使用你的移动服务 URL 和应用程序密钥：\n\n         public static MobileServiceClient MobileService = new MobileServiceClient(\n            \"https://your-mobile-service.azure-mobile.net/\",\n            \"Your AppKey\"\n        );\n\n3. 在 Visual Studio 中，按 **F5** 键重新生成并运行应用。\n\n    ![][0]\n\n\n##更新后端中的数据以制造冲突\n\n在实际情况中，当一个应用程序将更新推送到数据库中的一条记录，然后另一个应用程序尝试使用该记录中过时的版本字段将更新推送到同一条记录时，会发生同步冲突。如[脱机数据入门]中所述，要支持脱机同步功能需要版本系统属性。通过每次数据库更新检查此版本信息。如果应用的实例尝试使用过时版本更新记录，则将发生冲突，并且会在应用中捕获为 `MobileServicePreconditionFailedException`。如果应用未捕获 `MobileServicePreconditionFailedException`，则最终将引发 `MobileServicePushFailedException`，描述遇到了多少同步错误。\n\n>[AZURE.NOTE]若要通过脱机数据同步支持同步已删除的记录，应启用“[软删除](/documentation/articles/mobile-services-using-soft-delete)”。否则，必须手动删除本地存储中的记录，或者调用 `IMobileServiceSyncTable::PurgeAsync()` 以清除本地存储。\n\n\n下面的步骤演示使用示例同时运行 Windows Phone 8.1 和 Windows 应用商店 8.1 客户端以引发冲突并解决冲突。\n\n1. 在 Visual Studio 中，右键单击 Windows Phone 8.1 项目，然后单击“设为启动项目”。然后按 **Ctrl+F5** 键以运行 Windows Phone 8.1 客户端而不进行调试。在模拟器中运行 Windows Phone 8.1 客户端之后，单击“拉取”按钮将本地存储与数据库的当前状态同步。\n \n    ![][3]\n \n   \n2. 在 Visual Studio 中，右键单击 Windows 8.1 运行时项目，然后单击“设为启动项目”以将其重设为启动项目。然后按 **F5** 运行该项目。在运行 Windows 应用商店 8.1 客户端之后，单击“拉取”按钮将本地存储与数据库的当前状态同步。\n\n    ![][4]\n \n3. 此时，两个客户端都将与数据库同步。这两个客户端的代码还使用增量同步，以便仅同步不完整的 todo 项。已完成的 todo 项将被忽略。选择其中的一个项，并在两个客户端中将同一个项的文本编辑为不同的值。单击“推送”按钮将这两个更改与服务器上的数据库同步。\n\n    ![][5]\n\n    ![][6]\n\n\n4. 最后执行其推送的客户端会遇到冲突，并让用户决定要将哪个值提交到数据库。该异常提供了用于解决冲突的正确版本值。\n\n    ![][7]\n\n\n\n## 查看处理同步冲突的代码\n\n若要使用移动服务脱机功能，必须在本地数据库和数据传输对象中都包括版本列。这是通过更新 `TodoItem` 类的以下成员实现的：\n\n        [Version]\n        public string Version { get; set; }\n\n当使用 `TodoItem` 类来定义本地存储时，`__version` 列包括在本地数据库的 `OnNavigatedTo()` 方法中。\n\n若要使用代码处理脱机同步冲突，请创建一个实现 `IMobileServiceSyncHandler` 的类。调用 `MobileServiceClient.SyncContext.InitializeAsync()` 时传递这种类型的对象。在示例的 `OnNavigatedTo()` 方法中也会发生这种情况。\n\n     await App.MobileService.SyncContext.InitializeAsync(store, new SyncHandler(App.MobileService));\n\n**SyncHandler.cs** 中的类 `SyncHandler` 实现了 `IMobileServiceSyncHandler`。将每个推送操作发送到服务器时均调用 `ExecuteTableOperationAsync` 方法。如果引发了 `MobileServicePreconditionFailedException` 类型的异常，则意味着某个项目的本地版本和远程版本之间存在冲突。\n\n若要在解决冲突时考虑到本地项目，则只需重试该操作。发生冲突后，需更新本地项目版本，使之与服务器版本匹配，因此重新执行该操作将使用本地更改覆盖服务器更改：\n\n    await operation.ExecuteAsync(); \n\n若要在解决冲突时考虑到服务器项目，则只需从 `ExecuteTableOperationAsync` 返回。将放弃该对象的本地版本，将其替换为服务器中的值。\n\n若要停止推送操作（但保留已排队的更改），请使用方法 `AbortPush()`：\n\n    operation.AbortPush();\n\n这将停止当前的推送操作，但会保留所有挂起的更改，包括当前操作（如果从 `ExecuteTableOperationAsync` 调用了 `AbortPush`）。下次调用 `PushAsync()` 时，这些更改将发送到服务器。\n\n在取消推送时，`PushAsync` 将引发 `MobileServicePushFailedException`，而异常属性 `PushResult.Status` 将具有值 `MobileServicePushStatus.CancelledByOperation`。\n\n\n\n<!-- Images -->\n[0]: ./media/mobile-services-windows-store-dotnet-handling-conflicts-offline-data/mobile-services-handling-conflicts-app-run1.png\n[1]: ./media/mobile-services-windows-store-dotnet-handling-conflicts-offline-data/javascript-backend-database.png\n[2]: ./media/mobile-services-windows-store-dotnet-handling-conflicts-offline-data/dotnet-backend-database.png\n[3]: ./media/mobile-services-windows-store-dotnet-handling-conflicts-offline-data/wp81-view.png\n[4]: ./media/mobile-services-windows-store-dotnet-handling-conflicts-offline-data/win81-view.png\n[5]: ./media/mobile-services-windows-store-dotnet-handling-conflicts-offline-data/wp81-edit-text.png\n[6]: ./media/mobile-services-windows-store-dotnet-handling-conflicts-offline-data/win81-edit-text.png\n[7]: ./media/mobile-services-windows-store-dotnet-handling-conflicts-offline-data/conflict.png\n\n\n\n\n<!-- URLs -->\n[Handling conflicts code sample]: http://go.microsoft.com/fwlink/?LinkId=394787\n[Get started with Mobile Services]: /documentation/articles/mobile-services-windows-store-get-started/\n[脱机数据入门]: /documentation/articles/mobile-services-windows-store-dotnet-get-started-offline-data\n[脱机数据处理入门]: /documentation/articles/mobile-services-windows-store-dotnet-get-started-offline-data\n[SQLite for Windows 8.1]: http://go.microsoft.com/fwlink/?LinkId=394776\n[Azure 经典门户]: https://manage.windowsazure.cn/\n[Handling Database Conflicts]: /documentation/articles/mobile-services-windows-store-dotnet-handle-database-conflicts/#test-app\n[移动服务示例 GitHub 存储库]: http://go.microsoft.com/fwlink/?LinkId=512865\n[Todo 脱机移动服务示例]: http://go.microsoft.com/fwlink/?LinkId=512866\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

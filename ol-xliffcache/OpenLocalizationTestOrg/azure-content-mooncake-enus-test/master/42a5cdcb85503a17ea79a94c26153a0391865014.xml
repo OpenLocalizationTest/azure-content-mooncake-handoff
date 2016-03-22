@@ -1,0 +1,607 @@
+{
+  "nodes": [
+    {
+      "content": "管理 Azure SQL 数据库的数据库和登录名 | Azure",
+      "pos": [
+        26,
+        58
+      ]
+    },
+    {
+      "content": "如何使用服务器级别主体和其他帐户以便在 SQL 数据库中管理登录名和数据库",
+      "pos": [
+        76,
+        113
+      ]
+    },
+    {
+      "content": "管理 Azure SQL 数据库的数据库和登录名",
+      "pos": [
+        326,
+        350
+      ]
+    },
+    {
+      "pos": [
+        352,
+        503
+      ],
+      "content": "在 Azure SQL 数据库中，当你注册该服务时，预配过程将创建一个 Azure SQL 数据库服务器、一个名为 <bpt id=\"p1\">**</bpt>master<ept id=\"p1\">**</ept> 的数据库以及作为你的 Azure SQL 数据库服务器的服务器级别主体的登录名。该登录名与你的本地 SQL Server 实例的服务器级别主体 <bpt id=\"p2\">**</bpt>sa<ept id=\"p2\">**</ept> 类似。"
+    },
+    {
+      "content": "Azure SQL 数据库服务器级别主体帐户始终有权管理所有服务器级别和数据库级别的安全性。本主题介绍如何使用服务器级别主体和其他帐户以便在 SQL 数据库中管理登录名和数据库。",
+      "pos": [
+        505,
+        594
+      ]
+    },
+    {
+      "pos": [
+        598,
+        1072
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>SQL 数据库 V12 允许用户使用包含的数据库用户在数据库中进行身份验证。包含的数据库用户不需要登录名。这将使数据库更易于移植，但会降低服务器级主体对数据库访问权限的控制能力。启用包含的数据库用户会产生重要的安全影响。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>包含的数据库用户 - 使你的数据库可移植<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/ff929188.aspx)</ept>、<bpt id=\"p2\">[</bpt>包含的数据库<ept id=\"p2\">](https://technet.microsoft.com/zh-cn/library/ff929071.aspx)</ept>、<bpt id=\"p3\">[</bpt>CREATE USER (Transact-SQL)<ept id=\"p3\">](https://technet.microsoft.com/zh-cn/library/ms173463.aspx)</ept> 和<bpt id=\"p4\">[</bpt>使用 Azure Active Directory 身份验证连接到 SQL 数据库<ept id=\"p4\">](/documentation/articles/sql-database-aad-authentication)</ept>。"
+    },
+    {
+      "content": "SQL 数据库安全管理概述",
+      "pos": [
+        1077,
+        1090
+      ]
+    },
+    {
+      "content": "SQL 数据库中的安全管理类似于 SQL Server 的本地实例的安全管理。在数据库级别管理安全性几乎完全相同，只是在可用参数上存在差异。因为 SQL 数据库可以扩展到一个或多个计算机，所以，Azure SQL 数据库为服务器级别管理使用不同的策略。下表介绍本地 SQL Server 的安全管理与 Azure SQL 数据库中的安全管理之间的差异。",
+      "pos": [
+        1092,
+        1268
+      ]
+    },
+    {
+      "content": "差异点",
+      "pos": [
+        1272,
+        1275
+      ]
+    },
+    {
+      "content": "本地 SQL Server",
+      "pos": [
+        1278,
+        1291
+      ]
+    },
+    {
+      "content": "Azure SQL 数据库",
+      "pos": [
+        1294,
+        1307
+      ]
+    },
+    {
+      "content": "管理服务器级别安全性的位置",
+      "pos": [
+        1492,
+        1505
+      ]
+    },
+    {
+      "pos": [
+        1508,
+        1559
+      ],
+      "content": "SQL Server Management Studio 的“对象资源管理器”中的<bpt id=\"p1\">**</bpt>安全性<ept id=\"p1\">**</ept>文件夹"
+    },
+    {
+      "pos": [
+        1562,
+        1589
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>master<ept id=\"p1\">**</ept> 数据库以及通过 Azure 门户"
+    },
+    {
+      "content": "Windows 身份验证",
+      "pos": [
+        1594,
+        1606
+      ]
+    },
+    {
+      "content": "Active Directory 标识",
+      "pos": [
+        1609,
+        1628
+      ]
+    },
+    {
+      "content": "Azure Active Directory 标识",
+      "pos": [
+        1631,
+        1656
+      ]
+    },
+    {
+      "content": "用于创建登录名的服务器级别安全角色",
+      "pos": [
+        1661,
+        1678
+      ]
+    },
+    {
+      "pos": [
+        1681,
+        1706
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>securityadmin<ept id=\"p1\">**</ept> 固定服务器角色"
+    },
+    {
+      "pos": [
+        1709,
+        1748
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>master<ept id=\"p1\">**</ept> 数据库中的 <bpt id=\"p2\">**</bpt>loginmanager<ept id=\"p2\">**</ept> 数据库角色"
+    },
+    {
+      "content": "用于管理登录名的命令",
+      "pos": [
+        1753,
+        1763
+      ]
+    },
+    {
+      "content": "CREATE LOGIN、ALTER LOGIN、DROP LOGIN",
+      "pos": [
+        1766,
+        1801
+      ]
+    },
+    {
+      "pos": [
+        1804,
+        1873
+      ],
+      "content": "CREATE LOGIN、ALTER LOGIN、DROP LOGIN（存在一些参数限制并且你必须连接到 <bpt id=\"p1\">**</bpt>master<ept id=\"p1\">**</ept> 数据库。）"
+    },
+    {
+      "content": "显示所有登录名的视图",
+      "pos": [
+        1878,
+        1888
+      ]
+    },
+    {
+      "content": "sys.server\\_principals",
+      "pos": [
+        1891,
+        1913
+      ]
+    },
+    {
+      "pos": [
+        1916,
+        1954
+      ],
+      "content": "sys.sql\\_logins（你必须连接到 <bpt id=\"p1\">**</bpt>master<ept id=\"p1\">**</ept> 数据库）"
+    },
+    {
+      "content": "用于创建数据库的服务器级别角色",
+      "pos": [
+        1958,
+        1973
+      ]
+    },
+    {
+      "pos": [
+        1976,
+        1997
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>dbcreator<ept id=\"p1\">**</ept> 固定数据库角色"
+    },
+    {
+      "pos": [
+        2000,
+        2036
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>master<ept id=\"p1\">**</ept> 数据库中的 <bpt id=\"p2\">**</bpt>dbmanager<ept id=\"p2\">**</ept> 数据库角色"
+    },
+    {
+      "content": "用于创建数据库的命令",
+      "pos": [
+        2041,
+        2051
+      ]
+    },
+    {
+      "content": "CREATE DATABASE",
+      "pos": [
+        2054,
+        2069
+      ]
+    },
+    {
+      "pos": [
+        2072,
+        2121
+      ],
+      "content": "CREATE DATABASE（存在一些参数限制并且你必须连接到 <bpt id=\"p1\">**</bpt>master<ept id=\"p1\">**</ept> 数据库。）"
+    },
+    {
+      "content": "列出所有数据库的视图",
+      "pos": [
+        2126,
+        2136
+      ]
+    },
+    {
+      "content": "sys.databases",
+      "pos": [
+        2139,
+        2152
+      ]
+    },
+    {
+      "pos": [
+        2155,
+        2192
+      ],
+      "content": "sys.databases（你必须连接到 <bpt id=\"p1\">**</bpt>master<ept id=\"p1\">**</ept> 数据库。）"
+    },
+    {
+      "content": "服务器级别管理和 master 数据库",
+      "pos": [
+        2199,
+        2218
+      ]
+    },
+    {
+      "pos": [
+        2220,
+        2351
+      ],
+      "content": "你的 Azure SQL 数据库服务器是用于定义一组数据库的抽象。与你的 Azure SQL 数据库服务器相关联的数据库可以驻留在 Microsoft 数据中心的单独物理计算机上。通过使用名为 <bpt id=\"p1\">**</bpt>master<ept id=\"p1\">**</ept> 的单一数据库对全部数据库执行服务器级别的管理。"
+    },
+    {
+      "pos": [
+        2353,
+        2507
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>master<ept id=\"p1\">**</ept> 数据库跟踪登录名以及哪些登录名有权创建数据库或其他登录名。只要你创建、更改或删除登录名或数据库，就必须连接到 <bpt id=\"p2\">**</bpt>master<ept id=\"p2\">**</ept> 数据库。<bpt id=\"p3\">**</bpt>master<ept id=\"p3\">**</ept> 数据库还具有 <ph id=\"ph1\">``sys.sql_logins``</ph> 和 <ph id=\"ph2\">``sys.databases``</ph> 视图，可供你查看登录名和数据库。"
+    },
+    {
+      "pos": [
+        2511,
+        2559
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph><ph id=\"ph2\">``USE``</ph> 命令不支持在数据库之间切换。直接建立与目标数据库的连接。"
+    },
+    {
+      "pos": [
+        2561,
+        2738
+      ],
+      "content": "你可以在 Azure SQL 数据库中通过与用于 SQL Server 的本地实例相同的方式来管理用户和对象的数据库级别的安全性。仅在可用于相应命令的参数中存在差异。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure SQL 数据库安全指导原则和限制<ept id=\"p1\">](/documentation/articles/sql-database-security-guidelines)</ept>。"
+    },
+    {
+      "content": "管理包含数据库用户",
+      "pos": [
+        2743,
+        2752
+      ]
+    },
+    {
+      "pos": [
+        2754,
+        2860
+      ],
+      "content": "通过连接到数据库来使用服务器级别主体创建第一个包含数据库用户。使用 <ph id=\"ph1\">``CREATE USER``</ph>、<ph id=\"ph2\">``ALTER USER``</ph> 或 <ph id=\"ph3\">``DROP USER``</ph> 语句。以下示例将创建一个名为 user1 的用户。"
+    },
+    {
+      "pos": [
+        2926,
+        3028
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>创建包含数据库用户时必须使用强密码。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>强密码<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/ms161962.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        3030,
+        3076
+      ],
+      "content": "可以通过拥有 <bpt id=\"p1\">**</bpt>ALTER ANY USER<ept id=\"p1\">**</ept> 权限的任何用户创建额外的包含数据库用户。"
+    },
+    {
+      "pos": [
+        3078,
+        3251
+      ],
+      "content": "作为一项预览功能，SQL 数据库 V12 支持将 Azure Active Directory 标识作为包含数据库用户。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>通过使用 Azure Active Directory 身份验证连接到 SQL 数据库<ept id=\"p1\">](/documentation/articles/sql-database-aad-authentication)</ept>。"
+    },
+    {
+      "pos": [
+        3253,
+        3372
+      ],
+      "content": "Microsoft 建议对 SQL 数据库使用包含数据库用户。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>包含数据库用户 - 使你的数据库可移植<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/ff929188.aspx)</ept>。"
+    },
+    {
+      "content": "管理登录名",
+      "pos": [
+        3377,
+        3382
+      ]
+    },
+    {
+      "pos": [
+        3384,
+        3506
+      ],
+      "content": "通过连接到 master 数据库来使用服务器级别主体登录名管理登录名。你可以使用 <ph id=\"ph1\">``CREATE LOGIN``</ph>、<ph id=\"ph2\">``ALTER LOGIN``</ph> 或 <ph id=\"ph3\">``DROP LOGIN``</ph> 语句。以下示例将创建一个名为 <bpt id=\"p1\">**</bpt>login1<ept id=\"p1\">**</ept> 的登录名："
+    },
+    {
+      "pos": [
+        3615,
+        3713
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>创建登录名时必须使用强密码。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>强密码<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/ms161962.aspx)</ept>。"
+    },
+    {
+      "content": "使用新登录名",
+      "pos": [
+        3720,
+        3726
+      ]
+    },
+    {
+      "pos": [
+        3728,
+        3897
+      ],
+      "content": "为了使用你创建的登录名连接到 Azure SQL 数据库，你必须首先通过使用 <ph id=\"ph1\">``CREATE USER``</ph> 语句为每个登录名授予数据库级别权限。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>向登录名授予数据库级别权限<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/ee336235.aspx#DatabasePerms)</ept>。"
+    },
+    {
+      "pos": [
+        3899,
+        4287
+      ],
+      "content": "因为某些工具以不同方式实现表格格式数据流 (TDS)，所以，你可能需要使用 <ph id=\"ph1\">``&lt;login&gt;@&lt;server&gt;``</ph> 表示法将 Azure SQL 数据库服务器名称追加到连接字符串中的登录名。在这些情况下，使用 <ph id=\"ph2\">``@``</ph> 符号分隔登录名和 Azure SQL 数据库服务器名称。例如，如果你的登录名为 <bpt id=\"p1\">**</bpt>login1<ept id=\"p1\">**</ept>，并且你的 Azure SQL 数据库服务器的完全限定名称为 <bpt id=\"p2\">**</bpt>servername.database.chinacloudapi.cn<ept id=\"p2\">**</ept>，则你的连接字符串的用户名参数应为：<bpt id=\"p3\">**</bpt>login1@servername<ept id=\"p3\">**</ept>。此限制将限制你可为登录名选择的文本。有关详细信息，请参阅 <bpt id=\"p4\">[</bpt>CREATE LOGIN (Transact-SQL)<ept id=\"p4\">](https://msdn.microsoft.com/zh-cn/library/ms189751.aspx)</ept>。"
+    },
+    {
+      "content": "向登录名授予服务器级别权限",
+      "pos": [
+        4292,
+        4305
+      ]
+    },
+    {
+      "pos": [
+        4307,
+        4445
+      ],
+      "content": "为了让你使用除服务器级主体以外的登录名来管理服务器级安全，Azure SQL 数据库提供了两个安全角色：用于创建登录名的 <bpt id=\"p1\">**</bpt>loginmanager<ept id=\"p1\">**</ept>，以及用于创建数据库的 <bpt id=\"p2\">**</bpt>dbmanager<ept id=\"p2\">**</ept>。只有 <bpt id=\"p3\">**</bpt>master<ept id=\"p3\">**</ept> 数据库中的用户才能添加到这些数据库角色中。"
+    },
+    {
+      "pos": [
+        4449,
+        4518
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>若要创建登录名或数据库，你必须连接到 <bpt id=\"p1\">**</bpt>master<ept id=\"p1\">**</ept> 数据库（这是 <bpt id=\"p2\">**</bpt>master<ept id=\"p2\">**</ept> 的逻辑表示形式）。"
+    },
+    {
+      "content": "loginmanager 角色",
+      "pos": [
+        4524,
+        4539
+      ]
+    },
+    {
+      "pos": [
+        4541,
+        4695
+      ],
+      "content": "与用于 SQL Server 的本地实例的 <bpt id=\"p1\">**</bpt>securityadmin<ept id=\"p1\">**</ept> 固定服务器角色相似，Azure SQL 数据库中的 <bpt id=\"p2\">**</bpt>loginmanager<ept id=\"p2\">**</ept> 数据库角色有权创建登录名。只有服务器级别主体登录名（由预配过程创建）或 <bpt id=\"p3\">**</bpt>loginmanager<ept id=\"p3\">**</ept> 数据库角色的成员才能创建新的登录名。"
+    },
+    {
+      "content": "dbmanager 角色",
+      "pos": [
+        4701,
+        4713
+      ]
+    },
+    {
+      "pos": [
+        4715,
+        5060
+      ],
+      "content": "Azure SQL 数据库 <bpt id=\"p1\">**</bpt>dbmanager<ept id=\"p1\">**</ept> 数据库角色与用于 SQL Server 的本地实例的 <bpt id=\"p2\">**</bpt>dbcreator<ept id=\"p2\">**</ept> 固定服务器角色相似。只有服务器级别主体登录名（由预配过程创建）或 <bpt id=\"p3\">**</bpt>dbmanager<ept id=\"p3\">**</ept> 数据库角色的成员才能创建数据库。某个用户成为 <bpt id=\"p4\">**</bpt>dbmanager<ept id=\"p4\">**</ept> 数据库角色的成员后，可以使用 Azure SQL 数据库 <ph id=\"ph1\">``CREATE DATABASE``</ph> 命令创建数据库，但该命令必须在 master 数据库中执行。有关详细信息，请参阅 <bpt id=\"p5\">[</bpt>CREATE DATABASE (Azure Server Transact-SQL)<ept id=\"p5\">](https://msdn.microsoft.com/zh-cn/library/ms176061.aspx)</ept>。"
+    },
+    {
+      "content": "如何分配 SQL 数据库服务器级别角色",
+      "pos": [
+        5066,
+        5085
+      ]
+    },
+    {
+      "content": "若要创建登录名以及可创建数据库或其他登录名的关联用户，请执行以下步骤：",
+      "pos": [
+        5087,
+        5122
+      ]
+    },
+    {
+      "pos": [
+        5127,
+        5202
+      ],
+      "content": "使用服务器级别主体登录名（由预配过程创建）的凭据或 <bpt id=\"p1\">**</bpt>loginmanager<ept id=\"p1\">**</ept> 数据库角色的现有成员的凭据连接到 <bpt id=\"p2\">**</bpt>master<ept id=\"p2\">**</ept> 数据库。"
+    },
+    {
+      "pos": [
+        5206,
+        5333
+      ],
+      "content": "使用 <ph id=\"ph1\">``CREATE LOGIN``</ph> 命令创建一个登录名。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>CREATE LOGIN (Transact-SQL)<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/ms189751.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        5337,
+        5480
+      ],
+      "content": "在 master 数据库中使用 <ph id=\"ph1\">``CREATE USER``</ph> 命令为该登录名创建一个新用户。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>CREATE USER (Transact-SQL)<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/ms173463.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        5484,
+        5563
+      ],
+      "content": "使用存储过程 <ph id=\"ph1\">``sp_addrolememeber``</ph> 将新用户添加到 <bpt id=\"p1\">**</bpt>dbmanager<ept id=\"p1\">**</ept> 数据库角色和/或 loginmanager 数据库角色。"
+    },
+    {
+      "pos": [
+        5565,
+        5661
+      ],
+      "content": "以下代码示例演示了如何创建一个登录名 <bpt id=\"p1\">**</bpt>login1<ept id=\"p1\">**</ept> 以及名为 <bpt id=\"p2\">**</bpt>login1User<ept id=\"p2\">**</ept> 的相应数据库用户，该用户能够在连接到 <bpt id=\"p3\">**</bpt>master<ept id=\"p3\">**</ept> 数据库时创建数据库或其他登录名："
+    },
+    {
+      "pos": [
+        5913,
+        6011
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>创建登录名时必须使用强密码。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>强密码<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/ms161962.aspx)</ept>。"
+    },
+    {
+      "content": "授予对登录名的数据库访问权限",
+      "pos": [
+        6016,
+        6030
+      ]
+    },
+    {
+      "content": "所有登录名都必须在 master 数据库中创建。在创建一个登录名后，你可以为该登录名在另一个数据库中创建用户帐户。Azure SQL 数据库通过与 SQL Server 的本地实例中相同的方式支持数据库角色。",
+      "pos": [
+        6032,
+        6136
+      ]
+    },
+    {
+      "content": "若要在其他数据库中创建用户帐户，并且假设你尚未创建登录名或数据库，请执行以下步骤：",
+      "pos": [
+        6138,
+        6179
+      ]
+    },
+    {
+      "pos": [
+        6184,
+        6249
+      ],
+      "content": "连接到 <bpt id=\"p1\">**</bpt>master<ept id=\"p1\">**</ept> 数据库（使用具有 <bpt id=\"p2\">**</bpt>loginmanager<ept id=\"p2\">**</ept> 和 <bpt id=\"p3\">**</bpt>dbmanager<ept id=\"p3\">**</ept> 角色的登录名）。"
+    },
+    {
+      "pos": [
+        6253,
+        6398
+      ],
+      "content": "使用 <ph id=\"ph1\">``CREATE LOGIN``</ph> 命令创建一个新登录名。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>CREATE LOGIN (Transact-SQL)<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/ms189751.aspx)</ept>。不支持 Windows 身份验证。"
+    },
+    {
+      "pos": [
+        6402,
+        6536
+      ],
+      "content": "使用 <ph id=\"ph1\">``CREATE DATABASE``</ph> 命令创建一个新数据库。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>CREATE DATABASE (Transact-SQL)<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/dn268335.aspx)</ept>。"
+    },
+    {
+      "content": "建立与该新数据库的连接（使用创建了该数据库的登录名）。",
+      "pos": [
+        6540,
+        6567
+      ]
+    },
+    {
+      "pos": [
+        6571,
+        6704
+      ],
+      "content": "使用 <ph id=\"ph1\">``CREATE USER``</ph> 命令在这个新数据库上创建一个新用户。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>CREATE USER (Transact-SQL)<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/ms173463.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        6706,
+        6763
+      ],
+      "content": "以下代码示例演示如何创建一个名为 <bpt id=\"p1\">**</bpt>login1<ept id=\"p1\">**</ept> 的登录名和一个名为 <bpt id=\"p2\">**</bpt>database1<ept id=\"p2\">**</ept> 的数据库："
+    },
+    {
+      "pos": [
+        6899,
+        6997
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>创建登录名时必须使用强密码。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>强密码<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/ms161962.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        6999,
+        7191
+      ],
+      "content": "以下示例演示如何在与登录名 <bpt id=\"p1\">**</bpt>login1<ept id=\"p1\">**</ept> 相对应的数据库 <bpt id=\"p2\">**</bpt>database1<ept id=\"p2\">**</ept> 中创建名为 <bpt id=\"p3\">**</bpt>login1User<ept id=\"p3\">**</ept> 的一个数据库用户。若要执行以下示例，首先必须使用在 database1 中拥有 <bpt id=\"p4\">**</bpt>ALTER ANY USER<ept id=\"p4\">**</ept> 权限的登录名与该数据库建立新连接。以 <bpt id=\"p5\">**</bpt>db\\_owner<ept id=\"p5\">**</ept> 角色成员连接的任何用户（例如创建该数据库的登录名）都拥有该权限。"
+    },
+    {
+      "content": "Azure SQL 数据库中的这一数据库级别权限模型与 SQL Server 的本地实例中的权限模型相同。有关详细信息，请参阅 SQL ServerSQL Server 联机丛书中的下列主题。",
+      "pos": [
+        7300,
+        7396
+      ]
+    },
+    {
+      "content": "管理登录名、用户和架构操作指南主题",
+      "pos": [
+        7401,
+        7418
+      ]
+    },
+    {
+      "content": "第 2 课：配置对数据库对象的权限",
+      "pos": [
+        7480,
+        7497
+      ]
+    },
+    {
+      "pos": [
+        7559,
+        7646
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>Azure SQL 数据库中与安全相关的 Transact-SQL 语句在可用的参数方面可能稍有不同。有关详细信息，请参阅“特定语句的联机丛书语法”。"
+    },
+    {
+      "content": "查看登录名和数据库",
+      "pos": [
+        7651,
+        7660
+      ]
+    },
+    {
+      "pos": [
+        7663,
+        7799
+      ],
+      "content": "若要查看你的 Azure SQL 数据库服务器上的登录名和数据库，请分别使用 master 数据库的 <ph id=\"ph1\">``sys.sql_logins``</ph> 和 <ph id=\"ph2\">``sys.databases``</ph> 视图。以下示例演示如何显示你的 Azure SQL 数据库服务器上所有登录名和数据库的列表。"
+    },
+    {
+      "content": "另请参阅",
+      "pos": [
+        7914,
+        7918
+      ]
+    },
+    {
+      "pos": [
+        7920,
+        8104
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Azure SQL 数据库安全指导原则和限制<ept id=\"p1\">](/documentation/articles/sql-database-security-guidelines)</ept><bpt id=\"p2\">[</bpt>通过使用 Azure Active Directory 身份验证连接到 SQL 数据库<ept id=\"p2\">](/documentation/articles/sql-database-aad-authentication)</ept>"
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"管理 Azure SQL 数据库的数据库和登录名 | Azure\"\n   description=\"如何使用服务器级别主体和其他帐户以便在 SQL 数据库中管理登录名和数据库\"\n   services=\"sql-database\"\n   documentationCenter=\"\"\n   authors=\"BYHAM\"\n   manager=\"jeffreyg\"\n   editor=\"\"\n   tags=\"\"/>\n\n<tags\n   ms.service=\"sql-database\"\n   ms.date=\"09/25/2015\"\n   wacn.date=\"11/27/2015\"/>\n\n# 管理 Azure SQL 数据库的数据库和登录名\n\n在 Azure SQL 数据库中，当你注册该服务时，预配过程将创建一个 Azure SQL 数据库服务器、一个名为 **master** 的数据库以及作为你的 Azure SQL 数据库服务器的服务器级别主体的登录名。该登录名与你的本地 SQL Server 实例的服务器级别主体 **sa** 类似。\n\nAzure SQL 数据库服务器级别主体帐户始终有权管理所有服务器级别和数据库级别的安全性。本主题介绍如何使用服务器级别主体和其他帐户以便在 SQL 数据库中管理登录名和数据库。\n\n> [AZURE.IMPORTANT]SQL 数据库 V12 允许用户使用包含的数据库用户在数据库中进行身份验证。包含的数据库用户不需要登录名。这将使数据库更易于移植，但会降低服务器级主体对数据库访问权限的控制能力。启用包含的数据库用户会产生重要的安全影响。有关详细信息，请参阅[包含的数据库用户 - 使你的数据库可移植](https://msdn.microsoft.com/zh-cn/library/ff929188.aspx)、[包含的数据库](https://technet.microsoft.com/zh-cn/library/ff929071.aspx)、[CREATE USER (Transact-SQL)](https://technet.microsoft.com/zh-cn/library/ms173463.aspx) 和[使用 Azure Active Directory 身份验证连接到 SQL 数据库](/documentation/articles/sql-database-aad-authentication)。\n\n## SQL 数据库安全管理概述\n\nSQL 数据库中的安全管理类似于 SQL Server 的本地实例的安全管理。在数据库级别管理安全性几乎完全相同，只是在可用参数上存在差异。因为 SQL 数据库可以扩展到一个或多个计算机，所以，Azure SQL 数据库为服务器级别管理使用不同的策略。下表介绍本地 SQL Server 的安全管理与 Azure SQL 数据库中的安全管理之间的差异。\n\n| 差异点 | 本地 SQL Server | Azure SQL 数据库 |\n|------------------------------------------------|-----------------------------------------------------------------------------|--------------------------------------------------|\n| 管理服务器级别安全性的位置 | SQL Server Management Studio 的“对象资源管理器”中的**安全性**文件夹 | **master** 数据库以及通过 Azure 门户 |\n| Windows 身份验证 | Active Directory 标识 | Azure Active Directory 标识 |\n| 用于创建登录名的服务器级别安全角色 | **securityadmin** 固定服务器角色 | **master** 数据库中的 **loginmanager** 数据库角色 |\n| 用于管理登录名的命令 | CREATE LOGIN、ALTER LOGIN、DROP LOGIN | CREATE LOGIN、ALTER LOGIN、DROP LOGIN（存在一些参数限制并且你必须连接到 **master** 数据库。） |\n| 显示所有登录名的视图 | sys.server\\_principals | sys.sql\\_logins（你必须连接到 **master** 数据库）|\n| 用于创建数据库的服务器级别角色 | **dbcreator** 固定数据库角色 | **master** 数据库中的 **dbmanager** 数据库角色 |\n| 用于创建数据库的命令 | CREATE DATABASE | CREATE DATABASE（存在一些参数限制并且你必须连接到 **master** 数据库。） |\n| 列出所有数据库的视图 | sys.databases | sys.databases（你必须连接到 **master** 数据库。） |\n\n## 服务器级别管理和 master 数据库\n\n你的 Azure SQL 数据库服务器是用于定义一组数据库的抽象。与你的 Azure SQL 数据库服务器相关联的数据库可以驻留在 Microsoft 数据中心的单独物理计算机上。通过使用名为 **master** 的单一数据库对全部数据库执行服务器级别的管理。\n\n**master** 数据库跟踪登录名以及哪些登录名有权创建数据库或其他登录名。只要你创建、更改或删除登录名或数据库，就必须连接到 **master** 数据库。**master** 数据库还具有 ``sys.sql_logins`` 和 ``sys.databases`` 视图，可供你查看登录名和数据库。\n\n> [AZURE.NOTE]``USE`` 命令不支持在数据库之间切换。直接建立与目标数据库的连接。\n\n你可以在 Azure SQL 数据库中通过与用于 SQL Server 的本地实例相同的方式来管理用户和对象的数据库级别的安全性。仅在可用于相应命令的参数中存在差异。有关详细信息，请参阅 [Azure SQL 数据库安全指导原则和限制](/documentation/articles/sql-database-security-guidelines)。\n\n## 管理包含数据库用户\n\n通过连接到数据库来使用服务器级别主体创建第一个包含数据库用户。使用 ``CREATE USER``、``ALTER USER`` 或 ``DROP USER`` 语句。以下示例将创建一个名为 user1 的用户。\n\n```\nCREATE USER user1 WITH password='<Strong_Password>';\n```\n\n> [AZURE.NOTE]创建包含数据库用户时必须使用强密码。有关详细信息，请参阅[强密码](https://msdn.microsoft.com/zh-cn/library/ms161962.aspx)。\n\n可以通过拥有 **ALTER ANY USER** 权限的任何用户创建额外的包含数据库用户。\n\n作为一项预览功能，SQL 数据库 V12 支持将 Azure Active Directory 标识作为包含数据库用户。有关详细信息，请参阅[通过使用 Azure Active Directory 身份验证连接到 SQL 数据库](/documentation/articles/sql-database-aad-authentication)。\n\nMicrosoft 建议对 SQL 数据库使用包含数据库用户。有关详细信息，请参阅[包含数据库用户 - 使你的数据库可移植](https://msdn.microsoft.com/zh-cn/library/ff929188.aspx)。\n\n## 管理登录名\n\n通过连接到 master 数据库来使用服务器级别主体登录名管理登录名。你可以使用 ``CREATE LOGIN``、``ALTER LOGIN`` 或 ``DROP LOGIN`` 语句。以下示例将创建一个名为 **login1** 的登录名：\n\n```\n-- first, connect to the master database\nCREATE LOGIN login1 WITH password='<ProvidePassword>';\n```\n\n> [AZURE.NOTE]创建登录名时必须使用强密码。有关详细信息，请参阅[强密码](https://msdn.microsoft.com/zh-cn/library/ms161962.aspx)。\n\n#### 使用新登录名\n\n为了使用你创建的登录名连接到 Azure SQL 数据库，你必须首先通过使用 ``CREATE USER`` 语句为每个登录名授予数据库级别权限。有关详细信息，请参阅[向登录名授予数据库级别权限](https://msdn.microsoft.com/zh-cn/library/ee336235.aspx#DatabasePerms)。\n\n因为某些工具以不同方式实现表格格式数据流 (TDS)，所以，你可能需要使用 ``<login>@<server>`` 表示法将 Azure SQL 数据库服务器名称追加到连接字符串中的登录名。在这些情况下，使用 ``@`` 符号分隔登录名和 Azure SQL 数据库服务器名称。例如，如果你的登录名为 **login1**，并且你的 Azure SQL 数据库服务器的完全限定名称为 **servername.database.chinacloudapi.cn**，则你的连接字符串的用户名参数应为：**login1@servername**。此限制将限制你可为登录名选择的文本。有关详细信息，请参阅 [CREATE LOGIN (Transact-SQL)](https://msdn.microsoft.com/zh-cn/library/ms189751.aspx)。\n\n## 向登录名授予服务器级别权限\n\n为了让你使用除服务器级主体以外的登录名来管理服务器级安全，Azure SQL 数据库提供了两个安全角色：用于创建登录名的 **loginmanager**，以及用于创建数据库的 **dbmanager**。只有 **master** 数据库中的用户才能添加到这些数据库角色中。\n\n> [AZURE.NOTE]若要创建登录名或数据库，你必须连接到 **master** 数据库（这是 **master** 的逻辑表示形式）。\n\n### loginmanager 角色\n\n与用于 SQL Server 的本地实例的 **securityadmin** 固定服务器角色相似，Azure SQL 数据库中的 **loginmanager** 数据库角色有权创建登录名。只有服务器级别主体登录名（由预配过程创建）或 **loginmanager** 数据库角色的成员才能创建新的登录名。\n\n### dbmanager 角色\n\nAzure SQL 数据库 **dbmanager** 数据库角色与用于 SQL Server 的本地实例的 **dbcreator** 固定服务器角色相似。只有服务器级别主体登录名（由预配过程创建）或 **dbmanager** 数据库角色的成员才能创建数据库。某个用户成为 **dbmanager** 数据库角色的成员后，可以使用 Azure SQL 数据库 ``CREATE DATABASE`` 命令创建数据库，但该命令必须在 master 数据库中执行。有关详细信息，请参阅 [CREATE DATABASE (Azure Server Transact-SQL)](https://msdn.microsoft.com/zh-cn/library/ms176061.aspx)。\n\n### 如何分配 SQL 数据库服务器级别角色\n\n若要创建登录名以及可创建数据库或其他登录名的关联用户，请执行以下步骤：\n\n1. 使用服务器级别主体登录名（由预配过程创建）的凭据或 **loginmanager** 数据库角色的现有成员的凭据连接到 **master** 数据库。\n2. 使用 ``CREATE LOGIN`` 命令创建一个登录名。有关详细信息，请参阅 [CREATE LOGIN (Transact-SQL)](https://msdn.microsoft.com/zh-cn/library/ms189751.aspx)。\n3. 在 master 数据库中使用 ``CREATE USER`` 命令为该登录名创建一个新用户。有关详细信息，请参阅 [CREATE USER (Transact-SQL)](https://msdn.microsoft.com/zh-cn/library/ms173463.aspx)。\n4. 使用存储过程 ``sp_addrolememeber`` 将新用户添加到 **dbmanager** 数据库角色和/或 loginmanager 数据库角色。\n\n以下代码示例演示了如何创建一个登录名 **login1** 以及名为 **login1User** 的相应数据库用户，该用户能够在连接到 **master** 数据库时创建数据库或其他登录名：\n\n```\n-- first, connect to the master database\nCREATE LOGIN login1 WITH password='<ProvidePassword>';\nCREATE USER login1User FROM LOGIN login1;\nEXEC sp_addrolemember 'dbmanager', 'login1User';\nEXEC sp_addrolemember 'loginmanager', 'login1User';\n```\n\n> [AZURE.NOTE]创建登录名时必须使用强密码。有关详细信息，请参阅[强密码](https://msdn.microsoft.com/zh-cn/library/ms161962.aspx)。\n\n## 授予对登录名的数据库访问权限\n\n所有登录名都必须在 master 数据库中创建。在创建一个登录名后，你可以为该登录名在另一个数据库中创建用户帐户。Azure SQL 数据库通过与 SQL Server 的本地实例中相同的方式支持数据库角色。\n\n若要在其他数据库中创建用户帐户，并且假设你尚未创建登录名或数据库，请执行以下步骤：\n\n1. 连接到 **master** 数据库（使用具有 **loginmanager** 和 **dbmanager** 角色的登录名）。\n2. 使用 ``CREATE LOGIN`` 命令创建一个新登录名。有关详细信息，请参阅 [CREATE LOGIN (Transact-SQL)](https://msdn.microsoft.com/zh-cn/library/ms189751.aspx)。不支持 Windows 身份验证。\n3. 使用 ``CREATE DATABASE`` 命令创建一个新数据库。有关详细信息，请参阅 [CREATE DATABASE (Transact-SQL)](https://msdn.microsoft.com/zh-cn/library/dn268335.aspx)。\n4. 建立与该新数据库的连接（使用创建了该数据库的登录名）。\n5. 使用 ``CREATE USER`` 命令在这个新数据库上创建一个新用户。有关详细信息，请参阅 [CREATE USER (Transact-SQL)](https://msdn.microsoft.com/zh-cn/library/ms173463.aspx)。\n\n以下代码示例演示如何创建一个名为 **login1** 的登录名和一个名为 **database1** 的数据库：\n\n```\n-- first, connect to the master database\nCREATE LOGIN login1 WITH password='<ProvidePassword>';\nCREATE DATABASE database1;\n```\n\n> [AZURE.NOTE]创建登录名时必须使用强密码。有关详细信息，请参阅[强密码](https://msdn.microsoft.com/zh-cn/library/ms161962.aspx)。\n\n以下示例演示如何在与登录名 **login1** 相对应的数据库 **database1** 中创建名为 **login1User** 的一个数据库用户。若要执行以下示例，首先必须使用在 database1 中拥有 **ALTER ANY USER** 权限的登录名与该数据库建立新连接。以 **db\\_owner** 角色成员连接的任何用户（例如创建该数据库的登录名）都拥有该权限。\n\n```\n-- Establish a new connection to the database1 database\nCREATE USER login1User FROM LOGIN login1;\n```\n\nAzure SQL 数据库中的这一数据库级别权限模型与 SQL Server 的本地实例中的权限模型相同。有关详细信息，请参阅 SQL ServerSQL Server 联机丛书中的下列主题。\n\n- [管理登录名、用户和架构操作指南主题](https://msdn.microsoft.com/zh-cn/library/aa337552.aspx) \n- [第 2 课：配置对数据库对象的权限](https://msdn.microsoft.com/zh-cn/library/ms365345.aspx) \n\n> [AZURE.NOTE]Azure SQL 数据库中与安全相关的 Transact-SQL 语句在可用的参数方面可能稍有不同。有关详细信息，请参阅“特定语句的联机丛书语法”。\n\n## 查看登录名和数据库\n\n\n若要查看你的 Azure SQL 数据库服务器上的登录名和数据库，请分别使用 master 数据库的 ``sys.sql_logins`` 和 ``sys.databases`` 视图。以下示例演示如何显示你的 Azure SQL 数据库服务器上所有登录名和数据库的列表。\n\n```\n-- first, connect to the master database\nSELECT * FROM sys.sql_logins;\nSELECT * FROM sys.databases; \n```\n\n## 另请参阅\n\n[Azure SQL 数据库安全指导原则和限制](/documentation/articles/sql-database-security-guidelines)[通过使用 Azure Active Directory 身份验证连接到 SQL 数据库](/documentation/articles/sql-database-aad-authentication)\n\n<!---HONumber=82-->"
+}

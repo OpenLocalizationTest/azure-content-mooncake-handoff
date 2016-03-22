@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "content": "下载媒体资产",
+      "pos": [
+        28,
+        34
+      ]
+    },
+    {
+      "content": "了解如何将资产下载到计算机。代码示例用 C# 编写且使用 适用于 .NET 的媒体服务 SDK。",
+      "pos": [
+        54,
+        102
+      ]
+    },
+    {
+      "content": "如何：通过下载交付资产",
+      "pos": [
+        320,
+        331
+      ]
+    },
+    {
+      "content": "本主题介绍已上载到媒体服务的媒体资产的交付选项。你可以采用众多的应用程序方案来交付媒体服务内容。你可以下载媒体资产，或使用定位器访问媒体资产。你可以将媒体内容发送到其他应用程序或其他内容提供商。为了提高性能和可缩放性，你还可以使用内容传送网络 (CDN) 来传送内容。",
+      "pos": [
+        333,
+        467
+      ]
+    },
+    {
+      "pos": [
+        469,
+        616
+      ],
+      "content": "此示例演示如何将媒体资产从媒体服务下载到本地计算机。该代码将按作业 ID 查询与媒体服务帐户关联的作业，并访问其 <bpt id=\"p1\">**</bpt>OutputMediaAssets<ept id=\"p1\">**</ept> 集合（运行作业后生成的、包含一个或多个输出媒体资产的集）。此示例演示如何通过作业下载输出媒体资产，但你可以运用相同的方法来下载其他资产。"
+    },
+    {
+      "content": "另请参阅",
+      "pos": [
+        2697,
+        2701
+      ]
+    },
+    {
+      "content": "交付流内容",
+      "pos": [
+        2705,
+        2710
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"下载媒体资产\" \n    description=\"了解如何将资产下载到计算机。代码示例用 C# 编写且使用 适用于 .NET 的媒体服务 SDK。\" \n    services=\"media-services\" \n    documentationCenter=\"\" \n    authors=\"juliako\" \n    manager=\"dwrede\" \n    editor=\"\"/>\n\n<tags\n    ms.service=\"media-services\"\n    ms.date=\"02/03/2016\"\n    wacn.date=\"03/17/2016\"/>\n\n#如何：通过下载交付资产\n\n本主题介绍已上载到媒体服务的媒体资产的交付选项。你可以采用众多的应用程序方案来交付媒体服务内容。你可以下载媒体资产，或使用定位器访问媒体资产。你可以将媒体内容发送到其他应用程序或其他内容提供商。为了提高性能和可缩放性，你还可以使用内容传送网络 (CDN) 来传送内容。\n\n此示例演示如何将媒体资产从媒体服务下载到本地计算机。该代码将按作业 ID 查询与媒体服务帐户关联的作业，并访问其 **OutputMediaAssets** 集合（运行作业后生成的、包含一个或多个输出媒体资产的集）。此示例演示如何通过作业下载输出媒体资产，但你可以运用相同的方法来下载其他资产。\n\n    \n    // Download the output asset of the specified job to a local folder.\n    static IAsset DownloadAssetToLocal( string jobId, string outputFolder)\n    {\n        // This method illustrates how to download a single asset. \n        // However, you can iterate through the OutputAssets\n        // collection, and download all assets if there are many. \n    \n        // Get a reference to the job. \n        IJob job = GetJob(jobId);\n    \n        // Get a reference to the first output asset. If there were multiple \n        // output media assets you could iterate and handle each one.\n        IAsset outputAsset = job.OutputMediaAssets[0];\n    \n        // Create a SAS locator to download the asset\n        IAccessPolicy accessPolicy = _context.AccessPolicies.Create(\"File Download Policy\", TimeSpan.FromDays(30), AccessPermissions.Read);\n        ILocator locator = _context.Locators.CreateLocator(LocatorType.Sas, outputAsset, accessPolicy);\n    \n        BlobTransferClient blobTransfer = new BlobTransferClient\n        {\n            NumberOfConcurrentTransfers = 20,\n            ParallelTransferThreadCount = 20\n        };\n    \n        var downloadTasks = new List<Task>();\n        foreach (IAssetFile outputFile in outputAsset.AssetFiles)\n        {\n            // Use the following event handler to check download progress.\n            outputFile.DownloadProgressChanged += DownloadProgress;\n    \n            string localDownloadPath = Path.Combine(outputFolder, outputFile.Name);\n    \n            Console.WriteLine(\"File download path:  \" + localDownloadPath);\n    \n            downloadTasks.Add(outputFile.DownloadAsync(Path.GetFullPath(localDownloadPath), blobTransfer, locator, CancellationToken.None));\n    \n            outputFile.DownloadProgressChanged -= DownloadProgress;\n        }\n    \n        Task.WaitAll(downloadTasks.ToArray());\n    \n        return outputAsset;\n    }\n    \n    static void DownloadProgress(object sender, DownloadProgressChangedEventArgs e)\n    {\n        Console.WriteLine(string.Format(\"{0} % download progress. \", e.Progress));\n    }\n\n\n   \n##另请参阅 \n\n[交付流内容](/documentation/articles/media-services-deliver-streaming-content)\n\n<!---HONumber=Mooncake_0307_2016-->"
+}

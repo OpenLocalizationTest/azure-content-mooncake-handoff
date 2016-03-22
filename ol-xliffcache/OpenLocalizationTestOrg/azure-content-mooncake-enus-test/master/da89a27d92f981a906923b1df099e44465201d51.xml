@@ -1,0 +1,2154 @@
+{
+  "nodes": [
+    {
+      "content": "自动缩放 Azure  批处理( Batch )池中的计算节点",
+      "pos": [
+        28,
+        59
+      ]
+    },
+    {
+      "content": "可以通过对池启用自动缩放，并将一个公式（用于计算处理应用程序所需的计算节点数）关联到该池，来实现自动缩放。",
+      "pos": [
+        78,
+        131
+      ]
+    },
+    {
+      "content": "自动缩放 Azure 批处理 ( Batch )池中的计算节点",
+      "pos": [
+        333,
+        364
+      ]
+    },
+    {
+      "content": "Azure Batch 中的自动缩放是指在作业执行期间动态添加或删除计算节点，从而自动调整应用程序使用的处理能力。这种自动调整可以节省时间和资金。",
+      "pos": [
+        366,
+        439
+      ]
+    },
+    {
+      "pos": [
+        441,
+        689
+      ],
+      "content": "可以通过将 <bpt id=\"p1\">*</bpt>自动缩放公式<ept id=\"p1\">*</ept> 与池相关联（例如，使用 <bpt id=\"p2\">[</bpt>Batch .NET<ept id=\"p2\">](/documentation/articles/batch-dotnet-get-started)</ept> 库中的 <bpt id=\"p3\">[</bpt>PoolOperations.EnableAutoScale<ept id=\"p3\">][net_enableautoscale]</ept> 方法），对计算节点池启用自动缩放。然后，Batch 服务将使用此公式来确定执行工作负荷所需的计算节点数目。对定期收集的服务度量值样本进行操作时，池中的计算节点数会根据关联的公式按可配置的间隔进行调整。"
+    },
+    {
+      "content": "可以在创建池时或在现有的池上启用自动缩放，也可以更改已启用自动缩放的池上的现有公式。Batch 可让你在将公式分配给池之前先评估公式，以及监视自动缩放运行的状态。",
+      "pos": [
+        691,
+        772
+      ]
+    },
+    {
+      "content": "自动缩放公式",
+      "pos": [
+        777,
+        783
+      ]
+    },
+    {
+      "pos": [
+        785,
+        1072
+      ],
+      "content": "自动缩放公式是一个字符串值，该值包含分配给池的 <bpt id=\"p1\">[</bpt>autoScaleFormula<ept id=\"p1\">][rest_autoscaleformula]</ept> 元素 (Batch REST API) 或 <bpt id=\"p2\">[</bpt>CloudPool.AutoScaleFormula<ept id=\"p2\">][net_cloudpool_autoscaleformula]</ept> 属性 (Batch .NET API) 的一个或多个语句。这些公式由你来定义。将公式分配到池后，它们将确定池中可供下一个处理间隔使用的计算节点数目（稍后将详细说明间隔）。公式是一个字符串，其大小不能超过 8KB，最多可以包含 100 个以分号分隔的语句，可以包括换行符和注释。"
+    },
+    {
+      "content": "可以将自动缩放公式视为使用 Batch 自动缩放“语言”。 公式语句是任意格式的表达式，可以包含系统与用户定义的变量和常量。它们可以使用内置类型、运算符和函数对这些值执行各种操作。例如，语句可以采用以下格式：",
+      "pos": [
+        1074,
+        1178
+      ]
+    },
+    {
+      "content": "公式通常包含多个语句，这些语句对先前语句中获取的值执行操作：",
+      "pos": [
+        1251,
+        1281
+      ]
+    },
+    {
+      "pos": [
+        1390,
+        1546
+      ],
+      "content": "在公式中使用语句的目标是实现池要缩放到的计算节点数目，也就是<bpt id=\"p1\">**</bpt>专用节点<ept id=\"p1\">**</ept>的<bpt id=\"p2\">**</bpt>目标<ept id=\"p2\">**</ept>数目。此“专用目标”数目可以大于、小于或等于池中当前的节点数目。Batch 按特定的间隔评估池的自动缩放公式（下面将讨论<bpt id=\"p3\">[</bpt>自动缩放间隔<ept id=\"p3\">](#interval)</ept>），并在评估时将池中的目标节点数目调整为自动缩放公式指定的数目。"
+    },
+    {
+      "content": "举个简单的例子，以下两行自动缩放公式根据活动任务数目指定应该调整的节点数目（最多 10 个计算节点）：",
+      "pos": [
+        1548,
+        1599
+      ]
+    },
+    {
+      "content": "本文的后续部分将介绍构成自动缩放公式的各个实体，包括变量、运算符、操作和函数。你将了解如何获取 Batch 中的各种计算资源和任务度量值，以便根据资源使用量和任务状态明智地调整池的节点计数。然后，你将了解如何使用 Batch REST 和 .NET API 构建公式以及对池启用自动缩放，最后我们将讨论几个示例公式。",
+      "pos": [
+        1744,
+        1902
+      ]
+    },
+    {
+      "pos": [
+        1906,
+        2055
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 每个 Azure 批处理帐户限制为可用于处理的计算节点的最大数目。Batch 服务最多会创建限制数目的节点，因此不可能会达到公式指定的目标数。请参阅 <bpt id=\"p1\">[</bpt>Azure Batch 服务的配额和限制<ept id=\"p1\">](batch-quota-limit.md)</ept>了解有关查看和提高帐户配额的信息。"
+    },
+    {
+      "pos": [
+        2060,
+        2086
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"variables\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>变量"
+    },
+    {
+      "pos": [
+        2088,
+        2217
+      ],
+      "content": "可以在自动缩放公式中使用系统定义的变量和用户定义的变量。在上述两行示例公式中，<ph id=\"ph1\">`$TargetDedicated`</ph> 是系统定义的变量，而 <ph id=\"ph2\">`$averageActiveTaskCount`</ph> 是用户定义的变量。下表显示了 Batch 服务定义的读写和只读变量。"
+    },
+    {
+      "pos": [
+        2219,
+        2262
+      ],
+      "content": "可以 <bpt id=\"p1\">*</bpt>获取<ept id=\"p1\">*</ept> 和 <bpt id=\"p2\">*</bpt>设置<ept id=\"p2\">*</ept> 这些<bpt id=\"p3\">**</bpt>系统定义变量<ept id=\"p3\">**</ept>的值，以管理池中计算节点的数目："
+    },
+    {
+      "content": "变量（读写）",
+      "pos": [
+        2287,
+        2293
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        2307,
+        2309
+      ]
+    },
+    {
+      "content": "$TargetDedicated",
+      "pos": [
+        2338,
+        2354
+      ]
+    },
+    {
+      "content": "池的<ph id=\"ph1\">&lt;b&gt;</ph>专用计算节点<ph id=\"ph2\">&lt;/b&gt;</ph>的<ph id=\"ph3\">&lt;b&gt;</ph>目标<ph id=\"ph4\">&lt;/b&gt;</ph>数。这是池应该缩放到的计算节点数目。它是一个“目标”数目，因为池可能达不到此目标节点数目。如果在池达到初始目标之前后续自动缩放评估再次修改目标节点数目，或者在达到目标节点数目前便达到了 Batch 帐户节点或核心配额，则可能发生这种情况。",
+      "pos": [
+        2368,
+        2512
+      ]
+    },
+    {
+      "content": "$NodeDeallocationOption",
+      "pos": [
+        2541,
+        2564
+      ]
+    },
+    {
+      "content": "从池中删除计算节点时发生的操作。可能的值包括：",
+      "pos": [
+        2578,
+        2601
+      ]
+    },
+    {
+      "content": "requeue<ph id=\"ph1\">&lt;/b&gt;</ph> – 立即终止任务并将其放回作业队列，以便重新计划这些任务。",
+      "pos": [
+        2643,
+        2684
+      ]
+    },
+    {
+      "content": "terminate<ph id=\"ph1\">&lt;/b&gt;</ph> – 立即终止任务并从作业队列中删除它们。",
+      "pos": [
+        2712,
+        2746
+      ]
+    },
+    {
+      "content": "taskcompletion<ph id=\"ph1\">&lt;/b&gt;</ph> – 等待当前运行的任务完成，然后从池中删除节点。",
+      "pos": [
+        2774,
+        2817
+      ]
+    },
+    {
+      "content": "retaineddata<ph id=\"ph1\">&lt;/b&gt;</ph><ph id=\"ph2\"> -</ph> 等待清理节点上的本地任务保留的所有数据，然后从池中删除节点。",
+      "pos": [
+        2845,
+        2894
+      ]
+    },
+    {
+      "pos": [
+        2940,
+        2982
+      ],
+      "content": "<bpt id=\"p1\">*</bpt>获取<ept id=\"p1\">*</ept> 这些<bpt id=\"p2\">**</bpt>系统定义变量<ept id=\"p2\">**</ept>的值即可根据 Batch 服务中的度量值进行调整："
+    },
+    {
+      "content": "变量（只读）",
+      "pos": [
+        3007,
+        3013
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        3027,
+        3029
+      ]
+    },
+    {
+      "content": "$CPUPercent",
+      "pos": [
+        3058,
+        3069
+      ]
+    },
+    {
+      "content": "CPU 使用率的平均百分比",
+      "pos": [
+        3083,
+        3096
+      ]
+    },
+    {
+      "content": "$WallClockSeconds",
+      "pos": [
+        3125,
+        3142
+      ]
+    },
+    {
+      "content": "使用的秒数",
+      "pos": [
+        3156,
+        3161
+      ]
+    },
+    {
+      "content": "$MemoryBytes",
+      "pos": [
+        3190,
+        3202
+      ]
+    },
+    {
+      "content": "使用的平均 MB 数",
+      "pos": [
+        3216,
+        3226
+      ]
+    },
+    {
+      "content": "$DiskBytes",
+      "pos": [
+        3247,
+        3257
+      ]
+    },
+    {
+      "content": "本地磁盘上使用的平均 GB 数",
+      "pos": [
+        3271,
+        3286
+      ]
+    },
+    {
+      "content": "$DiskReadBytes",
+      "pos": [
+        3315,
+        3329
+      ]
+    },
+    {
+      "content": "读取的字节数",
+      "pos": [
+        3343,
+        3349
+      ]
+    },
+    {
+      "content": "$DiskWriteBytes",
+      "pos": [
+        3378,
+        3393
+      ]
+    },
+    {
+      "content": "写入的字节数",
+      "pos": [
+        3407,
+        3413
+      ]
+    },
+    {
+      "content": "$DiskReadOps",
+      "pos": [
+        3442,
+        3454
+      ]
+    },
+    {
+      "content": "执行的读取磁盘操作数",
+      "pos": [
+        3468,
+        3478
+      ]
+    },
+    {
+      "content": "$DiskWriteOps",
+      "pos": [
+        3507,
+        3520
+      ]
+    },
+    {
+      "content": "执行的写入磁盘操作数",
+      "pos": [
+        3534,
+        3544
+      ]
+    },
+    {
+      "content": "$NetworkInBytes",
+      "pos": [
+        3573,
+        3588
+      ]
+    },
+    {
+      "content": "入站字节数",
+      "pos": [
+        3602,
+        3607
+      ]
+    },
+    {
+      "content": "$NetworkInBytes",
+      "pos": [
+        3636,
+        3651
+      ]
+    },
+    {
+      "content": "出站字节数",
+      "pos": [
+        3665,
+        3670
+      ]
+    },
+    {
+      "content": "$SampleNodeCount",
+      "pos": [
+        3699,
+        3715
+      ]
+    },
+    {
+      "content": "计算节点数",
+      "pos": [
+        3729,
+        3734
+      ]
+    },
+    {
+      "content": "$ActiveTasks",
+      "pos": [
+        3763,
+        3775
+      ]
+    },
+    {
+      "content": "处于活动状态的任务数",
+      "pos": [
+        3789,
+        3799
+      ]
+    },
+    {
+      "content": "$RunningTasks",
+      "pos": [
+        3828,
+        3841
+      ]
+    },
+    {
+      "content": "处于运行状态的任务数",
+      "pos": [
+        3855,
+        3865
+      ]
+    },
+    {
+      "content": "$SucceededTasks",
+      "pos": [
+        3894,
+        3909
+      ]
+    },
+    {
+      "content": "成功完成的任务数",
+      "pos": [
+        3923,
+        3931
+      ]
+    },
+    {
+      "content": "$FailedTasks",
+      "pos": [
+        3960,
+        3972
+      ]
+    },
+    {
+      "content": "失败的任务数",
+      "pos": [
+        3986,
+        3992
+      ]
+    },
+    {
+      "content": "$CurrentDedicated",
+      "pos": [
+        4021,
+        4038
+      ]
+    },
+    {
+      "content": "当前的专用计算节点数",
+      "pos": [
+        4052,
+        4062
+      ]
+    },
+    {
+      "pos": [
+        4088,
+        4176
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.TIP]</ph> 上面所示的只读系统定义变量是可提供各种方法来访问相互关联数据的 <bpt id=\"p1\">*</bpt>对象<ept id=\"p1\">*</ept> 。有关详细信息，请参阅下面的<bpt id=\"p2\">[</bpt>获取样本数据<ept id=\"p2\">](#getsampledata)</ept>。"
+    },
+    {
+      "content": "类型",
+      "pos": [
+        4181,
+        4183
+      ]
+    },
+    {
+      "pos": [
+        4185,
+        4198
+      ],
+      "content": "公式支持以下<bpt id=\"p1\">**</bpt>类型<ept id=\"p1\">**</ept>："
+    },
+    {
+      "content": "double",
+      "pos": [
+        4202,
+        4208
+      ]
+    },
+    {
+      "content": "doubleVec",
+      "pos": [
+        4211,
+        4220
+      ]
+    },
+    {
+      "content": "doubleVecList",
+      "pos": [
+        4223,
+        4236
+      ]
+    },
+    {
+      "content": "字符串",
+      "pos": [
+        4239,
+        4242
+      ]
+    },
+    {
+      "content": "timestamp -- timestamp 是包含以下成员的复合结构：",
+      "pos": [
+        4245,
+        4281
+      ]
+    },
+    {
+      "content": "year",
+      "pos": [
+        4288,
+        4292
+      ]
+    },
+    {
+      "content": "month (1-12)",
+      "pos": [
+        4299,
+        4311
+      ]
+    },
+    {
+      "content": "day (1-31)",
+      "pos": [
+        4318,
+        4328
+      ]
+    },
+    {
+      "content": "weekday（采用数字格式，例如 1 表示星期一）",
+      "pos": [
+        4335,
+        4361
+      ]
+    },
+    {
+      "content": "hour（采用 24 时制数字格式，例如 13 表示下午 1 点）",
+      "pos": [
+        4368,
+        4401
+      ]
+    },
+    {
+      "content": "minute (00-59)",
+      "pos": [
+        4408,
+        4422
+      ]
+    },
+    {
+      "content": "second (00-59)",
+      "pos": [
+        4429,
+        4443
+      ]
+    },
+    {
+      "content": "timeinterval",
+      "pos": [
+        4446,
+        4458
+      ]
+    },
+    {
+      "content": "TimeInterval\\_Zero",
+      "pos": [
+        4465,
+        4483
+      ]
+    },
+    {
+      "content": "TimeInterval\\_100ns",
+      "pos": [
+        4490,
+        4509
+      ]
+    },
+    {
+      "content": "TimeInterval\\_Microsecond",
+      "pos": [
+        4516,
+        4541
+      ]
+    },
+    {
+      "content": "TimeInterval\\_Millisecond",
+      "pos": [
+        4548,
+        4573
+      ]
+    },
+    {
+      "content": "TimeInterval\\_Second",
+      "pos": [
+        4580,
+        4600
+      ]
+    },
+    {
+      "content": "TimeInterval\\_Minute",
+      "pos": [
+        4607,
+        4627
+      ]
+    },
+    {
+      "content": "TimeInterval\\_Hour",
+      "pos": [
+        4634,
+        4652
+      ]
+    },
+    {
+      "content": "TimeInterval\\_Day",
+      "pos": [
+        4659,
+        4676
+      ]
+    },
+    {
+      "content": "TimeInterval\\_Week",
+      "pos": [
+        4683,
+        4701
+      ]
+    },
+    {
+      "content": "TimeInterval\\_Year",
+      "pos": [
+        4708,
+        4726
+      ]
+    },
+    {
+      "content": "操作",
+      "pos": [
+        4732,
+        4734
+      ]
+    },
+    {
+      "pos": [
+        4736,
+        4753
+      ],
+      "content": "上面所列的类型允许的<bpt id=\"p1\">**</bpt>操作<ept id=\"p1\">**</ept>："
+    },
+    {
+      "content": "操作",
+      "pos": [
+        4778,
+        4780
+      ]
+    },
+    {
+      "content": "允许的操作",
+      "pos": [
+        4794,
+        4799
+      ]
+    },
+    {
+      "content": "double &amp;lt;运算符&gt; double =&gt; double",
+      "pos": [
+        4828,
+        4860
+      ]
+    },
+    {
+      "content": "+, -, *, /",
+      "pos": [
+        4874,
+        4884
+      ]
+    },
+    {
+      "content": "double &amp;lt;运算符&gt; timeinterval =&gt; timeinterval",
+      "pos": [
+        4913,
+        4957
+      ]
+    },
+    {
+      "content": "doubleVec &amp;lt;运算符&gt; double =&gt; doubleVec",
+      "pos": [
+        5001,
+        5039
+      ]
+    },
+    {
+      "content": "+, -, *, /",
+      "pos": [
+        5053,
+        5063
+      ]
+    },
+    {
+      "content": "doubleVec &amp;lt;运算符&gt; doubleVec =&gt; doubleVec",
+      "pos": [
+        5092,
+        5133
+      ]
+    },
+    {
+      "content": "+, -, *, /",
+      "pos": [
+        5147,
+        5157
+      ]
+    },
+    {
+      "content": "timeinterval &amp;lt;运算符&gt; double =&gt; timeinterval",
+      "pos": [
+        5186,
+        5230
+      ]
+    },
+    {
+      "content": "*, /",
+      "pos": [
+        5244,
+        5248
+      ]
+    },
+    {
+      "content": "timeinterval &amp;lt;运算符&gt; timeinterval =&gt; timeinterval",
+      "pos": [
+        5277,
+        5327
+      ]
+    },
+    {
+      "content": "+, -",
+      "pos": [
+        5341,
+        5345
+      ]
+    },
+    {
+      "content": "timeinterval &amp;lt;运算符&gt; timestamp =&gt; timestamp",
+      "pos": [
+        5374,
+        5418
+      ]
+    },
+    {
+      "content": "timestamp &amp;lt;运算符&gt; timeinterval =&gt; timestamp",
+      "pos": [
+        5462,
+        5506
+      ]
+    },
+    {
+      "content": "timestamp &amp;lt;运算符&gt; timestamp =&gt; timeinterval",
+      "pos": [
+        5550,
+        5594
+      ]
+    },
+    {
+      "content": "&amp;lt;运算符&gt;double =&gt; double",
+      "pos": [
+        5638,
+        5662
+      ]
+    },
+    {
+      "content": "-, !",
+      "pos": [
+        5676,
+        5680
+      ]
+    },
+    {
+      "content": "&amp;lt;运算符&gt;timeinterval =&gt; timeinterval",
+      "pos": [
+        5709,
+        5745
+      ]
+    },
+    {
+      "content": "double &amp;lt;运算符&gt; double =&gt; double",
+      "pos": [
+        5789,
+        5821
+      ]
+    },
+    {
+      "content": "&amp;lt;, &amp;lt;=, ==, &gt;=, &gt;, !=",
+      "pos": [
+        5835,
+        5861
+      ]
+    },
+    {
+      "content": "string &amp;lt;运算符&gt; string =&gt; double",
+      "pos": [
+        5890,
+        5922
+      ]
+    },
+    {
+      "content": "&amp;lt;, &amp;lt;=, ==, &gt;=, &gt;, !=",
+      "pos": [
+        5936,
+        5962
+      ]
+    },
+    {
+      "content": "timestamp &amp;lt;运算符&gt; timestamp =&gt; double",
+      "pos": [
+        5991,
+        6029
+      ]
+    },
+    {
+      "content": "&amp;lt;, &amp;lt;=, ==, &gt;=, &gt;, !=",
+      "pos": [
+        6043,
+        6069
+      ]
+    },
+    {
+      "content": "timeinterval &amp;lt;运算符&gt; timeinterval =&gt; double",
+      "pos": [
+        6098,
+        6142
+      ]
+    },
+    {
+      "content": "&amp;lt;, &amp;lt;=, ==, &gt;=, &gt;, !=",
+      "pos": [
+        6156,
+        6182
+      ]
+    },
+    {
+      "content": "double &amp;lt;运算符&gt; double =&gt; double",
+      "pos": [
+        6211,
+        6243
+      ]
+    },
+    {
+      "content": "&amp;amp;&amp;amp;, ||",
+      "pos": [
+        6257,
+        6271
+      ]
+    },
+    {
+      "content": "测试仅限 double（非零值为 true，零值为 false）",
+      "pos": [
+        6300,
+        6332
+      ]
+    },
+    {
+      "content": "?",
+      "pos": [
+        6346,
+        6347
+      ]
+    },
+    {
+      "content": ":",
+      "pos": [
+        6348,
+        6349
+      ]
+    },
+    {
+      "content": "函数",
+      "pos": [
+        6376,
+        6378
+      ]
+    },
+    {
+      "pos": [
+        6380,
+        6405
+      ],
+      "content": "可以使用以下预定义<bpt id=\"p1\">**</bpt>函数<ept id=\"p1\">**</ept>来定义自动缩放公式。"
+    },
+    {
+      "content": "函数",
+      "pos": [
+        6430,
+        6432
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        6446,
+        6448
+      ]
+    },
+    {
+      "content": "double <ph id=\"ph1\">&lt;b&gt;</ph>avg<ph id=\"ph2\">&lt;/b&gt;</ph>(doubleVecList)",
+      "pos": [
+        6477,
+        6509
+      ]
+    },
+    {
+      "content": "DoubleVecList 中所有值的平均值。",
+      "pos": [
+        6523,
+        6546
+      ]
+    },
+    {
+      "content": "double <ph id=\"ph1\">&lt;b&gt;</ph>len<ph id=\"ph2\">&lt;/b&gt;</ph>(doubleVecList)",
+      "pos": [
+        6575,
+        6607
+      ]
+    },
+    {
+      "content": "从 doubleVecList 创建的向量的长度。",
+      "pos": [
+        6621,
+        6646
+      ]
+    },
+    {
+      "content": "double <ph id=\"ph1\">&lt;b&gt;</ph>lg<ph id=\"ph2\">&lt;/b&gt;</ph>(double)",
+      "pos": [
+        6667,
+        6691
+      ]
+    },
+    {
+      "content": "对数底数为 2。",
+      "pos": [
+        6705,
+        6713
+      ]
+    },
+    {
+      "content": "doubleVec <ph id=\"ph1\">&lt;b&gt;</ph>lg<ph id=\"ph2\">&lt;/b&gt;</ph>(doubleVecList)",
+      "pos": [
+        6742,
+        6776
+      ]
+    },
+    {
+      "content": "分量对数底数 2。必须为单个 double 参数显式传递 vec(double)，否则将采用 double lg(double) 版本。",
+      "pos": [
+        6790,
+        6858
+      ]
+    },
+    {
+      "content": "double <ph id=\"ph1\">&lt;b&gt;</ph>ln<ph id=\"ph2\">&lt;/b&gt;</ph>(double)",
+      "pos": [
+        6887,
+        6911
+      ]
+    },
+    {
+      "content": "自然对数。",
+      "pos": [
+        6925,
+        6930
+      ]
+    },
+    {
+      "content": "doubleVec <ph id=\"ph1\">&lt;b&gt;</ph>ln<ph id=\"ph2\">&lt;/b&gt;</ph>(doubleVecList)",
+      "pos": [
+        6959,
+        6993
+      ]
+    },
+    {
+      "content": "分量对数底数 2。必须为单个 double 参数显式传递 vec(double)，否则将采用 double lg(double) 版本。",
+      "pos": [
+        7007,
+        7075
+      ]
+    },
+    {
+      "content": "double <ph id=\"ph1\">&lt;b&gt;</ph>log<ph id=\"ph2\">&lt;/b&gt;</ph>(double)",
+      "pos": [
+        7104,
+        7129
+      ]
+    },
+    {
+      "content": "对数底数为 10。",
+      "pos": [
+        7143,
+        7152
+      ]
+    },
+    {
+      "content": "doubleVec <ph id=\"ph1\">&lt;b&gt;</ph>log<ph id=\"ph2\">&lt;/b&gt;</ph>(doubleVecList)",
+      "pos": [
+        7181,
+        7216
+      ]
+    },
+    {
+      "content": "分量对数底数 10。必须为单个 double 参数显式传递 vec(double)，否则将采用 double log(double) 版本。",
+      "pos": [
+        7230,
+        7300
+      ]
+    },
+    {
+      "content": "double <ph id=\"ph1\">&lt;b&gt;</ph>max<ph id=\"ph2\">&lt;/b&gt;</ph>(doubleVecList)",
+      "pos": [
+        7329,
+        7361
+      ]
+    },
+    {
+      "content": "doubleVecList 中的最大值。",
+      "pos": [
+        7375,
+        7395
+      ]
+    },
+    {
+      "content": "double <ph id=\"ph1\">&lt;b&gt;</ph>min<ph id=\"ph2\">&lt;/b&gt;</ph>(doubleVecList)",
+      "pos": [
+        7424,
+        7456
+      ]
+    },
+    {
+      "content": "doubleVecList 中的最小值。",
+      "pos": [
+        7470,
+        7490
+      ]
+    },
+    {
+      "content": "double <ph id=\"ph1\">&lt;b&gt;</ph>norm<ph id=\"ph2\">&lt;/b&gt;</ph>(doubleVecList)",
+      "pos": [
+        7519,
+        7552
+      ]
+    },
+    {
+      "content": "从 doubleVecList 创建的向量的二范数。",
+      "pos": [
+        7566,
+        7592
+      ]
+    },
+    {
+      "content": "double <ph id=\"ph1\">&lt;b&gt;</ph>percentile<ph id=\"ph2\">&lt;/b&gt;</ph>(doubleVec v, double p)",
+      "pos": [
+        7616,
+        7663
+      ]
+    },
+    {
+      "content": "向量 v 百分位元素。",
+      "pos": [
+        7677,
+        7688
+      ]
+    },
+    {
+      "content": "double <ph id=\"ph1\">&lt;b&gt;</ph>rand<ph id=\"ph2\">&lt;/b&gt;</ph>()",
+      "pos": [
+        7717,
+        7737
+      ]
+    },
+    {
+      "content": "介于 0.0 和 1.0 之间的随机值。",
+      "pos": [
+        7751,
+        7771
+      ]
+    },
+    {
+      "content": "double <ph id=\"ph1\">&lt;b&gt;</ph>range<ph id=\"ph2\">&lt;/b&gt;</ph>(doubleVecList)",
+      "pos": [
+        7800,
+        7834
+      ]
+    },
+    {
+      "content": "doubleVecList 中最小值和最大值之间的差。",
+      "pos": [
+        7848,
+        7875
+      ]
+    },
+    {
+      "content": "double <ph id=\"ph1\">&lt;b&gt;</ph>std<ph id=\"ph2\">&lt;/b&gt;</ph>(doubleVecList)",
+      "pos": [
+        7904,
+        7936
+      ]
+    },
+    {
+      "content": "doubleVecList 中值的样本标准偏差。",
+      "pos": [
+        7950,
+        7974
+      ]
+    },
+    {
+      "content": "stop<ph id=\"ph1\">&lt;/b&gt;</ph>()",
+      "pos": [
+        8006,
+        8016
+      ]
+    },
+    {
+      "content": "停止自动缩放表达式计算。",
+      "pos": [
+        8030,
+        8042
+      ]
+    },
+    {
+      "content": "double <ph id=\"ph1\">&lt;b&gt;</ph>sum<ph id=\"ph2\">&lt;/b&gt;</ph>(doubleVecList)",
+      "pos": [
+        8071,
+        8103
+      ]
+    },
+    {
+      "content": "doubleVecList 的所有组成部分之和。",
+      "pos": [
+        8117,
+        8141
+      ]
+    },
+    {
+      "content": "timestamp <ph id=\"ph1\">&lt;b&gt;</ph>time<ph id=\"ph2\">&lt;/b&gt;</ph>(string dateTime=\"\")",
+      "pos": [
+        8170,
+        8211
+      ]
+    },
+    {
+      "content": "如果未传递参数，则为当前时间的时间戳；如果传递了参数，则为 dateTime 字符串的时间戳。支持的 dateTime 格式为 W3CDTF 和 RFC1123。",
+      "pos": [
+        8225,
+        8306
+      ]
+    },
+    {
+      "content": "double <ph id=\"ph1\">&lt;b&gt;</ph>val<ph id=\"ph2\">&lt;/b&gt;</ph>(doubleVec v, double i)",
+      "pos": [
+        8335,
+        8375
+      ]
+    },
+    {
+      "content": "在起始索引为零的向量 v 中，位置 i 处的元素的值。",
+      "pos": [
+        8389,
+        8416
+      ]
+    },
+    {
+      "pos": [
+        8440,
+        8501
+      ],
+      "content": "上表中描述的某些函数可以接受列表作为参数。逗号分隔列表为 <bpt id=\"p1\">*</bpt>double<ept id=\"p1\">*</ept> 和 <bpt id=\"p2\">*</bpt>doubleVec<ept id=\"p2\">*</ept> 的任意组合。例如："
+    },
+    {
+      "pos": [
+        8576,
+        8705
+      ],
+      "content": "<bpt id=\"p1\">*</bpt>doubleVecList<ept id=\"p1\">*</ept> 值在计算之前将转换为单个 <bpt id=\"p2\">*</bpt>doubleVec<ept id=\"p2\">*</ept>。例如，如果 <ph id=\"ph1\">`v = [1,2,3]`</ph>，则调用 <ph id=\"ph2\">`avg(v)`</ph> 等效于调用 <ph id=\"ph3\">`avg(1,2,3)`</ph>，调用 <ph id=\"ph4\">`avg(v, 7)`</ph> 等效于调用 <ph id=\"ph5\">`avg(1,2,3,7)`</ph>。"
+    },
+    {
+      "pos": [
+        8710,
+        8744
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"getsampledata\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>获取样本数据"
+    },
+    {
+      "content": "自动缩放公式对 Batch 服务提供的度量值数据（样本）产生作用，并根据从服务获取的值扩大或缩减池大小。上述系统定义的变量是可提供各种方法来访问与该对象关联的数据的对象。例如，以下表达式显示了一个用于获取过去五分钟 CPU 使用率的请求：",
+      "pos": [
+        8746,
+        8865
+      ]
+    },
+    {
+      "content": "这些方法可用于获取样本数据。",
+      "pos": [
+        8917,
+        8931
+      ]
+    },
+    {
+      "content": "方法",
+      "pos": [
+        8956,
+        8958
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        8972,
+        8974
+      ]
+    },
+    {
+      "content": "Count()",
+      "pos": [
+        9003,
+        9010
+      ]
+    },
+    {
+      "content": "返回度量值历史记录中的样本总数。",
+      "pos": [
+        9024,
+        9040
+      ]
+    },
+    {
+      "content": "GetSample()",
+      "pos": [
+        9069,
+        9080
+      ]
+    },
+    {
+      "content": "GetSample()<ph id=\"ph1\">&lt;/b&gt;</ph> 方法返回数据样本的向量。",
+      "pos": [
+        9100,
+        9128
+      ]
+    },
+    {
+      "content": "一个样本最好包含 30 秒钟的度量值数据。换而言之，将每隔 30 秒获取样本一次，但如下所述，每收集一个样本后并且该样本可供公式使用时，会存在一定的延迟。因此，并非一段指定时间内的所有样本都可用于公式求值。",
+      "pos": [
+        9136,
+        9239
+      ]
+    },
+    {
+      "content": "doubleVec GetSample(double count)<ph id=\"ph1\">&lt;/b&gt;</ph><ph id=\"ph2\"> -</ph> 在最近的收集的样本中指定要获取的样本数。",
+      "pos": [
+        9273,
+        9333
+      ]
+    },
+    {
+      "content": "GetSample(1) 返回最后一个可用样本。但对于像 $CPUPercent 这样的度量值，你不应使用此方法，因为无法知道样本是<ph id=\"ph1\">&lt;em&gt;</ph>何时<ph id=\"ph2\">&lt;/em&gt;</ph>收集的 - 它可能是最近收集的，也可能由于系统问题而变得很旧。最好使用如下所示的时间间隔。",
+      "pos": [
+        9359,
+        9481
+      ]
+    },
+    {
+      "content": "doubleVec GetSample((timestamp | timeinterval) startTime [, double samplePercent])<ph id=\"ph1\">&lt;/b&gt;</ph> – 指定收集样本数据的时间范围，并选择性地指定必须在请求时间范围内可用的样本百分比。",
+      "pos": [
+        9511,
+        9640
+      ]
+    },
+    {
+      "content": "如果 CPUPercent 历史记录中存在过去十分钟的所在样本，<ph id=\"ph1\">&lt;em&gt;</ph>$CPUPercent.GetSample(TimeInterval_Minute * 10)<ph id=\"ph2\">&lt;/em&gt;</ph> 将返回 20 个样本。如果最后一分钟的历史记录不可用，则只返回 18 个样本，在这种情况下：",
+      "pos": [
+        9658,
+        9793
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">\n          &amp;#160;&amp;#160;&amp;#160;&amp;#160;&lt;em&gt;</ph>$CPUPercent.GetSample(TimeInterval_Minute * 10, 95)<ph id=\"ph2\">&lt;/em&gt;</ph> 将会失败，因为只有 90% 的样本可用；",
+      "pos": [
+        9798,
+        9914
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">\n          &amp;#160;&amp;#160;&amp;#160;&amp;#160;&lt;em&gt;</ph>$CPUPercent.GetSample(TimeInterval_Minute * 10, 80)<ph id=\"ph2\">&lt;/em&gt;</ph> 将会成功。",
+      "pos": [
+        9919,
+        10020
+      ]
+    },
+    {
+      "content": "doubleVec GetSample((timestamp | timeinterval) startTime, (timestamp | timeinterval) endTime [, double samplePercent])<ph id=\"ph1\">&lt;/b&gt;</ph> – 指定收集数据的时间范围，包括开始时间和结束时间。",
+      "pos": [
+        10050,
+        10199
+      ]
+    },
+    {
+      "content": "如前所述，每收集一个样本后并且该样本可供公式使用时，会存在一定的延迟。在使用 <ph id=\"ph1\">&lt;em&gt;</ph>GetSample<ph id=\"ph2\">&lt;/em&gt;</ph> 方法时，必须考虑这个因素 - 请参阅下面的 <ph id=\"ph3\">&lt;em&gt;</ph>GetSamplePercent<ph id=\"ph4\">&lt;/em&gt;</ph>。",
+      "pos": [
+        10227,
+        10333
+      ]
+    },
+    {
+      "content": "GetSamplePeriod()",
+      "pos": [
+        10362,
+        10379
+      ]
+    },
+    {
+      "content": "返回在历史样本数据集中采样的期间。",
+      "pos": [
+        10393,
+        10410
+      ]
+    },
+    {
+      "content": "Count()",
+      "pos": [
+        10445,
+        10452
+      ]
+    },
+    {
+      "content": "返回度量值历史记录中的样本总数。",
+      "pos": [
+        10470,
+        10486
+      ]
+    },
+    {
+      "content": "HistoryBeginTime()",
+      "pos": [
+        10517,
+        10535
+      ]
+    },
+    {
+      "content": "返回度量值最旧可用数据样本的时间戳。",
+      "pos": [
+        10549,
+        10567
+      ]
+    },
+    {
+      "content": "GetSamplePercent()",
+      "pos": [
+        10596,
+        10614
+      ]
+    },
+    {
+      "content": "返回给定时间间隔的可用样本百分比。例如：",
+      "pos": [
+        10631,
+        10651
+      ]
+    },
+    {
+      "content": "doubleVec GetSamplePercent( (timestamp | timeinterval) startTime [, (timestamp | timeinterval) endTime] )<ph id=\"ph1\">&lt;/b&gt;</ph><ph id=\"ph2\">\n    </ph>",
+      "pos": [
+        10666,
+        10780
+      ]
+    },
+    {
+      "content": "由于当返回的样本百分比小于指定的 samplePercent 时 GetSample 方法会失败，因此，你可以使用 GetSamplePercent 方法执行初始检查，然后在没有足够样本的情况下，不暂停样本自动缩放评估并执行备选操作。",
+      "pos": [
+        10783,
+        10900
+      ]
+    },
+    {
+      "pos": [
+        10932,
+        10958
+      ],
+      "content": "样本、样本百分比和 <bpt id=\"p1\">*</bpt>GetSample()<ept id=\"p1\">*</ept> 方法"
+    },
+    {
+      "content": "自动缩放公式的核心操作是获取任务和资源度量值数据，并根据该数据调整池大小。因此，请务必明确知道自动缩放公式如何与度量值数据或“样本”交互。",
+      "pos": [
+        10960,
+        11029
+      ]
+    },
+    {
+      "content": "示例",
+      "pos": [
+        11033,
+        11035
+      ]
+    },
+    {
+      "pos": [
+        11039,
+        11202
+      ],
+      "content": "Batch 服务定期获取任务和资源度量值的 <bpt id=\"p1\">*</bpt>样本<ept id=\"p1\">*</ept> ，使其可供自动缩放公式使用。Batch 服务每隔 30 秒记录这些样本一次，但是，通常有一些滞后，以致记录样本的时间与样本可供自动缩放公式使用（与读取）的时间之间有所延迟。此外，由于各种因素（例如网络或其他基础结构问题），可能无法记录特定间隔的样本，从而导致样本“遗漏”。"
+    },
+    {
+      "content": "样本百分比",
+      "pos": [
+        11206,
+        11211
+      ]
+    },
+    {
+      "pos": [
+        11215,
+        11342
+      ],
+      "content": "将 <ph id=\"ph1\">`samplePercent`</ph> 传递到 <ph id=\"ph2\">`GetSample()`</ph> 方法，或调用 <ph id=\"ph3\">`GetSamplePercent()`</ph> 方法时，“percent”是指 Batch 服务 <bpt id=\"p1\">*</bpt>可能<ept id=\"p1\">*</ept> 记录的样本总数与自动缩放公式实际 <bpt id=\"p2\">*</bpt>可用<ept id=\"p2\">*</ept> 的样本数目之间的比较。"
+    },
+    {
+      "pos": [
+        11344,
+        11533
+      ],
+      "content": "让我们以 10 分钟的时间跨度为例。由于每隔 30 秒记录样本一次，因此在 10 分钟的时间跨度内，Batch 服务所记录的样本总数将达到 20 个（每分钟 2 个）。但是，由于报告机制固有的延迟，或者 Azure 基础结构出现的其他一些问题，可能只有 15 个样本可供自动缩放公式读取。这意味着，在这 10 分钟的期间内，记录的样本总数只有 <bpt id=\"p1\">**</bpt>75%<ept id=\"p1\">**</ept> 实际可供公式使用。"
+    },
+    {
+      "content": "GetSample() 和样本范围",
+      "pos": [
+        11537,
+        11554
+      ]
+    },
+    {
+      "pos": [
+        11558,
+        11661
+      ],
+      "content": "自动缩放公式即将扩大和缩减池 - 添加节点或删除节点。由于节点为付费使用，想要确保公式使用根据充足数据的明智的分析方法。因此，建议在公式中使用趋势类型分析，此类型根据所收集样本的 <bpt id=\"p1\">*</bpt>范围<ept id=\"p1\">*</ept> 来扩大和缩减池。"
+    },
+    {
+      "pos": [
+        11663,
+        11744
+      ],
+      "content": "为此，请使用 <ph id=\"ph1\">`GetSample(interval look-back start, interval look-back end)`</ph> 返回样本的<bpt id=\"p1\">**</bpt>向量<ept id=\"p1\">**</ept>："
+    },
+    {
+      "content": "Batch 评估上述代码行后，它以值的向量形式返回样本范围，例如：",
+      "pos": [
+        11845,
+        11878
+      ]
+    },
+    {
+      "pos": [
+        11925,
+        11982
+      ],
+      "content": "收集样本向量后，便可使用 <ph id=\"ph1\">`min()`</ph>、<ph id=\"ph2\">`max()`</ph> 和 <ph id=\"ph3\">`avg()`</ph> 等函数从所收集的范围派生有意义的值。"
+    },
+    {
+      "pos": [
+        11984,
+        12144
+      ],
+      "content": "为了提高安全性，如果特定时间段可用的样本数小于特定百分比，你可以强制将公式评估为 <bpt id=\"p1\">*</bpt>失败<ept id=\"p1\">*</ept> 。强制将公式评估为失败会指示 Batch 在指定的样本百分比不可用时停止进一步的公式评估，而且不更改池大小。若要指定评估成功所需的样本百分比，请将其指定为 <ph id=\"ph1\">`GetSample()`</ph> 的第三个参数。下面指定要求 75% 的样本："
+    },
+    {
+      "pos": [
+        12252,
+        12436
+      ],
+      "content": "此外，由于先前提到的样本可用性延迟问题，请务必记得指定回查开始时间早于一分钟的时间范围。这是由于样本需要花大约一分钟的时间才能传播到整个系统，因此通常无法使用 <ph id=\"ph1\">`(0 * TimeInterval_Second, 60 * TimeInterval_Second)`</ph> 范围内的样本。同样地，可以使用 <ph id=\"ph2\">`GetSample()`</ph> 百分比参数来强制实施特定样本百分比要求。"
+    },
+    {
+      "pos": [
+        12440,
+        12659
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph> <bpt id=\"p1\">**</bpt>强烈建议****不要 <bpt id=\"p2\">*</bpt>只<ept id=\"p2\">*</ept> 依赖于自动缩放公式中的 <ph id=\"ph2\">`GetSample(1)`</ph><ept id=\"p1\">**</ept>。这是因为，<ph id=\"ph3\">`GetSample(1)`</ph> 基本上只是向 Batch 服务表明：“不论多久以前获取最后一个样本，请将它提供给我。” 由于它只是单个样本，而且可能是较旧的样本，因此可能无法代表最近任务或资源状态的全貌。如果使用 <ph id=\"ph4\">`GetSample(1)`</ph>，请确保它是较大语句的一部分，而不是公式所依赖的唯一数据点。"
+    },
+    {
+      "content": "度量值",
+      "pos": [
+        12664,
+        12667
+      ]
+    },
+    {
+      "pos": [
+        12669,
+        12762
+      ],
+      "content": "可以在定义公式时使用<bpt id=\"p1\">**</bpt>资源<ept id=\"p1\">**</ept>和<bpt id=\"p2\">**</bpt>任务度量值<ept id=\"p2\">**</ept>，根据获取和评估的度量值数据来调整池中专用节点的目标数目。有关每个度量值的详细信息，请参阅上面的<bpt id=\"p3\">[</bpt>变量<ept id=\"p3\">](#variables)</ept>部分。"
+    },
+    {
+      "content": "度量值",
+      "pos": [
+        12787,
+        12790
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        12804,
+        12806
+      ]
+    },
+    {
+      "content": "资源",
+      "pos": [
+        12838,
+        12840
+      ]
+    },
+    {
+      "content": "资源度量值<ph id=\"ph1\">&lt;/b&gt;</ph>基于计算节点的 CPU、带宽和内存使用量，以及节点数目。",
+      "pos": [
+        12864,
+        12901
+      ]
+    },
+    {
+      "content": "这些系统定义的变量可用于根据节点计数进行调整：",
+      "pos": [
+        12918,
+        12941
+      ]
+    },
+    {
+      "content": "$TargetDedicated",
+      "pos": [
+        12968,
+        12984
+      ]
+    },
+    {
+      "content": "$CurrentDedicated",
+      "pos": [
+        13006,
+        13023
+      ]
+    },
+    {
+      "content": "$SampleNodeCount",
+      "pos": [
+        13045,
+        13061
+      ]
+    },
+    {
+      "content": "这些系统定义的变量可用于根据节点资源使用量进行调整：",
+      "pos": [
+        13088,
+        13114
+      ]
+    },
+    {
+      "content": "$CPUPercent",
+      "pos": [
+        13141,
+        13152
+      ]
+    },
+    {
+      "content": "$WallClockSeconds",
+      "pos": [
+        13168,
+        13185
+      ]
+    },
+    {
+      "content": "$MemoryBytes",
+      "pos": [
+        13201,
+        13213
+      ]
+    },
+    {
+      "content": "$DiskBytes",
+      "pos": [
+        13229,
+        13239
+      ]
+    },
+    {
+      "content": "$DiskReadBytes",
+      "pos": [
+        13255,
+        13269
+      ]
+    },
+    {
+      "content": "$DiskWriteBytes",
+      "pos": [
+        13285,
+        13300
+      ]
+    },
+    {
+      "content": "$DiskReadOps",
+      "pos": [
+        13316,
+        13328
+      ]
+    },
+    {
+      "content": "$DiskWriteOps",
+      "pos": [
+        13344,
+        13357
+      ]
+    },
+    {
+      "content": "$NetworkInBytes",
+      "pos": [
+        13373,
+        13388
+      ]
+    },
+    {
+      "content": "$NetworkInBytes",
+      "pos": [
+        13404,
+        13419
+      ]
+    },
+    {
+      "content": "任务",
+      "pos": [
+        13462,
+        13464
+      ]
+    },
+    {
+      "content": "任务度量值<ph id=\"ph1\">&lt;/b&gt;</ph>基于任务的状态，例如“活动”、“挂起”和“已完成”。以下系统定义变量可用于根据任务度量值调整池大小：",
+      "pos": [
+        13488,
+        13547
+      ]
+    },
+    {
+      "content": "$ActiveTasks",
+      "pos": [
+        13574,
+        13586
+      ]
+    },
+    {
+      "content": "$RunningTasks",
+      "pos": [
+        13602,
+        13615
+      ]
+    },
+    {
+      "content": "$SucceededTasks",
+      "pos": [
+        13631,
+        13646
+      ]
+    },
+    {
+      "content": "$FailedTasks",
+      "pos": [
+        13668,
+        13680
+      ]
+    },
+    {
+      "content": "构建自动缩放公式",
+      "pos": [
+        13730,
+        13738
+      ]
+    },
+    {
+      "content": "构造自动缩放公式时，可以使用上述组件来生成语句，然后将这些语句组合成完整的公式即可。例如，在这里，我们在构造公式时，会先定义对公式的要求：",
+      "pos": [
+        13740,
+        13809
+      ]
+    },
+    {
+      "content": "如果 CPU 使用率高，则增加池中计算节点的目标数",
+      "pos": [
+        13814,
+        13839
+      ]
+    },
+    {
+      "content": "如果 CPU 使用率低，则降低池中计算节点的目标数",
+      "pos": [
+        13843,
+        13868
+      ]
+    },
+    {
+      "content": "始终将最大节点数限制为 400",
+      "pos": [
+        13872,
+        13887
+      ]
+    },
+    {
+      "pos": [
+        13889,
+        14004
+      ],
+      "content": "为了在 CPU 使用率高时<bpt id=\"p1\">*</bpt>增加<ept id=\"p1\">*</ept> 节点数，我们定义了一个语句，如果在过去 10 分钟内最小平均 CPU 使用率高于 70%，该语句就会向用户定义变量 ($TotalNodes) 填充一个值，值的大小为节点当前目标数的 110%："
+    },
+    {
+      "pos": [
+        14131,
+        14243
+      ],
+      "content": "如果过去 60 分钟的平均 CPU 使用率<bpt id=\"p1\">*</bpt>低于<ept id=\"p1\">*</ept> 20%，则下一个语句会将同一变量设置为节点当前目标数的 90%，降低 CPU 使用率低时的目标数。请注意，此语句还引用以上语句中的用户定义变量 <bpt id=\"p2\">*</bpt>$TotalNodes<ept id=\"p2\">*</ept>。"
+    },
+    {
+      "pos": [
+        14366,
+        14395
+      ],
+      "content": "现在，将专用计算节点的目标数限制为<bpt id=\"p1\">**</bpt>最大值<ept id=\"p1\">**</ept> 400："
+    },
+    {
+      "content": "下面是完整公式：",
+      "pos": [
+        14441,
+        14449
+      ]
+    },
+    {
+      "pos": [
+        14741,
+        14855
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 自动缩放公式由 <bpt id=\"p1\">[</bpt>Batch REST<ept id=\"p1\">][rest_api]</ept> API 变量、类型、操作和函数组成。即使是在使用 <bpt id=\"p2\">[</bpt>Batch .NET<ept id=\"p2\">][net_api]</ept> 库的时候，也会在公式字符串中使用这些组成元素。"
+    },
+    {
+      "content": "在启用自动缩放的情况下创建池",
+      "pos": [
+        14860,
+        14874
+      ]
+    },
+    {
+      "content": "若要在创建池时启用自动缩放功能，请使用以下方法之一：",
+      "pos": [
+        14876,
+        14902
+      ]
+    },
+    {
+      "pos": [
+        14906,
+        15043
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>New-AzureBatchPool<ept id=\"p1\">](https://msdn.microsoft.com/library/azure/mt125936.aspx)</ept> – 此 Azure PowerShell cmdlet 使用 AutoScaleFormula 参数来指定自动缩放公式。"
+    },
+    {
+      "pos": [
+        15046,
+        15469
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>BatchClient.PoolOperations.CreatePool<ept id=\"p1\">](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.pooloperations.createpool.aspx)</ept> – 在调用此 .NET 方法创建池后，将设置池的 <bpt id=\"p2\">[</bpt>CloudPool.AutoScaleEnabled<ept id=\"p2\">](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudpool.autoscaleenabled.aspx)</ept> 和 <bpt id=\"p3\">[</bpt>CloudPool.AutoScaleFormula<ept id=\"p3\">](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudpool.autoscaleformula.aspx)</ept> 属性，以启用自动缩放。"
+    },
+    {
+      "pos": [
+        15472,
+        15610
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>将池添加到帐户<ept id=\"p1\">](https://msdn.microsoft.com/library/azure/dn820174.aspx)</ept> – 创建池后，此 REST API 请求中使用的 enableAutoScale 和 autoScaleFormula 元素将为池设置自动缩放。"
+    },
+    {
+      "pos": [
+        15614,
+        15822
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph> 如果你使用上述方法之一创建了支持自动缩放的池，则<bpt id=\"p1\">**</bpt>不得<ept id=\"p1\">**</ept>指定该池的 <bpt id=\"p2\">*</bpt>targetDedicated<ept id=\"p2\">*</ept> 参数。另请注意，如果你希望手动调整启用自动缩放功能的池的大小（例如，使用 <bpt id=\"p3\">[</bpt>BatchClient.PoolOperations.ResizePool<ept id=\"p3\">][net_poolops_resizepool]</ept> 来调整），则必须先<bpt id=\"p4\">**</bpt>禁用<ept id=\"p4\">**</ept>该池的自动缩放功能，然后再调整池的大小。"
+    },
+    {
+      "pos": [
+        15824,
+        16059
+      ],
+      "content": "以下代码段显示了如何创建启用自动缩放功能的 <bpt id=\"p1\">[</bpt>CloudPool<ept id=\"p1\">][net_cloudpool]</ept>，创建时使用 <bpt id=\"p2\">[</bpt>Batch .NET<ept id=\"p2\">][net_api]</ept> 库，其公式将节点的目标数设置为 5（周一）和 1（除周一外的其他时间）。此外，自动缩放间隔设置为 30 分钟（请参阅下面的<bpt id=\"p3\">[</bpt>自动缩放间隔<ept id=\"p3\">](#interval)</ept>）。在本文的此部分与其他 C# 代码段中，“myBatchClient”是适当初始化的 <bpt id=\"p4\">[</bpt>BatchClient<ept id=\"p4\">][net_batchclient]</ept> 实例。"
+    },
+    {
+      "pos": [
+        16333,
+        16362
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"interval\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>自动缩放间隔"
+    },
+    {
+      "pos": [
+        16364,
+        16422
+      ],
+      "content": "默认情况下，Batch 服务根据其自动缩放公式每隔 <bpt id=\"p1\">**</bpt>15 分钟<ept id=\"p1\">**</ept>调整池大小。但是，可使用以下池属性配置此间隔："
+    },
+    {
+      "pos": [
+        16426,
+        16490
+      ],
+      "content": "REST API - <bpt id=\"p1\">[</bpt>autoScaleEvaluationInterval<ept id=\"p1\">][rest_autoscaleinterval]</ept>"
+    },
+    {
+      "pos": [
+        16493,
+        16580
+      ],
+      "content": ".NET API - <bpt id=\"p1\">[</bpt>CloudPool.AutoScaleEvaluationInterval<ept id=\"p1\">][net_cloudpool_autoscaleevalinterval]</ept>"
+    },
+    {
+      "content": "最小间隔为 5 分钟，最大间隔为 168 小时。如果指定的间隔超出此范围，Batch 服务将返回“错误的请求(400)”错误。",
+      "pos": [
+        16582,
+        16645
+      ]
+    },
+    {
+      "pos": [
+        16649,
+        16703
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 自动缩放目前不能以低于一分钟的时间响应更改，而是在你运行工作负荷时逐步调整池大小。"
+    },
+    {
+      "content": "创建池后启用自动缩放",
+      "pos": [
+        16708,
+        16718
+      ]
+    },
+    {
+      "pos": [
+        16720,
+        16792
+      ],
+      "content": "如果你使用 <bpt id=\"p1\">*</bpt>targetDedicated<ept id=\"p1\">*</ept> 参数设置了包含指定计算节点数的池，则以后可以更新现有池以自动缩放。通过以下方法之一执行这种检查："
+    },
+    {
+      "pos": [
+        16796,
+        16897
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>BatchClient.PoolOperations.EnableAutoScale<ept id=\"p1\">][net_enableautoscale]</ept> – 此 .NET 方法需要现有池的 ID 和自动缩放公式才能应用到池。"
+    },
+    {
+      "pos": [
+        16900,
+        16984
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>允许对池进行自动缩放<ept id=\"p1\">][rest_enableautoscale]</ept> – 此 REST API 请求要求 URI 中存在现有池的 ID，以及请求正文中存在自动缩放公式。"
+    },
+    {
+      "pos": [
+        16988,
+        17055
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 如果某个值是在创建池时为 <bpt id=\"p1\">*</bpt>targetDedicated<ept id=\"p1\">*</ept> 参数指定的，则会在评估自动缩放公式时忽略该值。"
+    },
+    {
+      "pos": [
+        17057,
+        17216
+      ],
+      "content": "此代码段演示了如何在现有池上通过 <bpt id=\"p1\">[</bpt>Batch .NET<ept id=\"p1\">][net_api]</ept> 库启用自动缩放功能。请注意，针对现有池启用公式和更新公式使用相同的方法。因此，如果已启用自动缩放功能，则此方法会针对指定池 <bpt id=\"p2\">*</bpt>更新<ept id=\"p2\">*</ept> 公式。该代码段假设“mypool”是现有 <bpt id=\"p3\">[</bpt>CloudPool<ept id=\"p3\">][net_cloudpool]</ept> 的 ID。"
+    },
+    {
+      "content": "评估自动缩放公式",
+      "pos": [
+        17752,
+        17760
+      ]
+    },
+    {
+      "content": "在应用程序中使用公式之前，最好先对它进行评估。评估公式时，可以针对现有池对公式进行“测试性运行”。执行此操作时，可通过以下方式：",
+      "pos": [
+        17762,
+        17826
+      ]
+    },
+    {
+      "pos": [
+        17830,
+        18305
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>BatchClient.PoolOperations.EvaluateAutoScale<ept id=\"p1\">](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.pooloperations.evaluateautoscale.aspx)</ept> 或 <bpt id=\"p2\">[</bpt>BatchClient.PoolOperations.EvaluateAutoScaleAsync<ept id=\"p2\">](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.pooloperations.evaluateautoscaleasync.aspx)</ept> – 这些 .NET 方法需要现有池的 ID，并需要包含自动缩放公式的字符串。调用的结果将包含在 <bpt id=\"p3\">[</bpt>AutoScaleEvaluation<ept id=\"p3\">](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.autoscaleevaluation.aspx)</ept> 类的实例中。"
+    },
+    {
+      "pos": [
+        18308,
+        18472
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>评估自动缩放公式<ept id=\"p1\">](https://msdn.microsoft.com/library/azure/dn820183.aspx)</ept> – 在这个 REST API 请求中，池 ID 已在 URI 中指定，自动缩放公式已在请求正文的 <bpt id=\"p2\">*</bpt>autoScaleFormula<ept id=\"p2\">*</ept> 元素中指定。操作的响应包含任何可能与该公式相关的错误信息。"
+    },
+    {
+      "pos": [
+        18476,
+        18525
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 若要评估某个自动缩放公式，你必须先通过有效的公式对池启用了自动缩放功能。"
+    },
+    {
+      "pos": [
+        18527,
+        18608
+      ],
+      "content": "在这个使用 <bpt id=\"p1\">[</bpt>Batch .NET<ept id=\"p1\">][net_api]</ept> 库的代码段中，我们先对公式进行评估，然后将其应用到 <bpt id=\"p2\">[</bpt>CloudPool<ept id=\"p2\">][net_cloudpool]</ept>。"
+    },
+    {
+      "content": "成功对此代码段中的公式进行评估以后，将生成如下所示的输出：",
+      "pos": [
+        20133,
+        20162
+      ]
+    },
+    {
+      "content": "获取有关自动缩放运行的信息",
+      "pos": [
+        20345,
+        20358
+      ]
+    },
+    {
+      "content": "定期检查自动缩放的运行结果，以确保公式按预期执行。",
+      "pos": [
+        20360,
+        20385
+      ]
+    },
+    {
+      "pos": [
+        20389,
+        20650
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>CloudPool.AutoScaleRun<ept id=\"p1\">](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudpool.autoscalerun.aspx)</ept> – 使用 .NET 库时，池的此属性将提供 <bpt id=\"p2\">[</bpt>AutoScaleRun<ept id=\"p2\">](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.autoscalerun.aspx)</ept> 类的一个实例，该类提供最新自动缩放运行的以下属性："
+    },
+    {
+      "content": "AutoScaleRun.Error",
+      "pos": [
+        20656,
+        20674
+      ]
+    },
+    {
+      "content": "AutoScaleRun.Results",
+      "pos": [
+        20769,
+        20789
+      ]
+    },
+    {
+      "content": "AutoScaleRun.Timestamp",
+      "pos": [
+        20886,
+        20908
+      ]
+    },
+    {
+      "pos": [
+        21004,
+        21103
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>获取有关池的信息<ept id=\"p1\">](https://msdn.microsoft.com/library/dn820165.aspx)</ept> – 此 REST API 请求返回有关池的信息，包括最近的自动缩放运行结果。"
+    },
+    {
+      "pos": [
+        21108,
+        21135
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"examples\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>示例公式"
+    },
+    {
+      "content": "让我们看看一些示例，了解如何通过多种方式使用公式来自动缩放池中的计算资源。",
+      "pos": [
+        21137,
+        21174
+      ]
+    },
+    {
+      "content": "示例 1：基于时间的调整",
+      "pos": [
+        21180,
+        21192
+      ]
+    },
+    {
+      "content": "也许，你希望能够根据星期几和一天的具体时间来调整池的大小，相应地增加或减少池中节点的数目：",
+      "pos": [
+        21194,
+        21239
+      ]
+    },
+    {
+      "content": "此公式首先获取当前时间。如果日期是工作日（周一到周五）且时间是工作时间（早 8 点到晚 6 点），则会将目标池大小设置为 20 个节点。否则，目标池大小将设置为 10 个节点。",
+      "pos": [
+        21465,
+        21553
+      ]
+    },
+    {
+      "content": "示例 2：基于任务的调整",
+      "pos": [
+        21559,
+        21571
+      ]
+    },
+    {
+      "content": "在此示例中，池大小是根据队列中的任务数来调整的。请注意，在公式字符串中，注释和分行符都是可以接受的。",
+      "pos": [
+        21573,
+        21623
+      ]
+    },
+    {
+      "content": "示例 3：考虑并行任务",
+      "pos": [
+        22526,
+        22537
+      ]
+    },
+    {
+      "pos": [
+        22539,
+        22670
+      ],
+      "content": "另一个根据任务数来调整池大小的示例就是，此公式还会考虑为池设置的 <bpt id=\"p1\">[</bpt>MaxTasksPerComputeNode<ept id=\"p1\">][net_maxtasks]</ept> 值。在对池启用了<bpt id=\"p2\">[</bpt>并行任务执行<ept id=\"p2\">](batch-parallel-node-tasks.md)</ept>的情况下，此公式特别有用。"
+    },
+    {
+      "content": "示例 4：设置初始池大小",
+      "pos": [
+        23540,
+        23552
+      ]
+    },
+    {
+      "content": "此示例显示 C# 代码段中的自动缩放公式在初始时间段将池大小设置为一定的节点数目，然后在初始时间段过后，根据正在运行和处于活动状态的任务数目调整池大小。",
+      "pos": [
+        23554,
+        23630
+      ]
+    },
+    {
+      "content": "上述代码段中的公式具有以下特征：",
+      "pos": [
+        24099,
+        24115
+      ]
+    },
+    {
+      "content": "将初始池大小设置为 4 个节点",
+      "pos": [
+        24119,
+        24134
+      ]
+    },
+    {
+      "content": "在池生命周期的最初 10 分钟内不调整池大小",
+      "pos": [
+        24137,
+        24159
+      ]
+    },
+    {
+      "content": "10 分钟后，获取过去 60 分钟内正在运行和处于活动状态的任务数目的最大值",
+      "pos": [
+        24162,
+        24200
+      ]
+    },
+    {
+      "content": "如果这两个值均为 0（表示过去 60 分钟没有正在运行或处于活动状态的任务），则池大小将设置为 0",
+      "pos": [
+        24205,
+        24254
+      ]
+    },
+    {
+      "content": "如果其中一个值大于零，则不进行任何更改",
+      "pos": [
+        24259,
+        24278
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        24283,
+        24287
+      ]
+    },
+    {
+      "content": "若要完全评估应用程序的效率，你可能需要访问计算节点。若要利用远程访问，必须将一个用户帐户添加到你要访问的节点，并且必须为该节点检索 RDP 文件。",
+      "pos": [
+        24292,
+        24365
+      ]
+    },
+    {
+      "content": "通过以下方法之一添加用户帐户：",
+      "pos": [
+        24372,
+        24387
+      ]
+    },
+    {
+      "pos": [
+        24398,
+        24517
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>New-AzureBatchVMUser<ept id=\"p1\">](https://msdn.microsoft.com/library/mt149846.aspx)</ept> – 此 PowerShell cmdlet 使用池名称、计算节点名称、帐户名和密码作为参数。"
+    },
+    {
+      "pos": [
+        24528,
+        24961
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>BatchClient.PoolOperations.CreateComputeNodeUser<ept id=\"p1\">](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.pooloperations.createcomputenodeuser.aspx)</ept> – 此 .NET 方法会创建 <bpt id=\"p2\">[</bpt>ComputeNodeUser<ept id=\"p2\">](https://msdn.microsoft.com/library/microsoft.azure.batch.computenodeuser.aspx)</ept> 类的一个实例，你可以在该实例上针对计算节点设置帐户名和密码，然后再在该实例上调用 <bpt id=\"p3\">[</bpt>ComputeNodeUser.Commit<ept id=\"p3\">](https://msdn.microsoft.com/library/microsoft.azure.batch.computenodeuser.commit.aspx)</ept>，以便在该节点上创建用户。"
+    },
+    {
+      "pos": [
+        24972,
+        25089
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>将用户帐户添加到节点<ept id=\"p1\">](https://msdn.microsoft.com/library/dn820137.aspx)</ept> – 池和计算节点的名称在 URI 中指定，帐户名和密码将发送到此 REST API 请求的请求正文中的节点。"
+    },
+    {
+      "content": "获取 RDP 文件：",
+      "pos": [
+        25096,
+        25106
+      ]
+    },
+    {
+      "pos": [
+        25117,
+        25293
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>BatchClient.PoolOperations.GetRDPFile<ept id=\"p1\">](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.pooloperations.getrdpfile.aspx)</ept> – 此 .NET 方法需要池 ID、节点 ID 以及要创建的 RDP 文件的名称。"
+    },
+    {
+      "pos": [
+        25304,
+        25416
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>从节点获取远程桌面协议文件<ept id=\"p1\">](https://msdn.microsoft.com/library/dn820120.aspx)</ept> – 此 REST API 请求需要池的名称以及计算节点的名称。响应包含 RDP 文件的内容。"
+    },
+    {
+      "pos": [
+        25427,
+        25557
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Get-AzureBatchRDPFile<ept id=\"p1\">](https://msdn.microsoft.com/library/mt149851.aspx)</ept> – 此 PowerShell cmdlet 从指定的计算节点获取 RDP 文件，并将其保存到指定的文件位置或流。"
+    },
+    {
+      "pos": [
+        25562,
+        25658
+      ],
+      "content": "某些应用程序会生成大量难以处理的数据。解决此问题的方法之一是进行<bpt id=\"p1\">[</bpt>有效的列表查询<ept id=\"p1\">](/documentation/articles/batch-efficient-list-queries)</ept>。"
+    }
+  ],
+  "content": "\n<properties\n    pageTitle=\"自动缩放 Azure  批处理( Batch )池中的计算节点\"\n    description=\"可以通过对池启用自动缩放，并将一个公式（用于计算处理应用程序所需的计算节点数）关联到该池，来实现自动缩放。\"\n    services=\"batch\"\n    documentationCenter=\"\"\n    authors=\"davidmu1\"\n    manager=\"timlt\"\n    editor=\"tysonn\"/>\n\n<tags\n    ms.service=\"batch\"\n    ms.date=\"01/08/2015\"\n    wacn.date=\"02/25/2016\"/>\n\n# 自动缩放 Azure 批处理 ( Batch )池中的计算节点\n\nAzure Batch 中的自动缩放是指在作业执行期间动态添加或删除计算节点，从而自动调整应用程序使用的处理能力。这种自动调整可以节省时间和资金。\n\n可以通过将 *自动缩放公式* 与池相关联（例如，使用 [Batch .NET](/documentation/articles/batch-dotnet-get-started) 库中的 [PoolOperations.EnableAutoScale][net_enableautoscale] 方法），对计算节点池启用自动缩放。然后，Batch 服务将使用此公式来确定执行工作负荷所需的计算节点数目。对定期收集的服务度量值样本进行操作时，池中的计算节点数会根据关联的公式按可配置的间隔进行调整。\n\n可以在创建池时或在现有的池上启用自动缩放，也可以更改已启用自动缩放的池上的现有公式。Batch 可让你在将公式分配给池之前先评估公式，以及监视自动缩放运行的状态。\n\n## 自动缩放公式\n\n自动缩放公式是一个字符串值，该值包含分配给池的 [autoScaleFormula][rest_autoscaleformula] 元素 (Batch REST API) 或 [CloudPool.AutoScaleFormula][net_cloudpool_autoscaleformula] 属性 (Batch .NET API) 的一个或多个语句。这些公式由你来定义。将公式分配到池后，它们将确定池中可供下一个处理间隔使用的计算节点数目（稍后将详细说明间隔）。公式是一个字符串，其大小不能超过 8KB，最多可以包含 100 个以分号分隔的语句，可以包括换行符和注释。\n\n可以将自动缩放公式视为使用 Batch 自动缩放“语言”。 公式语句是任意格式的表达式，可以包含系统与用户定义的变量和常量。它们可以使用内置类型、运算符和函数对这些值执行各种操作。例如，语句可以采用以下格式：\n\n`VAR = Expression(system-defined variables, user-defined variables);`\n\n公式通常包含多个语句，这些语句对先前语句中获取的值执行操作：\n\n```\nVAR₀ = Expression₀(system-defined variables);\nVAR₁ = Expression₁(system-defined variables, VAR₀);\n```\n\n在公式中使用语句的目标是实现池要缩放到的计算节点数目，也就是**专用节点**的**目标**数目。此“专用目标”数目可以大于、小于或等于池中当前的节点数目。Batch 按特定的间隔评估池的自动缩放公式（下面将讨论[自动缩放间隔](#interval)），并在评估时将池中的目标节点数目调整为自动缩放公式指定的数目。\n\n举个简单的例子，以下两行自动缩放公式根据活动任务数目指定应该调整的节点数目（最多 10 个计算节点）：\n\n```\n$averageActiveTaskCount = avg($ActiveTasks.GetSample(TimeInterval_Minute * 15));\n$TargetDedicated = min(10, $averageActiveTaskCount);\n```\n\n本文的后续部分将介绍构成自动缩放公式的各个实体，包括变量、运算符、操作和函数。你将了解如何获取 Batch 中的各种计算资源和任务度量值，以便根据资源使用量和任务状态明智地调整池的节点计数。然后，你将了解如何使用 Batch REST 和 .NET API 构建公式以及对池启用自动缩放，最后我们将讨论几个示例公式。\n\n> [AZURE.NOTE] 每个 Azure 批处理帐户限制为可用于处理的计算节点的最大数目。Batch 服务最多会创建限制数目的节点，因此不可能会达到公式指定的目标数。请参阅 [Azure Batch 服务的配额和限制](batch-quota-limit.md)了解有关查看和提高帐户配额的信息。\n\n## <a name=\"variables\"></a>变量\n\n可以在自动缩放公式中使用系统定义的变量和用户定义的变量。在上述两行示例公式中，`$TargetDedicated` 是系统定义的变量，而 `$averageActiveTaskCount` 是用户定义的变量。下表显示了 Batch 服务定义的读写和只读变量。\n\n可以 *获取* 和 *设置* 这些**系统定义变量**的值，以管理池中计算节点的数目：\n\n<table>\n  <tr>\n    <th>变量（读写）</th>\n    <th>说明</th>\n  </tr>\n  <tr>\n    <td>$TargetDedicated</td>\n    <td>池的<b>专用计算节点</b>的<b>目标</b>数。这是池应该缩放到的计算节点数目。它是一个“目标”数目，因为池可能达不到此目标节点数目。如果在池达到初始目标之前后续自动缩放评估再次修改目标节点数目，或者在达到目标节点数目前便达到了 Batch 帐户节点或核心配额，则可能发生这种情况。</td>\n  </tr>\n  <tr>\n    <td>$NodeDeallocationOption</td>\n    <td>从池中删除计算节点时发生的操作。可能的值包括：\n      <br/>\n      <ul>\n        <li><p><b>requeue</b> – 立即终止任务并将其放回作业队列，以便重新计划这些任务。</p></li>\n        <li><p><b>terminate</b> – 立即终止任务并从作业队列中删除它们。</p></li>\n        <li><p><b>taskcompletion</b> – 等待当前运行的任务完成，然后从池中删除节点。</p></li>\n        <li><p><b>retaineddata</b> - 等待清理节点上的本地任务保留的所有数据，然后从池中删除节点。</p></li>\n      </ul></td>\n   </tr>\n</table>\n\n*获取* 这些**系统定义变量**的值即可根据 Batch 服务中的度量值进行调整：\n\n<table>\n  <tr>\n    <th>变量（只读）</th>\n    <th>说明</th>\n  </tr>\n  <tr>\n    <td>$CPUPercent</td>\n    <td>CPU 使用率的平均百分比</td>\n  </tr>\n  <tr>\n    <td>$WallClockSeconds</td>\n    <td>使用的秒数</td>\n  </tr>\n  <tr>\n    <td>$MemoryBytes</td>\n    <td>使用的平均 MB 数</td>\n  <tr>\n    <td>$DiskBytes</td>\n    <td>本地磁盘上使用的平均 GB 数</td>\n  </tr>\n  <tr>\n    <td>$DiskReadBytes</td>\n    <td>读取的字节数</td>\n  </tr>\n  <tr>\n    <td>$DiskWriteBytes</td>\n    <td>写入的字节数</td>\n  </tr>\n  <tr>\n    <td>$DiskReadOps</td>\n    <td>执行的读取磁盘操作数</td>\n  </tr>\n  <tr>\n    <td>$DiskWriteOps</td>\n    <td>执行的写入磁盘操作数</td>\n  </tr>\n  <tr>\n    <td>$NetworkInBytes</td>\n    <td>入站字节数</td>\n  </tr>\n  <tr>\n    <td>$NetworkInBytes</td>\n    <td>出站字节数</td>\n  </tr>\n  <tr>\n    <td>$SampleNodeCount</td>\n    <td>计算节点数</td>\n  </tr>\n  <tr>\n    <td>$ActiveTasks</td>\n    <td>处于活动状态的任务数</td>\n  </tr>\n  <tr>\n    <td>$RunningTasks</td>\n    <td>处于运行状态的任务数</td>\n  </tr>\n  <tr>\n    <td>$SucceededTasks</td>\n    <td>成功完成的任务数</td>\n  </tr>\n  <tr>\n    <td>$FailedTasks</td>\n    <td>失败的任务数</td>\n  </tr>\n  <tr>\n    <td>$CurrentDedicated</td>\n    <td>当前的专用计算节点数</td>\n  </tr>\n</table>\n\n> [AZURE.TIP] 上面所示的只读系统定义变量是可提供各种方法来访问相互关联数据的 *对象* 。有关详细信息，请参阅下面的[获取样本数据](#getsampledata)。\n\n## 类型\n\n公式支持以下**类型**：\n\n- double\n- doubleVec\n- doubleVecList\n- 字符串\n- timestamp -- timestamp 是包含以下成员的复合结构：\n    - year\n    - month (1-12)\n    - day (1-31)\n    - weekday（采用数字格式，例如 1 表示星期一）\n    - hour（采用 24 时制数字格式，例如 13 表示下午 1 点）\n    - minute (00-59)\n    - second (00-59)\n- timeinterval\n    - TimeInterval\\_Zero\n    - TimeInterval\\_100ns\n    - TimeInterval\\_Microsecond\n    - TimeInterval\\_Millisecond\n    - TimeInterval\\_Second\n    - TimeInterval\\_Minute\n    - TimeInterval\\_Hour\n    - TimeInterval\\_Day\n    - TimeInterval\\_Week\n    - TimeInterval\\_Year\n\n### 操作\n\n上面所列的类型允许的**操作**：\n\n<table>\n  <tr>\n    <th>操作</th>\n    <th>允许的操作</th>\n  </tr>\n  <tr>\n    <td>double &lt;运算符> double => double</td>\n    <td>+, -, *, /</td>\n  </tr>\n  <tr>\n    <td>double &lt;运算符> timeinterval => timeinterval</td>\n    <td>*</td>\n  </tr>\n  <tr>\n    <td>doubleVec &lt;运算符> double => doubleVec</td>\n    <td>+, -, *, /</td>\n  </tr>\n  <tr>\n    <td>doubleVec &lt;运算符> doubleVec => doubleVec</td>\n    <td>+, -, *, /</td>\n  </tr>\n  <tr>\n    <td>timeinterval &lt;运算符> double => timeinterval</td>\n    <td>*, /</td>\n  </tr>\n  <tr>\n    <td>timeinterval &lt;运算符> timeinterval => timeinterval</td>\n    <td>+, -</td>\n  </tr>\n  <tr>\n    <td>timeinterval &lt;运算符> timestamp => timestamp</td>\n    <td>+</td>\n  </tr>\n  <tr>\n    <td>timestamp &lt;运算符> timeinterval => timestamp</td>\n    <td>+</td>\n  </tr>\n  <tr>\n    <td>timestamp &lt;运算符> timestamp => timeinterval</td>\n    <td>-</td>\n  </tr>\n  <tr>\n    <td>&lt;运算符>double => double</td>\n    <td>-, !</td>\n  </tr>\n  <tr>\n    <td>&lt;运算符>timeinterval => timeinterval</td>\n    <td>-</td>\n  </tr>\n  <tr>\n    <td>double &lt;运算符> double => double</td>\n    <td>&lt;, &lt;=, ==, >=, >, !=</td>\n  </tr>\n  <tr>\n    <td>string &lt;运算符> string => double</td>\n    <td>&lt;, &lt;=, ==, >=, >, !=</td>\n  </tr>\n  <tr>\n    <td>timestamp &lt;运算符> timestamp => double</td>\n    <td>&lt;, &lt;=, ==, >=, >, !=</td>\n  </tr>\n  <tr>\n    <td>timeinterval &lt;运算符> timeinterval => double</td>\n    <td>&lt;, &lt;=, ==, >=, >, !=</td>\n  </tr>\n  <tr>\n    <td>double &lt;运算符> double => double</td>\n    <td>&amp;&amp;, ||</td>\n  </tr>\n  <tr>\n    <td>测试仅限 double（非零值为 true，零值为 false）</td>\n    <td>? :</td>\n  </tr>\n</table>\n\n## 函数\n\n可以使用以下预定义**函数**来定义自动缩放公式。\n\n<table>\n  <tr>\n    <th>函数</th>\n    <th>说明</th>\n  </tr>\n  <tr>\n    <td>double <b>avg</b>(doubleVecList)</td>\n    <td>DoubleVecList 中所有值的平均值。</td>\n  </tr>\n  <tr>\n    <td>double <b>len</b>(doubleVecList)</td>\n    <td>从 doubleVecList 创建的向量的长度。</td>\n  <tr>\n    <td>double <b>lg</b>(double)</td>\n    <td>对数底数为 2。</td>\n  </tr>\n  <tr>\n    <td>doubleVec <b>lg</b>(doubleVecList)</td>\n    <td>分量对数底数 2。必须为单个 double 参数显式传递 vec(double)，否则将采用 double lg(double) 版本。</td>\n  </tr>\n  <tr>\n    <td>double <b>ln</b>(double)</td>\n    <td>自然对数。</td>\n  </tr>\n  <tr>\n    <td>doubleVec <b>ln</b>(doubleVecList)</td>\n    <td>分量对数底数 2。必须为单个 double 参数显式传递 vec(double)，否则将采用 double lg(double) 版本。</td>\n  </tr>\n  <tr>\n    <td>double <b>log</b>(double)</td>\n    <td>对数底数为 10。</td>\n  </tr>\n  <tr>\n    <td>doubleVec <b>log</b>(doubleVecList)</td>\n    <td>分量对数底数 10。必须为单个 double 参数显式传递 vec(double)，否则将采用 double log(double) 版本。</td>\n  </tr>\n  <tr>\n    <td>double <b>max</b>(doubleVecList)</td>\n    <td>doubleVecList 中的最大值。</td>\n  </tr>\n  <tr>\n    <td>double <b>min</b>(doubleVecList)</td>\n    <td>doubleVecList 中的最小值。</td>\n  </tr>\n  <tr>\n    <td>double <b>norm</b>(doubleVecList)</td>\n    <td>从 doubleVecList 创建的向量的二范数。\n  </tr>\n  <tr>\n    <td>double <b>percentile</b>(doubleVec v, double p)</td>\n    <td>向量 v 百分位元素。</td>\n  </tr>\n  <tr>\n    <td>double <b>rand</b>()</td>\n    <td>介于 0.0 和 1.0 之间的随机值。</td>\n  </tr>\n  <tr>\n    <td>double <b>range</b>(doubleVecList)</td>\n    <td>doubleVecList 中最小值和最大值之间的差。</td>\n  </tr>\n  <tr>\n    <td>double <b>std</b>(doubleVecList)</td>\n    <td>doubleVecList 中值的样本标准偏差。</td>\n  </tr>\n  <tr>\n    <td><b>stop</b>()</td>\n    <td>停止自动缩放表达式计算。</td>\n  </tr>\n  <tr>\n    <td>double <b>sum</b>(doubleVecList)</td>\n    <td>doubleVecList 的所有组成部分之和。</td>\n  </tr>\n  <tr>\n    <td>timestamp <b>time</b>(string dateTime=\"\")</td>\n    <td>如果未传递参数，则为当前时间的时间戳；如果传递了参数，则为 dateTime 字符串的时间戳。支持的 dateTime 格式为 W3CDTF 和 RFC1123。</td>\n  </tr>\n  <tr>\n    <td>double <b>val</b>(doubleVec v, double i)</td>\n    <td>在起始索引为零的向量 v 中，位置 i 处的元素的值。</td>\n  </tr>\n</table>\n\n上表中描述的某些函数可以接受列表作为参数。逗号分隔列表为 *double* 和 *doubleVec* 的任意组合。例如：\n\n`doubleVecList := ( (double | doubleVec)+(, (double | doubleVec) )* )?`\n\n*doubleVecList* 值在计算之前将转换为单个 *doubleVec*。例如，如果 `v = [1,2,3]`，则调用 `avg(v)` 等效于调用 `avg(1,2,3)`，调用 `avg(v, 7)` 等效于调用 `avg(1,2,3,7)`。\n\n## <a name=\"getsampledata\"></a>获取样本数据\n\n自动缩放公式对 Batch 服务提供的度量值数据（样本）产生作用，并根据从服务获取的值扩大或缩减池大小。上述系统定义的变量是可提供各种方法来访问与该对象关联的数据的对象。例如，以下表达式显示了一个用于获取过去五分钟 CPU 使用率的请求：\n\n    $CPUPercent.GetSample(TimeInterval_Minute*5)\n\n这些方法可用于获取样本数据。\n\n<table>\n  <tr>\n    <th>方法</th>\n    <th>说明</th>\n  </tr>\n  <tr>\n    <td>Count()</td>\n    <td>返回度量值历史记录中的样本总数。</td>\n  </tr>\n  <tr>\n    <td>GetSample()</td>\n    <td><p><b>GetSample()</b> 方法返回数据样本的向量。\n    <p>一个样本最好包含 30 秒钟的度量值数据。换而言之，将每隔 30 秒获取样本一次，但如下所述，每收集一个样本后并且该样本可供公式使用时，会存在一定的延迟。因此，并非一段指定时间内的所有样本都可用于公式求值。\n        <ul>\n          <li><p><b>doubleVec GetSample(double count)</b> - 在最近的收集的样本中指定要获取的样本数。</p>\n                  <p>GetSample(1) 返回最后一个可用样本。但对于像 $CPUPercent 这样的度量值，你不应使用此方法，因为无法知道样本是<em>何时</em>收集的 - 它可能是最近收集的，也可能由于系统问题而变得很旧。最好使用如下所示的时间间隔。</p></li>\n          <li><p><b>doubleVec GetSample((timestamp | timeinterval) startTime [, double samplePercent])</b> – 指定收集样本数据的时间范围，并选择性地指定必须在请求时间范围内可用的样本百分比。</p>\n          <p>如果 CPUPercent 历史记录中存在过去十分钟的所在样本，<em>$CPUPercent.GetSample(TimeInterval_Minute * 10)</em> 将返回 20 个样本。如果最后一分钟的历史记录不可用，则只返回 18 个样本，在这种情况下：<br/>\n          &#160;&#160;&#160;&#160;<em>$CPUPercent.GetSample(TimeInterval_Minute * 10, 95)</em> 将会失败，因为只有 90% 的样本可用；<br/>\n          &#160;&#160;&#160;&#160;<em>$CPUPercent.GetSample(TimeInterval_Minute * 10, 80)</em> 将会成功。</p></li>\n          <li><p><b>doubleVec GetSample((timestamp | timeinterval) startTime, (timestamp | timeinterval) endTime [, double samplePercent])</b> – 指定收集数据的时间范围，包括开始时间和结束时间。</p></li></ul>\n          <p>如前所述，每收集一个样本后并且该样本可供公式使用时，会存在一定的延迟。在使用 <em>GetSample</em> 方法时，必须考虑这个因素 - 请参阅下面的 <em>GetSamplePercent</em>。</td>\n  </tr>\n  <tr>\n    <td>GetSamplePeriod()</td>\n    <td>返回在历史样本数据集中采样的期间。</td>\n  </tr>\n    <tr>\n        <td>Count()</td>\n        <td>返回度量值历史记录中的样本总数。</td>\n    </tr>\n  <tr>\n    <td>HistoryBeginTime()</td>\n    <td>返回度量值最旧可用数据样本的时间戳。</td>\n  </tr>\n  <tr>\n    <td>GetSamplePercent()</td>\n    <td><p>返回给定时间间隔的可用样本百分比。例如：</p>\n    <p><b>doubleVec GetSamplePercent( (timestamp | timeinterval) startTime [, (timestamp | timeinterval) endTime] )</b>\n    <p>由于当返回的样本百分比小于指定的 samplePercent 时 GetSample 方法会失败，因此，你可以使用 GetSamplePercent 方法执行初始检查，然后在没有足够样本的情况下，不暂停样本自动缩放评估并执行备选操作。</p></td>\n  </tr>\n</table>\n\n### 样本、样本百分比和 *GetSample()* 方法\n\n自动缩放公式的核心操作是获取任务和资源度量值数据，并根据该数据调整池大小。因此，请务必明确知道自动缩放公式如何与度量值数据或“样本”交互。\n\n**示例**\n\nBatch 服务定期获取任务和资源度量值的 *样本* ，使其可供自动缩放公式使用。Batch 服务每隔 30 秒记录这些样本一次，但是，通常有一些滞后，以致记录样本的时间与样本可供自动缩放公式使用（与读取）的时间之间有所延迟。此外，由于各种因素（例如网络或其他基础结构问题），可能无法记录特定间隔的样本，从而导致样本“遗漏”。\n\n**样本百分比**\n\n将 `samplePercent` 传递到 `GetSample()` 方法，或调用 `GetSamplePercent()` 方法时，“percent”是指 Batch 服务 *可能* 记录的样本总数与自动缩放公式实际 *可用* 的样本数目之间的比较。\n\n让我们以 10 分钟的时间跨度为例。由于每隔 30 秒记录样本一次，因此在 10 分钟的时间跨度内，Batch 服务所记录的样本总数将达到 20 个（每分钟 2 个）。但是，由于报告机制固有的延迟，或者 Azure 基础结构出现的其他一些问题，可能只有 15 个样本可供自动缩放公式读取。这意味着，在这 10 分钟的期间内，记录的样本总数只有 **75%** 实际可供公式使用。\n\n**GetSample() 和样本范围**\n\n自动缩放公式即将扩大和缩减池 - 添加节点或删除节点。由于节点为付费使用，想要确保公式使用根据充足数据的明智的分析方法。因此，建议在公式中使用趋势类型分析，此类型根据所收集样本的 *范围* 来扩大和缩减池。\n\n为此，请使用 `GetSample(interval look-back start, interval look-back end)` 返回样本的**向量**：\n\n`runningTasksSample = $RunningTasks.GetSample(1 * TimeInterval_Minute, 6 * TimeInterval_Minute);`\n\nBatch 评估上述代码行后，它以值的向量形式返回样本范围，例如：\n\n`runningTasksSample=[1,1,1,1,1,1,1,1,1,1];`\n\n收集样本向量后，便可使用 `min()`、`max()` 和 `avg()` 等函数从所收集的范围派生有意义的值。\n\n为了提高安全性，如果特定时间段可用的样本数小于特定百分比，你可以强制将公式评估为 *失败* 。强制将公式评估为失败会指示 Batch 在指定的样本百分比不可用时停止进一步的公式评估，而且不更改池大小。若要指定评估成功所需的样本百分比，请将其指定为 `GetSample()` 的第三个参数。下面指定要求 75% 的样本：\n\n`runningTasksSample = $RunningTasks.GetSample(60 * TimeInterval_Second, 120 * TimeInterval_Second, 75);`\n\n此外，由于先前提到的样本可用性延迟问题，请务必记得指定回查开始时间早于一分钟的时间范围。这是由于样本需要花大约一分钟的时间才能传播到整个系统，因此通常无法使用 `(0 * TimeInterval_Second, 60 * TimeInterval_Second)` 范围内的样本。同样地，可以使用 `GetSample()` 百分比参数来强制实施特定样本百分比要求。\n\n> [AZURE.IMPORTANT] **强烈建议****不要 *只* 依赖于自动缩放公式中的 `GetSample(1)`**。这是因为，`GetSample(1)` 基本上只是向 Batch 服务表明：“不论多久以前获取最后一个样本，请将它提供给我。” 由于它只是单个样本，而且可能是较旧的样本，因此可能无法代表最近任务或资源状态的全貌。如果使用 `GetSample(1)`，请确保它是较大语句的一部分，而不是公式所依赖的唯一数据点。\n\n## 度量值\n\n可以在定义公式时使用**资源**和**任务度量值**，根据获取和评估的度量值数据来调整池中专用节点的目标数目。有关每个度量值的详细信息，请参阅上面的[变量](#variables)部分。\n\n<table>\n  <tr>\n    <th>度量值</th>\n    <th>说明</th>\n  </tr>\n  <tr>\n    <td><b>资源</b></td>\n    <td><p><b>资源度量值</b>基于计算节点的 CPU、带宽和内存使用量，以及节点数目。</p>\n        <p> 这些系统定义的变量可用于根据节点计数进行调整：</p>\n    <p><ul>\n      <li>$TargetDedicated</li>\n            <li>$CurrentDedicated</li>\n            <li>$SampleNodeCount</li>\n    </ul></p>\n    <p>这些系统定义的变量可用于根据节点资源使用量进行调整：</p>\n    <p><ul>\n      <li>$CPUPercent</li>\n      <li>$WallClockSeconds</li>\n      <li>$MemoryBytes</li>\n      <li>$DiskBytes</li>\n      <li>$DiskReadBytes</li>\n      <li>$DiskWriteBytes</li>\n      <li>$DiskReadOps</li>\n      <li>$DiskWriteOps</li>\n      <li>$NetworkInBytes</li>\n      <li>$NetworkInBytes</li></ul></p>\n \n  </tr>\n  <tr>\n    <td><b>任务</b></td>\n    <td><p><b>任务度量值</b>基于任务的状态，例如“活动”、“挂起”和“已完成”。以下系统定义变量可用于根据任务度量值调整池大小：</p>\n    <p><ul>\n      <li>$ActiveTasks</li>\n      <li>$RunningTasks</li>\n      <li>$SucceededTasks</li>\n            <li>$FailedTasks</li></ul></p>\n        </td>\n  </tr>\n</table>\n\n## 构建自动缩放公式\n\n构造自动缩放公式时，可以使用上述组件来生成语句，然后将这些语句组合成完整的公式即可。例如，在这里，我们在构造公式时，会先定义对公式的要求：\n\n1. 如果 CPU 使用率高，则增加池中计算节点的目标数\n2. 如果 CPU 使用率低，则降低池中计算节点的目标数\n3. 始终将最大节点数限制为 400\n\n为了在 CPU 使用率高时*增加* 节点数，我们定义了一个语句，如果在过去 10 分钟内最小平均 CPU 使用率高于 70%，该语句就会向用户定义变量 ($TotalNodes) 填充一个值，值的大小为节点当前目标数的 110%：\n\n`$TotalNodes = (min($CPUPercent.GetSample(TimeInterval_Minute*10)) > 0.7) ? ($CurrentDedicated * 1.1) : $CurrentDedicated;`\n\n如果过去 60 分钟的平均 CPU 使用率*低于* 20%，则下一个语句会将同一变量设置为节点当前目标数的 90%，降低 CPU 使用率低时的目标数。请注意，此语句还引用以上语句中的用户定义变量 *$TotalNodes*。\n\n`$TotalNodes = (avg($CPUPercent.GetSample(TimeInterval_Minute * 60)) < 0.2) ? ($CurrentDedicated * 0.9) : $TotalNodes;`\n\n现在，将专用计算节点的目标数限制为**最大值** 400：\n\n`$TargetDedicated = min(400, $TotalNodes)`\n\n下面是完整公式：\n\n```\n$TotalNodes = (min($CPUPercent.GetSample(TimeInterval_Minute*10)) > 0.7) ? ($CurrentDedicated * 1.1) : $CurrentDedicated;\n$TotalNodes = (avg($CPUPercent.GetSample(TimeInterval_Minute*60)) < 0.2) ? ($CurrentDedicated * 0.9) : $TotalNodes;\n$TargetDedicated = min(400, $TotalNodes)\n```\n\n> [AZURE.NOTE] 自动缩放公式由 [Batch REST][rest_api] API 变量、类型、操作和函数组成。即使是在使用 [Batch .NET][net_api] 库的时候，也会在公式字符串中使用这些组成元素。\n\n## 在启用自动缩放的情况下创建池\n\n若要在创建池时启用自动缩放功能，请使用以下方法之一：\n\n- [New-AzureBatchPool](https://msdn.microsoft.com/library/azure/mt125936.aspx) – 此 Azure PowerShell cmdlet 使用 AutoScaleFormula 参数来指定自动缩放公式。\n- [BatchClient.PoolOperations.CreatePool](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.pooloperations.createpool.aspx) – 在调用此 .NET 方法创建池后，将设置池的 [CloudPool.AutoScaleEnabled](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudpool.autoscaleenabled.aspx) 和 [CloudPool.AutoScaleFormula](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudpool.autoscaleformula.aspx) 属性，以启用自动缩放。\n- [将池添加到帐户](https://msdn.microsoft.com/library/azure/dn820174.aspx) – 创建池后，此 REST API 请求中使用的 enableAutoScale 和 autoScaleFormula 元素将为池设置自动缩放。\n\n> [AZURE.IMPORTANT] 如果你使用上述方法之一创建了支持自动缩放的池，则**不得**指定该池的 *targetDedicated* 参数。另请注意，如果你希望手动调整启用自动缩放功能的池的大小（例如，使用 [BatchClient.PoolOperations.ResizePool][net_poolops_resizepool] 来调整），则必须先**禁用**该池的自动缩放功能，然后再调整池的大小。\n\n以下代码段显示了如何创建启用自动缩放功能的 [CloudPool][net_cloudpool]，创建时使用 [Batch .NET][net_api] 库，其公式将节点的目标数设置为 5（周一）和 1（除周一外的其他时间）。此外，自动缩放间隔设置为 30 分钟（请参阅下面的[自动缩放间隔](#interval)）。在本文的此部分与其他 C# 代码段中，“myBatchClient”是适当初始化的 [BatchClient][net_batchclient] 实例。\n\n```\nCloudPool pool = myBatchClient.PoolOperations.CreatePool(\"mypool\", \"3\", \"small\");\npool.AutoScaleEnabled = true;\npool.AutoScaleFormula = \"$TargetDedicated = (time().weekday==1?5:1);\";\npool.AutoScaleEvaluationInterval = TimeSpan.FromMinutes(30);\npool.Commit();\n```\n\n### <a name=\"interval\"></a>自动缩放间隔\n\n默认情况下，Batch 服务根据其自动缩放公式每隔 **15 分钟**调整池大小。但是，可使用以下池属性配置此间隔：\n\n- REST API - [autoScaleEvaluationInterval][rest_autoscaleinterval]\n- .NET API - [CloudPool.AutoScaleEvaluationInterval][net_cloudpool_autoscaleevalinterval]\n\n最小间隔为 5 分钟，最大间隔为 168 小时。如果指定的间隔超出此范围，Batch 服务将返回“错误的请求(400)”错误。\n\n> [AZURE.NOTE] 自动缩放目前不能以低于一分钟的时间响应更改，而是在你运行工作负荷时逐步调整池大小。\n\n## 创建池后启用自动缩放\n\n如果你使用 *targetDedicated* 参数设置了包含指定计算节点数的池，则以后可以更新现有池以自动缩放。通过以下方法之一执行这种检查：\n\n- [BatchClient.PoolOperations.EnableAutoScale][net_enableautoscale] – 此 .NET 方法需要现有池的 ID 和自动缩放公式才能应用到池。\n- [允许对池进行自动缩放][rest_enableautoscale] – 此 REST API 请求要求 URI 中存在现有池的 ID，以及请求正文中存在自动缩放公式。\n\n> [AZURE.NOTE] 如果某个值是在创建池时为 *targetDedicated* 参数指定的，则会在评估自动缩放公式时忽略该值。\n\n此代码段演示了如何在现有池上通过 [Batch .NET][net_api] 库启用自动缩放功能。请注意，针对现有池启用公式和更新公式使用相同的方法。因此，如果已启用自动缩放功能，则此方法会针对指定池 *更新* 公式。该代码段假设“mypool”是现有 [CloudPool][net_cloudpool] 的 ID。\n\n         // Define the autoscaling formula. In this snippet, the  formula sets the target number of nodes to 5 on\n         // Mondays, and 1 on every other day of the week\n         string myAutoScaleFormula = \"$TargetDedicated = (time().weekday==1?5:1);\";\n\n         // Update the existing pool's autoscaling formula by calling the BatchClient.PoolOperations.EnableAutoScale\n         // method, passing in both the pool's ID and the new formula.\n         myBatchClient.PoolOperations.EnableAutoScale(\"mypool\", myAutoScaleFormula);\n\n## 评估自动缩放公式\n\n在应用程序中使用公式之前，最好先对它进行评估。评估公式时，可以针对现有池对公式进行“测试性运行”。执行此操作时，可通过以下方式：\n\n- [BatchClient.PoolOperations.EvaluateAutoScale](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.pooloperations.evaluateautoscale.aspx) 或 [BatchClient.PoolOperations.EvaluateAutoScaleAsync](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.pooloperations.evaluateautoscaleasync.aspx) – 这些 .NET 方法需要现有池的 ID，并需要包含自动缩放公式的字符串。调用的结果将包含在 [AutoScaleEvaluation](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.autoscaleevaluation.aspx) 类的实例中。\n- [评估自动缩放公式](https://msdn.microsoft.com/library/azure/dn820183.aspx) – 在这个 REST API 请求中，池 ID 已在 URI 中指定，自动缩放公式已在请求正文的 *autoScaleFormula* 元素中指定。操作的响应包含任何可能与该公式相关的错误信息。\n\n> [AZURE.NOTE] 若要评估某个自动缩放公式，你必须先通过有效的公式对池启用了自动缩放功能。\n\n在这个使用 [Batch .NET][net_api] 库的代码段中，我们先对公式进行评估，然后将其应用到 [CloudPool][net_cloudpool]。\n\n```\n// First obtain a reference to the existing pool\nCloudPool pool = myBatchClient.PoolOperations.GetPool(\"mypool\");\n\n// We must ensure that autoscaling is enabled on the pool prior to evaluating a formula\nif (pool.AutoScaleEnabled.HasValue && pool.AutoScaleEnabled.Value)\n{\n    // The formula to evaluate - adjusts target number of nodes based on day of week and time of day\n    string myFormula = @\"\n        $CurTime=time();\n        $WorkHours=$CurTime.hour>=8 && $CurTime.hour<18;\n        $IsWeekday=$CurTime.weekday>=1 && $CurTime.weekday<=5;\n        $IsWorkingWeekdayHour=$WorkHours && $IsWeekday;\n        $TargetDedicated=$IsWorkingWeekdayHour?20:10;\n    \";\n\n    // Perform the autoscale formula evaluation. Note that this does not actually apply the formula to\n    // the pool.\n    AutoScaleEvaluation eval = client.PoolOperations.EvaluateAutoScale(pool.Id, myFormula);\n\n    if (eval.AutoScaleRun.Error == null)\n    {\n        // Evaluation success - print the results of the AutoScaleRun. This will display the values of each\n        // variable as evaluated by the the autoscaling formula.\n        Console.WriteLine(\"AutoScaleRun.Results: \" + eval.AutoScaleRun.Results);\n\n        // Apply the formula to the pool since it evaluated successfully\n        client.PoolOperations.EnableAutoScale(pool.Id, myFormula);\n    }\n    else\n    {\n        // Evaluation failed, output the message associated with the error\n        Console.WriteLine(\"AutoScaleRun.Error.Message: \" + eval.AutoScaleRun.Error.Message);\n    }\n}\n```\n\n成功对此代码段中的公式进行评估以后，将生成如下所示的输出：\n\n`AutoScaleRun.Results: $TargetDedicated = 10;$NodeDeallocationOption = requeue;$CurTime = 2015 - 08 - 25T20: 08:42.271Z;$IsWeekday = 1;$IsWorkingWeekdayHour = 0;$WorkHours = 0`\n\n## 获取有关自动缩放运行的信息\n\n定期检查自动缩放的运行结果，以确保公式按预期执行。\n\n- [CloudPool.AutoScaleRun](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudpool.autoscalerun.aspx) – 使用 .NET 库时，池的此属性将提供 [AutoScaleRun](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.autoscalerun.aspx) 类的一个实例，该类提供最新自动缩放运行的以下属性：\n  - [AutoScaleRun.Error](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.autoscalerun.error.aspx)\n  - [AutoScaleRun.Results](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.autoscalerun.results.aspx)\n  - [AutoScaleRun.Timestamp](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.autoscalerun.timestamp.aspx)\n- [获取有关池的信息](https://msdn.microsoft.com/library/dn820165.aspx) – 此 REST API 请求返回有关池的信息，包括最近的自动缩放运行结果。\n\n## <a name=\"examples\"></a>示例公式\n\n让我们看看一些示例，了解如何通过多种方式使用公式来自动缩放池中的计算资源。\n\n### 示例 1：基于时间的调整\n\n也许，你希望能够根据星期几和一天的具体时间来调整池的大小，相应地增加或减少池中节点的数目：\n\n```\n$CurTime=time();\n$WorkHours=$CurTime.hour>=8 && $CurTime.hour<18;\n$IsWeekday=$CurTime.weekday>=1 && $CurTime.weekday<=5;\n$IsWorkingWeekdayHour=$WorkHours && $IsWeekday;\n$TargetDedicated=$IsWorkingWeekdayHour?20:10;\n```\n\n此公式首先获取当前时间。如果日期是工作日（周一到周五）且时间是工作时间（早 8 点到晚 6 点），则会将目标池大小设置为 20 个节点。否则，目标池大小将设置为 10 个节点。\n\n### 示例 2：基于任务的调整\n\n在此示例中，池大小是根据队列中的任务数来调整的。请注意，在公式字符串中，注释和分行符都是可以接受的。\n\n```\n// Get pending tasks for the past 15 minutes.\n$Samples = $ActiveTasks.GetSamplePercent(TimeInterval_Minute * 15);\n// If we have less than 70% data points, we use the last sample point, otherwise we use the maximum of\n// last sample point and the history average.\n$Tasks = $Samples < 70 ? max(0,$ActiveTasks.GetSample(1)) : max( $ActiveTasks.GetSample(1), avg($ActiveTasks.GetSample(TimeInterval_Minute * 15)));\n// If number of pending tasks is not 0, set targetVM to pending tasks, otherwise half of current dedicated.\n$TargetVMs = $Tasks > 0? $Tasks:max(0, $TargetDedicated/2);\n// The pool size is capped at 20, if target VM value is more than that, set it to 20. This value\n// should be adjusted according to your use case.\n$TargetDedicated = max(0,min($TargetVMs,20));\n// Set node deallocation mode - keep nodes active only until tasks finish\n$NodeDeallocationOption = taskcompletion;\n```\n\n### 示例 3：考虑并行任务\n\n另一个根据任务数来调整池大小的示例就是，此公式还会考虑为池设置的 [MaxTasksPerComputeNode][net_maxtasks] 值。在对池启用了[并行任务执行](batch-parallel-node-tasks.md)的情况下，此公式特别有用。\n\n```\n// Determine whether 70% of the samples have been recorded in the past 15 minutes; if not, use last sample\n$Samples = $ActiveTasks.GetSamplePercent(TimeInterval_Minute * 15);\n$Tasks = $Samples < 70 ? max(0,$ActiveTasks.GetSample(1)) : max( $ActiveTasks.GetSample(1),avg($ActiveTasks.GetSample(TimeInterval_Minute * 15)));\n// Set the number of nodes to add to one-fourth the number of active tasks (the MaxTasksPerComputeNode\n// property on this pool is set to 4, adjust this number for your use case)\n$Cores = $TargetDedicated * 4;\n$ExtraVMs = (($Tasks - $Cores) + 3) / 4;\n$TargetVMs = ($TargetDedicated+$ExtraVMs);\n// Attempt to grow the number of compute nodes to match the number of active tasks, with a maximum of 3\n$TargetDedicated = max(0,min($TargetVMs,3));\n// Keep the nodes active until the tasks finish\n$NodeDeallocationOption = taskcompletion;\n```\n\n### 示例 4：设置初始池大小\n\n此示例显示 C# 代码段中的自动缩放公式在初始时间段将池大小设置为一定的节点数目，然后在初始时间段过后，根据正在运行和处于活动状态的任务数目调整池大小。\n\n```\nstring now = DateTime.UtcNow.ToString(\"r\");\nstring formula = string.Format(@\"\n\n    $TargetDedicated = {1};\n    lifespan         = time() - time(\"\"{0}\"\");\n    span             = TimeInterval_Minute * 60;\n    startup          = TimeInterval_Minute * 10;\n    ratio            = 50;\n\n    $TargetDedicated = (lifespan > startup ? (max($RunningTasks.GetSample(span, ratio), $ActiveTasks.GetSample(span, ratio)) == 0 ? 0 : $TargetDedicated) : {1});\n    \", now, 4);\n```\n\n上述代码段中的公式具有以下特征：\n\n- 将初始池大小设置为 4 个节点\n- 在池生命周期的最初 10 分钟内不调整池大小\n- 10 分钟后，获取过去 60 分钟内正在运行和处于活动状态的任务数目的最大值\n  - 如果这两个值均为 0（表示过去 60 分钟没有正在运行或处于活动状态的任务），则池大小将设置为 0\n  - 如果其中一个值大于零，则不进行任何更改\n\n## 后续步骤\n\n1. 若要完全评估应用程序的效率，你可能需要访问计算节点。若要利用远程访问，必须将一个用户帐户添加到你要访问的节点，并且必须为该节点检索 RDP 文件。\n    - 通过以下方法之一添加用户帐户：\n        * [New-AzureBatchVMUser](https://msdn.microsoft.com/library/mt149846.aspx) – 此 PowerShell cmdlet 使用池名称、计算节点名称、帐户名和密码作为参数。\n        * [BatchClient.PoolOperations.CreateComputeNodeUser](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.pooloperations.createcomputenodeuser.aspx) – 此 .NET 方法会创建 [ComputeNodeUser](https://msdn.microsoft.com/library/microsoft.azure.batch.computenodeuser.aspx) 类的一个实例，你可以在该实例上针对计算节点设置帐户名和密码，然后再在该实例上调用 [ComputeNodeUser.Commit](https://msdn.microsoft.com/library/microsoft.azure.batch.computenodeuser.commit.aspx)，以便在该节点上创建用户。\n        * [将用户帐户添加到节点](https://msdn.microsoft.com/library/dn820137.aspx) – 池和计算节点的名称在 URI 中指定，帐户名和密码将发送到此 REST API 请求的请求正文中的节点。\n    - 获取 RDP 文件：\n        * [BatchClient.PoolOperations.GetRDPFile](https://msdn.microsoft.com/library/azure/microsoft.azure.batch.pooloperations.getrdpfile.aspx) – 此 .NET 方法需要池 ID、节点 ID 以及要创建的 RDP 文件的名称。\n        * [从节点获取远程桌面协议文件](https://msdn.microsoft.com/library/dn820120.aspx) – 此 REST API 请求需要池的名称以及计算节点的名称。响应包含 RDP 文件的内容。\n        * [Get-AzureBatchRDPFile](https://msdn.microsoft.com/library/mt149851.aspx) – 此 PowerShell cmdlet 从指定的计算节点获取 RDP 文件，并将其保存到指定的文件位置或流。\n2.  某些应用程序会生成大量难以处理的数据。解决此问题的方法之一是进行[有效的列表查询](/documentation/articles/batch-efficient-list-queries)。\n\n[net_api]: https://msdn.microsoft.com/library/azure/mt348682.aspx\n[net_batchclient]: http://msdn.microsoft.com/library/azure/microsoft.azure.batch.batchclient.aspx\n[net_cloudpool]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudpool.aspx\n[net_cloudpool_autoscaleformula]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudpool.autoscaleformula.aspx\n[net_cloudpool_autoscaleevalinterval]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudpool.autoscaleevaluationinterval.aspx\n[net_enableautoscale]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.pooloperations.enableautoscale.aspx\n[net_maxtasks]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.cloudpool.maxtaskspercomputenode.aspx\n[net_poolops_resizepool]: https://msdn.microsoft.com/library/azure/microsoft.azure.batch.pooloperations.resizepool.aspx\n\n[rest_api]: https://msdn.microsoft.com/library/azure/dn820158.aspx\n[rest_autoscaleformula]: https://msdn.microsoft.com/library/azure/dn820173.aspx\n[rest_autoscaleinterval]: https://msdn.microsoft.com/zh-cn/library/azure/dn820173.aspx\n[rest_enableautoscale]: https://msdn.microsoft.com/library/azure/dn820173.aspx\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

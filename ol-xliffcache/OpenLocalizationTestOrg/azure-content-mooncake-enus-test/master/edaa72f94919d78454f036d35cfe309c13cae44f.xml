@@ -1,0 +1,558 @@
+{
+  "nodes": [
+    {
+      "content": "使用 Chef 部署 Azure 虚拟机 | Azure",
+      "pos": [
+        26,
+        54
+      ]
+    },
+    {
+      "content": "了解如何使用 Chef 在 Azure 中自动执行虚拟机的部署和配置",
+      "pos": [
+        72,
+        106
+      ]
+    },
+    {
+      "content": "使用 Chef 自动执行 Azure 虚拟机部署",
+      "pos": [
+        381,
+        405
+      ]
+    },
+    {
+      "content": "Chef 是一个强大的工具，用于提供自动化和所需的状态配置。",
+      "pos": [
+        407,
+        437
+      ]
+    },
+    {
+      "content": "使用我们的最新 cloud-api 版本，Chef 提供了与 Azure 的无缝集成，使得你能够通过单个命令设置和部署配置状态。",
+      "pos": [
+        439,
+        503
+      ]
+    },
+    {
+      "content": "在本文中，我将向你展示如何设置你的 Chef 环境来设置 Azure 虚拟机，并引导你完成创建一个策略或“食谱”并将此指南部署到 Azure VM 的过程。",
+      "pos": [
+        505,
+        583
+      ]
+    },
+    {
+      "content": "让我们开始吧！",
+      "pos": [
+        585,
+        592
+      ]
+    },
+    {
+      "content": "Chef 基础知识",
+      "pos": [
+        597,
+        606
+      ]
+    },
+    {
+      "pos": [
+        608,
+        739
+      ],
+      "content": "在开始之前，建议你首先熟悉一下 Chef 的基本概念。<ph id=\"ph1\">&lt;a href=\"http://www.chef.io/chef\" target=\"_blank\"&gt;</ph>此处<ph id=\"ph2\">&lt;/a&gt;</ph>有大量资料，建议你在尝试此演练之前快速阅读一下。不过，在我们开始之前，我会扼要重述一下基础知识。"
+    },
+    {
+      "content": "下图描绘了概要的 Chef 体系结构。",
+      "pos": [
+        741,
+        760
+      ]
+    },
+    {
+      "pos": [
+        770,
+        828
+      ],
+      "content": "Chef 有三个主要的体系结构组件。<bpt id=\"p1\">**</bpt>Chef 服务器、Chef 客户端（节点）<ept id=\"p1\">**</ept>和 <bpt id=\"p2\">**</bpt>Chef 工作站<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "pos": [
+        830,
+        893
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Chef 服务器<ept id=\"p1\">**</ept>是我们的管理点，对于 Chef 服务器有两种选择：托管解决方案和本地解决方案。我们将使用托管解决方案。"
+    },
+    {
+      "pos": [
+        895,
+        927
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Chef 客户端（节点）<ept id=\"p1\">**</ept>是位于你在管理的服务器上的代理。"
+    },
+    {
+      "pos": [
+        929,
+        1007
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Chef 工作站<ept id=\"p1\">**</ept>是我们的管理工作站，我们将在其中创建策略并执行管理命令。我们从 Chef 工作站运行<bpt id=\"p2\">**</bpt>“knife”<ept id=\"p2\">**</ept>命令来管理我们的基础结构。"
+    },
+    {
+      "content": "我们还引入了“食谱”和“配方”的概念。它们实际上是我们定义并应用于我们的服务器的策略。",
+      "pos": [
+        1009,
+        1052
+      ]
+    },
+    {
+      "content": "准备工作站",
+      "pos": [
+        1057,
+        1062
+      ]
+    },
+    {
+      "content": "首先，让我们准备工作站。我使用的是标准 Windows 工作站。我们需要创建一个目录来存储我们的配置文件和食谱。",
+      "pos": [
+        1064,
+        1120
+      ]
+    },
+    {
+      "pos": [
+        1122,
+        1149
+      ],
+      "content": "首先，创建一个名为 <bpt id=\"p1\">**</bpt>C:\\\\chef<ept id=\"p1\">**</ept> 的目录。"
+    },
+    {
+      "pos": [
+        1151,
+        1185
+      ],
+      "content": "然后，创建另一个目录 <bpt id=\"p1\">**</bpt>c:\\\\chef\\\\cookbooks<ept id=\"p1\">**</ept>"
+    },
+    {
+      "content": "现在，我们需要下载 Azure 设置文件，以便 Chef 可以与我们的 Azure 订阅进行通信。",
+      "pos": [
+        1187,
+        1236
+      ]
+    },
+    {
+      "pos": [
+        1238,
+        1375
+      ],
+      "content": "从此处下载你的发布设置：<ph id=\"ph1\">&lt;a href=\"https://manage.windowsazure.cn/publishsettings/\" target=\"_blank\"&gt;</ph>https://manage.windowsazure.cn/publishsettings/<ph id=\"ph2\">&lt;/a&gt;</ph>"
+    },
+    {
+      "pos": [
+        1377,
+        1402
+      ],
+      "content": "将发布设置文件保存到 <bpt id=\"p1\">**</bpt>C:\\\\chef<ept id=\"p1\">**</ept> 中"
+    },
+    {
+      "content": "创建托管的 Chef 帐户",
+      "pos": [
+        1406,
+        1419
+      ]
+    },
+    {
+      "pos": [
+        1421,
+        1524
+      ],
+      "content": "注册托管的 Chef 帐户：<ph id=\"ph1\">&lt;a href=\"https://manage.chef.io/signup\" target=\"_blank\"&gt;</ph>https://manage.chef.io/signup<ph id=\"ph2\">&lt;/a&gt;</ph>"
+    },
+    {
+      "content": "在注册过程中，会要求你创建一个新组织。",
+      "pos": [
+        1526,
+        1545
+      ]
+    },
+    {
+      "content": "在创建你的组织后，下载初学者工具包。",
+      "pos": [
+        1555,
+        1573
+      ]
+    },
+    {
+      "pos": [
+        1583,
+        1631
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>如果你收到提示，警告你将重置你的密钥，可以继续操作，因为我们尚未配置现有基础结构。"
+    },
+    {
+      "content": "此初学者工具包 zip 文件包含你的组织的配置文件和密钥。",
+      "pos": [
+        1633,
+        1662
+      ]
+    },
+    {
+      "content": "配置 Chef 工作站",
+      "pos": [
+        1666,
+        1677
+      ]
+    },
+    {
+      "pos": [
+        1679,
+        1717
+      ],
+      "content": "将 chef-starter.zip 的内容提取到 <bpt id=\"p1\">**</bpt>C:\\\\chef<ept id=\"p1\">**</ept>"
+    },
+    {
+      "pos": [
+        1719,
+        1779
+      ],
+      "content": "将 <bpt id=\"p1\">**</bpt>chef-starter\\\\chef-repo.chef<ept id=\"p1\">**</ept> 下的所有文件都复制到 <bpt id=\"p2\">**</bpt>c:\\\\chef<ept id=\"p2\">**</ept> 中"
+    },
+    {
+      "content": "你的目录现在看起来应当与下图类似：",
+      "pos": [
+        1781,
+        1798
+      ]
+    },
+    {
+      "content": "你现在应当有 4 个文件，包括位于根目录 c:\\\\chef 中的 Azure 发布文件",
+      "pos": [
+        1808,
+        1851
+      ]
+    },
+    {
+      "pos": [
+        1853,
+        1930
+      ],
+      "content": "PEM 文件包含你的组织和用于通信的管理私钥，而 <bpt id=\"p1\">**</bpt>knife.rb<ept id=\"p1\">**</ept> 文件包含你的 knife 配置。你将需要编辑 <bpt id=\"p2\">**</bpt>knife.rb<ept id=\"p2\">**</ept> 文件。"
+    },
+    {
+      "content": "在你选择的编辑器中打开该文件并修改“cookbook_path”：从路径中删除 /../，使其如下所示：",
+      "pos": [
+        1932,
+        1984
+      ]
+    },
+    {
+      "content": "另外，请添加以下行以反映你的 Azure 发布设置文件的名称。",
+      "pos": [
+        2035,
+        2066
+      ]
+    },
+    {
+      "content": "你的 knife.rb 文件现在看起来应当如下所示：",
+      "pos": [
+        2143,
+        2169
+      ]
+    },
+    {
+      "content": "这些行将确保 Knife 在执行 Azure 操作期间引用 c:\\\\chef\\\\cookbooks 下的 cookbooks 目录并且还使用我们的 Azure 发布设置文件。",
+      "pos": [
+        2179,
+        2266
+      ]
+    },
+    {
+      "content": "安装 Chef 开发工具包",
+      "pos": [
+        2271,
+        2284
+      ]
+    },
+    {
+      "content": "接下来，下载并安装 ChefDK（Chef 开发工具包）来设置你的 Chef 工作站。",
+      "pos": [
+        2286,
+        2329
+      ]
+    },
+    {
+      "pos": [
+        2331,
+        2450
+      ],
+      "content": "<ph id=\"ph1\">&lt;a href=\"http://downloads.getchef.com/chef-dk/windows\" target=\"_blank\"&gt;</ph>http://downloads.getchef.com/chef-dk/windows<ph id=\"ph2\">&lt;/a&gt;</ph>"
+    },
+    {
+      "content": "这简单明了。让其安装在默认位置 c:\\\\opscode 中。此安装将花费大约 10 分钟时间。",
+      "pos": [
+        2460,
+        2507
+      ]
+    },
+    {
+      "content": "确认你的 PATH 变量包含以下条目：C:\\\\opscode\\\\chefdk\\\\bin;C:\\\\opscode\\\\chefdk\\\\embedded\\\\bin;c:\\\\users\\\\yourusername.chefdk\\\\gem\\\\ruby\\\\2.0.0\\\\bin",
+      "pos": [
+        2509,
+        2641
+      ]
+    },
+    {
+      "content": "如果未包含，请务必添加这些路径！",
+      "pos": [
+        2643,
+        2659
+      ]
+    },
+    {
+      "pos": [
+        2661,
+        2713
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>请注意，该路径的顺序非常重要！<ept id=\"p1\">**</ept> 如果你的 opscode 路径未采用正确的顺序，你将会遇到问题。"
+    },
+    {
+      "content": "在继续操作之前重新启动你的工作站。",
+      "pos": [
+        2715,
+        2732
+      ]
+    },
+    {
+      "content": "接下来，我们将安装 Knife Azure 扩展。这将为 Knife 提供“Azure 插件”。",
+      "pos": [
+        2734,
+        2782
+      ]
+    },
+    {
+      "content": "运行以下命令：",
+      "pos": [
+        2784,
+        2791
+      ]
+    },
+    {
+      "pos": [
+        2833,
+        2895
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>–pre 参数确保你收到 knife azure 插件的最新 RC 版本，该版本提供对最新 API 集的访问。"
+    },
+    {
+      "content": "同时，可能还会安装许多依赖项。",
+      "pos": [
+        2897,
+        2912
+      ]
+    },
+    {
+      "content": "若要确保所有项都已正确配置，请运行：",
+      "pos": [
+        2923,
+        2941
+      ]
+    },
+    {
+      "content": "如果所有项都已正确配置，你会看到可用 Azure 映像的列表滚动显示。",
+      "pos": [
+        2971,
+        3006
+      ]
+    },
+    {
+      "content": "祝贺你。工作站已设置！",
+      "pos": [
+        3008,
+        3019
+      ]
+    },
+    {
+      "content": "创建食谱",
+      "pos": [
+        3023,
+        3027
+      ]
+    },
+    {
+      "content": "食谱由 Chef 用来定义你希望在托管客户端上执行的一组命令。创建食谱简单明了，我们将使用命令 chef generate cookbook 来生成我们的食谱模板。我将像自动部署 IIS 的策略一样调用我的食谱 Web 服务器。",
+      "pos": [
+        3029,
+        3143
+      ]
+    },
+    {
+      "content": "在 C:\\\\Chef 目录下运行以下命令：",
+      "pos": [
+        3145,
+        3166
+      ]
+    },
+    {
+      "pos": [
+        3206,
+        3294
+      ],
+      "content": "这将在 <bpt id=\"p1\">**</bpt>C:\\\\Chef\\\\cookbooks\\\\webserver<ept id=\"p1\">**</ept> 目录下生成一组文件。 现在，我们需要定义我们希望 Chef 客户端在托管 VM 上执行的一组命令。"
+    },
+    {
+      "pos": [
+        3296,
+        3376
+      ],
+      "content": "这些命令存储在文件 <bpt id=\"p1\">**</bpt>default.rb<ept id=\"p1\">**</ept> 中。 在此文件中，我将定义一组命令来安装 IIS、启动 IIS 并将模板文件复制到 wwwroot 文件夹中。"
+    },
+    {
+      "pos": [
+        3378,
+        3444
+      ],
+      "content": "修改 <bpt id=\"p1\">**</bpt>C:\\\\chef\\\\cookbooks\\\\webserver\\\\recipes\\\\default.rb<ept id=\"p1\">**</ept> 并添加以下行："
+    },
+    {
+      "content": "在完成后，保存该文件。",
+      "pos": [
+        3750,
+        3761
+      ]
+    },
+    {
+      "content": "创建模板",
+      "pos": [
+        3766,
+        3770
+      ]
+    },
+    {
+      "content": "如上文提到的那样，我们需要生成一个模板文件，该文件将用作我们的 default.html 页面。",
+      "pos": [
+        3772,
+        3820
+      ]
+    },
+    {
+      "content": "执行以下命令来生成模板：",
+      "pos": [
+        3822,
+        3834
+      ]
+    },
+    {
+      "pos": [
+        3886,
+        3973
+      ],
+      "content": "现在导航到文件 <bpt id=\"p1\">**</bpt>C:\\\\chef\\\\cookbooks\\\\webserver\\\\templates\\\\default\\\\Default.htm.erb<ept id=\"p1\">**</ept> 并编辑该文件。"
+    },
+    {
+      "content": "添加一些简单的“Hello World”html 代码并保存该文件。",
+      "pos": [
+        3975,
+        4009
+      ]
+    },
+    {
+      "content": "将食谱上载到 Chef 服务器",
+      "pos": [
+        4014,
+        4029
+      ]
+    },
+    {
+      "content": "在此步骤中，我们将制作我们已在本地计算机上创建的食谱的副本并将其上载到 Chef 托管服务器。上载完成后，食谱将显示在“策略”选项卡下。",
+      "pos": [
+        4031,
+        4099
+      ]
+    },
+    {
+      "content": "使用 Knife Azure 部署虚拟机",
+      "pos": [
+        4149,
+        4169
+      ]
+    },
+    {
+      "content": "现在，我们将部署 Azure 虚拟机并应用“Webserver”食谱，该食谱将安装我们的 IIS Web 服务和默认网页。",
+      "pos": [
+        4171,
+        4232
+      ]
+    },
+    {
+      "pos": [
+        4234,
+        4279
+      ],
+      "content": "若要执行此操作，请使用 <bpt id=\"p1\">**</bpt>knife azure server create<ept id=\"p1\">**</ept> 命令。"
+    },
+    {
+      "content": "下面是该命令的示例：",
+      "pos": [
+        4281,
+        4291
+      ]
+    },
+    {
+      "content": "各个参数不言自明。替换你的特定变量并运行。",
+      "pos": [
+        4741,
+        4762
+      ]
+    },
+    {
+      "pos": [
+        4764,
+        4853
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept>通过命令行，我还通过使用 –tcp-endpoints 参数自动执行终结点网络筛选器规则。我已打开端口 80 和 3389 来提供对我的网页和 RDP 会话的访问。"
+    },
+    {
+      "content": "在运行该命令后，访问 Azure 门户，你会看到你的计算机已开始设置。",
+      "pos": [
+        4855,
+        4890
+      ]
+    },
+    {
+      "content": "返回到命令提示符：",
+      "pos": [
+        4901,
+        4910
+      ]
+    },
+    {
+      "content": "在部署完成后，我们应当能够通过端口 80 连接到 web 服务，因为我们在通过 knife azure 命令设置 VM 时已打开了该端口。因为此 VM 是我的云服务中的唯一 VM，所以我将使用云服务 URL 来连接它。",
+      "pos": [
+        4921,
+        5030
+      ]
+    },
+    {
+      "content": "如你所见，我的 html 代码富有创造性:)",
+      "pos": [
+        5041,
+        5063
+      ]
+    },
+    {
+      "content": "不要忘记，我们还可以从 Azure 门户使用端口 3389 通过 RDP 会话进行连接。",
+      "pos": [
+        5065,
+        5109
+      ]
+    },
+    {
+      "content": "希望这对你有所帮助！ 现在就使用 Azure 开始你的基础结构即代码之旅吧！",
+      "pos": [
+        5111,
+        5149
+      ]
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"使用 Chef 部署 Azure 虚拟机 | Azure\"\n   description=\"了解如何使用 Chef 在 Azure 中自动执行虚拟机的部署和配置\"\n   services=\"virtual-machines\"\n   documentationCenter=\"\"\n   authors=\"diegoviso\"\n   manager=\"timlt\"\n   tags=\"azure-service-management,azure-resource-manager\"\n   editor=\"\"/>\n\n<tags \n    ms.service=\"virtual-machines\" \n    ms.date=\"05/19/2015\" \n    wacn.date=\"11/12/2015\"/>\n\n# 使用 Chef 自动执行 Azure 虚拟机部署\n\nChef 是一个强大的工具，用于提供自动化和所需的状态配置。\n\n使用我们的最新 cloud-api 版本，Chef 提供了与 Azure 的无缝集成，使得你能够通过单个命令设置和部署配置状态。\n\n在本文中，我将向你展示如何设置你的 Chef 环境来设置 Azure 虚拟机，并引导你完成创建一个策略或“食谱”并将此指南部署到 Azure VM 的过程。\n\n让我们开始吧！\n\n## Chef 基础知识\n\n在开始之前，建议你首先熟悉一下 Chef 的基本概念。<a href=\"http://www.chef.io/chef\" target=\"_blank\">此处</a>有大量资料，建议你在尝试此演练之前快速阅读一下。不过，在我们开始之前，我会扼要重述一下基础知识。\n\n下图描绘了概要的 Chef 体系结构。\n\n![][2]\n\nChef 有三个主要的体系结构组件。**Chef 服务器、Chef 客户端（节点）**和 **Chef 工作站**。\n\n**Chef 服务器**是我们的管理点，对于 Chef 服务器有两种选择：托管解决方案和本地解决方案。我们将使用托管解决方案。\n\n**Chef 客户端（节点）**是位于你在管理的服务器上的代理。\n\n**Chef 工作站**是我们的管理工作站，我们将在其中创建策略并执行管理命令。我们从 Chef 工作站运行**“knife”**命令来管理我们的基础结构。\n\n我们还引入了“食谱”和“配方”的概念。它们实际上是我们定义并应用于我们的服务器的策略。\n\n## 准备工作站\n\n首先，让我们准备工作站。我使用的是标准 Windows 工作站。我们需要创建一个目录来存储我们的配置文件和食谱。\n\n首先，创建一个名为 **C:\\\\chef** 的目录。\n\n然后，创建另一个目录 **c:\\\\chef\\\\cookbooks**\n\n现在，我们需要下载 Azure 设置文件，以便 Chef 可以与我们的 Azure 订阅进行通信。\n\n从此处下载你的发布设置：<a href=\"https://manage.windowsazure.cn/publishsettings/\" target=\"_blank\">https://manage.windowsazure.cn/publishsettings/</a>\n\n将发布设置文件保存到 **C:\\\\chef** 中\n\n##创建托管的 Chef 帐户\n\n注册托管的 Chef 帐户：<a href=\"https://manage.chef.io/signup\" target=\"_blank\">https://manage.chef.io/signup</a>\n\n在注册过程中，会要求你创建一个新组织。\n\n![][3]\n\n在创建你的组织后，下载初学者工具包。\n\n![][4]\n\n**注意：**如果你收到提示，警告你将重置你的密钥，可以继续操作，因为我们尚未配置现有基础结构。\n\n此初学者工具包 zip 文件包含你的组织的配置文件和密钥。\n\n##配置 Chef 工作站\n\n将 chef-starter.zip 的内容提取到 **C:\\\\chef**\n\n将 **chef-starter\\\\chef-repo.chef** 下的所有文件都复制到 **c:\\\\chef** 中\n\n你的目录现在看起来应当与下图类似：\n\n![][5]\n\n你现在应当有 4 个文件，包括位于根目录 c:\\\\chef 中的 Azure 发布文件\n\nPEM 文件包含你的组织和用于通信的管理私钥，而 **knife.rb** 文件包含你的 knife 配置。你将需要编辑 **knife.rb** 文件。\n\n在你选择的编辑器中打开该文件并修改“cookbook_path”：从路径中删除 /../，使其如下所示：\n\n    cookbook_path  [\"#{current_dir}/cookbooks\"]\n\n另外，请添加以下行以反映你的 Azure 发布设置文件的名称。\n\n    knife[:azure_publish_settings_file] = \"yourfilename.publishsettings\" \n\n你的 knife.rb 文件现在看起来应当如下所示：\n\n![][6]\n\n这些行将确保 Knife 在执行 Azure 操作期间引用 c:\\\\chef\\\\cookbooks 下的 cookbooks 目录并且还使用我们的 Azure 发布设置文件。\n\n## 安装 Chef 开发工具包\n\n接下来，下载并安装 ChefDK（Chef 开发工具包）来设置你的 Chef 工作站。\n\n<a href=\"http://downloads.getchef.com/chef-dk/windows\" target=\"_blank\">http://downloads.getchef.com/chef-dk/windows</a>\n\n![][7]\n\n这简单明了。让其安装在默认位置 c:\\\\opscode 中。此安装将花费大约 10 分钟时间。\n\n确认你的 PATH 变量包含以下条目：C:\\\\opscode\\\\chefdk\\\\bin;C:\\\\opscode\\\\chefdk\\\\embedded\\\\bin;c:\\\\users\\\\yourusername.chefdk\\\\gem\\\\ruby\\\\2.0.0\\\\bin\n\n如果未包含，请务必添加这些路径！\n\n**请注意，该路径的顺序非常重要！** 如果你的 opscode 路径未采用正确的顺序，你将会遇到问题。\n\n在继续操作之前重新启动你的工作站。\n\n接下来，我们将安装 Knife Azure 扩展。这将为 Knife 提供“Azure 插件”。\n\n运行以下命令：\n\n    chef gem install knife-azure ––pre\n\n**注意：**–pre 参数确保你收到 knife azure 插件的最新 RC 版本，该版本提供对最新 API 集的访问。\n\n同时，可能还会安装许多依赖项。\n\n![][8]\n\n\n若要确保所有项都已正确配置，请运行：\n\n    knife azure image list\n\n如果所有项都已正确配置，你会看到可用 Azure 映像的列表滚动显示。\n\n祝贺你。工作站已设置！\n\n##创建食谱\n\n食谱由 Chef 用来定义你希望在托管客户端上执行的一组命令。创建食谱简单明了，我们将使用命令 chef generate cookbook 来生成我们的食谱模板。我将像自动部署 IIS 的策略一样调用我的食谱 Web 服务器。\n\n在 C:\\\\Chef 目录下运行以下命令：\n\n    chef generate cookbook webserver\n\n这将在 **C:\\\\Chef\\\\cookbooks\\\\webserver** 目录下生成一组文件。 现在，我们需要定义我们希望 Chef 客户端在托管 VM 上执行的一组命令。\n\n这些命令存储在文件 **default.rb** 中。 在此文件中，我将定义一组命令来安装 IIS、启动 IIS 并将模板文件复制到 wwwroot 文件夹中。\n\n修改 **C:\\\\chef\\\\cookbooks\\\\webserver\\\\recipes\\\\default.rb** 并添加以下行：\n\n    powershell_script 'Install IIS' do\n        action :run\n        code 'add-windowsfeature Web-Server'\n    end\n\n    service 'w3svc' do\n        action [ :enable, :start ]\n    end\n\n    template 'c:\\inetpub\\wwwroot\\Default.htm' do\n        source 'Default.htm.erb'\n        rights :read, 'Everyone'\n    end\n\n在完成后，保存该文件。\n\n## 创建模板\n\n如上文提到的那样，我们需要生成一个模板文件，该文件将用作我们的 default.html 页面。\n\n执行以下命令来生成模板：\n\n    chef generate template webserver Default.htm\n\n现在导航到文件 **C:\\\\chef\\\\cookbooks\\\\webserver\\\\templates\\\\default\\\\Default.htm.erb** 并编辑该文件。\n\n添加一些简单的“Hello World”html 代码并保存该文件。\n\n## 将食谱上载到 Chef 服务器\n\n在此步骤中，我们将制作我们已在本地计算机上创建的食谱的副本并将其上载到 Chef 托管服务器。上载完成后，食谱将显示在“策略”选项卡下。\n\n    knife cookbook upload webserver\n\n![][9]\n\n## 使用 Knife Azure 部署虚拟机\n\n现在，我们将部署 Azure 虚拟机并应用“Webserver”食谱，该食谱将安装我们的 IIS Web 服务和默认网页。\n\n若要执行此操作，请使用 **knife azure server create** 命令。\n\n下面是该命令的示例：\n\n    knife azure server create --azure-dns-name 'diegotest01' --azure-vm-name 'testserver01' --azure-vm-size 'Small' --azure-storage-account 'portalvhdsxxxx' --bootstrap-protocol 'cloud-api' --azure-source-image 'a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-Datacenter-201411.01-en.us-127GB.vhd' --azure-service-location 'China North' --winrm-user azureuser --winrm-password 'myPassword123' --tcp-endpoints 80,3389 --r 'recipe[webserver]'\n\n各个参数不言自明。替换你的特定变量并运行。\n\n**注意：**通过命令行，我还通过使用 –tcp-endpoints 参数自动执行终结点网络筛选器规则。我已打开端口 80 和 3389 来提供对我的网页和 RDP 会话的访问。\n\n在运行该命令后，访问 Azure 门户，你会看到你的计算机已开始设置。\n\n![][13]\n\n返回到命令提示符：\n\n![][10]\n\n在部署完成后，我们应当能够通过端口 80 连接到 web 服务，因为我们在通过 knife azure 命令设置 VM 时已打开了该端口。因为此 VM 是我的云服务中的唯一 VM，所以我将使用云服务 URL 来连接它。\n\n![][11]\n\n如你所见，我的 html 代码富有创造性:)\n\n不要忘记，我们还可以从 Azure 门户使用端口 3389 通过 RDP 会话进行连接。\n\n希望这对你有所帮助！ 现在就使用 Azure 开始你的基础结构即代码之旅吧！\n\n\n\n<!--Image references-->\n[2]: ./media/virtual-machines-automation-with-chef/2.png\n[3]: ./media/virtual-machines-automation-with-chef/3.png\n[4]: ./media/virtual-machines-automation-with-chef/4.png\n[5]: ./media/virtual-machines-automation-with-chef/5.png\n[6]: ./media/virtual-machines-automation-with-chef/6.png\n[7]: ./media/virtual-machines-automation-with-chef/7.png\n[8]: ./media/virtual-machines-automation-with-chef/8.png\n[9]: ./media/virtual-machines-automation-with-chef/9.png\n[10]: ./media/virtual-machines-automation-with-chef/10.png\n[11]: ./media/virtual-machines-automation-with-chef/11.png\n[13]: ./media/virtual-machines-automation-with-chef/13.png\n\n\n<!--Link references-->\n\n<!---HONumber=79-->"
+}

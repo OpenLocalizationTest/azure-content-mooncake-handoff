@@ -1,0 +1,47 @@
+{
+  "nodes": [
+    {
+      "content": "打开项目文件 MainPage.xaml.cs 并添加以下 using 语句：",
+      "pos": [
+        4,
+        43
+      ]
+    },
+    {
+      "content": "将以下代码段添加到 MainPage 类：",
+      "pos": [
+        82,
+        103
+      ]
+    },
+    {
+      "pos": [
+        974,
+        1115
+      ],
+      "content": "这样可以创建用于存储当前用户的成员变量，以及用于处理身份验证过程的方法。将使用 Facebook 登录对用户进行身份验证。如果使用的标识提供商不是 Facebook，请将上述 <bpt id=\"p1\">**</bpt>MobileServiceAuthenticationProvider<ept id=\"p1\">**</ept> 的值更改为您的提供商的值。"
+    },
+    {
+      "pos": [
+        1120,
+        1182
+      ],
+      "content": "将现有的 <bpt id=\"p1\">**</bpt>OnNavigatedTo<ept id=\"p1\">**</ept> 方法覆盖替换为以下方法，以便调用新的 <bpt id=\"p2\">**</bpt>Authenticate<ept id=\"p2\">**</ept> 方法："
+    },
+    {
+      "content": "按 F5 键运行应用，并使用您选择的标识提供程序登录应用。",
+      "pos": [
+        1362,
+        1391
+      ]
+    },
+    {
+      "content": "当您成功登录时，应用应该运行而不出现错误，您应该能够查询移动服务，并对数据进行更新。",
+      "pos": [
+        1398,
+        1440
+      ]
+    }
+  ],
+  "content": "\n1. 打开项目文件 MainPage.xaml.cs 并添加以下 using 语句：\n\n        using Windows.UI.Popups;\n\n2. 将以下代码段添加到 MainPage 类：\n    \n        private MobileServiceUser user;\n        private async System.Threading.Tasks.Task AuthenticateAsync()\n        {\n            while (user == null)\n            {\n                string message;\n                try\n                {\n                    user = await App.MobileService\n                        .LoginAsync(MobileServiceAuthenticationProvider.Facebook);\n                    message = \n                        string.Format(\"You are now logged in - {0}\", user.UserId);\n                }\n                catch (InvalidOperationException)\n                {\n                    message = \"You must log in. Login Required\";\n                }\n                        \n                var dialog = new MessageDialog(message);\n                dialog.Commands.Add(new UICommand(\"OK\"));\n                await dialog.ShowAsync();\n            }\n        }\n\n    这样可以创建用于存储当前用户的成员变量，以及用于处理身份验证过程的方法。将使用 Facebook 登录对用户进行身份验证。如果使用的标识提供商不是 Facebook，请将上述 **MobileServiceAuthenticationProvider** 的值更改为您的提供商的值。\n\n3. 将现有的 **OnNavigatedTo** 方法覆盖替换为以下方法，以便调用新的 **Authenticate** 方法：\n\n        protected override async void OnNavigatedTo(NavigationEventArgs e)\n        {\n            await AuthenticateAsync();\n            RefreshTodoItems();\n        }\n        \n4. 按 F5 键运行应用，并使用您选择的标识提供程序登录应用。 \n\n    当您成功登录时，应用应该运行而不出现错误，您应该能够查询移动服务，并对数据进行更新。\n"
+}

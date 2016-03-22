@@ -1,0 +1,96 @@
+{
+  "nodes": [
+    {
+      "content": "在 SQL 数据仓库中透视和逆透视数据 | Azure",
+      "pos": [
+        26,
+        53
+      ]
+    },
+    {
+      "content": "有关在开发解决方案时于 Azure SQL 数据仓库中透视和逆透视数据的技巧。",
+      "pos": [
+        71,
+        110
+      ]
+    },
+    {
+      "content": "在 SQL 数据仓库中透视和逆透视数据",
+      "pos": [
+        334,
+        353
+      ]
+    },
+    {
+      "content": "可以使用 CASE 语句透视 SQL 数据仓库中的数据。",
+      "pos": [
+        355,
+        383
+      ]
+    },
+    {
+      "content": "本文包含两个简单示例，说明如何在不使用 SQL Server 中的透视和逆透视语法情况下，来透视和逆透视某个表。",
+      "pos": [
+        385,
+        441
+      ]
+    },
+    {
+      "content": "透视",
+      "pos": [
+        446,
+        448
+      ]
+    },
+    {
+      "content": "逆透视",
+      "pos": [
+        1721,
+        1724
+      ]
+    },
+    {
+      "pos": [
+        1726,
+        1838
+      ],
+      "content": "逆透视有点复杂。但是，仍然可以使用 <ph id=\"ph1\">`CASE`</ph> 来实现。为此，首先还需要判断要逆透视多少列。在前面的示例中，我们透视了四列。让我们沿用此示例。若要执行逆透视，我们需要暂时使用系数 4 放大数据集。这就要执行一个双步骤过程："
+    },
+    {
+      "content": "首先，创建一个包含四行的临时表。我们将使用此表来扩大数据：",
+      "pos": [
+        1840,
+        1869
+      ]
+    },
+    {
+      "content": "第二步是使用 CASE 条件性地逆透视数据，将数据集转换回行。若要实现此目的，我们需要通过联接到第一步中创建的临时表 #Nmbr，来创建笛卡儿积：",
+      "pos": [
+        2089,
+        2162
+      ]
+    },
+    {
+      "content": "最后，别忘了删除临时表以清理数据。",
+      "pos": [
+        2687,
+        2704
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        2737,
+        2741
+      ]
+    },
+    {
+      "pos": [
+        2742,
+        2763
+      ],
+      "content": "有关更多开发技巧，请参阅<bpt id=\"p1\">[</bpt>开发概述<ept id=\"p1\">][]</ept>。"
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"在 SQL 数据仓库中透视和逆透视数据 | Azure\"\n   description=\"有关在开发解决方案时于 Azure SQL 数据仓库中透视和逆透视数据的技巧。\"\n   services=\"sql-data-warehouse\"\n   documentationCenter=\"NA\"\n   authors=\"jrowlandjones\"\n   manager=\"barbkess\"\n   editor=\"\"/>\n\n<tags\n   ms.service=\"sql-data-warehouse\"\n   ms.date=\"09/22/2015\"\n   wacn.date=\"01/20/2016\"/>\n\n# 在 SQL 数据仓库中透视和逆透视数据\n\n可以使用 CASE 语句透视 SQL 数据仓库中的数据。\n\n本文包含两个简单示例，说明如何在不使用 SQL Server 中的透视和逆透视语法情况下，来透视和逆透视某个表。\n\n## 透视\n\n```\nCREATE TABLE AnnualSales_pvt\nWITH    (   DISTRIBUTION = ROUND_ROBIN\n        )\nAS\nWITH SalesPVT \nAS\n(   SELECT  [EnglishProductCategoryName]\n    ,       CASE WHEN [CalendarYear] = 2001 THEN SUM([SalesAmount]) ELSE 0 END AS 'CY_2001'\n    ,       CASE WHEN [CalendarYear] = 2002 THEN SUM([SalesAmount]) ELSE 0 END AS 'CY_2002'\n    ,       CASE WHEN [CalendarYear] = 2003 THEN SUM([SalesAmount]) ELSE 0 END AS 'CY_2003'\n    ,       CASE WHEN [CalendarYear] = 2004 THEN SUM([SalesAmount]) ELSE 0 END AS 'CY_2004'\n    FROM    [dbo].[FactInternetSales] s\n    JOIN    [dbo].[DimDate] d               ON s.[OrderDateKey]          = d.[DateKey]\n    JOIN    [dbo].[DimProduct] p            ON s.[ProductKey]            = p.[ProductKey]\n    JOIN    [dbo].[DimProductSubCategory] u ON p.[ProductSubcategoryKey] = u.[ProductSubcategoryKey]\n    JOIN    [dbo].[DimProductCategory] c    ON u.[ProductCategoryKey]    = c.[ProductCategoryKey]\n    GROUP BY \n            [EnglishProductCategoryName]\n    ,       [CalendarYear]\n)\nSELECT  [EnglishProductCategoryName]\n,       SUM([CY_2001])  AS 'CY_2001'\n,       SUM([CY_2002])  AS 'CY_2002'\n,       SUM([CY_2003])  AS 'CY_2003'\n,       SUM([CY_2004])  AS 'CY_2004'\nFROM    SalesPVT\nGROUP BY \n        [EnglishProductCategoryName]\n;\n```\n\n## 逆透视\n\n逆透视有点复杂。但是，仍然可以使用 `CASE` 来实现。为此，首先还需要判断要逆透视多少列。在前面的示例中，我们透视了四列。让我们沿用此示例。若要执行逆透视，我们需要暂时使用系数 4 放大数据集。这就要执行一个双步骤过程：\n\n首先，创建一个包含四行的临时表。我们将使用此表来扩大数据：\n\n```\nCREATE TABLE #Nmbr\nWITH \n(   DISTRIBUTION = ROUND_ROBIN\n,   LOCATION     = USER_DB\n)\nAS\nSELECT 1 AS 'Number'\nUNION ALL\nSELECT 2\nUNION ALL\nSELECT 3\nUNION ALL\nSELECT 4\nOPTION (LABEL = 'CTAS : #Nmbr : CREATE')\n;\n```\n\n第二步是使用 CASE 条件性地逆透视数据，将数据集转换回行。若要实现此目的，我们需要通过联接到第一步中创建的临时表 #Nmbr，来创建笛卡儿积：\n\n```\nSELECT  [EnglishProductCategoryName]\n,       CASE    c.[Number]\n                WHEN 1 THEN [CY_2001]\n                WHEN 2 THEN [CY_2002]\n                WHEN 3 THEN [CY_2003]\n                WHEN 4 THEN [CY_2004]\n        END as Sales\nFROM AnnualSales_pvt\nJOIN #Nmbr c ON 1=1\nWHERE   CASE    c.[Number]\n                WHEN 1 THEN CY_2001\n                WHEN 2 THEN CY_2002\n                WHEN 3 THEN CY_2003\n                WHEN 4 THEN CY_2004\n        END IS NOT NULL\nOPTION (LABEL = 'Unpivot :  : SELECT')\n;\n```\n\n最后，别忘了删除临时表以清理数据。\n\n```\nDROP TABLE #Nmbr\n;\n```\n\n## 后续步骤\n有关更多开发技巧，请参阅[开发概述][]。\n\n<!--Image references-->\n\n<!--Article references-->\n[开发概述]: /documentation/articles/sql-data-warehouse-overview-develop\n\n<!--MSDN references-->\n\n<!--Other Web references-->\n\n<!---HONumber=Mooncake_1207_2015-->\n"
+}

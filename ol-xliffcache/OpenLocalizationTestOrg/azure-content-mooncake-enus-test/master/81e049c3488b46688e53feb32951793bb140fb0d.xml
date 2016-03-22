@@ -1,0 +1,271 @@
+{
+  "nodes": [
+    {
+      "content": "使用 PowerShell 更改 Azure SQL 数据库的服务层和性能级别",
+      "pos": [
+        28,
+        67
+      ]
+    },
+    {
+      "content": "“更改 Azure SQL 数据库的服务层和性能级别”介绍如何使用 PowerShell 扩展和缩减 SQL 数据库。使用 PowerShell 更改 Azure SQL 数据库定价层。",
+      "pos": [
+        87,
+        180
+      ]
+    },
+    {
+      "content": "使用 PowerShell 更改 SQL 数据库的服务层和性能级别（定价层）",
+      "pos": [
+        397,
+        435
+      ]
+    },
+    {
+      "content": "单一数据库",
+      "pos": [
+        439,
+        444
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        450,
+        466
+      ]
+    },
+    {
+      "content": "Azure 门户",
+      "pos": [
+        470,
+        478
+      ]
+    },
+    {
+      "content": "PowerShell",
+      "pos": [
+        530,
+        540
+      ]
+    },
+    {
+      "content": "本文介绍如何使用 PowerShell 更改 SQL 数据库的服务层和性能级别。",
+      "pos": [
+        602,
+        642
+      ]
+    },
+    {
+      "pos": [
+        644,
+        848
+      ],
+      "content": "使用<bpt id=\"p1\">[</bpt>将 SQL 数据库 Web/企业数据库升级到新服务层<ept id=\"p1\">](/documentation/articles/sql-database-upgrade-new-service-tiers)</ept>和 <bpt id=\"p2\">[</bpt>Azure SQL 数据库服务层和性能级别<ept id=\"p2\">](/documentation/articles/sql-database-service-tiers)</ept>中的信息为 Azure SQL 数据库确定适当的服务层和性能级别。"
+    },
+    {
+      "pos": [
+        852,
+        927
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph> 更改 SQL 数据库的服务层和性能级别是一项联机操作。这意味着在整个操作期间数据库将保持联机并可用而没有停机时间。"
+    },
+    {
+      "content": "若要对数据库进行降级，数据库应小于目标服务层允许的最大大小。",
+      "pos": [
+        931,
+        961
+      ]
+    },
+    {
+      "pos": [
+        965,
+        1154
+      ],
+      "content": "在启用了<bpt id=\"p1\">[</bpt>标准异地复制<ept id=\"p1\">](/documentation/articles/sql-database-business-continuity-design)</ept>或<bpt id=\"p2\">[</bpt>活动异地复制<ept id=\"p2\">](/documentation/articles/sql-database-geo-replication-overview)</ept>的情况下升级数据库时，必须先将次要数据库升级到所需的性能层，然后再升级主数据库。"
+    },
+    {
+      "pos": [
+        1157,
+        1282
+      ],
+      "content": "从高级服务层降级时，必须先终止所有异地复制关系。你可以按照<bpt id=\"p1\">[</bpt>终止连续复制关系<ept id=\"p1\">](/documentation/articles/sql-database-disaster-recovery)</ept>主题中所述的步骤停止主数据库与活动次要数据库之间的复制过程。"
+    },
+    {
+      "pos": [
+        1285,
+        1423
+      ],
+      "content": "各服务层提供的还原服务是不同的。如果进行降级，你可能无法再还原到某个时间点，或者备份保留期变短。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure SQL 数据库备份和还原<ept id=\"p1\">](/documentation/articles/sql-database-business-continuity)</ept>。"
+    },
+    {
+      "content": "你可以在 24 小时内进行最多四项单独的数据库更改（服务层或性能级别）。",
+      "pos": [
+        1426,
+        1462
+      ]
+    },
+    {
+      "content": "所做的更改完成之前不会应用数据库的新属性。",
+      "pos": [
+        1465,
+        1486
+      ]
+    },
+    {
+      "content": "若要完成本文，你需要以下各项：",
+      "pos": [
+        1492,
+        1507
+      ]
+    },
+    {
+      "content": "Azure 订阅。如果你需要 Azure 订阅，只需单击本页顶部的“试用”，然后再回来完成本文的相关操作即可。",
+      "pos": [
+        1513,
+        1568
+      ]
+    },
+    {
+      "pos": [
+        1571,
+        1686
+      ],
+      "content": "Azure SQL 数据库。如果你没有 SQL 数据库，请按照<bpt id=\"p1\">[</bpt>创建你的第一个 Azure SQL 数据库<ept id=\"p1\">](/documentation/articles/sql-database-get-started)</ept>文章中的步骤创建一个。"
+    },
+    {
+      "content": "Azure PowerShell。",
+      "pos": [
+        1689,
+        1706
+      ]
+    },
+    {
+      "pos": [
+        1709,
+        1849
+      ],
+      "content": "若要运行 PowerShell cmdlet，需要已安装并运行 Azure PowerShell。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何安装和配置 Azure PowerShell<ept id=\"p1\">](/documentation/articles/powershell-install-configure)</ept>。"
+    },
+    {
+      "content": "配置你的凭据，然后选择你的订阅",
+      "pos": [
+        1856,
+        1871
+      ]
+    },
+    {
+      "content": "首先必须与 Azure 帐户建立访问连接，因此请启动 PowerShell，然后运行以下 cmdlet。在登录屏幕中，输入登录 Azure 门户时所用的相同电子邮件和密码。",
+      "pos": [
+        1873,
+        1959
+      ]
+    },
+    {
+      "content": "成功登录后，你会在屏幕上看到一些信息，其中包括你登录时使用的 ID，以及你有权访问的 Azure 订阅。",
+      "pos": [
+        2018,
+        2070
+      ]
+    },
+    {
+      "content": "选择 Azure 订阅",
+      "pos": [
+        2077,
+        2088
+      ]
+    },
+    {
+      "pos": [
+        2090,
+        2260
+      ],
+      "content": "若要选择订阅，你需要提供订阅 ID 或订阅名称 (<bpt id=\"p1\">**</bpt>-SubscriptionName<ept id=\"p1\">**</ept>)。你可以从前面的步骤中显示的信息中复制订阅 ID，或者，如果你有多个订阅且需要更多详细信息，可以运行 <bpt id=\"p2\">**</bpt>Get-AzureSubscription<ept id=\"p2\">**</ept> cmdlet，然后从结果集中复制所需的订阅信息。获得订阅以后，你可以运行以下 cmdlet："
+    },
+    {
+      "pos": [
+        2387,
+        2518
+      ],
+      "content": "成功运行 <bpt id=\"p1\">**</bpt>Select-AzureSubscription<ept id=\"p1\">**</ept> 后，将返回到 PowerShell 提示符处。如果你有多个订阅，可以运行 <bpt id=\"p2\">**</bpt>Get-AzureSubscription<ept id=\"p2\">**</ept> 并验证要使用的订阅是否显示 <bpt id=\"p3\">**</bpt>IsCurrent: True<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "content": "更改 SQL 数据库的服务层和性能级别",
+      "pos": [
+        2528,
+        2547
+      ]
+    },
+    {
+      "pos": [
+        2549,
+        2673
+      ],
+      "content": "运行 <bpt id=\"p1\">**</bpt>Set-AzureRmSqlDatabase<ept id=\"p1\">**</ept> cmdlet 并将 <bpt id=\"p2\">**</bpt>-RequestedServiceObjectiveName<ept id=\"p2\">**</ept> 设置为所需定价层的性能级别；例如 <bpt id=\"p3\">*</bpt>S0<ept id=\"p3\">*</ept>、<bpt id=\"p4\">*</bpt>S1<ept id=\"p4\">*</ept>、<bpt id=\"p5\">*</bpt>S2<ept id=\"p5\">*</ept>、<bpt id=\"p6\">*</bpt>S3<ept id=\"p6\">*</ept>、<bpt id=\"p7\">*</bpt>P1<ept id=\"p7\">*</ept>、<bpt id=\"p8\">*</bpt>P2<ept id=\"p8\">*</ept>..."
+    },
+    {
+      "content": "用于更改 SQL 数据库的服务层和性能级别的示例 PowerShell 脚本",
+      "pos": [
+        3065,
+        3103
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        3760,
+        3764
+      ]
+    },
+    {
+      "content": "扩大和缩小",
+      "pos": [
+        3769,
+        3774
+      ]
+    },
+    {
+      "content": "使用 SSMS 连接和查询 SQL 数据库",
+      "pos": [
+        3843,
+        3864
+      ]
+    },
+    {
+      "content": "导出 Azure SQL 数据库",
+      "pos": [
+        3926,
+        3942
+      ]
+    },
+    {
+      "content": "其他资源",
+      "pos": [
+        4004,
+        4008
+      ]
+    },
+    {
+      "content": "业务连续性概述",
+      "pos": [
+        4013,
+        4020
+      ]
+    },
+    {
+      "content": "SQL 数据库文档",
+      "pos": [
+        4083,
+        4092
+      ]
+    },
+    {
+      "content": "Azure SQL 数据库 Cmdlet",
+      "pos": [
+        4136,
+        4156
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"使用 PowerShell 更改 Azure SQL 数据库的服务层和性能级别\" \n    description=\"“更改 Azure SQL 数据库的服务层和性能级别”介绍如何使用 PowerShell 扩展和缩减 SQL 数据库。使用 PowerShell 更改 Azure SQL 数据库定价层。\" \n    services=\"sql-database\"\n    documentationCenter=\"\"\n    authors=\"stevestein\"\n    manager=\"jeffreyg\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"sql-database\"\n    ms.date=\"12/01/2015\"\n    wacn.date=\"01/29/2016\"/>\n\n\n# 使用 PowerShell 更改 SQL 数据库的服务层和性能级别（定价层）\n\n**单一数据库**\n\n> [AZURE.SELECTOR]\n- [Azure 门户](/documentation/articles/sql-database-scale-up)\n- [PowerShell](/documentation/articles/sql-database-scale-up-powershell)\n\n\n本文介绍如何使用 PowerShell 更改 SQL 数据库的服务层和性能级别。\n\n使用[将 SQL 数据库 Web/企业数据库升级到新服务层](/documentation/articles/sql-database-upgrade-new-service-tiers)和 [Azure SQL 数据库服务层和性能级别](/documentation/articles/sql-database-service-tiers)中的信息为 Azure SQL 数据库确定适当的服务层和性能级别。\n\n> [AZURE.IMPORTANT] 更改 SQL 数据库的服务层和性能级别是一项联机操作。这意味着在整个操作期间数据库将保持联机并可用而没有停机时间。\n\n- 若要对数据库进行降级，数据库应小于目标服务层允许的最大大小。 \n- 在启用了[标准异地复制](/documentation/articles/sql-database-business-continuity-design)或[活动异地复制](/documentation/articles/sql-database-geo-replication-overview)的情况下升级数据库时，必须先将次要数据库升级到所需的性能层，然后再升级主数据库。\n- 从高级服务层降级时，必须先终止所有异地复制关系。你可以按照[终止连续复制关系](/documentation/articles/sql-database-disaster-recovery)主题中所述的步骤停止主数据库与活动次要数据库之间的复制过程。\n- 各服务层提供的还原服务是不同的。如果进行降级，你可能无法再还原到某个时间点，或者备份保留期变短。有关详细信息，请参阅 [Azure SQL 数据库备份和还原](/documentation/articles/sql-database-business-continuity)。\n- 你可以在 24 小时内进行最多四项单独的数据库更改（服务层或性能级别）。\n- 所做的更改完成之前不会应用数据库的新属性。\n\n\n\n**若要完成本文，你需要以下各项：**\n\n- Azure 订阅。如果你需要 Azure 订阅，只需单击本页顶部的“试用”，然后再回来完成本文的相关操作即可。\n- Azure SQL 数据库。如果你没有 SQL 数据库，请按照[创建你的第一个 Azure SQL 数据库](/documentation/articles/sql-database-get-started)文章中的步骤创建一个。\n- Azure PowerShell。\n\n\n若要运行 PowerShell cmdlet，需要已安装并运行 Azure PowerShell。有关详细信息，请参阅[如何安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure)。\n\n\n\n## 配置你的凭据，然后选择你的订阅\n\n首先必须与 Azure 帐户建立访问连接，因此请启动 PowerShell，然后运行以下 cmdlet。在登录屏幕中，输入登录 Azure 门户时所用的相同电子邮件和密码。\n\n    Add-AzureRmAccount -EnvironmentName AzureChinaCloud\n\n成功登录后，你会在屏幕上看到一些信息，其中包括你登录时使用的 ID，以及你有权访问的 Azure 订阅。\n\n\n### 选择 Azure 订阅\n\n若要选择订阅，你需要提供订阅 ID 或订阅名称 (**-SubscriptionName**)。你可以从前面的步骤中显示的信息中复制订阅 ID，或者，如果你有多个订阅且需要更多详细信息，可以运行 **Get-AzureSubscription** cmdlet，然后从结果集中复制所需的订阅信息。获得订阅以后，你可以运行以下 cmdlet：\n\n    $SubscriptionId = \"4cac86b0-1e56-bbbb-aaaa-000000000000\"\n    Select-AzureRmSubscription -SubscriptionId $SubscriptionId\n\n成功运行 **Select-AzureSubscription** 后，将返回到 PowerShell 提示符处。如果你有多个订阅，可以运行 **Get-AzureSubscription** 并验证要使用的订阅是否显示 **IsCurrent: True**。\n\n\n \n\n\n## 更改 SQL 数据库的服务层和性能级别\n\n运行 **Set-AzureRmSqlDatabase** cmdlet 并将 **-RequestedServiceObjectiveName** 设置为所需定价层的性能级别；例如 *S0*、*S1*、*S2*、*S3*、*P1*、*P2*...\n\n    $ResourceGroupName = \"resourceGroupName\"\n    \n    $ServerName = \"serverName\"\n    $DatabaseName = \"databaseName\"\n\n    $NewEdition = \"Standard\"\n    $NewPricingTier = \"S2\"\n\n    $ScaleRequest = Set-AzureRmSqlDatabase -DatabaseName $DatabaseName -ServerName $ServerName -ResourceGroupName $ResourceGroupName -Edition $NewEdition -RequestedServiceObjectiveName $NewPricingTier\n\n\n  \n\n   \n\n\n## 用于更改 SQL 数据库的服务层和性能级别的示例 PowerShell 脚本\n\n    \n\n    \n    $SubscriptionId = \"4cac86b0-1e56-bbbb-aaaa-000000000000\"\n    \n    $ResourceGroupName = \"resourceGroupName\"\n    $Location = \"China East\"\n    \n    $ServerName = \"serverName\"\n    $DatabaseName = \"databaseName\"\n    \n    $NewEdition = \"Standard\"\n    $NewPricingTier = \"S2\"\n    \n    Add-AzureRmAccount -EnvironmentName AzureChinaCloud\n    Select-AzureRmSubscription -SubscriptionId $SubscriptionId\n    \n    $ScaleRequest = Set-AzureRmSqlDatabase -DatabaseName $DatabaseName -ServerName $ServerName -ResourceGroupName $ResourceGroupName -Edition $NewEdition -RequestedServiceObjectiveName $NewPricingTier\n    \n    $ScaleRequest\n    \n        \n\n\n## 后续步骤\n\n- [扩大和缩小](/documentation/articles/sql-database-elastic-scale-get-started)\n- [使用 SSMS 连接和查询 SQL 数据库](/documentation/articles/sql-database-connect-query-ssms)\n- [导出 Azure SQL 数据库](/documentation/articles/sql-database-export-powershell)\n\n## 其他资源\n\n- [业务连续性概述](/documentation/articles/sql-database-business-continuity)\n- [SQL 数据库文档](/documentation/services/sql-databases)\n- [Azure SQL 数据库 Cmdlet](https://msdn.microsoft.com/zh-cn/library/azure/mt163521.aspx)\n\n<!---HONumber=Mooncake_0118_2016-->\n"
+}

@@ -1,0 +1,278 @@
+{
+  "nodes": [
+    {
+      "content": "使用 PowerShell 创建 Azure SQL 数据库的副本",
+      "pos": [
+        28,
+        61
+      ]
+    },
+    {
+      "content": "使用 PowerShell 创建 Azure SQL 数据库的副本",
+      "pos": [
+        81,
+        114
+      ]
+    },
+    {
+      "content": "使用 PowerShell 创建 Azure SQL 数据库的副本",
+      "pos": [
+        335,
+        368
+      ]
+    },
+    {
+      "content": "单一数据库",
+      "pos": [
+        372,
+        377
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        383,
+        399
+      ]
+    },
+    {
+      "content": "Azure 门户",
+      "pos": [
+        403,
+        411
+      ]
+    },
+    {
+      "content": "PowerShell",
+      "pos": [
+        459,
+        469
+      ]
+    },
+    {
+      "content": "SQL",
+      "pos": [
+        528,
+        531
+      ]
+    },
+    {
+      "pos": [
+        592,
+        771
+      ],
+      "content": "以下步骤说明如何使用 PowerShell 复制 SQL 数据库。数据库复制操作使用 <bpt id=\"p1\">[</bpt>Start-AzureSqlDatabaseCopy<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/dn720220.aspx)</ept> cmdlet 语句将 SQL 数据库复制到新的数据库。副本是在相同或不同服务器上创建的数据库快照备份。"
+    },
+    {
+      "pos": [
+        775,
+        903
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>Azure SQL 数据库会自动为你可以还原的每个用户数据库创建和维护备份。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>业务连续性概述<ept id=\"p1\">](/documentation/articles/sql-database-business-continuity)</ept>。"
+    },
+    {
+      "content": "复制过程完成后，新数据库将完全正常工作，并独立于源数据库。完成复制时，新数据库的事务处理方式将与源数据库保持一致。数据库副本的服务层和性能级别（定价层）都与源数据库相同。在完成该复制后，副本将成为能够完全行使功能的独立数据库。登录名、用户和权限可单独进行管理。",
+      "pos": [
+        905,
+        1035
+      ]
+    },
+    {
+      "content": "将某个数据库复制到同一逻辑服务器时，可以在这两个数据库上使用相同的登录名。用于复制该数据库的安全主体将成为新数据库上的数据库所有者 (DBO)。所有数据库用户、其权限及安全标识符 (SID) 都复制到数据库副本中。",
+      "pos": [
+        1038,
+        1145
+      ]
+    },
+    {
+      "content": "若要完成本文，你需要以下各项：",
+      "pos": [
+        1148,
+        1163
+      ]
+    },
+    {
+      "content": "Azure 订阅。如果你需要 Azure 订阅，只需单击本页顶部的“试用”，然后再回来完成本文的相关操作即可。",
+      "pos": [
+        1167,
+        1222
+      ]
+    },
+    {
+      "pos": [
+        1225,
+        1340
+      ],
+      "content": "Azure SQL 数据库。如果你没有 SQL 数据库，请按照<bpt id=\"p1\">[</bpt>创建你的第一个 Azure SQL 数据库<ept id=\"p1\">](/documentation/articles/sql-database-get-started)</ept>文章中的步骤创建一个。"
+    },
+    {
+      "pos": [
+        1343,
+        1568
+      ],
+      "content": "Azure PowerShell。你可以通过运行 <bpt id=\"p1\">[</bpt>Microsoft Web 平台安装程序<ept id=\"p1\">](http://go.microsoft.com/fwlink/p/?linkid=320376&amp;clcid=0x409)</ept>下载并安装 Azure PowerShell 模块。有关详细信息，请参阅<bpt id=\"p2\">[</bpt>如何安装和配置 Azure PowerShell<ept id=\"p2\">](/documentation/articles/powershell-install-configure)</ept>。"
+    },
+    {
+      "content": "配置你的凭据，然后选择你的订阅",
+      "pos": [
+        1575,
+        1590
+      ]
+    },
+    {
+      "content": "首先必须与 Azure 帐户建立访问连接，因此请启动 PowerShell，然后运行以下 cmdlet。在登录屏幕中，输入登录 Azure 经典门户时所用的相同电子邮件和密码。",
+      "pos": [
+        1592,
+        1680
+      ]
+    },
+    {
+      "content": "成功登录后，你会在屏幕上看到一些信息，其中包括你登录时使用的 ID，以及你有权访问的 Azure 订阅。",
+      "pos": [
+        1733,
+        1785
+      ]
+    },
+    {
+      "content": "选择 Azure 订阅",
+      "pos": [
+        1792,
+        1803
+      ]
+    },
+    {
+      "pos": [
+        1805,
+        1975
+      ],
+      "content": "若要选择订阅，你需要提供订阅 ID 或订阅名称 (<bpt id=\"p1\">**</bpt>-SubscriptionName<ept id=\"p1\">**</ept>)。你可以从前面的步骤中显示的信息中复制订阅 ID，或者，如果你有多个订阅且需要更多详细信息，可以运行 <bpt id=\"p2\">**</bpt>Get-AzureSubscription<ept id=\"p2\">**</ept> cmdlet，然后从结果集中复制所需的订阅信息。获得订阅以后，你可以运行以下 cmdlet："
+    },
+    {
+      "pos": [
+        2060,
+        2189
+      ],
+      "content": "成功运行 <bpt id=\"p1\">**</bpt>Select-AzureSubscription<ept id=\"p1\">**</ept> 后，将返回到 PowerShell 提示符处。如果你有多个订阅，可以运行 <bpt id=\"p2\">**</bpt>Get-AzureSubscription<ept id=\"p2\">**</ept> 并验证要使用的订阅显示 <bpt id=\"p3\">**</bpt>IsCurrent: True<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "content": "设置适合特定环境的变量",
+      "pos": [
+        2195,
+        2206
+      ]
+    },
+    {
+      "content": "有几个变量需要你将示例值替换为你的数据库和服务器的特定值。",
+      "pos": [
+        2208,
+        2237
+      ]
+    },
+    {
+      "content": "将占位符值替换为你的环境的值：",
+      "pos": [
+        2239,
+        2254
+      ]
+    },
+    {
+      "content": "将 SQL 数据库复制到同一台服务器",
+      "pos": [
+        2781,
+        2799
+      ]
+    },
+    {
+      "content": "此命令会将复制数据库请求提交到服务。根据数据库的大小，复制操作可能需要一些时间才能完成。",
+      "pos": [
+        2801,
+        2845
+      ]
+    },
+    {
+      "content": "将 SQL 数据库复制到不同的服务器",
+      "pos": [
+        3013,
+        3031
+      ]
+    },
+    {
+      "content": "此命令会将复制数据库请求提交到服务。根据数据库的大小，复制操作可能需要一些时间才能完成。",
+      "pos": [
+        3033,
+        3077
+      ]
+    },
+    {
+      "content": "监视复制操作的进度",
+      "pos": [
+        3287,
+        3296
+      ]
+    },
+    {
+      "pos": [
+        3298,
+        3452
+      ],
+      "content": "运行 <bpt id=\"p1\">**</bpt>Start-AzureSqlDatabaseCopy<ept id=\"p1\">**</ept> 之后，你可以检查复制请求的状态。在请求后立即运行此命令通常将返回 <bpt id=\"p2\">**</bpt>State : Pending<ept id=\"p2\">**</ept> 或 <bpt id=\"p3\">**</bpt>State : Running<ept id=\"p3\">**</ept>，因此你可以运行此命令多次，直到看到输出中显示 <bpt id=\"p4\">**</bpt>State : COMPLETED<ept id=\"p4\">**</ept>。"
+    },
+    {
+      "content": "复制 SQL 数据库 PowerShell 脚本",
+      "pos": [
+        3546,
+        3570
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        4580,
+        4584
+      ]
+    },
+    {
+      "content": "使用 SQL Server Management Studio (SSMS) 进行连接",
+      "pos": [
+        4589,
+        4632
+      ]
+    },
+    {
+      "content": "将数据库导出到 BACPAC",
+      "pos": [
+        4695,
+        4709
+      ]
+    },
+    {
+      "content": "其他资源",
+      "pos": [
+        4772,
+        4776
+      ]
+    },
+    {
+      "content": "业务连续性概述",
+      "pos": [
+        4781,
+        4788
+      ]
+    },
+    {
+      "content": "灾难恢复练习",
+      "pos": [
+        4851,
+        4857
+      ]
+    },
+    {
+      "content": "SQL 数据库文档",
+      "pos": [
+        4925,
+        4934
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"使用 PowerShell 创建 Azure SQL 数据库的副本\" \n    description=\"使用 PowerShell 创建 Azure SQL 数据库的副本\" \n    services=\"sql-database\"\n    documentationCenter=\"\"\n    authors=\"stevestein\"\n    manager=\"jeffreyg\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"sql-database\"\n    ms.date=\"12/01/2015\"\n        wacn.date=\"01/15/2016\"/>\n\n\n# 使用 PowerShell 创建 Azure SQL 数据库的副本\n\n**单一数据库**\n\n> [AZURE.SELECTOR]\n- [Azure 门户](/documentation/articles/sql-database-copy)\n- [PowerShell](/documentation/articles/sql-database-copy-powershell)\n- [SQL](/documentation/articles/sql-database-copy-transact-sql)\n\n\n\n以下步骤说明如何使用 PowerShell 复制 SQL 数据库。数据库复制操作使用 [Start-AzureSqlDatabaseCopy](https://msdn.microsoft.com/zh-cn/library/dn720220.aspx) cmdlet 语句将 SQL 数据库复制到新的数据库。副本是在相同或不同服务器上创建的数据库快照备份。\n\n> [AZURE.NOTE]Azure SQL 数据库会自动为你可以还原的每个用户数据库创建和维护备份。有关详细信息，请参阅[业务连续性概述](/documentation/articles/sql-database-business-continuity)。\n\n复制过程完成后，新数据库将完全正常工作，并独立于源数据库。完成复制时，新数据库的事务处理方式将与源数据库保持一致。数据库副本的服务层和性能级别（定价层）都与源数据库相同。在完成该复制后，副本将成为能够完全行使功能的独立数据库。登录名、用户和权限可单独进行管理。\n\n\n将某个数据库复制到同一逻辑服务器时，可以在这两个数据库上使用相同的登录名。用于复制该数据库的安全主体将成为新数据库上的数据库所有者 (DBO)。所有数据库用户、其权限及安全标识符 (SID) 都复制到数据库副本中。\n\n\n若要完成本文，你需要以下各项：\n\n- Azure 订阅。如果你需要 Azure 订阅，只需单击本页顶部的“试用”，然后再回来完成本文的相关操作即可。\n- Azure SQL 数据库。如果你没有 SQL 数据库，请按照[创建你的第一个 Azure SQL 数据库](/documentation/articles/sql-database-get-started)文章中的步骤创建一个。\n- Azure PowerShell。你可以通过运行 [Microsoft Web 平台安装程序](http://go.microsoft.com/fwlink/p/?linkid=320376&clcid=0x409)下载并安装 Azure PowerShell 模块。有关详细信息，请参阅[如何安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure)。\n\n\n\n## 配置你的凭据，然后选择你的订阅\n\n首先必须与 Azure 帐户建立访问连接，因此请启动 PowerShell，然后运行以下 cmdlet。在登录屏幕中，输入登录 Azure 经典门户时所用的相同电子邮件和密码。\n\n    Add-AzureAccount -environment azurechinacloud\n\n成功登录后，你会在屏幕上看到一些信息，其中包括你登录时使用的 ID，以及你有权访问的 Azure 订阅。\n\n\n### 选择 Azure 订阅\n\n若要选择订阅，你需要提供订阅 ID 或订阅名称 (**-SubscriptionName**)。你可以从前面的步骤中显示的信息中复制订阅 ID，或者，如果你有多个订阅且需要更多详细信息，可以运行 **Get-AzureSubscription** cmdlet，然后从结果集中复制所需的订阅信息。获得订阅以后，你可以运行以下 cmdlet：\n\n    Select-AzureSubscription -SubscriptionId 4cac86b0-1e56-bbbb-aaaa-000000000000\n\n成功运行 **Select-AzureSubscription** 后，将返回到 PowerShell 提示符处。如果你有多个订阅，可以运行 **Get-AzureSubscription** 并验证要使用的订阅显示 **IsCurrent: True**。\n\n\n## 设置适合特定环境的变量\n\n有几个变量需要你将示例值替换为你的数据库和服务器的特定值。\n\n将占位符值替换为你的环境的值：\n\n    # The name of the server on which the source database resides.\n    $ServerName = \"sourceServerName\"\n\n    # The name of the source database (the database to copy). \n    $DatabaseName = \"sourceDatabaseName\" \n    \n    # The name of the server that hosts the target database. This server must be in the same Azure subscription as the source database server. \n    $PartnerServerName = \"partnerServerName\"\n\n    # The name of the target database (the name of the copy).\n    $PartnerDatabaseName = \"partnerDatabaseName\" \n\n\n\n\n\n## 将 SQL 数据库复制到同一台服务器\n\n此命令会将复制数据库请求提交到服务。根据数据库的大小，复制操作可能需要一些时间才能完成。\n\n    # Copy a database to the same server\n    Start-AzureSqlDatabaseCopy -ServerName $ServerName -DatabaseName $DatabaseName -PartnerDatabase $PartnerDatabaseName\n\n## 将 SQL 数据库复制到不同的服务器\n\n此命令会将复制数据库请求提交到服务。根据数据库的大小，复制操作可能需要一些时间才能完成。\n\n    # Copy a database to a different server\n    Start-AzureSqlDatabaseCopy -ServerName $ServerName -DatabaseName $DatabaseName -PartnerServer $PartnerServerName -PartnerDatabase $PartnerDatabaseName\n    \n\n## 监视复制操作的进度\n\n运行 **Start-AzureSqlDatabaseCopy** 之后，你可以检查复制请求的状态。在请求后立即运行此命令通常将返回 **State : Pending** 或 **State : Running**，因此你可以运行此命令多次，直到看到输出中显示 **State : COMPLETED**。\n\n\n    Get-AzureSqlDatabaseOperation -ServerName $ServerName -DatabaseName $DatabaseName\n\n\n## 复制 SQL 数据库 PowerShell 脚本\n\n    # The name of the server where the source database resides\n    $ServerName = \"sourceServerName\"\n\n    # The name of the source database (the database to copy) \n    $DatabaseName = \"sourceDatabaseName\" \n    \n    # The name of the server to host the database copy. This server must be in the same Azure subscription as the source database server\n    $PartnerServerName = \"partnerServerName\"\n\n    # The name of the target database (the name of the copy)\n    $PartnerDatabaseName = \"partnerDatabaseName\" \n\n\n    Add-AzureAccount\n    Select-AzureSubscription -SubscriptionName \"myAzureSubscriptionName\"\n      \n    # Copy a database to a different server (remove the -PartnerServer parameter to copy to the same server)\n    Start-AzureSqlDatabaseCopy -ServerName $ServerName -DatabaseName $DatabaseName -PartnerServer $PartnerServerName -PartnerDatabase $PartnerDatabaseName\n    \n    # Monitor the status of the copy\n    Get-AzureSqlDatabaseOperation -ServerName $ServerName -DatabaseName $DatabaseName\n    \n\n## 后续步骤\n\n- [使用 SQL Server Management Studio (SSMS) 进行连接](/documentation/articles/sql-database-connect-to-database)\n- [将数据库导出到 BACPAC](/documentation/articles/sql-database-export-powershell)\n\n\n## 其他资源\n\n- [业务连续性概述](/documentation/articles/sql-database-business-continuity)\n- [灾难恢复练习](/documentation/articles/sql-database-disaster-recovery-drills)\n- [SQL 数据库文档](/documentation/services/sql-databases)\n\n<!---HONumber=Mooncake_0104_2016-->\n"
+}

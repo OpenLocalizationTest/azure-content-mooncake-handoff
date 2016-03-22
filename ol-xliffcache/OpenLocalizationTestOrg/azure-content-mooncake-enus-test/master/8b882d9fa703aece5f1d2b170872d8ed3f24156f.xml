@@ -1,0 +1,474 @@
+{
+  "nodes": [
+    {
+      "content": "在 Windows 上使用 SSH 连接到 Linux 虚拟机 | Azure",
+      "pos": [
+        28,
+        67
+      ]
+    },
+    {
+      "content": "了解如何在 Windows 计算机上生成和使用 SSH 密钥连接到 Azure 上的 Linux 虚拟机。",
+      "pos": [
+        87,
+        140
+      ]
+    },
+    {
+      "content": "如何在 Azure 上结合使用 SSH 和 Windows",
+      "pos": [
+        423,
+        452
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        456,
+        472
+      ]
+    },
+    {
+      "content": "Windows",
+      "pos": [
+        476,
+        483
+      ]
+    },
+    {
+      "content": "Linux/Mac",
+      "pos": [
+        550,
+        559
+      ]
+    },
+    {
+      "pos": [
+        622,
+        942
+      ],
+      "content": "本主题介绍了如何在 Windows 上创建和使用 <bpt id=\"p1\">**</bpt>ssh-rsa<ept id=\"p1\">**</ept> 与 <bpt id=\"p2\">**</bpt>.pem<ept id=\"p2\">**</ept> 格式的公钥和私钥文件，并且你可以使用这些文件通过 <bpt id=\"p3\">**</bpt>ssh<ept id=\"p3\">**</ept> 命令连接到 Azure 上的 Linux VM。如果你已经创建了 <bpt id=\"p4\">**</bpt>.pem<ept id=\"p4\">**</ept> 文件，则可以使用那些文件创建 Linux VM，并且可以使用 <bpt id=\"p5\">**</bpt>ssh<ept id=\"p5\">**</ept> 连接到这些 VM。其他几个命令使用 <bpt id=\"p6\">**</bpt>SSH<ept id=\"p6\">**</ept> 协议和密钥文件来安全地执行工作。其中值得注意的是 <bpt id=\"p7\">**</bpt>scp<ept id=\"p7\">**</ept> 或 <bpt id=\"p8\">[</bpt>安全复制<ept id=\"p8\">](https://en.wikipedia.org/wiki/Secure_copy)</ept>，通过这两个命令可以安全地将文件复制到支持 <bpt id=\"p9\">**</bpt>SSH<ept id=\"p9\">**</ept> 连接的计算机或从该计算机中复制文件。"
+    },
+    {
+      "pos": [
+        947,
+        1027
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"What-SSH-and-key-creation-programs-do-you-need\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 你需要哪些 SSH 和密钥创建计划？"
+    },
+    {
+      "pos": [
+        1029,
+        1313
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>SSH<ept id=\"p1\">**</ept> &amp;#8212; 或 <bpt id=\"p2\">[</bpt>secure shell<ept id=\"p2\">](https://en.wikipedia.org/wiki/Secure_Shell)</ept> &amp;#8212; 是一种加密的连接协议，利用该协议可以通过未受保护的连接进行安全登录。它是适用于 Azure 中托管的 Linux VM 的默认连接协议，除非你配置自己的 Linux VM 来启用其他一些连接机制。Windows 用户还可以使用 <bpt id=\"p3\">**</bpt>ssh<ept id=\"p3\">**</ept> 客户端实现连接到 Azure 中的 Linux VM 并对其进行管理，但 Windows 计算机通常不会附带 <bpt id=\"p4\">**</bpt>ssh<ept id=\"p4\">**</ept> 客户端，因此你需要选择一个。"
+    },
+    {
+      "content": "可以安装的常见客户端包括：",
+      "pos": [
+        1315,
+        1328
+      ]
+    },
+    {
+      "content": "puTTY 和 puTTYgen",
+      "pos": [
+        1333,
+        1349
+      ]
+    },
+    {
+      "content": "MobaXterm",
+      "pos": [
+        1406,
+        1415
+      ]
+    },
+    {
+      "content": "Cygwin",
+      "pos": [
+        1451,
+        1457
+      ]
+    },
+    {
+      "pos": [
+        1482,
+        1546
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Git For Windows<ept id=\"p1\">](https://git-for-windows.github.io/)</ept>，其中附带了环境和工具"
+    },
+    {
+      "pos": [
+        1548,
+        1725
+      ],
+      "content": "如果你特别技术狂，则还可以尝试使用 <bpt id=\"p1\">[</bpt>用于 Windows 的 <bpt id=\"p2\">**</bpt>OpenSSH<ept id=\"p2\">**</ept> 工具集新端口<ept id=\"p1\">](http://blogs.msdn.com/b/powershell/archive/2015/10/19/openssh-for-windows-update.aspx)</ept>。但是，请注意这是当前处于开发阶段的代码，用于生产系统之前，你应该查看代码库。"
+    },
+    {
+      "pos": [
+        1729,
+        1812
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-both-include.md)</ept>]"
+    },
+    {
+      "content": "你需要创建哪些密钥文件？",
+      "pos": [
+        1817,
+        1829
+      ]
+    },
+    {
+      "pos": [
+        1831,
+        1900
+      ],
+      "content": "Azure 的基本 SSH 设置包括从 <bpt id=\"p1\">**</bpt>id\\_rsa<ept id=\"p1\">**</ept> 私钥文件生成的 <ph id=\"ph1\">`.pem`</ph> 文件，以供与经典门户的经典部署模型一起使用。"
+    },
+    {
+      "pos": [
+        1902,
+        2037
+      ],
+      "content": "使用<bpt id=\"p1\">[</bpt>管理门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>创建 VM 时必需使用 .pem 文件。使用 <bpt id=\"p2\">[</bpt>Azure CLI<ept id=\"p2\">](/documentation/articles/xplat-cli-install)</ept> 的经典部署中也支持.pem 文件。"
+    },
+    {
+      "pos": [
+        2041,
+        2169
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 如果你计划管理使用经典部署模型部署的服务，则可能还要创建 <bpt id=\"p1\">**</bpt>.cer<ept id=\"p1\">**</ept> 格式的文件来上载到门户，尽管这不涉及 <bpt id=\"p2\">**</bpt>ssh<ept id=\"p2\">**</ept> 或连接到 Linux VM，但这是本文的主题。若要在 Linux 或 Mac 上创建那些文件，请键入"
+    },
+    {
+      "content": "获得适用于Windows的ssh-keygen和openssl工具",
+      "pos": [
+        2174,
+        2207
+      ]
+    },
+    {
+      "pos": [
+        2212,
+        2333
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>本部分<ept id=\"p1\">](#What-SSH-and-key-creation-programs-do-you-need)</ept>的上述内容列出了多个包括适用于 Windows 的 <ph id=\"ph1\">`ssh-keygen`</ph> 和 <ph id=\"ph2\">`openssl`</ph> 的实用工具。下面列出了几个示例："
+    },
+    {
+      "content": "使用 Msysgit",
+      "pos": [
+        2339,
+        2349
+      ]
+    },
+    {
+      "pos": [
+        2359,
+        2434
+      ],
+      "content": "从以下位置下载并安装 msysgit：<bpt id=\"p1\">[</bpt>http://msysgit.github.com/<ept id=\"p1\">](http://msysgit.github.com/)</ept>"
+    },
+    {
+      "pos": [
+        2439,
+        2479
+      ],
+      "content": "从安装目录运行 <ph id=\"ph1\">`msys`</ph>（示例：c:\\\\msysgit\\\\msys.exe）"
+    },
+    {
+      "pos": [
+        2484,
+        2510
+      ],
+      "content": "通过键入 <ph id=\"ph1\">`cd bin`</ph> 更改为 <ph id=\"ph2\">`bin`</ph> 目录"
+    },
+    {
+      "content": "使用针对 Windows 的 GitHub",
+      "pos": [
+        2517,
+        2538
+      ]
+    },
+    {
+      "pos": [
+        2548,
+        2634
+      ],
+      "content": "从以下位置下载并安装 GitHub for Windows：<bpt id=\"p1\">[</bpt>http://windows.github.com/<ept id=\"p1\">](http://windows.github.com/)</ept>"
+    },
+    {
+      "content": "从“开始”菜单 &gt;“所有程序”&gt;“GitHub, Inc”运行 Git Shell",
+      "pos": [
+        2639,
+        2680
+      ]
+    },
+    {
+      "pos": [
+        2684,
+        2727
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 在运行上述 <ph id=\"ph2\">`openssl`</ph> 命令时，可能会遇到以下错误："
+    },
+    {
+      "pos": [
+        2797,
+        2866
+      ],
+      "content": "解决此问题的最简单方法是设置 <ph id=\"ph1\">`OPENSSL_CONF`</ph> 环境变量。此变量的设置过程将因已在 Github 中配置的 shell 而异："
+    },
+    {
+      "content": "Powershell：",
+      "pos": [
+        2870,
+        2881
+      ]
+    },
+    {
+      "content": "CMD：",
+      "pos": [
+        2948,
+        2952
+      ]
+    },
+    {
+      "content": "Git Bash：",
+      "pos": [
+        3013,
+        3022
+      ]
+    },
+    {
+      "content": "使用 Cygwin",
+      "pos": [
+        3091,
+        3100
+      ]
+    },
+    {
+      "pos": [
+        3109,
+        3167
+      ],
+      "content": "从以下位置下载并安装 Cygwin：<bpt id=\"p1\">[</bpt>http://cygwin.com/<ept id=\"p1\">](http://cygwin.com/)</ept>"
+    },
+    {
+      "content": "确保安装了 OpenSSL 包及其所有依赖项。",
+      "pos": [
+        3172,
+        3195
+      ]
+    },
+    {
+      "pos": [
+        3200,
+        3211
+      ],
+      "content": "运行 <ph id=\"ph1\">`cygwin`</ph>"
+    },
+    {
+      "content": "创建私钥",
+      "pos": [
+        3216,
+        3220
+      ]
+    },
+    {
+      "pos": [
+        3228,
+        3261
+      ],
+      "content": "按照上述某组说明进行操作，以便能够运行 <ph id=\"ph1\">`openssl.exe`</ph>"
+    },
+    {
+      "content": "键入以下命令：",
+      "pos": [
+        3266,
+        3273
+      ]
+    },
+    {
+      "content": "您的屏幕应与下图中所示类似：",
+      "pos": [
+        3387,
+        3401
+      ]
+    },
+    {
+      "content": "linuxwelcomegit",
+      "pos": [
+        3409,
+        3424
+      ]
+    },
+    {
+      "content": "回答询问的问题。",
+      "pos": [
+        3495,
+        3503
+      ]
+    },
+    {
+      "pos": [
+        3508,
+        3551
+      ],
+      "content": "应已创建两个文件：<ph id=\"ph1\">`myPrivateKey.key`</ph> 和 <ph id=\"ph2\">`myCert.pem`</ph>。"
+    },
+    {
+      "pos": [
+        3556,
+        3634
+      ],
+      "content": "如果你要直接使用 API，而不使用管理门户，请使用以下命令将 <ph id=\"ph1\">`myCert.pem`</ph> 转换为 <ph id=\"ph2\">`myCert.cer`</ph>（DER 编码的 X509 证书）："
+    },
+    {
+      "content": "为 Putty 创建 PPK",
+      "pos": [
+        3712,
+        3726
+      ]
+    },
+    {
+      "pos": [
+        3734,
+        3884
+      ],
+      "content": "从以下位置下载并安装 Puttygen：<bpt id=\"p1\">[</bpt>http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html<ept id=\"p1\">](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html)</ept>"
+    },
+    {
+      "pos": [
+        3889,
+        3968
+      ],
+      "content": "Puttygen 可能不能读取先前创建的私钥 (<ph id=\"ph1\">`myPrivateKey.key`</ph>)。运行以下命令以将其转换为 Puttygen 可以识别的 RSA 私钥："
+    },
+    {
+      "content": "上面的命令应生成名为 myPrivateKey\\_rsa 的新私钥。",
+      "pos": [
+        4081,
+        4115
+      ]
+    },
+    {
+      "pos": [
+        4120,
+        4137
+      ],
+      "content": "运行 <ph id=\"ph1\">`puttygen.exe`</ph>"
+    },
+    {
+      "content": "单击菜单：“文件”&gt;“加载私钥”",
+      "pos": [
+        4142,
+        4158
+      ]
+    },
+    {
+      "pos": [
+        4163,
+        4225
+      ],
+      "content": "查找上述名为 <ph id=\"ph1\">`myPrivateKey_rsa`</ph> 的私钥。你将需要更改文件筛选器以显示<bpt id=\"p1\">**</bpt>“所有文件 (\\*.\\*)”<ept id=\"p1\">**</ept>"
+    },
+    {
+      "pos": [
+        4230,
+        4254
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“打开”<ept id=\"p1\">**</ept>。您将收到与如下所示的提示："
+    },
+    {
+      "content": "linuxgoodforeignkey",
+      "pos": [
+        4262,
+        4281
+      ]
+    },
+    {
+      "pos": [
+        4355,
+        4365
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“确定”<ept id=\"p1\">**</ept>"
+    },
+    {
+      "pos": [
+        4370,
+        4397
+      ],
+      "content": "单击在下面的屏幕截图中突出显示的<bpt id=\"p1\">**</bpt>“保存私钥”<ept id=\"p1\">**</ept>："
+    },
+    {
+      "content": "linuxputtyprivatekey",
+      "pos": [
+        4405,
+        4425
+      ]
+    },
+    {
+      "content": "将文件另存为 PPK",
+      "pos": [
+        4503,
+        4513
+      ]
+    },
+    {
+      "content": "使用 Putty 连接到 Linux 计算机",
+      "pos": [
+        4519,
+        4541
+      ]
+    },
+    {
+      "pos": [
+        4550,
+        4697
+      ],
+      "content": "从以下位置下载并安装 putty：<bpt id=\"p1\">[</bpt>http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html<ept id=\"p1\">](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html)</ept>"
+    },
+    {
+      "content": "运行 putty.exe",
+      "pos": [
+        4702,
+        4714
+      ]
+    },
+    {
+      "content": "从管理门户使用 IP 填充主机名：",
+      "pos": [
+        4719,
+        4736
+      ]
+    },
+    {
+      "content": "linuxputtyconfig",
+      "pos": [
+        4744,
+        4760
+      ]
+    },
+    {
+      "pos": [
+        4832,
+        4896
+      ],
+      "content": "在选择<bpt id=\"p1\">**</bpt>“打开”<ept id=\"p1\">**</ept>之前，依次单击“连接”&gt;“SSH”&gt;“身份验证”选项卡以选择你的密钥。在下面的屏幕截图中查看要填充的字段："
+    },
+    {
+      "content": "linuxputtyprivatekey",
+      "pos": [
+        4904,
+        4924
+      ]
+    },
+    {
+      "pos": [
+        5000,
+        5019
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“打开”<ept id=\"p1\">**</ept>以连接到你的虚拟机"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"在 Windows 上使用 SSH 连接到 Linux 虚拟机 | Azure\" \n    description=\"了解如何在 Windows 计算机上生成和使用 SSH 密钥连接到 Azure 上的 Linux 虚拟机。\" \n    services=\"virtual-machines\" \n    documentationCenter=\"\" \n    authors=\"squillace\" \n    manager=\"timlt\" \n    editor=\"\"\n    tags=\"azure-service-management,azure-resource-manager\" />\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"01/04/2016\"\n    wacn.date=\"02/26/2016\"/>\n\n#如何在 Azure 上结合使用 SSH 和 Windows\n\n> [AZURE.SELECTOR]\n- [Windows](/documentation/articles/virtual-machines-windows-use-ssh-key)\n- [Linux/Mac](/documentation/articles/virtual-machines-linux-use-ssh-key)\n\n本主题介绍了如何在 Windows 上创建和使用 **ssh-rsa** 与 **.pem** 格式的公钥和私钥文件，并且你可以使用这些文件通过 **ssh** 命令连接到 Azure 上的 Linux VM。如果你已经创建了 **.pem** 文件，则可以使用那些文件创建 Linux VM，并且可以使用 **ssh** 连接到这些 VM。其他几个命令使用 **SSH** 协议和密钥文件来安全地执行工作。其中值得注意的是 **scp** 或 [安全复制](https://en.wikipedia.org/wiki/Secure_copy)，通过这两个命令可以安全地将文件复制到支持 **SSH** 连接的计算机或从该计算机中复制文件。\n\n\n##<a name=\"What-SSH-and-key-creation-programs-do-you-need\"></a> 你需要哪些 SSH 和密钥创建计划？\n\n**SSH** &#8212; 或 [secure shell](https://en.wikipedia.org/wiki/Secure_Shell) &#8212; 是一种加密的连接协议，利用该协议可以通过未受保护的连接进行安全登录。它是适用于 Azure 中托管的 Linux VM 的默认连接协议，除非你配置自己的 Linux VM 来启用其他一些连接机制。Windows 用户还可以使用 **ssh** 客户端实现连接到 Azure 中的 Linux VM 并对其进行管理，但 Windows 计算机通常不会附带 **ssh** 客户端，因此你需要选择一个。\n\n可以安装的常见客户端包括：\n\n- [puTTY 和 puTTYgen](http://www.chiark.greenend.org.uk/~sgtatham/putty/)\n- [MobaXterm](http://mobaxterm.mobatek.net/)\n- [Cygwin](https://cygwin.com/)\n- [Git For Windows](https://git-for-windows.github.io/)，其中附带了环境和工具\n\n如果你特别技术狂，则还可以尝试使用 [用于 Windows 的 **OpenSSH** 工具集新端口](http://blogs.msdn.com/b/powershell/archive/2015/10/19/openssh-for-windows-update.aspx)。但是，请注意这是当前处于开发阶段的代码，用于生产系统之前，你应该查看代码库。\n\n> [AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-both-include.md)]\n\n## 你需要创建哪些密钥文件？\n\nAzure 的基本 SSH 设置包括从 **id\\_rsa** 私钥文件生成的 `.pem` 文件，以供与经典门户的经典部署模型一起使用。\n\n使用[管理门户](https://manage.windowsazure.cn)创建 VM 时必需使用 .pem 文件。使用 [Azure CLI](/documentation/articles/xplat-cli-install) 的经典部署中也支持.pem 文件。\n\n> [AZURE.NOTE] 如果你计划管理使用经典部署模型部署的服务，则可能还要创建 **.cer** 格式的文件来上载到门户，尽管这不涉及 **ssh** 或连接到 Linux VM，但这是本文的主题。若要在 Linux 或 Mac 上创建那些文件，请键入\n\n## 获得适用于Windows的ssh-keygen和openssl工具 ##\n\n[本部分](#What-SSH-and-key-creation-programs-do-you-need)的上述内容列出了多个包括适用于 Windows 的 `ssh-keygen` 和 `openssl` 的实用工具。下面列出了几个示例：\n\n### 使用 Msysgit ###\n\n1.  从以下位置下载并安装 msysgit：[http://msysgit.github.com/](http://msysgit.github.com/)\n2.  从安装目录运行 `msys`（示例：c:\\\\msysgit\\\\msys.exe）\n3.  通过键入 `cd bin` 更改为 `bin` 目录\n\n\n### 使用针对 Windows 的 GitHub ###\n\n1.  从以下位置下载并安装 GitHub for Windows：[http://windows.github.com/](http://windows.github.com/)\n2.  从“开始”菜单 >“所有程序”>“GitHub, Inc”运行 Git Shell\n\n> [AZURE.NOTE] 在运行上述 `openssl` 命令时，可能会遇到以下错误：\n\n        Unable to load config info from /usr/local/ssl/openssl.cnf\n\n解决此问题的最简单方法是设置 `OPENSSL_CONF` 环境变量。此变量的设置过程将因已在 Github 中配置的 shell 而异：\n\n**Powershell：**\n\n        $Env:OPENSSL_CONF=\"$Env:GITHUB_GIT\\ssl\\openssl.cnf\"\n\n**CMD：**\n\n        set OPENSSL_CONF=%GITHUB_GIT%\\ssl\\openssl.cnf\n\n**Git Bash：**\n\n        export OPENSSL_CONF=$GITHUB_GIT/ssl/openssl.cnf\n    \n\n###使用 Cygwin###\n\n1.  从以下位置下载并安装 Cygwin：[http://cygwin.com/](http://cygwin.com/)\n2.  确保安装了 OpenSSL 包及其所有依赖项。\n3.  运行 `cygwin`\n\n## 创建私钥##\n\n1.  按照上述某组说明进行操作，以便能够运行 `openssl.exe`\n2.  键入以下命令：\n\n        # openssl.exe req -x509 -nodes -days 365 -newkey rsa:2048 -keyout myPrivateKey.key -out myCert.pem\n\n3.  您的屏幕应与下图中所示类似：\n\n    ![linuxwelcomegit](./media/virtual-machines-linux-use-ssh-key/linuxwelcomegit.png)\n\n4.  回答询问的问题。\n5.  应已创建两个文件：`myPrivateKey.key` 和 `myCert.pem`。\n6.  如果你要直接使用 API，而不使用管理门户，请使用以下命令将 `myCert.pem` 转换为 `myCert.cer`（DER 编码的 X509 证书）：\n\n        # openssl.exe  x509 -outform der -in myCert.pem -out myCert.cer\n\n## 为 Putty 创建 PPK ##\n\n1. 从以下位置下载并安装 Puttygen：[http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html)\n\n2. Puttygen 可能不能读取先前创建的私钥 (`myPrivateKey.key`)。运行以下命令以将其转换为 Puttygen 可以识别的 RSA 私钥：\n\n        # openssl rsa -in ./myPrivateKey.key -out myPrivateKey_rsa\n        # chmod 600 ./myPrivateKey_rsa\n\n    上面的命令应生成名为 myPrivateKey\\_rsa 的新私钥。\n\n3. 运行 `puttygen.exe`\n\n4. 单击菜单：“文件”>“加载私钥”\n\n5. 查找上述名为 `myPrivateKey_rsa` 的私钥。你将需要更改文件筛选器以显示**“所有文件 (\\*.\\*)”**\n\n6. 单击**“打开”**。您将收到与如下所示的提示：\n\n    ![linuxgoodforeignkey](./media/virtual-machines-linux-use-ssh-key/linuxgoodforeignkey.png)\n\n7. 单击**“确定”**\n\n8. 单击在下面的屏幕截图中突出显示的**“保存私钥”**：\n\n    ![linuxputtyprivatekey](./media/virtual-machines-linux-use-ssh-key/linuxputtygenprivatekey.png)\n\n9. 将文件另存为 PPK\n\n\n## 使用 Putty 连接到 Linux 计算机 ##\n\n1.  从以下位置下载并安装 putty：[http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html)\n2.  运行 putty.exe\n3.  从管理门户使用 IP 填充主机名：\n\n    ![linuxputtyconfig](./media/virtual-machines-linux-use-ssh-key/linuxputtyconfig.png)\n\n4.  在选择**“打开”**之前，依次单击“连接”>“SSH”>“身份验证”选项卡以选择你的密钥。在下面的屏幕截图中查看要填充的字段：\n\n    ![linuxputtyprivatekey](./media/virtual-machines-linux-use-ssh-key/linuxputtyprivatekey.png)\n\n5.  单击**“打开”**以连接到你的虚拟机\n \n\n<!---HONumber=Mooncake_0215_2016-->"
+}

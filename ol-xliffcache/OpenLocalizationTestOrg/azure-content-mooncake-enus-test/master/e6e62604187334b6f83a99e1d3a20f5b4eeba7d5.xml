@@ -1,0 +1,26 @@
+{
+  "nodes": [
+    {
+      "pos": [
+        4,
+        108
+      ],
+      "content": "在 Visual Studio 的解决方案资源管理器中，展开移动服务项目中的 \"Controllers\" 文件夹。打开 TodoItemController.cs。在文件顶部，添加以下 <ph id=\"ph1\">`using`</ph> 语句："
+    },
+    {
+      "pos": [
+        180,
+        209
+      ],
+      "content": "使用以下代码更新 <ph id=\"ph1\">`PostTodoItem`</ph> 方法定义："
+    },
+    {
+      "content": "这段代码可在插入 Todo 项之后发送推送通知（包含所插入项的文本）。在发生错误的情况下，这段代码将添加一个错误日志条目，该条目可在管理门户中的移动服务的“日志”选项卡上查看。",
+      "pos": [
+        968,
+        1056
+      ]
+    }
+  ],
+  "content": "1.  在 Visual Studio 的解决方案资源管理器中，展开移动服务项目中的 \"Controllers\" 文件夹。打开 TodoItemController.cs。在文件顶部，添加以下 `using` 语句：\n\n         using System;\n        using System.Collections.Generic;\n\n2.  使用以下代码更新 `PostTodoItem` 方法定义：\n\n        public async Task<IHttpActionResult> PostTodoItem(TodoItem item)\n        {\n        TodoItem current = await InsertAsync(item);\n\n        Dictionary<string, string> data = new Dictionary<string, string>()\n            {\n        { \"message\", \"Hello from Mobile Services\"}\n            };\n        GooglePushMessage message = new GooglePushMessage(data, TimeSpan.FromHours(1));\n\n        try\n            {\n        var result = await Services.Push.SendAsync(message);\n        Services.Log.Info(result.State.ToString());\n            }\n        catch (System.Exception ex)\n            {\n        Services.Log.Error(ex.Message, null, \"Push.SendAsync Error\");\n            }\n        return CreatedAtRoute(\"Tables\", new { id = current.Id }, current);\n        }\n\n    这段代码可在插入 Todo 项之后发送推送通知（包含所插入项的文本）。在发生错误的情况下，这段代码将添加一个错误日志条目，该条目可在管理门户中的移动服务的“日志”选项卡上查看。 \n\n\n"
+}

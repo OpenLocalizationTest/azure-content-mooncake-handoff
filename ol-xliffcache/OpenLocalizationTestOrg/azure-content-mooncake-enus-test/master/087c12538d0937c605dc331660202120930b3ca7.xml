@@ -1,0 +1,82 @@
+{
+  "nodes": [
+    {
+      "content": "在 Visual Studio 的解决方案资源管理器中，展开 App\\_Start 文件夹，然后打开 WebApiConfig.cs 项目文件。",
+      "pos": [
+        4,
+        76
+      ]
+    },
+    {
+      "pos": [
+        81,
+        127
+      ],
+      "content": "将以下代码行添加到 Register 方法的 <bpt id=\"p1\">**</bpt>ConfigOptions<ept id=\"p1\">**</ept> 定义后面："
+    },
+    {
+      "content": "这会强制用户在注册推送通知之前进行身份验证。",
+      "pos": [
+        256,
+        278
+      ]
+    },
+    {
+      "content": "右键单击该项目，单击“添加”，然后单击“类...”。",
+      "pos": [
+        283,
+        309
+      ]
+    },
+    {
+      "pos": [
+        314,
+        358
+      ],
+      "content": "将新的空类命名为 <ph id=\"ph1\">`PushRegistrationHandler`</ph>，然后单击“添加”。"
+    },
+    {
+      "pos": [
+        363,
+        389
+      ],
+      "content": "在代码页的顶部，添加以下 <bpt id=\"p1\">**</bpt>using<ept id=\"p1\">**</ept> 语句："
+    },
+    {
+      "pos": [
+        695,
+        737
+      ],
+      "content": "将现有的 <bpt id=\"p1\">**</bpt>PushRegistrationHandler<ept id=\"p1\">**</ept> 类替换为以下代码："
+    },
+    {
+      "pos": [
+        2643,
+        2756
+      ],
+      "content": "在注册期间将调用 <bpt id=\"p1\">**</bpt>Register<ept id=\"p1\">**</ept> 方法。这样，你便可以向注册添加一个标记（已登录用户的 ID）。将验证提供的标记以防止用户注册其他用户的 ID。通知发送给该用户后，用户可在此设备和用户所注册的其他任何设备上接收通知。"
+    },
+    {
+      "pos": [
+        2761,
+        2865
+      ],
+      "content": "展开 Controllers 文件夹、打开 TodoItemController.cs 项目文件、找到 <bpt id=\"p1\">**</bpt>PostTodoItem<ept id=\"p1\">**</ept> 方法，然后将调用 <bpt id=\"p2\">**</bpt>SendAsync<ept id=\"p2\">**</ept> 的代码行替换为以下代码："
+    },
+    {
+      "content": "重新发布移动服务项目。",
+      "pos": [
+        3118,
+        3129
+      ]
+    },
+    {
+      "content": "现在，服务将使用该用户 ID 标记向已登录用户创建的所有注册发送推送通知（包括插入项的文本）。",
+      "pos": [
+        3131,
+        3178
+      ]
+    }
+  ],
+  "content": "\n1. 在 Visual Studio 的解决方案资源管理器中，展开 App\\_Start 文件夹，然后打开 WebApiConfig.cs 项目文件。\n\n2. 将以下代码行添加到 Register 方法的 **ConfigOptions** 定义后面：\n\n        options.PushAuthorization = \n            Microsoft.WindowsAzure.Mobile.Service.Security.AuthorizationLevel.User;\n \n    这会强制用户在注册推送通知之前进行身份验证。\n\n3. 右键单击该项目，单击“添加”，然后单击“类...”。\n\n4. 将新的空类命名为 `PushRegistrationHandler`，然后单击“添加”。\n\n5. 在代码页的顶部，添加以下 **using** 语句：\n\n        using System.Threading.Tasks; \n        using System.Web.Http; \n        using System.Web.Http.Controllers; \n        using Microsoft.WindowsAzure.Mobile.Service; \n        using Microsoft.WindowsAzure.Mobile.Service.Notifications; \n        using Microsoft.WindowsAzure.Mobile.Service.Security; \n\n6. 将现有的 **PushRegistrationHandler** 类替换为以下代码：\n \n        public class PushRegistrationHandler : INotificationHandler\n        {\n            public Task Register(ApiServices services, HttpRequestContext context,\n            NotificationRegistration registration)\n        {\n            try\n            {\n                // Perform a check here for user ID tags, which are not allowed.\n                if(!ValidateTags(registration))\n                {\n                    throw new InvalidOperationException(\n                        \"You cannot supply a tag that is a user ID.\");                    \n                }\n\n                // Get the logged-in user.\n                var currentUser = context.Principal as ServiceUser;\n\n                // Add a new tag that is the user ID.\n                registration.Tags.Add(currentUser.Id);\n\n                services.Log.Info(\"Registered tag for userId: \" + currentUser.Id);\n            }\n            catch(Exception ex)\n            {\n                services.Log.Error(ex.ToString());\n            }\n                return Task.FromResult(true);\n        }\n\n        private bool ValidateTags(NotificationRegistration registration)\n        {\n            // Create a regex to search for disallowed tags.\n            System.Text.RegularExpressions.Regex searchTerm =\n            new System.Text.RegularExpressions.Regex(@\"microsoftaccount:\",\n                System.Text.RegularExpressions.RegexOptions.IgnoreCase);\n\n            foreach (string tag in registration.Tags)\n            {\n                if (searchTerm.IsMatch(tag))\n                {\n                    return false;\n                }\n            }\n            return true;\n        }\n    \n        public Task Unregister(ApiServices services, HttpRequestContext context, \n            string deviceId)\n        {\n            // This is where you can hook into registration deletion.\n            return Task.FromResult(true);\n        }\n        }\n\n    在注册期间将调用 **Register** 方法。这样，你便可以向注册添加一个标记（已登录用户的 ID）。将验证提供的标记以防止用户注册其他用户的 ID。通知发送给该用户后，用户可在此设备和用户所注册的其他任何设备上接收通知。\n\n7. 展开 Controllers 文件夹、打开 TodoItemController.cs 项目文件、找到 **PostTodoItem** 方法，然后将调用 **SendAsync** 的代码行替换为以下代码：\n\n        // Get the logged-in user.\n        var currentUser = this.User as ServiceUser;\n        \n        // Use a tag to only send the notification to the logged-in user.\n        var result = await Services.Push.SendAsync(message, currentUser.Id);\n\n8. 重新发布移动服务项目。\n\n现在，服务将使用该用户 ID 标记向已登录用户创建的所有注册发送推送通知（包括插入项的文本）。\n \n\n<!---HONumber=74-->"
+}

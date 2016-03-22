@@ -1,0 +1,327 @@
+{
+  "nodes": [
+    {
+      "content": "SQL 数据仓库中的表分区 | Azure",
+      "pos": [
+        26,
+        47
+      ]
+    },
+    {
+      "content": "有关在开发解决方案时使用 Azure SQL 数据仓库中的表分区的技巧。",
+      "pos": [
+        65,
+        101
+      ]
+    },
+    {
+      "content": "SQL 数据仓库中的表分区",
+      "pos": [
+        325,
+        338
+      ]
+    },
+    {
+      "content": "若要将 SQL Server 分区定义迁移到 SQL 数据仓库，请执行以下操作：",
+      "pos": [
+        340,
+        380
+      ]
+    },
+    {
+      "content": "删除 SQL Server 分区函数和方案，因为当你创建表时系统会帮你管理。",
+      "pos": [
+        384,
+        422
+      ]
+    },
+    {
+      "pos": [
+        425,
+        487
+      ],
+      "content": "在创建表时定义分区。只需指定分区边界点，以及希望边界点是有效的 <ph id=\"ph1\">`RANGE RIGHT`</ph> 还是 <ph id=\"ph2\">`RANGE LEFT`</ph>。"
+    },
+    {
+      "content": "分区大小",
+      "pos": [
+        493,
+        497
+      ]
+    },
+    {
+      "content": "SQL DW 为 DBA 提供数个表类型选项：堆、群集索引 (CI) 和群集列存储索引 (CCI)。DBA 还可以针对每个表类型分区表，还就是将其分区成多个部分，以提升性能。但是，创建具有太多分区的表实际上有可能会导致性能降低，或导致查询在某些情况下失败。对于 CCI 表，尤其要考虑到这一点。若要使数据分区有所帮助，DBA 务必要了解使用数据分区的时机，以及要创建的分区数目。这些指导旨在帮助 DBA 在遇到状况时做出最佳选择。",
+      "pos": [
+        498,
+        713
+      ]
+    },
+    {
+      "content": "表分区通常在两种主要方式下很有用：",
+      "pos": [
+        715,
+        732
+      ]
+    },
+    {
+      "content": "切换分区以快速截断表的某个部分。常用的设计是针对包含只供某段预先决定期限内使用的行的事实表。例如，销售事实表可能仅包含过去 36 个月的数据。在每个月月底，便从表删除最旧月份的销售数据。只要删除最旧月份的所有行即可完成此操作，但逐列删除批量数据可能花费很多时间。为了优化此方案，SQL DW 支持分区交换，使你只需执行一项操作，就能快速删除分区中的整个行集。",
+      "pos": [
+        737,
+        916
+      ]
+    },
+    {
+      "content": "如果查询在分区列上放置谓词，数据分区便可让查询轻松排除处理大量的行集（即分区）。例如，如果使用销售日期字段将销售事实表分区成 36 个月，以销售日期进行筛选的查询便可以跳过处理不符合筛选条件的分区。实际上，以这种方式使用的数据分区是粗糙的索引。",
+      "pos": [
+        924,
+        1046
+      ]
+    },
+    {
+      "content": "在 SQL DW 中创建群集列存储索引时，DBA 需注意事项另一个因素：行数。CCI 表可以实现高度压缩，并帮助 SQL DW 加速查询性能。由于压缩在 SQL DW 内部运行，因此 CCI 表中的每个分区在压缩数据前都必须拥有相当多的行。此外，SQL DW 在批量的分布之间分布数据，而且分区进一步分割每个分布区。为了实现最佳压缩和性能，每个分布区与分区都需要至少 100,000 个行。根据上述示例，如果销售事实表包含 36 个月的分区，并假设 SQL DW 有 60 个分布区，则销售事实表每个月应包含 600 万行，或者在填充所有月份时包含 2.16 亿行。如果表包含的行数远少于建议的最小值，DBA 应该考虑创建具有较少分区的表，以增加每个分布区的行数。",
+      "pos": [
+        1048,
+        1380
+      ]
+    },
+    {
+      "content": "若要在分区级别调整当前数据库的大小，请使用类似于下面的查询：",
+      "pos": [
+        1383,
+        1413
+      ]
+    },
+    {
+      "content": "分布区总数等于我们创建表时使用的存储位置数。也就是说，每个表根据每一个分布区创建一次。",
+      "pos": [
+        3302,
+        3345
+      ]
+    },
+    {
+      "content": "你也可以大致预测有多少个行，因而预测每个分区有多大。源数据仓库中的分区再细分为每个分布区。",
+      "pos": [
+        3347,
+        3392
+      ]
+    },
+    {
+      "content": "确定分区大小时，请参考以下计算公式：",
+      "pos": [
+        3394,
+        3412
+      ]
+    },
+    {
+      "content": "MPP 分区大小 = SMP 分区大小 / 分布区数",
+      "pos": [
+        3414,
+        3440
+      ]
+    },
+    {
+      "content": "你可以使用以下查询，找出 SQL 数据仓库数据库有多少个分布区：",
+      "pos": [
+        3442,
+        3474
+      ]
+    },
+    {
+      "content": "既然知道了源系统中的每个分区有多大，以及预期的 SQLDW 大小为何，就可以确定分区边界。",
+      "pos": [
+        3534,
+        3579
+      ]
+    },
+    {
+      "content": "工作负荷管理",
+      "pos": [
+        3585,
+        3591
+      ]
+    },
+    {
+      "pos": [
+        3592,
+        3782
+      ],
+      "content": "需要纳入表分区决策的最后一项信息是工作负荷管理。在 SQL 数据仓库中，此功能控制在查询运行期间分配给每个分布的最大内存。有关<bpt id=\"p1\">[</bpt><ept id=\"p1\">工作负荷管理]</ept>的详细信息，请参阅下面的文章。理想情况下，调整分区大小时，将考虑 inmemory 操作（如列存储索引重建）。索引重建是内存密集型操作。因此，你需要确保重建分区索引不会耗尽内存。从默认角色切换到其他可用角色之一，即可增加查询可用的内存量。"
+    },
+    {
+      "content": "查询资源调控器动态管理视图即可获取每个分布的内存分配信息。事实上，内存授予小于以下数据。但是，这可以提供指导，以便你在针对数据管理操作调整分区大小时使用。",
+      "pos": [
+        3784,
+        3861
+      ]
+    },
+    {
+      "pos": [
+        4661,
+        4737
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>尽量避免将分区大小调整超过超大型资源类所提供的内存授予。如果分区成长超过此数据，就冒着内存压力的风险，进而导致比较不理想的压缩。"
+    },
+    {
+      "content": "分区切换",
+      "pos": [
+        4742,
+        4746
+      ]
+    },
+    {
+      "content": "若要切换两个表间的分区，必须确定分区对齐其各自的边界，而且表定义匹配。检查约束不适用于强制表中的值范围，源表必须包含与目标表相同的分区边界。如果情况不是如此，则分区切换将失败，因为分区元数据不会同步。",
+      "pos": [
+        4747,
+        4847
+      ]
+    },
+    {
+      "content": "如何拆分包含数据的分区",
+      "pos": [
+        4853,
+        4864
+      ]
+    },
+    {
+      "pos": [
+        4865,
+        4919
+      ],
+      "content": "使用 <ph id=\"ph1\">`CTAS`</ph> 语句是拆分包含数据的分区的最有效方法。如果分区表是群集列存储，则表分区必须为空才能拆分。"
+    },
+    {
+      "content": "以下示例显示了每个分区包含一个行的分区列存储表：",
+      "pos": [
+        4921,
+        4945
+      ]
+    },
+    {
+      "pos": [
+        6083,
+        6174
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>通过创建统计信息对象，我们可以确保表元数据更加准确。如果我们省略了创建统计信息，SQL 数据仓库将使用默认值。有关统计信息的详细信息，请参阅<bpt id=\"p1\">[</bpt>统计信息<ept id=\"p1\">][]</ept>。"
+    },
+    {
+      "pos": [
+        6176,
+        6213
+      ],
+      "content": "然后，我们可以利用 <ph id=\"ph1\">`sys.partitions`</ph> 目录视图查询行计数："
+    },
+    {
+      "content": "如果尝试拆分此表，将会收到错误：",
+      "pos": [
+        6782,
+        6798
+      ]
+    },
+    {
+      "content": "消息 35346，级别 15，状态 1，行 44: ALTER PARTITION 语句的 SPLIT 子句失败，因为分区不为空。仅当表上存在列存储索引时，才可以拆分空分区。请考虑在发出 ALTER PARTITION 语句前禁用列存储索引，然后在 ALTER PARTITION 完成后重建列存储索引。",
+      "pos": [
+        6862,
+        7014
+      ]
+    },
+    {
+      "pos": [
+        7016,
+        7043
+      ],
+      "content": "但是，我们可以使用 <ph id=\"ph1\">`CTAS`</ph> 创建新表以保存数据。"
+    },
+    {
+      "content": "分区边界已对齐，因此允许切换。这使源表有空白分区可供我们完成后续拆分。",
+      "pos": [
+        7432,
+        7467
+      ]
+    },
+    {
+      "pos": [
+        7644,
+        7681
+      ],
+      "content": "接下来只需使用 <ph id=\"ph1\">`CTAS`</ph> 将数据对齐新的分区边界，并将数据切换回到主表"
+    },
+    {
+      "content": "完成数据移动后，最好是刷新目标表上的统计信息，确保统计信息可在其各自的分区中准确反映数据的新分布：",
+      "pos": [
+        8403,
+        8452
+      ]
+    },
+    {
+      "content": "表分区源代码管理",
+      "pos": [
+        8512,
+        8520
+      ]
+    },
+    {
+      "pos": [
+        8521,
+        8553
+      ],
+      "content": "若要避免表定义在源代码管理系统中<bpt id=\"p1\">**</bpt>失效<ept id=\"p1\">**</ept>，可以考虑以下方法："
+    },
+    {
+      "content": "将表创建为分区表，但不包含分区值",
+      "pos": [
+        8558,
+        8574
+      ]
+    },
+    {
+      "pos": [
+        9356,
+        9373
+      ],
+      "content": "在部署过程中 <ph id=\"ph1\">`SPLIT`</ph> 表："
+    },
+    {
+      "content": "使用这种方法时，源代码管理中的代码将保持静态，允许动态的分区边界值，并不断地与仓库一起演进。",
+      "pos": [
+        10951,
+        10997
+      ]
+    },
+    {
+      "pos": [
+        11000,
+        11060
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>相比于 SQL Server，分区切换有一些差异。请务必阅读<bpt id=\"p1\">[</bpt>迁移代码<ept id=\"p1\">][]</ept>，以深入了解此主题。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        11066,
+        11070
+      ]
+    },
+    {
+      "content": "成功将数据库架构迁移到 SQL 数据仓库后，可以继续阅读下列文章之一：",
+      "pos": [
+        11071,
+        11106
+      ]
+    },
+    {
+      "content": "迁移数据",
+      "pos": [
+        11111,
+        11115
+      ]
+    },
+    {
+      "content": "迁移代码",
+      "pos": [
+        11122,
+        11126
+      ]
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"SQL 数据仓库中的表分区 | Azure\"\n   description=\"有关在开发解决方案时使用 Azure SQL 数据仓库中的表分区的技巧。\"\n   services=\"sql-data-warehouse\"\n   documentationCenter=\"NA\"\n   authors=\"jrowlandjones\"\n   manager=\"barbkess\"\n   editor=\"\"/>\n\n<tags\n   ms.service=\"sql-data-warehouse\"\n   ms.date=\"09/28/2015\"\n   wacn.date=\"01/20/2016\"/>\n\n# SQL 数据仓库中的表分区\n\n若要将 SQL Server 分区定义迁移到 SQL 数据仓库，请执行以下操作：\n\n- 删除 SQL Server 分区函数和方案，因为当你创建表时系统会帮你管理。\n- 在创建表时定义分区。只需指定分区边界点，以及希望边界点是有效的 `RANGE RIGHT` 还是 `RANGE LEFT`。\n\n### 分区大小\nSQL DW 为 DBA 提供数个表类型选项：堆、群集索引 (CI) 和群集列存储索引 (CCI)。DBA 还可以针对每个表类型分区表，还就是将其分区成多个部分，以提升性能。但是，创建具有太多分区的表实际上有可能会导致性能降低，或导致查询在某些情况下失败。对于 CCI 表，尤其要考虑到这一点。若要使数据分区有所帮助，DBA 务必要了解使用数据分区的时机，以及要创建的分区数目。这些指导旨在帮助 DBA 在遇到状况时做出最佳选择。\n\n表分区通常在两种主要方式下很有用：\n\n1. 切换分区以快速截断表的某个部分。常用的设计是针对包含只供某段预先决定期限内使用的行的事实表。例如，销售事实表可能仅包含过去 36 个月的数据。在每个月月底，便从表删除最旧月份的销售数据。只要删除最旧月份的所有行即可完成此操作，但逐列删除批量数据可能花费很多时间。为了优化此方案，SQL DW 支持分区交换，使你只需执行一项操作，就能快速删除分区中的整个行集。   \n\n2. 如果查询在分区列上放置谓词，数据分区便可让查询轻松排除处理大量的行集（即分区）。例如，如果使用销售日期字段将销售事实表分区成 36 个月，以销售日期进行筛选的查询便可以跳过处理不符合筛选条件的分区。实际上，以这种方式使用的数据分区是粗糙的索引。\n\n在 SQL DW 中创建群集列存储索引时，DBA 需注意事项另一个因素：行数。CCI 表可以实现高度压缩，并帮助 SQL DW 加速查询性能。由于压缩在 SQL DW 内部运行，因此 CCI 表中的每个分区在压缩数据前都必须拥有相当多的行。此外，SQL DW 在批量的分布之间分布数据，而且分区进一步分割每个分布区。为了实现最佳压缩和性能，每个分布区与分区都需要至少 100,000 个行。根据上述示例，如果销售事实表包含 36 个月的分区，并假设 SQL DW 有 60 个分布区，则销售事实表每个月应包含 600 万行，或者在填充所有月份时包含 2.16 亿行。如果表包含的行数远少于建议的最小值，DBA 应该考虑创建具有较少分区的表，以增加每个分布区的行数。\n\n\n若要在分区级别调整当前数据库的大小，请使用类似于下面的查询：\n\n```\nSELECT      s.[name]                        AS      [schema_name]\n,           t.[name]                        AS      [table_name]\n,           i.[name]                        AS      [index_name]\n,           p.[partition_number]            AS      [partition_number]\n,           SUM(a.[used_pages]*8.0)         AS      [partition_size_kb]\n,           SUM(a.[used_pages]*8.0)/1024    AS      [partition_size_mb]\n,           SUM(a.[used_pages]*8.0)/1048576 AS      [partition_size_gb]\n,           p.[rows]                        AS      [partition_row_count]\n,           rv.[value]                      AS      [partition_boundary_value]\n,           p.[data_compression_desc]       AS      [partition_compression_desc]\nFROM        sys.schemas s\nJOIN        sys.tables t                    ON      t.[schema_id]         = s.[schema_id]\nJOIN        sys.partitions p                ON      p.[object_id]         = t.[object_id]\nJOIN        sys.allocation_units a          ON      a.[container_id]        = p.[partition_id]\nJOIN        sys.indexes i                   ON      i.[object_id]         = p.[object_id]\n                                            AND     i.[index_id]          = p.[index_id]\nJOIN        sys.data_spaces ds              ON      ds.[data_space_id]    = i.[data_space_id]\nLEFT JOIN   sys.partition_schemes ps        ON      ps.[data_space_id]    = ds.[data_space_id]\nLEFT JOIN   sys.partition_functions pf      ON      pf.[function_id]      = ps.[function_id]\nLEFT JOIN   sys.partition_range_values rv   ON      rv.[function_id]      = pf.[function_id]\n                                            AND     rv.[boundary_id]      = p.[partition_number]\nWHERE       p.[index_id] <=1\nGROUP BY    s.[name]\n,           t.[name]\n,           i.[name]\n,           p.[partition_number]\n,           p.[rows]\n,           rv.[value]\n,           p.[data_compression_desc]\n;\n```\n\n分布区总数等于我们创建表时使用的存储位置数。也就是说，每个表根据每一个分布区创建一次。\n\n你也可以大致预测有多少个行，因而预测每个分区有多大。源数据仓库中的分区再细分为每个分布区。\n\n确定分区大小时，请参考以下计算公式：\n\nMPP 分区大小 = SMP 分区大小 / 分布区数\n\n你可以使用以下查询，找出 SQL 数据仓库数据库有多少个分布区：\n\n```\nSELECT  COUNT(*)\nFROM    sys.pdw_distributions\n;\n```\n\n既然知道了源系统中的每个分区有多大，以及预期的 SQLDW 大小为何，就可以确定分区边界。\n\n### 工作负荷管理\n需要纳入表分区决策的最后一项信息是工作负荷管理。在 SQL 数据仓库中，此功能控制在查询运行期间分配给每个分布的最大内存。有关[工作负荷管理]的详细信息，请参阅下面的文章。理想情况下，调整分区大小时，将考虑 inmemory 操作（如列存储索引重建）。索引重建是内存密集型操作。因此，你需要确保重建分区索引不会耗尽内存。从默认角色切换到其他可用角色之一，即可增加查询可用的内存量。\n\n查询资源调控器动态管理视图即可获取每个分布的内存分配信息。事实上，内存授予小于以下数据。但是，这可以提供指导，以便你在针对数据管理操作调整分区大小时使用。\n\n```\nSELECT  rp.[name]                               AS [pool_name]\n,       rp.[max_memory_kb]                      AS [max_memory_kb]\n,       rp.[max_memory_kb]/1024                 AS [max_memory_mb]\n,       rp.[max_memory_kb]/1048576              AS [mex_memory_gb]\n,       rp.[max_memory_percent]                 AS [max_memory_percent]\n,       wg.[name]                               AS [group_name]\n,       wg.[importance]                         AS [group_importance]\n,       wg.[request_max_memory_grant_percent]   AS [request_max_memory_grant_percent]\nFROM    sys.dm_pdw_nodes_resource_governor_workload_groups  wg\nJOIN    sys.dm_pdw_nodes_resource_governor_resource_pools   rp ON wg.[pool_id] = rp.[pool_id]\nWHERE   wg.[name] like 'SloDWGroup%'\nAND     rp.[name]    = 'SloDWPool'\n;\n```\n\n> [AZURE.NOTE]尽量避免将分区大小调整超过超大型资源类所提供的内存授予。如果分区成长超过此数据，就冒着内存压力的风险，进而导致比较不理想的压缩。\n\n## 分区切换\n若要切换两个表间的分区，必须确定分区对齐其各自的边界，而且表定义匹配。检查约束不适用于强制表中的值范围，源表必须包含与目标表相同的分区边界。如果情况不是如此，则分区切换将失败，因为分区元数据不会同步。\n\n### 如何拆分包含数据的分区\n使用 `CTAS` 语句是拆分包含数据的分区的最有效方法。如果分区表是群集列存储，则表分区必须为空才能拆分。\n\n以下示例显示了每个分区包含一个行的分区列存储表：\n\n```\n    CREATE TABLE [dbo].[FactInternetSales]\n        (\n                [ProductKey]            int          NOT NULL\n            ,   [OrderDateKey]          int          NOT NULL\n            ,   [CustomerKey]           int          NOT NULL\n            ,   [PromotionKey]          int          NOT NULL\n            ,   [SalesOrderNumber]      nvarchar(20) NOT NULL\n            ,   [OrderQuantity]         smallint     NOT NULL\n            ,   [UnitPrice]             money        NOT NULL\n            ,   [SalesAmount]           money        NOT NULL\n        )\n        WITH\n        (   CLUSTERED COLUMNSTORE INDEX\n        ,   DISTRIBUTION = HASH([ProductKey])\n        ,   PARTITION   (   [OrderDateKey] RANGE RIGHT FOR VALUES\n                            (20000101\n                            )\n                        )\n        )\n        ;       \n        INSERT INTO dbo.FactInternetSales\n        VALUES (1,19990101,1,1,1,1,1,1);\n        INSERT INTO dbo.FactInternetSales\n        VALUES (1,20000101,1,1,1,1,1,1);        \n        CREATE STATISTICS Stat_dbo_FactInternetSales_OrderDateKey ON dbo.FactInternetSales(OrderDateKey);\n```\n\n> [AZURE.NOTE]通过创建统计信息对象，我们可以确保表元数据更加准确。如果我们省略了创建统计信息，SQL 数据仓库将使用默认值。有关统计信息的详细信息，请参阅[统计信息][]。\n\n然后，我们可以利用 `sys.partitions` 目录视图查询行计数：\n\n```\nSELECT  QUOTENAME(s.[name])+'.'+QUOTENAME(t.[name]) as Table_name\n,       i.[name] as Index_name\n,       p.partition_number as Partition_nmbr\n,       p.[rows] as Row_count\n,       p.[data_compression_desc] as Data_Compression_desc\nFROM    sys.partitions p\nJOIN    sys.tables     t    ON    p.[object_id]   = t.[object_id]\nJOIN    sys.schemas    s    ON    t.[schema_id]   = s.[schema_id]\nJOIN    sys.indexes    i    ON    p.[object_id]   = i.[object_Id]\n                            AND   p.[index_Id]    = i.[index_Id]\nWHERE t.[name] = 'FactInternetSales'\n;\n```\n\n如果尝试拆分此表，将会收到错误：\n\n```\nALTER TABLE FactInternetSales SPLIT RANGE (20010101);\n```\n消息 35346，级别 15，状态 1，行 44: ALTER PARTITION 语句的 SPLIT 子句失败，因为分区不为空。仅当表上存在列存储索引时，才可以拆分空分区。请考虑在发出 ALTER PARTITION 语句前禁用列存储索引，然后在 ALTER PARTITION 完成后重建列存储索引。\n\n但是，我们可以使用 `CTAS` 创建新表以保存数据。\n\n```\nCREATE TABLE dbo.FactInternetSales_20000101\n    WITH    (   DISTRIBUTION = HASH(ProductKey)\n            ,   CLUSTERED COLUMNSTORE INDEX\n            ,   PARTITION   (   [OrderDateKey] RANGE RIGHT FOR VALUES\n                                (20000101\n                                )\n                            )\n            )\nAS\nSELECT *\nFROM    FactInternetSales\nWHERE   1=2\n;\n```\n\n分区边界已对齐，因此允许切换。这使源表有空白分区可供我们完成后续拆分。\n\n\n        ALTER TABLE FactInternetSales SWITCH PARTITION 2 TO  FactInternetSales_20000101 PARTITION 2;\n        \n        ALTER TABLE FactInternetSales SPLIT RANGE (20010101);\n\n\n接下来只需使用 `CTAS` 将数据对齐新的分区边界，并将数据切换回到主表\n\n\n\n        CREATE TABLE [dbo].[FactInternetSales_20000101_20010101]\n            WITH    (   DISTRIBUTION = HASH([ProductKey])\n                    ,   CLUSTERED COLUMNSTORE INDEX\n                    ,   PARTITION   (   [OrderDateKey] RANGE RIGHT FOR VALUES\n                                        (20000101,20010101\n                                        )\n                                    )\n                    )\n        AS\n        SELECT  *\n        FROM    [dbo].[FactInternetSales_20000101]\n        WHERE   [OrderDateKey] >= 20000101\n        AND     [OrderDateKey] <  20010101\n        ;\n        \n        ALTER TABLE dbo.FactInternetSales_20000101_20010101 SWITCH PARTITION 2 TO dbo.FactInternetSales PARTITION 2;\n\n\n完成数据移动后，最好是刷新目标表上的统计信息，确保统计信息可在其各自的分区中准确反映数据的新分布：\n\n```\nUPDATE STATISTICS [dbo].[FactInternetSales];\n```\n\n### 表分区源代码管理\n若要避免表定义在源代码管理系统中**失效**，可以考虑以下方法：\n\n1. 将表创建为分区表，但不包含分区值\n\n\n\n        CREATE TABLE [dbo].[FactInternetSales]\n        (\n            [ProductKey]            int          NOT NULL\n        ,   [OrderDateKey]          int          NOT NULL\n        ,   [CustomerKey]           int          NOT NULL\n        ,   [PromotionKey]          int          NOT NULL\n        ,   [SalesOrderNumber]      nvarchar(20) NOT NULL\n        ,   [OrderQuantity]         smallint     NOT NULL\n        ,   [UnitPrice]             money        NOT NULL\n        ,   [SalesAmount]           money        NOT NULL\n        )\n        WITH\n        (   CLUSTERED COLUMNSTORE INDEX\n        ,   DISTRIBUTION = HASH([ProductKey])\n        ,   PARTITION   (   [OrderDateKey] RANGE RIGHT FOR VALUES\n                            ()\n                        )\n        )\n        ;\n\n\n2. 在部署过程中 `SPLIT` 表：\n\n\n\n        Create a table containing the partition boundaries\n        \n        CREATE TABLE #partitions\n        WITH\n        (\n            LOCATION = USER_DB\n        ,   DISTRIBUTION = HASH(ptn_no)\n        )\n        AS\n        SELECT  ptn_no\n        ,       ROW_NUMBER() OVER (ORDER BY (ptn_no)) as seq_no\n        FROM    (\n                SELECT CAST(20000101 AS INT) ptn_no\n                UNION ALL\n                SELECT CAST(20010101 AS INT)\n                UNION ALL\n                SELECT CAST(20020101 AS INT)\n                UNION ALL\n                SELECT CAST(20030101 AS INT)\n                UNION ALL\n                SELECT CAST(20040101 AS INT)\n                ) a\n        ;\n        \n        -- Iterate over the partition boundaries and split the table\n        \n        DECLARE @c INT = (SELECT COUNT(*) FROM #partitions)\n        ,       @i INT = 1                                 --iterator for while loop\n        ,       @q NVARCHAR(4000)                          --query\n        ,       @p NVARCHAR(20)     = N''                  --partition_number\n        ,       @s NVARCHAR(128)    = N'dbo'               --schema\n        ,       @t NVARCHAR(128)    = N'FactInternetSales' --table\n        ;\n        \n        WHILE @i <= @c\n        BEGIN\n            SET @p = (SELECT ptn_no FROM #partitions WHERE seq_no = @i);\n            SET @q = (SELECT N'ALTER TABLE '+@s+N'.'+@t+N' SPLIT RANGE ('+@p+N');');\n        \n            -- PRINT @q;\n            EXECUTE sp_executesql @q;\n        \n            SET @i+=1;\n        END\n        \n        -- Code clean-up\n        \n\n\n使用这种方法时，源代码管理中的代码将保持静态，允许动态的分区边界值，并不断地与仓库一起演进。\n\n>[AZURE.NOTE]相比于 SQL Server，分区切换有一些差异。请务必阅读[迁移代码][]，以深入了解此主题。\n\n\n## 后续步骤\n成功将数据库架构迁移到 SQL 数据仓库后，可以继续阅读下列文章之一：\n\n- [迁移数据][]\n- [迁移代码][]\n\n<!--Image references-->\n\n<!-- Article references -->\n[迁移代码]: /documentation/articles/sql-data-warehouse-migrate-code\n[迁移数据]: /documentation/articles/sql-data-warehouse-migrate-data\n[统计信息]: /documentation/articles/sql-data-warehouse-develop-statistics\n[工作负荷管理]: /documentation/articles/sql-data-warehouse-develop-concurrency\n\n<!-- MSDN Articles -->\n\n<!-- Other web references -->\n\n<!---HONumber=Mooncake_1207_2015-->\n"
+}

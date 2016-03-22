@@ -1,0 +1,572 @@
+{
+  "nodes": [
+    {
+      "content": "创建和上载 FreeBSD VM 映像 | Azure",
+      "pos": [
+        26,
+        53
+      ]
+    },
+    {
+      "content": "了解如何创建和上载包含 FreeBSD 操作系统的虚拟硬盘 (VHD) 以创建 Azure 虚拟机。",
+      "pos": [
+        71,
+        121
+      ]
+    },
+    {
+      "content": "创建 FreeBSD VHD 并将其上载到 Azure",
+      "pos": [
+        371,
+        398
+      ]
+    },
+    {
+      "content": "本文介绍如何创建和上载包含 FreeBSD 操作系统的虚拟硬盘 (VHD)，以便可以使用它作为自己的映像在 Azure 中创建虚拟机 (VM)。",
+      "pos": [
+        400,
+        472
+      ]
+    },
+    {
+      "pos": [
+        474,
+        552
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-include.md)</ept>]"
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        557,
+        561
+      ]
+    },
+    {
+      "content": "本文假定你拥有以下项目：",
+      "pos": [
+        564,
+        576
+      ]
+    },
+    {
+      "pos": [
+        580,
+        653
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Azure 订阅<ept id=\"p1\">**</ept> - 如果你没有帐户，只需花费几分钟就能创建一个帐户。请参阅<bpt id=\"p2\">[</bpt>创建试用帐户<ept id=\"p2\">](/pricing/1rmb-trial/)</ept>。"
+    },
+    {
+      "pos": [
+        657,
+        816
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Azure PowerShell 工具<ept id=\"p1\">**</ept> - 已安装 Azure PowerShell 模块并将其配置为使用你的订阅。若要下载该模块，请参阅 <bpt id=\"p2\">[</bpt>Azure 下载<ept id=\"p2\">](/downloads/)</ept>。可在此处获取安装和配置该模块的教程。你将使用 <bpt id=\"p3\">[</bpt>Azure 下载<ept id=\"p3\">](/downloads/)</ept> cmdlet 上载 VHD。"
+    },
+    {
+      "pos": [
+        820,
+        1031
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>安装在 .vhd 文件中的 FreeBSD 操作系统<ept id=\"p1\">**</ept> - 你已将受支持的 FreeBSD 操作系统安装到虚拟硬盘。存在多种工具可创建 .vhd 文件，例如，可以使用虚拟化解决方案（例如 Hyper-V）创建 .vhd 文件并安装操作系统。有关说明，请参阅<bpt id=\"p2\">[</bpt>安装 Hyper-V 角色和配置虚拟机<ept id=\"p2\">](http://technet.microsoft.com/zh-cn/library/hh846766.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        1035,
+        1180
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> Azure 不支持更新的 VHDX 格式。可使用 Hyper-V 管理器或 <bpt id=\"p1\">[</bpt>convert-vhd<ept id=\"p1\">](https://technet.microsoft.com/zh-cn/library/hh848454.aspx)</ept> cmdlet 将磁盘转换为 VHD 格式。"
+    },
+    {
+      "content": "此任务包括以下五个步骤。",
+      "pos": [
+        1182,
+        1194
+      ]
+    },
+    {
+      "content": "步骤 1：准备要上载的映像",
+      "pos": [
+        1199,
+        1212
+      ]
+    },
+    {
+      "pos": [
+        1217,
+        1335
+      ],
+      "content": "关于 Hyper-v 上的 FreeBSD 安装，可在<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](http://blogs.msdn.com/b/kylie/archive/2014/12/25/running-freebsd-on-hyper-v.aspx)</ept>获取教程。"
+    },
+    {
+      "content": "在 FreeBSD 操作系统已安装到的虚拟机中，完成以下过程：",
+      "pos": [
+        1337,
+        1368
+      ]
+    },
+    {
+      "content": "启用 DHCP",
+      "pos": [
+        1375,
+        1382
+      ]
+    },
+    {
+      "content": "启用 SSH",
+      "pos": [
+        1481,
+        1487
+      ]
+    },
+    {
+      "content": "从光盘安装后，将默认启用 SSH。如果没有默认启用 SSH，或者你直接使用了 FreeBSD VHD，请键入：",
+      "pos": [
+        1495,
+        1550
+      ]
+    },
+    {
+      "content": "设置串行控制台",
+      "pos": [
+        1754,
+        1761
+      ]
+    },
+    {
+      "content": "安装 sudo",
+      "pos": [
+        1905,
+        1912
+      ]
+    },
+    {
+      "content": "在 Azure 中 root 帐户处于禁用状态，然后你需要利用无特权用户的 sudo 使用提升的权限运行命令。",
+      "pos": [
+        1920,
+        1975
+      ]
+    },
+    {
+      "content": "Azure 代理的先决条件",
+      "pos": [
+        2008,
+        2021
+      ]
+    },
+    {
+      "pos": [
+        2027,
+        2045
+      ],
+      "content": "5\\.1 <bpt id=\"p1\">**</bpt>安装 Python<ept id=\"p1\">**</ept>"
+    },
+    {
+      "pos": [
+        2140,
+        2156
+      ],
+      "content": "5\\.2 <bpt id=\"p1\">**</bpt>安装 wget<ept id=\"p1\">**</ept>"
+    },
+    {
+      "content": "安装 Azure 代理",
+      "pos": [
+        2191,
+        2202
+      ]
+    },
+    {
+      "pos": [
+        2210,
+        2359
+      ],
+      "content": "可以始终在 <bpt id=\"p1\">[</bpt>github<ept id=\"p1\">](https://github.com/Azure/WALinuxAgent/releases)</ept> 上找到 Azure 代理的最新版本。版本 2.0.10 及更高版本正式支持 FreeBSD 10 及更高版本。FreeBSD 的最新 Azure 代理版本是 2.0.16。"
+    },
+    {
+      "pos": [
+        2591,
+        2619
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>重要说明<ept id=\"p1\">**</ept>：安装完成后，请仔细检查它是否正在运行。"
+    },
+    {
+      "pos": [
+        2723,
+        2767
+      ],
+      "content": "现在，你可以<bpt id=\"p1\">**</bpt>关闭<ept id=\"p1\">**</ept>你的 VM 了。你还可以在关闭前执行步骤 7，但这一步是可选的。"
+    },
+    {
+      "content": "取消设置是可选的。它用于清除系统并使其适用于重新设置。",
+      "pos": [
+        2772,
+        2799
+      ]
+    },
+    {
+      "content": "以下命令还会删除上次设置的用户帐户和关联数据。",
+      "pos": [
+        2805,
+        2828
+      ]
+    },
+    {
+      "content": "步骤 2：在 Azure 中创建存储帐户",
+      "pos": [
+        2870,
+        2890
+      ]
+    },
+    {
+      "content": "你需要在 Azure 中具有存储帐户才能上载 .vhd 文件，以便可以在 Azure 中使用它创建虚拟机。可使用 Azure 管理门户创建存储帐户。",
+      "pos": [
+        2895,
+        2969
+      ]
+    },
+    {
+      "pos": [
+        2974,
+        3023
+      ],
+      "content": "登录到 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>。"
+    },
+    {
+      "content": "在命令栏上，单击“新建”。",
+      "pos": [
+        3028,
+        3041
+      ]
+    },
+    {
+      "pos": [
+        3046,
+        3081
+      ],
+      "content": "依次单击<bpt id=\"p1\">**</bpt>“数据服务”<ept id=\"p1\">**</ept>&gt;<bpt id=\"p2\">**</bpt>“存储”<ept id=\"p2\">**</ept>&gt;<bpt id=\"p3\">**</bpt>“快速创建”<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "content": "快速创建存储帐户",
+      "pos": [
+        3089,
+        3097
+      ]
+    },
+    {
+      "content": "如下所示填写字段：",
+      "pos": [
+        3180,
+        3189
+      ]
+    },
+    {
+      "pos": [
+        3197,
+        3296
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>URL<ept id=\"p1\">**</ept> 下，键入要在存储帐户的 URL 中使用的子域名称。该条目可能包含 3 到 24 个小写字母和数字。此名称将成为用于对订阅的 Blob、队列或表资源进行寻址的 URL 中的主机名。"
+    },
+    {
+      "pos": [
+        3304,
+        3347
+      ],
+      "content": "为存储帐户选择<bpt id=\"p1\">**</bpt>位置或地缘组<ept id=\"p1\">**</ept>。地缘组让你能够将你的云服务和存储放在同一数据中心。"
+    },
+    {
+      "pos": [
+        3355,
+        3677
+      ],
+      "content": "决定是否对存储帐户使用<bpt id=\"p1\">**</bpt>地域复制<ept id=\"p1\">**</ept>。默认情况下启用地域复制。此选项会将你的数据免费复制到辅助位置，以便在主位置发生严重故障时将你的存储故障转移到该位置。将自动分配辅助位置，并且无法对其进行更改。如果你因法律要求或组织策略需要更好地控制基于云的存储的位置，可以关闭地域复制。但是，请注意，如果稍后你打开地域复制，则将现有数据复制到辅助位置时将向你收取一次性数据传输费用。不具有地域复制的存储服务将以优惠价提供。有关管理存储帐户的异地复制的更多详细信息，请参阅：<bpt id=\"p2\">[</bpt>创建、管理或删除存储帐户<ept id=\"p2\">](/documentation/articles/storage-create-storage-account#replication-options)</ept>。"
+    },
+    {
+      "content": "输入存储帐户详细信息",
+      "pos": [
+        3685,
+        3695
+      ]
+    },
+    {
+      "pos": [
+        3781,
+        3811
+      ],
+      "content": "单击“创建存储帐户”。该帐户现在会出现在<bpt id=\"p1\">**</bpt>“存储”<ept id=\"p1\">**</ept>下。"
+    },
+    {
+      "content": "已成功创建存储帐户",
+      "pos": [
+        3819,
+        3828
+      ]
+    },
+    {
+      "content": "接下来，为上载的 VHD 创建容器。单击存储帐户名称，然后单击“容器”。",
+      "pos": [
+        3908,
+        3944
+      ]
+    },
+    {
+      "content": "存储帐户详细信息",
+      "pos": [
+        3952,
+        3960
+      ]
+    },
+    {
+      "pos": [
+        4044,
+        4057
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“创建容器”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "存储帐户详细信息",
+      "pos": [
+        4065,
+        4073
+      ]
+    },
+    {
+      "content": "为容器键入“名称”，并选择“访问”策略。",
+      "pos": [
+        4160,
+        4180
+      ]
+    },
+    {
+      "content": "容器名称",
+      "pos": [
+        4188,
+        4192
+      ]
+    },
+    {
+      "pos": [
+        4288,
+        4425
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 默认情况下，该容器是专用容器，只能由帐户所有者访问。若要允许对容器中的 Blob 进行公共读取访问，但不允许对容器属性和元数据进行公共读取访问，请使用“公共 Blob”选项。若要允许对容器和 Blob 进行完全公共读取访问，请使用“公共容器”选项。"
+    },
+    {
+      "content": "步骤 3：准备连接到 Azure",
+      "pos": [
+        4430,
+        4446
+      ]
+    },
+    {
+      "content": "你首先需要在计算机和 Azure 中的订阅之间建立一个安全连接，然后才能上载 .vhd 文件。你可以使用 Azure Active Directory 方法或证书方法来执行此操作。",
+      "pos": [
+        4451,
+        4541
+      ]
+    },
+    {
+      "content": "使用 Azure AD 方法",
+      "pos": [
+        4546,
+        4560
+      ]
+    },
+    {
+      "content": "打开 Azure PowerShell 控制台。",
+      "pos": [
+        4565,
+        4589
+      ]
+    },
+    {
+      "pos": [
+        4594,
+        4648
+      ],
+      "content": "输入以下命令：<ph id=\"ph1\">`Add-AzureAccount -Environment AzureChinaCloud`</ph>"
+    },
+    {
+      "content": "此命令将打开一个登录窗口，以便你可以使用工作或学校帐户登录。",
+      "pos": [
+        4654,
+        4684
+      ]
+    },
+    {
+      "content": "PowerShell 窗口",
+      "pos": [
+        4692,
+        4705
+      ]
+    },
+    {
+      "content": "Azure 将对凭据信息进行身份验证和保存，然后关闭该窗口。",
+      "pos": [
+        4784,
+        4814
+      ]
+    },
+    {
+      "content": "使用证书方法",
+      "pos": [
+        4819,
+        4825
+      ]
+    },
+    {
+      "content": "打开 Azure PowerShell 控制台。",
+      "pos": [
+        4830,
+        4854
+      ]
+    },
+    {
+      "pos": [
+        4859,
+        4922
+      ],
+      "content": "键入：<ph id=\"ph1\">`Get-AzurePublishSettingsFile -Environment AzureChinaCloud`</ph>。"
+    },
+    {
+      "content": "此时将打开一个浏览器窗口，并提示你下载 .publishsettings 文件。它包含 Azure 订阅的信息和证书。",
+      "pos": [
+        4927,
+        4986
+      ]
+    },
+    {
+      "content": "浏览器下载页面",
+      "pos": [
+        4994,
+        5001
+      ]
+    },
+    {
+      "content": "保存 .publishsettings 文件。",
+      "pos": [
+        5103,
+        5126
+      ]
+    },
+    {
+      "pos": [
+        5131,
+        5209
+      ],
+      "content": "键入：<ph id=\"ph1\">`Import-AzurePublishSettingsFile -Environment AzureChinaCloud &lt;PathToFile&gt;`</ph>"
+    },
+    {
+      "pos": [
+        5215,
+        5260
+      ],
+      "content": "其中 <ph id=\"ph1\">`&lt;PathToFile&gt;`</ph> 是 .publishsettings 文件的完整路径。"
+    },
+    {
+      "pos": [
+        5265,
+        5354
+      ],
+      "content": "有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure Cmdlet 入门<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/azure/jj554332.aspx)</ept>"
+    },
+    {
+      "pos": [
+        5359,
+        5468
+      ],
+      "content": "有关安装和配置 PowerShell 的详细信息，请参阅<bpt id=\"p1\">[</bpt>如何安装和配置 Azure PowerShell<ept id=\"p1\">](/documentation/articles/powershell-install-configure)</ept>。"
+    },
+    {
+      "content": "步骤 4：上载 .vhd 文件",
+      "pos": [
+        5473,
+        5488
+      ]
+    },
+    {
+      "pos": [
+        5493,
+        5706
+      ],
+      "content": "在上载 .vhd 文件时，你可以将 .vhd 文件放置在 Blob 存储中的任何位置。在以下命令示例中，<bpt id=\"p1\">**</bpt>BlobStorageURL<ept id=\"p1\">**</ept> 是你在步骤 2 中创建的存储帐户的 URL，<bpt id=\"p2\">**</bpt>YourImagesFolder<ept id=\"p2\">**</ept> 是要在其中存储映像的 Blob 存储中的容器。<bpt id=\"p3\">**</bpt>VHDName<ept id=\"p3\">**</ept> 是显示在 Azure 管理门户中用于标识虚拟硬盘的标签。<bpt id=\"p4\">**</bpt>PathToVHDFile<ept id=\"p4\">**</ept> 是 .vhd 文件的完整路径和名称。"
+    },
+    {
+      "content": "从你在上一步中使用的 Azure PowerShell 窗口中，键入：",
+      "pos": [
+        5712,
+        5747
+      ]
+    },
+    {
+      "content": "步骤 5：使用上载的 VHD 创建 VM",
+      "pos": [
+        5870,
+        5890
+      ]
+    },
+    {
+      "content": "上载 .vhd 后，你可以将其作为映像添加到与订阅关联的自定义映像列表，并使用此自定义映像创建虚拟机。",
+      "pos": [
+        5894,
+        5945
+      ]
+    },
+    {
+      "content": "从你在上一步中使用的 Azure PowerShell 窗口中，键入：",
+      "pos": [
+        5950,
+        5985
+      ]
+    },
+    {
+      "pos": [
+        6117,
+        6196
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>重要说明<ept id=\"p1\">**</ept>：现在请使用 Linux 作为 OS 类型，因为当前 Azure PowerShell 版本只接受“Linux”或“Windows”作为参数。"
+    },
+    {
+      "content": "完成前面的步骤后，当你在 Azure 管理门户上选择“映像”选项卡时，将列出新映像。",
+      "pos": [
+        6201,
+        6243
+      ]
+    },
+    {
+      "content": "添加映像",
+      "pos": [
+        6251,
+        6255
+      ]
+    },
+    {
+      "content": "从库中创建虚拟机。此新映像现在将显示在“我的映像”下。选择该新映像，并按照提示完成设置主机名、密码/SSH 密钥等操作。",
+      "pos": [
+        6333,
+        6393
+      ]
+    },
+    {
+      "content": "自定义映像",
+      "pos": [
+        6401,
+        6406
+      ]
+    },
+    {
+      "content": "完成设置后，你将看到你的 FreeBSD VM 在 Azure 中运行。",
+      "pos": [
+        6494,
+        6530
+      ]
+    },
+    {
+      "content": "azure 中的 freebsd 映像",
+      "pos": [
+        6538,
+        6557
+      ]
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"创建和上载 FreeBSD VM 映像 | Azure\"\n   description=\"了解如何创建和上载包含 FreeBSD 操作系统的虚拟硬盘 (VHD) 以创建 Azure 虚拟机。\"\n   services=\"virtual-machines\"\n   documentationCenter=\"\"\n   authors=\"KylieLiang\"\n   manager=\"timlt\"\n   editor=\"\"\n   tags=\"azure-service-management\"/>\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"01/12/2016\"\n    wacn.date=\"02/26/2016\"/>\n\n# 创建 FreeBSD VHD 并将其上载到 Azure\n\n本文介绍如何创建和上载包含 FreeBSD 操作系统的虚拟硬盘 (VHD)，以便可以使用它作为自己的映像在 Azure 中创建虚拟机 (VM)。\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-include.md)]\n\n\n##先决条件##\n本文假定你拥有以下项目：\n\n- **Azure 订阅** - 如果你没有帐户，只需花费几分钟就能创建一个帐户。请参阅[创建试用帐户](/pricing/1rmb-trial/)。\n\n- **Azure PowerShell 工具** - 已安装 Azure PowerShell 模块并将其配置为使用你的订阅。若要下载该模块，请参阅 [Azure 下载](/downloads/)。可在此处获取安装和配置该模块的教程。你将使用 [Azure 下载](/downloads/) cmdlet 上载 VHD。\n\n- **安装在 .vhd 文件中的 FreeBSD 操作系统** - 你已将受支持的 FreeBSD 操作系统安装到虚拟硬盘。存在多种工具可创建 .vhd 文件，例如，可以使用虚拟化解决方案（例如 Hyper-V）创建 .vhd 文件并安装操作系统。有关说明，请参阅[安装 Hyper-V 角色和配置虚拟机](http://technet.microsoft.com/zh-cn/library/hh846766.aspx)。\n\n> [AZURE.NOTE] Azure 不支持更新的 VHDX 格式。可使用 Hyper-V 管理器或 [convert-vhd](https://technet.microsoft.com/zh-cn/library/hh848454.aspx) cmdlet 将磁盘转换为 VHD 格式。\n\n此任务包括以下五个步骤。\n\n## 步骤 1：准备要上载的映像 ##\n\n关于 Hyper-v 上的 FreeBSD 安装，可在[此处](http://blogs.msdn.com/b/kylie/archive/2014/12/25/running-freebsd-on-hyper-v.aspx)获取教程。\n\n在 FreeBSD 操作系统已安装到的虚拟机中，完成以下过程：\n\n1. **启用 DHCP**\n\n        # echo 'ifconfig_hn0=\"SYNCDHCP\"' >> /etc/rc.conf\n        # service netif restart\n\n2. **启用 SSH**\n\n    从光盘安装后，将默认启用 SSH。如果没有默认启用 SSH，或者你直接使用了 FreeBSD VHD，请键入：\n\n        # echo 'sshd_enable=\"YES\"' >> /etc/rc.conf\n        # ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key\n        # ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key\n        # service sshd restart\n\n3. **设置串行控制台**\n\n        # echo 'console=\"comconsole vidconsole\"' >> /boot/loader.conf\n        # echo 'comconsole_speed=\"115200\"' >> /boot/loader.conf\n\n4. **安装 sudo**\n\n    在 Azure 中 root 帐户处于禁用状态，然后你需要利用无特权用户的 sudo 使用提升的权限运行命令。\n\n        # pkg install sudo\n\n5. Azure 代理的先决条件\n\n    5\\.1 **安装 Python**\n\n        # pkg install python27\n        # ln -s /usr/local/bin/python2.7 /usr/bin/python\n\n    5\\.2 **安装 wget**\n\n        # pkg install wget\n\n6. **安装 Azure 代理**\n\n    可以始终在 [github](https://github.com/Azure/WALinuxAgent/releases) 上找到 Azure 代理的最新版本。版本 2.0.10 及更高版本正式支持 FreeBSD 10 及更高版本。FreeBSD 的最新 Azure 代理版本是 2.0.16。\n\n        # wget https://raw.githubusercontent.com/Azure/WALinuxAgent/WALinuxAgent-2.0.10/waagent --no-check-certificate\n        # mv waagent /usr/sbin\n        # chmod 755 /usr/sbin/waagent\n        # /usr/sbin/waagent -install\n\n    **重要说明**：安装完成后，请仔细检查它是否正在运行。\n\n        # service -e | grep waagent\n        /etc/rc.d/waagent\n        # cat /var/log/waagent.log\n\n    现在，你可以**关闭**你的 VM 了。你还可以在关闭前执行步骤 7，但这一步是可选的。\n\n7. 取消设置是可选的。它用于清除系统并使其适用于重新设置。\n\n    以下命令还会删除上次设置的用户帐户和关联数据。\n\n        # waagent -deprovision+user\n\n## 步骤 2：在 Azure 中创建存储帐户 ##\n\n你需要在 Azure 中具有存储帐户才能上载 .vhd 文件，以便可以在 Azure 中使用它创建虚拟机。可使用 Azure 管理门户创建存储帐户。\n\n1. 登录到 [Azure 管理门户](https://manage.windowsazure.cn)。\n\n2. 在命令栏上，单击“新建”。\n\n3. 依次单击**“数据服务”**>**“存储”**>**“快速创建”**。\n\n    ![快速创建存储帐户](./media/virtual-machines-freebsd-create-upload-vhd/Storage-quick-create.png)\n\n4. 如下所示填写字段：\n\n    - 在 **URL** 下，键入要在存储帐户的 URL 中使用的子域名称。该条目可能包含 3 到 24 个小写字母和数字。此名称将成为用于对订阅的 Blob、队列或表资源进行寻址的 URL 中的主机名。\n\n    - 为存储帐户选择**位置或地缘组**。地缘组让你能够将你的云服务和存储放在同一数据中心。\n\n    - 决定是否对存储帐户使用**地域复制**。默认情况下启用地域复制。此选项会将你的数据免费复制到辅助位置，以便在主位置发生严重故障时将你的存储故障转移到该位置。将自动分配辅助位置，并且无法对其进行更改。如果你因法律要求或组织策略需要更好地控制基于云的存储的位置，可以关闭地域复制。但是，请注意，如果稍后你打开地域复制，则将现有数据复制到辅助位置时将向你收取一次性数据传输费用。不具有地域复制的存储服务将以优惠价提供。有关管理存储帐户的异地复制的更多详细信息，请参阅：[创建、管理或删除存储帐户](/documentation/articles/storage-create-storage-account#replication-options)。\n\n    ![输入存储帐户详细信息](./media/virtual-machines-freebsd-create-upload-vhd/Storage-create-account.png)\n\n\n5. 单击“创建存储帐户”。该帐户现在会出现在**“存储”**下。\n\n    ![已成功创建存储帐户](./media/virtual-machines-freebsd-create-upload-vhd/Storagenewaccount.png)\n\n6. 接下来，为上载的 VHD 创建容器。单击存储帐户名称，然后单击“容器”。\n\n    ![存储帐户详细信息](./media/virtual-machines-freebsd-create-upload-vhd/storageaccount_detail.png)\n\n7. 单击**“创建容器”**。\n\n    ![存储帐户详细信息](./media/virtual-machines-freebsd-create-upload-vhd/storageaccount_container.png)\n\n8. 为容器键入“名称”，并选择“访问”策略。\n\n    ![容器名称](./media/virtual-machines-freebsd-create-upload-vhd/storageaccount_containervalues.png)\n\n    > [AZURE.NOTE] 默认情况下，该容器是专用容器，只能由帐户所有者访问。若要允许对容器中的 Blob 进行公共读取访问，但不允许对容器属性和元数据进行公共读取访问，请使用“公共 Blob”选项。若要允许对容器和 Blob 进行完全公共读取访问，请使用“公共容器”选项。\n\n## 步骤 3：准备连接到 Azure ##\n\n你首先需要在计算机和 Azure 中的订阅之间建立一个安全连接，然后才能上载 .vhd 文件。你可以使用 Azure Active Directory 方法或证书方法来执行此操作。\n\n###使用 Azure AD 方法\n\n1. 打开 Azure PowerShell 控制台。\n\n2. 输入以下命令：`Add-AzureAccount -Environment AzureChinaCloud`\n\n    此命令将打开一个登录窗口，以便你可以使用工作或学校帐户登录。\n\n    ![PowerShell 窗口](./media/virtual-machines-freebsd-create-upload-vhd/add_azureaccount.png)\n\n3. Azure 将对凭据信息进行身份验证和保存，然后关闭该窗口。\n\n###使用证书方法\n\n1. 打开 Azure PowerShell 控制台。\n\n2. 键入：`Get-AzurePublishSettingsFile -Environment AzureChinaCloud`。\n\n3. 此时将打开一个浏览器窗口，并提示你下载 .publishsettings 文件。它包含 Azure 订阅的信息和证书。\n\n    ![浏览器下载页面](./media/virtual-machines-freebsd-create-upload-vhd/Browser_download_GetPublishSettingsFile.png)\n\n3. 保存 .publishsettings 文件。\n\n4. 键入：`Import-AzurePublishSettingsFile -Environment AzureChinaCloud <PathToFile>`\n\n    其中 `<PathToFile>` 是 .publishsettings 文件的完整路径。\n\n   有关详细信息，请参阅 [Azure Cmdlet 入门](http://msdn.microsoft.com/zh-cn/library/azure/jj554332.aspx)\n\n   有关安装和配置 PowerShell 的详细信息，请参阅[如何安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure)。\n\n## 步骤 4：上载 .vhd 文件 ##\n\n在上载 .vhd 文件时，你可以将 .vhd 文件放置在 Blob 存储中的任何位置。在以下命令示例中，**BlobStorageURL** 是你在步骤 2 中创建的存储帐户的 URL，**YourImagesFolder** 是要在其中存储映像的 Blob 存储中的容器。**VHDName** 是显示在 Azure 管理门户中用于标识虚拟硬盘的标签。**PathToVHDFile** 是 .vhd 文件的完整路径和名称。\n\n\n1. 从你在上一步中使用的 Azure PowerShell 窗口中，键入：\n\n        Add-AzureVhd -Destination \"<BlobStorageURL>/<YourImagesFolder>/<VHDName>.vhd\" -LocalFilePath <PathToVHDFile>\n\n## 步骤 5：使用上载的 VHD 创建 VM ##\n上载 .vhd 后，你可以将其作为映像添加到与订阅关联的自定义映像列表，并使用此自定义映像创建虚拟机。\n\n1. 从你在上一步中使用的 Azure PowerShell 窗口中，键入：\n\n        Add-AzureVMImage -ImageName <Your Image's Name> -MediaLocation <location of the VHD> -OS <Type of the OS on the VHD>\n\n    **重要说明**：现在请使用 Linux 作为 OS 类型，因为当前 Azure PowerShell 版本只接受“Linux”或“Windows”作为参数。\n\n2. 完成前面的步骤后，当你在 Azure 管理门户上选择“映像”选项卡时，将列出新映像。\n\n    ![添加映像](./media/virtual-machines-freebsd-create-upload-vhd/addfreebsdimage.png)\n\n3. 从库中创建虚拟机。此新映像现在将显示在“我的映像”下。选择该新映像，并按照提示完成设置主机名、密码/SSH 密钥等操作。\n\n    ![自定义映像](./media/virtual-machines-freebsd-create-upload-vhd/createfreebsdimageinazure.png)\n\n4. 完成设置后，你将看到你的 FreeBSD VM 在 Azure 中运行。\n\n    ![azure 中的 freebsd 映像](./media/virtual-machines-freebsd-create-upload-vhd/freebsdimageinazure.png)\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

@@ -1,0 +1,460 @@
+{
+  "nodes": [
+    {
+      "content": "SQL 数据库的 XEvent 事件文件代码 | Azure",
+      "pos": [
+        28,
+        58
+      ]
+    },
+    {
+      "content": "提供一个双阶段代码示例的 PowerShell 和 Transact-SQL，该示例演示 Azure SQL 数据库的扩展事件中的事件文件目标。完成此方案部分必须用到 Azure 存储空间。",
+      "pos": [
+        78,
+        173
+      ]
+    },
+    {
+      "content": "SQL 数据库中扩展事件的事件文件目标代码",
+      "pos": [
+        410,
+        431
+      ]
+    },
+    {
+      "content": "你需要一个完整的代码示例来可靠捕获和报告扩展事件的信息。",
+      "pos": [
+        434,
+        462
+      ]
+    },
+    {
+      "pos": [
+        465,
+        630
+      ],
+      "content": "在 Microsoft SQL Server 中，<bpt id=\"p1\">[</bpt>事件文件目标<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/ff878115.aspx)</ept>用于将事件输出存储在本地硬盘驱动器文件中。但是，此类文件并不适用于 Azure SQL 数据库。我们改为使用 Azure 存储空间服务来支持事件文件目标。"
+    },
+    {
+      "content": "本主题演示了一个两阶段代码示例：",
+      "pos": [
+        633,
+        649
+      ]
+    },
+    {
+      "content": "PowerShell：用于在云中创建 Azure 存储空间容器。",
+      "pos": [
+        654,
+        686
+      ]
+    },
+    {
+      "content": "Transact-SQL：",
+      "pos": [
+        690,
+        703
+      ]
+    },
+    {
+      "content": "将 Azure 存储空间容器分配到事件文件目标。",
+      "pos": [
+        707,
+        731
+      ]
+    },
+    {
+      "content": "创建和启动事件会话，等等。",
+      "pos": [
+        735,
+        748
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        754,
+        758
+      ]
+    },
+    {
+      "pos": [
+        763,
+        807
+      ],
+      "content": "Azure 帐户和订阅。你可以注册<bpt id=\"p1\">[</bpt>试用版<ept id=\"p1\">](/pricing/1rmb-trial)</ept>。"
+    },
+    {
+      "content": "可以在其中创建表的任何数据库。",
+      "pos": [
+        812,
+        827
+      ]
+    },
+    {
+      "pos": [
+        831,
+        922
+      ],
+      "content": "你可以选择快速<bpt id=\"p1\">[</bpt>创建一个 <bpt id=\"p2\">**</bpt>AdventureWorksLT<ept id=\"p2\">**</ept> 演示数据库<ept id=\"p1\">](/documentation/articles/sql-database-get-started)</ept>。"
+    },
+    {
+      "content": "SQL Server Management Studio (ssms.exe) 2015 年 8 月预览版或更高版本。可从以下位置下载最新的 ssms.exe：",
+      "pos": [
+        927,
+        1007
+      ]
+    },
+    {
+      "pos": [
+        1011,
+        1107
+      ],
+      "content": "标题为<bpt id=\"p1\">[</bpt>下载 SQL Server Management Studio<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/mt238290.aspx)</ept> 的主题。"
+    },
+    {
+      "content": "直接指向下载位置的链接。",
+      "pos": [
+        1112,
+        1124
+      ]
+    },
+    {
+      "content": "Microsoft 建议定期更新 ssms.exe。在某些情况下，ssms.exe 将每个月更新。",
+      "pos": [
+        1176,
+        1225
+      ]
+    },
+    {
+      "pos": [
+        1230,
+        1299
+      ],
+      "content": "你必须安装 <bpt id=\"p1\">[</bpt>Azure PowerShell 模块<ept id=\"p1\">](http://go.microsoft.com/?linkid=9811175)</ept>。"
+    },
+    {
+      "pos": [
+        1303,
+        1342
+      ],
+      "content": "这些模块提供 <bpt id=\"p1\">**</bpt>New-AzureStorageAccount<ept id=\"p1\">**</ept> 等命令。"
+    },
+    {
+      "content": "阶段 1：Azure 存储空间容器的 PowerShell 代码",
+      "pos": [
+        1348,
+        1380
+      ]
+    },
+    {
+      "content": "此 PowerShell 是两阶段代码示例的第 1 阶段。",
+      "pos": [
+        1383,
+        1412
+      ]
+    },
+    {
+      "content": "脚本开头的命令将清除以前可能运行后的结果，并且设计为可重复运行。",
+      "pos": [
+        1414,
+        1446
+      ]
+    },
+    {
+      "pos": [
+        1453,
+        1518
+      ],
+      "content": "将 PowerShell 脚本粘贴到 Notepad.exe 等简单文本编辑器，并将脚本保存到扩展名为 <bpt id=\"p1\">**</bpt>.ps1<ept id=\"p1\">**</ept> 的文件。"
+    },
+    {
+      "content": "以管理员身份启动 PowerShell ISE。",
+      "pos": [
+        1523,
+        1547
+      ]
+    },
+    {
+      "content": "在提示符下键入",
+      "pos": [
+        1552,
+        1559
+      ]
+    },
+    {
+      "content": "，然后按 Enter。",
+      "pos": [
+        1640,
+        1651
+      ]
+    },
+    {
+      "pos": [
+        1656,
+        1697
+      ],
+      "content": "在 PowerShell ISE 中打开你的 <bpt id=\"p1\">**</bpt>.ps1<ept id=\"p1\">**</ept> 文件。运行该脚本。"
+    },
+    {
+      "content": "该脚本会先启动新的窗口让你登录 Azure。",
+      "pos": [
+        1702,
+        1724
+      ]
+    },
+    {
+      "pos": [
+        1728,
+        1782
+      ],
+      "content": "如果你想要重复运行脚本而不中断会话，可以很方便地选择注释掉 <bpt id=\"p1\">**</bpt>Add-AzureAccount<ept id=\"p1\">**</ept> 命令。"
+    },
+    {
+      "content": "在准备运行脚本之前，必须准备好已装有 Azure 模块的 PowerShell ISE。",
+      "pos": [
+        1787,
+        1831
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        1854,
+        1860
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        6433,
+        6439
+      ]
+    },
+    {
+      "content": "记下 PowerShell 脚本结束时输出的几个命名值。必须将这些值编辑成阶段 2 中使用的 Transact-SQL 脚本。",
+      "pos": [
+        6442,
+        6505
+      ]
+    },
+    {
+      "content": "阶段 2：使用 Azure 存储空间容器的 Transact-SQL 代码",
+      "pos": [
+        6511,
+        6548
+      ]
+    },
+    {
+      "content": "在此代码示例的第 1 阶段，你已运行 PowerShell 脚本来创建 Azure 存储空间容器。",
+      "pos": [
+        6553,
+        6602
+      ]
+    },
+    {
+      "content": "接下来在第 2 阶段，以下 Transact-SQL 脚本必须使用该容器。",
+      "pos": [
+        6605,
+        6642
+      ]
+    },
+    {
+      "content": "脚本开头的命令将清除以前可能运行后的结果，并且设计为可重复运行。",
+      "pos": [
+        6645,
+        6677
+      ]
+    },
+    {
+      "pos": [
+        6680,
+        6771
+      ],
+      "content": "PowerShell 脚本在结束时输出了几个命名值。你必须编辑 Transact-SQL 脚本以使用这些值。在 Transact-SQL 脚本中查找 <bpt id=\"p1\">**</bpt>TODO<ept id=\"p1\">**</ept> 以找到编辑点。"
+    },
+    {
+      "content": "打开 SQL Server Management Studio (ssms.exe)。",
+      "pos": [
+        6777,
+        6820
+      ]
+    },
+    {
+      "content": "连接到你的 Azure SQL 数据库。",
+      "pos": [
+        6825,
+        6845
+      ]
+    },
+    {
+      "content": "单击打开新的查询窗格。",
+      "pos": [
+        6850,
+        6861
+      ]
+    },
+    {
+      "content": "将以下 Transact-SQL 脚本粘贴到查询窗格中。",
+      "pos": [
+        6866,
+        6894
+      ]
+    },
+    {
+      "pos": [
+        6899,
+        6926
+      ],
+      "content": "在脚本中查找每个 <bpt id=\"p1\">**</bpt>TODO<ept id=\"p1\">**</ept> 并进行适当的编辑。"
+    },
+    {
+      "content": "保存然后运行该脚本。",
+      "pos": [
+        6931,
+        6941
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        13615,
+        13621
+      ]
+    },
+    {
+      "content": "如果当你运行脚本时无法附加目标，则你必须停止再重新启动事件会话：",
+      "pos": [
+        13624,
+        13656
+      ]
+    },
+    {
+      "content": "输出",
+      "pos": [
+        13771,
+        13773
+      ]
+    },
+    {
+      "pos": [
+        13776,
+        13871
+      ],
+      "content": "完成 Transact-SQL 脚本后，请单击 <bpt id=\"p1\">**</bpt>event\\_data\\_XML<ept id=\"p1\">**</ept> 列标题下的单元格。此时将显示一个 <bpt id=\"p2\">**</bpt><ph id=\"ph1\">&lt;event&gt;</ph><ept id=\"p2\">**</ept> 元素，其中显示了一个 UPDATE 语句。"
+    },
+    {
+      "pos": [
+        13873,
+        13901
+      ],
+      "content": "下面是测试期间生成的一个 <bpt id=\"p1\">**</bpt><ph id=\"ph1\">&lt;event&gt;</ph><ept id=\"p1\">**</ept> 元素："
+    },
+    {
+      "content": "转换代码示例以在 SQL Server 上运行",
+      "pos": [
+        15019,
+        15042
+      ]
+    },
+    {
+      "content": "假设你要在 Microsoft SQL Server 上运行上述 Transact-SQL 示例。",
+      "pos": [
+        15045,
+        15094
+      ]
+    },
+    {
+      "pos": [
+        15099,
+        15195
+      ],
+      "content": "为了方便，你想要将 Azure 存储空间容器完全替换为一个简单文件（例如 <bpt id=\"p1\">**</bpt>C:\\\\myeventdata.xel<ept id=\"p1\">**</ept>）。该文件将写入托管 SQL Server 的计算机的本地硬盘驱动器上。"
+    },
+    {
+      "pos": [
+        15200,
+        15276
+      ],
+      "content": "你不需要为 <bpt id=\"p1\">**</bpt>CREATE MASTER KEY<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>CREATE CREDENTIAL<ept id=\"p2\">**</ept> 使用任何类型的 Transact-SQL 语句。"
+    },
+    {
+      "pos": [
+        15281,
+        15392
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>CREATE EVENT SESSION<ept id=\"p1\">**</ept> 语句的 <bpt id=\"p2\">**</bpt>ADD TARGET<ept id=\"p2\">**</ept> 子句中，将对 <bpt id=\"p3\">**</bpt>filename=<ept id=\"p3\">**</ept> 分配的 Http 值替换为完整路径字符串（例如 <bpt id=\"p4\">**</bpt>C:\\\\myfile.xel<ept id=\"p4\">**</ept>）。"
+    },
+    {
+      "content": "此操作不涉及任何 Azure 存储帐户。",
+      "pos": [
+        15396,
+        15416
+      ]
+    },
+    {
+      "content": "详细信息",
+      "pos": [
+        15422,
+        15426
+      ]
+    },
+    {
+      "content": "有关 Azure SQL 数据库中扩展事件的主要主题是：",
+      "pos": [
+        15429,
+        15457
+      ]
+    },
+    {
+      "pos": [
+        15461,
+        15568
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>SQL 数据库中的扩展事件<ept id=\"p1\">](/documentation/articles/sql-database-xevent-db-diff-from-svr)</ept> - 有关 Azure SQL 数据库中扩展事件的主要主题。"
+    },
+    {
+      "content": "对比 Azure SQL 数据库与 Microsoft SQL Server 的扩展事件的不同方面。",
+      "pos": [
+        15572,
+        15622
+      ]
+    },
+    {
+      "pos": [
+        15627,
+        15763
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>SQL 数据库中扩展事件的环形缓冲区目标代码<ept id=\"p1\">](/documentation/articles/sql-database-xevent-code-ring-buffer)</ept> - 提供一个可以快速方便上手的辅助代码示例，但该示例主要适用于简单测试，而对于大型活动则不够可靠。"
+    },
+    {
+      "content": "有关 Azure 存储空间服务中帐户和容器的详细信息，请参阅：",
+      "pos": [
+        15766,
+        15797
+      ]
+    },
+    {
+      "content": "如何通过 .NET 使用 Blob 存储",
+      "pos": [
+        15802,
+        15822
+      ]
+    },
+    {
+      "content": "命名和引用容器、Blob 与元数据",
+      "pos": [
+        15884,
+        15901
+      ]
+    },
+    {
+      "content": "使用根容器",
+      "pos": [
+        15967,
+        15972
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"SQL 数据库的 XEvent 事件文件代码 | Azure\" \n    description=\"提供一个双阶段代码示例的 PowerShell 和 Transact-SQL，该示例演示 Azure SQL 数据库的扩展事件中的事件文件目标。完成此方案部分必须用到 Azure 存储空间。\" \n    services=\"sql-database\" \n    documentationCenter=\"\" \n    authors=\"MightyPen\" \n    manager=\"jeffreyg\" \n    editor=\"\" \n    tags=\"\"/>\n\n\n<tags \n    ms.service=\"sql-database\" \n    ms.date=\"12/09/2015\" \n    wacn.date=\"01/29/2016\"/>\n\n\n# SQL 数据库中扩展事件的事件文件目标代码\n\n\n你需要一个完整的代码示例来可靠捕获和报告扩展事件的信息。\n\n\n在 Microsoft SQL Server 中，[事件文件目标](http://msdn.microsoft.com/zh-cn/library/ff878115.aspx)用于将事件输出存储在本地硬盘驱动器文件中。但是，此类文件并不适用于 Azure SQL 数据库。我们改为使用 Azure 存储空间服务来支持事件文件目标。\n\n\n本主题演示了一个两阶段代码示例：\n\n\n- PowerShell：用于在云中创建 Azure 存储空间容器。\n\n- Transact-SQL：\n - 将 Azure 存储空间容器分配到事件文件目标。\n - 创建和启动事件会话，等等。\n\n\n## 先决条件\n\n\n- Azure 帐户和订阅。你可以注册[试用版](/pricing/1rmb-trial)。\n\n\n- 可以在其中创建表的任何数据库。\n - 你可以选择快速[创建一个 **AdventureWorksLT** 演示数据库](/documentation/articles/sql-database-get-started)。\n\n\n- SQL Server Management Studio (ssms.exe) 2015 年 8 月预览版或更高版本。可从以下位置下载最新的 ssms.exe：\n - 标题为[下载 SQL Server Management Studio](http://msdn.microsoft.com/zh-cn/library/mt238290.aspx) 的主题。\n - [直接指向下载位置的链接。](http://go.microsoft.com/fwlink/?linkid=616025)\n - Microsoft 建议定期更新 ssms.exe。在某些情况下，ssms.exe 将每个月更新。\n\n\n- 你必须安装 [Azure PowerShell 模块](http://go.microsoft.com/?linkid=9811175)。\n - 这些模块提供 **New-AzureStorageAccount** 等命令。\n\n\n## 阶段 1：Azure 存储空间容器的 PowerShell 代码\n\n\n此 PowerShell 是两阶段代码示例的第 1 阶段。\n\n脚本开头的命令将清除以前可能运行后的结果，并且设计为可重复运行。\n\n\n\n1. 将 PowerShell 脚本粘贴到 Notepad.exe 等简单文本编辑器，并将脚本保存到扩展名为 **.ps1** 的文件。\n\n2. 以管理员身份启动 PowerShell ISE。\n\n3. 在提示符下键入 <br/>`Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser`<br/>，然后按 Enter。\n\n4. 在 PowerShell ISE 中打开你的 **.ps1** 文件。运行该脚本。\n\n5. 该脚本会先启动新的窗口让你登录 Azure。\n - 如果你想要重复运行脚本而不中断会话，可以很方便地选择注释掉 **Add-AzureAccount** 命令。\n\n\n![在准备运行脚本之前，必须准备好已装有 Azure 模块的 PowerShell ISE。][30_powershell_ise]\n\n\n&nbsp;\n\n\n\n    ## TODO: Before running, find all 'TODO' and make each edit!\n    \n    #--------------- 1 -----------------------\n    \n    \n    # You can comment out or skip this Add-AzureAccount command after the first run.\n    # Current PowerShell environment retains the successful outcome.\n    \n    'Expect a pop-up window in which you log in to Azure.'\n    \n    \n    Add-AzureRmAccount -EnvironmentName AzureChinaCloud\n    \n    #-------------- 2 ------------------------\n    \n    \n    '\n    TODO: Edit the values assigned to these variables, especially the first few!\n    '\n    \n    $subscriptionName       = 'YOUR_SUBSCRIPTION_NAME'\n    $policySasExpiryTime = '2016-01-28T23:44:56Z'\n    $policySasStartTime  = '2015-08-01'\n    \n    \n    $storageAccountName     = 'gmstorageaccountxevent'\n    $storageAccountLocation = 'China North'\n    $contextName            = 'gmcontext'\n    $containerName          = 'gmcontainerxevent'\n    $policySasToken      = 'gmpolicysastoken'\n    \n    \n    # Leave this value alone, as 'rwl'.\n    $policySasPermission = 'rwl'\n    \n    #--------------- 3 -----------------------\n    \n    \n    # The ending display lists your Azure subscriptions.\n    # One should match the $subscriptionName value you assigned\n    #   earlier in this PowerShell script. \n    \n    'Choose an existing subscription for the current PowerShell environment.'\n    \n    \n    Select-AzureSubscription -SubscriptionName $subscriptionName\n    \n    \n    #-------------- 4 ------------------------\n    \n    \n    '\n    Clean-up the old Azure Storage Account after any previous run, \n    before continuing this new run.'\n    \n    \n    If ($storageAccountName)\n    {\n        Remove-AzureStorageAccount -StorageAccountName $storageAccountName\n    }\n    \n    #--------------- 5 -----------------------\n    \n    [System.DateTime]::Now.ToString()\n    \n    '\n    Create a storage account. \n    This might take several minutes, will beep when ready.\n      ...PLEASE WAIT...'\n    \n    New-AzureStorageAccount `\n        -StorageAccountName $storageAccountName `\n        -Location           $storageAccountLocation\n    \n    [System.DateTime]::Now.ToString()\n    \n    [System.Media.SystemSounds]::Beep.Play()\n    \n    \n    '\n    Get the primary access key for your storage account.\n    '\n    \n    \n    $primaryAccessKey_ForStorageAccount = `\n        (Get-AzureStorageKey `\n            -StorageAccountName $storageAccountName).Primary\n    \n    \"`$primaryAccessKey_ForStorageAccount = $primaryAccessKey_ForStorageAccount\"\n    \n    'Azure Storage Account cmdlet completed.\n    Remainder of PowerShell .ps1 script continues.\n    '\n    \n    #--------------- 6 -----------------------\n    \n    \n    # The context will be needed to create a container within the storage account.\n    \n    'Create a context object from the storage account and its primary access key.\n    '\n    \n    $context = New-AzureStorageContext `\n        -StorageAccountName $storageAccountName `\n        -StorageAccountKey  $primaryAccessKey_ForStorageAccount\n    \n    \n    'Create a container within the storage account.\n    '\n    \n    \n    $containerObjectInStorageAccount = New-AzureStorageContainer `\n        -Name    $containerName `\n        -Context $context\n    \n    \n    'Create a security policy to be applied to the SAS token.\n    '\n    \n    New-AzureStorageContainerStoredAccessPolicy `\n        -Container  $containerName `\n        -Context    $context `\n        -Policy     $policySasToken `\n        -Permission $policySasPermission `\n        -ExpiryTime $policySasExpiryTime `\n        -StartTime  $policySasStartTime \n    \n    '\n    Generate a SAS token for the container.\n    '\n    Try\n    {\n        $sasTokenWithPolicy = New-AzureStorageContainerSASToken `\n            -Name    $containerName `\n            -Context $context `\n            -Policy  $policySasToken\n    }\n    Catch \n    {\n        $Error[0].Exception.ToString()\n    }\n    \n    #-------------- 7 ------------------------\n    \n    \n    'Display the values that YOU must edit into the Transact-SQL script next!:\n    '\n    \n    \"storageAccountName: $storageAccountName\"\n    \"containerName:      $containerName\"\n    \"sasTokenWithPolicy: $sasTokenWithPolicy\"\n    \n    '\n    REMINDER: sasTokenWithPolicy here might start with \"?\" character, which you must exclude from Transact-SQL.\n    '\n    \n    '\n    (Later, return here to delete your Azure Storage account. See the preceding - Remove-AzureStorageAccount -StorageAccountName $storageAccountName)'\n    \n    '\n    Now shift to the Transact-SQL portion of the two-part code sample!'\n    \n    # EOFile\n\n\n\n&nbsp;\n\n\n记下 PowerShell 脚本结束时输出的几个命名值。必须将这些值编辑成阶段 2 中使用的 Transact-SQL 脚本。\n\n\n## 阶段 2：使用 Azure 存储空间容器的 Transact-SQL 代码\n\n\n- 在此代码示例的第 1 阶段，你已运行 PowerShell 脚本来创建 Azure 存储空间容器。\n- 接下来在第 2 阶段，以下 Transact-SQL 脚本必须使用该容器。\n\n\n脚本开头的命令将清除以前可能运行后的结果，并且设计为可重复运行。\n\n\nPowerShell 脚本在结束时输出了几个命名值。你必须编辑 Transact-SQL 脚本以使用这些值。在 Transact-SQL 脚本中查找 **TODO** 以找到编辑点。\n\n\n1. 打开 SQL Server Management Studio (ssms.exe)。\n\n2. 连接到你的 Azure SQL 数据库。\n\n3. 单击打开新的查询窗格。\n\n4. 将以下 Transact-SQL 脚本粘贴到查询窗格中。\n\n5. 在脚本中查找每个 **TODO** 并进行适当的编辑。\n\n6. 保存然后运行该脚本。\n\n\n        ---- TODO: First, run the PowerShell portion of this two-part code sample.\n        ---- TODO: Second, find every 'TODO' in this Transact-SQL file, and edit each.\n        \n        ---- Transact-SQL code for Event File target on Azure SQL Database.\n        \n        \n        SET NOCOUNT ON;\n        \n        GO\n        \n        \n        ----  Step 1.  Establish one little table, and  ---------\n        ----  insert one row of data.\n        \n        \n        IF EXISTS\n            (SELECT * FROM sys.objects\n                WHERE type = 'U' and name = 'gmTabEmployee')\n        BEGIN\n            DROP TABLE gmTabEmployee;\n        END\n        GO\n        \n        \n        CREATE TABLE gmTabEmployee\n        (\n            EmployeeGuid         uniqueIdentifier   not null  default newid()  primary key,\n            EmployeeId           int                not null  identity(1,1),\n            EmployeeKudosCount   int                not null  default 0,\n            EmployeeDescr        nvarchar(256)          null\n        );\n        GO\n        \n        \n        INSERT INTO gmTabEmployee ( EmployeeDescr )\n            VALUES ( 'Jane Doe' );\n        GO\n        \n        \n        ------  Step 2.  Create key, and  ------------\n        ------  Create credential (your Azure Storage container must already exist).\n        \n        \n        IF NOT EXISTS\n            (SELECT * FROM sys.symmetric_keys\n                WHERE symmetric_key_id = 101)\n        BEGIN\n            CREATE MASTER KEY ENCRYPTION BY PASSWORD = '0C34C960-6621-4682-A123-C7EA08E3FC46' -- Or any newid().\n        END\n        GO\n        \n        \n        IF EXISTS\n            (SELECT * FROM sys.database_scoped_credentials\n                -- TODO: Assign AzureStorageAccount name, and the associated Container name.\n                WHERE name = 'https://gmstorageaccountxevent.blob.core.chinacloudapi.cn/gmcontainerxevent')\n        BEGIN\n            DROP DATABASE SCOPED CREDENTIAL\n                -- TODO: Assign AzureStorageAccount name, and the associated Container name.\n                [https://gmstorageaccountxevent.blob.core.chinacloudapi.cn/gmcontainerxevent] ;\n        END\n        GO\n        \n        \n        CREATE\n            DATABASE SCOPED\n            CREDENTIAL\n                -- use '.blob.',   and not '.queue.' or '.table.' etc.\n                -- TODO: Assign AzureStorageAccount name, and the associated Container name.\n                [https://gmstorageaccountxevent.blob.core.chinacloudapi.cn/gmcontainerxevent]\n            WITH\n                IDENTITY = 'SHARED ACCESS SIGNATURE',  -- \"SAS\" token.\n                -- TODO: Paste in the long SasToken string here for Secret, but exclude any leading '?'.\n                SECRET = 'sv=2014-02-14&sr=c&si=gmpolicysastoken&sig=EjAqjo6Nu5xMLEZEkMkLbeF7TD9v1J8DNB2t8gOKTts%3D'\n            ;\n        GO\n        \n        \n        ------  Step 3.  Create (define) an event session.  --------\n        ------  The event session has an event with an action,\n        ------  and a has a target.\n        \n        IF EXISTS\n            (SELECT * from sys.database_event_sessions\n                WHERE name = 'gmeventsessionname240b')\n        BEGIN\n            DROP\n                EVENT SESSION\n                    gmeventsessionname240b\n                ON DATABASE;\n        END\n        GO\n        \n        \n        CREATE\n            EVENT SESSION\n                gmeventsessionname240b\n            ON DATABASE\n        \n            ADD EVENT\n                sqlserver.sql_statement_starting\n                    (\n                    ACTION (sqlserver.sql_text)\n                    WHERE statement LIKE 'UPDATE gmTabEmployee%'\n                    )\n            ADD TARGET\n                package0.event_file\n                    (\n                    -- TODO: Assign AzureStorageAccount name, and the associated Container name.\n                    -- Also, tweak the .xel file name at end, if you like.\n                    SET filename =\n                        'https://gmstorageaccountxevent.blob.core.chinacloudapi.cn/gmcontainerxevent/anyfilenamexel242b.xel'\n                    )\n            WITH\n                (MAX_MEMORY = 10 MB,\n                MAX_DISPATCH_LATENCY = 3 SECONDS)\n            ;\n        GO\n        \n        \n        ------  Step 4.  Start the event session.  ----------------\n        ------  Issue the SQL Update statements that will be traced.\n        ------  Then stop the session.\n        \n        ------  Note: If the target fails to attach,\n        ------  the session must be stopped and restarted.\n        \n        ALTER\n            EVENT SESSION\n                gmeventsessionname240b\n            ON DATABASE\n            STATE = START;\n        GO\n        \n        \n        SELECT 'BEFORE_Updates', EmployeeKudosCount, * FROM gmTabEmployee;\n        \n        UPDATE gmTabEmployee\n            SET EmployeeKudosCount = EmployeeKudosCount + 2\n            WHERE EmployeeDescr = 'Jane Doe';\n        \n        UPDATE gmTabEmployee\n            SET EmployeeKudosCount = EmployeeKudosCount + 13\n            WHERE EmployeeDescr = 'Jane Doe';\n        \n        SELECT 'AFTER__Updates', EmployeeKudosCount, * FROM gmTabEmployee;\n        GO\n        \n        \n        ALTER\n            EVENT SESSION\n                gmeventsessionname240b\n            ON DATABASE\n            STATE = STOP;\n        GO\n        \n        \n        -------------- Step 5.  Select the results. ----------\n        \n        SELECT\n                *, 'CLICK_NEXT_CELL_TO_BROWSE_ITS_RESULTS!' as [CLICK_NEXT_CELL_TO_BROWSE_ITS_RESULTS],\n                CAST(event_data AS XML) AS [event_data_XML]  -- TODO: In ssms.exe results grid, double-click this cell!\n            FROM\n                sys.fn_xe_file_target_read_file\n                    (\n                        -- TODO: Fill in Storage Account name, and the associated Container name.\n                        'https://gmstorageaccountxevent.blob.core.chinacloudapi.cn/gmcontainerxevent/anyfilenamexel242b',\n                        null, null, null\n                    );\n        GO\n        \n        \n        -------------- Step 6.  Clean up. ----------\n        \n        DROP\n            EVENT SESSION\n                gmeventsessionname240b\n            ON DATABASE;\n        GO\n        \n        DROP DATABASE SCOPED CREDENTIAL\n            -- TODO: Assign AzureStorageAccount name, and the associated Container name.\n            [https://gmstorageaccountxevent.blob.core.chinacloudapi.cn/gmcontainerxevent]\n            ;\n        GO\n        \n        DROP TABLE gmTabEmployee;\n        GO\n        \n        PRINT 'Use PowerShell Remove-AzureStorageAccount to delete your Azure Storage account!';\n        GO\n\n\n\n&nbsp;\n\n\n如果当你运行脚本时无法附加目标，则你必须停止再重新启动事件会话：\n\n\n     \n    ALTER EVENT SESSION ... STATE = STOP;\n    GO\n    ALTER EVENT SESSION ... STATE = START;\n    GO\n \n\n\n## 输出\n\n\n完成 Transact-SQL 脚本后，请单击 **event\\_data\\_XML** 列标题下的单元格。此时将显示一个 **<event>** 元素，其中显示了一个 UPDATE 语句。\n\n下面是测试期间生成的一个 **<event>** 元素：\n\n \n    <event name=\"sql_statement_starting\" package=\"sqlserver\" timestamp=\"2015-09-22T19:18:45.420Z\">\n      <data name=\"state\">\n        <value>0</value>\n        <text>Normal</text>\n      </data>\n      <data name=\"line_number\">\n        <value>5</value>\n      </data>\n      <data name=\"offset\">\n        <value>148</value>\n      </data>\n      <data name=\"offset_end\">\n        <value>368</value>\n      </data>\n      <data name=\"statement\">\n        <value>UPDATE gmTabEmployee\n        SET EmployeeKudosCount = EmployeeKudosCount + 2\n        WHERE EmployeeDescr = 'Jane Doe'</value>\n      </data>\n      <action name=\"sql_text\" package=\"sqlserver\">\n        <value>\n    \n    SELECT 'BEFORE_Updates', EmployeeKudosCount, * FROM gmTabEmployee;\n    \n    UPDATE gmTabEmployee\n        SET EmployeeKudosCount = EmployeeKudosCount + 2\n        WHERE EmployeeDescr = 'Jane Doe';\n    \n    UPDATE gmTabEmployee\n        SET EmployeeKudosCount = EmployeeKudosCount + 13\n        WHERE EmployeeDescr = 'Jane Doe';\n    \n    SELECT 'AFTER__Updates', EmployeeKudosCount, * FROM gmTabEmployee;\n    </value>\n      </action>\n    </event>\n\n\n \n\n## 转换代码示例以在 SQL Server 上运行\n\n\n假设你要在 Microsoft SQL Server 上运行上述 Transact-SQL 示例。\n\n\n- 为了方便，你想要将 Azure 存储空间容器完全替换为一个简单文件（例如 **C:\\\\myeventdata.xel**）。该文件将写入托管 SQL Server 的计算机的本地硬盘驱动器上。\n\n\n- 你不需要为 **CREATE MASTER KEY** 和 **CREATE CREDENTIAL** 使用任何类型的 Transact-SQL 语句。\n\n\n- 在 **CREATE EVENT SESSION** 语句的 **ADD TARGET** 子句中，将对 **filename=** 分配的 Http 值替换为完整路径字符串（例如 **C:\\\\myfile.xel**）。\n - 此操作不涉及任何 Azure 存储帐户。\n\n\n## 详细信息\n\n\n有关 Azure SQL 数据库中扩展事件的主要主题是：\n\n- [SQL 数据库中的扩展事件](/documentation/articles/sql-database-xevent-db-diff-from-svr) - 有关 Azure SQL 数据库中扩展事件的主要主题。\n - 对比 Azure SQL 数据库与 Microsoft SQL Server 的扩展事件的不同方面。\n\n\n- [SQL 数据库中扩展事件的环形缓冲区目标代码](/documentation/articles/sql-database-xevent-code-ring-buffer) - 提供一个可以快速方便上手的辅助代码示例，但该示例主要适用于简单测试，而对于大型活动则不够可靠。\n\n\n有关 Azure 存储空间服务中帐户和容器的详细信息，请参阅：\n\n- [如何通过 .NET 使用 Blob 存储](/documentation/articles/storage-dotnet-how-to-use-blobs)\n- [命名和引用容器、Blob 与元数据](http://msdn.microsoft.com/zh-cn/library/azure/dd135715.aspx)\n- [使用根容器](http://msdn.microsoft.com/zh-cn/library/azure/ee395424.aspx)\n\n\n<!--\nImage references.\n-->\n\n[30_powershell_ise]: ./media/sql-database-xevent-code-event-file/event-file-powershell-ise-b30.png\n\n<!---HONumber=Mooncake_0118_2016-->\n"
+}

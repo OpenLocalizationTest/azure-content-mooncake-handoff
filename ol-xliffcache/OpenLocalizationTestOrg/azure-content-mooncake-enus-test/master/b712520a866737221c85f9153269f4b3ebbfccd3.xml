@@ -1,0 +1,390 @@
+{
+  "nodes": [
+    {
+      "content": "在门户中创建 AD 应用程序和服务主体 | Azure",
+      "pos": [
+        26,
+        53
+      ]
+    },
+    {
+      "content": "介绍如何创建新的 Active Directory 应用程序和服务主体，在 Azure 资源管理器中将此服务主体与基于角色的访问控制配合使用可以管理对资源的访问权限。",
+      "pos": [
+        71,
+        154
+      ]
+    },
+    {
+      "content": "使用门户创建 Active Directory 应用程序和服务主体",
+      "pos": [
+        381,
+        414
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        419,
+        421
+      ]
+    },
+    {
+      "content": "当你的自动化进程或应用程序需要访问或修改订阅中的资源时，你可以使用门户来创建 Active Directory 应用程序，并将它分配到拥有适当权限的角色。通过门户创建某个 Active Directory 应用程序时，实际上会同时创建该应用程序和一个服务主体。设置权限时，将要使用该服务主体。",
+      "pos": [
+        422,
+        568
+      ]
+    },
+    {
+      "pos": [
+        570,
+        854
+      ],
+      "content": "本主题说明如何使用门户创建新的应用程序和服务主体。目前，你必须使用门户来创建新的 Active Directory 应用程序。在以后的版本中，此功能将添加到 Azure 门户。可以使用门户将应用程序添加到角色。你也可以通过 Azure PowerShell 或 Azure CLI 执行这些步骤。若要使用 PowerShell 或 CLI 处理服务主体的详细信息，请参阅<bpt id=\"p1\">[</bpt>使用 Azure 资源管理器对服务主体进行身份验证<ept id=\"p1\">](/documentation/articles/resource-group-authenticate-service-principal)</ept>。"
+    },
+    {
+      "content": "概念",
+      "pos": [
+        859,
+        861
+      ]
+    },
+    {
+      "pos": [
+        865,
+        999
+      ],
+      "content": "Azure Active Directory (AAD) - 云的标识与访问管理服务生成版。有关详细信息，请参阅：<bpt id=\"p1\">[</bpt>什么是 Azure Active Directory<ept id=\"p1\">](/documentation/articles/active-directory-whatis)</ept>"
+    },
+    {
+      "content": "服务主体 - 目录中应用程序的实例。",
+      "pos": [
+        1003,
+        1021
+      ]
+    },
+    {
+      "content": "AD 应用程序 - AAD 中向 AAD 标识某个应用程序的目录记录。",
+      "pos": [
+        1025,
+        1060
+      ]
+    },
+    {
+      "content": "有关应用程序和服务主体的详细说明，请参阅<bpt id=\"p1\">[</bpt>应用程序对象和服务主体对象<ept id=\"p1\">](/documentation/articles/active-directory-application-objects)</ept>。",
+      "pos": [
+        1063,
+        1161
+      ]
+    },
+    {
+      "content": "有关 Active Directory 身份验证的详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure AD 的身份验证方案<ept id=\"p1\">](/documentation/articles/active-directory-authentication-scenarios)</ept>。",
+      "pos": [
+        1162,
+        1282
+      ]
+    },
+    {
+      "content": "创建应用程序对象和服务主体对象",
+      "pos": [
+        1288,
+        1303
+      ]
+    },
+    {
+      "pos": [
+        1308,
+        1369
+      ],
+      "content": "通过 <bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">](https://manage.windowsazure.cn/)</ept>登录到你的 Azure 帐户。"
+    },
+    {
+      "content": "在左侧窗格中选择“Active Directory”。",
+      "pos": [
+        1374,
+        1401
+      ]
+    },
+    {
+      "content": "选择“Active Directory”",
+      "pos": [
+        1410,
+        1430
+      ]
+    },
+    {
+      "content": "选择你要用来创建新应用程序的目录。",
+      "pos": [
+        1439,
+        1456
+      ]
+    },
+    {
+      "content": "选择目录",
+      "pos": [
+        1465,
+        1469
+      ]
+    },
+    {
+      "content": "若要查看目录中的应用程序，请单击“应用程序”。",
+      "pos": [
+        1478,
+        1501
+      ]
+    },
+    {
+      "content": "查看应用程序",
+      "pos": [
+        1510,
+        1516
+      ]
+    },
+    {
+      "content": "如果你之前尚未在该目录中创建应用程序，则应该会看到与下面类似的图像。单击“添加应用程序”。",
+      "pos": [
+        1526,
+        1571
+      ]
+    },
+    {
+      "content": "添加应用程序",
+      "pos": [
+        1580,
+        1586
+      ]
+    },
+    {
+      "content": "或者，单击底部窗格中的“添加”。",
+      "pos": [
+        1597,
+        1613
+      ]
+    },
+    {
+      "content": "添加",
+      "pos": [
+        1622,
+        1624
+      ]
+    },
+    {
+      "content": "选择你想要创建的应用程序类型。对于本教程，我们将不使用库中的应用程序。",
+      "pos": [
+        1634,
+        1669
+      ]
+    },
+    {
+      "content": "新应用程序",
+      "pos": [
+        1678,
+        1683
+      ]
+    },
+    {
+      "content": "填写应用程序名称，然后选择你要使用的应用程序类型。由于我们想要使用此应用程序的服务主体在 Azure 资源管理器上进行身份验证，因此要选择创建“Web 应用程序和/或 WEB API”，然后单击“下一步”按钮。",
+      "pos": [
+        1693,
+        1798
+      ]
+    },
+    {
+      "content": "命名应用程序",
+      "pos": [
+        1807,
+        1813
+      ]
+    },
+    {
+      "content": "填写应用程序的属性。对于“登入 URL”，请提供用于描述应用程序的网站 URI。将不验证网站是否存在。对于“应用程序 ID URI”，请提供用于标识应用程序的 URI。将不验证终结点的唯一性或存在性。单击“完成”创建 AAD 应用程序。",
+      "pos": [
+        1822,
+        1940
+      ]
+    },
+    {
+      "content": "应用程序属性",
+      "pos": [
+        1949,
+        1955
+      ]
+    },
+    {
+      "content": "为应用程序创建身份验证密钥",
+      "pos": [
+        1964,
+        1977
+      ]
+    },
+    {
+      "content": "门户现在应该已选择你的应用程序。",
+      "pos": [
+        1978,
+        1994
+      ]
+    },
+    {
+      "content": "单击“配置”选项卡以配置应用程序的密码。",
+      "pos": [
+        1999,
+        2019
+      ]
+    },
+    {
+      "content": "配置应用程序",
+      "pos": [
+        2028,
+        2034
+      ]
+    },
+    {
+      "content": "向下滚动到“密钥”部分，并选择你希望密码保持有效的时间。",
+      "pos": [
+        2043,
+        2071
+      ]
+    },
+    {
+      "content": "密钥",
+      "pos": [
+        2080,
+        2082
+      ]
+    },
+    {
+      "content": "选择“保存”以创建密钥。",
+      "pos": [
+        2091,
+        2103
+      ]
+    },
+    {
+      "content": "保存",
+      "pos": [
+        2112,
+        2114
+      ]
+    },
+    {
+      "content": "随后将显示保存的密钥，你可以复制该密钥。以后你无法检索该密钥，因此建议你复制该密钥。",
+      "pos": [
+        2126,
+        2168
+      ]
+    },
+    {
+      "content": "保存的密钥",
+      "pos": [
+        2177,
+        2182
+      ]
+    },
+    {
+      "content": "现在，你可以使用该密钥来以服务主体的身份进行身份验证。除了“密钥”以外，你还需要使用“客户端 ID”来登录。转到“客户端 ID”并复制它。",
+      "pos": [
+        2191,
+        2260
+      ]
+    },
+    {
+      "content": "客户端 ID",
+      "pos": [
+        2271,
+        2277
+      ]
+    },
+    {
+      "content": "在某些情况下，你需要连同身份验证请求一起传递租户 ID。可以通过选择“查看终结点”并检索 ID 来检索租户 ID，如下所示。",
+      "pos": [
+        2286,
+        2348
+      ]
+    },
+    {
+      "content": "你的应用程序现已准备就绪，并且租户上已创建服务主体。以服务主体身份登录时，请务必使用：",
+      "pos": [
+        2350,
+        2393
+      ]
+    },
+    {
+      "pos": [
+        2397,
+        2419
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>客户端 ID<ept id=\"p1\">**</ept> - 与你的用户名相同。"
+    },
+    {
+      "pos": [
+        2422,
+        2439
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>密钥<ept id=\"p1\">**</ept> - 与你的密码相同。"
+    },
+    {
+      "pos": [
+        2441,
+        2529
+      ],
+      "content": "可以使用<bpt id=\"p1\">[</bpt>Azure 门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>将 Active Directory 应用程序分配到有权访问你需要访问的资源的角色。"
+    },
+    {
+      "content": "在代码中获取访问令牌",
+      "pos": [
+        2534,
+        2544
+      ]
+    },
+    {
+      "content": "如果你正在使用 .NET，可以通过以下代码检索应用程序的访问令牌。",
+      "pos": [
+        2546,
+        2579
+      ]
+    },
+    {
+      "content": "首先，必须将 Active Directory 身份验证库安装到你的 Visual Studio 项目中。执行此操作的最简单方法是使用 NuGet 包。打开包管理器控制台并键入以下命令。",
+      "pos": [
+        2581,
+        2674
+      ]
+    },
+    {
+      "content": "在你的应用程序中，添加如下所示的方法以检索令牌。",
+      "pos": [
+        2850,
+        2874
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        3508,
+        3512
+      ]
+    },
+    {
+      "pos": [
+        3516,
+        3629
+      ],
+      "content": "若要了解如何指定安全策略，请参阅 <bpt id=\"p1\">[</bpt>Azure 基于角色的访问控制<ept id=\"p1\">](/documentation/articles/active-directory/role-based-access-control-configure)</ept>。"
+    },
+    {
+      "pos": [
+        3634,
+        3846
+      ],
+      "content": "有关这些步骤的演示视频，请参阅<bpt id=\"p1\">[</bpt>使用 Azure Active Directory 启用 Azure 资源的编程管理<ept id=\"p1\">](https://channel9.msdn.com/Series/Azure-Active-Directory-Videos-Demos/Enabling-Programmatic-Management-of-an-Azure-Resource-with-Azure-Active-Directory)</ept>。"
+    },
+    {
+      "pos": [
+        3849,
+        4016
+      ],
+      "content": "若要了解如何使用 Azure PowerShell 或 Azure CLI 来处理 Active Directory 应用程序和服务主体，包括如何使用证书进行身份验证，请参阅<bpt id=\"p1\">[</bpt>通过 Azure 资源管理器对服务主体进行身份验证<ept id=\"p1\">](./resource-group-authenticate-service-principal.md)</ept>。"
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"在门户中创建 AD 应用程序和服务主体 | Azure\"\n   description=\"介绍如何创建新的 Active Directory 应用程序和服务主体，在 Azure 资源管理器中将此服务主体与基于角色的访问控制配合使用可以管理对资源的访问权限。\"\n   services=\"azure-resource-manager\"\n   documentationCenter=\"na\"\n   authors=\"tfitzmac\"\n   manager=\"wpickett\"\n   editor=\"\"/>\n\n<tags\n   ms.service=\"azure-resource-manager\"\n   ms.date=\"12/17/2015\"\n   wacn.date=\"01/14/2016\"/>\n\n# 使用门户创建 Active Directory 应用程序和服务主体\n\n## 概述\n当你的自动化进程或应用程序需要访问或修改订阅中的资源时，你可以使用门户来创建 Active Directory 应用程序，并将它分配到拥有适当权限的角色。通过门户创建某个 Active Directory 应用程序时，实际上会同时创建该应用程序和一个服务主体。设置权限时，将要使用该服务主体。\n\n本主题说明如何使用门户创建新的应用程序和服务主体。目前，你必须使用门户来创建新的 Active Directory 应用程序。在以后的版本中，此功能将添加到 Azure 门户。可以使用门户将应用程序添加到角色。你也可以通过 Azure PowerShell 或 Azure CLI 执行这些步骤。若要使用 PowerShell 或 CLI 处理服务主体的详细信息，请参阅[使用 Azure 资源管理器对服务主体进行身份验证](/documentation/articles/resource-group-authenticate-service-principal)。\n\n## 概念\n1. Azure Active Directory (AAD) - 云的标识与访问管理服务生成版。有关详细信息，请参阅：[什么是 Azure Active Directory](/documentation/articles/active-directory-whatis)\n2. 服务主体 - 目录中应用程序的实例。\n3. AD 应用程序 - AAD 中向 AAD 标识某个应用程序的目录记录。 \n\n有关应用程序和服务主体的详细说明，请参阅[应用程序对象和服务主体对象](/documentation/articles/active-directory-application-objects)。\n有关 Active Directory 身份验证的详细信息，请参阅 [Azure AD 的身份验证方案](/documentation/articles/active-directory-authentication-scenarios)。\n\n\n## 创建应用程序对象和服务主体对象\n\n1. 通过 [Azure 门户](https://manage.windowsazure.cn/)登录到你的 Azure 帐户。\n\n2. 在左侧窗格中选择“Active Directory”。\n\n     ![选择“Active Directory”][1]\n\n3. 选择你要用来创建新应用程序的目录。\n\n     ![选择目录][2]\n\n3. 若要查看目录中的应用程序，请单击“应用程序”。\n\n     ![查看应用程序][11]\n\n4. 如果你之前尚未在该目录中创建应用程序，则应该会看到与下面类似的图像。单击“添加应用程序”。\n\n     ![添加应用程序][6]\n\n     或者，单击底部窗格中的“添加”。\n\n     ![添加][12]\n\n5. 选择你想要创建的应用程序类型。对于本教程，我们将不使用库中的应用程序。\n\n     ![新应用程序][10]\n\n6. 填写应用程序名称，然后选择你要使用的应用程序类型。由于我们想要使用此应用程序的服务主体在 Azure 资源管理器上进行身份验证，因此要选择创建“Web 应用程序和/或 WEB API”，然后单击“下一步”按钮。\n\n     ![命名应用程序][9]\n\n7. 填写应用程序的属性。对于“登入 URL”，请提供用于描述应用程序的网站 URI。将不验证网站是否存在。对于“应用程序 ID URI”，请提供用于标识应用程序的 URI。将不验证终结点的唯一性或存在性。单击“完成”创建 AAD 应用程序。\n\n     ![应用程序属性][4]\n\n## 为应用程序创建身份验证密钥\n门户现在应该已选择你的应用程序。\n\n1. 单击“配置”选项卡以配置应用程序的密码。\n\n     ![配置应用程序][3]\n\n2. 向下滚动到“密钥”部分，并选择你希望密码保持有效的时间。\n\n     ![密钥][7]\n\n3. 选择“保存”以创建密钥。\n\n     ![保存][13]\n\n     随后将显示保存的密钥，你可以复制该密钥。以后你无法检索该密钥，因此建议你复制该密钥。\n\n     ![保存的密钥][8]\n\n4. 现在，你可以使用该密钥来以服务主体的身份进行身份验证。除了“密钥”以外，你还需要使用“客户端 ID”来登录。转到“客户端 ID”并复制它。\n  \n     ![客户端 ID][5]\n\n5. 在某些情况下，你需要连同身份验证请求一起传递租户 ID。可以通过选择“查看终结点”并检索 ID 来检索租户 ID，如下所示。\n\n你的应用程序现已准备就绪，并且租户上已创建服务主体。以服务主体身份登录时，请务必使用：\n\n* **客户端 ID** - 与你的用户名相同。\n* **密钥** - 与你的密码相同。\n\n可以使用[Azure 门户](https://manage.windowsazure.cn)将 Active Directory 应用程序分配到有权访问你需要访问的资源的角色。\n\n## 在代码中获取访问令牌\n\n如果你正在使用 .NET，可以通过以下代码检索应用程序的访问令牌。\n\n首先，必须将 Active Directory 身份验证库安装到你的 Visual Studio 项目中。执行此操作的最简单方法是使用 NuGet 包。打开包管理器控制台并键入以下命令。\n\n    PM> Install-Package Microsoft.IdentityModel.Clients.ActiveDirectory -Version 2.19.208020213\n    PM> Update-Package Microsoft.IdentityModel.Clients.ActiveDirectory -Safe\n\n在你的应用程序中，添加如下所示的方法以检索令牌。\n\n    public static string GetAccessToken()\n    {\n        var authenticationContext = new AuthenticationContext(\"https://login.chinacloudapi.cn/{tenantId or tenant name}\");  \n        var credential = new ClientCredential(clientId: \"{application id}\", clientSecret: \"{application password}\");\n        var result = authenticationContext.AcquireToken(resource: \"https://management.core.chinacloudapi.cn/\", clientCredential:credential);\n\n        if (result == null) {\n            throw new InvalidOperationException(\"Failed to obtain the JWT token\");\n        }\n\n        string token = result.AccessToken;\n\n        return token;\n    }\n\n## 后续步骤\n\n- 若要了解如何指定安全策略，请参阅 [Azure 基于角色的访问控制](/documentation/articles/active-directory/role-based-access-control-configure)。  \n- 有关这些步骤的演示视频，请参阅[使用 Azure Active Directory 启用 Azure 资源的编程管理](https://channel9.msdn.com/Series/Azure-Active-Directory-Videos-Demos/Enabling-Programmatic-Management-of-an-Azure-Resource-with-Azure-Active-Directory)。\n- 若要了解如何使用 Azure PowerShell 或 Azure CLI 来处理 Active Directory 应用程序和服务主体，包括如何使用证书进行身份验证，请参阅[通过 Azure 资源管理器对服务主体进行身份验证](./resource-group-authenticate-service-principal.md)。\n\n\n<!-- Images. -->\n[1]: ./media/resource-group-create-service-principal-portal/active-directory.png\n[2]: ./media/resource-group-create-service-principal-portal/active-directory-details.png\n[3]: ./media/resource-group-create-service-principal-portal/application-configure.png\n[4]: ./media/resource-group-create-service-principal-portal/app-properties.png\n[5]: ./media/resource-group-create-service-principal-portal/client-id.png\n[6]: ./media/resource-group-create-service-principal-portal/create-application.png\n[7]: ./media/resource-group-create-service-principal-portal/create-key.png\n[8]: ./media/resource-group-create-service-principal-portal/save-key.png\n[9]: ./media/resource-group-create-service-principal-portal/tell-us-about-your-application.png\n[10]: ./media/resource-group-create-service-principal-portal/what-do-you-want-to-do.png\n[11]: ./media/resource-group-create-service-principal-portal/view-applications.png\n[12]: ./media/resource-group-create-service-principal-portal/add-icon.png\n[13]: ./media/resource-group-create-service-principal-portal/save-icon.png\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

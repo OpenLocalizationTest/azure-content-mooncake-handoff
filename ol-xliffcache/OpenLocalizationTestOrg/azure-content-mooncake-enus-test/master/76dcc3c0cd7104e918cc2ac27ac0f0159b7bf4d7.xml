@@ -1,0 +1,194 @@
+{
+  "nodes": [
+    {
+      "content": "将自定义数据注入到虚拟机中 | Azure",
+      "pos": [
+        27,
+        48
+      ]
+    },
+    {
+      "content": "本主题介绍如何在创建实例时将自定义数据注入到 Azure 虚拟机中，以及如何在 Windows 或 Linux 上找到自定义数据。",
+      "pos": [
+        67,
+        132
+      ]
+    },
+    {
+      "content": "将自定义数据注入到 Azure 虚拟机中",
+      "pos": [
+        394,
+        414
+      ]
+    },
+    {
+      "content": "无论操作系统是 Windows 还是 Linux 分发，在设置 Azure 虚拟机时，将脚本或其他数据注入到 Azure 虚拟机都是非常常见的方案。",
+      "pos": [
+        416,
+        490
+      ]
+    },
+    {
+      "pos": [
+        492,
+        578
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]"
+    },
+    {
+      "content": "本主题介绍如何执行以下操作：",
+      "pos": [
+        581,
+        595
+      ]
+    },
+    {
+      "content": "在预配 Azure 虚拟机时，将数据注入到 Azure 虚拟机中。",
+      "pos": [
+        599,
+        632
+      ]
+    },
+    {
+      "content": "针对 Windows 和 Linux 检索它。",
+      "pos": [
+        636,
+        659
+      ]
+    },
+    {
+      "content": "使用某些系统上提供的特殊工具来检测和自动处理自定义数据。",
+      "pos": [
+        663,
+        691
+      ]
+    },
+    {
+      "pos": [
+        695,
+        869
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 本文介绍了如何才能使用通过 Azure 服务管理 API 创建的 VM 注入自定义数据。若要了解如何使用 Azure 资源管理 API，请参阅<bpt id=\"p1\">[</bpt>示例模板<ept id=\"p1\">](https://github.com/Azure/azure-quickstart-templates/tree/master/101-vm-customdata)</ept>。"
+    },
+    {
+      "content": "将自定义数据注入到 Azure 虚拟机中",
+      "pos": [
+        874,
+        894
+      ]
+    },
+    {
+      "pos": [
+        896,
+        1016
+      ],
+      "content": "当前仅在 <bpt id=\"p1\">[</bpt>Azure 命令行界面<ept id=\"p1\">](https://github.com/Azure/azure-xplat-cli)</ept>上支持此功能。尽管你可以使用 <ph id=\"ph1\">`azure vm create`</ph> 命令的任何选项，但以下内容演示的是一个非常基本的方法。"
+    },
+    {
+      "content": "在虚拟机中使用自定义数据",
+      "pos": [
+        1377,
+        1389
+      ]
+    },
+    {
+      "pos": [
+        1393,
+        1529
+      ],
+      "content": "如果你的 Azure 虚拟机是基于 Windows 的虚拟机，则自定义数据文件将保存到 <ph id=\"ph1\">`%SYSTEMDRIVE%\\AzureData\\CustomData.bin`</ph>。虽然它已进行 Base64 编码，以便从本地计算机传输到新虚拟机，但它将自动解码并可以立即打开或使用。"
+    },
+    {
+      "pos": [
+        1535,
+        1630
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 如果该文件存在，它将被覆盖。目录的安全性已设为 <bpt id=\"p1\">**</bpt>System:Full Control<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>Administrators:Full Control<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "如果你的 Azure 虚拟机是基于 Linux 的虚拟机，则自定义数据文件将位于以下两个位置。数据将会是 base64 编码的，因此需要首先对数据进行解码。",
+      "pos": [
+        1634,
+        1712
+      ]
+    },
+    {
+      "pos": [
+        1720,
+        1754
+      ],
+      "content": "在 <ph id=\"ph1\">`/var/lib/waagent/ovf-env.xml`</ph> 上"
+    },
+    {
+      "pos": [
+        1761,
+        1794
+      ],
+      "content": "在 <ph id=\"ph1\">`/var/lib/waagent/CustomData`</ph> 上"
+    },
+    {
+      "content": "Azure 中的 Cloud-init",
+      "pos": [
+        1801,
+        1820
+      ]
+    },
+    {
+      "content": "如果你的 Azure 虚拟机来自 Ubuntu 或 CoreOS 映像，则可以使用 CustomData 将 cloud-config 发送到 cloud-init。或者，如果你的自定义数据文件是一个脚本，则 cloud-init 只需执行它。",
+      "pos": [
+        1822,
+        1944
+      ]
+    },
+    {
+      "content": "Ubuntu 云映像",
+      "pos": [
+        1950,
+        1960
+      ]
+    },
+    {
+      "pos": [
+        1962,
+        2118
+      ],
+      "content": "在大多数 Azure Linux 映像中，你将编辑“/etc/waagent.conf”来配置临时资源磁盘和交换文件。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure Linux 代理用户指南<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-agent-user-guide)</ept>。"
+    },
+    {
+      "pos": [
+        2120,
+        2276
+      ],
+      "content": "但是，在 Ubuntu 云映像上，你必须使用 cloud-init 来配置资源磁盘（又称“临时”磁盘）和交换分区。有关更多详细信息，请参阅 Ubuntu wiki 上的以下页面：<bpt id=\"p1\">[</bpt>AzureSwapPartitions<ept id=\"p1\">](https://wiki.ubuntu.com/AzureSwapPartitions)</ept>。"
+    },
+    {
+      "content": "后续步骤：使用 cloud-init",
+      "pos": [
+        2399,
+        2417
+      ]
+    },
+    {
+      "pos": [
+        2419,
+        2505
+      ],
+      "content": "有关更多详细信息，请参阅<bpt id=\"p1\">[</bpt>适用于 Ubuntu 的 cloud-init 文档<ept id=\"p1\">](https://help.ubuntu.com/community/CloudInit)</ept>。"
+    },
+    {
+      "content": "添加 Azure 角色服务管理 REST API 参考",
+      "pos": [
+        2531,
+        2558
+      ]
+    },
+    {
+      "content": "Azure 命令行界面",
+      "pos": [
+        2623,
+        2634
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"将自定义数据注入到虚拟机中 | Azure\"\n    description=\"本主题介绍如何在创建实例时将自定义数据注入到 Azure 虚拟机中，以及如何在 Windows 或 Linux 上找到自定义数据。\"\n    services=\"virtual-machines\"\n    documentationCenter=\"\"\n    authors=\"squillace\"\n    manager=\"timlt\"\n    editor=\"tysonn\"\n    tags=\"azure-service-management\" />\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"12/08/2015\"\n    wacn.date=\"01/29/2016\"/>\n\n\n#将自定义数据注入到 Azure 虚拟机中\n\n无论操作系统是 Windows 还是 Linux 分发，在设置 Azure 虚拟机时，将脚本或其他数据注入到 Azure 虚拟机都是非常常见的方案。\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]\n\n\n本主题介绍如何执行以下操作：\n\n- 在预配 Azure 虚拟机时，将数据注入到 Azure 虚拟机中。\n\n- 针对 Windows 和 Linux 检索它。\n\n- 使用某些系统上提供的特殊工具来检测和自动处理自定义数据。\n\n> [AZURE.NOTE] 本文介绍了如何才能使用通过 Azure 服务管理 API 创建的 VM 注入自定义数据。若要了解如何使用 Azure 资源管理 API，请参阅[示例模板](https://github.com/Azure/azure-quickstart-templates/tree/master/101-vm-customdata)。\n\n## 将自定义数据注入到 Azure 虚拟机中\n\n当前仅在 [Azure 命令行界面](https://github.com/Azure/azure-xplat-cli)上支持此功能。尽管你可以使用 `azure vm create` 命令的任何选项，但以下内容演示的是一个非常基本的方法。\n\n    \n        PASSWORD='AcceptablePassword -- more than 8 chars, a cap, a num, a special'\n        VMNAME=mycustomdataubuntu\n        USERNAME=username\n        VMIMAGE= An image chosen from among those listed by azure vm image list\n        azure vm create $VMNAME $VMIMAGE $USERNAME $PASSWORD --location \"China North\" --json -d ./custom-data.txt -e 22\n    \n\n\n## 在虚拟机中使用自定义数据\n\n+ 如果你的 Azure 虚拟机是基于 Windows 的虚拟机，则自定义数据文件将保存到 `%SYSTEMDRIVE%\\AzureData\\CustomData.bin`。虽然它已进行 Base64 编码，以便从本地计算机传输到新虚拟机，但它将自动解码并可以立即打开或使用。\n\n   >[AZURE.NOTE] 如果该文件存在，它将被覆盖。目录的安全性已设为 **System:Full Control** 和 **Administrators:Full Control**。\n\n+ 如果你的 Azure 虚拟机是基于 Linux 的虚拟机，则自定义数据文件将位于以下两个位置。数据将会是 base64 编码的，因此需要首先对数据进行解码。\n\n    + 在 `/var/lib/waagent/ovf-env.xml` 上\n    + 在 `/var/lib/waagent/CustomData` 上\n\n\n\n## Azure 中的 Cloud-init\n\n如果你的 Azure 虚拟机来自 Ubuntu 或 CoreOS 映像，则可以使用 CustomData 将 cloud-config 发送到 cloud-init。或者，如果你的自定义数据文件是一个脚本，则 cloud-init 只需执行它。\n\n### Ubuntu 云映像\n\n在大多数 Azure Linux 映像中，你将编辑“/etc/waagent.conf”来配置临时资源磁盘和交换文件。有关详细信息，请参阅 [Azure Linux 代理用户指南](/documentation/articles/virtual-machines-linux-agent-user-guide)。\n\n但是，在 Ubuntu 云映像上，你必须使用 cloud-init 来配置资源磁盘（又称“临时”磁盘）和交换分区。有关更多详细信息，请参阅 Ubuntu wiki 上的以下页面：[AzureSwapPartitions](https://wiki.ubuntu.com/AzureSwapPartitions)。\n\n\n\n<!--Every topic should have next steps and links to the next logical set of content to keep the customer engaged-->\n## 后续步骤：使用 cloud-init\n\n有关更多详细信息，请参阅[适用于 Ubuntu 的 cloud-init 文档](https://help.ubuntu.com/community/CloudInit)。\n\n<!--Link references-->\n[添加 Azure 角色服务管理 REST API 参考](http://msdn.microsoft.com/zh-cn/library/azure/jj157186.aspx)\n\n[Azure 命令行界面](https://github.com/Azure/azure-xplat-cli)\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

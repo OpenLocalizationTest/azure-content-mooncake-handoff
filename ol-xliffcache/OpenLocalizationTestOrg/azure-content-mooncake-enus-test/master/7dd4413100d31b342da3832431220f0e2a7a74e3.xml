@@ -1,0 +1,187 @@
+{
+  "nodes": [
+    {
+      "content": "使用 MSDeploy、主机名和 SSL 证书部署 Web 应用",
+      "pos": [
+        27,
+        59
+      ]
+    },
+    {
+      "content": "通过使用 MSDeploy 并设置自定义主机名和 SSL 证书，在 Azure 资源管理器模板中部署 Web 应用",
+      "pos": [
+        78,
+        135
+      ]
+    },
+    {
+      "content": "使用 MSDeploy、自定义主机名和 SSL 证书部署 Web 应用",
+      "pos": [
+        322,
+        357
+      ]
+    },
+    {
+      "content": "本指南逐步说明如何通过利用 MSDeploy，以及将自定义主机名和 SSL 证书添加到 ARM 模板，来创建 Azure Web 应用的端到端部署。",
+      "pos": [
+        359,
+        433
+      ]
+    },
+    {
+      "pos": [
+        435,
+        529
+      ],
+      "content": "有关创建模板的详细信息，请参阅<bpt id=\"p1\">[</bpt>创作 Azure 资源管理器模板<ept id=\"p1\">](/documentation/articles/resource-group-authoring-templates)</ept>。"
+    },
+    {
+      "content": "创建示例应用程序",
+      "pos": [
+        534,
+        542
+      ]
+    },
+    {
+      "content": "你将部署一个 ASP.NET Web 应用程序。第一步是创建简单的 Web 应用程序（或者，可以选择使用现有的应用程序 - 在这种情况下，可以跳过此步骤）。",
+      "pos": [
+        544,
+        622
+      ]
+    },
+    {
+      "content": "打开 Visual Studio 2015，然后选择“文件”&gt;“新建项目”。在出现的对话框中，选择“Web”&gt;“ASP.NET Web 应用程序”。在“模板”下选择“Web”，然后选择 MVC 模板。在“更改身份验证类型”中，选择“无身份验证”。这是为了尽量简化示例应用程序。",
+      "pos": [
+        624,
+        762
+      ]
+    },
+    {
+      "content": "此时，你将获得一个可随时在部署过程中使用的基本 ASP.Net Web 应用。",
+      "pos": [
+        764,
+        803
+      ]
+    },
+    {
+      "content": "创建 MSDeploy 包",
+      "pos": [
+        808,
+        821
+      ]
+    },
+    {
+      "content": "下一步是创建用于将 Web 应用部署到 Azure 的包。为此，请保存你的项目，然后从命令行运行以下命令：",
+      "pos": [
+        823,
+        876
+      ]
+    },
+    {
+      "content": "这将在 PackageLocation 文件夹下创建一个压缩包。现在，应用程序可供部署，你可以构建 Azure 资源管理器模板来执行此操作。",
+      "pos": [
+        961,
+        1031
+      ]
+    },
+    {
+      "content": "创建 ARM 模板",
+      "pos": [
+        1036,
+        1045
+      ]
+    },
+    {
+      "content": "首先，让我们创建一个基本的 ARM 模板，以便创建 Web 应用程序和托管计划（请注意，为求简洁，此处并未显示参数和变量）。",
+      "pos": [
+        1046,
+        1108
+      ]
+    },
+    {
+      "content": "接下来，需要修改 Web 应用资源，以使用嵌套的 MSDeploy 资源。这样便可以引用前面创建的包，并指示 Azure 资源管理器使用 MSDeploy 将包部署到 Azure WebApp。下面显示了包含嵌套 MSDeploy 资源的 Microsoft.Web/sites 资源：",
+      "pos": [
+        2367,
+        2510
+      ]
+    },
+    {
+      "pos": [
+        4164,
+        4211
+      ],
+      "content": "现在，你会注意到 MSDeploy 资源使用了如下定义的 <bpt id=\"p1\">**</bpt>packageUri<ept id=\"p1\">**</ept> 属性："
+    },
+    {
+      "pos": [
+        4407,
+        4730
+      ],
+      "content": "此 <bpt id=\"p1\">**</bpt>packageUri<ept id=\"p1\">**</ept> 使用的存储帐户 URI 指向包 zip 所要上载到的存储帐户。当你部署模板时，Azure 资源管理器会利用<bpt id=\"p2\">[</bpt>共享访问签名<ept id=\"p2\">](/documentation/articles/storage-dotnet-shared-access-signature-part-1)</ept>从存储帐户将包提取到本地。此过程将会通过一个 PowerShell 脚本自动化，该脚本将上载包，调用 Azure 管理 API 以创建所需的密钥，然后将这些密钥作为参数传入模板（ <bpt id=\"p3\">*</bpt>\\_artifactsLocation<ept id=\"p3\">*</ept> 和 <bpt id=\"p4\">*</bpt>\\_artifactsLocationSasToken<ept id=\"p4\">*</ept> ）。你需要针对存储容器下包所上载到的文件夹和文件名定义参数。"
+    },
+    {
+      "pos": [
+        4732,
+        4937
+      ],
+      "content": "接下来，需要加入其他嵌套资源，以设置主机名绑定来利用自定义域。首先，需要确保拥有该主机名，然后对它进行设置，使 Azure 能够验证你是否拥有它 - 请参阅<bpt id=\"p1\">[</bpt>在 Azure Web 应用中配置自定义域名<ept id=\"p1\">](/documentation/articles/web-sites-custom-domain-name)</ept>。完成此操作后，可以将以下内容添加到模板中的 Microsoft.Web/sites 资源部分下："
+    },
+    {
+      "content": "最后，需要添加另一个顶级资源，即 Microsoft.Web/certificates。此资源将包含你的 SSL 证书，并与 Web 应用和托管计划位于同一级别。",
+      "pos": [
+        5328,
+        5409
+      ]
+    },
+    {
+      "content": "需要具备有效的 SSL 证书才能设置此资源。获得有效的证书后，需要提取 base64 字符串形式的 pfx 字节。提取此信息的方法之一是使用以下 PowerShell 命令：",
+      "pos": [
+        5719,
+        5806
+      ]
+    },
+    {
+      "content": "然后，可将此信息作为参数传递给 ARM 部署模板。",
+      "pos": [
+        5966,
+        5991
+      ]
+    },
+    {
+      "content": "至此，ARM 模板已准备就绪。",
+      "pos": [
+        5993,
+        6008
+      ]
+    },
+    {
+      "content": "部署模板",
+      "pos": [
+        6013,
+        6017
+      ]
+    },
+    {
+      "pos": [
+        6019,
+        6340
+      ],
+      "content": "最后一步是将上述所有组成部分整合为完整的端到端部署。若要简化部署，可以利用你在 Visual Studio 中创建 Azure 资源组项目时添加的 <bpt id=\"p1\">**</bpt>Deploy-AzureResourceGroup.ps1 PowerShell<ept id=\"p1\">**</ept> 脚本来上载模板中所需的任何项目。为此，必须事先创建你要使用的存储帐户。在本示例中，我已针对要上载的 package.zip 创建了一个共享存储帐户。脚本将利用 AzCopy 将该包上载到存储帐户。在传入项目文件夹位置后，脚本会自动将该目录中的所有文件上载到指定的存储容器。调用 Deploy-AzureResourceGroup.ps1 之后，必须更新 SSL 绑定，以映射自定义主机名与 SSL 证书。"
+    },
+    {
+      "content": "以下 PowerShell 显示了调用 Deploy-AzureResourceGroup.ps1 的完整部署：",
+      "pos": [
+        6342,
+        6398
+      ]
+    },
+    {
+      "content": "此时，应用程序应已部署，你可以通过 https://www.yourcustomdomain.com 浏览它",
+      "pos": [
+        7848,
+        7902
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"使用 MSDeploy、主机名和 SSL 证书部署 Web 应用\"\n    description=\"通过使用 MSDeploy 并设置自定义主机名和 SSL 证书，在 Azure 资源管理器模板中部署 Web 应用\"\n    services=\"app-service\\web\"\n    documentationCenter=\"\"\n    authors=\"jodehavi\"\n    />\n\n<tags\n    ms.service=\"app-service-web\"\n    ms.date=\"12/22/2015\"\n    wacn.date=\"02/26/2016\"/>\n\n# 使用 MSDeploy、自定义主机名和 SSL 证书部署 Web 应用\n\n本指南逐步说明如何通过利用 MSDeploy，以及将自定义主机名和 SSL 证书添加到 ARM 模板，来创建 Azure Web 应用的端到端部署。\n\n有关创建模板的详细信息，请参阅[创作 Azure 资源管理器模板](/documentation/articles/resource-group-authoring-templates)。\n\n###创建示例应用程序\n\n你将部署一个 ASP.NET Web 应用程序。第一步是创建简单的 Web 应用程序（或者，可以选择使用现有的应用程序 - 在这种情况下，可以跳过此步骤）。\n\n打开 Visual Studio 2015，然后选择“文件”>“新建项目”。在出现的对话框中，选择“Web”>“ASP.NET Web 应用程序”。在“模板”下选择“Web”，然后选择 MVC 模板。在“更改身份验证类型”中，选择“无身份验证”。这是为了尽量简化示例应用程序。\n\n此时，你将获得一个可随时在部署过程中使用的基本 ASP.Net Web 应用。\n\n###创建 MSDeploy 包\n\n下一步是创建用于将 Web 应用部署到 Azure 的包。为此，请保存你的项目，然后从命令行运行以下命令：\n\n    msbuild yourwebapp.csproj /t:Package /p:PackageLocation=\"path\\to\\package.zip\"\n\n这将在 PackageLocation 文件夹下创建一个压缩包。现在，应用程序可供部署，你可以构建 Azure 资源管理器模板来执行此操作。\n\n###创建 ARM 模板\n首先，让我们创建一个基本的 ARM 模板，以便创建 Web 应用程序和托管计划（请注意，为求简洁，此处并未显示参数和变量）。\n\n    {\n        \"name\": \"[parameters('appServicePlanName')]\",\n        \"type\": \"Microsoft.Web/serverfarms\",\n        \"location\": \"[resourceGroup().location]\",\n        \"apiVersion\": \"2014-06-01\",\n        \"dependsOn\": [ ],\n        \"tags\": {\n            \"displayName\": \"appServicePlan\"\n        },\n        \"properties\": {\n            \"name\": \"[parameters('appServicePlanName')]\",\n            \"sku\": \"[parameters('appServicePlanSKU')]\",\n            \"workerSize\": \"[parameters('appServicePlanWorkerSize')]\",\n            \"numberOfWorkers\": 1\n        }\n    },\n    {\n        \"name\": \"[variables('webAppName')]\",\n        \"type\": \"Microsoft.Web/sites\",\n        \"location\": \"[resourceGroup().location]\",\n        \"apiVersion\": \"2015-08-01\",\n        \"dependsOn\": [\n            \"[concat('Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]\"\n        ],\n        \"tags\": {\n            \"[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]\": \"Resource\",\n            \"displayName\": \"webApp\"\n        },\n        \"properties\": {\n            \"name\": \"[variables('webAppName')]\",\n            \"serverFarmId\": \"[resourceId('Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]\"\n        }\n    }\n\n接下来，需要修改 Web 应用资源，以使用嵌套的 MSDeploy 资源。这样便可以引用前面创建的包，并指示 Azure 资源管理器使用 MSDeploy 将包部署到 Azure WebApp。下面显示了包含嵌套 MSDeploy 资源的 Microsoft.Web/sites 资源：\n\n    {\n        \"name\": \"[variables('webAppName')]\",\n        \"type\": \"Microsoft.Web/sites\",\n        \"location\": \"[resourceGroup().location]\",\n        \"apiVersion\": \"2015-08-01\",\n        \"dependsOn\": [\n            \"[concat('Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]\"\n        ],\n        \"tags\": {\n            \"[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]\": \"Resource\",\n            \"displayName\": \"webApp\"\n        },\n        \"properties\": {\n            \"name\": \"[variables('webAppName')]\",\n            \"serverFarmId\": \"[resourceId('Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]\"\n        },\n        \"resources\": [\n            {\n                \"name\": \"MSDeploy\",\n                \"type\": \"extensions\",\n                \"location\": \"[resourceGroup().location]\",\n                \"apiVersion\": \"2015-08-01\",\n                \"dependsOn\": [\n                    \"[concat('Microsoft.Web/sites/', variables('webAppName'))]\"\n                ],\n                \"tags\": {\n                    \"displayName\": \"webDeploy\"\n                },\n                \"properties\": {\n                    \"packageUri\": \"[concat(parameters('_artifactsLocation'), '/', parameters('webDeployPackageFolder'), '/', parameters('webDeployPackageFileName'), parameters('_artifactsLocationSasToken'))]\",\n                    \"dbType\": \"None\",\n                    \"connectionString\": \"\",\n                    \"setParameters\": {\n                        \"IIS Web Application Name\": \"[variables('webAppName')]\"\n                    }\n                }\n            }\n        ]\n    }\n\n现在，你会注意到 MSDeploy 资源使用了如下定义的 **packageUri** 属性：\n\n    \"packageUri\": \"[concat(parameters('_artifactsLocation'), '/', parameters('webDeployPackageFolder'), '/', parameters('webDeployPackageFileName'), parameters('_artifactsLocationSasToken'))]\"\n\n此 **packageUri** 使用的存储帐户 URI 指向包 zip 所要上载到的存储帐户。当你部署模板时，Azure 资源管理器会利用[共享访问签名](/documentation/articles/storage-dotnet-shared-access-signature-part-1)从存储帐户将包提取到本地。此过程将会通过一个 PowerShell 脚本自动化，该脚本将上载包，调用 Azure 管理 API 以创建所需的密钥，然后将这些密钥作为参数传入模板（ *\\_artifactsLocation* 和 *\\_artifactsLocationSasToken* ）。你需要针对存储容器下包所上载到的文件夹和文件名定义参数。\n\n接下来，需要加入其他嵌套资源，以设置主机名绑定来利用自定义域。首先，需要确保拥有该主机名，然后对它进行设置，使 Azure 能够验证你是否拥有它 - 请参阅[在 Azure Web 应用中配置自定义域名](/documentation/articles/web-sites-custom-domain-name)。完成此操作后，可以将以下内容添加到模板中的 Microsoft.Web/sites 资源部分下：\n\n    {\n        \"apiVersion\": \"2015-08-01\",\n        \"type\": \"hostNameBindings\",\n        \"name\": \"www.yourcustomdomain.com\",\n        \"dependsOn\": [\n            \"[concat('Microsoft.Web/sites/', variables('webAppName'))]\"\n        ],\n        \"properties\": {\n            \"domainId\": null,\n            \"hostNameType\": \"Verified\",\n            \"siteName\": \"variables('webAppName')\"\n        }\n    }\n\n最后，需要添加另一个顶级资源，即 Microsoft.Web/certificates。此资源将包含你的 SSL 证书，并与 Web 应用和托管计划位于同一级别。\n\n    {\n        \"name\": \"[parameters('certificateName')]\",\n        \"apiVersion\": \"2014-04-01\",\n        \"type\": \"Microsoft.Web/certificates\",\n        \"location\": \"[resourceGroup().location]\",\n        \"properties\": {\n            \"pfxBlob\": \"pfx base64 blob\",\n            \"password\": \"some pass\"\n        }\n    }\n\n需要具备有效的 SSL 证书才能设置此资源。获得有效的证书后，需要提取 base64 字符串形式的 pfx 字节。提取此信息的方法之一是使用以下 PowerShell 命令：\n\n    $fileContentBytes = get-content 'C:\\path\\to\\cert.pfx' -Encoding Byte\n\n    [System.Convert]::ToBase64String($fileContentBytes) | Out-File 'pfx-bytes.txt'\n\n然后，可将此信息作为参数传递给 ARM 部署模板。\n\n至此，ARM 模板已准备就绪。\n\n###部署模板\n\n最后一步是将上述所有组成部分整合为完整的端到端部署。若要简化部署，可以利用你在 Visual Studio 中创建 Azure 资源组项目时添加的 **Deploy-AzureResourceGroup.ps1 PowerShell** 脚本来上载模板中所需的任何项目。为此，必须事先创建你要使用的存储帐户。在本示例中，我已针对要上载的 package.zip 创建了一个共享存储帐户。脚本将利用 AzCopy 将该包上载到存储帐户。在传入项目文件夹位置后，脚本会自动将该目录中的所有文件上载到指定的存储容器。调用 Deploy-AzureResourceGroup.ps1 之后，必须更新 SSL 绑定，以映射自定义主机名与 SSL 证书。\n\n以下 PowerShell 显示了调用 Deploy-AzureResourceGroup.ps1 的完整部署：\n\n    #Set resource group name\n    $rgName = \"Name-of-resource-group\"\n\n    #call deploy-azureresourcegroup script to deploy web app\n\n    .\\Deploy-AzureResourceGroup.ps1 -ResourceGroupLocation \"China East\" `\n                                    -ResourceGroupName $rgName `\n                                    -UploadArtifacts \"container-name\" `\n                                    -StorageAccountName \"name-of-storage-acct-for-package\" `\n                                    -StorageAccountResourceGroupName \"resource-group-name-storage-acct\" `\n                                    -TemplateFile \"web-app-deploy.json\" `\n                                    -TemplateParametersFile \"web-app-deploy-parameters.json\" `\n                                    -ArtifactStagingDirectory \"C:\\path\\to\\packagefolder\"\n\n    #update web app to bind ssl certificate to hostname. This has to be done after creation above.\n\n    $cert = Get-PfxCertificate -FilePath C:\\path\\to\\certificate.pfx\n\n    $ar = Get-AzureRmResource -Name nameofwebsite -ResourceGroupName $rgName -ResourceType Microsoft.Web/sites -ApiVersion 2014-11-01\n\n    $props = $ar.Properties\n\n    $props.HostNameSslStates[2].'SslState' = 1\n    $props.HostNameSslStates[2].'thumbprint' = $cert.Thumbprint\n    $props.hostNameSslStates[2].'toUpdate' = $true\n\n    Set-AzureRmResource -ApiVersion 2014-11-01 -Name nameofwebsite -ResourceGroupName $rgName -ResourceType Microsoft.Web/sites -PropertyObject $props\n\n此时，应用程序应已部署，你可以通过 https://www.yourcustomdomain.com 浏览它\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

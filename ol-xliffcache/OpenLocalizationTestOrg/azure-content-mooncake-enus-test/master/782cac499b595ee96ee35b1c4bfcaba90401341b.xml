@@ -1,0 +1,656 @@
+{
+  "nodes": [
+    {
+      "content": "使用 Azure 资源管理器创建和配置具有内部负载平衡器 (ILB) 的应用程序网关 | Azure",
+      "pos": [
+        27,
+        77
+      ]
+    },
+    {
+      "content": "本页提供有关使用 Azure 资源管理器创建、配置、启动和删除具有内部负载平衡器 (ILB) 的 Azure 应用程序网关的说明",
+      "pos": [
+        95,
+        159
+      ]
+    },
+    {
+      "content": "使用 Azure 资源管理器创建具有内部负载平衡器 (ILB) 的应用程序网关",
+      "pos": [
+        382,
+        421
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        425,
+        441
+      ]
+    },
+    {
+      "content": "Azure 经典步骤",
+      "pos": [
+        445,
+        455
+      ]
+    },
+    {
+      "content": "资源管理器 Powershell 步骤",
+      "pos": [
+        509,
+        528
+      ]
+    },
+    {
+      "content": "可以配置使用面对 Internet 的 VIP 或不向 Internet 公开的内部终结点（也称为内部负载平衡器 (ILB) 终结点）的应用程序网关。配置使用 ILB 的网关适用于不向 Internet 公开的内部业务线应用程序。对于位于不向 Internet 公开的安全边界内的多层应用程序中的服务/层也很有用，但仍需要执行循环负载分散、会话粘性或 SSL 终止。本文将引导你配置具有 ILB 的应用程序网关。",
+      "pos": [
+        584,
+        790
+      ]
+    },
+    {
+      "content": "开始之前",
+      "pos": [
+        795,
+        799
+      ]
+    },
+    {
+      "pos": [
+        804,
+        903
+      ],
+      "content": "使用 Web 平台安装程序安装最新版本的 Azure PowerShell cmdlet。可以从<bpt id=\"p1\">[</bpt>下载页面<ept id=\"p1\">](/downloads)</ept>的“Windows PowerShell”部分下载并安装最新版本。"
+    },
+    {
+      "content": "你将为应用程序网关创建虚拟网络和子网。请确保没有虚拟机或云部署正在使用子网。应用程序网关必须单独位于虚拟网络子网中。",
+      "pos": [
+        907,
+        965
+      ]
+    },
+    {
+      "content": "要配置为使用应用程序网关的服务器必须存在，或者在虚拟网络中为其创建终结点，或者为其分配公共 IP/VIP。",
+      "pos": [
+        969,
+        1022
+      ]
+    },
+    {
+      "content": "创建应用程序网关需要什么？",
+      "pos": [
+        1027,
+        1040
+      ]
+    },
+    {
+      "pos": [
+        1046,
+        1104
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>后端服务器池：<ept id=\"p1\">**</ept>后端服务器的 IP 地址列表。列出的 IP 地址应属于虚拟网络子网，或者是公共 IP/VIP。"
+    },
+    {
+      "pos": [
+        1108,
+        1177
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>后端服务器池设置：<ept id=\"p1\">**</ept>每个池都有一些设置，例如端口、协议和基于 Cookie 的关联性。这些设置绑定到池，并会应用到池中的所有服务器。"
+    },
+    {
+      "pos": [
+        1180,
+        1233
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>前端端口：<ept id=\"p1\">**</ept>此端口是应用程序网关上打开的公共端口。客户流量将抵达此端口，然后重定向到后端服务器之一。"
+    },
+    {
+      "pos": [
+        1236,
+        1301
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>侦听器：<ept id=\"p1\">**</ept>侦听器具有前端端口、协议（Http 或 Https，区分大小写）和 SSL 证书名称（如果要配置 SSL 卸载）。"
+    },
+    {
+      "pos": [
+        1305,
+        1385
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>规则：<ept id=\"p1\">**</ept>规则将会绑定侦听器和后端服务器池，并定义当流量抵达特定侦听器时应定向到的后端服务器池。目前仅支持<bpt id=\"p2\">*</bpt>基本<ept id=\"p2\">*</ept>规则。<bpt id=\"p3\">*</bpt>基本<ept id=\"p3\">*</ept>规则是一种轮循负载分发模式。"
+    },
+    {
+      "content": "创建新的应用程序网关",
+      "pos": [
+        1393,
+        1403
+      ]
+    },
+    {
+      "content": "使用 Azure 经典门户和 Azure 资源管理器的差别在于创建应用程序网关的顺序和需要配置的项。使用资源管理器，组成应用程序网关的所有项都将分开配置，然后放在一起创建应用程序网关资源。",
+      "pos": [
+        1405,
+        1499
+      ]
+    },
+    {
+      "content": "以下是创建应用程序网关所要执行的步骤：",
+      "pos": [
+        1502,
+        1521
+      ]
+    },
+    {
+      "content": "创建资源管理器的资源组",
+      "pos": [
+        1526,
+        1537
+      ]
+    },
+    {
+      "content": "为应用程序网关创建虚拟网络和子网",
+      "pos": [
+        1541,
+        1557
+      ]
+    },
+    {
+      "content": "创建应用程序网关配置对象",
+      "pos": [
+        1561,
+        1573
+      ]
+    },
+    {
+      "content": "创建应用程序网关资源",
+      "pos": [
+        1577,
+        1587
+      ]
+    },
+    {
+      "content": "创建资源管理器的资源组",
+      "pos": [
+        1593,
+        1604
+      ]
+    },
+    {
+      "pos": [
+        1606,
+        1741
+      ],
+      "content": "确保将 PowerShell 模式切换为使用 ARM cmdlet。<bpt id=\"p1\">[</bpt>将 Windows PowerShell 与资源管理器配合使用<ept id=\"p1\">](/documentation/articles/powershell-azure-resource-manager)</ept>中提供了详细信息。"
+    },
+    {
+      "content": "步骤 1",
+      "pos": [
+        1747,
+        1751
+      ]
+    },
+    {
+      "content": "步骤 2",
+      "pos": [
+        1855,
+        1859
+      ]
+    },
+    {
+      "content": "检查帐户的订阅",
+      "pos": [
+        1861,
+        1868
+      ]
+    },
+    {
+      "content": "系统将提示你使用凭据进行身份验证。",
+      "pos": [
+        1912,
+        1929
+      ]
+    },
+    {
+      "content": "步骤 3",
+      "pos": [
+        1939,
+        1943
+      ]
+    },
+    {
+      "content": "选择要使用的 Azure 订阅。",
+      "pos": [
+        1946,
+        1962
+      ]
+    },
+    {
+      "content": "步骤 4",
+      "pos": [
+        2057,
+        2061
+      ]
+    },
+    {
+      "content": "创建新的资源组（如果要使用现有的资源组，请跳过此步骤）",
+      "pos": [
+        2063,
+        2090
+      ]
+    },
+    {
+      "content": "Azure 资源管理器要求所有资源组指定一个位置。此位置将用作该资源组中的资源的默认位置。请确保用于创建应用程序网关的所有命令都使用相同的资源组。",
+      "pos": [
+        2161,
+        2234
+      ]
+    },
+    {
+      "content": "在上面的示例中，我们在位置“中国北部”创建了名为“appgw-RG”的资源组。",
+      "pos": [
+        2236,
+        2275
+      ]
+    },
+    {
+      "content": "为应用程序网关创建虚拟网络和子网",
+      "pos": [
+        2280,
+        2296
+      ]
+    },
+    {
+      "content": "以下示例演示如何使用资源管理器创建虚拟网络：",
+      "pos": [
+        2298,
+        2320
+      ]
+    },
+    {
+      "content": "步骤 1",
+      "pos": [
+        2326,
+        2330
+      ]
+    },
+    {
+      "content": "将地址范围 10.0.0.0/24 分配给用于创建虚拟网络的子网变量",
+      "pos": [
+        2441,
+        2475
+      ]
+    },
+    {
+      "content": "步骤 2",
+      "pos": [
+        2481,
+        2485
+      ]
+    },
+    {
+      "content": "使用前缀 10.0.0.0/16 和子网 10.0.0.0/24，在中国北部区域的“appw-rg”资源组中创建名为“appgwvnet”的虚拟网络",
+      "pos": [
+        2647,
+        2721
+      ]
+    },
+    {
+      "content": "步骤 3",
+      "pos": [
+        2731,
+        2735
+      ]
+    },
+    {
+      "content": "将子网对象分配到变量 $subnet 以完成后续步骤。",
+      "pos": [
+        2767,
+        2794
+      ]
+    },
+    {
+      "content": "创建应用程序网关配置对象",
+      "pos": [
+        2801,
+        2813
+      ]
+    },
+    {
+      "content": "步骤 1",
+      "pos": [
+        2819,
+        2823
+      ]
+    },
+    {
+      "content": "创建名为“gatewayIP01”的应用程序网关 IP 配置。当应用程序网关启动时，它会从配置的子网获取 IP 地址，再将网络流量路由到后端 IP 池中的 IP 地址。请记住，每个实例需要一个 IP 地址。",
+      "pos": [
+        2922,
+        3025
+      ]
+    },
+    {
+      "content": "步骤 2",
+      "pos": [
+        3032,
+        3036
+      ]
+    },
+    {
+      "content": "此步骤将配置名为“pool01”的后端 IP 地址池，其 IP 地址为“10.0.0.10,10.0.0.11, 10.0.0.12”。这些 IP 地址将接收来自前端 IP 终结点的网络流量。你要替换上述 IP 地址，添加你自己的应用程序 IP 地址终结点。",
+      "pos": [
+        3162,
+        3291
+      ]
+    },
+    {
+      "content": "步骤 3",
+      "pos": [
+        3297,
+        3301
+      ]
+    },
+    {
+      "content": "为后端池中负载平衡的网络流量配置应用程序网关设置“poolsetting01”。",
+      "pos": [
+        3446,
+        3486
+      ]
+    },
+    {
+      "content": "步骤 4",
+      "pos": [
+        3492,
+        3496
+      ]
+    },
+    {
+      "content": "为 ILB 配置名为“frontendport01”的前端 IP 端口。",
+      "pos": [
+        3582,
+        3618
+      ]
+    },
+    {
+      "content": "步骤 5",
+      "pos": [
+        3624,
+        3628
+      ]
+    },
+    {
+      "content": "创建名为“fipconfig01”的前端 IP 配置，并将其与当前虚拟网络子网中的某个专用 IP 相关联。",
+      "pos": [
+        3728,
+        3781
+      ]
+    },
+    {
+      "content": "步骤 6",
+      "pos": [
+        3787,
+        3791
+      ]
+    },
+    {
+      "content": "创建名为“listener01”的侦听器，并将前端端口与前端 IP 配置相关联。",
+      "pos": [
+        3939,
+        3979
+      ]
+    },
+    {
+      "content": "步骤 7",
+      "pos": [
+        3985,
+        3989
+      ]
+    },
+    {
+      "content": "创建名为“rule01”的负载平衡器路由规则，并配置负载平衡器的行为。",
+      "pos": [
+        4166,
+        4201
+      ]
+    },
+    {
+      "content": "步骤 8",
+      "pos": [
+        4207,
+        4211
+      ]
+    },
+    {
+      "content": "配置应用程序网关的实例大小",
+      "pos": [
+        4306,
+        4319
+      ]
+    },
+    {
+      "pos": [
+        4322,
+        4456
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph><bpt id=\"p1\">*</bpt>InstanceCount<ept id=\"p1\">*</ept> 的默认值为 2，最大值为 10。<bpt id=\"p2\">*</bpt>GatewaySize<ept id=\"p2\">*</ept> 的默认值为 Medium。你可以在 Standard\\_Small、Standard\\_Medium 和 Standard\\_Large 之间进行选择。"
+    },
+    {
+      "content": "使用 New-AzureApplicationGateway 创建应用程序网关",
+      "pos": [
+        4461,
+        4500
+      ]
+    },
+    {
+      "content": "创建包含上述步骤中所有配置项的应用程序网关。示例中的应用程序网关名为“appgwtest”。",
+      "pos": [
+        4840,
+        4886
+      ]
+    },
+    {
+      "content": "启动网关",
+      "pos": [
+        4893,
+        4897
+      ]
+    },
+    {
+      "pos": [
+        4899,
+        4978
+      ],
+      "content": "配置网关后，使用 <ph id=\"ph1\">`Start-AzureRmApplicationGateway`</ph> cmdlet 来启动网关。成功启动网关后，将开始计收应用程序网关的费用。"
+    },
+    {
+      "pos": [
+        4981,
+        5051
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept><ph id=\"ph1\">`Start-AzureRmApplicationGateway`</ph> cmdlet 最多可能需要 15 到 20 分钟才能完成。"
+    },
+    {
+      "content": "在以下示例中，应用程序网关名为“appgwtest”，资源组为“appgw-rg”：",
+      "pos": [
+        5053,
+        5095
+      ]
+    },
+    {
+      "content": "步骤 1",
+      "pos": [
+        5102,
+        5106
+      ]
+    },
+    {
+      "content": "获取应用程序网关对象，并将其关联到变量“$getgw”：",
+      "pos": [
+        5108,
+        5136
+      ]
+    },
+    {
+      "content": "步骤 2",
+      "pos": [
+        5232,
+        5236
+      ]
+    },
+    {
+      "pos": [
+        5243,
+        5289
+      ],
+      "content": "使用 <ph id=\"ph1\">`Start-AzureRmApplicationGateway`</ph> 启动应用程序网关："
+    },
+    {
+      "content": "验证应用程序网关状态",
+      "pos": [
+        5815,
+        5825
+      ]
+    },
+    {
+      "pos": [
+        5827,
+        5942
+      ],
+      "content": "使用 <ph id=\"ph1\">`Get-AzureRmApplicationGateway`</ph> cmdlet 检查网关的状态。如果前一步骤中的 <bpt id=\"p1\">*</bpt>Start-AzureApplicationGateway<ept id=\"p1\">*</ept> 成功，则 State 应为 <bpt id=\"p2\">*</bpt>Running<ept id=\"p2\">*</ept>。"
+    },
+    {
+      "content": "删除应用程序网关",
+      "pos": [
+        5948,
+        5956
+      ]
+    },
+    {
+      "content": "若要删除应用程序网关，需要按顺序执行以下操作：",
+      "pos": [
+        5958,
+        5981
+      ]
+    },
+    {
+      "pos": [
+        5986,
+        6035
+      ],
+      "content": "使用 <ph id=\"ph1\">`Stop-AzureRmApplicationGateway`</ph> cmdlet 停止该网关。"
+    },
+    {
+      "pos": [
+        6040,
+        6091
+      ],
+      "content": "使用 <ph id=\"ph1\">`Remove-AzureRmApplicationGateway`</ph> cmdlet 删除该网关。"
+    },
+    {
+      "pos": [
+        6095,
+        6146
+      ],
+      "content": "使用 <ph id=\"ph1\">`Get-AzureApplicationGateway`</ph> cmdlet 验证是否已删除该网关。"
+    },
+    {
+      "pos": [
+        6148,
+        6205
+      ],
+      "content": "此示例在第一行显示 <ph id=\"ph1\">`Stop-AzureRmApplicationGateway`</ph> cmdlet，接着显示输出。"
+    },
+    {
+      "content": "步骤 1",
+      "pos": [
+        6211,
+        6215
+      ]
+    },
+    {
+      "content": "获取应用程序网关对象，并将其关联到变量“$getgw”：",
+      "pos": [
+        6217,
+        6245
+      ]
+    },
+    {
+      "content": "步骤 2",
+      "pos": [
+        6341,
+        6345
+      ]
+    },
+    {
+      "pos": [
+        6352,
+        6397
+      ],
+      "content": "使用 <ph id=\"ph1\">`Stop-AzureRmApplicationGateway`</ph> 停止应用程序网关："
+    },
+    {
+      "pos": [
+        6862,
+        6928
+      ],
+      "content": "应用程序网关进入停止状态后，请使用 <ph id=\"ph1\">`Remove-AzureRmApplicationGateway`</ph> cmdlet 删除该服务。"
+    },
+    {
+      "pos": [
+        7424,
+        7459
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>可以使用“-force”开关来抑制删除确认消息"
+    },
+    {
+      "pos": [
+        7463,
+        7528
+      ],
+      "content": "若要验证是否已删除服务，可以使用 <ph id=\"ph1\">`Get-AzureRmApplicationGateway`</ph> cmdlet。此步骤不是必需的。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        7786,
+        7790
+      ]
+    },
+    {
+      "pos": [
+        7792,
+        7879
+      ],
+      "content": "如果你要配置 SSL 卸载，请参阅<bpt id=\"p1\">[</bpt>配置应用程序网关以进行 SSL 卸载<ept id=\"p1\">](/documentation/articles/application-gateway-ssl)</ept>。"
+    },
+    {
+      "pos": [
+        7881,
+        7987
+      ],
+      "content": "如果你想要将应用程序网关配置为与 ILB 配合使用，请参阅<bpt id=\"p1\">[</bpt>创建具有内部负载平衡器 (ILB) 的应用程序网关<ept id=\"p1\">](/documentation/articles/application-gateway-ilb)</ept>。"
+    },
+    {
+      "content": "如需负载平衡选项的其他常规信息，请参阅：",
+      "pos": [
+        7989,
+        8009
+      ]
+    },
+    {
+      "content": "Azure 负载平衡器",
+      "pos": [
+        8014,
+        8025
+      ]
+    },
+    {
+      "content": "Azure 流量管理器",
+      "pos": [
+        8069,
+        8080
+      ]
+    }
+  ],
+  "content": "<properties \n   pageTitle=\"使用 Azure 资源管理器创建和配置具有内部负载平衡器 (ILB) 的应用程序网关 | Azure\"\n   description=\"本页提供有关使用 Azure 资源管理器创建、配置、启动和删除具有内部负载平衡器 (ILB) 的 Azure 应用程序网关的说明\"\n   documentationCenter=\"na\"\n   services=\"application-gateway\"\n   authors=\"joaoma\"\n   manager=\"jdial\"\n   editor=\"tysonn\"/>\n<tags \n   ms.service=\"application-gateway\"\n   ms.date=\"11/24/2015\"\n   wacn.date=\"01/15/2016\"/>\n\n\n# 使用 Azure 资源管理器创建具有内部负载平衡器 (ILB) 的应用程序网关\n\n> [AZURE.SELECTOR]\n- [Azure 经典步骤](/documentation/articles/application-gateway-ilb)\n- [资源管理器 Powershell 步骤](/documentation/articles/application-gateway-ilb-arm)\n\n可以配置使用面对 Internet 的 VIP 或不向 Internet 公开的内部终结点（也称为内部负载平衡器 (ILB) 终结点）的应用程序网关。配置使用 ILB 的网关适用于不向 Internet 公开的内部业务线应用程序。对于位于不向 Internet 公开的安全边界内的多层应用程序中的服务/层也很有用，但仍需要执行循环负载分散、会话粘性或 SSL 终止。本文将引导你配置具有 ILB 的应用程序网关。\n\n## 开始之前\n\n1. 使用 Web 平台安装程序安装最新版本的 Azure PowerShell cmdlet。可以从[下载页面](/downloads)的“Windows PowerShell”部分下载并安装最新版本。\n2. 你将为应用程序网关创建虚拟网络和子网。请确保没有虚拟机或云部署正在使用子网。应用程序网关必须单独位于虚拟网络子网中。\n3. 要配置为使用应用程序网关的服务器必须存在，或者在虚拟网络中为其创建终结点，或者为其分配公共 IP/VIP。\n\n## 创建应用程序网关需要什么？\n \n\n- **后端服务器池：**后端服务器的 IP 地址列表。列出的 IP 地址应属于虚拟网络子网，或者是公共 IP/VIP。 \n- **后端服务器池设置：**每个池都有一些设置，例如端口、协议和基于 Cookie 的关联性。这些设置绑定到池，并会应用到池中的所有服务器。\n- **前端端口：**此端口是应用程序网关上打开的公共端口。客户流量将抵达此端口，然后重定向到后端服务器之一。\n- **侦听器：**侦听器具有前端端口、协议（Http 或 Https，区分大小写）和 SSL 证书名称（如果要配置 SSL 卸载）。 \n- **规则：**规则将会绑定侦听器和后端服务器池，并定义当流量抵达特定侦听器时应定向到的后端服务器池。目前仅支持*基本*规则。*基本*规则是一种轮循负载分发模式。\n\n\n \n## 创建新的应用程序网关\n\n使用 Azure 经典门户和 Azure 资源管理器的差别在于创建应用程序网关的顺序和需要配置的项。使用资源管理器，组成应用程序网关的所有项都将分开配置，然后放在一起创建应用程序网关资源。\n\n\n以下是创建应用程序网关所要执行的步骤：\n\n1. 创建资源管理器的资源组\n2. 为应用程序网关创建虚拟网络和子网\n3. 创建应用程序网关配置对象\n4. 创建应用程序网关资源\n\n\n## 创建资源管理器的资源组\n\n确保将 PowerShell 模式切换为使用 ARM cmdlet。[将 Windows PowerShell 与资源管理器配合使用](/documentation/articles/powershell-azure-resource-manager)中提供了详细信息。\n\n### 步骤 1\n\n        PS C:\\> Login-AzureRmAccount –Environment (Get-AzureRmEnvironment –Name AzureChinaCloud)\n\n### 步骤 2\n\n检查帐户的订阅\n\n        PS C:\\> get-AzureRmSubscription \n\n系统将提示你使用凭据进行身份验证。<BR>\n\n### 步骤 3 \n\n选择要使用的 Azure 订阅。<BR>\n\n\n        PS C:\\> Select-AzureRmSubscription -Subscriptionid \"GUID of subscription\"\n\n\n### 步骤 4\n\n创建新的资源组（如果要使用现有的资源组，请跳过此步骤）\n\n    New-AzureRmResourceGroup -Name appgw-rg -location \"China North\"\n\nAzure 资源管理器要求所有资源组指定一个位置。此位置将用作该资源组中的资源的默认位置。请确保用于创建应用程序网关的所有命令都使用相同的资源组。\n\n在上面的示例中，我们在位置“中国北部”创建了名为“appgw-RG”的资源组。\n\n## 为应用程序网关创建虚拟网络和子网\n\n以下示例演示如何使用资源管理器创建虚拟网络：\n\n### 步骤 1    \n    \n    $subnetconfig = New-AzureRmVirtualNetworkSubnetConfig -Name subnet01 -AddressPrefix 10.0.0.0/24\n\n将地址范围 10.0.0.0/24 分配给用于创建虚拟网络的子网变量\n\n### 步骤 2\n    \n    $vnet = New-AzureRmVirtualNetwork -Name appgwvnet -ResourceGroupName appgw-rg -Location \"China North\" -AddressPrefix 10.0.0.0/16 -Subnet $subnetconfig\n\n使用前缀 10.0.0.0/16 和子网 10.0.0.0/24，在中国北部区域的“appw-rg”资源组中创建名为“appgwvnet”的虚拟网络\n    \n### 步骤 3\n\n    $subnet=$vnet.subnets[0]\n\n将子网对象分配到变量 $subnet 以完成后续步骤。\n \n\n## 创建应用程序网关配置对象\n\n### 步骤 1\n\n    $gipconfig = New-AzureRmApplicationGatewayIPConfiguration -Name gatewayIP01 -Subnet $subnet\n\n创建名为“gatewayIP01”的应用程序网关 IP 配置。当应用程序网关启动时，它会从配置的子网获取 IP 地址，再将网络流量路由到后端 IP 池中的 IP 地址。请记住，每个实例需要一个 IP 地址。\n \n### 步骤 2\n\n    $pool = New-AzureRmApplicationGatewayBackendAddressPool -Name pool01 -BackendIPAddresses 10.0.0.10,10.0.0.11,10.0.0.12\n\n此步骤将配置名为“pool01”的后端 IP 地址池，其 IP 地址为“10.0.0.10,10.0.0.11, 10.0.0.12”。这些 IP 地址将接收来自前端 IP 终结点的网络流量。你要替换上述 IP 地址，添加你自己的应用程序 IP 地址终结点。\n\n### 步骤 3\n\n    $poolSetting = New-AzureRmApplicationGatewayBackendHttpSettings -Name poolsetting01 -Port 80 -Protocol Http -CookieBasedAffinity Disabled\n\n为后端池中负载平衡的网络流量配置应用程序网关设置“poolsetting01”。\n\n### 步骤 4\n\n    $fp = New-AzureRmApplicationGatewayFrontendPort -Name frontendport01  -Port 80\n\n为 ILB 配置名为“frontendport01”的前端 IP 端口。\n\n### 步骤 5\n\n    $fipconfig = New-AzureRmApplicationGatewayFrontendIPConfig -Name fipconfig01 -Subnet $subnet\n\n创建名为“fipconfig01”的前端 IP 配置，并将其与当前虚拟网络子网中的某个专用 IP 相关联。\n\n### 步骤 6\n\n    $listener = New-AzureRmApplicationGatewayHttpListener -Name listener01  -Protocol Http -FrontendIPConfiguration $fipconfig -FrontendPort $fp\n\n创建名为“listener01”的侦听器，并将前端端口与前端 IP 配置相关联。\n\n### 步骤 7 \n\n    $rule = New-AzureRmApplicationGatewayRequestRoutingRule -Name rule01 -RuleType Basic -BackendHttpSettings $poolSetting -HttpListener $listener -BackendAddressPool $pool\n\n创建名为“rule01”的负载平衡器路由规则，并配置负载平衡器的行为。\n\n### 步骤 8\n\n    $sku = New-AzureRmApplicationGatewaySku -Name Standard_Small -Tier Standard -Capacity 2\n\n配置应用程序网关的实例大小\n\n>[AZURE.NOTE]*InstanceCount* 的默认值为 2，最大值为 10。*GatewaySize* 的默认值为 Medium。你可以在 Standard\\_Small、Standard\\_Medium 和 Standard\\_Large 之间进行选择。\n\n## 使用 New-AzureApplicationGateway 创建应用程序网关\n\n    $appgw = New-AzureRmApplicationGateway -Name appgwtest -ResourceGroupName appgw-rg -Location \"China North\" -BackendAddressPools $pool -BackendHttpSettingsCollection $poolSetting -FrontendIpConfigurations $fipconfig  -GatewayIpConfigurations $gipconfig -FrontendPorts $fp -HttpListeners $listener -RequestRoutingRules $rule -Sku $sku\n\n创建包含上述步骤中所有配置项的应用程序网关。示例中的应用程序网关名为“appgwtest”。\n\n\n\n## 启动网关\n\n配置网关后，使用 `Start-AzureRmApplicationGateway` cmdlet 来启动网关。成功启动网关后，将开始计收应用程序网关的费用。\n\n\n**注意：**`Start-AzureRmApplicationGateway` cmdlet 最多可能需要 15 到 20 分钟才能完成。\n\n在以下示例中，应用程序网关名为“appgwtest”，资源组为“appgw-rg”：\n\n\n### 步骤 1\n\n获取应用程序网关对象，并将其关联到变量“$getgw”：\n \n    $getgw =  Get-AzureRmApplicationGateway -Name appgwtest -ResourceGroupName appgw-rg\n\n### 步骤 2\n     \n使用 `Start-AzureRmApplicationGateway` 启动应用程序网关：\n\n    PS C:\\> Start-AzureRmApplicationGateway -ApplicationGateway $getgw  \n\n    PS C:\\> Start-AzureRmApplicationGateway AppGwTest \n\n    VERBOSE: 7:59:16 PM - Begin Operation: Start-AzureApplicationGateway \n    VERBOSE: 8:05:52 PM - Completed Operation: Start-AzureApplicationGateway\n    Name       HTTP Status Code     Operation ID                             Error \n    ----       ----------------     ------------                             ----\n    Successful OK                   fc592db8-4c58-2c8e-9a1d-1c97880f0b9b\n\n## 验证应用程序网关状态\n\n使用 `Get-AzureRmApplicationGateway` cmdlet 检查网关的状态。如果前一步骤中的 *Start-AzureApplicationGateway* 成功，则 State 应为 *Running*。\n\n\n## 删除应用程序网关\n\n若要删除应用程序网关，需要按顺序执行以下操作：\n\n1. 使用 `Stop-AzureRmApplicationGateway` cmdlet 停止该网关。 \n2. 使用 `Remove-AzureRmApplicationGateway` cmdlet 删除该网关。\n3. 使用 `Get-AzureApplicationGateway` cmdlet 验证是否已删除该网关。\n\n此示例在第一行显示 `Stop-AzureRmApplicationGateway` cmdlet，接着显示输出。\n\n### 步骤 1\n\n获取应用程序网关对象，并将其关联到变量“$getgw”：\n \n    $getgw =  Get-AzureRmApplicationGateway -Name appgwtest -ResourceGroupName appgw-rg\n\n### 步骤 2\n     \n使用 `Stop-AzureRmApplicationGateway` 停止应用程序网关：\n\n    PS C:\\> Stop-AzureRmApplicationGateway -ApplicationGateway $getgw  \n\n    VERBOSE: 9:49:34 PM - Begin Operation: Stop-AzureApplicationGateway \n    VERBOSE: 10:10:06 PM - Completed Operation: Stop-AzureApplicationGateway\n    Name       HTTP Status Code     Operation ID                             Error \n    ----       ----------------     ------------                             ----\n    Successful OK                   ce6c6c95-77b4-2118-9d65-e29defadffb8\n\n应用程序网关进入停止状态后，请使用 `Remove-AzureRmApplicationGateway` cmdlet 删除该服务。\n\n\n    PS C:\\> Remove-AzureRmApplicationGateway -Name appgwtest -ResourceGroupName appgw-rg -Force\n\n    VERBOSE: 10:49:34 PM - Begin Operation: Remove-AzureApplicationGateway \n    VERBOSE: 10:50:36 PM - Completed Operation: Remove-AzureApplicationGateway\n    Name       HTTP Status Code     Operation ID                             Error \n    ----       ----------------     ------------                             ----\n    Successful OK                   055f3a96-8681-2094-a304-8d9a11ad8301\n\n>[AZURE.NOTE]可以使用“-force”开关来抑制删除确认消息\n>\n\n若要验证是否已删除服务，可以使用 `Get-AzureRmApplicationGateway` cmdlet。此步骤不是必需的。\n\n\n    PS C:\\>Get-AzureRmApplicationGateway -Name appgwtest -ResourceGroupName appgw-rg\n\n    VERBOSE: 10:52:46 PM - Begin Operation: Get-AzureApplicationGateway \n\n    Get-AzureApplicationGateway : ResourceNotFound: The gateway does not exist. \n    .....\n\n## 后续步骤\n\n如果你要配置 SSL 卸载，请参阅[配置应用程序网关以进行 SSL 卸载](/documentation/articles/application-gateway-ssl)。\n\n如果你想要将应用程序网关配置为与 ILB 配合使用，请参阅[创建具有内部负载平衡器 (ILB) 的应用程序网关](/documentation/articles/application-gateway-ilb)。\n\n如需负载平衡选项的其他常规信息，请参阅：\n\n- [Azure 负载平衡器](/documentation/services/load-balancer)\n- [Azure 流量管理器](/documentation/services/traffic-manager)\n\n<!---HONumber=Mooncake_0104_2016-->\n"
+}

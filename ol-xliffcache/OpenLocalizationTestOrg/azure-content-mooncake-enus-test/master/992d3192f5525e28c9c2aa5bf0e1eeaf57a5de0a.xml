@@ -1,0 +1,432 @@
+{
+  "nodes": [
+    {
+      "content": "使用PowerShell管理使用MySQL Database on Azure - Azure 微软云",
+      "pos": [
+        51,
+        102
+      ]
+    },
+    {
+      "content": "本文主要介绍如何使用PowerShell脚本快速搭建使用MySQL服务。",
+      "pos": [
+        239,
+        275
+      ]
+    },
+    {
+      "content": "利用Azure 资源管理器与 PowerShell 来部署使用MySQL Database on Azure",
+      "pos": [
+        470,
+        524
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        527,
+        543
+      ]
+    },
+    {
+      "content": "中文版",
+      "pos": [
+        547,
+        550
+      ]
+    },
+    {
+      "content": "英文版",
+      "pos": [
+        611,
+        614
+      ]
+    },
+    {
+      "pos": [
+        678,
+        1128
+      ],
+      "content": "Azure 资源管理器 (ARM) 是适用于 Azure 服务的全新管理框架。现在可以使用基于 Azure 资源管理器的 API 和工具来管理 MySQL Database on Azure。若要了解有关 Azure 资源管理器的详细信息，请参阅<bpt id=\"p1\">[</bpt>使用资源组管理 Azure 资源<ept id=\"p1\">](/documentation/articles/azure-preview-portal-using-resource-groups)</ept>。MySQL Database on Azure支持您通过PowerShell脚本查询创建管理删除MySQL服务器、数据库、防火墙原则、用户等，同时支持您通过脚本更改参数设置。本文主要介绍如何使用PowerShell脚本快速搭建使用MySQL服务。对于更多创建、查看、删除、更改的操作，您可以查看<bpt id=\"p2\">[</bpt>使用PowerShell管理MySQL Database on Azure<ept id=\"p2\">](/documentation/articles/mysql-database-commandlines)</ept>。"
+    },
+    {
+      "content": "目录",
+      "pos": [
+        1133,
+        1135
+      ]
+    },
+    {
+      "content": "步骤1：安装Azure PowerShell",
+      "pos": [
+        1139,
+        1161
+      ]
+    },
+    {
+      "content": "步骤2：配置账户信息",
+      "pos": [
+        1174,
+        1184
+      ]
+    },
+    {
+      "content": "步骤3：订阅MySQL Database on Azure服务",
+      "pos": [
+        1197,
+        1228
+      ]
+    },
+    {
+      "content": "步骤4：创建资源组",
+      "pos": [
+        1241,
+        1250
+      ]
+    },
+    {
+      "content": "步骤5：创建服务器",
+      "pos": [
+        1263,
+        1272
+      ]
+    },
+    {
+      "content": "步骤6：创建服务器防火墙原则",
+      "pos": [
+        1285,
+        1299
+      ]
+    },
+    {
+      "content": "步骤7：创建数据库",
+      "pos": [
+        1312,
+        1321
+      ]
+    },
+    {
+      "content": "步骤8：创建用户",
+      "pos": [
+        1334,
+        1342
+      ]
+    },
+    {
+      "content": "步骤9：添加用户权限",
+      "pos": [
+        1355,
+        1365
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a id=\"step1\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>步骤1： 安装Azure PowerShell",
+      "pos": [
+        1378,
+        1419
+      ]
+    },
+    {
+      "content": "运行脚本前，您需要安装并运行Azure PowerShell。您可以通过<bpt id=\"p1\">[</bpt>运行Microsft Web平台安装程序<ept id=\"p1\">](http://go.microsoft.com/fwlink/p/?linkid=320376&amp;clcid=0x409)</ept>下载并安装最新版本Azure PowerShell 。可参阅<bpt id=\"p2\">[</bpt>如何安装和配置Azure PowerShell<ept id=\"p2\">](/documentation/articles/powershell-install-configure)</ept>来了解更多详细步骤。",
+      "pos": [
+        1420,
+        1658
+      ]
+    },
+    {
+      "content": "用于创建和管理MySQL Database on Azure 数据库的cmdlet位于Azure资源管理器模块中。启动Azure PowerShell时，默认情况下将导入Azure模块中的cmdlet。",
+      "pos": [
+        1659,
+        1760
+      ]
+    },
+    {
+      "content": "请先确认Azure PowerShell版本， 可在控制台运行以下命令：",
+      "pos": [
+        1761,
+        1797
+      ]
+    },
+    {
+      "content": "Azure PowerShell 0.9* 版本：",
+      "pos": [
+        1838,
+        1863
+      ]
+    },
+    {
+      "content": "切换到Azure资源管理器模块，请使用以下命令转换：",
+      "pos": [
+        1864,
+        1890
+      ]
+    },
+    {
+      "content": "Azure PowerShell 1.0.0+版本：",
+      "pos": [
+        1948,
+        1974
+      ]
+    },
+    {
+      "pos": [
+        1975,
+        2209
+      ],
+      "content": "此版本最大的改变在于将原来的Switch-AzureMode的指令移除。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>Azure PowerShell 1.0.0以上版本在中国Azure使用的注意事项<ept id=\"p1\">](http://blogs.msdn.com/b/azchina/archive/2015/12/18/azure-powershell-1.0.0_e54e0a4e48722c6728572d4efd56_azure_7f4f28758476e86c0f618b4e7998_.aspx)</ept>"
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a id=\"step2\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>步骤2： 配置账户信息",
+      "pos": [
+        2213,
+        2242
+      ]
+    },
+    {
+      "content": "在针对Azure订阅运行PowerShell之前，必须先将Azure账户绑定。运行以下命令，在登陆页面输入与Azure管理门户相同的电子邮件和密码，进行身份验证。",
+      "pos": [
+        2243,
+        2324
+      ]
+    },
+    {
+      "content": "Azure PowerShell 0.9* 版本：",
+      "pos": [
+        2329,
+        2354
+      ]
+    },
+    {
+      "content": "Azure PowerShell 1.0.0+版本：",
+      "pos": [
+        2415,
+        2441
+      ]
+    },
+    {
+      "content": "若您有多个SubID需要选择，可通过运行 Select-AzureSubscription命令进行选择。",
+      "pos": [
+        2505,
+        2557
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a id=\"step3\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>步骤3： 订阅MySQL Database on Azure服务",
+      "pos": [
+        2561,
+        2611
+      ]
+    },
+    {
+      "content": "运行以下命令订阅MySQL服务。",
+      "pos": [
+        2612,
+        2628
+      ]
+    },
+    {
+      "content": "Azure PowerShell 0.9* 版本：",
+      "pos": [
+        2633,
+        2658
+      ]
+    },
+    {
+      "content": "Azure PowerShell 1.0.0+版本：",
+      "pos": [
+        2731,
+        2757
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a id=\"step4\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>步骤4： 创建资源组",
+      "pos": [
+        2838,
+        2866
+      ]
+    },
+    {
+      "content": "如果您已有资源组，可以直接创建服务器，或者编辑运行以下命令，创建新的资源组：",
+      "pos": [
+        2867,
+        2905
+      ]
+    },
+    {
+      "content": "Azure PowerShell 0.9* 版本：",
+      "pos": [
+        2910,
+        2935
+      ]
+    },
+    {
+      "content": "Azure PowerShell 1.0.0+版本：",
+      "pos": [
+        3024,
+        3050
+      ]
+    },
+    {
+      "pos": [
+        3138,
+        3220
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> ** 注意:Location的默认选项为chinanorth, 处于性能以及安全性考虑，强烈建议您将资源组中的服务选择在同一个地域中。**"
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a id=\"step5\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>步骤5： 创建服务器",
+      "pos": [
+        3224,
+        3252
+      ]
+    },
+    {
+      "content": "编辑运行以下命令，定义您的服务器名称、位置、版本等信息来完成服务器创建。",
+      "pos": [
+        3253,
+        3289
+      ]
+    },
+    {
+      "content": "Azure PowerShell 0.9* 版本：",
+      "pos": [
+        3294,
+        3319
+      ]
+    },
+    {
+      "content": "Azure PowerShell 1.0.0+版本：",
+      "pos": [
+        3533,
+        3559
+      ]
+    },
+    {
+      "pos": [
+        3772,
+        3900
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> ** 注意:“-ApiVersion 2015-09-01”指定了API的版本，是必要的。另外，运行上述命令可以完成MySQL服务器的创建，但没有用户，须在后续步骤中创建用户设置权限，这一点和使用Azure管理门户创建稍有不同**"
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a id=\"step6\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>步骤6： 创建服务器防火墙原则",
+      "pos": [
+        3904,
+        3937
+      ]
+    },
+    {
+      "content": "编辑运行以下命令，定义您的防火墙原则名称、IP白名单范围（起始IP地址，终止IP地址）等信息来完成防火墙原则的创建。",
+      "pos": [
+        3938,
+        3996
+      ]
+    },
+    {
+      "content": "Azure PowerShell 0.9* 版本：",
+      "pos": [
+        4001,
+        4026
+      ]
+    },
+    {
+      "content": "Azure PowerShell 1.0.0+版本：",
+      "pos": [
+        4280,
+        4306
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a id=\"step7\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>步骤7： 创建数据库",
+      "pos": [
+        4560,
+        4588
+      ]
+    },
+    {
+      "content": "编辑运行以下命令，定义您的数据库名称、字符集等信息完成数据库创建。",
+      "pos": [
+        4589,
+        4622
+      ]
+    },
+    {
+      "content": "Azure PowerShell 0.9* 版本：",
+      "pos": [
+        4627,
+        4652
+      ]
+    },
+    {
+      "content": "Azure PowerShell 1.0.0+版本：",
+      "pos": [
+        4890,
+        4916
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a id=\"step8\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>步骤8： 创建用户",
+      "pos": [
+        5156,
+        5183
+      ]
+    },
+    {
+      "content": "编辑运行以下命令，定义您的用户名、密码等信息完成数据库创建。",
+      "pos": [
+        5184,
+        5214
+      ]
+    },
+    {
+      "content": "Azure PowerShell 0.9* 版本：",
+      "pos": [
+        5219,
+        5244
+      ]
+    },
+    {
+      "content": "Azure PowerShell 1.0.0+版本：",
+      "pos": [
+        5452,
+        5478
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a id=\"step9\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>步骤9： 添加用户权限",
+      "pos": [
+        5686,
+        5715
+      ]
+    },
+    {
+      "content": "编辑运行以下命令，设置数据库读写权限给用户。权限分为\"Read\"以及\"ReadWrite\"。",
+      "pos": [
+        5716,
+        5762
+      ]
+    },
+    {
+      "content": "Azure PowerShell 0.9* 版本：",
+      "pos": [
+        5767,
+        5792
+      ]
+    },
+    {
+      "content": "Azure PowerShell 1.0.0+版本：",
+      "pos": [
+        6021,
+        6047
+      ]
+    },
+    {
+      "pos": [
+        6274,
+        6470
+      ],
+      "content": "通过上述操作，您已经完成了服务器、数据库、用户、防火墙原则等的创建工作，可以开始使用MySQL Database on Azure的数据库服务。在使用过程中，如需更多创建、查看、删除、更改的操作，您可以查看<bpt id=\"p1\">[</bpt>使用PowerShell管理MySQL Database on Azure<ept id=\"p1\">](/documentation/articles/mysql-database-commandlines)</ept>。"
+    }
+  ],
+  "content": "<properties linkid=\"\" urlDisplayName=\"\" pageTitle=\"使用PowerShell管理使用MySQL Database on Azure - Azure 微软云\" metaKeywords=\"Azure 云,技术文档,文档与资源,MySQL,数据库,入门指南,Azure MySQL, MySQL PaaS,Azure MySQL PaaS, Azure MySQL Service, Azure RDS\" description=\"本文主要介绍如何使用PowerShell脚本快速搭建使用MySQL服务。\" metaCanonical=\"\" services=\"MySQL\" documentationCenter=\"Services\" title=\"\" authors=\"sofia\" solutions=\"\" manager=\"\" editor=\"\" />  \n\n<tags ms.service=\"mysql\" ms.date=\"\" wacn.date=\"12/28/2015\"/>\n\n#利用Azure 资源管理器与 PowerShell 来部署使用MySQL Database on Azure\n> [AZURE.SELECTOR]\n- [中文版](/documentation/articles/mysql-database-etoe-powershell)\n- [英文版](/documentation/articles/mysql-database-enus-etoe-powershell)\n\nAzure 资源管理器 (ARM) 是适用于 Azure 服务的全新管理框架。现在可以使用基于 Azure 资源管理器的 API 和工具来管理 MySQL Database on Azure。若要了解有关 Azure 资源管理器的详细信息，请参阅[使用资源组管理 Azure 资源](/documentation/articles/azure-preview-portal-using-resource-groups)。MySQL Database on Azure支持您通过PowerShell脚本查询创建管理删除MySQL服务器、数据库、防火墙原则、用户等，同时支持您通过脚本更改参数设置。本文主要介绍如何使用PowerShell脚本快速搭建使用MySQL服务。对于更多创建、查看、删除、更改的操作，您可以查看[使用PowerShell管理MySQL Database on Azure](/documentation/articles/mysql-database-commandlines)。\n\n###目录\n- [步骤1：安装Azure PowerShell](#step1)\n- [步骤2：配置账户信息](#step2)\n- [步骤3：订阅MySQL Database on Azure服务](#step3)\n- [步骤4：创建资源组](#step4)\n- [步骤5：创建服务器](#step5)\n- [步骤6：创建服务器防火墙原则](#step6)\n- [步骤7：创建数据库](#step7)\n- [步骤8：创建用户](#step8)\n- [步骤9：添加用户权限](#step9)\n\n##<a id=\"step1\"></a>步骤1： 安装Azure PowerShell\n运行脚本前，您需要安装并运行Azure PowerShell。您可以通过[运行Microsft Web平台安装程序](http://go.microsoft.com/fwlink/p/?linkid=320376&clcid=0x409)下载并安装最新版本Azure PowerShell 。可参阅[如何安装和配置Azure PowerShell](/documentation/articles/powershell-install-configure)来了解更多详细步骤。\n用于创建和管理MySQL Database on Azure 数据库的cmdlet位于Azure资源管理器模块中。启动Azure PowerShell时，默认情况下将导入Azure模块中的cmdlet。\n请先确认Azure PowerShell版本， 可在控制台运行以下命令：\n```\n(Get-Module Azure).Version \n```\n### Azure PowerShell 0.9* 版本：\n切换到Azure资源管理器模块，请使用以下命令转换：\n\n```\nSwitch-AzureMode -Name AzureResourceManager\n```\n### Azure PowerShell 1.0.0+版本：\n此版本最大的改变在于将原来的Switch-AzureMode的指令移除。有关详细信息，请参阅[Azure PowerShell 1.0.0以上版本在中国Azure使用的注意事项](http://blogs.msdn.com/b/azchina/archive/2015/12/18/azure-powershell-1.0.0_e54e0a4e48722c6728572d4efd56_azure_7f4f28758476e86c0f618b4e7998_.aspx)\n\n##<a id=\"step2\"></a>步骤2： 配置账户信息\n在针对Azure订阅运行PowerShell之前，必须先将Azure账户绑定。运行以下命令，在登陆页面输入与Azure管理门户相同的电子邮件和密码，进行身份验证。\n### Azure PowerShell 0.9* 版本：\n\n```\nAdd-AzureAccount -Environment AzureChinaCloud \n```\n### Azure PowerShell 1.0.0+版本：\n```\nLogin-AzureRmAccount -EnvironmentName AzureChinaCloud\n```\n\n若您有多个SubID需要选择，可通过运行 Select-AzureSubscription命令进行选择。\n\n##<a id=\"step3\"></a>步骤3： 订阅MySQL Database on Azure服务\n运行以下命令订阅MySQL服务。\n### Azure PowerShell 0.9* 版本：\n```\nRegister-AzureProvider -ProviderNamespace \"Microsoft.MySql\"\n```\n### Azure PowerShell 1.0.0+版本：\n```\nRegister-AzureRmResourceProvider -ProviderNamespace \"Microsoft.MySql\"\n```\n##<a id=\"step4\"></a>步骤4： 创建资源组\n如果您已有资源组，可以直接创建服务器，或者编辑运行以下命令，创建新的资源组：\n### Azure PowerShell 0.9* 版本：\n```\nNew-AzureResourceGroup -Name \"resourcegroupChinaEast\" -Location \"chinaeast\"\n```\n### Azure PowerShell 1.0.0+版本：\n```\nNew-AzureRmResourceGroup -Name \"resourcegroupChinaEast\" -Location \"chinaeast\"\n```\n>[AZURE.NOTE] ** 注意:Location的默认选项为chinanorth, 处于性能以及安全性考虑，强烈建议您将资源组中的服务选择在同一个地域中。**\n\n##<a id=\"step5\"></a>步骤5： 创建服务器\n编辑运行以下命令，定义您的服务器名称、位置、版本等信息来完成服务器创建。\n### Azure PowerShell 0.9* 版本：\n```\nNew-AzureResource -ResourceType \"Microsoft.MySql/servers\" -ResourceName testPSH -ApiVersion 2015-09-01 -ResourceGroupName resourcegroupChinaEast -Location chinaeast -PropertyObject @{version = '5.5'} \n```\n### Azure PowerShell 1.0.0+版本：\n```\nNew-AzureRmResource -ResourceType \"Microsoft.MySql/servers\" -ResourceName testPSH -ApiVersion 2015-09-01 -ResourceGroupName resourcegroupChinaEast -Location chinaeast -PropertyObject @{version = '5.5'} \n```\n>[AZURE.NOTE] ** 注意:“-ApiVersion 2015-09-01”指定了API的版本，是必要的。另外，运行上述命令可以完成MySQL服务器的创建，但没有用户，须在后续步骤中创建用户设置权限，这一点和使用Azure管理门户创建稍有不同**\n\n##<a id=\"step6\"></a>步骤6： 创建服务器防火墙原则\n编辑运行以下命令，定义您的防火墙原则名称、IP白名单范围（起始IP地址，终止IP地址）等信息来完成防火墙原则的创建。\n### Azure PowerShell 0.9* 版本：\n```\nNew-AzureResource -ResourceType \"Microsoft.MySql/servers/firewallRules\" -ResourceName testPSH/rule1 -ApiVersion 2015-09-01 -PropertyObject @{startIpAddress=\"0.0.0.0\"; endIpAddress=\"255.255.255.255\"} -ResourceGroupName resourcegroupChinaEast\n```\n### Azure PowerShell 1.0.0+版本：\n```\nNew-AzureRmResource -ResourceType \"Microsoft.MySql/servers/firewallRules\" -ResourceName testPSH/rule1 -ApiVersion 2015-09-01 -PropertyObject @{startIpAddress=\"0.0.0.0\"; endIpAddress=\"255.255.255.255\"} -ResourceGroupName resourcegroupChinaEast\n```\n##<a id=\"step7\"></a>步骤7： 创建数据库\n编辑运行以下命令，定义您的数据库名称、字符集等信息完成数据库创建。\n### Azure PowerShell 0.9* 版本：\n```\nNew-AzureResource -ResourceType \"Microsoft.MySql/servers/databases\" -ResourceName testPSH/demodb -ApiVersion 2015-09-01 -ResourceGroupName resourcegroupChinaEast -PropertyObject @{collation='utf8_general_ci'; charset='utf8'}\n```\n### Azure PowerShell 1.0.0+版本：\n```\nNew-AzureRmResource -ResourceType \"Microsoft.MySql/servers/databases\" -ResourceName testPSH/demodb -ApiVersion 2015-09-01 -ResourceGroupName resourcegroupChinaEast -PropertyObject @{collation='utf8_general_ci'; charset='utf8'}\n```\n\n\n##<a id=\"step8\"></a>步骤8： 创建用户\n编辑运行以下命令，定义您的用户名、密码等信息完成数据库创建。\n### Azure PowerShell 0.9* 版本：\n\n```\nNew-AzureResource -ResourceType \"Microsoft.MySql/servers/users\" -ResourceName testPSH/admin -ApiVersion 2015-09-01 -ResourceGroupName resourcegroupChinaEast -PropertyObject @{password='abc123'}\n```\n### Azure PowerShell 1.0.0+版本：\n```\nNew-AzureRmResource -ResourceType \"Microsoft.MySql/servers/users\" -ResourceName testPSH/admin -ApiVersion 2015-09-01 -ResourceGroupName resourcegroupChinaEast -PropertyObject @{password='abc123'}\n```\n\n##<a id=\"step9\"></a>步骤9： 添加用户权限\n编辑运行以下命令，设置数据库读写权限给用户。权限分为\"Read\"以及\"ReadWrite\"。\n### Azure PowerShell 0.9* 版本：\n```\nNew-AzureResource -ResourceType \"Microsoft.MySql/servers/databases/privileges\" -ResourceName testPSH/demodb/admin -ApiVersion 2015-09-01 -ResourceGroupName resourcegroupChinaEast -PropertyObject @{level='ReadWrite'}\n```\n### Azure PowerShell 1.0.0+版本：\n```\nNew-AzureRmResource -ResourceType \"Microsoft.MySql/servers/databases/privileges\" -ResourceName testPSH/demodb/admin -ApiVersion 2015-09-01 -ResourceGroupName resourcegroupChinaEast -PropertyObject @{level='ReadWrite'}\n```\n通过上述操作，您已经完成了服务器、数据库、用户、防火墙原则等的创建工作，可以开始使用MySQL Database on Azure的数据库服务。在使用过程中，如需更多创建、查看、删除、更改的操作，您可以查看[使用PowerShell管理MySQL Database on Azure](/documentation/articles/mysql-database-commandlines)。\n\n\n"
+}

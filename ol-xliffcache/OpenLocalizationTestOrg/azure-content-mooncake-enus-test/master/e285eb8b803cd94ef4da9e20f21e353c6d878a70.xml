@@ -1,0 +1,75 @@
+{
+  "nodes": [
+    {
+      "content": "如何将 VM 或角色实例移到其他子网",
+      "pos": [
+        27,
+        45
+      ]
+    },
+    {
+      "content": "了解如何将 VM 和角色实例移到其他子网",
+      "pos": [
+        63,
+        83
+      ]
+    },
+    {
+      "content": "如何将 VM 或角色实例移到其他子网",
+      "pos": [
+        308,
+        326
+      ]
+    },
+    {
+      "content": "可以使用 PowerShell 将 VM 在同一虚拟网络 (VNet) 中的子网之间移动。可以通过编辑 CSCFG（而不是使用 PowerShell）移动角色实例。",
+      "pos": [
+        328,
+        410
+      ]
+    },
+    {
+      "content": "为何要将 VM 移到另一个子网？ 当旧子网太小并且由于该子网中存在正在运行的 VM 而无法扩展时，子网迁移很有用。在这种情况下，你可以创建一个更大的新子网，将 VM 迁移到新子网，然后在迁移完成后，可以删除空的旧子网。",
+      "pos": [
+        412,
+        521
+      ]
+    },
+    {
+      "content": "如何将 VM 移到另一个子网",
+      "pos": [
+        526,
+        540
+      ]
+    },
+    {
+      "content": "若要移动 VM，请使用下面的示例作为模板运行 Set-AzureSubnet PowerShell cmdlet。在下面的示例中，我们将 TestVM 从其当前的子网移到 Subnet-2。请务必编辑此示例以反映你的环境。请注意，每当你在过程中运行 Update-AzureVM cmdlet 时，都会在更新过程中重新启动 VM。",
+      "pos": [
+        542,
+        707
+      ]
+    },
+    {
+      "content": "如果你为 VM 指定了静态 DIP，则必须清除该设置，然后才能将 VM 移到新子网。在这种情况下，请使用以下代码：",
+      "pos": [
+        833,
+        890
+      ]
+    },
+    {
+      "content": "将角色实例移到另一个子网",
+      "pos": [
+        1129,
+        1141
+      ]
+    },
+    {
+      "pos": [
+        1143,
+        1270
+      ],
+      "content": "若要移动角色实例，请编辑 CSCFG 文件。在以下示例中，我们要将虚拟网络 <bpt id=\"p1\">*</bpt>VNETName<ept id=\"p1\">*</ept> 中的“Role0”从其当前的子网移到 <bpt id=\"p2\">*</bpt>Subnet-2<ept id=\"p2\">*</ept>。由于已部署角色实例，你只需将子网名称更改为“Subnet-2”。请务必编辑此示例以反映你的环境。"
+    }
+  ],
+  "content": "<properties \n   pageTitle=\"如何将 VM 或角色实例移到其他子网\"\n   description=\"了解如何将 VM 和角色实例移到其他子网\"\n   services=\"virtual-network\"\n   documentationCenter=\"na\"\n   authors=\"telmosampaio\"\n   manager=\"carmonm\"\n   editor=\"tysonn\" />\n<tags\n    ms.service=\"virtual-network\"\n    ms.date=\"12/11/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n# 如何将 VM 或角色实例移到其他子网\n\n可以使用 PowerShell 将 VM 在同一虚拟网络 (VNet) 中的子网之间移动。可以通过编辑 CSCFG（而不是使用 PowerShell）移动角色实例。\n\n为何要将 VM 移到另一个子网？ 当旧子网太小并且由于该子网中存在正在运行的 VM 而无法扩展时，子网迁移很有用。在这种情况下，你可以创建一个更大的新子网，将 VM 迁移到新子网，然后在迁移完成后，可以删除空的旧子网。\n\n## 如何将 VM 移到另一个子网\n\n若要移动 VM，请使用下面的示例作为模板运行 Set-AzureSubnet PowerShell cmdlet。在下面的示例中，我们将 TestVM 从其当前的子网移到 Subnet-2。请务必编辑此示例以反映你的环境。请注意，每当你在过程中运行 Update-AzureVM cmdlet 时，都会在更新过程中重新启动 VM。\n\n    Get-AzureVM –ServiceName TestVMCloud –Name TestVM `\n    | Set-AzureSubnet –SubnetNames Subnet-2 `\n    | Update-AzureVM\n\n如果你为 VM 指定了静态 DIP，则必须清除该设置，然后才能将 VM 移到新子网。在这种情况下，请使用以下代码：\n\n    Get-AzureVM -ServiceName TestVMCloud -Name TestVM `\n    | Remove-AzureStaticVNetIP `\n    | Update-AzureVM\n    Get-AzureVM -ServiceName TestVMCloud -Name TestVM `\n    | Set-AzureSubnet -SubnetNames Subnet-2 `\n    | Update-AzureVM\n\n## 将角色实例移到另一个子网\n\n若要移动角色实例，请编辑 CSCFG 文件。在以下示例中，我们要将虚拟网络 *VNETName* 中的“Role0”从其当前的子网移到 *Subnet-2*。由于已部署角色实例，你只需将子网名称更改为“Subnet-2”。请务必编辑此示例以反映你的环境。\n\n    <NetworkConfiguration>\n        <VirtualNetworkSite name=\"VNETName\" />\n        <AddressAssignments>\n           <InstanceAddress roleName=\"Role0\">\n                <Subnets><Subnet name=\"Subnet-2\" /></Subnets>\n           </InstanceAddress>\n        </AddressAssignments>\n    </NetworkConfiguration> \n\n<!---HONumber=74-->"
+}

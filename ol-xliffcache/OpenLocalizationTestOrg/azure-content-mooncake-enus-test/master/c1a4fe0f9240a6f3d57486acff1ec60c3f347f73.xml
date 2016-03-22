@@ -1,0 +1,194 @@
+{
+  "nodes": [
+    {
+      "content": "在经典部署模型中使用 Azure CLI 部署多 NIC VM | Azure",
+      "pos": [
+        27,
+        66
+      ]
+    },
+    {
+      "content": "了解如何在经典部署模型中使用 Azure CLI 部署多 NIC VM",
+      "pos": [
+        84,
+        119
+      ]
+    },
+    {
+      "content": "使用 Azure CLI 部署多 NIC VM（经典）",
+      "pos": [
+        372,
+        399
+      ]
+    },
+    {
+      "pos": [
+        939,
+        1095
+      ],
+      "content": "由于目前你不能使用具有单个 NIC 的 VM 以及具有同一个云服务中的多个 NIC 的 VM，因此你将在一个云服务中实现后端服务器，而在其他云服务中实现方案中的所有其他组件。以下步骤使用名为 <bpt id=\"p1\">*</bpt>IaaSStory<ept id=\"p1\">*</ept> 的云服务作为主资源，并在名为 <bpt id=\"p2\">*</bpt>IaaSStory-BackEnd<ept id=\"p2\">*</ept> 的云服务中实现后端服务器。"
+    },
+    {
+      "pos": [
+        1100,
+        1133
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"Prerequisites\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 先决条件"
+    },
+    {
+      "pos": [
+        1135,
+        1293
+      ],
+      "content": "在部署后端服务器之前，你需要先使用此方案的所有必需资源部署主云服务。至少，你需要创建包含后端子网的虚拟网络。若要了解如何部署虚拟网络，请访问<bpt id=\"p1\">[</bpt>使用 Azure CLI 创建虚拟网络<ept id=\"p1\">](/documentation/articles/virtual-networks-create-vnet-classic-cli)</ept>。"
+    },
+    {
+      "content": "部署后端 VM",
+      "pos": [
+        1400,
+        1407
+      ]
+    },
+    {
+      "content": "后端 VM 取决于下面列出的资源的创建。",
+      "pos": [
+        1409,
+        1429
+      ]
+    },
+    {
+      "pos": [
+        1433,
+        1517
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>数据磁盘的存储帐户<ept id=\"p1\">**</ept>。为了提高性能，数据库服务器上的数据磁盘将使用固态驱动器 (SSD) 技术，这需要高级存储帐户。请确保你部署的 Azure 位置支持高级存储。"
+    },
+    {
+      "pos": [
+        1520,
+        1563
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>NIC<ept id=\"p1\">**</ept>。每个 VM 都将具有两个 NIC，一个用于数据库访问，另一个用于管理。"
+    },
+    {
+      "pos": [
+        1566,
+        1621
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>可用性集<ept id=\"p1\">**</ept>。所有数据库服务器都将添加到单个可用性集，以确保在维护期间至少有一个 VM 已启动且正在运行。"
+    },
+    {
+      "content": "步骤 1 - 启动脚本",
+      "pos": [
+        1628,
+        1639
+      ]
+    },
+    {
+      "pos": [
+        1641,
+        1840
+      ],
+      "content": "你可以在<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/IaaS-Story/11-MultiNIC/classic/virtual-network-deploy-multinic-classic-cli.sh)</ept>下载所用的完整 bash 脚本。请按照以下步骤更改要在你的环境中使用的脚本。"
+    },
+    {
+      "pos": [
+        1845,
+        1886
+      ],
+      "content": "基于你在上面<bpt id=\"p1\">[</bpt>先决条件<ept id=\"p1\">](#Prerequisites)</ept>中部署的更改以下变量的值。"
+    },
+    {
+      "content": "基于要用于后端部署的值更改以下变量的值。",
+      "pos": [
+        1986,
+        2006
+      ]
+    },
+    {
+      "content": "步骤 2 - 为你的 VM 创建必要的资源",
+      "pos": [
+        2506,
+        2527
+      ]
+    },
+    {
+      "pos": [
+        2532,
+        2609
+      ],
+      "content": "为所有后端 VM 创建新的云服务。请注意使用 <ph id=\"ph1\">`$backendCSName`</ph> 变量表示云服务名称，使用 <ph id=\"ph2\">`$location`</ph> 表示 Azure 区域。"
+    },
+    {
+      "content": "为要由你的 VM 使用的 OS 和数据磁盘创建高级存储帐户。",
+      "pos": [
+        2708,
+        2738
+      ]
+    },
+    {
+      "content": "步骤 3 - 创建具有多个 NIC 的 VM",
+      "pos": [
+        2867,
+        2889
+      ]
+    },
+    {
+      "pos": [
+        2894,
+        2928
+      ],
+      "content": "基于 <ph id=\"ph1\">`numberOfVMs`</ph> 变量启动一个循环来创建多个 VM。"
+    },
+    {
+      "content": "对于每个 VM，指定两个 NIC 中的每一个的名称和 IP 地址。",
+      "pos": [
+        3018,
+        3051
+      ]
+    },
+    {
+      "pos": [
+        3321,
+        3383
+      ],
+      "content": "创建 VM。请注意 <ph id=\"ph1\">`--nic-config`</ph> 参数的用法，其中包含所有 NIC 的列表（包含名称、子网和 IP 地址）。"
+    },
+    {
+      "content": "为每个 VM 创建两个数据磁盘。",
+      "pos": [
+        3974,
+        3990
+      ]
+    },
+    {
+      "content": "步骤 4 - 运行脚本",
+      "pos": [
+        4345,
+        4356
+      ]
+    },
+    {
+      "content": "现在，你已根据需要下载并更改了脚本，请运行该脚本以创建具有多个 NIC 的后端数据库 VM。",
+      "pos": [
+        4358,
+        4404
+      ]
+    },
+    {
+      "pos": [
+        4409,
+        4447
+      ],
+      "content": "保存该脚本并从 <bpt id=\"p1\">**</bpt>Bash<ept id=\"p1\">**</ept> 终端运行它。你将看到最初的输出，如下所示。"
+    },
+    {
+      "content": "几分钟后，执行将结束，你将看到输出的其余部分，如下所示。",
+      "pos": [
+        5144,
+        5172
+      ]
+    }
+  ],
+  "content": "<properties \n   pageTitle=\"在经典部署模型中使用 Azure CLI 部署多 NIC VM | Azure\"\n   description=\"了解如何在经典部署模型中使用 Azure CLI 部署多 NIC VM\"\n   services=\"virtual-network\"\n   documentationCenter=\"na\"\n   authors=\"telmosampaio\"\n   manager=\"carmonm\"\n   editor=\"\"\n   tags=\"azure-service-management\"\n/>\n<tags\n    ms.service=\"virtual-network\"\n    ms.date=\"11/12/2015\"\n    wacn.date=\"12/31/2015\"/>\n\n#使用 Azure CLI 部署多 NIC VM（经典）\n\n[AZURE.INCLUDE [virtual-network-deploy-multinic-classic-selectors-include.md](../includes/virtual-network-deploy-multinic-classic-selectors-include.md)]\n\n[AZURE.INCLUDE [virtual-network-deploy-multinic-intro-include.md](../includes/virtual-network-deploy-multinic-intro-include.md)]\n\n[AZURE.INCLUDE [azure-arm-classic-important-include](../includes/learn-about-deployment-models-classic-include.md)] \n\n[AZURE.INCLUDE [virtual-network-deploy-multinic-scenario-include.md](../includes/virtual-network-deploy-multinic-scenario-include.md)]\n\n由于目前你不能使用具有单个 NIC 的 VM 以及具有同一个云服务中的多个 NIC 的 VM，因此你将在一个云服务中实现后端服务器，而在其他云服务中实现方案中的所有其他组件。以下步骤使用名为 *IaaSStory* 的云服务作为主资源，并在名为 *IaaSStory-BackEnd* 的云服务中实现后端服务器。\n\n## <a name=\"Prerequisites\"></a> 先决条件\n\n在部署后端服务器之前，你需要先使用此方案的所有必需资源部署主云服务。至少，你需要创建包含后端子网的虚拟网络。若要了解如何部署虚拟网络，请访问[使用 Azure CLI 创建虚拟网络](/documentation/articles/virtual-networks-create-vnet-classic-cli)。\n\n[AZURE.INCLUDE [azure-cli-prerequisites-include.md](../includes/azure-cli-prerequisites-include.md)]\n\n## 部署后端 VM\n\n后端 VM 取决于下面列出的资源的创建。\n\n- **数据磁盘的存储帐户**。为了提高性能，数据库服务器上的数据磁盘将使用固态驱动器 (SSD) 技术，这需要高级存储帐户。请确保你部署的 Azure 位置支持高级存储。\n- **NIC**。每个 VM 都将具有两个 NIC，一个用于数据库访问，另一个用于管理。\n- **可用性集**。所有数据库服务器都将添加到单个可用性集，以确保在维护期间至少有一个 VM 已启动且正在运行。 \n\n### 步骤 1 - 启动脚本\n\n你可以在[此处](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/IaaS-Story/11-MultiNIC/classic/virtual-network-deploy-multinic-classic-cli.sh)下载所用的完整 bash 脚本。请按照以下步骤更改要在你的环境中使用的脚本。\n\n1. 基于你在上面[先决条件](#Prerequisites)中部署的更改以下变量的值。\n\n        location=\"chinaeast\"\n        vnetName=\"WTestVNet\"\n        backendSubnetName=\"BackEnd\"\n\n2. 基于要用于后端部署的值更改以下变量的值。\n\n        backendCSName=\"IaaSStory-Backend\"\n        prmStorageAccountName=\"iaasstoryprmstorage\"\n        image=\"0b11de9248dd4d87b18621318e037d37__RightImage-Ubuntu-14.04-x64-v14.2.1\"\n        avSetName=\"ASDB\"\n        vmSize=\"Standard_DS3\"\n        diskSize=127\n        vmNamePrefix=\"DB\"\n        osDiskName=\"osdiskdb\"\n        dataDiskPrefix=\"db\"\n        dataDiskName=\"datadisk\"\n        ipAddressPrefix=\"192.168.2.\"\n        username='adminuser'\n        password='adminP@ssw0rd'\n        numberOfVMs=2\n\n### 步骤 2 - 为你的 VM 创建必要的资源\n\n1. 为所有后端 VM 创建新的云服务。请注意使用 `$backendCSName` 变量表示云服务名称，使用 `$location` 表示 Azure 区域。\n\n        azure service create --serviceName $backendCSName \\\n            --location $location\n\n2. 为要由你的 VM 使用的 OS 和数据磁盘创建高级存储帐户。\n\n        azure storage account create $prmStorageAccountName \\\n            --location $location \\\n            --type PLRS \n\n### 步骤 3 - 创建具有多个 NIC 的 VM\n\n1. 基于 `numberOfVMs` 变量启动一个循环来创建多个 VM。\n\n        for ((suffixNumber=1;suffixNumber<=numberOfVMs;suffixNumber++));\n        do\n\n2. 对于每个 VM，指定两个 NIC 中的每一个的名称和 IP 地址。\n\n            nic1Name=$vmNamePrefix$suffixNumber-DA\n            x=$((suffixNumber+3))\n            ipAddress1=$ipAddressPrefix$x\n        \n            nic2Name=$vmNamePrefix$suffixNumber-RA\n            x=$((suffixNumber+53))\n            ipAddress2=$ipAddressPrefix$x\n\n4. 创建 VM。请注意 `--nic-config` 参数的用法，其中包含所有 NIC 的列表（包含名称、子网和 IP 地址）。\n\n            azure vm create $backendCSName $image $username $password \\\n                --connect $backendCSName \\\n                --vm-name $vmNamePrefix$suffixNumber \\\n                --vm-size $vmSize \\\n                --availability-set $avSetName \\\n                --blob-url $prmStorageAccountName.blob.core.chinacloudapi.cn/vhds/$osDiskName$suffixNumber.vhd \\\n                --virtual-network-name $vnetName \\\n                --subnet-names $backendSubnetName \\\n                --nic-config $nic1Name:$backendSubnetName:$ipAddress1::,$nic2Name:$backendSubnetName:$ipAddress2::\n\n5. 为每个 VM 创建两个数据磁盘。\n\n            azure vm disk attach-new $vmNamePrefix$suffixNumber \\\n                $diskSize \\\n                vhds/$dataDiskPrefix$suffixNumber$dataDiskName-1.vhd\n        \n            azure vm disk attach-new $vmNamePrefix$suffixNumber \\\n                $diskSize \\\n                vhds/$dataDiskPrefix$suffixNumber$dataDiskName-2.vhd\n        done\n\n### 步骤 4 - 运行脚本\n\n现在，你已根据需要下载并更改了脚本，请运行该脚本以创建具有多个 NIC 的后端数据库 VM。\n\n1. 保存该脚本并从 **Bash** 终端运行它。你将看到最初的输出，如下所示。\n\n        info:    Executing command service create\n        info:    Creating cloud service\n        data:    Cloud service name IaaSStory-Backend\n        info:    service create command OK\n        info:    Executing command storage account create\n        info:    Creating storage account\n        info:    storage account create command OK\n        info:    Executing command vm create\n        info:    Looking up image 0b11de9248dd4d87b18621318e037d37__RightImage-Ubuntu-14.04-x64-v14.2.1\n        info:    Looking up virtual network\n        info:    Looking up cloud service\n        info:    Getting cloud service properties\n        info:    Looking up deployment\n        info:    Creating VM\n\n2. 几分钟后，执行将结束，你将看到输出的其余部分，如下所示。\n\n        info:    OK\n        info:    vm create command OK\n        info:    Executing command vm disk attach-new\n        info:    Getting virtual machines\n        info:    Adding Data-Disk\n        info:    vm disk attach-new command OK\n        info:    Executing command vm disk attach-new\n        info:    Getting virtual machines\n        info:    Adding Data-Disk\n        info:    vm disk attach-new command OK\n        info:    Executing command vm create\n        info:    Looking up image 0b11de9248dd4d87b18621318e037d37__RightImage-Ubuntu-14.04-x64-v14.2.1\n        info:    Looking up virtual network\n        info:    Looking up cloud service\n        info:    Getting cloud service properties\n        info:    Looking up deployment\n        info:    Creating VM\n        info:    OK\n        info:    vm create command OK\n        info:    Executing command vm disk attach-new\n        info:    Getting virtual machines\n        info:    Adding Data-Disk\n        info:    vm disk attach-new command OK\n        info:    Executing command vm disk attach-new\n        info:    Getting virtual machines\n        info:    Adding Data-Disk\n        info:    vm disk attach-new command OK\n\n<!---HONumber=Mooncake_1221_2015-->"
+}

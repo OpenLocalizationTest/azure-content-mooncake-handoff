@@ -1,0 +1,383 @@
+{
+  "nodes": [
+    {
+      "content": "使用经典部署配置应用程序网关以进行 SSL 卸载 | Azure",
+      "pos": [
+        27,
+        59
+      ]
+    },
+    {
+      "content": "本文提供有关使用 Azure 经典部署模型创建支持 SSL 卸载的应用程序网关的说明。",
+      "pos": [
+        77,
+        120
+      ]
+    },
+    {
+      "content": "使用经典部署模型配置应用程序网关以进行 SSL 卸载",
+      "pos": [
+        341,
+        367
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        372,
+        388
+      ]
+    },
+    {
+      "content": "-<bpt id=\"p1\">[</bpt>Azure Classic Powershell<ept id=\"p1\">](/documentation/articles/application-gateway-ssl)</ept>",
+      "pos": [
+        389,
+        465
+      ]
+    },
+    {
+      "content": "-<bpt id=\"p1\">[</bpt>Azure 资源管理器 PowerShell<ept id=\"p1\">](/documentation/articles/application-gateway-ssl-arm)</ept>",
+      "pos": [
+        466,
+        544
+      ]
+    },
+    {
+      "content": "可将应用程序网关配置为在网关上终止 SSL 会话，以避免 Web 场中发生开销较高的 SSL 解密。SSL 卸载还简化了网站的前端服务器设置与管理。",
+      "pos": [
+        546,
+        620
+      ]
+    },
+    {
+      "pos": [
+        623,
+        935
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>在使用 Azure 资源之前，请务必了解 Azure 当前使用两种部署模型：资源管理器部署模型和经典部署模型。在使用任何 Azure 资源之前，请确保你了解<bpt id=\"p1\">[</bpt>部署模型和工具<ept id=\"p1\">](/documentation/articles/azure-classic-rm)</ept>。可以通过单击本文顶部的选项卡来查看不同工具的文档。本文档将说明使用 Azure 经典部署模型创建应用程序网关的方式。若要使用 Azure 资源管理器版本，请转到<bpt id=\"p2\">[</bpt>使用 Azure 资源管理器配置应用程序网关 SSL 卸载<ept id=\"p2\">](/documentation/articles/application-gateway-ssl-arm)</ept>。"
+    },
+    {
+      "content": "开始之前",
+      "pos": [
+        941,
+        945
+      ]
+    },
+    {
+      "pos": [
+        950,
+        1050
+      ],
+      "content": "使用 Web 平台安装程序安装最新版本的 Azure PowerShell cmdlet。可以从<bpt id=\"p1\">[</bpt>下载页面<ept id=\"p1\">](/downloads/)</ept>的“Windows PowerShell”部分下载并安装最新版本。"
+    },
+    {
+      "content": "请确认你已创建包含有效子网、可正常运行的虚拟网络。",
+      "pos": [
+        1054,
+        1079
+      ]
+    },
+    {
+      "content": "请确认后端服务器位于虚拟网络中，或者为后端服务器分配了公共 IP/VIP。",
+      "pos": [
+        1083,
+        1120
+      ]
+    },
+    {
+      "content": "若要在应用程序网关上配置 SSL 卸载，请按所列顺序执行以下步骤。",
+      "pos": [
+        1122,
+        1155
+      ]
+    },
+    {
+      "content": "创建新的应用程序网关",
+      "pos": [
+        1161,
+        1171
+      ]
+    },
+    {
+      "content": "上载 SSL 证书",
+      "pos": [
+        1212,
+        1221
+      ]
+    },
+    {
+      "content": "配置网关",
+      "pos": [
+        1254,
+        1258
+      ]
+    },
+    {
+      "content": "设置网关配置",
+      "pos": [
+        1288,
+        1294
+      ]
+    },
+    {
+      "content": "启动网关",
+      "pos": [
+        1332,
+        1336
+      ]
+    },
+    {
+      "content": "验证网关状态",
+      "pos": [
+        1362,
+        1368
+      ]
+    },
+    {
+      "content": "创建新的应用程序网关",
+      "pos": [
+        1403,
+        1413
+      ]
+    },
+    {
+      "pos": [
+        1415,
+        1514
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>若要创建网关<ept id=\"p1\">**</ept>，请使用 <ph id=\"ph1\">`New-AzureApplicationGateway`</ph> cmdlet，并将值替换为你自己的值。请注意，此时不会开始计收网关的费用。计费将在后面已成功启动网关时开始。"
+    },
+    {
+      "content": "此示例在第一行显示 cmdlet，接着显示输出。",
+      "pos": [
+        1516,
+        1540
+      ]
+    },
+    {
+      "pos": [
+        2029,
+        2087
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>若要验证<ept id=\"p1\">**</ept>是否已创建网关，可以使用 <ph id=\"ph1\">`Get-AzureApplicationGateway`</ph> cmdlet。"
+    },
+    {
+      "pos": [
+        2090,
+        2280
+      ],
+      "content": "在此示例中，<bpt id=\"p1\">*</bpt>Description<ept id=\"p1\">*</ept>、<bpt id=\"p2\">*</bpt>InstanceCount<ept id=\"p2\">*</ept> 和 <bpt id=\"p3\">*</bpt>GatewaySize<ept id=\"p3\">*</ept> 是可选参数。<bpt id=\"p4\">*</bpt>InstanceCount<ept id=\"p4\">*</ept> 的默认值为 2，最大值为 10。<bpt id=\"p5\">*</bpt>GatewaySize<ept id=\"p5\">*</ept> 的默认值为 Medium。其他可用值为 Small 和 Large。<bpt id=\"p6\">*</bpt>Vip<ept id=\"p6\">*</ept> 和 <bpt id=\"p7\">*</bpt>DnsName<ept id=\"p7\">*</ept> 显示为空白，因为网关尚未启动。这些值将在网关进入运行状态后立即创建。"
+    },
+    {
+      "content": "此示例在第一行显示 cmdlet，接着显示输出。",
+      "pos": [
+        2282,
+        2306
+      ]
+    },
+    {
+      "content": "上载 SSL 证书",
+      "pos": [
+        2701,
+        2710
+      ]
+    },
+    {
+      "pos": [
+        2713,
+        2843
+      ],
+      "content": "使用 <ph id=\"ph1\">`Add-AzureApplicationGatewaySslCertificate`</ph> 将 <bpt id=\"p1\">*</bpt>pfx<ept id=\"p1\">*</ept> 格式的服务器证书上载到应用程序网关。证书名称是用户选择的名称，在应用程序网关中必须唯一。在应用程序网关上执行所有证书管理操作时，将按此名称引用此证书。"
+    },
+    {
+      "content": "此示例在第一行显示 cmdlet，接着显示输出。将示例中的值替换为你自己的值。",
+      "pos": [
+        2845,
+        2884
+      ]
+    },
+    {
+      "pos": [
+        3464,
+        3519
+      ],
+      "content": "接下来，验证证书上载。使用 <ph id=\"ph1\">`Get-AzureApplicationGatewayCertificate`</ph>。"
+    },
+    {
+      "content": "此示例在第一行显示 cmdlet，接着显示输出。",
+      "pos": [
+        3521,
+        3545
+      ]
+    },
+    {
+      "content": "配置网关",
+      "pos": [
+        3991,
+        3995
+      ]
+    },
+    {
+      "content": "应用程序网关配置由多个值组成。这些值可将绑定在一起以构造配置。",
+      "pos": [
+        3997,
+        4028
+      ]
+    },
+    {
+      "content": "有效值为：",
+      "pos": [
+        4030,
+        4035
+      ]
+    },
+    {
+      "pos": [
+        4040,
+        4100
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>后端服务器池：<ept id=\"p1\">**</ept>后端服务器的 IP 地址列表。列出的 IP 地址应属于 VNet 子网，或者是公共 IP/VIP。"
+    },
+    {
+      "pos": [
+        4104,
+        4173
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>后端服务器池设置：<ept id=\"p1\">**</ept>每个池都有一些设置，例如端口、协议和基于 Cookie 的关联性。这些设置绑定到池，并会应用到池中的所有服务器。"
+    },
+    {
+      "pos": [
+        4176,
+        4229
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>前端端口：<ept id=\"p1\">**</ept>此端口是应用程序网关上打开的公共端口。客户流量将抵达此端口，然后重定向到后端服务器之一。"
+    },
+    {
+      "pos": [
+        4232,
+        4297
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>侦听器：<ept id=\"p1\">**</ept>侦听器具有前端端口、协议（Http 或 Https，区分大小写）和 SSL 证书名称（如果要配置 SSL 卸载）。"
+    },
+    {
+      "pos": [
+        4301,
+        4381
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>规则：<ept id=\"p1\">**</ept>规则将会绑定侦听器和后端服务器池，并定义当流量抵达特定侦听器时应定向到的后端服务器池。目前仅支持<bpt id=\"p2\">*</bpt>基本<ept id=\"p2\">*</ept>规则。<bpt id=\"p3\">*</bpt>基本<ept id=\"p3\">*</ept>规则是一种轮循负载分发模式。"
+    },
+    {
+      "content": "其他配置说明：",
+      "pos": [
+        4385,
+        4392
+      ]
+    },
+    {
+      "pos": [
+        4396,
+        4528
+      ],
+      "content": "对于 SSL 证书配置，<bpt id=\"p1\">**</bpt>HttpListener<ept id=\"p1\">**</ept> 中的协议应更改为 <bpt id=\"p2\">*</bpt>Https<ept id=\"p2\">*</ept>（区分大小写）。需要将 <bpt id=\"p3\">**</bpt>SslCert<ept id=\"p3\">**</ept> 元素添加到 <bpt id=\"p4\">**</bpt>HttpListener<ept id=\"p4\">**</ept>，后者的值设置为上述上载 SSL 证书部分中使用的名称。前端端口应更新为 443。"
+    },
+    {
+      "pos": [
+        4530,
+        4715
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>启用基于 Cookie 的相关性<ept id=\"p1\">**</ept>：可以配置应用程序网关，以确保来自客户端会话的请求始终定向到 Web 场中的同一 VM。这是通过注入允许网关适当定向流量的会话 Cookie 来实现的。若要启用基于 Cookie 的相关性，请在 <bpt id=\"p2\">**</bpt>BackendHttpSettings<ept id=\"p2\">**</ept> 元素中将 <bpt id=\"p3\">**</bpt>CookieBasedAffinity<ept id=\"p3\">**</ept> 设置为 <bpt id=\"p4\">*</bpt>Enabled<ept id=\"p4\">*</ept>。"
+    },
+    {
+      "content": "可以通过创建配置对象或使用配置 XML 文件来构造配置。若要使用配置 XML 文件构造配置，请使用以下示例。",
+      "pos": [
+        4719,
+        4773
+      ]
+    },
+    {
+      "content": "配置 XML 示例",
+      "pos": [
+        4777,
+        4786
+      ]
+    },
+    {
+      "content": "设置网关配置",
+      "pos": [
+        6601,
+        6607
+      ]
+    },
+    {
+      "pos": [
+        6609,
+        6687
+      ],
+      "content": "接下来，你将设置应用程序网关。可以对配置对象或配置 XML 文件使用 <ph id=\"ph1\">`Set-AzureApplicationGatewayConfig`</ph> cmdlet。"
+    },
+    {
+      "content": "启动网关",
+      "pos": [
+        7181,
+        7185
+      ]
+    },
+    {
+      "pos": [
+        7187,
+        7264
+      ],
+      "content": "配置网关后，使用 <ph id=\"ph1\">`Start-AzureApplicationGateway`</ph> cmdlet 来启动网关。成功启动网关后，将开始计收应用程序网关的费用。"
+    },
+    {
+      "pos": [
+        7267,
+        7335
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>注意：<ept id=\"p1\">**</ept><ph id=\"ph1\">`Start-AzureApplicationGateway`</ph> cmdlet 最多可能需要 15 到 20 分钟才能完成。"
+    },
+    {
+      "content": "验证网关状态",
+      "pos": [
+        7790,
+        7796
+      ]
+    },
+    {
+      "pos": [
+        7798,
+        7934
+      ],
+      "content": "使用 <ph id=\"ph1\">`Get-AzureApplicationGateway`</ph> cmdlet 检查网关的状态。如果前一步骤中的 <bpt id=\"p1\">*</bpt>Start-AzureApplicationGateway<ept id=\"p1\">*</ept> 成功，则 State 应为 <bpt id=\"p2\">*</bpt>Running<ept id=\"p2\">*</ept>，Vip 和 DnsName 应包含有效的条目。"
+    },
+    {
+      "content": "此示例演示了一个正常运行并已准备好接收流量的应用程序网关",
+      "pos": [
+        7936,
+        7964
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        8328,
+        8332
+      ]
+    },
+    {
+      "content": "如需负载平衡选项的其他常规信息，请参阅：",
+      "pos": [
+        8335,
+        8355
+      ]
+    },
+    {
+      "content": "Azure 流量管理器",
+      "pos": [
+        8431,
+        8442
+      ]
+    }
+  ],
+  "content": "<properties \n   pageTitle=\"使用经典部署配置应用程序网关以进行 SSL 卸载 | Azure\"\n   description=\"本文提供有关使用 Azure 经典部署模型创建支持 SSL 卸载的应用程序网关的说明。\"\n   documentationCenter=\"na\"\n   services=\"application-gateway\"\n   authors=\"joaoma\"\n   manager=\"jdial\"\n   editor=\"tysonn\"/>\n<tags \n   ms.service=\"application-gateway\"\n   ms.date=\"10/28/2015\"\n   wacn.date=\"01/05/2016\"/>\n# 使用经典部署模型配置应用程序网关以进行 SSL 卸载 \n\n> [AZURE.SELECTOR]\n-[Azure Classic Powershell](/documentation/articles/application-gateway-ssl)\n-[Azure 资源管理器 PowerShell](/documentation/articles/application-gateway-ssl-arm)\n\n可将应用程序网关配置为在网关上终止 SSL 会话，以避免 Web 场中发生开销较高的 SSL 解密。SSL 卸载还简化了网站的前端服务器设置与管理。\n\n>[AZURE.IMPORTANT]在使用 Azure 资源之前，请务必了解 Azure 当前使用两种部署模型：资源管理器部署模型和经典部署模型。在使用任何 Azure 资源之前，请确保你了解[部署模型和工具](/documentation/articles/azure-classic-rm)。可以通过单击本文顶部的选项卡来查看不同工具的文档。本文档将说明使用 Azure 经典部署模型创建应用程序网关的方式。若要使用 Azure 资源管理器版本，请转到[使用 Azure 资源管理器配置应用程序网关 SSL 卸载](/documentation/articles/application-gateway-ssl-arm)。\n\n\n## 开始之前\n\n1. 使用 Web 平台安装程序安装最新版本的 Azure PowerShell cmdlet。可以从[下载页面](/downloads/)的“Windows PowerShell”部分下载并安装最新版本。\n2. 请确认你已创建包含有效子网、可正常运行的虚拟网络。\n3. 请确认后端服务器位于虚拟网络中，或者为后端服务器分配了公共 IP/VIP。\n\n若要在应用程序网关上配置 SSL 卸载，请按所列顺序执行以下步骤。\n\n1. [创建新的应用程序网关](#create-a-new-application-gateway)\n2. [上载 SSL 证书](#upload-ssl-certificates) \n3. [配置网关](#configure-the-gateway)\n4. [设置网关配置](#set-the-gateway-configuration)\n5. [启动网关](#start-the-gateway)\n6. [验证网关状态](#verify-the-gateway-status)\n\n\n## 创建新的应用程序网关\n\n**若要创建网关**，请使用 `New-AzureApplicationGateway` cmdlet，并将值替换为你自己的值。请注意，此时不会开始计收网关的费用。计费将在后面已成功启动网关时开始。\n\n此示例在第一行显示 cmdlet，接着显示输出。\n\n    PS C:\\> New-AzureApplicationGateway -Name AppGwTest -VnetName testvnet1 -Subnets @(\"Subnet-1\")\n\n    VERBOSE: 4:31:35 PM - Begin Operation: New-AzureApplicationGateway \n    VERBOSE: 4:32:37 PM - Completed Operation: New-AzureApplicationGateway\n    Name       HTTP Status Code     Operation ID                             Error \n    ----       ----------------     ------------                             ----\n    Successful OK                   55ef0460-825d-2981-ad20-b9a8af41b399\n\n**若要验证**是否已创建网关，可以使用 `Get-AzureApplicationGateway` cmdlet。\n\n\n在此示例中，*Description*、*InstanceCount* 和 *GatewaySize* 是可选参数。*InstanceCount* 的默认值为 2，最大值为 10。*GatewaySize* 的默认值为 Medium。其他可用值为 Small 和 Large。*Vip* 和 *DnsName* 显示为空白，因为网关尚未启动。这些值将在网关进入运行状态后立即创建。\n\n此示例在第一行显示 cmdlet，接着显示输出。\n\n    PS C:\\> Get-AzureApplicationGateway AppGwTest\n\n    VERBOSE: 4:39:39 PM - Begin Operation:\n    Get-AzureApplicationGateway VERBOSE: 4:39:40 PM - Completed \n    Operation: Get-AzureApplicationGateway\n    Name: AppGwTest \n    Description: \n    VnetName: testvnet1 \n    Subnets: {Subnet-1} \n    InstanceCount: 2 \n    GatewaySize: Medium \n    State: Stopped \n    VirtualIPs: \n    DnsName:\n\n\n## 上载 SSL 证书 \n\n使用 `Add-AzureApplicationGatewaySslCertificate` 将 *pfx* 格式的服务器证书上载到应用程序网关。证书名称是用户选择的名称，在应用程序网关中必须唯一。在应用程序网关上执行所有证书管理操作时，将按此名称引用此证书。\n\n此示例在第一行显示 cmdlet，接着显示输出。将示例中的值替换为你自己的值。\n\n    PS C:\\> Add-AzureApplicationGatewaySslCertificate  -Name AppGwTest -CertificateName GWCert -Password <password> -CertificateFile <full path to pfx file> \n    \n    VERBOSE: 5:05:23 PM - Begin Operation: Get-AzureApplicationGatewaySslCertificate \n    VERBOSE: 5:06:29 PM - Completed Operation: Get-AzureApplicationGatewaySslCertificate\n    Name       HTTP Status Code     Operation ID                             Error \n    ----       ----------------     ------------                             ----\n    Successful OK                   21fdc5a0-3bf7-2c12-ad98-192e0dd078ef\n\n接下来，验证证书上载。使用 `Get-AzureApplicationGatewayCertificate`。\n\n此示例在第一行显示 cmdlet，接着显示输出。\n\n    PS C:\\> Get-AzureApplicationGatewaySslCertificate AppGwTest \n\n    VERBOSE: 5:07:54 PM - Begin Operation: Get-AzureApplicationGatewaySslCertificate \n    VERBOSE: 5:07:55 PM - Completed Operation: Get-AzureApplicationGatewaySslCertificate\n    Name           : SslCert \n    SubjectName    : CN=gwcert.app.test.contoso.com \n    Thumbprint     : AF5ADD77E160A01A6......EE48D1A \n    ThumbprintAlgo : sha1RSA\n    State..........: Provisioned\n\n\n## 配置网关\n\n应用程序网关配置由多个值组成。这些值可将绑定在一起以构造配置。\n\n有效值为：\n \n- **后端服务器池：**后端服务器的 IP 地址列表。列出的 IP 地址应属于 VNet 子网，或者是公共 IP/VIP。 \n- **后端服务器池设置：**每个池都有一些设置，例如端口、协议和基于 Cookie 的关联性。这些设置绑定到池，并会应用到池中的所有服务器。\n- **前端端口：**此端口是应用程序网关上打开的公共端口。客户流量将抵达此端口，然后重定向到后端服务器之一。\n- **侦听器：**侦听器具有前端端口、协议（Http 或 Https，区分大小写）和 SSL 证书名称（如果要配置 SSL 卸载）。 \n- **规则：**规则将会绑定侦听器和后端服务器池，并定义当流量抵达特定侦听器时应定向到的后端服务器池。目前仅支持*基本*规则。*基本*规则是一种轮循负载分发模式。\n\n**其他配置说明：**\n\n对于 SSL 证书配置，**HttpListener** 中的协议应更改为 *Https*（区分大小写）。需要将 **SslCert** 元素添加到 **HttpListener**，后者的值设置为上述上载 SSL 证书部分中使用的名称。前端端口应更新为 443。\n\n**启用基于 Cookie 的相关性**：可以配置应用程序网关，以确保来自客户端会话的请求始终定向到 Web 场中的同一 VM。这是通过注入允许网关适当定向流量的会话 Cookie 来实现的。若要启用基于 Cookie 的相关性，请在 **BackendHttpSettings** 元素中将 **CookieBasedAffinity** 设置为 *Enabled*。\n\n\n\n可以通过创建配置对象或使用配置 XML 文件来构造配置。若要使用配置 XML 文件构造配置，请使用以下示例。\n\n**配置 XML 示例**\n\n\n        <?xml version=\"1.0\" encoding=\"utf-8\"?>\n    <ApplicationGatewayConfiguration xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://schemas.microsoft.com/windowsazure\">\n        <FrontendIPConfigurations />\n        <FrontendPorts>\n            <FrontendPort>\n                <Name>FrontendPort1</Name>\n                <Port>443</Port>\n            </FrontendPort>\n        </FrontendPorts>\n        <BackendAddressPools>\n            <BackendAddressPool>\n                <Name>BackendPool1</Name>\n                <IPAddresses>\n                    <IPAddress>10.0.0.1</IPAddress>\n                    <IPAddress>10.0.0.2</IPAddress>\n                </IPAddresses>\n            </BackendAddressPool>\n        </BackendAddressPools>\n        <BackendHttpSettingsList>\n            <BackendHttpSettings>\n                <Name>BackendSetting1</Name>\n                <Port>80</Port>\n                <Protocol>Http</Protocol>\n                <CookieBasedAffinity>Enabled</CookieBasedAffinity>\n            </BackendHttpSettings>\n        </BackendHttpSettingsList>\n        <HttpListeners>\n            <HttpListener>\n                <Name>HTTPListener1</Name>\n                <FrontendPort>FrontendPort1</FrontendPort>\n                <Protocol>Https</Protocol>\n                <SslCert>GWCert</SslCert>\n            </HttpListener>\n        </HttpListeners>\n        <HttpLoadBalancingRules>\n            <HttpLoadBalancingRule>\n                <Name>HttpLBRule1</Name>\n                <Type>basic</Type>\n                <BackendHttpSettings>BackendSetting1</BackendHttpSettings>\n                <Listener>HTTPListener1</Listener>\n                <BackendAddressPool>BackendPool1</BackendAddressPool>\n            </HttpLoadBalancingRule>\n        </HttpLoadBalancingRules>\n    </ApplicationGatewayConfiguration>\n\n\n## 设置网关配置\n\n接下来，你将设置应用程序网关。可以对配置对象或配置 XML 文件使用 `Set-AzureApplicationGatewayConfig` cmdlet。\n\n\n    PS C:\\> Set-AzureApplicationGatewayConfig -Name AppGwTest -ConfigFile D:\\config.xml\n\n    VERBOSE: 7:54:59 PM - Begin Operation: Set-AzureApplicationGatewayConfig \n    VERBOSE: 7:55:32 PM - Completed Operation: Set-AzureApplicationGatewayConfig\n    Name       HTTP Status Code     Operation ID                             Error \n    ----       ----------------     ------------                             ----\n    Successful OK                   9b995a09-66fe-2944-8b67-9bb04fcccb9d\n\n## 启动网关\n\n配置网关后，使用 `Start-AzureApplicationGateway` cmdlet 来启动网关。成功启动网关后，将开始计收应用程序网关的费用。\n\n\n**注意：**`Start-AzureApplicationGateway` cmdlet 最多可能需要 15 到 20 分钟才能完成。\n\n   \n    PS C:\\> Start-AzureApplicationGateway AppGwTest \n\n    VERBOSE: 7:59:16 PM - Begin Operation: Start-AzureApplicationGateway \n    VERBOSE: 8:05:52 PM - Completed Operation: Start-AzureApplicationGateway\n    Name       HTTP Status Code     Operation ID                             Error \n    ----       ----------------     ------------                             ----\n    Successful OK                   fc592db8-4c58-2c8e-9a1d-1c97880f0b9b\n\n\n## 验证网关状态\n\n使用 `Get-AzureApplicationGateway` cmdlet 检查网关的状态。如果前一步骤中的 *Start-AzureApplicationGateway* 成功，则 State 应为 *Running*，Vip 和 DnsName 应包含有效的条目。\n\n此示例演示了一个正常运行并已准备好接收流量的应用程序网关\n\n    PS C:\\> Get-AzureApplicationGateway AppGwTest \n\n    Name          : AppGwTest2\n    Description   : \n    VnetName      : testvnet1\n    Subnets       : {Subnet-1}\n    InstanceCount : 2\n    GatewaySize   : Medium\n    State         : Running\n    VirtualIPs    : {23.96.22.241}\n    DnsName       : appgw-4c960426-d1e6-4aae-8670-81fd7a519a43.chinacloudapp.cn\n\n\n## 后续步骤\n\n\n如需负载平衡选项的其他常规信息，请参阅：\n\n<!--- [Azure Load Balancer](/documentation/services/load-balancer/)-->\n- [Azure 流量管理器](/documentation/services/traffic-manager)\n\n<!---HONumber=Mooncake_1221_2015-->\n"
+}

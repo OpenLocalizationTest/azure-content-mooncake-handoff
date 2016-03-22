@@ -1,0 +1,838 @@
+{
+  "nodes": [
+    {
+      "content": "SQL 数据仓库中的表设计 | Azure",
+      "pos": [
+        26,
+        47
+      ]
+    },
+    {
+      "content": "有关在开发解决方案时于 Azure SQL 数据仓库中设计表的技巧。",
+      "pos": [
+        65,
+        99
+      ]
+    },
+    {
+      "content": "SQL 数据仓库中的表设计",
+      "pos": [
+        323,
+        336
+      ]
+    },
+    {
+      "pos": [
+        339,
+        480
+      ],
+      "content": "SQL 数据仓库是一种大规模并行处理 (MPP) 分布式数据库系统。它将数据存储在许多不同的位置（称为<bpt id=\"p1\">**</bpt>分布区<ept id=\"p1\">**</ept>）。每个<bpt id=\"p2\">**</bpt>分布区<ept id=\"p2\">**</ept>类似于一个桶，可在数据仓库中存储唯一的数据子集。通过将数据和处理能力分布于多个节点，SQL 数据仓库能够提供极大的缩放性 — 远超任何单一系统。"
+    },
+    {
+      "content": "在 SQL 数据仓库中创建表时，表实际上分布在所有的分布区。",
+      "pos": [
+        482,
+        512
+      ]
+    },
+    {
+      "content": "本文包括以下主题：",
+      "pos": [
+        514,
+        523
+      ]
+    },
+    {
+      "content": "支持的数据类型",
+      "pos": [
+        527,
+        534
+      ]
+    },
+    {
+      "content": "数据分布原则",
+      "pos": [
+        537,
+        543
+      ]
+    },
+    {
+      "content": "轮循机制分布",
+      "pos": [
+        546,
+        552
+      ]
+    },
+    {
+      "content": "哈希分布",
+      "pos": [
+        555,
+        559
+      ]
+    },
+    {
+      "content": "表分区",
+      "pos": [
+        562,
+        565
+      ]
+    },
+    {
+      "content": "统计信息",
+      "pos": [
+        568,
+        572
+      ]
+    },
+    {
+      "content": "不支持的功能",
+      "pos": [
+        575,
+        581
+      ]
+    },
+    {
+      "content": "支持的数据类型",
+      "pos": [
+        586,
+        593
+      ]
+    },
+    {
+      "content": "SQL 数据仓库支持常见的业务数据类型：",
+      "pos": [
+        594,
+        614
+      ]
+    },
+    {
+      "content": "bigint",
+      "pos": [
+        620,
+        626
+      ]
+    },
+    {
+      "content": "binary",
+      "pos": [
+        633,
+        639
+      ]
+    },
+    {
+      "content": "bit",
+      "pos": [
+        646,
+        649
+      ]
+    },
+    {
+      "content": "char",
+      "pos": [
+        656,
+        660
+      ]
+    },
+    {
+      "content": "日期",
+      "pos": [
+        667,
+        669
+      ]
+    },
+    {
+      "content": "datetime",
+      "pos": [
+        676,
+        684
+      ]
+    },
+    {
+      "content": "datetime2",
+      "pos": [
+        691,
+        700
+      ]
+    },
+    {
+      "content": "datetimeoffset",
+      "pos": [
+        707,
+        721
+      ]
+    },
+    {
+      "content": "decimal",
+      "pos": [
+        728,
+        735
+      ]
+    },
+    {
+      "content": "float",
+      "pos": [
+        742,
+        747
+      ]
+    },
+    {
+      "content": "int",
+      "pos": [
+        754,
+        757
+      ]
+    },
+    {
+      "content": "money",
+      "pos": [
+        764,
+        769
+      ]
+    },
+    {
+      "content": "nchar",
+      "pos": [
+        776,
+        781
+      ]
+    },
+    {
+      "content": "nvarchar",
+      "pos": [
+        788,
+        796
+      ]
+    },
+    {
+      "content": "real",
+      "pos": [
+        803,
+        807
+      ]
+    },
+    {
+      "content": "smalldatetime",
+      "pos": [
+        814,
+        827
+      ]
+    },
+    {
+      "content": "smallint",
+      "pos": [
+        834,
+        842
+      ]
+    },
+    {
+      "content": "smallmoney",
+      "pos": [
+        849,
+        859
+      ]
+    },
+    {
+      "content": "time",
+      "pos": [
+        866,
+        870
+      ]
+    },
+    {
+      "content": "tinyint",
+      "pos": [
+        877,
+        884
+      ]
+    },
+    {
+      "content": "varbinary",
+      "pos": [
+        891,
+        900
+      ]
+    },
+    {
+      "content": "varchar",
+      "pos": [
+        907,
+        914
+      ]
+    },
+    {
+      "content": "你可以使用以下查询来识别数据仓库中包含不兼容类型的列：",
+      "pos": [
+        918,
+        945
+      ]
+    },
+    {
+      "content": "该查询包含任何不支持的用户定义数据类型。",
+      "pos": [
+        1858,
+        1878
+      ]
+    },
+    {
+      "content": "以下是一些可用于取代不支持的数据类型的替代方案。",
+      "pos": [
+        1880,
+        1904
+      ]
+    },
+    {
+      "content": "不要使用：",
+      "pos": [
+        1906,
+        1911
+      ]
+    },
+    {
+      "pos": [
+        1915,
+        1945
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>geometry<ept id=\"p1\">**</ept>，而要使用 varbinary 类型"
+    },
+    {
+      "pos": [
+        1948,
+        1979
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>geography<ept id=\"p1\">**</ept>，而要使用 varbinary 类型"
+    },
+    {
+      "pos": [
+        1982,
+        2009
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>hierarchyid<ept id=\"p1\">**</ept>，CLR 类型不是本机的"
+    },
+    {
+      "pos": [
+        2012,
+        2074
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>image<ept id=\"p1\">**</ept>、<bpt id=\"p2\">**</bpt>text<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>ntext<ept id=\"p3\">**</ept>（基于文本），而要使用 varchar/nvarchar（越小越好）"
+    },
+    {
+      "pos": [
+        2077,
+        2124
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>nvarchar(max)<ept id=\"p1\">**</ept>，而要使用 nvarchar(4000) 或更小，以改善性能"
+    },
+    {
+      "pos": [
+        2127,
+        2151
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>numeric<ept id=\"p1\">**</ept>，而要使用 decimal"
+    },
+    {
+      "pos": [
+        2154,
+        2183
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>sql\\_variant<ept id=\"p1\">**</ept>，将列拆分成多个强类型化列"
+    },
+    {
+      "pos": [
+        2186,
+        2216
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>sysname<ept id=\"p1\">**</ept>，而要使用 nvarchar(128)"
+    },
+    {
+      "pos": [
+        2219,
+        2235
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>table<ept id=\"p1\">**</ept>，转换成暂时表"
+    },
+    {
+      "pos": [
+        2238,
+        2427
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>timestamp<ept id=\"p1\">**</ept>，修改代码以使用 datetime2 和 <ph id=\"ph1\">`CURRENT_TIMESTAMP`</ph> 函数。请注意，不能使用 current\\_timestamp 作为默认约束，因为值不会自动更新。如果需要从 timestamp 类型化列迁移 rowversion 值，请对 NOT NULL 或 NULL 行版本值使用 BINARY(8) 或 VARBINARY(8)。"
+    },
+    {
+      "pos": [
+        2430,
+        2475
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>varchar(max)<ept id=\"p1\">**</ept>，而要使用 varchar(8000) 或更小，以改善性能"
+    },
+    {
+      "pos": [
+        2478,
+        2516
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>uniqueidentifier<ept id=\"p1\">**</ept>，而要使用 varbinary(8)"
+    },
+    {
+      "pos": [
+        2519,
+        2541
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>用户定义的类型<ept id=\"p1\">**</ept>，尽可能转换回本机类型"
+    },
+    {
+      "pos": [
+        2544,
+        2592
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>xml<ept id=\"p1\">**</ept>，而要使用 varchar(8000) 或更小，以改善性能 - 根据需要在列间拆分"
+    },
+    {
+      "content": "部分支持：",
+      "pos": [
+        2594,
+        2599
+      ]
+    },
+    {
+      "pos": [
+        2603,
+        2667
+      ],
+      "content": "默认约束仅支持文本和常量。不支持非确定性表达式或函数，例如 <ph id=\"ph1\">`GETDATE()`</ph> 或 <ph id=\"ph2\">`CURRENT_TIMESTAMP`</ph>。"
+    },
+    {
+      "pos": [
+        2671,
+        2789
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>定义表，使最大可能的行大小（包括可变长度列的完整长度）不超过 32,767 个字节。虽然定义的行可以包含超过此数据的可变长度数据，但数据将无法插入表。此外，还请限制可变长度列的大小，以便运行查询时有更大的吞吐量。"
+    },
+    {
+      "content": "数据分布原则",
+      "pos": [
+        2794,
+        2800
+      ]
+    },
+    {
+      "content": "有两个选项可在 SQL 数据仓库中分布数据：",
+      "pos": [
+        2802,
+        2824
+      ]
+    },
+    {
+      "content": "均衡随机分布数据",
+      "pos": [
+        2829,
+        2837
+      ]
+    },
+    {
+      "content": "根据单个列中的哈希值分布数据",
+      "pos": [
+        2842,
+        2856
+      ]
+    },
+    {
+      "content": "在表级别决定数据分布。分布所有表。在 SQL 数据仓库数据库中分配每个表的分布。",
+      "pos": [
+        2858,
+        2898
+      ]
+    },
+    {
+      "pos": [
+        2900,
+        2949
+      ],
+      "content": "第一个选项就是所谓的<bpt id=\"p1\">**</bpt>轮询机制<ept id=\"p1\">**</ept>分布 - 有时称为随机哈希。可以将此选项视为默认或防故障选项。"
+    },
+    {
+      "pos": [
+        2951,
+        3011
+      ],
+      "content": "第二个选项称为<bpt id=\"p1\">**</bpt>哈希<ept id=\"p1\">**</ept>分布。可以将它视为数据分布的优化形式。当表群集共享通用的联接和/或聚合条件时，经常使用此选项。"
+    },
+    {
+      "content": "轮循机制分布",
+      "pos": [
+        3016,
+        3022
+      ]
+    },
+    {
+      "content": "轮循机制分布是尽可能让数据平均分布在所有分布区中的方法。包含行的缓冲区依次分配（因此名为轮循机制）到每个分布。该过程将不断重复，直到分配了所有数据缓冲区为止。数据不会在轮循机制分布式表中进行排序。出于此原因，轮循机制分布有时称为随机哈希。数据尽可能地平均分布在所有分布区中。",
+      "pos": [
+        3024,
+        3161
+      ]
+    },
+    {
+      "content": "以下是轮循机制分布式表的示例：",
+      "pos": [
+        3163,
+        3178
+      ]
+    },
+    {
+      "content": "以下同样是轮循机制分布式表的一个示例：",
+      "pos": [
+        3702,
+        3721
+      ]
+    },
+    {
+      "pos": [
+        4216,
+        4306
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>请注意，上述第二个示例并未提到分布键。轮循机制是默认设置，因此不是绝对必要的。但是，最好是明确分布方式，因为这可以在审查表设计时，确保你的同事知道你的意图。"
+    },
+    {
+      "content": "没有明显的键列可哈希数据时，通常使用此表类型。较小或较不重要的表（其移动成本可能不是很高）也可以使用此表类型。",
+      "pos": [
+        4308,
+        4363
+      ]
+    },
+    {
+      "content": "将数据载入轮循机制分布式表通常比载入哈希分布式表更快。使用轮循机制分布式表，加载前不需要了解数据或执行哈希。出于此原因，轮循机制表通常具有良好的加载目标。",
+      "pos": [
+        4365,
+        4442
+      ]
+    },
+    {
+      "pos": [
+        4446,
+        4489
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>将数据进行轮循机制分布后，数据将在<bpt id=\"p1\">*</bpt>缓冲区<ept id=\"p1\">*</ept>级别分配到分布区。"
+    },
+    {
+      "content": "建议",
+      "pos": [
+        4495,
+        4497
+      ]
+    },
+    {
+      "content": "在以下情况下，请考虑对表使用轮循机制分布：",
+      "pos": [
+        4499,
+        4520
+      ]
+    },
+    {
+      "content": "没有明显的联接键时",
+      "pos": [
+        4524,
+        4533
+      ]
+    },
+    {
+      "content": "不知道候选哈希分布键时",
+      "pos": [
+        4536,
+        4547
+      ]
+    },
+    {
+      "content": "表没有与其他表共享通用的联接键时",
+      "pos": [
+        4550,
+        4566
+      ]
+    },
+    {
+      "content": "该联接比查询中的其他联接更不重要时",
+      "pos": [
+        4569,
+        4586
+      ]
+    },
+    {
+      "content": "该表是初始加载表时",
+      "pos": [
+        4589,
+        4598
+      ]
+    },
+    {
+      "content": "哈希分布",
+      "pos": [
+        4603,
+        4607
+      ]
+    },
+    {
+      "pos": [
+        4609,
+        4771
+      ],
+      "content": "哈希分布使用内部函数通过哈希单个列来将数据集分布到各个分布区。哈希数据后，将数据分配到分布区不遵循明确的顺序。但是，哈希本身是确定性的过程。这使哈希结果变得可预测。例如，哈希包含值 10 的整数列时，始终会生成相同的哈希值。这意味着，<bpt id=\"p1\">***</bpt>任何<ept id=\"p1\">***</ept>包含值 10 的哈希整数列最终都会分配到相同的分布区。这一点适用于所有表。"
+    },
+    {
+      "content": "哈希可预测性非常重要。也就是说，分布数据的哈希可能使读取数据和将表联接在一起时的性能得到改进。",
+      "pos": [
+        4773,
+        4820
+      ]
+    },
+    {
+      "content": "如下所示，哈希分布对查询优化非常有用。这就是它为何被视为数据分布优化形式的原因。",
+      "pos": [
+        4822,
+        4862
+      ]
+    },
+    {
+      "pos": [
+        4866,
+        4906
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>请记住！ 哈希不是基于数据值，而是基于要哈希的数据类型。"
+    },
+    {
+      "content": "以下是根据 ProductKey 进行哈希分布的表。",
+      "pos": [
+        4908,
+        4934
+      ]
+    },
+    {
+      "pos": [
+        5467,
+        5504
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>将数据进行哈希分布后，数据将在行级别分配到分布区。"
+    },
+    {
+      "content": "表分区",
+      "pos": [
+        5509,
+        5512
+      ]
+    },
+    {
+      "content": "支持并且可轻松定义表分区。",
+      "pos": [
+        5513,
+        5526
+      ]
+    },
+    {
+      "pos": [
+        5528,
+        5560
+      ],
+      "content": "SQL 数据仓库分区的 <ph id=\"ph1\">`CREATE TABLE`</ph> 命令示例："
+    },
+    {
+      "content": "请注意，定义中没有数据分区函数或方案。所有这些信息都是在创建表时处理。你只需识别即将成为分区键的列的边界点。",
+      "pos": [
+        6287,
+        6341
+      ]
+    },
+    {
+      "content": "统计信息",
+      "pos": [
+        6346,
+        6350
+      ]
+    },
+    {
+      "pos": [
+        6352,
+        6550
+      ],
+      "content": "当用户查询表时，SQL 数据仓库将使用分布式查询优化器来创建适当的查询计划。创建后，查询计划将提供数据库用于访问数据和履行用户请求的策略与方法。SQL 数据仓库的查询优化器基于成本。换句话说，它根据相对成本来比较各种选项（计划）并选择最有效率的可用计划。因此，SQL 数据仓库需要大量信息才能做出基于成本的明智决策。它保留有关表（表大小）的统计信息，在数据库对象中称为 <ph id=\"ph1\">`STATISTICS`</ph>。"
+    },
+    {
+      "pos": [
+        6552,
+        6769
+      ],
+      "content": "统计信息针对索引或表的单个或多个列保留。这些数据可将值的基数和选择性相关重要信息提供给基于成本的优化器。当优化器需要评估查询中的 JOIN、GROUP BY、HAVING 和 WHERE 子句时，这些数据特别有用。因此，这些统计信息对象包含的信息一定要<bpt id=\"p1\">*</bpt>准确<ept id=\"p1\">*</ept>反映表的当前状态。请务必知道，成本的准确性非常重要。如果统计信息准确反映了表的状态，则可以比较计划以找出最低的成本。如果统计信息不准确，SQL 数据仓库可能会选择错误的计划。"
+    },
+    {
+      "content": "SQL 数据仓库中的列级统计信息由用户定义。",
+      "pos": [
+        6771,
+        6793
+      ]
+    },
+    {
+      "content": "换句话说，我们必须自行创建这些统计信息。我们刚才知道，这件事不容忽视。这是 SQL Server 与 SQL 数据仓库间的重要差异。查询列时，SQL Server 会自动创建统计信息。默认情况下，SQL Server 还会自动更新这些统计信息。但是，在 SQL 数据仓库中，需要手动创建和管理统计信息。",
+      "pos": [
+        6795,
+        6946
+      ]
+    },
+    {
+      "content": "建议",
+      "pos": [
+        6952,
+        6954
+      ]
+    },
+    {
+      "content": "生成统计信息时，请遵循以下建议：",
+      "pos": [
+        6956,
+        6972
+      ]
+    },
+    {
+      "pos": [
+        6977,
+        7045
+      ],
+      "content": "对 <ph id=\"ph1\">`WHERE`</ph>、<ph id=\"ph2\">`JOIN`</ph>、<ph id=\"ph3\">`GROUP BY`</ph>、<ph id=\"ph4\">`ORDER BY`</ph> 和 <ph id=\"ph5\">`DISTINCT`</ph> 子句使用的列，请创建单列统计信息"
+    },
+    {
+      "content": "生成复合子句的多列统计信息",
+      "pos": [
+        7049,
+        7062
+      ]
+    },
+    {
+      "content": "定期更新统计信息。请记住，此操作不会自动完成！",
+      "pos": [
+        7066,
+        7089
+      ]
+    },
+    {
+      "pos": [
+        7092,
+        7267
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>SQL Server 数据仓库通常完全依赖 <ph id=\"ph2\">`AUTOSTATS`</ph> 来保持列统计信息的最新状态。对于 SQL Server 数据仓库而言，这不是最佳实践。20% 的变化率将触发 <ph id=\"ph3\">`AUTOSTATS`</ph>，这对于包含数百万或数十亿行的大型事实表而言可能不太足够。因此，最好随时掌握统计信息更新，以确保统计信息能准确地反映表的基数。"
+    },
+    {
+      "content": "不支持的功能",
+      "pos": [
+        7272,
+        7278
+      ]
+    },
+    {
+      "content": "SQL 数据仓库不使用或不支持以下功能：",
+      "pos": [
+        7279,
+        7299
+      ]
+    },
+    {
+      "content": "主键",
+      "pos": [
+        7303,
+        7305
+      ]
+    },
+    {
+      "content": "外键",
+      "pos": [
+        7308,
+        7310
+      ]
+    },
+    {
+      "content": "检查约束",
+      "pos": [
+        7313,
+        7317
+      ]
+    },
+    {
+      "content": "唯一约束",
+      "pos": [
+        7320,
+        7324
+      ]
+    },
+    {
+      "content": "唯一索引",
+      "pos": [
+        7327,
+        7331
+      ]
+    },
+    {
+      "content": "计算列",
+      "pos": [
+        7334,
+        7337
+      ]
+    },
+    {
+      "content": "稀疏列",
+      "pos": [
+        7340,
+        7343
+      ]
+    },
+    {
+      "content": "用户定义的类型",
+      "pos": [
+        7346,
+        7353
+      ]
+    },
+    {
+      "content": "索引视图",
+      "pos": [
+        7356,
+        7360
+      ]
+    },
+    {
+      "content": "标识",
+      "pos": [
+        7363,
+        7365
+      ]
+    },
+    {
+      "content": "序列",
+      "pos": [
+        7368,
+        7370
+      ]
+    },
+    {
+      "content": "触发器",
+      "pos": [
+        7373,
+        7376
+      ]
+    },
+    {
+      "content": "同义词",
+      "pos": [
+        7379,
+        7382
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        7388,
+        7392
+      ]
+    },
+    {
+      "pos": [
+        7393,
+        7414
+      ],
+      "content": "有关更多开发技巧，请参阅<bpt id=\"p1\">[</bpt>开发概述<ept id=\"p1\">][]</ept>。"
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"SQL 数据仓库中的表设计 | Azure\"\n   description=\"有关在开发解决方案时于 Azure SQL 数据仓库中设计表的技巧。\"\n   services=\"sql-data-warehouse\"\n   documentationCenter=\"NA\"\n   authors=\"jrowlandjones\"\n   manager=\"barbkess\"\n   editor=\"\"/>\n\n<tags\n   ms.service=\"sql-data-warehouse\"\n   ms.date=\"09/22/2015\"\n   wacn.date=\"01/20/2016\"/>\n\n# SQL 数据仓库中的表设计 #\nSQL 数据仓库是一种大规模并行处理 (MPP) 分布式数据库系统。它将数据存储在许多不同的位置（称为**分布区**）。每个**分布区**类似于一个桶，可在数据仓库中存储唯一的数据子集。通过将数据和处理能力分布于多个节点，SQL 数据仓库能够提供极大的缩放性 — 远超任何单一系统。\n\n在 SQL 数据仓库中创建表时，表实际上分布在所有的分布区。\n\n本文包括以下主题：\n\n- 支持的数据类型\n- 数据分布原则\n- 轮循机制分布\n- 哈希分布\n- 表分区\n- 统计信息\n- 不支持的功能\n\n## 支持的数据类型\nSQL 数据仓库支持常见的业务数据类型：\n\n- **bigint**\n- **binary**\n- **bit**\n- **char**\n- **日期**\n- **datetime**\n- **datetime2**\n- **datetimeoffset**\n- **decimal**\n- **float**\n- **int**\n- **money**\n- **nchar**\n- **nvarchar**\n- **real**\n- **smalldatetime**\n- **smallint**\n- **smallmoney**\n- **time**\n- **tinyint**\n- **varbinary**\n- **varchar**\n\n你可以使用以下查询来识别数据仓库中包含不兼容类型的列：\n\n``` \n    SELECT  t.[name]\n    ,       c.[name]\n    ,       c.[system_type_id]\n    ,       c.[user_type_id]\n    ,       y.[is_user_defined]\n    ,       y.[name]\n    FROM sys.tables  t\n    JOIN sys.columns c on t.[object_id]    = c.[object_id]\n    JOIN sys.types   y on c.[user_type_id] = y.[user_type_id]\n    WHERE y.[name] IN\n                    (   'geography'\n                    ,   'geometry'\n                    ,   'hierarchyid'\n                    ,   'image'\n                    ,   'ntext'\n                    ,   'numeric'\n                    ,   'sql_variant'\n                    ,   'sysname'\n                    ,   'text'\n                    ,   'timestamp'\n                    ,   'uniqueidentifier'\n                    ,   'xml'\n                    )   \n    OR  (   y.[name] IN (  'nvarchar','varchar','varbinary')\n        AND c.[max_length] = -1\n        )\n    OR  y.[is_user_defined] = 1;\n```\n\n该查询包含任何不支持的用户定义数据类型。\n\n以下是一些可用于取代不支持的数据类型的替代方案。\n\n不要使用：\n\n- **geometry**，而要使用 varbinary 类型\n- **geography**，而要使用 varbinary 类型\n- **hierarchyid**，CLR 类型不是本机的\n- **image**、**text**、**ntext**（基于文本），而要使用 varchar/nvarchar（越小越好）\n- **nvarchar(max)**，而要使用 nvarchar(4000) 或更小，以改善性能\n- **numeric**，而要使用 decimal\n- **sql\\_variant**，将列拆分成多个强类型化列\n- **sysname**，而要使用 nvarchar(128)\n- **table**，转换成暂时表\n- **timestamp**，修改代码以使用 datetime2 和 `CURRENT_TIMESTAMP` 函数。请注意，不能使用 current\\_timestamp 作为默认约束，因为值不会自动更新。如果需要从 timestamp 类型化列迁移 rowversion 值，请对 NOT NULL 或 NULL 行版本值使用 BINARY(8) 或 VARBINARY(8)。\n- **varchar(max)**，而要使用 varchar(8000) 或更小，以改善性能\n- **uniqueidentifier**，而要使用 varbinary(8)\n- **用户定义的类型**，尽可能转换回本机类型\n- **xml**，而要使用 varchar(8000) 或更小，以改善性能 - 根据需要在列间拆分\n\n部分支持：\n\n- 默认约束仅支持文本和常量。不支持非确定性表达式或函数，例如 `GETDATE()` 或 `CURRENT_TIMESTAMP`。\n\n> [AZURE.NOTE]定义表，使最大可能的行大小（包括可变长度列的完整长度）不超过 32,767 个字节。虽然定义的行可以包含超过此数据的可变长度数据，但数据将无法插入表。此外，还请限制可变长度列的大小，以便运行查询时有更大的吞吐量。\n\n## 数据分布原则\n\n有两个选项可在 SQL 数据仓库中分布数据：\n\n1. 均衡随机分布数据 \n2. 根据单个列中的哈希值分布数据\n\n在表级别决定数据分布。分布所有表。在 SQL 数据仓库数据库中分配每个表的分布。\n\n第一个选项就是所谓的**轮询机制**分布 - 有时称为随机哈希。可以将此选项视为默认或防故障选项。\n\n第二个选项称为**哈希**分布。可以将它视为数据分布的优化形式。当表群集共享通用的联接和/或聚合条件时，经常使用此选项。\n\n## 轮循机制分布\n\n轮循机制分布是尽可能让数据平均分布在所有分布区中的方法。包含行的缓冲区依次分配（因此名为轮循机制）到每个分布。该过程将不断重复，直到分配了所有数据缓冲区为止。数据不会在轮循机制分布式表中进行排序。出于此原因，轮循机制分布有时称为随机哈希。数据尽可能地平均分布在所有分布区中。\n\n以下是轮循机制分布式表的示例：\n\n```\nCREATE TABLE [dbo].[FactInternetSales]\n(   [ProductKey]            int          NOT NULL\n,   [OrderDateKey]          int          NOT NULL\n,   [CustomerKey]           int          NOT NULL\n,   [PromotionKey]          int          NOT NULL\n,   [SalesOrderNumber]      nvarchar(20) NOT NULL\n,   [OrderQuantity]         smallint     NOT NULL\n,   [UnitPrice]             money        NOT NULL\n,   [SalesAmount]           money        NOT NULL\n)\nWITH\n(   CLUSTERED COLUMNSTORE INDEX\n,   DISTRIBUTION = ROUND_ROBIN\n)\n;\n```\n\n以下同样是轮循机制分布式表的一个示例：\n\n```\nCREATE TABLE [dbo].[FactInternetSales]\n(   [ProductKey]            int          NOT NULL\n,   [OrderDateKey]          int          NOT NULL\n,   [CustomerKey]           int          NOT NULL\n,   [PromotionKey]          int          NOT NULL\n,   [SalesOrderNumber]      nvarchar(20) NOT NULL\n,   [OrderQuantity]         smallint     NOT NULL\n,   [UnitPrice]             money        NOT NULL\n,   [SalesAmount]           money        NOT NULL\n)\nWITH\n(   CLUSTERED COLUMNSTORE INDEX\n)\n;\n```\n\n> [AZURE.NOTE]请注意，上述第二个示例并未提到分布键。轮循机制是默认设置，因此不是绝对必要的。但是，最好是明确分布方式，因为这可以在审查表设计时，确保你的同事知道你的意图。\n\n没有明显的键列可哈希数据时，通常使用此表类型。较小或较不重要的表（其移动成本可能不是很高）也可以使用此表类型。\n\n将数据载入轮循机制分布式表通常比载入哈希分布式表更快。使用轮循机制分布式表，加载前不需要了解数据或执行哈希。出于此原因，轮循机制表通常具有良好的加载目标。\n\n> [AZURE.NOTE]将数据进行轮循机制分布后，数据将在*缓冲区*级别分配到分布区。\n\n### 建议\n\n在以下情况下，请考虑对表使用轮循机制分布：\n\n- 没有明显的联接键时\n- 不知道候选哈希分布键时\n- 表没有与其他表共享通用的联接键时\n- 该联接比查询中的其他联接更不重要时\n- 该表是初始加载表时\n\n## 哈希分布\n\n哈希分布使用内部函数通过哈希单个列来将数据集分布到各个分布区。哈希数据后，将数据分配到分布区不遵循明确的顺序。但是，哈希本身是确定性的过程。这使哈希结果变得可预测。例如，哈希包含值 10 的整数列时，始终会生成相同的哈希值。这意味着，***任何***包含值 10 的哈希整数列最终都会分配到相同的分布区。这一点适用于所有表。\n\n哈希可预测性非常重要。也就是说，分布数据的哈希可能使读取数据和将表联接在一起时的性能得到改进。\n\n如下所示，哈希分布对查询优化非常有用。这就是它为何被视为数据分布优化形式的原因。\n\n> [AZURE.NOTE]请记住！ 哈希不是基于数据值，而是基于要哈希的数据类型。\n\n以下是根据 ProductKey 进行哈希分布的表。\n\n```\nCREATE TABLE [dbo].[FactInternetSales]\n(   [ProductKey]            int          NOT NULL\n,   [OrderDateKey]          int          NOT NULL\n,   [CustomerKey]           int          NOT NULL\n,   [PromotionKey]          int          NOT NULL\n,   [SalesOrderNumber]      nvarchar(20) NOT NULL\n,   [OrderQuantity]         smallint     NOT NULL\n,   [UnitPrice]             money        NOT NULL\n,   [SalesAmount]           money        NOT NULL\n)\nWITH\n(   CLUSTERED COLUMNSTORE INDEX\n,   DISTRIBUTION = HASH([ProductKey])\n)\n;\n```\n\n> [AZURE.NOTE]将数据进行哈希分布后，数据将在行级别分配到分布区。\n\n## 表分区\n支持并且可轻松定义表分区。\n\nSQL 数据仓库分区的 `CREATE TABLE` 命令示例：\n\n```\nCREATE TABLE [dbo].[FactInternetSales]\n(\n    [ProductKey]            int          NOT NULL\n,   [OrderDateKey]          int          NOT NULL\n,   [CustomerKey]           int          NOT NULL\n,   [PromotionKey]          int          NOT NULL\n,   [SalesOrderNumber]      nvarchar(20) NOT NULL\n,   [OrderQuantity]         smallint     NOT NULL\n,   [UnitPrice]             money        NOT NULL\n,   [SalesAmount]           money        NOT NULL\n)\nWITH\n(   CLUSTERED COLUMNSTORE INDEX\n,   DISTRIBUTION = HASH([ProductKey])\n,   PARTITION   (   [OrderDateKey] RANGE RIGHT FOR VALUES\n                    (20000101,20010101,20020101\n                    ,20030101,20040101,20050101\n                    )\n                )\n)\n;\n```\n\n请注意，定义中没有数据分区函数或方案。所有这些信息都是在创建表时处理。你只需识别即将成为分区键的列的边界点。\n\n## 统计信息\n\n当用户查询表时，SQL 数据仓库将使用分布式查询优化器来创建适当的查询计划。创建后，查询计划将提供数据库用于访问数据和履行用户请求的策略与方法。SQL 数据仓库的查询优化器基于成本。换句话说，它根据相对成本来比较各种选项（计划）并选择最有效率的可用计划。因此，SQL 数据仓库需要大量信息才能做出基于成本的明智决策。它保留有关表（表大小）的统计信息，在数据库对象中称为 `STATISTICS`。\n\n统计信息针对索引或表的单个或多个列保留。这些数据可将值的基数和选择性相关重要信息提供给基于成本的优化器。当优化器需要评估查询中的 JOIN、GROUP BY、HAVING 和 WHERE 子句时，这些数据特别有用。因此，这些统计信息对象包含的信息一定要*准确*反映表的当前状态。请务必知道，成本的准确性非常重要。如果统计信息准确反映了表的状态，则可以比较计划以找出最低的成本。如果统计信息不准确，SQL 数据仓库可能会选择错误的计划。\n\nSQL 数据仓库中的列级统计信息由用户定义。\n\n换句话说，我们必须自行创建这些统计信息。我们刚才知道，这件事不容忽视。这是 SQL Server 与 SQL 数据仓库间的重要差异。查询列时，SQL Server 会自动创建统计信息。默认情况下，SQL Server 还会自动更新这些统计信息。但是，在 SQL 数据仓库中，需要手动创建和管理统计信息。\n\n### 建议\n\n生成统计信息时，请遵循以下建议：\n\n1. 对 `WHERE`、`JOIN`、`GROUP BY`、`ORDER BY` 和 `DISTINCT` 子句使用的列，请创建单列统计信息\n2. 生成复合子句的多列统计信息\n3. 定期更新统计信息。请记住，此操作不会自动完成！\n\n>[AZURE.NOTE]SQL Server 数据仓库通常完全依赖 `AUTOSTATS` 来保持列统计信息的最新状态。对于 SQL Server 数据仓库而言，这不是最佳实践。20% 的变化率将触发 `AUTOSTATS`，这对于包含数百万或数十亿行的大型事实表而言可能不太足够。因此，最好随时掌握统计信息更新，以确保统计信息能准确地反映表的基数。\n\n## 不支持的功能\nSQL 数据仓库不使用或不支持以下功能：\n\n- 主键\n- 外键\n- 检查约束\n- 唯一约束\n- 唯一索引\n- 计算列\n- 稀疏列\n- 用户定义的类型\n- 索引视图\n- 标识\n- 序列\n- 触发器\n- 同义词\n\n\n## 后续步骤\n有关更多开发技巧，请参阅[开发概述][]。\n\n<!--Image references-->\n\n<!--Article references-->\n[开发概述]: /documentation/articles/sql-data-warehouse-overview-develop\n\n<!--MSDN references-->\n\n<!--Other Web references-->\n\n<!---HONumber=Mooncake_1207_2015-->\n"
+}

@@ -1,0 +1,362 @@
+{
+  "nodes": [
+    {
+      "content": "自动化实现定时关闭虚拟机",
+      "pos": [
+        28,
+        40
+      ]
+    },
+    {
+      "content": "在虚拟机中配置如何定时关闭虚拟机",
+      "pos": [
+        60,
+        76
+      ]
+    },
+    {
+      "content": "自动化实现定时关闭虚拟机",
+      "pos": [
+        260,
+        272
+      ]
+    },
+    {
+      "content": "本文包含以下内容",
+      "pos": [
+        277,
+        285
+      ]
+    },
+    {
+      "content": "前提条件",
+      "pos": [
+        290,
+        294
+      ]
+    },
+    {
+      "content": "如何实现定时关闭虚拟机",
+      "pos": [
+        314,
+        325
+      ]
+    },
+    {
+      "pos": [
+        345,
+        374
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"prerequisite\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>前提条件"
+    },
+    {
+      "pos": [
+        375,
+        522
+      ],
+      "content": "Controller机器上必须安装 Azure PowerShell，并且要在PowerShell里登录一次Azure, 请参见： <bpt id=\"p1\">[</bpt>如何安装和配置 Azure PowserShell<ept id=\"p1\">](/documentation/articles/powershell-install-configure)</ept>"
+    },
+    {
+      "pos": [
+        527,
+        560
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"operation\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>如何实现定时关闭虚拟机"
+    },
+    {
+      "pos": [
+        561,
+        666
+      ],
+      "content": "配好Azure PowerShell以后，就可以用下面这个脚本创建定时关机任务。把下面的代码另存为一个 PowerShell 脚本保存到本地磁盘，比如叫<ph id=\"ph1\">`Stop-AzureVMsOnSchedule.ps1`</ph>"
+    },
+    {
+      "content": "param(",
+      "pos": [
+        1170,
+        1176
+      ]
+    },
+    {
+      "content": "The name of the VM(s) to start on schedule.",
+      "pos": [
+        1181,
+        1224
+      ]
+    },
+    {
+      "content": "Can be wildcard pattern.",
+      "pos": [
+        1226,
+        1250
+      ]
+    },
+    {
+      "content": "[Parameter(Mandatory = $true)]",
+      "pos": [
+        1253,
+        1283
+      ]
+    },
+    {
+      "content": "[string]$VMName,",
+      "pos": [
+        1287,
+        1303
+      ]
+    },
+    {
+      "content": "The service name that $VMName belongs to.",
+      "pos": [
+        1309,
+        1350
+      ]
+    },
+    {
+      "content": "[Parameter(Mandatory = $true)]",
+      "pos": [
+        1353,
+        1383
+      ]
+    },
+    {
+      "content": "[string]$ServiceName,",
+      "pos": [
+        1387,
+        1408
+      ]
+    },
+    {
+      "content": "The name of the scheduled task.",
+      "pos": [
+        1414,
+        1445
+      ]
+    },
+    {
+      "content": "[Parameter(Mandatory = $true)]",
+      "pos": [
+        1448,
+        1478
+      ]
+    },
+    {
+      "content": "[string]$TaskName,",
+      "pos": [
+        1482,
+        1500
+      ]
+    },
+    {
+      "content": "The name of the \"Stop\" scheduled tasks.",
+      "pos": [
+        1506,
+        1545
+      ]
+    },
+    {
+      "content": "[Parameter(Mandatory = $true)]",
+      "pos": [
+        1548,
+        1578
+      ]
+    },
+    {
+      "content": "[DateTime]$At",
+      "pos": [
+        1582,
+        1595
+      ]
+    },
+    {
+      "content": ")",
+      "pos": [
+        1596,
+        1597
+      ]
+    },
+    {
+      "content": "The script has been tested on Powershell 3.0",
+      "pos": [
+        1601,
+        1645
+      ]
+    },
+    {
+      "content": "Set-StrictMode -Version 3",
+      "pos": [
+        1646,
+        1671
+      ]
+    },
+    {
+      "content": "Following modifies the Write-Verbose behavior to turn the messages on globally for this session",
+      "pos": [
+        1675,
+        1770
+      ]
+    },
+    {
+      "content": "$VerbosePreference = \"Continue\"",
+      "pos": [
+        1771,
+        1802
+      ]
+    },
+    {
+      "content": "Check if Azure Powershell is avaiable",
+      "pos": [
+        1806,
+        1843
+      ]
+    },
+    {
+      "content": "if ((Get-Module -ListAvailable Azure) -eq $null)",
+      "pos": [
+        1844,
+        1892
+      ]
+    },
+    {
+      "content": "{",
+      "pos": [
+        1893,
+        1894
+      ]
+    },
+    {
+      "content": "throw \"Azure Powershell not found!",
+      "pos": [
+        1897,
+        1931
+      ]
+    },
+    {
+      "content": "Please install from http://www.windowsazure.com/en-us/downloads/#cmd-line-tools\"",
+      "pos": [
+        1932,
+        2012
+      ]
+    },
+    {
+      "content": "}",
+      "pos": [
+        2013,
+        2014
+      ]
+    },
+    {
+      "content": "Define a scheduled task to stop the VM(s) on a schedule.",
+      "pos": [
+        2018,
+        2074
+      ]
+    },
+    {
+      "content": "$stopAzureVM = \"Stop-AzureVM -Name \" + $VMName + \" -ServiceName \" + $ServiceName + \" -Force -Verbose\"",
+      "pos": [
+        2075,
+        2176
+      ]
+    },
+    {
+      "content": "$stopTaskTrigger = New-ScheduledTaskTrigger -Daily -At $At",
+      "pos": [
+        2177,
+        2235
+      ]
+    },
+    {
+      "content": "$stopTaskAction = New-ScheduledTaskAction -Execute \"PowerShell.exe\" -Argument $stopAzureVM",
+      "pos": [
+        2236,
+        2326
+      ]
+    },
+    {
+      "content": "$startTaskSettingsSet = New-ScheduledTaskSettingsSet  -AllowStartIfOnBatteries",
+      "pos": [
+        2327,
+        2405
+      ]
+    },
+    {
+      "content": "$stopScheduledTask = New-ScheduledTask -Action $stopTaskAction -Trigger $stopTaskTrigger -Settings $startTaskSettingsSet",
+      "pos": [
+        2409,
+        2529
+      ]
+    },
+    {
+      "content": "Register the scheduled tasks to start and stop the VM(s).",
+      "pos": [
+        2533,
+        2590
+      ]
+    },
+    {
+      "content": "Register-ScheduledTask -TaskName $TaskName -InputObject $stopScheduledTask",
+      "pos": [
+        2591,
+        2665
+      ]
+    },
+    {
+      "content": "还是刚才那个文件，右键用PowerShell运行，按PowerShell提示输入四个必要的参数：",
+      "pos": [
+        2683,
+        2731
+      ]
+    },
+    {
+      "content": "VMName, 要关闭的Virtual Machine名称",
+      "pos": [
+        2735,
+        2764
+      ]
+    },
+    {
+      "content": "ServiceName, 关联的服务名称",
+      "pos": [
+        2767,
+        2787
+      ]
+    },
+    {
+      "content": "TaskName, 任务名称",
+      "pos": [
+        2790,
+        2804
+      ]
+    },
+    {
+      "content": "At，具体操作时间",
+      "pos": [
+        2807,
+        2816
+      ]
+    },
+    {
+      "content": "然后到计划任务列表里就能刷出这个定时关机的任务了，可以测一下：",
+      "pos": [
+        2916,
+        2947
+      ]
+    },
+    {
+      "content": "到指定时候后PowerShell开始关机。",
+      "pos": [
+        3051,
+        3072
+      ]
+    },
+    {
+      "content": "到Portal里验证一下，已经成功关机了.",
+      "pos": [
+        3170,
+        3191
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"自动化实现定时关闭虚拟机\" \n    description=\"在虚拟机中配置如何定时关闭虚拟机\" \n    services=\"virtual machine\" \n    documentationCenter=\"\" \n    authors=\"\"\n    manager=\"\" \n    editor=\"\"/>\n<tags ms.service=\"virtual machine\" ms.date=\"\" wacn.date=\"01/21/2016\"/>\n\n\n#自动化实现定时关闭虚拟机\n\n###本文包含以下内容\n\n* [前提条件](#prerequisite)\n* [如何实现定时关闭虚拟机](#operation)\n\n \n## <a id=\"prerequisite\"></a>前提条件\nController机器上必须安装 Azure PowerShell，并且要在PowerShell里登录一次Azure, 请参见： [如何安装和配置 Azure PowserShell](/documentation/articles/powershell-install-configure)\n\n## <a id=\"operation\"></a>如何实现定时关闭虚拟机\n配好Azure PowerShell以后，就可以用下面这个脚本创建定时关机任务。把下面的代码另存为一个 PowerShell 脚本保存到本地磁盘，比如叫`Stop-AzureVMsOnSchedule.ps1`\n\n<pre><code>\n<#\n.Synopsis\n  Creates scheduled tasks to stop Virtual Machines.\n.DESCRIPTION\n  Creates scheduled tasks to stop a single Virtual Machine or a set of Virtual Machines (using\n  wildcard pattern syntax for the Virtual Machine name).\n.EXAMPLE\n  Stop-AzureVMsOnSchedule.ps1 -ServiceName \"MyServiceName\" -VMName \"testmachine1\" -TaskName \"Stopt Test Machine 1\" -At 5:30PM\n  Stop-AzureVMsOnSchedule.ps1 -ServiceName \"MyServiceName\" -VMName \"test*\" -TaskName \"Stop All Test Machines\" -At 5:30PM\n#>\n\nparam(\n  # The name of the VM(s) to start on schedule.  Can be wildcard pattern.\n  [Parameter(Mandatory = $true)] \n  [string]$VMName,\n\n  # The service name that $VMName belongs to.\n  [Parameter(Mandatory = $true)] \n  [string]$ServiceName,\n\n  # The name of the scheduled task.\n  [Parameter(Mandatory = $true)] \n  [string]$TaskName,\n\n  # The name of the \"Stop\" scheduled tasks.\n  [Parameter(Mandatory = $true)] \n  [DateTime]$At\n)\n\n# The script has been tested on Powershell 3.0\nSet-StrictMode -Version 3\n\n# Following modifies the Write-Verbose behavior to turn the messages on globally for this session\n$VerbosePreference = \"Continue\"\n\n# Check if Azure Powershell is avaiable\nif ((Get-Module -ListAvailable Azure) -eq $null)\n{\n  throw \"Azure Powershell not found! Please install from http://www.windowsazure.com/en-us/downloads/#cmd-line-tools\"\n}\n\n# Define a scheduled task to stop the VM(s) on a schedule.\n$stopAzureVM = \"Stop-AzureVM -Name \" + $VMName + \" -ServiceName \" + $ServiceName + \" -Force -Verbose\"\n$stopTaskTrigger = New-ScheduledTaskTrigger -Daily -At $At\n$stopTaskAction = New-ScheduledTaskAction -Execute \"PowerShell.exe\" -Argument $stopAzureVM\n$startTaskSettingsSet = New-ScheduledTaskSettingsSet  -AllowStartIfOnBatteries \n \n$stopScheduledTask = New-ScheduledTask -Action $stopTaskAction -Trigger $stopTaskTrigger -Settings $startTaskSettingsSet\n\n# Register the scheduled tasks to start and stop the VM(s).\nRegister-ScheduledTask -TaskName $TaskName -InputObject $stopScheduledTask \n\n</code></pre>\n\n还是刚才那个文件，右键用PowerShell运行，按PowerShell提示输入四个必要的参数：\n\n* VMName, 要关闭的Virtual Machine名称\n* ServiceName, 关联的服务名称\n* TaskName, 任务名称\n* At，具体操作时间\n\n![](./media/aog-virtual-machine-how-to-turn-off-vm-automatically/powershell-add-parameter.png)\n\n \n然后到计划任务列表里就能刷出这个定时关机的任务了，可以测一下：\n\n![](./media/aog-virtual-machine-how-to-turn-off-vm-automatically/powershell-add-task-to-system.png)\n \n到指定时候后PowerShell开始关机。\n\n![](./media/aog-virtual-machine-how-to-turn-off-vm-automatically/powershell-turn-down-vm.png)\n \n到Portal里验证一下，已经成功关机了.\n \n\n![](./media/aog-virtual-machine-how-to-turn-off-vm-automatically/powershell-turn-down-result.png)"
+}

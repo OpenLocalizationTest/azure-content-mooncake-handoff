@@ -1,0 +1,117 @@
+{
+  "nodes": [
+    {
+      "content": "如何将 Azure Redis 缓存与 Java 配合使用",
+      "pos": [
+        27,
+        56
+      ]
+    },
+    {
+      "content": "开始将 Azure Redis 缓存与 Java 配合使用",
+      "pos": [
+        75,
+        104
+      ]
+    },
+    {
+      "content": "如何将 Azure Redis 缓存与 Java 配合使用",
+      "pos": [
+        307,
+        336
+      ]
+    },
+    {
+      "content": "Azure Redis 缓存可让你访问 WindowsAzure.cn 管理的、专用安全的 Redis 缓存。可从 Azure 内部的任何应用程序访问你的缓存。",
+      "pos": [
+        338,
+        418
+      ]
+    },
+    {
+      "content": "本主题说明如何开始将 Azure Redis 缓存与 Java 配合使用。",
+      "pos": [
+        420,
+        457
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        463,
+        467
+      ]
+    },
+    {
+      "pos": [
+        469,
+        531
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Jedis<ept id=\"p1\">](https://github.com/xetorthio/jedis)</ept> - Redis 的 Java 客户端"
+    },
+    {
+      "pos": [
+        533,
+        619
+      ],
+      "content": "本教程使用 Jedis，但你可以使用 <bpt id=\"p1\">[</bpt>http://redis.io/clients<ept id=\"p1\">](http://redis.io/clients)</ept> 中列出的任何 Java 客户端。"
+    },
+    {
+      "content": "在 Azure 上创建 Redis 缓存",
+      "pos": [
+        625,
+        645
+      ]
+    },
+    {
+      "content": "Azure 中国目前只支持 PowerShell 或者 Azure CLI 对 Redis 缓存进行管理。",
+      "pos": [
+        647,
+        700
+      ]
+    },
+    {
+      "content": "使用以下的 PowerShell 脚本创建缓存：",
+      "pos": [
+        829,
+        853
+      ]
+    },
+    {
+      "content": "启用非 SSL 终结点",
+      "pos": [
+        1249,
+        1260
+      ]
+    },
+    {
+      "content": "你可以使用以下的 PowerShell 命令行启用非 SSL 终结点",
+      "pos": [
+        1263,
+        1297
+      ]
+    },
+    {
+      "content": "在缓存中添加一些内容并检索此内容",
+      "pos": [
+        1428,
+        1444
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        2122,
+        2126
+      ]
+    },
+    {
+      "pos": [
+        2130,
+        2177
+      ],
+      "content": "阅读官方 <bpt id=\"p1\">[</bpt>Redis 文档<ept id=\"p1\">](http://redis.io/documentation)</ept>。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"如何将 Azure Redis 缓存与 Java 配合使用\"\n    description=\"开始将 Azure Redis 缓存与 Java 配合使用\"\n    services=\"redis-cache\"\n    documentationCenter=\"\"\n    authors=\"steved0x\"\n    manager=\"dwrede\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"cache\"\n    ms.date=\"12/03/2015\"\n    wacn.date=\"01/04/2016\"/>\n\n# 如何将 Azure Redis 缓存与 Java 配合使用\n\nAzure Redis 缓存可让你访问 WindowsAzure.cn 管理的、专用安全的 Redis 缓存。可从 Azure 内部的任何应用程序访问你的缓存。\n\n本主题说明如何开始将 Azure Redis 缓存与 Java 配合使用。\n\n\n## 先决条件\n\n[Jedis](https://github.com/xetorthio/jedis) - Redis 的 Java 客户端\n\n本教程使用 Jedis，但你可以使用 [http://redis.io/clients](http://redis.io/clients) 中列出的任何 Java 客户端。\n\n\n## 在 Azure 上创建 Redis 缓存\n\nAzure 中国目前只支持 PowerShell 或者 Azure CLI 对 Redis 缓存进行管理。\n\n[AZURE.INCLUDE [azurerm-azurechinacloud-environment-parameter](../includes/azurerm-azurechinacloud-environment-parameter.md)]\n\n使用以下的 PowerShell 脚本创建缓存：\n\n    $VerbosePreference = \"Continue\"\n\n    # Create a new cache with date string to make name unique. \n    $cacheName = \"MovieCache\" + $(Get-Date -Format ('ddhhmm')) \n    $location = \"China North\"\n    $resourceGroupName = \"Default-Web-ChinaNorth\"\n    \n    $movieCache = New-AzureRmRedisCache -Location $location -Name $cacheName  -ResourceGroupName $resourceGroupName -Size 250MB -Sku Basic\n\n\n## 启用非 SSL 终结点\n\n\n你可以使用以下的 PowerShell 命令行启用非 SSL 终结点\n\n    Set-AzureRmRedisCache -Name \"<your cache name>\" -ResourceGroupName \"<your resource group name>\" -EnableNonSslPort $true\n\n\n## 在缓存中添加一些内容并检索此内容\n\n    package com.mycompany.app;\n    import redis.clients.jedis.Jedis;\n    import redis.clients.jedis.JedisShardInfo;\n\n    /* Make sure your turn on non SSL port in Azure Redis using the Configuration section in the Azure portal */\n    public class App\n    {\n      public static void main( String[] args )\n      {\n        /* In this line, replace <name> with your cache name: */\n        JedisShardInfo shardInfo = new JedisShardInfo(\"<name>.redis.cache.windows.net\", 6379);\n        shardInfo.setPassword(\"<key>\"); /* Use your access key. */\n        Jedis jedis = new Jedis(shardInfo);\n        jedis.set(\"foo\", \"bar\");\n        String value = jedis.get(\"foo\");\n      }\n    }\n\n\n## 后续步骤\n\n- 阅读官方 [Redis 文档](http://redis.io/documentation)。\n\n\n<!--Image references-->\n[1]: ./media/cache-java-get-started/cache01.png\n[2]: ./media/cache-java-get-started/cache02.png\n[3]: ./media/cache-java-get-started/cache03.png\n[4]: ./media/cache-java-get-started/cache04.png\n\n<!---HONumber=71-->"
+}

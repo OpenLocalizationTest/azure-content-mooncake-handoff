@@ -1,0 +1,159 @@
+{
+  "nodes": [
+    {
+      "content": "跨多个存储帐户管理媒体服务资产",
+      "pos": [
+        28,
+        43
+      ]
+    },
+    {
+      "content": "本文提供有关如何跨多个存储帐户管理媒体服务资产的指导。",
+      "pos": [
+        63,
+        90
+      ]
+    },
+    {
+      "content": "跨多个存储帐户管理媒体服务资产",
+      "pos": [
+        310,
+        325
+      ]
+    },
+    {
+      "content": "从 Azure媒体服务2.2 开始，可以将多个存储帐户附加到一个媒体服务帐户。将多个存储帐户附加到一个媒体服务帐户这一功能具有以下优势：",
+      "pos": [
+        327,
+        395
+      ]
+    },
+    {
+      "content": "使多个存储帐户之间的资产实现负载平衡。",
+      "pos": [
+        399,
+        418
+      ]
+    },
+    {
+      "content": "缩放媒体服务以处理大量内容（目前，单个存储帐户的上限为 500 TB）。",
+      "pos": [
+        421,
+        457
+      ]
+    },
+    {
+      "content": "本主题演示如何使用 Azure 服务管理 REST API 将多个存储帐户附加到一个媒体服务帐户，此外还说明如何在使用媒体服务 SDK 创建资产时指定不同的存储帐户。",
+      "pos": [
+        460,
+        543
+      ]
+    },
+    {
+      "content": "注意事项",
+      "pos": [
+        547,
+        551
+      ]
+    },
+    {
+      "content": "将多个存储帐户附加到媒体服务帐户时，请注意以下事项：",
+      "pos": [
+        553,
+        579
+      ]
+    },
+    {
+      "content": "附加到媒体服务帐户的所有存储帐户必须与媒体服务帐户位于同一数据中心。",
+      "pos": [
+        583,
+        617
+      ]
+    },
+    {
+      "content": "目前，存储帐户一旦附加到指定的媒体服务帐户便无法断开。",
+      "pos": [
+        620,
+        647
+      ]
+    },
+    {
+      "content": "主存储帐户是在创建媒体服务帐户创建时指定的帐户。目前，你无法更改默认存储帐户。",
+      "pos": [
+        650,
+        689
+      ]
+    },
+    {
+      "content": "其他注意事项：",
+      "pos": [
+        692,
+        699
+      ]
+    },
+    {
+      "pos": [
+        701,
+        1068
+      ],
+      "content": "构建流内容的 URL 时，媒体服务会使用 <bpt id=\"p1\">**</bpt>IAssetFile.Name<ept id=\"p1\">**</ept> 属性的值（如 http://{WAMSAccount}.origin.mediaservices.chinacloudapi.cn/{GUID}/{IAssetFile.Name}/streamingParameters.）。出于这个原因，不允许使用百分号编码。Name 属性的值不能含有任何以下保留的<bpt id=\"p2\">[</bpt>百分号编码字符<ept id=\"p2\">](http://zh.wikipedia.org/wiki/百分号编码#.E4.BF.9D.E7.95.99.E5.AD.97.E7.AC.A6.E7.9A.84.E7.99.BE.E5.88.86.E5.8F.B7.E7.BC.96.E7.A0.81)</ept>：!*'();:@&amp;=+$,/?%#\"。此外，文件扩展名中只能含有一个“.”。"
+    },
+    {
+      "content": "使用 Azure 服务管理 REST API 附加存储帐户",
+      "pos": [
+        1072,
+        1101
+      ]
+    },
+    {
+      "pos": [
+        1103,
+        1432
+      ],
+      "content": "目前，只能使用 <bpt id=\"p1\">[</bpt>Azure 服务管理 REST API<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/azure/dn167014.aspx)</ept> 附加多个存储帐户。<bpt id=\"p2\">[</bpt>如何：使用媒体服务管理 REST API<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/dn167656.aspx)</ept> 主题中的代码示例定义了将存储帐户附加到指定媒体服务帐户的 <bpt id=\"p3\">**</bpt>AttachStorageAccountToMediaServiceAccount<ept id=\"p3\">**</ept> 方法。此主题中的代码定义了列出已附加到指定媒体服务帐户的所有存储帐户的 <bpt id=\"p4\">**</bpt>ListStorageAccountDetails<ept id=\"p4\">**</ept> 方法。"
+    },
+    {
+      "content": "跨多个存储帐户管理媒体服务资产",
+      "pos": [
+        1437,
+        1452
+      ]
+    },
+    {
+      "content": "以下代码使用最新的媒体服务 SDK 执行下列任务：",
+      "pos": [
+        1454,
+        1479
+      ]
+    },
+    {
+      "content": "显示与指定媒体服务帐户关联的所有存储帐户。",
+      "pos": [
+        1484,
+        1505
+      ]
+    },
+    {
+      "content": "检索默认存储帐户的名称。",
+      "pos": [
+        1509,
+        1521
+      ]
+    },
+    {
+      "content": "在默认存储帐户中创建一个新资产。",
+      "pos": [
+        1525,
+        1541
+      ]
+    },
+    {
+      "content": "在指定存储帐户中创建编码作业的输出资产。",
+      "pos": [
+        1545,
+        1565
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"跨多个存储帐户管理媒体服务资产\" \n    description=\"本文提供有关如何跨多个存储帐户管理媒体服务资产的指导。\" \n    services=\"media-services\" \n    documentationCenter=\"\" \n    authors=\"Juliako\" \n    manager=\"dwrede\" \n    editor=\"\"/>\n\n<tags\n    ms.service=\"media-services\"\n    ms.date=\"01/28/2016\" \n    wacn.date=\"03/17/2016\"/>\n\n\n#跨多个存储帐户管理媒体服务资产\n\n从 Azure媒体服务2.2 开始，可以将多个存储帐户附加到一个媒体服务帐户。将多个存储帐户附加到一个媒体服务帐户这一功能具有以下优势：\n\n- 使多个存储帐户之间的资产实现负载平衡。\n- 缩放媒体服务以处理大量内容（目前，单个存储帐户的上限为 500 TB）。 \n\n本主题演示如何使用 Azure 服务管理 REST API 将多个存储帐户附加到一个媒体服务帐户，此外还说明如何在使用媒体服务 SDK 创建资产时指定不同的存储帐户。\n\n##注意事项\n\n将多个存储帐户附加到媒体服务帐户时，请注意以下事项：\n\n- 附加到媒体服务帐户的所有存储帐户必须与媒体服务帐户位于同一数据中心。\n- 目前，存储帐户一旦附加到指定的媒体服务帐户便无法断开。\n- 主存储帐户是在创建媒体服务帐户创建时指定的帐户。目前，你无法更改默认存储帐户。 \n\n其他注意事项：\n\n构建流内容的 URL 时，媒体服务会使用 **IAssetFile.Name** 属性的值（如 http://{WAMSAccount}.origin.mediaservices.chinacloudapi.cn/{GUID}/{IAssetFile.Name}/streamingParameters.）。出于这个原因，不允许使用百分号编码。Name 属性的值不能含有任何以下保留的[百分号编码字符](http://zh.wikipedia.org/wiki/百分号编码#.E4.BF.9D.E7.95.99.E5.AD.97.E7.AC.A6.E7.9A.84.E7.99.BE.E5.88.86.E5.8F.B7.E7.BC.96.E7.A0.81)：!*'();:@&=+$,/?%#\"。此外，文件扩展名中只能含有一个“.”。\n\n##使用 Azure 服务管理 REST API 附加存储帐户\n\n目前，只能使用 [Azure 服务管理 REST API](http://msdn.microsoft.com/zh-cn/library/azure/dn167014.aspx) 附加多个存储帐户。[如何：使用媒体服务管理 REST API](https://msdn.microsoft.com/zh-cn/library/azure/dn167656.aspx) 主题中的代码示例定义了将存储帐户附加到指定媒体服务帐户的 **AttachStorageAccountToMediaServiceAccount** 方法。此主题中的代码定义了列出已附加到指定媒体服务帐户的所有存储帐户的 **ListStorageAccountDetails** 方法。\n\n\n##跨多个存储帐户管理媒体服务资产\n\n以下代码使用最新的媒体服务 SDK 执行下列任务：\n\n1. 显示与指定媒体服务帐户关联的所有存储帐户。\n1. 检索默认存储帐户的名称。\n1. 在默认存储帐户中创建一个新资产。\n1. 在指定存储帐户中创建编码作业的输出资产。\n    \n        using Microsoft.WindowsAzure.MediaServices.Client;\n        using System;\n        using System.Collections.Generic;\n        using System.Configuration;\n        using System.IO;\n        using System.Linq;\n        using System.Text;\n        using System.Threading;\n        using System.Threading.Tasks;\n        \n        namespace MultipleStorageAccounts\n        {\n            class Program\n            {\n                // Location of the media file that you want to encode. \n                private static readonly string _singleInputFilePath =\n                    Path.GetFullPath(@\"../..\\supportFiles\\multifile\\interview2.wmv\");\n        \n                private static readonly string MediaServicesAccountName = \n                    ConfigurationManager.AppSettings[\"MediaServicesAccountName\"];\n                private static readonly string MediaServicesAccountKey = \n                    ConfigurationManager.AppSettings[\"MediaServicesAccountKey\"];\n        \n                private static readonly String _defaultScope = \"urn:WindowsAzureMediaServices\";\n\n                // Azure China uses a different API server and a different ACS Base Address from the Global.\n                private static readonly String _chinaApiServerUrl = \"https://wamsshaclus001rest-hs.chinacloudapp.cn/API/\";\n                private static readonly String _chinaAcsBaseAddressUrl = \"https://wamsprodglobal001acs.accesscontrol.chinacloudapi.cn\";\n\n                private static CloudMediaContext _context;\n                private static MediaServicesCredentials _cachedCredentials = null;\n    \n                static void Main(string[] args)\n                {\n    \n                    // Create and cache the Media Services credentials in a static class variable.\n                    _cachedCredentials = new MediaServicesCredentials(\n                                    MediaServicesAccountName,\n                                    MediaServicesAccountKey,\n                                    _defaultScope,\n                                    _chinaAcsBaseAddressUrl);\n\n                    // Create the API server Uri\n                    _apiServer = new Uri(_chinaApiServerUrl);\n\n                    // Used the cached credentials to create CloudMediaContext.\n                    _context = new CloudMediaContext(_apiServer, _cachedCredentials);\n    \n        \n                    // Display the storage accounts associated with \n                    // the specified Media Services account:\n                    foreach (var sa in _context.StorageAccounts)\n                        Console.WriteLine(sa.Name);\n        \n                    // Retrieve the name of the default storage account.\n                    var defaultStorageName = _context.StorageAccounts.Where(s => s.IsDefault == true).FirstOrDefault();\n                    Console.WriteLine(\"Name: {0}\", defaultStorageName.Name);\n                    Console.WriteLine(\"IsDefault: {0}\", defaultStorageName.IsDefault);\n        \n                    // Retrieve the name of a storage account that is not the default one.\n                    var notDefaultStroageName = _context.StorageAccounts.Where(s => s.IsDefault == false).FirstOrDefault();\n                    Console.WriteLine(\"Name: {0}\", notDefaultStroageName.Name);\n                    Console.WriteLine(\"IsDefault: {0}\", notDefaultStroageName.IsDefault);\n                    \n                    // Create the original asset in the default storage account.\n                    IAsset asset = CreateAssetAndUploadSingleFile(AssetCreationOptions.None, \n                        defaultStorageName.Name, _singleInputFilePath);\n                    Console.WriteLine(\"Created the asset in the {0} storage account\", asset.StorageAccountName);\n                    \n                    // Create an output asset of the encoding job in the other storage account.\n                    IAsset outputAsset = CreateEncodingJob(asset, notDefaultStroageName.Name, _singleInputFilePath);\n                    if(outputAsset!=null)\n                        Console.WriteLine(\"Created the output asset in the {0} storage account\", outputAsset.StorageAccountName);\n        \n                }\n        \n                static public IAsset CreateAssetAndUploadSingleFile(AssetCreationOptions assetCreationOptions, string storageName, string singleFilePath)\n                {\n                    var assetName = \"UploadSingleFile_\" + DateTime.UtcNow.ToString();\n                    \n                    // If you are creating an asset in the default storage account, you can omit the StorageName parameter.\n                    var asset = _context.Assets.Create(assetName, storageName, assetCreationOptions);\n        \n                    var fileName = Path.GetFileName(singleFilePath);\n        \n                    var assetFile = asset.AssetFiles.Create(fileName);\n        \n                    Console.WriteLine(\"Created assetFile {0}\", assetFile.Name);\n        \n                    assetFile.Upload(singleFilePath);\n                    \n                    Console.WriteLine(\"Done uploading {0}\", assetFile.Name);\n        \n                    return asset;\n                }\n        \n                static IAsset CreateEncodingJob(IAsset asset, string storageName, string inputMediaFilePath)\n                {\n                    // Declare a new job.\n                    IJob job = _context.Jobs.Create(\"My encoding job\");\n                    // Get a media processor reference, and pass to it the name of the \n                    // processor to use for the specific task.\n                    IMediaProcessor processor = GetLatestMediaProcessorByName(\"Azure Media Encoder\");\n        \n                    // Create a task with the encoding details, using a string preset.\n                    ITask task = job.Tasks.AddNew(\"My encoding task\",\n                        processor,\n                        \"H264 Broadband 720p\",\n                        Microsoft.WindowsAzure.MediaServices.Client.TaskOptions.ProtectedConfiguration);\n        \n                    // Specify the input asset to be encoded.\n                    task.InputAssets.Add(asset);\n                    // Add an output asset to contain the results of the job. \n                    // This output is specified as AssetCreationOptions.None, which \n                    // means the output asset is not encrypted. \n                    task.OutputAssets.AddNew(\"Output asset\", storageName,\n                        AssetCreationOptions.None);\n        \n                    // Use the following event handler to check job progress.  \n                    job.StateChanged += new\n                            EventHandler<JobStateChangedEventArgs>(StateChanged);\n        \n                    // Launch the job.\n                    job.Submit();\n        \n                    // Check job execution and wait for job to finish. \n                    Task progressJobTask = job.GetExecutionProgressTask(CancellationToken.None);\n                    progressJobTask.Wait();\n        \n                    // Get an updated job reference.\n                    job = GetJob(job.Id);\n        \n                    // If job state is Error the event handling \n                    // method for job progress should log errors.  Here we check \n                    // for error state and exit if needed.\n                    if (job.State == JobState.Error)\n                    {\n                        Console.WriteLine(\"\\nExiting method due to job error.\");\n                        return null;\n                    }\n        \n                    // Get a reference to the output asset from the job.\n                    IAsset outputAsset = job.OutputMediaAssets[0];\n        \n                    return outputAsset;\n                }\n        \n        \n                private static IMediaProcessor GetLatestMediaProcessorByName(string mediaProcessorName)\n                {\n                    var processor = _context.MediaProcessors.Where(p => p.Name == mediaProcessorName).\n                        ToList().OrderBy(p => new Version(p.Version)).LastOrDefault();\n        \n                    if (processor == null)\n                        throw new ArgumentException(string.Format(\"Unknown media processor\", mediaProcessorName));\n        \n                    return processor;\n                }\n        \n                private static void StateChanged(object sender, JobStateChangedEventArgs e)\n                {\n                    Console.WriteLine(\"Job state changed event:\");\n                    Console.WriteLine(\"  Previous state: \" + e.PreviousState);\n                    Console.WriteLine(\"  Current state: \" + e.CurrentState);\n        \n                    switch (e.CurrentState)\n                    {\n                        case JobState.Finished:\n                            Console.WriteLine();\n                            Console.WriteLine(\"********************\");\n                            Console.WriteLine(\"Job is finished.\");\n                            Console.WriteLine(\"Please wait while local tasks or downloads complete...\");\n                            Console.WriteLine(\"********************\");\n                            Console.WriteLine();\n                            Console.WriteLine();\n                            break;\n                        case JobState.Canceling:\n                        case JobState.Queued:\n                        case JobState.Scheduled:\n                        case JobState.Processing:\n                            Console.WriteLine(\"Please wait...\\n\");\n                            break;\n                        case JobState.Canceled:\n                        case JobState.Error:\n                            // Cast sender as a job.\n                            IJob job = (IJob)sender;\n                            // Display or log error details as needed.\n                            Console.WriteLine(\"An error occurred in {0}\", job.Id);\n                            break;\n                        default:\n                            break;\n                    }\n                }\n        \n                static IJob GetJob(string jobId)\n                {\n                    // Use a Linq select query to get an updated \n                    // reference by Id. \n                    var jobInstance =\n                        from j in _context.Jobs\n                        where j.Id == jobId\n                        select j;\n                    // Return the job reference as an Ijob. \n                    IJob job = jobInstance.FirstOrDefault();\n        \n                    return job;\n                }\n            }\n        }\n \n\n<!---HONumber=Mooncake_0307_2016-->"
+}

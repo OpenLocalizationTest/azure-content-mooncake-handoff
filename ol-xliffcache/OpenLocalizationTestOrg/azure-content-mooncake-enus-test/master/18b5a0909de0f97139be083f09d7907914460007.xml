@@ -1,0 +1,565 @@
+{
+  "nodes": [
+    {
+      "content": "自定义身份验证入门 | Azure",
+      "pos": [
+        28,
+        45
+      ]
+    },
+    {
+      "content": "了解如何使用用户名和密码对用户进行身份验证。",
+      "pos": [
+        65,
+        87
+      ]
+    },
+    {
+      "content": "自定义身份验证入门",
+      "pos": [
+        323,
+        332
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        434,
+        440
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        446,
+        448
+      ]
+    },
+    {
+      "content": "本主题说明如何通过颁发自己的移动服务身份验证令牌，对 Azure 移动服务 .NET 后端中的用户进行身份验证。在本教程中，你将使用应用程序的自定义用户名和密码向快速入门项目添加身份验证。",
+      "pos": [
+        449,
+        543
+      ]
+    },
+    {
+      "pos": [
+        546,
+        699
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>本教程演示了使用自定义凭据对移动服务进行身份验证的高级方法。许多应用程序最好是改用内置的社交标识提供程序，以便让用户通过 Microsoft 帐户和 Azure Active Directory 登录。如果你这是第一次体验移动服务中的身份验证，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">向应用程序添加身份验证]</ept>教程。"
+    },
+    {
+      "pos": [
+        701,
+        735
+      ],
+      "content": "本教程基于移动服务快速入门。此外，还必须先完成<bpt id=\"p1\">[</bpt><ept id=\"p1\">移动服务入门]</ept>教程。"
+    },
+    {
+      "pos": [
+        738,
+        834
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>本教程旨在说明如何颁发移动服务的身份验证令牌。请不要将其视为安全指导原则。在开发应用程序时，你必须留意密码存储的安全问题，并且需要制定暴力破解攻击的管理策略。"
+    },
+    {
+      "content": "设置帐户表",
+      "pos": [
+        839,
+        844
+      ]
+    },
+    {
+      "content": "由于你使用自定义身份验证，且未依赖其他标识提供程序，因此需要存储用户的登录信息。在本部分中，你将为帐户创建一个表，并设置基本的安全性机制。帐户表包含用户名和加盐哈希密码，你也可以视需要加入其他用户信息。",
+      "pos": [
+        846,
+        947
+      ]
+    },
+    {
+      "pos": [
+        952,
+        1000
+      ],
+      "content": "在后端项目的 <bpt id=\"p1\">**</bpt>DataObjects<ept id=\"p1\">**</ept> 数据夹中，创建名为 <ph id=\"ph1\">`Account`</ph> 的新实体。"
+    },
+    {
+      "pos": [
+        1005,
+        1021
+      ],
+      "content": "添加以下 <ph id=\"ph1\">`using`</ph> 语句："
+    },
+    {
+      "content": "将类定义替换为以下代码：",
+      "pos": [
+        1082,
+        1094
+      ]
+    },
+    {
+      "content": "这样，我们的新帐户表中将会显示一行，其中包含用户名、该用户的盐以及安全存储的密码。",
+      "pos": [
+        1349,
+        1390
+      ]
+    },
+    {
+      "pos": [
+        1395,
+        1472
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>Models<ept id=\"p1\">**</ept> 文件夹下，你将会看到与移动服务同名的 <bpt id=\"p2\">**</bpt>DbContext<ept id=\"p2\">**</ept> 派生类。请打开你的内容并添加以下代码，将帐户表添加到数据模型："
+    },
+    {
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>本教程中的代码段使用 <ph id=\"ph2\">`todoContext`</ph> 作为上下文名称。你必须更新项目上下文的代码段。",
+      "pos": [
+        1533,
+        1593
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        1603,
+        1609
+      ]
+    },
+    {
+      "content": "接下来，请设置安全功能以处理此数据。",
+      "pos": [
+        1614,
+        1632
+      ]
+    },
+    {
+      "pos": [
+        1638,
+        1691
+      ],
+      "content": "创建名为 <ph id=\"ph1\">`CustomLoginProviderUtils`</ph> 的类，然后添加以下 <ph id=\"ph2\">`using`</ph> 语句："
+    },
+    {
+      "content": "将以下代码方法添加到新类：",
+      "pos": [
+        1741,
+        1754
+      ]
+    },
+    {
+      "content": "创建注册终结点",
+      "pos": [
+        2760,
+        2767
+      ]
+    },
+    {
+      "content": "此时，创建用户帐户的各项准备都已完成。在本部分中，你将设置注册终结点以处理新的注册请求。你将在此处强制实施新的用户名和密码策略，并确保用户名不会盗用。然后，你要将用户信息安全存储在数据库中。",
+      "pos": [
+        2769,
+        2864
+      ]
+    },
+    {
+      "content": "创建以下新类用于表示传入的注册尝试：",
+      "pos": [
+        2869,
+        2887
+      ]
+    },
+    {
+      "content": "如果你要在注册期间收集和存储其他信息，应该在此处执行相应的操作。",
+      "pos": [
+        3053,
+        3085
+      ]
+    },
+    {
+      "pos": [
+        3090,
+        3199
+      ],
+      "content": "在移动服务后端项目中，右键单击“控制器”，单击“添加”和“控制器”，创建名为 <ph id=\"ph1\">`CustomRegistrationController`</ph> 的新“Azure 移动服务自定义控制器”，然后添加以下 <ph id=\"ph2\">`using`</ph> 语句："
+    },
+    {
+      "content": "在以上代码中，将占位符替换为项目的命名空间。",
+      "pos": [
+        3409,
+        3431
+      ]
+    },
+    {
+      "content": "将类定义替换为以下代码：",
+      "pos": [
+        3437,
+        3449
+      ]
+    },
+    {
+      "pos": [
+        5361,
+        5436
+      ],
+      "content": "请记得将 <bpt id=\"p1\">*</bpt>todoContext<ept id=\"p1\">*</ept> 变量替换为项目的 <bpt id=\"p2\">**</bpt>DbContext<ept id=\"p2\">**</ept> 的名称。请注意，此控制器使用以下属性来允许发往此终结点的所有流量："
+    },
+    {
+      "pos": [
+        5495,
+        5603
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>任何客户端均可通过 HTTP 访问此注册终结点。将此服务发布到生产环境之前，应实现某种形式的方案来验证注册，例如 SMS 或基于电子邮件的验证。这有助于防止恶意用户创建欺骗性的注册。"
+    },
+    {
+      "content": "创建 LoginProvider",
+      "pos": [
+        5608,
+        5624
+      ]
+    },
+    {
+      "content": "<bpt id=\"p1\">**</bpt>LoginProvider<ept id=\"p1\">**</ept> 是移动服务身份验证管道中的基础构造之一。在本部分中，你将创建自己的 <ph id=\"ph1\">`CustomLoginProvider`</ph>。它并不会像内置提供程序一样插入管道中，但会为你提供方便的功能。",
+      "pos": [
+        5626,
+        5731
+      ]
+    },
+    {
+      "content": "如果你使用 Visual Studio 2013，则可能需要安装 <ph id=\"ph1\">`WindowsAzure.MobileServices.Backend.Security`</ph> Nuget 包才能添加对 <ph id=\"ph2\">`LoginProvider`</ph> 类的引用。",
+      "pos": [
+        5734,
+        5848
+      ]
+    },
+    {
+      "pos": [
+        5853,
+        5921
+      ],
+      "content": "创建派生自 <bpt id=\"p1\">**</bpt>LoginProvider<ept id=\"p1\">**</ept> 的新类 <ph id=\"ph1\">`CustomLoginProvider`</ph>，然后添加以下 <ph id=\"ph2\">`using`</ph> 语句："
+    },
+    {
+      "pos": [
+        6137,
+        6174
+      ],
+      "content": "将 <bpt id=\"p1\">**</bpt>CustomLoginProvider<ept id=\"p1\">**</ept> 类定义替换为以下代码："
+    },
+    {
+      "pos": [
+        6692,
+        6743
+      ],
+      "content": "在同一个代码文件中创建名为 <ph id=\"ph1\">`CustomLoginProviderCredentials`</ph> 的新类。"
+    },
+    {
+      "pos": [
+        6981,
+        7186
+      ],
+      "content": "此类表示有关用户的信息，将通过 <bpt id=\"p1\">[</bpt>GetIdentitiesAsync<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.windowsazure.mobile.service.security.serviceuser.getidentitiesasync.aspx)</ept> 在后端上供你使用。如果你要添加自定义声明，请确保可在此对象中捕获这些声明。"
+    },
+    {
+      "pos": [
+        7191,
+        7252
+      ],
+      "content": "将抽象方法 <ph id=\"ph1\">`ConfigureMiddleware`</ph> 的以下实现添加到 <bpt id=\"p1\">**</bpt>CustomLoginProvider<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        7474,
+        7521
+      ],
+      "content": "此方法尚未实现，因为 <bpt id=\"p1\">**</bpt>CustomLoginProvider<ept id=\"p1\">**</ept> 不会与身份验证管道集成。"
+    },
+    {
+      "pos": [
+        7526,
+        7584
+      ],
+      "content": "将抽象方法 <ph id=\"ph1\">`ParseCredentials`</ph> 的以下实现添加到 <bpt id=\"p1\">**</bpt>CustomLoginProvider<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "此方法将使后端能够从传入的身份验证令牌反序列化用户信息。",
+      "pos": [
+        7894,
+        7922
+      ]
+    },
+    {
+      "pos": [
+        7927,
+        7986
+      ],
+      "content": "将抽象方法 <ph id=\"ph1\">`CreateCredentials`</ph> 的以下实现添加到 <bpt id=\"p1\">**</bpt>CustomLoginProvider<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        8562,
+        8647
+      ],
+      "content": "此方法将 <bpt id=\"p1\">[</bpt><ept id=\"p1\">ClaimsIdentity]</ept> 转换成在身份验证令牌颁发阶段使用的 <bpt id=\"p2\">[</bpt><ept id=\"p2\">ProviderCredentials]</ept> 对象。在此方法中，你可以再次捕获任何其他声明。"
+    },
+    {
+      "pos": [
+        8651,
+        8723
+      ],
+      "content": "创建 <bpt id=\"p1\">**</bpt>ConfigOptions<ept id=\"p1\">**</ept> 后，打开 App\\_Start 文件夹中的 WebApiConfig.cs 项目文件并添加以下代码行:"
+    },
+    {
+      "content": "创建登录终结点",
+      "pos": [
+        8802,
+        8809
+      ]
+    },
+    {
+      "pos": [
+        8811,
+        8987
+      ],
+      "content": "接下来，需要创建一个终结点，使你的用户能够登录。系统会根据数据库检查你所收到的用户名和密码，方法是应用用户的盐，哈希处理密码，然后确保传入值与数据库的值匹配。如果匹配，则你可以创建 <bpt id=\"p1\">[</bpt><ept id=\"p1\">ClaimsIdentity]</ept> 并将其传递给 <bpt id=\"p2\">**</bpt>CustomLoginProvider<ept id=\"p2\">**</ept>。客户端应用程序将接收用户 ID 和身份验证令牌，以进一步访问你的移动服务。"
+    },
+    {
+      "pos": [
+        8992,
+        9026
+      ],
+      "content": "在移动服务后端项目中创建以下新的 <ph id=\"ph1\">`LoginRequest`</ph> 类："
+    },
+    {
+      "content": "此类表示传入的登录尝试。",
+      "pos": [
+        9185,
+        9197
+      ]
+    },
+    {
+      "pos": [
+        9202,
+        9231
+      ],
+      "content": "创建以下新的 <ph id=\"ph1\">`CustomLoginResult`</ph> 类："
+    },
+    {
+      "content": "此类表示使用用户 ID 和身份验证令牌成功完成的登录。请注意，此类和客户端的 MobileServiceUser 类具有相同形式，因此，使用此类可以轻松地将登录响应传递给强类型化客户端。",
+      "pos": [
+        9422,
+        9515
+      ]
+    },
+    {
+      "pos": [
+        9520,
+        9611
+      ],
+      "content": "右键单击“控制器”，单击“添加”和“控制器”，创建名为 <ph id=\"ph1\">`CustomLoginController`</ph> 的新“Azure 移动服务自定义控制器”，然后添加以下 <ph id=\"ph2\">`using`</ph> 语句："
+    },
+    {
+      "pos": [
+        9812,
+        9851
+      ],
+      "content": "将 <bpt id=\"p1\">**</bpt>CustomLoginController<ept id=\"p1\">**</ept> 类定义替换为以下代码："
+    },
+    {
+      "pos": [
+        11807,
+        11891
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>用于生产环境的 <ph id=\"ph2\">`CustomLoginController`</ph> 也应包含暴力破解攻击检测策略。否则，你的登录解决方案可能容易受到攻击。"
+    },
+    {
+      "content": "将移动服务配置为要求身份验证",
+      "pos": [
+        11896,
+        11910
+      ]
+    },
+    {
+      "content": "使用测试客户端测试登录流",
+      "pos": [
+        12055,
+        12067
+      ]
+    },
+    {
+      "content": "在客户端应用程序中，必须开发一个自定义登录屏幕，以捕获用户名和密码，并将其以 JSON 负载形式发送到你的注册和登录终结点。要完成本教程，你只需使用移动服务 .NET 后端的内置测试客户端。",
+      "pos": [
+        12069,
+        12164
+      ]
+    },
+    {
+      "content": "在 Visual Studio 中，右键单击移动服务项目，然后单击“调试”和“启动新实例”。",
+      "pos": [
+        12169,
+        12215
+      ]
+    },
+    {
+      "content": "随后会启动移动服务后端项目的新调试实例。成功启动服务之后，你会看到显示“此移动服务在正常运行”的启动页。",
+      "pos": [
+        12223,
+        12275
+      ]
+    },
+    {
+      "pos": [
+        12280,
+        12373
+      ],
+      "content": "在服务启动页中，单击“试用”，然后在身份验证对话框中，键入你在 web.config 文件的 <bpt id=\"p1\">**</bpt>MS\\_ApplicationKey<ept id=\"p1\">**</ept> 应用程序设置中设置的密码，并将用户名保留空白。"
+    },
+    {
+      "content": "在帮助页中，单击“CustomRegistration”终结点，然后单击“试用”。",
+      "pos": [
+        12378,
+        12419
+      ]
+    },
+    {
+      "content": "在正文中，将示例字符串替换为符合前面所指定条件的用户名和密码，然后单击“发送”。",
+      "pos": [
+        12436,
+        12476
+      ]
+    },
+    {
+      "content": "响应应为“201/已创建”。",
+      "pos": [
+        12494,
+        12508
+      ]
+    },
+    {
+      "pos": [
+        12513,
+        12577
+      ],
+      "content": "单击浏览器中的后退按钮，并使用前一步骤中注册的同一用户名和密码，对 <bpt id=\"p1\">**</bpt>CustomLogin<ept id=\"p1\">**</ept> 终结点重复步骤 2 和 3。"
+    },
+    {
+      "pos": [
+        12595,
+        12725
+      ],
+      "content": "你应会收到响应消息，其正文包含一个具有 <bpt id=\"p1\">*</bpt>userId<ept id=\"p1\">*</ept> 和 <bpt id=\"p2\">*</bpt>authenticationToken<ept id=\"p2\">*</ept> 的 <bpt id=\"p3\">**</bpt>user<ept id=\"p3\">**</ept> JSON 对象，此对象是自定义身份验证生成的移动服务身份验证令牌。此令牌足以授予客户端应用程序访问 TodoItem 终结点的权限。"
+    },
+    {
+      "pos": [
+        12731,
+        12788
+      ],
+      "content": "复制 <bpt id=\"p1\">*</bpt>authenticationToken<ept id=\"p1\">*</ept> 的值。稍后你将使用此值来访问受限制的 TodoItem 终结点。"
+    },
+    {
+      "content": "单击浏览器中的后退按钮，然后在 API 文档页中，依次单击“GetTables”、“试用”。",
+      "pos": [
+        12793,
+        12839
+      ]
+    },
+    {
+      "pos": [
+        12844,
+        12937
+      ],
+      "content": "在 GET 请求对话框中，单击“标头”旁边的加号，在左侧框中键入 <ph id=\"ph1\">`X-ZUMO-AUTH`</ph> 值，在右侧框中粘贴复制的 <bpt id=\"p1\">*</bpt>authenticationToken<ept id=\"p1\">*</ept> 值，然后单击“发送”。"
+    },
+    {
+      "content": "移动服务应会授予访问终结点的权限，并返回“200/正常”状态，以及表中的 TodoItems 列表。",
+      "pos": [
+        13089,
+        13139
+      ]
+    },
+    {
+      "pos": [
+        13287,
+        13426
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>如果你选择还要将此移动服务项目发布到 Azure 以供测试，请记住，登录和身份验证提供程序将很容易受到攻击。确保这些提供程序已经过适当的增强，或者受保护的测试数据对你而言并不重要。使用自定义身份验证方案之前请保持谨慎，以确保生产环境服务的安全。"
+    },
+    {
+      "content": "使用自定义身份验证从客户端登录",
+      "pos": [
+        13431,
+        13446
+      ]
+    },
+    {
+      "content": "本部分介绍在从客户端访问自定义身份验证终结点，以获取访问移动服务所需的身份验证令牌时需要执行的步骤。由于所需的特定客户端代码取决于客户端，因此，此处提供的指引与平台无关。",
+      "pos": [
+        13448,
+        13533
+      ]
+    },
+    {
+      "pos": [
+        13536,
+        13626
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>移动服务客户端库通过 HTTPS 与服务通信。由于此解决方案需要你以纯文本发送密码，因此请务必在使用直接 REST 请求调用这些终结点时，使用 HTTPS。"
+    },
+    {
+      "content": "在客户端应用程序中创建所需的 UI 元素，以允许用户输入用户名和密码。",
+      "pos": [
+        13631,
+        13666
+      ]
+    },
+    {
+      "pos": [
+        13671,
+        13777
+      ],
+      "content": "在客户端库的 <bpt id=\"p1\">**</bpt>MobileServiceClient<ept id=\"p1\">**</ept> 上使用适当的 <bpt id=\"p2\">**</bpt>invokeApi<ept id=\"p2\">**</ept> 方法调用 <bpt id=\"p3\">**</bpt>CustomRegistration<ept id=\"p3\">**</ept> 终结点，以在消息正文中传递运行时提供的用户名和密码。"
+    },
+    {
+      "pos": [
+        13783,
+        14032
+      ],
+      "content": "如果你在“帐户”表中保留了用户登录信息，则你只需调用 <bpt id=\"p1\">**</bpt>CustomRegistration<ept id=\"p1\">**</ept> 终结点一次，即可为给定的用户创建帐户。有关如何在支持的各种客户端平台上调用自定义 API 的示例，请参阅文章 <bpt id=\"p2\">[</bpt>Azure 移动服务中的自定义 API – 客户端 SDK<ept id=\"p2\">](http://blogs.msdn.com/b/carlosfigueira/archive/2013/06/19/custom-api-in-azure-mobile-services-client-sdks.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        14045,
+        14325
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>由于此用户设置步骤只会发生一次，因此你可以考虑以某种带外方式创建用户帐户。对于公共注册终结点，还应该考虑实施基于短信或电子邮件的验证过程或者其他防护机制，以避免生成欺骗性的帐户。你可以使用 Twilio 从移动服务发送短信。也可以使用 SendGrid 从移动服务发送电子邮件。有关使用 SendGrid 的详细信息，请参阅<bpt id=\"p1\">[</bpt>使用 SendGrid 从移动服务发送电子邮件<ept id=\"p1\">](/documentation/articles/store-sendgrid-mobile-services-send-email-scripts)</ept>。"
+    },
+    {
+      "pos": [
+        14334,
+        14409
+      ],
+      "content": "再次使用适当的 <bpt id=\"p1\">**</bpt>invokeApi<ept id=\"p1\">**</ept> 方法，但这次改为调用 <bpt id=\"p2\">**</bpt>CustomLogin<ept id=\"p2\">**</ept> 终结点，以在消息正文中传递运行时提供的用户名和密码。"
+    },
+    {
+      "pos": [
+        14415,
+        14473
+      ],
+      "content": "这次你必须在成功登录后，捕获响应对象中返回的 <bpt id=\"p1\">*</bpt>userId<ept id=\"p1\">*</ept> 和 <bpt id=\"p2\">*</bpt>authenticationToken<ept id=\"p2\">*</ept> 值。"
+    },
+    {
+      "pos": [
+        14482,
+        14757
+      ],
+      "content": "使用返回的 <bpt id=\"p1\">*</bpt>userId<ept id=\"p1\">*</ept> 和 <bpt id=\"p2\">*</bpt>authenticationToken<ept id=\"p2\">*</ept> 值创建新的 <bpt id=\"p3\">**</bpt>MobileServiceUser<ept id=\"p3\">**</ept> 对象，并将该对象设为 <bpt id=\"p4\">**</bpt>MobileServiceClient<ept id=\"p4\">**</ept> 实例的当前用户，如<bpt id=\"p5\">[</bpt>向现有应用程序添加身份验证<ept id=\"p5\">](/documentation/articles/mobile-services-dotnet-backend-ios-get-started-users)</ept>主题中所述。由于 CustomLogin 的结果与 <bpt id=\"p6\">**</bpt>MobileServiceUser<ept id=\"p6\">**</ept> 对象具有相同形式，因此你应该能够直接转换结果。"
+    },
+    {
+      "content": "本教程到此结束。",
+      "pos": [
+        14759,
+        14767
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"自定义身份验证入门 | Azure\" \n    description=\"了解如何使用用户名和密码对用户进行身份验证。\" \n    documentationCenter=\"Mobile\" \n    authors=\"mattchenderson\" \n    manager=\"dwrede\" \n    editor=\"\" \n    services=\"mobile-services\"/>\n\n<tags \n    ms.service=\"mobile-services\" \n    ms.date=\"12/28/2015\"\n    wacn.date=\"02/26/2016\"/>\n\n# 自定义身份验证入门\n\n[AZURE.INCLUDE [mobile-service-note-mobile-apps](../includes/mobile-services-note-mobile-apps.md)]\n\n&nbsp;\n\n\n## 概述\n本主题说明如何通过颁发自己的移动服务身份验证令牌，对 Azure 移动服务 .NET 后端中的用户进行身份验证。在本教程中，你将使用应用程序的自定义用户名和密码向快速入门项目添加身份验证。\n\n>[AZURE.NOTE]本教程演示了使用自定义凭据对移动服务进行身份验证的高级方法。许多应用程序最好是改用内置的社交标识提供程序，以便让用户通过 Microsoft 帐户和 Azure Active Directory 登录。如果你这是第一次体验移动服务中的身份验证，请参阅[向应用程序添加身份验证]教程。\n\n本教程基于移动服务快速入门。此外，还必须先完成[移动服务入门]教程。\n\n>[AZURE.IMPORTANT]本教程旨在说明如何颁发移动服务的身份验证令牌。请不要将其视为安全指导原则。在开发应用程序时，你必须留意密码存储的安全问题，并且需要制定暴力破解攻击的管理策略。\n\n## 设置帐户表\n\n由于你使用自定义身份验证，且未依赖其他标识提供程序，因此需要存储用户的登录信息。在本部分中，你将为帐户创建一个表，并设置基本的安全性机制。帐户表包含用户名和加盐哈希密码，你也可以视需要加入其他用户信息。\n\n1. 在后端项目的 **DataObjects** 数据夹中，创建名为 `Account` 的新实体。\n\n2. 添加以下 `using` 语句：\n\n        using Microsoft.WindowsAzure.Mobile.Service;  \n\n3. 将类定义替换为以下代码：\n\n            public class Account : EntityData\n            {\n                public string Username { get; set; }\n                public byte[] Salt { get; set; }\n                public byte[] SaltedAndHashedPassword { get; set; }\n            }\n    \n    这样，我们的新帐户表中将会显示一行，其中包含用户名、该用户的盐以及安全存储的密码。\n\n4. 在 **Models** 文件夹下，你将会看到与移动服务同名的 **DbContext** 派生类。请打开你的内容并添加以下代码，将帐户表添加到数据模型：\n\n        public DbSet<Account> Accounts { get; set; }\n\n    >[AZURE.NOTE]本教程中的代码段使用 `todoContext` 作为上下文名称。你必须更新项目上下文的代码段。 \n        &nbsp;\n    接下来，请设置安全功能以处理此数据。\n \n5. 创建名为 `CustomLoginProviderUtils` 的类，然后添加以下 `using` 语句：\n\n        using System.Security.Cryptography;\n\n6. 将以下代码方法添加到新类：\n\n\n        public static byte[] hash(string plaintext, byte[] salt)\n        {\n            SHA512Cng hashFunc = new SHA512Cng();\n            byte[] plainBytes = System.Text.Encoding.ASCII.GetBytes(plaintext);\n            byte[] toHash = new byte[plainBytes.Length + salt.Length];\n            plainBytes.CopyTo(toHash,0);\n            salt.CopyTo(toHash, plainBytes.Length);\n            return hashFunc.ComputeHash(toHash);\n        }\n\n        public static byte[] generateSalt()\n        {\n            RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();\n            byte[] salt = new byte[256];\n            rng.GetBytes(salt);\n            return salt;\n        }\n\n        public static bool slowEquals(byte[] a, byte[] b)\n        {\n            int diff = a.Length ^ b.Length;\n            for (int i = 0; i < a.Length && i < b.Length; i++)\n            {\n                diff |= a[i] ^ b[i];\n            }\n            return diff == 0;\n        }\n\n    这样，便会生成新的长格式盐，添加用于哈希处理加盐密码的功能，以及比较两个哈希代码的安全方式。\n\n## 创建注册终结点\n\n此时，创建用户帐户的各项准备都已完成。在本部分中，你将设置注册终结点以处理新的注册请求。你将在此处强制实施新的用户名和密码策略，并确保用户名不会盗用。然后，你要将用户信息安全存储在数据库中。\n\n1. 创建以下新类用于表示传入的注册尝试：\n\n        public class RegistrationRequest\n        {\n            public String username { get; set; }\n            public String password { get; set; }\n        }\n\n    如果你要在注册期间收集和存储其他信息，应该在此处执行相应的操作。\n\n2. 在移动服务后端项目中，右键单击“控制器”，单击“添加”和“控制器”，创建名为 `CustomRegistrationController` 的新“Azure 移动服务自定义控制器”，然后添加以下 `using` 语句：\n\n        using Microsoft.WindowsAzure.Mobile.Service.Security;\n        using System.Text.RegularExpressions;\n        using <my_project_namespace>.DataObjects;\n        using <my_project_namespace>.Models;\n\n    在以上代码中，将占位符替换为项目的命名空间。\n \n3. 将类定义替换为以下代码：\n\n        [AuthorizeLevel(AuthorizationLevel.Anonymous)]\n        public class CustomRegistrationController : ApiController\n        {\n            public ApiServices Services { get; set; }\n\n            // POST api/CustomRegistration\n            public HttpResponseMessage Post(RegistrationRequest registrationRequest)\n            {\n                if (!Regex.IsMatch(registrationRequest.username, \"^[a-zA-Z0-9]{4,}$\"))\n                {\n                    return this.Request.CreateResponse(HttpStatusCode.BadRequest, \"Invalid username (at least 4 chars, alphanumeric only)\");\n                }\n                else if (registrationRequest.password.Length < 8)\n                {\n                    return this.Request.CreateResponse(HttpStatusCode.BadRequest, \"Invalid password (at least 8 chars required)\");\n                }\n\n                todoContext context = new todoContext();\n                Account account = context.Accounts.Where(a => a.Username == registrationRequest.username).SingleOrDefault();\n                if (account != null)\n                {\n                    return this.Request.CreateResponse(HttpStatusCode.BadRequest, \"That username already exists.\");\n                }\n                else\n                {\n                    byte[] salt = CustomLoginProviderUtils.generateSalt();\n                    Account newAccount = new Account\n                    {\n                        Id = Guid.NewGuid().ToString(),\n                        Username = registrationRequest.username,\n                        Salt = salt,\n                        SaltedAndHashedPassword = CustomLoginProviderUtils.hash(registrationRequest.password, salt)\n                    };\n                    context.Accounts.Add(newAccount);\n                    context.SaveChanges();\n                    return this.Request.CreateResponse(HttpStatusCode.Created);\n                }\n            }\n        }   \n\n    请记得将 *todoContext* 变量替换为项目的 **DbContext** 的名称。请注意，此控制器使用以下属性来允许发往此终结点的所有流量：\n\n        [AuthorizeLevel(AuthorizationLevel.Anonymous)]\n\n>[AZURE.IMPORTANT]任何客户端均可通过 HTTP 访问此注册终结点。将此服务发布到生产环境之前，应实现某种形式的方案来验证注册，例如 SMS 或基于电子邮件的验证。这有助于防止恶意用户创建欺骗性的注册。\n\n## 创建 LoginProvider\n\n**LoginProvider** 是移动服务身份验证管道中的基础构造之一。在本部分中，你将创建自己的 `CustomLoginProvider`。它并不会像内置提供程序一样插入管道中，但会为你提供方便的功能。  \n如果你使用 Visual Studio 2013，则可能需要安装 `WindowsAzure.MobileServices.Backend.Security` Nuget 包才能添加对 `LoginProvider` 类的引用。\n\n1. 创建派生自 **LoginProvider** 的新类 `CustomLoginProvider`，然后添加以下 `using` 语句：\n\n        using Microsoft.WindowsAzure.Mobile.Service;\n        using Microsoft.WindowsAzure.Mobile.Service.Security;\n        using Newtonsoft.Json.Linq;\n        using Owin;\n        using System.Security.Claims;\n \n2. 将 **CustomLoginProvider** 类定义替换为以下代码：\n\n        public class CustomLoginProvider : LoginProvider\n        {\n            public const string ProviderName = \"custom\";\n\n            public override string Name\n            {\n                get { return ProviderName; }\n            }\n\n            public CustomLoginProvider(IServiceTokenHandler tokenHandler)\n                : base(tokenHandler)\n            {\n                this.TokenLifetime = new TimeSpan(30, 0, 0, 0);\n            }\n\n        }\n\n       如果你现在尝试生成项目，生成将会失败。`LoginProvider` 有三个稍后需要实现的抽象方法。\n\n3. 在同一个代码文件中创建名为 `CustomLoginProviderCredentials` 的新类。\n\n        public class CustomLoginProviderCredentials : ProviderCredentials\n        {\n            public CustomLoginProviderCredentials()\n                : base(CustomLoginProvider.ProviderName)\n            {\n            }\n        }\n\n    此类表示有关用户的信息，将通过 [GetIdentitiesAsync](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.windowsazure.mobile.service.security.serviceuser.getidentitiesasync.aspx) 在后端上供你使用。如果你要添加自定义声明，请确保可在此对象中捕获这些声明。\n\n4. 将抽象方法 `ConfigureMiddleware` 的以下实现添加到 **CustomLoginProvider**。\n\n        public override void ConfigureMiddleware(IAppBuilder appBuilder, ServiceSettingsDictionary settings)\n        {\n            // Not Applicable - used for federated identity flows\n            return;\n        }\n\n    此方法尚未实现，因为 **CustomLoginProvider** 不会与身份验证管道集成。\n\n4. 将抽象方法 `ParseCredentials` 的以下实现添加到 **CustomLoginProvider**。\n\n        public override ProviderCredentials ParseCredentials(JObject serialized)\n        {\n            if (serialized == null)\n            {\n                throw new ArgumentNullException(\"serialized\");\n            }\n\n            return serialized.ToObject<CustomLoginProviderCredentials>();\n        }\n\n    此方法将使后端能够从传入的身份验证令牌反序列化用户信息。\n\n6. 将抽象方法 `CreateCredentials` 的以下实现添加到 **CustomLoginProvider**。\n\n        public override ProviderCredentials CreateCredentials(ClaimsIdentity claimsIdentity)\n        {\n            if (claimsIdentity == null)\n            {\n                throw new ArgumentNullException(\"claimsIdentity\");\n            }\n\n            string username = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;\n            CustomLoginProviderCredentials credentials = new CustomLoginProviderCredentials\n            {\n                UserId = this.TokenHandler.CreateUserId(this.Name, username)\n            };\n\n            return credentials;\n        }\n\n    此方法将 [ClaimsIdentity] 转换成在身份验证令牌颁发阶段使用的 [ProviderCredentials] 对象。在此方法中，你可以再次捕获任何其他声明。\n7. 创建 **ConfigOptions** 后，打开 App\\_Start 文件夹中的 WebApiConfig.cs 项目文件并添加以下代码行:\n        \n        options.LoginProviders.Add(typeof(CustomLoginProvider));\n\n## 创建登录终结点\n\n接下来，需要创建一个终结点，使你的用户能够登录。系统会根据数据库检查你所收到的用户名和密码，方法是应用用户的盐，哈希处理密码，然后确保传入值与数据库的值匹配。如果匹配，则你可以创建 [ClaimsIdentity] 并将其传递给 **CustomLoginProvider**。客户端应用程序将接收用户 ID 和身份验证令牌，以进一步访问你的移动服务。\n\n1. 在移动服务后端项目中创建以下新的 `LoginRequest` 类：\n\n        public class LoginRequest\n        {\n            public String username { get; set; }\n            public String password { get; set; }\n        }\n\n    此类表示传入的登录尝试。\n\n2. 创建以下新的 `CustomLoginResult` 类：\n\n        public class CustomLoginResult\n        {\n            public string UserId { get; set; }\n            public string MobileServiceAuthenticationToken { get; set; }\n    \n        }\n\n    此类表示使用用户 ID 和身份验证令牌成功完成的登录。请注意，此类和客户端的 MobileServiceUser 类具有相同形式，因此，使用此类可以轻松地将登录响应传递给强类型化客户端。\n\n3. 右键单击“控制器”，单击“添加”和“控制器”，创建名为 `CustomLoginController` 的新“Azure 移动服务自定义控制器”，然后添加以下 `using` 语句：\n\n        using Microsoft.WindowsAzure.Mobile.Service.Security;\n        using System.Security.Claims;\n        using <my_project_namespace>.DataObjects;\n        using <my_project_namespace>.Models;\n\n4. 将 **CustomLoginController** 类定义替换为以下代码：\n\n        [AuthorizeLevel(AuthorizationLevel.Anonymous)]\n        public class CustomLoginController : ApiController\n        {\n            public ApiServices Services { get; set; }\n            public IServiceTokenHandler handler { get; set; }\n\n            // POST api/CustomLogin\n            public HttpResponseMessage Post(LoginRequest loginRequest)\n            {\n                todoContext context = new todoContext();\n                Account account = context.Accounts\n                    .Where(a => a.Username == loginRequest.username).SingleOrDefault();\n                if (account != null)\n                {\n                    byte[] incoming = CustomLoginProviderUtils\n                        .hash(loginRequest.password, account.Salt);\n\n                    if (CustomLoginProviderUtils.slowEquals(incoming, account.SaltedAndHashedPassword))\n                    {\n                        ClaimsIdentity claimsIdentity = new ClaimsIdentity();\n                        claimsIdentity.AddClaim(new Claim(ClaimTypes.NameIdentifier, loginRequest.username));\n                        LoginResult loginResult = new CustomLoginProvider(handler)\n                            .CreateLoginResult(claimsIdentity, Services.Settings.MasterKey);\n                        var customLoginResult = new CustomLoginResult()\n                        {\n                            UserId = loginResult.User.UserId,\n                            MobileServiceAuthenticationToken = loginResult.AuthenticationToken\n                        };\n                        return this.Request.CreateResponse(HttpStatusCode.OK, customLoginResult);\n                    }\n                }\n                return this.Request.CreateResponse(HttpStatusCode.Unauthorized,\n                    \"Invalid username or password\");\n            }\n        }\n\n       请记得将 *todoContext* 变量替换为项目的 **DbContext** 的名称。请注意，此控制器使用以下属性来允许发往此终结点的所有流量：\n\n        [AuthorizeLevel(AuthorizationLevel.Anonymous)]\n\n>[AZURE.IMPORTANT]用于生产环境的 `CustomLoginController` 也应包含暴力破解攻击检测策略。否则，你的登录解决方案可能容易受到攻击。\n\n## 将移动服务配置为要求身份验证\n\n[AZURE.INCLUDE [mobile-services-restrict-permissions-dotnet-backend](../includes/mobile-services-restrict-permissions-dotnet-backend.md)]\n\n\n## 使用测试客户端测试登录流\n\n在客户端应用程序中，必须开发一个自定义登录屏幕，以捕获用户名和密码，并将其以 JSON 负载形式发送到你的注册和登录终结点。要完成本教程，你只需使用移动服务 .NET 后端的内置测试客户端。\n\n1. 在 Visual Studio 中，右键单击移动服务项目，然后单击“调试”和“启动新实例”。  \n\n    随后会启动移动服务后端项目的新调试实例。成功启动服务之后，你会看到显示“此移动服务在正常运行”的启动页。\n\n2. 在服务启动页中，单击“试用”，然后在身份验证对话框中，键入你在 web.config 文件的 **MS\\_ApplicationKey** 应用程序设置中设置的密码，并将用户名保留空白。\n\n3. 在帮助页中，单击“CustomRegistration”终结点，然后单击“试用”。\n\n    ![][2]\n\n4. 在正文中，将示例字符串替换为符合前面所指定条件的用户名和密码，然后单击“发送”。\n\n    ![][3]\n\n    响应应为“201/已创建”。\n\n5. 单击浏览器中的后退按钮，并使用前一步骤中注册的同一用户名和密码，对 **CustomLogin** 终结点重复步骤 2 和 3。\n\n    ![][4]\n\n    你应会收到响应消息，其正文包含一个具有 *userId* 和 *authenticationToken* 的 **user** JSON 对象，此对象是自定义身份验证生成的移动服务身份验证令牌。此令牌足以授予客户端应用程序访问 TodoItem 终结点的权限。\n\n    复制 *authenticationToken* 的值。稍后你将使用此值来访问受限制的 TodoItem 终结点。\n\n6. 单击浏览器中的后退按钮，然后在 API 文档页中，依次单击“GetTables”、“试用”。\n\n7. 在 GET 请求对话框中，单击“标头”旁边的加号，在左侧框中键入 `X-ZUMO-AUTH` 值，在右侧框中粘贴复制的 *authenticationToken* 值，然后单击“发送”。\n\n    ![](./media/mobile-services-dotnet-backend-get-started-custom-authentication/mobile-services-dotnet-backend-custom-auth-access-endpoint.png)\n\n    移动服务应会授予访问终结点的权限，并返回“200/正常”状态，以及表中的 TodoItems 列表。\n\n    ![](./media/mobile-services-dotnet-backend-get-started-custom-authentication/mobile-services-dotnet-backend-custom-auth-access-success.png)\n\n>[AZURE.IMPORTANT]如果你选择还要将此移动服务项目发布到 Azure 以供测试，请记住，登录和身份验证提供程序将很容易受到攻击。确保这些提供程序已经过适当的增强，或者受保护的测试数据对你而言并不重要。使用自定义身份验证方案之前请保持谨慎，以确保生产环境服务的安全。\n\n## 使用自定义身份验证从客户端登录\n\n本部分介绍在从客户端访问自定义身份验证终结点，以获取访问移动服务所需的身份验证令牌时需要执行的步骤。由于所需的特定客户端代码取决于客户端，因此，此处提供的指引与平台无关。\n\n>[AZURE.NOTE]移动服务客户端库通过 HTTPS 与服务通信。由于此解决方案需要你以纯文本发送密码，因此请务必在使用直接 REST 请求调用这些终结点时，使用 HTTPS。\n\n1. 在客户端应用程序中创建所需的 UI 元素，以允许用户输入用户名和密码。\n\n2. 在客户端库的 **MobileServiceClient** 上使用适当的 **invokeApi** 方法调用 **CustomRegistration** 终结点，以在消息正文中传递运行时提供的用户名和密码。\n\n    如果你在“帐户”表中保留了用户登录信息，则你只需调用 **CustomRegistration** 终结点一次，即可为给定的用户创建帐户。有关如何在支持的各种客户端平台上调用自定义 API 的示例，请参阅文章 [Azure 移动服务中的自定义 API – 客户端 SDK](http://blogs.msdn.com/b/carlosfigueira/archive/2013/06/19/custom-api-in-azure-mobile-services-client-sdks.aspx)。\n     \n    > [AZURE.IMPORTANT]由于此用户设置步骤只会发生一次，因此你可以考虑以某种带外方式创建用户帐户。对于公共注册终结点，还应该考虑实施基于短信或电子邮件的验证过程或者其他防护机制，以避免生成欺骗性的帐户。你可以使用 Twilio 从移动服务发送短信。也可以使用 SendGrid 从移动服务发送电子邮件。有关使用 SendGrid 的详细信息，请参阅[使用 SendGrid 从移动服务发送电子邮件](/documentation/articles/store-sendgrid-mobile-services-send-email-scripts)。\n    \n3. 再次使用适当的 **invokeApi** 方法，但这次改为调用 **CustomLogin** 终结点，以在消息正文中传递运行时提供的用户名和密码。\n\n    这次你必须在成功登录后，捕获响应对象中返回的 *userId* 和 *authenticationToken* 值。\n    \n4. 使用返回的 *userId* 和 *authenticationToken* 值创建新的 **MobileServiceUser** 对象，并将该对象设为 **MobileServiceClient** 实例的当前用户，如[向现有应用程序添加身份验证](/documentation/articles/mobile-services-dotnet-backend-ios-get-started-users)主题中所述。由于 CustomLogin 的结果与 **MobileServiceUser** 对象具有相同形式，因此你应该能够直接转换结果。\n\n本教程到此结束。\n\n\n<!-- Anchors. -->\n\n\n<!-- Images. -->\n\n[0]: ./media/mobile-services-dotnet-backend-get-started-custom-authentication/mobile-services-dotnet-backend-debug-start.png\n[1]: ./media/mobile-services-dotnet-backend-get-started-custom-authentication/mobile-services-dotnet-backend-try-out.png\n[2]: ./media/mobile-services-dotnet-backend-get-started-custom-authentication/mobile-services-dotnet-backend-custom-auth-test-client.png\n[3]: ./media/mobile-services-dotnet-backend-get-started-custom-authentication/mobile-services-dotnet-backend-custom-auth-send-register.png\n[4]: ./media/mobile-services-dotnet-backend-get-started-custom-authentication/mobile-services-dotnet-backend-custom-auth-login-result.png\n\n\n<!-- URLs. -->\n[向应用程序添加身份验证]: /documentation/articles/mobile-services-dotnet-backend-windows-store-dotnet-get-started-users\n[移动服务入门]: /documentation/articles/mobile-services-dotnet-backend-windows-store-dotnet-get-started\n[ClaimsIdentity]: https://msdn.microsoft.com/zh-cn/library/system.security.claims.claimsidentity(v=vs.110).aspx\n[ProviderCredentials]: https://msdn.microsoft.com/zh-cn/library/azure/microsoft.windowsazure.mobile.service.security.providercredentials.aspx\n \n\n<!---HONumber=Mooncake_0118_2016-->"
+}

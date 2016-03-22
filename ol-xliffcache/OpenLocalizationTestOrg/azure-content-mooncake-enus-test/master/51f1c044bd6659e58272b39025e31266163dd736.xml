@@ -1,0 +1,537 @@
+{
+  "nodes": [
+    {
+      "content": "Linux RDMA 群集运行 MPI 应用程序 | Azure",
+      "pos": [
+        24,
+        56
+      ]
+    },
+    {
+      "content": "创建 A8 或 A9 大小 VM 的 Linux 群集以使用 RDMA 运行 MPI 应用。",
+      "pos": [
+        72,
+        118
+      ]
+    },
+    {
+      "content": "设置 Linux RDMA 群集以运行 MPI 应用程序",
+      "pos": [
+        351,
+        379
+      ]
+    },
+    {
+      "pos": [
+        381,
+        467
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]"
+    },
+    {
+      "content": "本文介绍如何在 Azure 中设置 Linux RDMA 群集以运行并行消息传递接口 (MPI) 应用程序。当你配置了基于 Linux 的 VM 以运行支持的 MPI 实现时，MPI 应用程序将通过 Azure 中基于远程直接内存访问 (RDMA) 技术的低延迟、高吞吐量网络高效地进行通信。",
+      "pos": [
+        470,
+        616
+      ]
+    },
+    {
+      "pos": [
+        619,
+        759
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 目前，在 Azure 库中 SUSE Linux Enterprise Server 12 (SLES 12) 映像上运行的 Intel MPI 库版本 5 支持 Azure Linux RDMA。本文基于 Intel MPI 版本 5.0.3.048。"
+    },
+    {
+      "content": "Linux 群集部署选项",
+      "pos": [
+        766,
+        778
+      ]
+    },
+    {
+      "content": "以下是可用于创建 Linux RDMA 群集的方法（使用或不使用作业计划程序）。",
+      "pos": [
+        780,
+        820
+      ]
+    },
+    {
+      "pos": [
+        824,
+        1031
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>HPC Pack<ept id=\"p1\">**</ept> - 在 Azure 中创建 Microsoft HPC Pack 群集，然后添加运行受支持 Linux 分发版的计算节点。可以将某些 Linux 节点配置为访问 RDMA 网络。请参阅 <bpt id=\"p2\">[</bpt>Azure 的 HPC Pack 群集中的 Linux 计算节点入门<ept id=\"p2\">](/documentation/articles/virtual-machines-linux-cluster-hpcpack)</ept>。"
+    },
+    {
+      "pos": [
+        1035,
+        1251
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Azure CLI 脚本<ept id=\"p1\">**</ept> - 如本文其他地方的步骤中所示，使用适用于 Mac、Linux 和 Windows 的 <bpt id=\"p2\">[</bpt>Azure 命令行界面<ept id=\"p2\">](/documentation/articles/xplat-cli-install)</ept> (CLI) 生成部署创建 Linux 群集所需的虚拟网络和其他必需组件的脚本。经典（服务管理）部署模式中的 CLI 将依次创建群集节点，因此，如果你要部署许多计算节点，可能需要几分钟才能完成部署。"
+    },
+    {
+      "content": "在 Azure 服务管理中使用 Azure CLI 脚本进行部署",
+      "pos": [
+        1256,
+        1288
+      ]
+    },
+    {
+      "content": "以下步骤将帮助你使用 Azure CLI 部署 SUSE Linux Enterprise Server 12 VM、安装 Intel MPI 库和其他自定义项、创建自定义 VM 映像，然后编写脚本部署群集。",
+      "pos": [
+        1290,
+        1394
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        1400,
+        1404
+      ]
+    },
+    {
+      "pos": [
+        1410,
+        1492
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>客户端计算机<ept id=\"p1\">**</ept> - 你需要基于 Mac、Linux 或 Windows 的客户端计算机，以便与 Azure 通信。这些步骤假定你使用的是 Linux 客户端。"
+    },
+    {
+      "pos": [
+        1498,
+        1583
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Azure 订阅<ept id=\"p1\">**</ept> - 如果你没有帐户，只需花费几分钟就能创建一个试用帐户。有关详细信息，请参阅 <bpt id=\"p2\">[</bpt>Azure 试用<ept id=\"p2\">](/pricing/1rmb-trial/)</ept>。"
+    },
+    {
+      "pos": [
+        1589,
+        1654
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>内核配额<ept id=\"p1\">**</ept> - 你可能需要增加内核配额才能部署群集。例如，如果你要按本文所示部署 8 个 VM，则至少需要 128 个内核。"
+    },
+    {
+      "pos": [
+        1660,
+        1810
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Azure CLI<ept id=\"p1\">**</ept> - <bpt id=\"p2\">[</bpt>安装<ept id=\"p2\">](/documentation/articles/xplat-cli-install)</ept> Azure CLI 并<bpt id=\"p3\">[</bpt>对其进行配置<ept id=\"p3\">](/documentation/articles/xplat-cli-connect)</ept>，以从客户端计算机连接到你的 Azure 订阅。"
+    },
+    {
+      "pos": [
+        1816,
+        2060
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Intel MPI<ept id=\"p1\">**</ept> - 在为群集自定义 Linux VM 映像的过程中（请参阅本文后面的详细信息），你需要从 <bpt id=\"p2\">[</bpt>Intel.com 站点<ept id=\"p2\">](https://software.intel.com/intel-mpi-library/)</ept>下载并安装 Intel MPI 库 5 运行时。为此，向 Intel 注册后，请点击确认电子邮件中的链接转到相关网页，并复制相应版本的 Intel MPI 所对应的 .tgz 文件的下载链接。本文基于 Intel MPI 版本 5.0.3.048。"
+    },
+    {
+      "content": "预配 SLES 12 VM",
+      "pos": [
+        2066,
+        2079
+      ]
+    },
+    {
+      "pos": [
+        2081,
+        2191
+      ],
+      "content": "使用 Azure CLI 登录到 Azure 后，运行 <ph id=\"ph1\">`azure config list`</ph> 以确认输出显示 <bpt id=\"p1\">**</bpt>asm<ept id=\"p1\">**</ept> 模式，表示 CLI 在 Azure 服务管理模式下。如果它不是，请通过运行以下命令设置模式："
+    },
+    {
+      "content": "键入以下内容以列出你有权使用的所有订阅：",
+      "pos": [
+        2220,
+        2240
+      ]
+    },
+    {
+      "pos": [
+        2266,
+        2334
+      ],
+      "content": "通过将 <ph id=\"ph1\">`Current`</ph> 设为 <ph id=\"ph2\">`true`</ph> 来标识当前的活动订阅。如果这不是你要用于创建群集的订阅，请将相应的订阅编号设为活动订阅："
+    },
+    {
+      "pos": [
+        2381,
+        2448
+      ],
+      "content": "若要查看 Azure 中公开提供的 SLES 12 HPC 映像，请运行如下命令（如果你的 shell 环境支持 <bpt id=\"p1\">**</bpt>grep<ept id=\"p1\">**</ept>）："
+    },
+    {
+      "pos": [
+        2495,
+        2558
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>已为 SLES 12 HPC 映像预配置了必需的用于 Azure 的 Linux RDMA 驱动程序。"
+    },
+    {
+      "content": "现在，通过运行如下命令使用提供的 SLES 12 HPC 映像预配 VM：",
+      "pos": [
+        2560,
+        2597
+      ]
+    },
+    {
+      "content": "其中",
+      "pos": [
+        2772,
+        2774
+      ]
+    },
+    {
+      "content": "外部 SSH 端口号（在此示例中为 SSH 默认值 22）是任何有效的端口号；内部 SSH 端口号将设为 22",
+      "pos": [
+        2778,
+        2833
+      ]
+    },
+    {
+      "content": "将在 location 指定的 Azure 区域中创建新的云服务；指定一个位置，例如“China North”",
+      "pos": [
+        2837,
+        2892
+      ]
+    },
+    {
+      "pos": [
+        2896,
+        3062
+      ],
+      "content": "映像名称当前可以是 <ph id=\"ph1\">`b4590d9e3ed742e4a1d46e5424aa335e__suse-sles-12-hpc-v20150708`</ph>（免费）或 <ph id=\"ph2\">`b4590d9e3ed742e4a1d46e5424aa335e__suse-sles-12-hpc-priority-v20150708`</ph>（用于 SUSE 优先支持，收费）"
+    },
+    {
+      "content": "自定义 VM",
+      "pos": [
+        3068,
+        3074
+      ]
+    },
+    {
+      "pos": [
+        3076,
+        3279
+      ],
+      "content": "在 VM 完成预配后，使用 VM 的外部 IP 地址（或 DNS 名称）和你配置的外部端口号通过 SSH 登录到 VM，然后对其进行自定义。有关连接详细信息，请参阅<bpt id=\"p1\">[</bpt>如何登录到运行 Linux 的虚拟机<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-how-to-log-on)</ept>。你必须以 VM 上配置的用户身份执行命令，除非必须要根访问权限才能完成步骤。"
+    },
+    {
+      "pos": [
+        3282,
+        3366
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>Azure 不提供对 Linux VM 的根访问权限。若要在以用户身份连接至 VM 时获得管理访问权限，使用 <ph id=\"ph2\">`sudo`</ph> 运行命令。"
+    },
+    {
+      "pos": [
+        3372,
+        3417
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>更新<ept id=\"p1\">**</ept> - 使用 <bpt id=\"p2\">**</bpt>zypper<ept id=\"p2\">**</ept> 安装更新。你可能想要安装 NFS 实用工具。"
+    },
+    {
+      "pos": [
+        3426,
+        3489
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>目前，我们建议你不要应用内核更新，这可能会在使用 Linux RDMA 驱动程序时导致问题。"
+    },
+    {
+      "pos": [
+        3495,
+        3556
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Intel MPI<ept id=\"p1\">**</ept> - 运行如下命令，从 Intel.com 站点下载并安装 Intel MPI 库 5 运行时。"
+    },
+    {
+      "content": "接受默认设置以便在 VM 上安装 Intel MPI。",
+      "pos": [
+        3720,
+        3747
+      ]
+    },
+    {
+      "pos": [
+        3753,
+        3848
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>锁定内存<ept id=\"p1\">**</ept> - 要使 MPI 代码锁定可用于 RDMA 的内存，需要在 /etc/security/limits.conf 文件中添加或更改以下设置。（需要根访问权限才能编辑此文件。）"
+    },
+    {
+      "pos": [
+        4041,
+        4137
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>出于测试目的，你也可以将 memlock 设置为不受限制。例如：<ph id=\"ph2\">`&lt;User or group name&gt;    hard    memlock unlimited`</ph>。"
+    },
+    {
+      "pos": [
+        4144,
+        4249
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>SSH 密钥<ept id=\"p1\">**</ept> -生成 SSH 密钥以在运行 MPI 作业时，在群集中的所有计算节点上为你的用户帐户建立信任。运行以下命令以创建 SSH 密钥。只需按 Enter 键以在默认位置生成密钥，而无需设置密码。"
+    },
+    {
+      "content": "对于已知的公钥，将公钥附加到 authorized\\_keys 文件。",
+      "pos": [
+        4275,
+        4310
+      ]
+    },
+    {
+      "content": "在 ~/.ssh 目录中编辑或创建 \"config\" 文件。提供将在 Azure 中使用的专用网络的 IP 地址范围（本例中为 10.32.0.0/16）：",
+      "pos": [
+        4373,
+        4451
+      ]
+    },
+    {
+      "content": "或者，按以下方式列出群集中每个 VM 的专用网络 IP 地址：",
+      "pos": [
+        4514,
+        4545
+      ]
+    },
+    {
+      "pos": [
+        4724,
+        4801
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果未按示例中所示指定特定 IP 地址或范围，配置 <ph id=\"ph2\">`StrictHostKeyChecking no`</ph> 就会产生潜在的安全风险。"
+    },
+    {
+      "pos": [
+        4805,
+        4853
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>应用程序<ept id=\"p1\">**</ept> - 在捕获映像之前，在此 VM 上安装所需的所有应用程序或执行其他自定义设置。"
+    },
+    {
+      "content": "捕获映像",
+      "pos": [
+        4859,
+        4863
+      ]
+    },
+    {
+      "content": "若要捕获映像，首先在 Linux VM 中运行以下命令：这将取消预配 VM，但会维护你设置的用户帐户和 SSH 密钥。",
+      "pos": [
+        4865,
+        4924
+      ]
+    },
+    {
+      "pos": [
+        4957,
+        5087
+      ],
+      "content": "然后，从客户端计算机运行以下 Azure CLI 命令，以捕获映像。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何捕获经典 Linux 虚拟机以用作映像<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-capture-image)</ept>。"
+    },
+    {
+      "content": "运行这些命令之后，将捕获 VM 映像供你使用并删除 VM。现已准备好用于部署群集的自定义映像。",
+      "pos": [
+        5174,
+        5221
+      ]
+    },
+    {
+      "content": "使用映像部署群集",
+      "pos": [
+        5227,
+        5235
+      ]
+    },
+    {
+      "content": "使用你环境的相应值修改以下 Bash 脚本，并从客户端计算机运行它。由于服务管理部署方法将依次部署 VM，因此将需要几分钟时间才能部署此脚本中建议的 8 个 VM。",
+      "pos": [
+        5237,
+        5319
+      ]
+    },
+    {
+      "content": "更新 SLES 12 的 Linux RDMA 驱动程序",
+      "pos": [
+        7176,
+        7204
+      ]
+    },
+    {
+      "content": "基于 SLES 12 HPC 映像创建 Linux RDMA 群集后，你可能需要更新 VM 上用于 RDMA 网络连接的 RDMA 驱动程序。",
+      "pos": [
+        7206,
+        7277
+      ]
+    },
+    {
+      "pos": [
+        7280,
+        7398
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>目前，<bpt id=\"p1\">**</bpt>需要<ept id=\"p1\">**</ept>针对大多数 Azure 区域中的 Linux RDMA 群集部署执行此步骤。<bpt id=\"p2\">**</bpt>只有在以下 Azure 区域中创建的 SLES 12 VM 才不需要更新：美国西部、西欧和日本东部。<ept id=\"p2\">**</ept>"
+    },
+    {
+      "pos": [
+        7400,
+        7473
+      ],
+      "content": "在更新驱动程序之前，请停止所有 <bpt id=\"p1\">**</bpt>zypper<ept id=\"p1\">**</ept> 进程，或者所有锁定 VM 上 SUSE 存储库数据库的进程。否则，可能无法正常更新驱动程序。"
+    },
+    {
+      "content": "通过在客户端计算机上运行以下 Azure CLI 命令集之一，来更新每个 VM 上的 Linux RDMA 驱动程序。",
+      "pos": [
+        7476,
+        7535
+      ]
+    },
+    {
+      "content": "对于在 Azure 服务管理中预配的 VM",
+      "pos": [
+        7539,
+        7560
+      ]
+    },
+    {
+      "pos": [
+        7678,
+        7748
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>安装驱动程序可能需要花费一段时间，并且命令在返回时不会提供输出。更新后，你的 VM 将重新启动，几分钟后即可供使用。"
+    },
+    {
+      "content": "你可以针对群集中的所有节点编写驱动程序更新脚本。例如，以下脚本将会更新上一步骤中的脚本所创建的 8 节点群集中的驱动程序。",
+      "pos": [
+        7750,
+        7811
+      ]
+    },
+    {
+      "content": "配置和运行 Intel MPI",
+      "pos": [
+        8195,
+        8210
+      ]
+    },
+    {
+      "content": "若要在 Azure Linux RDMA 上运行 MPI 应用程序，你需要配置特定于 Intel MPI 的某些环境变量。下面是用于配置变量和运行应用程序的示例 Bash 脚本。",
+      "pos": [
+        8212,
+        8301
+      ]
+    },
+    {
+      "content": "主机文件的格式如下所示。针对群集中的每个节点添加一行。指定前面定义的虚拟网络中的专用 IP 地址，而不是 DNS 名称。例如，对于两台 IP 地址为 10.32.0.1 和 10.32.0.2 的主机，文件包含以下信息:",
+      "pos": [
+        9180,
+        9290
+      ]
+    },
+    {
+      "content": "安装 Intel MPI 后验证基本双节点群集",
+      "pos": [
+        9330,
+        9353
+      ]
+    },
+    {
+      "content": "如果尚未这样做，先为 Intel MPI 设置环境。",
+      "pos": [
+        9355,
+        9381
+      ]
+    },
+    {
+      "content": "运行简单的 MPI 命令",
+      "pos": [
+        9439,
+        9451
+      ]
+    },
+    {
+      "pos": [
+        9453,
+        9546
+      ],
+      "content": "在一个计算节点上运行简单的 MPI 命令，以显示 MPI 已正确安装并且可以在至少两个计算节点之间通信。以下 <bpt id=\"p1\">**</bpt>mpirun<ept id=\"p1\">**</ept> 命令在两个节点上运行 <bpt id=\"p2\">**</bpt>hostname<ept id=\"p2\">**</ept> 命令。"
+    },
+    {
+      "pos": [
+        9729,
+        9799
+      ],
+      "content": "你的输出应列出你传递作为 <ph id=\"ph1\">`-hosts`</ph> 输入的所有节点的名称。例如，具有两个节点的 <bpt id=\"p1\">**</bpt>mpirun<ept id=\"p1\">**</ept> 命令将返回类似如下内容的输出:"
+    },
+    {
+      "content": "运行 MPI 基准",
+      "pos": [
+        9834,
+        9843
+      ]
+    },
+    {
+      "content": "以下 Intel MPI 命令使用 pingpong 基准来验证群集配置和 RDMA 网络连接。",
+      "pos": [
+        9845,
+        9893
+      ]
+    },
+    {
+      "content": "你应在具有两个节点的工作群集上看到类似如下内容的输出：在 Azure RDMA 网络上，不超过 512 字节的消息可能会延迟 3 微秒或 3 微秒以下。",
+      "pos": [
+        10110,
+        10186
+      ]
+    },
+    {
+      "content": "网络拓扑注意事项",
+      "pos": [
+        12939,
+        12947
+      ]
+    },
+    {
+      "content": "在 Linux VM 上，已为 RDMA 网络流量保留 Eth1。不要更改引用此网络的配置文件中的任何 Eth1 设置或任何信息。",
+      "pos": [
+        12951,
+        13016
+      ]
+    },
+    {
+      "content": "在 Azure 中，不支持 IP over Infiniband (IB)。仅支持 RDMA over IB。",
+      "pos": [
+        13020,
+        13075
+      ]
+    },
+    {
+      "content": "在 Linux VM 上，已为常规 RDMA 网络流量保留 Eth0。",
+      "pos": [
+        13079,
+        13114
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        13119,
+        13123
+      ]
+    },
+    {
+      "content": "在 Linux 群集上尝试部署和运行 Linux MPI 应用程序。",
+      "pos": [
+        13127,
+        13161
+      ]
+    },
+    {
+      "pos": [
+        13165,
+        13272
+      ],
+      "content": "有关 Intel MPI 的指南，请参阅 <bpt id=\"p1\">[</bpt>Intel MPI 库文档<ept id=\"p1\">](https://software.intel.com/articles/intel-mpi-library-documentation/)</ept>。"
+    }
+  ],
+  "content": "<properties\n pageTitle=\"Linux RDMA 群集运行 MPI 应用程序 | Azure\"\n description=\"创建 A8 或 A9 大小 VM 的 Linux 群集以使用 RDMA 运行 MPI 应用。\"\n services=\"virtual-machines\"\n documentationCenter=\"\"\n authors=\"dlepow\"\n manager=\"timlt\"\n editor=\"\"\n tags=\"azure-service-management\"/>\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"01/21/2016\"\n    wacn.date=\"03/21/2016\"/>\n\n# 设置 Linux RDMA 群集以运行 MPI 应用程序\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]\n\n\n本文介绍如何在 Azure 中设置 Linux RDMA 群集以运行并行消息传递接口 (MPI) 应用程序。当你配置了基于 Linux 的 VM 以运行支持的 MPI 实现时，MPI 应用程序将通过 Azure 中基于远程直接内存访问 (RDMA) 技术的低延迟、高吞吐量网络高效地进行通信。\n\n>[AZURE.NOTE] 目前，在 Azure 库中 SUSE Linux Enterprise Server 12 (SLES 12) 映像上运行的 Intel MPI 库版本 5 支持 Azure Linux RDMA。本文基于 Intel MPI 版本 5.0.3.048。\n\n\n\n## Linux 群集部署选项\n\n以下是可用于创建 Linux RDMA 群集的方法（使用或不使用作业计划程序）。\n\n* **HPC Pack** - 在 Azure 中创建 Microsoft HPC Pack 群集，然后添加运行受支持 Linux 分发版的计算节点。可以将某些 Linux 节点配置为访问 RDMA 网络。请参阅 [Azure 的 HPC Pack 群集中的 Linux 计算节点入门](/documentation/articles/virtual-machines-linux-cluster-hpcpack)。\n\n* **Azure CLI 脚本** - 如本文其他地方的步骤中所示，使用适用于 Mac、Linux 和 Windows 的 [Azure 命令行界面](/documentation/articles/xplat-cli-install) (CLI) 生成部署创建 Linux 群集所需的虚拟网络和其他必需组件的脚本。经典（服务管理）部署模式中的 CLI 将依次创建群集节点，因此，如果你要部署许多计算节点，可能需要几分钟才能完成部署。\n\n## 在 Azure 服务管理中使用 Azure CLI 脚本进行部署\n\n以下步骤将帮助你使用 Azure CLI 部署 SUSE Linux Enterprise Server 12 VM、安装 Intel MPI 库和其他自定义项、创建自定义 VM 映像，然后编写脚本部署群集。\n\n### 先决条件\n\n*   **客户端计算机** - 你需要基于 Mac、Linux 或 Windows 的客户端计算机，以便与 Azure 通信。这些步骤假定你使用的是 Linux 客户端。\n\n*   **Azure 订阅** - 如果你没有帐户，只需花费几分钟就能创建一个试用帐户。有关详细信息，请参阅 [Azure 试用](/pricing/1rmb-trial/)。\n\n*   **内核配额** - 你可能需要增加内核配额才能部署群集。例如，如果你要按本文所示部署 8 个 VM，则至少需要 128 个内核。\n\n*   **Azure CLI** - [安装](/documentation/articles/xplat-cli-install) Azure CLI 并[对其进行配置](/documentation/articles/xplat-cli-connect)，以从客户端计算机连接到你的 Azure 订阅。\n\n*   **Intel MPI** - 在为群集自定义 Linux VM 映像的过程中（请参阅本文后面的详细信息），你需要从 [Intel.com 站点](https://software.intel.com/intel-mpi-library/)下载并安装 Intel MPI 库 5 运行时。为此，向 Intel 注册后，请点击确认电子邮件中的链接转到相关网页，并复制相应版本的 Intel MPI 所对应的 .tgz 文件的下载链接。本文基于 Intel MPI 版本 5.0.3.048。\n\n### 预配 SLES 12 VM\n\n使用 Azure CLI 登录到 Azure 后，运行 `azure config list` 以确认输出显示 **asm** 模式，表示 CLI 在 Azure 服务管理模式下。如果它不是，请通过运行以下命令设置模式：\n\n    azure config mode asm\n\n键入以下内容以列出你有权使用的所有订阅：\n\n    azure account list\n\n通过将 `Current` 设为 `true` 来标识当前的活动订阅。如果这不是你要用于创建群集的订阅，请将相应的订阅编号设为活动订阅：\n\n    azure account set <subscription-number>\n\n若要查看 Azure 中公开提供的 SLES 12 HPC 映像，请运行如下命令（如果你的 shell 环境支持 **grep**）：\n\n    azure vm image list | grep \"suse.*hpc\"\n\n>[AZURE.NOTE]已为 SLES 12 HPC 映像预配置了必需的用于 Azure 的 Linux RDMA 驱动程序。\n\n现在，通过运行如下命令使用提供的 SLES 12 HPC 映像预配 VM：\n\n    azure vm create -g <username> -p <password> -c <cloud-service-name> -l <location> -z A7 -n <vm-name> -e 22 b4590d9e3ed742e4a1d46e5424aa335e__suse-sles-12-hpc-v20150708\n\n其中\n\n* 外部 SSH 端口号（在此示例中为 SSH 默认值 22）是任何有效的端口号；内部 SSH 端口号将设为 22\n\n* 将在 location 指定的 Azure 区域中创建新的云服务；指定一个位置，例如“China North”\n\n* 映像名称当前可以是 `b4590d9e3ed742e4a1d46e5424aa335e__suse-sles-12-hpc-v20150708`（免费）或 `b4590d9e3ed742e4a1d46e5424aa335e__suse-sles-12-hpc-priority-v20150708`（用于 SUSE 优先支持，收费）\n\n### 自定义 VM\n\n在 VM 完成预配后，使用 VM 的外部 IP 地址（或 DNS 名称）和你配置的外部端口号通过 SSH 登录到 VM，然后对其进行自定义。有关连接详细信息，请参阅[如何登录到运行 Linux 的虚拟机](/documentation/articles/virtual-machines-linux-how-to-log-on)。你必须以 VM 上配置的用户身份执行命令，除非必须要根访问权限才能完成步骤。\n\n>[AZURE.IMPORTANT]Azure 不提供对 Linux VM 的根访问权限。若要在以用户身份连接至 VM 时获得管理访问权限，使用 `sudo` 运行命令。\n\n*   **更新** - 使用 **zypper** 安装更新。你可能想要安装 NFS 实用工具。  \n\n    >[AZURE.IMPORTANT]目前，我们建议你不要应用内核更新，这可能会在使用 Linux RDMA 驱动程序时导致问题。\n\n*   **Intel MPI** - 运行如下命令，从 Intel.com 站点下载并安装 Intel MPI 库 5 运行时。\n\n        sudo wget <download link for your registration>\n    \n        sudo tar xvzf <tar-file>\n    \n        cd <mpi-directory>\n    \n        sudo ./install.sh\n\n    接受默认设置以便在 VM 上安装 Intel MPI。\n\n*   **锁定内存** - 要使 MPI 代码锁定可用于 RDMA 的内存，需要在 /etc/security/limits.conf 文件中添加或更改以下设置。（需要根访问权限才能编辑此文件。）\n\n        <User or group name> hard    memlock <memory required for your application in KB>\n    \n        <User or group name> soft    memlock <memory required for your application in KB>\n\n    >[AZURE.NOTE]出于测试目的，你也可以将 memlock 设置为不受限制。例如：`<User or group name>    hard    memlock unlimited`。\n\n\n*   **SSH 密钥** -生成 SSH 密钥以在运行 MPI 作业时，在群集中的所有计算节点上为你的用户帐户建立信任。运行以下命令以创建 SSH 密钥。只需按 Enter 键以在默认位置生成密钥，而无需设置密码。\n\n        ssh-keygen\n\n    对于已知的公钥，将公钥附加到 authorized\\_keys 文件。\n\n        cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys\n\n    在 ~/.ssh 目录中编辑或创建 \"config\" 文件。提供将在 Azure 中使用的专用网络的 IP 地址范围（本例中为 10.32.0.0/16）：\n\n        host 10.32.0.*\n        StrictHostKeyChecking no\n\n    或者，按以下方式列出群集中每个 VM 的专用网络 IP 地址：\n\n        host 10.32.0.1\n         StrictHostKeyChecking no\n        host 10.32.0.2\n         StrictHostKeyChecking no\n        host 10.32.0.3\n         StrictHostKeyChecking no\n\n    >[AZURE.NOTE]如果未按示例中所示指定特定 IP 地址或范围，配置 `StrictHostKeyChecking no` 就会产生潜在的安全风险。\n\n* **应用程序** - 在捕获映像之前，在此 VM 上安装所需的所有应用程序或执行其他自定义设置。\n\n### 捕获映像\n\n若要捕获映像，首先在 Linux VM 中运行以下命令：这将取消预配 VM，但会维护你设置的用户帐户和 SSH 密钥。\n\n    sudo waagent -deprovision\n\n然后，从客户端计算机运行以下 Azure CLI 命令，以捕获映像。有关详细信息，请参阅[如何捕获经典 Linux 虚拟机以用作映像](/documentation/articles/virtual-machines-linux-capture-image)。\n\n    azure vm shutdown <vm-name>\n    \n    azure vm capture -t <vm-name> <image-name>\n\n运行这些命令之后，将捕获 VM 映像供你使用并删除 VM。现已准备好用于部署群集的自定义映像。\n\n### 使用映像部署群集\n\n使用你环境的相应值修改以下 Bash 脚本，并从客户端计算机运行它。由于服务管理部署方法将依次部署 VM，因此将需要几分钟时间才能部署此脚本中建议的 8 个 VM。\n\n    #!/bin/bash -x\n    # Script to create a compute cluster without a scheduler in a VNet in Azure\n    # Create a custom private network in Azure\n    # Replace 10.32.0.0 with your virtual network address space\n    # Replace <network-name> with your network identifier\n    # Select a region, such as China North\n    # See Azure Pricing pages for prices and availability of VMs\n    \n    azure network vnet create -l \"China North\" -e 10.32.0.0 -i 16 <network-name>\n    \n    # Create a cloud service. All the instances need to be in the same cloud service for Linux RDMA to work across InfiniBand.\n    # Note: The current maximum number of VMs in a cloud service is 50. If you need to provision more than 50 VMs in the same cloud service in your cluster, contact Azure Support.\n    \n    azure service create <cloud-service-name> --location \"China North\" -s <subscription-ID>\n    \n    # Define a prefix naming scheme for compute nodes, e.g., cluster11, cluster12, etc.\n    \n    vmname=cluster\n    \n    # Define a prefix for external port numbers. If you want to turn off external ports and use only internal ports to communicate between compute nodes via port 22, don't use this option. Since port numbers up to 10000 are reserved, use numbers after 10000. Leave external port on for rank 0 and head node.\n    \n    portnumber=101\n    \n    # In this cluster there will be 8 nodes, named cluster11 to cluster18. Specify your captured image in <image-name>. Specify the username and password you used when creating the SSH keys.\n    \n    for (( i=11; i<19; i++ )); do\n            azure vm create -g <username> -p <password> -c <cloud-service-name> -z A7 -n $vmname$i -e $portnumber$i -w <network-name> -b Subnet-1 <image-name>\n    done\n    \n    # Save this script with a name like makecluster.sh and run it in your shell environment to provision your cluster\n\n## 更新 SLES 12 的 Linux RDMA 驱动程序\n\n基于 SLES 12 HPC 映像创建 Linux RDMA 群集后，你可能需要更新 VM 上用于 RDMA 网络连接的 RDMA 驱动程序。\n\n>[AZURE.IMPORTANT]目前，**需要**针对大多数 Azure 区域中的 Linux RDMA 群集部署执行此步骤。**只有在以下 Azure 区域中创建的 SLES 12 VM 才不需要更新：美国西部、西欧和日本东部。**\n\n在更新驱动程序之前，请停止所有 **zypper** 进程，或者所有锁定 VM 上 SUSE 存储库数据库的进程。否则，可能无法正常更新驱动程序。\n\n\n通过在客户端计算机上运行以下 Azure CLI 命令集之一，来更新每个 VM 上的 Linux RDMA 驱动程序。\n\n**对于在 Azure 服务管理中预配的 VM**\n\n    azure config mode asm\n\n    azure vm extension set <vm-name> RDMAUpdateForLinux Microsoft.OSTCExtensions 0.1\n\n>[AZURE.NOTE]安装驱动程序可能需要花费一段时间，并且命令在返回时不会提供输出。更新后，你的 VM 将重新启动，几分钟后即可供使用。\n\n你可以针对群集中的所有节点编写驱动程序更新脚本。例如，以下脚本将会更新上一步骤中的脚本所创建的 8 节点群集中的驱动程序。\n\n    #!/bin/bash -x\n\n    # Define a prefix naming scheme for compute nodes, e.g., cluster11, cluster12, etc.\n\n    vmname=cluster\n\n    # Plug in appropriate numbers in the for loop below.\n\n    for (( i=11; i<19; i++ )); do\n\n    # For ASM VMs use the following command in your script.\n\n    azure vm extension set $vmname$i RDMAUpdateForLinux Microsoft.OSTCExtensions 0.1\n\n    done\n\n## 配置和运行 Intel MPI\n\n若要在 Azure Linux RDMA 上运行 MPI 应用程序，你需要配置特定于 Intel MPI 的某些环境变量。下面是用于配置变量和运行应用程序的示例 Bash 脚本。\n\n    #!/bin/bash -x\n    \n    source /opt/intel/impi_latest/bin64/mpivars.sh\n    \n    export I_MPI_FABRICS=shm:dapl\n    \n    # THIS IS A MANDATORY ENVIRONMENT VARIABLEAND MUST BE SET BEFORE RUNNING ANY JOB\n    # Setting the variable to shm:dapl gives best performance for some applications\n    # If your application doesn't take advantage of shared memory and MPI together, then set only dapl\n    \n    export I_MPI_DAPL_PROVIDER=ofa-v2-ib0\n    \n    # THIS IS A MANDATORY ENVIRONMENT VARIABLE AND MUST BE SET BEFORE RUNNING ANY JOB\n    \n    export I_MPI_DYNAMIC_CONNECTION=0\n    \n    # THIS IS A MANDATORY ENVIRONMENT VARIABLE AND MUST BE SET BEFORE RUNNING ANY JOB\n    \n    # Command line to run the job\n    \n    mpirun -n <number-of-cores> -ppn <core-per-node> -hostfile <hostfilename>  /path <path to the application exe> <arguments specific to the application>\n    \n    #end\n\n主机文件的格式如下所示。针对群集中的每个节点添加一行。指定前面定义的虚拟网络中的专用 IP 地址，而不是 DNS 名称。例如，对于两台 IP 地址为 10.32.0.1 和 10.32.0.2 的主机，文件包含以下信息:\n\n    10.32.0.1:16\n    10.32.0.2:16\n\n## 安装 Intel MPI 后验证基本双节点群集\n\n如果尚未这样做，先为 Intel MPI 设置环境。\n\n    source /opt/intel/impi_latest/bin64/mpivars.sh\n\n### 运行简单的 MPI 命令\n\n在一个计算节点上运行简单的 MPI 命令，以显示 MPI 已正确安装并且可以在至少两个计算节点之间通信。以下 **mpirun** 命令在两个节点上运行 **hostname** 命令。\n\n    /opt/intel/impi_latest/bin64/mpirun -ppn 1 -n 2 -hosts <host1>,<host2> -env I_MPI_FABRICS=shm:dapl -env I_MPI_DAPL_PROVIDER=ofa-v2-ib0 -env I_MPI_DYNAMIC_CONNECTION=0 hostname\n\n你的输出应列出你传递作为 `-hosts` 输入的所有节点的名称。例如，具有两个节点的 **mpirun** 命令将返回类似如下内容的输出:\n\n    cluster11\n    cluster12\n\n### 运行 MPI 基准\n\n以下 Intel MPI 命令使用 pingpong 基准来验证群集配置和 RDMA 网络连接。\n\n    /opt/intel/impi_latest/bin64/mpirun -hosts <host1>,<host2> -ppn 1 -n 2 -env I_MPI_FABRICS=dapl -env I_MPI_DAPL_PROVIDER=ofa-v2-ib0 -env I_MPI_DYNAMIC_CONNECTION=0 /opt/intel/impi_latest/bin64/IMB-MPI1 pingpong\n\n你应在具有两个节点的工作群集上看到类似如下内容的输出：在 Azure RDMA 网络上，不超过 512 字节的消息可能会延迟 3 微秒或 3 微秒以下。\n\n    #------------------------------------------------------------\n    #    Intel (R) MPI Benchmarks 4.0 Update 1, MPI-1 part\n    #------------------------------------------------------------\n    # Date                  : Fri Jul 17 23:16:46 2015\n    # Machine               : x86_64\n    # System                : Linux\n    # Release               : 3.12.39-44-default\n    # Version               : #5 SMP Thu Jun 25 22:45:24 UTC 2015\n    # MPI Version           : 3.0\n    # MPI Thread Environment:\n    # New default behavior from Version 3.2 on:\n    # the number of iterations per message size is cut down\n    # dynamically when a certain run time (per message size sample)\n    # is expected to be exceeded. Time limit is defined by variable\n    # \"SECS_PER_SAMPLE\" (=> IMB_settings.h)\n    # or through the flag => -time\n    \n    # Calling sequence was:\n    # /opt/intel/impi_latest/bin64/IMB-MPI1 pingpong\n    # Minimum message length in bytes:   0\n    # Maximum message length in bytes:   4194304\n    #\n    # MPI_Datatype                   :   MPI_BYTE\n    # MPI_Datatype for reductions    :   MPI_FLOAT\n    # MPI_Op                         :   MPI_SUM\n    #\n    #\n    # List of Benchmarks to run:\n    # PingPong\n    #---------------------------------------------------\n    # Benchmarking PingPong\n    # #processes = 2\n    #---------------------------------------------------\n       #bytes #repetitions      t[usec]   Mbytes/sec\n            0         1000         2.23         0.00\n            1         1000         2.26         0.42\n            2         1000         2.26         0.85\n            4         1000         2.26         1.69\n            8         1000         2.26         3.38\n           16         1000         2.36         6.45\n           32         1000         2.57        11.89\n           64         1000         2.36        25.81\n          128         1000         2.64        46.19\n          256         1000         2.73        89.30\n          512         1000         3.09       157.99\n         1024         1000         3.60       271.53\n         2048         1000         4.46       437.57\n         4096         1000         6.11       639.23\n         8192         1000         7.49      1043.47\n        16384         1000         9.76      1600.76\n        32768         1000        14.98      2085.77\n        65536          640        25.99      2405.08\n       131072          320        50.68      2466.64\n       262144          160        80.62      3101.01\n       524288           80       145.86      3427.91\n      1048576           40       279.06      3583.42\n      2097152           20       543.37      3680.71\n      4194304           10      1082.94      3693.63\n\n    # All processes entering MPI_Finalize\n\n\n## 网络拓扑注意事项\n\n* 在 Linux VM 上，已为 RDMA 网络流量保留 Eth1。不要更改引用此网络的配置文件中的任何 Eth1 设置或任何信息。\n\n* 在 Azure 中，不支持 IP over Infiniband (IB)。仅支持 RDMA over IB。\n\n* 在 Linux VM 上，已为常规 RDMA 网络流量保留 Eth0。\n\n## 后续步骤\n\n* 在 Linux 群集上尝试部署和运行 Linux MPI 应用程序。\n\n* 有关 Intel MPI 的指南，请参阅 [Intel MPI 库文档](https://software.intel.com/articles/intel-mpi-library-documentation/)。\n\n<!---HONumber=Mooncake_0314_2016-->"
+}

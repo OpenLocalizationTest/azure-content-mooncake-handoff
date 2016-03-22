@@ -1,0 +1,299 @@
+{
+  "nodes": [
+    {
+      "content": "管理：负载平衡器分发模式（源 IP 关联）",
+      "pos": [
+        27,
+        48
+      ]
+    },
+    {
+      "content": "Azure 负载平衡器分发模式的管理功能",
+      "pos": [
+        66,
+        86
+      ]
+    },
+    {
+      "content": "管理虚拟网络：负载平衡器分发模式（源 IP 关联）",
+      "pos": [
+        314,
+        339
+      ]
+    },
+    {
+      "pos": [
+        340,
+        468
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>源 IP 关联<ept id=\"p1\">**</ept>（也称为“会话关联”或“客户端 IP 关联”）是一种 Azure 负载平衡器分发模式，它将来自单个客户端的连接绑定到 Azure 托管的单个服务器，而不是将每个客户端连接动态分发到 Azure 托管的不同服务器（默认负载平衡器行为）。"
+    },
+    {
+      "content": "使用源 IP 关联，Azure 负载平衡器可以配置为使用 2 元组组合（源 IP、目标 IP）或 3 元组组合（源 IP、目标 IP、协议）将流量映射到 Azure 托管的可用服务器池。使用源 IP 关联时，从同一客户端计算机发起的连接由单个 DIP 终结点（Azure 托管的单个服务器）处理。",
+      "pos": [
+        470,
+        618
+      ]
+    },
+    {
+      "content": "服务源",
+      "pos": [
+        623,
+        626
+      ]
+    },
+    {
+      "pos": [
+        628,
+        844
+      ],
+      "content": "源 IP 关联解决了以前 <bpt id=\"p1\">[</bpt>Azure 负载平衡器与 RD 网关 (DOC) 之间的不兼容<ept id=\"p1\">](http://download.microsoft.com/download/E/A/7/EA75F19F-63F1-401A-8021-13AE2E6D8196/Microsoft%20Azure%20Desktop%20Hosting%20Reference%20Architecture%20Guide-Nov2014.docx)</ept>。"
+    },
+    {
+      "content": "实现",
+      "pos": [
+        849,
+        851
+      ]
+    },
+    {
+      "content": "可以为以下项配置源 IP 关联：",
+      "pos": [
+        853,
+        869
+      ]
+    },
+    {
+      "content": "虚拟机终结点",
+      "pos": [
+        874,
+        880
+      ]
+    },
+    {
+      "content": "Web 角色",
+      "pos": [
+        1013,
+        1019
+      ]
+    },
+    {
+      "content": "辅助角色",
+      "pos": [
+        1085,
+        1089
+      ]
+    },
+    {
+      "content": "方案",
+      "pos": [
+        1156,
+        1158
+      ]
+    },
+    {
+      "content": "使用单个云服务的远程桌面网关群集",
+      "pos": [
+        1162,
+        1178
+      ]
+    },
+    {
+      "content": "媒体上载（即，UDP 用于数据，TCP 用于控制）",
+      "pos": [
+        1182,
+        1207
+      ]
+    },
+    {
+      "content": "客户端启动与 Azure 托管的负载平衡公共 IP 地址的 TCP 会话。",
+      "pos": [
+        1212,
+        1249
+      ]
+    },
+    {
+      "content": "客户端请求将由负载平衡器定向到某个 DIP；此通道将保持处于活动状态，以监视连接健康状况",
+      "pos": [
+        1254,
+        1298
+      ]
+    },
+    {
+      "content": "客户端启动与 Azure 托管的同一负载平衡公共 IP 地址的 UDP 会话",
+      "pos": [
+        1303,
+        1341
+      ]
+    },
+    {
+      "content": "Azure 负载平衡器将请求定向到与 TCP 连接相同的 DIP 终结点",
+      "pos": [
+        1346,
+        1382
+      ]
+    },
+    {
+      "content": "客户端将使用更高的 UDP 吞吐量上载媒体，同时通过 TCP 维护控制通道，以保证可靠性",
+      "pos": [
+        1387,
+        1431
+      ]
+    },
+    {
+      "content": "注意事项",
+      "pos": [
+        1438,
+        1442
+      ]
+    },
+    {
+      "content": "如果更改了负载平衡集（即添加或删除虚拟机），客户端通道分布将重新计算；来自现有客户端的新连接可能由不是原来使用的服务器处理",
+      "pos": [
+        1445,
+        1506
+      ]
+    },
+    {
+      "content": "使用源 IP 关联可能会导致跨 Azure 托管的服务器的流量不均匀分布",
+      "pos": [
+        1509,
+        1545
+      ]
+    },
+    {
+      "content": "通过代理路由流量的客户端可能被 Azure 负载平衡器视为单个客户端",
+      "pos": [
+        1548,
+        1582
+      ]
+    },
+    {
+      "content": "PowerShell 示例",
+      "pos": [
+        1587,
+        1600
+      ]
+    },
+    {
+      "pos": [
+        1601,
+        1687
+      ],
+      "content": "为获得最佳结果，请下载<bpt id=\"p1\">[</bpt>最新版的 Azure PowerShell<ept id=\"p1\">](https://github.com/Azure/azure-sdk-tools/releases)</ept>。"
+    },
+    {
+      "content": "将 Azure 终结点添加到虚拟机并设置负载平衡器分发模式",
+      "pos": [
+        1693,
+        1722
+      ]
+    },
+    {
+      "content": "LoadBalancerDistribution 可以设置为 sourceIP（用于 2 元组（源 IP、目标 IP）负载平衡）、sourceIPProtocol（用于 3 元组（源 IP、目标 IP、协议）负载平衡）或 none（如果想要默认行为（5 元组负载平衡））。",
+      "pos": [
+        2108,
+        2244
+      ]
+    },
+    {
+      "content": "检索终结点负载平衡器分发模式配置",
+      "pos": [
+        2250,
+        2266
+      ]
+    },
+    {
+      "content": "如果 LoadBalancerDistribution 元素不存在，则 Azure 负载平衡器使用默认的 5 元组算法",
+      "pos": [
+        2813,
+        2872
+      ]
+    },
+    {
+      "content": "在负载平衡终结点集上设置分发模式",
+      "pos": [
+        2878,
+        2894
+      ]
+    },
+    {
+      "content": "如果终结点是负载平衡终结点集的一部分，则必须在负载平衡终结点集上设置分发模式。",
+      "pos": [
+        3258,
+        3297
+      ]
+    },
+    {
+      "content": "云服务示例",
+      "pos": [
+        3302,
+        3307
+      ]
+    },
+    {
+      "content": "你可以利用 Azure SDK for .NET 来更新云服务",
+      "pos": [
+        3309,
+        3340
+      ]
+    },
+    {
+      "content": "云服务的终结点设置在 .csdef 中进行。若要更新云服务部署的负载平衡器分发模式，需要进行部署升级。",
+      "pos": [
+        3342,
+        3393
+      ]
+    },
+    {
+      "content": "下面是终结点设置的 .csdef 更改的示例：",
+      "pos": [
+        3395,
+        3418
+      ]
+    },
+    {
+      "content": "API 示例",
+      "pos": [
+        4200,
+        4206
+      ]
+    },
+    {
+      "content": "开发人员可以使用服务管理 API 配置负载平衡器分发。确保添加 x-ms-version 标头并将其设为版本 2014-09-01 或更高版本。",
+      "pos": [
+        4208,
+        4280
+      ]
+    },
+    {
+      "content": "更新部署中指定的负载平衡集配置",
+      "pos": [
+        4286,
+        4301
+      ]
+    },
+    {
+      "content": "请求",
+      "pos": [
+        4308,
+        4310
+      ]
+    },
+    {
+      "content": "LoadBalancerDistribution 的值可以是 sourceIP（用于 2 元组关联）、sourceIPProtocol（用于 3 元组关联）或 none（用于无关联，即 5 元组）",
+      "pos": [
+        5527,
+        5625
+      ]
+    },
+    {
+      "content": "响应",
+      "pos": [
+        5632,
+        5634
+      ]
+    }
+  ],
+  "content": "<properties \n   pageTitle=\"管理：负载平衡器分发模式（源 IP 关联）\"\n   description=\"Azure 负载平衡器分发模式的管理功能\" \n   services=\"virtual-network\" \n   documentationCenter=\"\" \n   authors=\"telmosampaio\" \n   manager=\"carolz\" \n   editor=\"\"\n   />\n\n<tags\n    ms.service=\"virtual-network\"\n    ms.date=\"12/07/2015\"\n    wacn.date=\"01/14/2016\"/>\n   \n# 管理虚拟网络：负载平衡器分发模式（源 IP 关联）\n**源 IP 关联**（也称为“会话关联”或“客户端 IP 关联”）是一种 Azure 负载平衡器分发模式，它将来自单个客户端的连接绑定到 Azure 托管的单个服务器，而不是将每个客户端连接动态分发到 Azure 托管的不同服务器（默认负载平衡器行为）。\n\n使用源 IP 关联，Azure 负载平衡器可以配置为使用 2 元组组合（源 IP、目标 IP）或 3 元组组合（源 IP、目标 IP、协议）将流量映射到 Azure 托管的可用服务器池。使用源 IP 关联时，从同一客户端计算机发起的连接由单个 DIP 终结点（Azure 托管的单个服务器）处理。\n\n## 服务源\n\n源 IP 关联解决了以前 [Azure 负载平衡器与 RD 网关 (DOC) 之间的不兼容](http://download.microsoft.com/download/E/A/7/EA75F19F-63F1-401A-8021-13AE2E6D8196/Microsoft%20Azure%20Desktop%20Hosting%20Reference%20Architecture%20Guide-Nov2014.docx)。\n\n## 实现\n\n可以为以下项配置源 IP 关联：\n\n* [虚拟机终结点](/documentation/articles/virtual-machines-set-up-endpoints)\n<!--* [负载平衡的终结点集](/documentation/articles/load-balancer-overview)-->\n* [Web 角色](http://msdn.microsoft.com/zh-cn/library/azure/ee758711.aspx)\n* [辅助角色](http://msdn.microsoft.com/zh-cn/library/azure/ee758711.aspx)\n\n## 方案\n1. 使用单个云服务的远程桌面网关群集\n2. 媒体上载（即，UDP 用于数据，TCP 用于控制）\n  * 客户端启动与 Azure 托管的负载平衡公共 IP 地址的 TCP 会话。\n  * 客户端请求将由负载平衡器定向到某个 DIP；此通道将保持处于活动状态，以监视连接健康状况\n  * 客户端启动与 Azure 托管的同一负载平衡公共 IP 地址的 UDP 会话\n  * Azure 负载平衡器将请求定向到与 TCP 连接相同的 DIP 终结点\n  * 客户端将使用更高的 UDP 吞吐量上载媒体，同时通过 TCP 维护控制通道，以保证可靠性\n  \n## 注意事项\n* 如果更改了负载平衡集（即添加或删除虚拟机），客户端通道分布将重新计算；来自现有客户端的新连接可能由不是原来使用的服务器处理\n* 使用源 IP 关联可能会导致跨 Azure 托管的服务器的流量不均匀分布\n* 通过代理路由流量的客户端可能被 Azure 负载平衡器视为单个客户端\n\n## PowerShell 示例\n为获得最佳结果，请下载[最新版的 Azure PowerShell](https://github.com/Azure/azure-sdk-tools/releases)。\n\n### 将 Azure 终结点添加到虚拟机并设置负载平衡器分发模式\n\n    Get-AzureVM -ServiceName \"mySvc\" -Name \"MyVM1\" | Add-AzureEndpoint -Name \"HttpIn\" -Protocol \"tcp\" -PublicPort 80 -LocalPort 8080 â€“LoadBalancerDistribution â€œsourceIPâ€�| Update-AzureVM  \n\n    Get-AzureVM -ServiceName \"mySvc\" -Name \"MyVM1\" | Add-AzureEndpoint -Name \"HttpIn\" -Protocol \"tcp\" -PublicPort 80 -LocalPort 8080 -LoadBalancerDistribution \"sourceIP\"| Update-AzureVM  \n\nLoadBalancerDistribution 可以设置为 sourceIP（用于 2 元组（源 IP、目标 IP）负载平衡）、sourceIPProtocol（用于 3 元组（源 IP、目标 IP、协议）负载平衡）或 none（如果想要默认行为（5 元组负载平衡））。\n\n### 检索终结点负载平衡器分发模式配置\n\n    PS C:\\> Get-AzureVM -ServiceName \"mySvc\" -Name \"MyVM\" | Get-AzureEndpoint\n    \n    VERBOSE: 6:43:50 PM - Completed Operation: Get Deployment\n    LBSetName : MyLoadBalancedSet\n    LocalPort : 80\n    Name : HTTP\n    Port : 80\n    Protocol : tcp\n    Vip : 65.52.xxx.xxx\n    ProbePath :\n    ProbePort : 80\n    ProbeProtocol : tcp\n    ProbeIntervalInSeconds : 15\n    ProbeTimeoutInSeconds : 31\n    EnableDirectServerReturn : False\n    Acl : {}\n    InternalLoadBalancerName :\n    IdleTimeoutInMinutes : 15\n    LoadBalancerDistribution : sourceIP\n\n如果 LoadBalancerDistribution 元素不存在，则 Azure 负载平衡器使用默认的 5 元组算法\n\n### 在负载平衡终结点集上设置分发模式\n\n    Set-AzureLoadBalancedEndpoint -ServiceName \"MyService\" -LBSetName \"LBSet1\" -Protocol tcp -LocalPort 80 -ProbeProtocolTCP -ProbePort 8080 -LoadBalancerDistribution \"sourceIP\"\n\n    Set-AzureLoadBalancedEndpoint -ServiceName \"MyService\" -LBSetName \"LBSet1\" -Protocol tcp -LocalPort 80 -ProbeProtocolTCP -ProbePort 8080 -LoadBalancerDistribution \"sourceIP\"\n    \n如果终结点是负载平衡终结点集的一部分，则必须在负载平衡终结点集上设置分发模式。\n\n## 云服务示例\n\n你可以利用 Azure SDK for .NET 来更新云服务\n\n云服务的终结点设置在 .csdef 中进行。若要更新云服务部署的负载平衡器分发模式，需要进行部署升级。\n\n下面是终结点设置的 .csdef 更改的示例：\n\n    <WorkerRole name=\"worker-role-name\" vmsize=\"worker-role-size\" enableNativeCodeExecution=\"[true|false]\">\n      <Endpoints>\n        <InputEndpoint name=\"input-endpoint-name\" protocol=\"[http|https|tcp|udp]\" localPort=\"local-port-number\" port=\"port-number\" certificate=\"certificate-name\" loadBalancerProbe=\"load-balancer-probe-name\" loadBalancerDistribution=\"sourceIP\" />\n      </Endpoints>\n    </WorkerRole>\n    <NetworkConfiguration>\n      <VirtualNetworkSite name=\"VNet\"/>\n      <AddressAssignments>\n        <InstanceAddress roleName=\"VMRolePersisted\">\n          <PublicIPs>\n            <PublicIP name=\"public-ip-name\" idleTimeoutInMinutes=\"timeout-in-minutes\"/>\n          </PublicIPs>\n        </InstanceAddress>\n      </AddressAssignments>\n    </NetworkConfiguration>\n    \n## API 示例\n\n开发人员可以使用服务管理 API 配置负载平衡器分发。确保添加 x-ms-version 标头并将其设为版本 2014-09-01 或更高版本。\n\n### 更新部署中指定的负载平衡集配置\n\n#### 请求\n\n    POST https://management.core.chinacloudapi.cn/<subscription-id>/services/hostedservices/<cloudservice-name>/deployments/<deployment-name>?comp=UpdateLbSet \n    \n    x-ms-version: 2014-09-01 \n    \n    Content-Type: application/xml \n    \n    <LoadBalancedEndpointList xmlns=\"http://schemas.microsoft.com/windowsazure\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\"> \n      <InputEndpoint> \n        <LoadBalancedEndpointSetName> endpoint-set-name </LoadBalancedEndpointSetName> \n        <LocalPort> local-port-number </LocalPort> \n        <Port> external-port-number </Port> \n        <LoadBalancerProbe> \n          <Port> port-assigned-to-probe </Port> \n          <Protocol> probe-protocol </Protocol> \n          <IntervalInSeconds> interval-of-probe </IntervalInSeconds> \n          <TimeoutInSeconds> timeout-for-probe </TimeoutInSeconds> \n        </LoadBalancerProbe> \n        <Protocol> endpoint-protocol </Protocol> \n        <EnableDirectServerReturn> enable-direct-server-return </EnableDirectServerReturn> \n        <IdleTimeoutInMinutes>idle-time-out</IdleTimeoutInMinutes> \n        <LoadBalancerDistribution>sourceIP</LoadBalancerDistribution> \n      </InputEndpoint> \n    </LoadBalancedEndpointList>\n\nLoadBalancerDistribution 的值可以是 sourceIP（用于 2 元组关联）、sourceIPProtocol（用于 3 元组关联）或 none（用于无关联，即 5 元组）\n\n#### 响应\n\n    HTTP/1.1 202 Accepted \n    Cache-Control: no-cache \n    Content-Length: 0 \n    Server: 1.0.6198.146 (rd_rdfe_stable.141015-1306) Microsoft-HTTPAPI/2.0 \n    x-ms-servedbyregion: ussouth2 \n    x-ms-request-id: 9c7bda3e67c621a6b57096323069f7af \n    Date: Thu, 16 Oct 2014 22:49:21 GMT\n \n\n<!---HONumber=74-->"
+}

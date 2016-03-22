@@ -1,0 +1,138 @@
+{
+  "nodes": [
+    {
+      "content": "后续步骤",
+      "pos": [
+        3,
+        7
+      ]
+    },
+    {
+      "content": "启用 Azure 密钥保管库集成之后，可以在 SQL VM 上启用 SQL Server 加密。首先，需要在密钥保管库内创建一个非对称密钥，并在 VM 上的 SQL Server 中创建一个对称密钥。然后，你将能够执行的 T-SQL 语句，以启用对数据库和备份的加密。",
+      "pos": [
+        8,
+        142
+      ]
+    },
+    {
+      "content": "可以利用以下几种形式的加密：",
+      "pos": [
+        144,
+        158
+      ]
+    },
+    {
+      "content": "透明数据加密 (TDE)",
+      "pos": [
+        163,
+        175
+      ]
+    },
+    {
+      "content": "加密备份",
+      "pos": [
+        236,
+        240
+      ]
+    },
+    {
+      "content": "列级加密 (CLE)",
+      "pos": [
+        301,
+        311
+      ]
+    },
+    {
+      "content": "以下 Transact-SQL 脚本提供针对每种形式的示例。",
+      "pos": [
+        370,
+        400
+      ]
+    },
+    {
+      "pos": [
+        403,
+        509
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 每个示例基于两个先决条件：密钥保管库中名为 <bpt id=\"p1\">**</bpt>CONTOSO\\_KEY<ept id=\"p1\">**</ept> 的非对称密钥，以及 AKV 集成功能创建的名为 <bpt id=\"p2\">**</bpt>Azure\\_EKM\\_TDE\\_cred<ept id=\"p2\">**</ept> 的凭据。"
+    },
+    {
+      "content": "透明数据加密 (TDE)",
+      "pos": [
+        515,
+        527
+      ]
+    },
+    {
+      "content": "创建数据库引擎将用于 TDE 的 SQL Server 登录名，然后向其添加凭据。",
+      "pos": [
+        531,
+        572
+      ]
+    },
+    {
+      "content": "创建将用于 TDE 的数据库加密密钥。",
+      "pos": [
+        1074,
+        1093
+      ]
+    },
+    {
+      "content": "加密备份",
+      "pos": [
+        1451,
+        1455
+      ]
+    },
+    {
+      "content": "创建数据库引擎将用于加密备份的 SQL Server 登录名，然后向其添加凭据。",
+      "pos": [
+        1459,
+        1499
+      ]
+    },
+    {
+      "content": "备份数据库，同时使用密钥保管库中存储的非对称密钥指定加密。",
+      "pos": [
+        2004,
+        2033
+      ]
+    },
+    {
+      "content": "列级加密 (CLE)",
+      "pos": [
+        2298,
+        2308
+      ]
+    },
+    {
+      "content": "此脚本创建一个受密钥保管库中的非对称密钥保护的对称密钥，然后使用该对称密钥对数据库中的数据进行加密。",
+      "pos": [
+        2309,
+        2359
+      ]
+    },
+    {
+      "content": "其他资源",
+      "pos": [
+        2968,
+        2972
+      ]
+    },
+    {
+      "pos": [
+        2973,
+        3087
+      ],
+      "content": "有关如何使用这些加密功能的详细信息，请参阅<bpt id=\"p1\">[</bpt>将 EKM 用于 SQL Server 加密功能<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/dn198405.aspx#UsesOfEKM)</ept>。"
+    },
+    {
+      "pos": [
+        3089,
+        3376
+      ],
+      "content": "请注意，本文中的步骤假定你已经具有在 Azure 虚拟机上运行的 SQL Server。如果没有，请参阅<bpt id=\"p1\">[</bpt>在 Azure 中预配 SQL Server 虚拟机<ept id=\"p1\">](/documentation/articles/virtual-machines-provision-sql-server)</ept>。有关在 Azure VM 中运行 SQL Server 的其他指南，请参阅 <bpt id=\"p2\">[</bpt>Azure 虚拟机上的 SQL Server 概述<ept id=\"p2\">](/documentation/articles/virtual-machines-sql-server-infrastructure-services)</ept>。"
+    }
+  ],
+  "content": "## 后续步骤\n启用 Azure 密钥保管库集成之后，可以在 SQL VM 上启用 SQL Server 加密。首先，需要在密钥保管库内创建一个非对称密钥，并在 VM 上的 SQL Server 中创建一个对称密钥。然后，你将能够执行的 T-SQL 语句，以启用对数据库和备份的加密。\n\n可以利用以下几种形式的加密：\n\n- [透明数据加密 (TDE)](https://msdn.microsoft.com/zh-cn/library/bb934049.aspx)\n- [加密备份](https://msdn.microsoft.com/zh-cn/library/dn449489.aspx)\n- [列级加密 (CLE)](https://msdn.microsoft.com/zh-cn/library/ms173744.aspx)\n\n以下 Transact-SQL 脚本提供针对每种形式的示例。\n\n>[AZURE.NOTE] 每个示例基于两个先决条件：密钥保管库中名为 **CONTOSO\\_KEY** 的非对称密钥，以及 AKV 集成功能创建的名为 **Azure\\_EKM\\_TDE\\_cred** 的凭据。\n\n### 透明数据加密 (TDE)\n1. 创建数据库引擎将用于 TDE 的 SQL Server 登录名，然后向其添加凭据。\n    \n        USE master;\n        -- Create a SQL Server login associated with the asymmetric key \n        -- for the Database engine to use when it loads a database \n        -- encrypted by TDE.\n        CREATE LOGIN TDE_Login \n        FROM ASYMMETRIC KEY CONTOSO_KEY;\n        GO\n        \n        -- Alter the TDE Login to add the credential for use by the \n        -- Database Engine to access the key vault\n        ALTER LOGIN TDE_Login \n        ADD CREDENTIAL Azure_EKM_TDE_cred;\n        GO\n    \n2. 创建将用于 TDE 的数据库加密密钥。\n    \n        USE ContosoDatabase;\n        GO\n        \n        CREATE DATABASE ENCRYPTION KEY \n        WITH ALGORITHM = AES_128 \n        ENCRYPTION BY SERVER ASYMMETRIC KEY CONTOSO_KEY;\n        GO\n        \n        -- Alter the database to enable transparent data encryption.\n        ALTER DATABASE ContosoDatabase \n        SET ENCRYPTION ON;\n        GO\n\n### 加密备份\n1. 创建数据库引擎将用于加密备份的 SQL Server 登录名，然后向其添加凭据。\n    \n        USE master;\n        -- Create a SQL Server login associated with the asymmetric key \n        -- for the Database engine to use when it is encrypting the backup.\n        CREATE LOGIN Backup_Login \n        FROM ASYMMETRIC KEY CONTOSO_KEY;\n        GO \n        \n        -- Alter the Encrypted Backup Login to add the credential for use by \n        -- the Database Engine to access the key vault\n        ALTER LOGIN Backup_Login \n        ADD CREDENTIAL Azure_EKM_Backup_cred ;\n        GO\n    \n2. 备份数据库，同时使用密钥保管库中存储的非对称密钥指定加密。\n    \n        USE master;\n        BACKUP DATABASE [DATABASE_TO_BACKUP]\n        TO DISK = N'[PATH TO BACKUP FILE]' \n        WITH FORMAT, INIT, SKIP, NOREWIND, NOUNLOAD, \n        ENCRYPTION(ALGORITHM = AES_256, SERVER ASYMMETRIC KEY = [CONTOSO_KEY]);\n        GO\n\n### 列级加密 (CLE)\n此脚本创建一个受密钥保管库中的非对称密钥保护的对称密钥，然后使用该对称密钥对数据库中的数据进行加密。\n\n    CREATE SYMMETRIC KEY DATA_ENCRYPTION_KEY\n    WITH ALGORITHM=AES_256\n    ENCRYPTION BY ASYMMETRIC KEY CONTOSO_KEY;\n    \n    DECLARE @DATA VARBINARY(MAX);\n    \n    --Open the symmetric key for use in this session\n    OPEN SYMMETRIC KEY DATA_ENCRYPTION_KEY \n    DECRYPTION BY ASYMMETRIC KEY CONTOSO_KEY;\n    \n    --Encrypt syntax\n    SELECT @DATA = ENCRYPTBYKEY(KEY_GUID('DATA_ENCRYPTION_KEY'), CONVERT(VARBINARY,'Plain text data to encrypt'));\n    \n    -- Decrypt syntax\n    SELECT CONVERT(VARCHAR, DECRYPTBYKEY(@DATA));\n    \n    --Close the symmetric key\n    CLOSE SYMMETRIC KEY DATA_ENCRYPTION_KEY;\n\n## 其他资源\n有关如何使用这些加密功能的详细信息，请参阅[将 EKM 用于 SQL Server 加密功能](https://msdn.microsoft.com/zh-cn/library/dn198405.aspx#UsesOfEKM)。\n\n请注意，本文中的步骤假定你已经具有在 Azure 虚拟机上运行的 SQL Server。如果没有，请参阅[在 Azure 中预配 SQL Server 虚拟机](/documentation/articles/virtual-machines-provision-sql-server)。有关在 Azure VM 中运行 SQL Server 的其他指南，请参阅 [Azure 虚拟机上的 SQL Server 概述](/documentation/articles/virtual-machines-sql-server-infrastructure-services)。\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

@@ -1,0 +1,705 @@
+{
+  "nodes": [
+    {
+      "content": "配置 SQL 数据库防火墙 | Azure",
+      "pos": [
+        26,
+        47
+      ]
+    },
+    {
+      "content": "了解如何配置使用服务器级和数据库级防火墙规则的 SQL 数据库防火墙以管理访问权限。",
+      "pos": [
+        65,
+        107
+      ]
+    },
+    {
+      "content": "如何配置 Azure SQL 数据库防火墙",
+      "pos": [
+        349,
+        370
+      ]
+    },
+    {
+      "content": "Azure SQL 数据库为 Azure 和其他基于 Internet 的应用程序提供关系数据库服务。为了帮助保护你的数据，在你指定哪些计算机具有访问权限之前，SQL 数据库防火墙将禁止所有对 SQL 数据库服务器的访问。数据库防火墙基于每个请求的起始 IP 地址授予访问权限。",
+      "pos": [
+        372,
+        511
+      ]
+    },
+    {
+      "content": "若要配置你的数据库防火墙，请创建防火墙规则，以指定可接受的 IP 地址的范围。可以在服务器和数据库级别上创建防火墙规则。",
+      "pos": [
+        513,
+        573
+      ]
+    },
+    {
+      "pos": [
+        577,
+        662
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>服务器级防火墙规则<ept id=\"p1\">**</ept>：这些规则允许客户端访问整个 Azure SQL 数据库服务器，即同一逻辑服务器内的所有数据库。这些规则存储在 <bpt id=\"p2\">**</bpt>master<ept id=\"p2\">**</ept> 数据库中。"
+    },
+    {
+      "pos": [
+        665,
+        788
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>数据库级防火墙规则<ept id=\"p1\">**</ept>：这些规则允许客户端访问 Azure SQL 数据库服务器内的单个数据库。按每个数据库创建这些规则，并且存储在单个数据库（包括 <bpt id=\"p2\">**</bpt>master<ept id=\"p2\">**</ept>）中。这些规则可以用来将访问限制为同一逻辑服务器内的某些（安全）数据库。"
+    },
+    {
+      "pos": [
+        790,
+        885
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>建议：<ept id=\"p1\">**</ept>Microsoft 建议尽量使用数据库级防火墙规则，以提高数据库的可移植性。如果你的多个数据库具有相同的访问要求，并且你不想花时间分别设置每个数据库，则使用服务器级防火墙规则。"
+    },
+    {
+      "pos": [
+        887,
+        1049
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>关于联合：<ept id=\"p1\">**</ept>联合的当前实现将随 Web 和企业服务层一起停用。请考虑部署自定义分片解决方案，以最大限度地提高可缩放性、灵活性和性能。有关自定义分片的详细信息，请参阅<bpt id=\"p2\">[</bpt>向外扩展 Azure SQL 数据库<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/dn495641.aspx)</ept>。"
+    },
+    {
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 如果在 Azure SQL 数据库中创建一个数据库联合（其中根数据库包含数据库级防火墙规则），则不将这些规则复制到联合成员数据库。如果需要为联合成员创建数据库级防火墙规则，你必须重新创建联合成员的规则。但是，如果你使用 ALTER FEDERATION …",
+      "pos": [
+        1053,
+        1194
+      ]
+    },
+    {
+      "content": "SPLIT 语句将包含数据库级防火墙规则的联合成员拆分为新的联合成员，新目标成员将具有与源联合成员相同的数据库级防火墙规则。有关联合的详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure SQL 数据库中的联合<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/hh597452.aspx)</ept>。",
+      "pos": [
+        1195,
+        1347
+      ]
+    },
+    {
+      "content": "SQL 数据库防火墙概述",
+      "pos": [
+        1352,
+        1364
+      ]
+    },
+    {
+      "content": "最初，防火墙会阻止对 Azure SQL 数据库服务器的所有访问。为了开始使用你的 Azure SQL 数据库服务器，你必须转到经典门户并且指定使你可以访问 Azure SQL 数据库服务器的一个或多个服务器级防火墙规则。使用防火墙规则可以指定允许的 Internet 上的 IP 地址范围，以及 Azure 应用程序是否可以尝试连接到你的 Azure SQL 数据库服务器。",
+      "pos": [
+        1366,
+        1554
+      ]
+    },
+    {
+      "content": "但是，如果要有选择地授予对 Azure SQL 数据库服务器中某个数据库的访问权限，必须使用一个 IP 地址范围（它超过服务器级防火墙规则中指定的 IP 地址范围）为所需的数据库创建数据库级规则，并确保客户端的 IP 地址位于数据库级规则中指定的范围内。",
+      "pos": [
+        1556,
+        1683
+      ]
+    },
+    {
+      "content": "来自 Internet 和 Azure 的连接尝试必须首先穿过防火墙，然后才能访问你的 Azure SQL 数据库服务器或数据库，如下图中所示。",
+      "pos": [
+        1685,
+        1757
+      ]
+    },
+    {
+      "content": "描绘 SQL 数据库防火墙配置的示意图。",
+      "pos": [
+        1764,
+        1784
+      ]
+    },
+    {
+      "content": "从 Internet 连接",
+      "pos": [
+        1793,
+        1806
+      ]
+    },
+    {
+      "content": "在计算机尝试从 Internet 连接到你的数据库服务器时，防火墙将根据整个服务器级和（如果必需）数据库级防火墙规则检查该请求的发起 IP 地址。",
+      "pos": [
+        1808,
+        1881
+      ]
+    },
+    {
+      "content": "如果该请求的 IP 地址位于服务器级防火墙规则中指定的某个范围内，则将连接权限授予 Azure SQL 数据库服务器。",
+      "pos": [
+        1885,
+        1944
+      ]
+    },
+    {
+      "content": "如果该请求的 IP 地址不位于服务器级防火墙规则中指定的某个范围内，则检查数据库级防火墙规则。如果该请求的 IP 地址位于数据库级防火墙规则中指定的某个范围内，则仅将连接权限授予匹配数据库级规则的数据库。",
+      "pos": [
+        1948,
+        2050
+      ]
+    },
+    {
+      "content": "如果该请求的 IP 地址不位于任何服务器级或数据库级防火墙规则中指定的范围内，则连接请求失败。",
+      "pos": [
+        2054,
+        2101
+      ]
+    },
+    {
+      "pos": [
+        2105,
+        2186
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 若要从你的本地计算机访问 Azure SQL 数据库，请确保你的网络和本地计算机上的防火墙允许在 TCP 端口 1433 上的传出通信。"
+    },
+    {
+      "content": "从 Azure 连接",
+      "pos": [
+        2192,
+        2202
+      ]
+    },
+    {
+      "content": "在应用程序尝试从 Azure 连接到你的数据库服务器时，防火墙将验证是否允许 Azure 连接。如果防火墙设置的开始地址和结束地址都等于 0.0.0.0，则表示允许这些连接。如果不允许该连接尝试，则该请求将不会访问 Azure SQL 数据库服务器。",
+      "pos": [
+        2204,
+        2329
+      ]
+    },
+    {
+      "pos": [
+        2331,
+        2393
+      ],
+      "content": "你可通过两种方式在<bpt id=\"p1\">[</bpt>经典门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>中启用从 Azure 的连接："
+    },
+    {
+      "content": "在创建新服务器时选中复选框“允许 Azure 服务访问服务器”。",
+      "pos": [
+        2397,
+        2429
+      ]
+    },
+    {
+      "content": "在服务器上的“配置”选项卡中，在“允许的服务”部分下，单击“Azure 服务”对应的“是”。",
+      "pos": [
+        2433,
+        2479
+      ]
+    },
+    {
+      "content": "创建第一个服务器级防火墙规则",
+      "pos": [
+        2484,
+        2498
+      ]
+    },
+    {
+      "pos": [
+        2500,
+        2758
+      ],
+      "content": "第一个服务器级防火墙设置可以使用<bpt id=\"p1\">[</bpt>经典门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>进行创建，也可以使用 REST API 或 Azure PowerShell 通过编程方式创建。后续的服务器级防火墙规则可以使用这些方法或通过Transact-SQL来创建和管理。有关服务器级防火墙规则的详细信息，请参阅<bpt id=\"p2\">[</bpt>如何：配置防火墙设置（Azure SQL 数据库）<ept id=\"p2\">](/documentation/articles/sql-database-configure-firewall-settings)</ept>。"
+    },
+    {
+      "content": "创建数据库级防火墙规则",
+      "pos": [
+        2763,
+        2774
+      ]
+    },
+    {
+      "pos": [
+        2776,
+        3064
+      ],
+      "content": "在你配置第一个服务器级防火墙之后，你可能希望限制对特定数据库的访问。如果你在数据库级防火墙规则中指定的 IP 地址范围超出了在服务器级防火墙规则中指定的范围，则客户端若要访问数据库，其 IP 地址必须处于数据库级别范围内。对于每个数据库，最多可以有 128 个数据库级防火墙规则。可以通过 Transact-SQL 创建和管理主数据库和用户数据库的数据库级防火墙规则。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何：配置防火墙设置（Azure SQL 数据库）<ept id=\"p1\">](/documentation/articles/sql-database-configure-firewall-settings)</ept>。"
+    },
+    {
+      "content": "以编程方式管理数据库防火墙规则",
+      "pos": [
+        3069,
+        3084
+      ]
+    },
+    {
+      "content": "除了 Azure 经典门户外，防火墙规则还可使用 Transact-SQL、REST API 和 Azure PowerShell 通过编程方式进行管理。下表描述了每个方法允许使用的一组命令。",
+      "pos": [
+        3086,
+        3182
+      ]
+    },
+    {
+      "content": "Transact-SQL",
+      "pos": [
+        3189,
+        3201
+      ]
+    },
+    {
+      "content": "目录视图或存储过程",
+      "pos": [
+        3205,
+        3214
+      ]
+    },
+    {
+      "content": "级别",
+      "pos": [
+        3217,
+        3219
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        3222,
+        3224
+      ]
+    },
+    {
+      "content": "sys.firewall\\_rules",
+      "pos": [
+        3392,
+        3411
+      ]
+    },
+    {
+      "content": "服务器",
+      "pos": [
+        3471,
+        3474
+      ]
+    },
+    {
+      "content": "显示当前的服务器级防火墙规则",
+      "pos": [
+        3477,
+        3491
+      ]
+    },
+    {
+      "content": "sp\\_set\\_firewall\\_rule",
+      "pos": [
+        3497,
+        3520
+      ]
+    },
+    {
+      "content": "服务器",
+      "pos": [
+        3580,
+        3583
+      ]
+    },
+    {
+      "content": "创建或更新服务器级防火墙规则",
+      "pos": [
+        3586,
+        3600
+      ]
+    },
+    {
+      "content": "sp\\_delete\\_firewall\\_rule",
+      "pos": [
+        3606,
+        3632
+      ]
+    },
+    {
+      "content": "服务器",
+      "pos": [
+        3692,
+        3695
+      ]
+    },
+    {
+      "content": "删除服务器级防火墙规则",
+      "pos": [
+        3698,
+        3709
+      ]
+    },
+    {
+      "content": "sys.database\\_firewall\\_rules",
+      "pos": [
+        3715,
+        3744
+      ]
+    },
+    {
+      "content": "数据库",
+      "pos": [
+        3804,
+        3807
+      ]
+    },
+    {
+      "content": "显示当前的数据库级防火墙规则",
+      "pos": [
+        3810,
+        3824
+      ]
+    },
+    {
+      "content": "sp\\_set\\_database\\_firewall\\_rule",
+      "pos": [
+        3830,
+        3863
+      ]
+    },
+    {
+      "content": "数据库",
+      "pos": [
+        3923,
+        3926
+      ]
+    },
+    {
+      "content": "创建或更新数据库级防火墙规则",
+      "pos": [
+        3929,
+        3943
+      ]
+    },
+    {
+      "content": "sp\\_delete\\_database\\_firewall\\_rule",
+      "pos": [
+        3949,
+        3985
+      ]
+    },
+    {
+      "content": "数据库",
+      "pos": [
+        4045,
+        4048
+      ]
+    },
+    {
+      "content": "删除数据库级防火墙规则",
+      "pos": [
+        4051,
+        4062
+      ]
+    },
+    {
+      "content": "REST API",
+      "pos": [
+        4070,
+        4078
+      ]
+    },
+    {
+      "content": "API",
+      "pos": [
+        4082,
+        4085
+      ]
+    },
+    {
+      "content": "级别",
+      "pos": [
+        4088,
+        4090
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        4093,
+        4095
+      ]
+    },
+    {
+      "content": "列出防火墙规则",
+      "pos": [
+        4202,
+        4209
+      ]
+    },
+    {
+      "content": "服务器",
+      "pos": [
+        4275,
+        4278
+      ]
+    },
+    {
+      "content": "显示当前的服务器级防火墙规则",
+      "pos": [
+        4281,
+        4295
+      ]
+    },
+    {
+      "content": "创建防火墙规则",
+      "pos": [
+        4301,
+        4308
+      ]
+    },
+    {
+      "content": "服务器",
+      "pos": [
+        4374,
+        4377
+      ]
+    },
+    {
+      "content": "创建或更新服务器级防火墙规则",
+      "pos": [
+        4380,
+        4394
+      ]
+    },
+    {
+      "content": "设置防火墙规则",
+      "pos": [
+        4400,
+        4407
+      ]
+    },
+    {
+      "content": "服务器",
+      "pos": [
+        4473,
+        4476
+      ]
+    },
+    {
+      "content": "更新现有服务器级防火墙规则的属性",
+      "pos": [
+        4479,
+        4495
+      ]
+    },
+    {
+      "content": "删除防火墙规则",
+      "pos": [
+        4501,
+        4508
+      ]
+    },
+    {
+      "content": "服务器",
+      "pos": [
+        4574,
+        4577
+      ]
+    },
+    {
+      "content": "删除服务器级防火墙规则",
+      "pos": [
+        4580,
+        4591
+      ]
+    },
+    {
+      "content": "Azure PowerShell",
+      "pos": [
+        4600,
+        4616
+      ]
+    },
+    {
+      "content": "Cmdlet",
+      "pos": [
+        4620,
+        4626
+      ]
+    },
+    {
+      "content": "级别",
+      "pos": [
+        4629,
+        4631
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        4634,
+        4636
+      ]
+    },
+    {
+      "content": "Get-AzureSqlDatabaseServerFirewallRule",
+      "pos": [
+        4822,
+        4860
+      ]
+    },
+    {
+      "content": "服务器",
+      "pos": [
+        4926,
+        4929
+      ]
+    },
+    {
+      "content": "返回当前的服务器级防火墙规则",
+      "pos": [
+        4932,
+        4946
+      ]
+    },
+    {
+      "content": "New-AzureSqlDatabaseServerFirewallRule",
+      "pos": [
+        4952,
+        4990
+      ]
+    },
+    {
+      "content": "服务器",
+      "pos": [
+        5056,
+        5059
+      ]
+    },
+    {
+      "content": "创建新的服务器级防火墙规则",
+      "pos": [
+        5062,
+        5075
+      ]
+    },
+    {
+      "content": "Set-AzureSqlDatabaseServerFirewallRule",
+      "pos": [
+        5081,
+        5119
+      ]
+    },
+    {
+      "content": "服务器",
+      "pos": [
+        5185,
+        5188
+      ]
+    },
+    {
+      "content": "更新现有服务器级防火墙规则的属性",
+      "pos": [
+        5191,
+        5207
+      ]
+    },
+    {
+      "content": "Remove-AzureSqlDatabaseServerFirewallRule",
+      "pos": [
+        5213,
+        5254
+      ]
+    },
+    {
+      "content": "服务器",
+      "pos": [
+        5320,
+        5323
+      ]
+    },
+    {
+      "content": "删除服务器级防火墙规则",
+      "pos": [
+        5326,
+        5337
+      ]
+    },
+    {
+      "pos": [
+        5343,
+        5382
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 在防火墙设置的更改生效之前，可能最多有五分钟的延迟。"
+    },
+    {
+      "content": "数据库防火墙故障排除",
+      "pos": [
+        5387,
+        5397
+      ]
+    },
+    {
+      "content": "在对 Azure SQL 数据库服务的访问与你的期望不符时，请考虑以下几点：",
+      "pos": [
+        5399,
+        5437
+      ]
+    },
+    {
+      "pos": [
+        5441,
+        5701
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>本地防火墙配置：<ept id=\"p1\">**</ept>在你的计算机可以访问 Azure SQL 数据库之前，可能需要在你的计算机上创建针对 TCP 端口 1433 的防火墙例外。如果要在 Azure 云边界内部建立连接，可能需要打开其他端口。有关详细信息，请参阅<bpt id=\"p2\">[</bpt>用于 ADO.NET 4.5 和 SQL 数据库 V12 的非 1433 端口<ept id=\"p2\">](/documentation/articles/sql-database-develop-direct-route-ports-adonet-v12)</ept>中的 <bpt id=\"p3\">**</bpt>SQL 数据库 V12：内部与外部<ept id=\"p3\">**</ept>部分。"
+    },
+    {
+      "pos": [
+        5705,
+        5912
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>网络地址转换 (NAT)：<ept id=\"p1\">**</ept>由于 NAT 的原因，计算机用来连接到 Azure SQL 数据库的 IP 地址可能不同于计算机 IP 配置设置中显示的 IP 地址。若要查看你的计算机用于连接到 Azure 的 IP 地址，请登录经典门户并导航到承载你的数据库的服务器上的“配置”选项卡。在“允许的 IP 地址”部分下，显示了“当前客户端 IP 地址”。单击“添加到允许的 IP 地址”以允许此计算机访问服务器。"
+    },
+    {
+      "pos": [
+        5916,
+        5977
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>对允许列表的更改尚未生效：<ept id=\"p1\">**</ept>对 Azure SQL 数据库防火墙配置所做的更改可能最多需要 5 分钟的延迟即可生效。"
+    },
+    {
+      "pos": [
+        5981,
+        6158
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>登录名未授权或使用了错误的密码：<ept id=\"p1\">**</ept>如果某个登录名对 Azure SQL 数据库服务器没有权限或者使用的密码不正确，则与 Azure SQL 数据库服务器的连接将被拒绝。创建防火墙设置仅向客户端提供尝试连接到你的服务器的机会；每个客户端必须提供必需的安全凭据。有关准备登录名的详细信息，请参阅在 Azure SQL 数据库中管理数据库、登录名和用户。"
+    },
+    {
+      "pos": [
+        6162,
+        6231
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>动态 IP 地址：<ept id=\"p1\">**</ept>如果你的 Internet 连接使用动态 IP 寻址，并且你在通过防火墙时遇到问题，则可以尝试以下解决方法之一："
+    },
+    {
+      "content": "向你的 Internet 服务提供商 (ISP) 询问分配给你的客户端计算机的将用来访问 Azure SQL 数据库服务器的 IP 地址范围，然后将该 IP 地址范围作为防火墙规则添加。",
+      "pos": [
+        6236,
+        6329
+      ]
+    },
+    {
+      "content": "改为获取你的客户端计算机的静态 IP 地址，然后将该 IP 地址作为防火墙规则添加。",
+      "pos": [
+        6334,
+        6376
+      ]
+    },
+    {
+      "content": "另请参阅",
+      "pos": [
+        6381,
+        6385
+      ]
+    },
+    {
+      "content": "如何：配置数据库防火墙设置（Azure SQL 数据库）",
+      "pos": [
+        6388,
+        6416
+      ]
+    },
+    {
+      "content": "SQL Server 数据库引擎和 Azure SQL 数据库安全中心",
+      "pos": [
+        6486,
+        6521
+      ]
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"配置 SQL 数据库防火墙 | Azure\"\n   description=\"了解如何配置使用服务器级和数据库级防火墙规则的 SQL 数据库防火墙以管理访问权限。\"\n   keywords=\"数据库防火墙\"\n   services=\"sql-database\"\n   documentationCenter=\"\"\n   authors=\"BYHAM\"\n   manager=\"jeffreyg\"\n   editor=\"cgronlun\"\n   tags=\"\"/>\n\n<tags\n   ms.service=\"sql-database\"\n   ms.date=\"11/24/2015\"\n   wacn.date=\"01/29/2016\"/>\n\n# 如何配置 Azure SQL 数据库防火墙\n\nAzure SQL 数据库为 Azure 和其他基于 Internet 的应用程序提供关系数据库服务。为了帮助保护你的数据，在你指定哪些计算机具有访问权限之前，SQL 数据库防火墙将禁止所有对 SQL 数据库服务器的访问。数据库防火墙基于每个请求的起始 IP 地址授予访问权限。\n\n若要配置你的数据库防火墙，请创建防火墙规则，以指定可接受的 IP 地址的范围。可以在服务器和数据库级别上创建防火墙规则。\n\n- **服务器级防火墙规则**：这些规则允许客户端访问整个 Azure SQL 数据库服务器，即同一逻辑服务器内的所有数据库。这些规则存储在 **master** 数据库中。\n- **数据库级防火墙规则**：这些规则允许客户端访问 Azure SQL 数据库服务器内的单个数据库。按每个数据库创建这些规则，并且存储在单个数据库（包括 **master**）中。这些规则可以用来将访问限制为同一逻辑服务器内的某些（安全）数据库。\n\n**建议：**Microsoft 建议尽量使用数据库级防火墙规则，以提高数据库的可移植性。如果你的多个数据库具有相同的访问要求，并且你不想花时间分别设置每个数据库，则使用服务器级防火墙规则。\n\n**关于联合：**联合的当前实现将随 Web 和企业服务层一起停用。请考虑部署自定义分片解决方案，以最大限度地提高可缩放性、灵活性和性能。有关自定义分片的详细信息，请参阅[向外扩展 Azure SQL 数据库](https://msdn.microsoft.com/zh-cn/library/dn495641.aspx)。\n\n> [AZURE.NOTE] 如果在 Azure SQL 数据库中创建一个数据库联合（其中根数据库包含数据库级防火墙规则），则不将这些规则复制到联合成员数据库。如果需要为联合成员创建数据库级防火墙规则，你必须重新创建联合成员的规则。但是，如果你使用 ALTER FEDERATION … SPLIT 语句将包含数据库级防火墙规则的联合成员拆分为新的联合成员，新目标成员将具有与源联合成员相同的数据库级防火墙规则。有关联合的详细信息，请参阅 [Azure SQL 数据库中的联合](https://msdn.microsoft.com/zh-cn/library/hh597452.aspx)。\n\n## SQL 数据库防火墙概述\n\n最初，防火墙会阻止对 Azure SQL 数据库服务器的所有访问。为了开始使用你的 Azure SQL 数据库服务器，你必须转到经典门户并且指定使你可以访问 Azure SQL 数据库服务器的一个或多个服务器级防火墙规则。使用防火墙规则可以指定允许的 Internet 上的 IP 地址范围，以及 Azure 应用程序是否可以尝试连接到你的 Azure SQL 数据库服务器。\n\n但是，如果要有选择地授予对 Azure SQL 数据库服务器中某个数据库的访问权限，必须使用一个 IP 地址范围（它超过服务器级防火墙规则中指定的 IP 地址范围）为所需的数据库创建数据库级规则，并确保客户端的 IP 地址位于数据库级规则中指定的范围内。\n\n来自 Internet 和 Azure 的连接尝试必须首先穿过防火墙，然后才能访问你的 Azure SQL 数据库服务器或数据库，如下图中所示。\n\n   ![描绘 SQL 数据库防火墙配置的示意图。][1]\n\n## 从 Internet 连接\n\n在计算机尝试从 Internet 连接到你的数据库服务器时，防火墙将根据整个服务器级和（如果必需）数据库级防火墙规则检查该请求的发起 IP 地址。\n\n- 如果该请求的 IP 地址位于服务器级防火墙规则中指定的某个范围内，则将连接权限授予 Azure SQL 数据库服务器。\n\n- 如果该请求的 IP 地址不位于服务器级防火墙规则中指定的某个范围内，则检查数据库级防火墙规则。如果该请求的 IP 地址位于数据库级防火墙规则中指定的某个范围内，则仅将连接权限授予匹配数据库级规则的数据库。\n\n- 如果该请求的 IP 地址不位于任何服务器级或数据库级防火墙规则中指定的范围内，则连接请求失败。\n\n> [AZURE.NOTE] 若要从你的本地计算机访问 Azure SQL 数据库，请确保你的网络和本地计算机上的防火墙允许在 TCP 端口 1433 上的传出通信。\n\n\n## 从 Azure 连接\n\n在应用程序尝试从 Azure 连接到你的数据库服务器时，防火墙将验证是否允许 Azure 连接。如果防火墙设置的开始地址和结束地址都等于 0.0.0.0，则表示允许这些连接。如果不允许该连接尝试，则该请求将不会访问 Azure SQL 数据库服务器。\n\n你可通过两种方式在[经典门户](https://manage.windowsazure.cn)中启用从 Azure 的连接：\n\n- 在创建新服务器时选中复选框“允许 Azure 服务访问服务器”。\n\n- 在服务器上的“配置”选项卡中，在“允许的服务”部分下，单击“Azure 服务”对应的“是”。\n\n## 创建第一个服务器级防火墙规则\n\n第一个服务器级防火墙设置可以使用[经典门户](https://manage.windowsazure.cn)进行创建，也可以使用 REST API 或 Azure PowerShell 通过编程方式创建。后续的服务器级防火墙规则可以使用这些方法或通过Transact-SQL来创建和管理。有关服务器级防火墙规则的详细信息，请参阅[如何：配置防火墙设置（Azure SQL 数据库）](/documentation/articles/sql-database-configure-firewall-settings)。\n\n## 创建数据库级防火墙规则\n\n在你配置第一个服务器级防火墙之后，你可能希望限制对特定数据库的访问。如果你在数据库级防火墙规则中指定的 IP 地址范围超出了在服务器级防火墙规则中指定的范围，则客户端若要访问数据库，其 IP 地址必须处于数据库级别范围内。对于每个数据库，最多可以有 128 个数据库级防火墙规则。可以通过 Transact-SQL 创建和管理主数据库和用户数据库的数据库级防火墙规则。有关详细信息，请参阅[如何：配置防火墙设置（Azure SQL 数据库）](/documentation/articles/sql-database-configure-firewall-settings)。\n\n## 以编程方式管理数据库防火墙规则\n\n除了 Azure 经典门户外，防火墙规则还可使用 Transact-SQL、REST API 和 Azure PowerShell 通过编程方式进行管理。下表描述了每个方法允许使用的一组命令。\n\n\n### Transact-SQL\n\n| 目录视图或存储过程 | 级别 | 说明 |\n|--------------------------------------------------------------------------------------------|-----------|------------------------------------------------------|\n| [sys.firewall\\_rules](https://msdn.microsoft.com/zh-cn/library/dn269980.aspx) | 服务器 | 显示当前的服务器级防火墙规则 |\n| [sp\\_set\\_firewall\\_rule](https://msdn.microsoft.com/zh-cn/library/dn270017.aspx) | 服务器 | 创建或更新服务器级防火墙规则 |\n| [sp\\_delete\\_firewall\\_rule](https://msdn.microsoft.com/zh-cn/library/dn270024.aspx) | 服务器 | 删除服务器级防火墙规则 |\n| [sys.database\\_firewall\\_rules](https://msdn.microsoft.com/zh-cn/library/dn269982.aspx) | 数据库 | 显示当前的数据库级防火墙规则 |\n| [sp\\_set\\_database\\_firewall\\_rule](https://msdn.microsoft.com/zh-cn/library/dn270010.aspx) | 数据库 | 创建或更新数据库级防火墙规则 |\n| [sp\\_delete\\_database\\_firewall\\_rule](https://msdn.microsoft.com/zh-cn/library/dn270030.aspx) | 数据库 | 删除数据库级防火墙规则 |\n\n### REST API\n\n| API | 级别 | 说明 |\n|----------------------|--------|------------------------------------------------------------------|\n| [列出防火墙规则](https://msdn.microsoft.com/zh-cn/library/azure/dn505715.aspx) | 服务器 | 显示当前的服务器级防火墙规则 |\n| [创建防火墙规则](https://msdn.microsoft.com/zh-cn/library/azure/dn505712.aspx) | 服务器 | 创建或更新服务器级防火墙规则 |\n| [设置防火墙规则](https://msdn.microsoft.com/zh-cn/library/azure/dn505707.aspx) | 服务器 | 更新现有服务器级防火墙规则的属性 |\n| [删除防火墙规则](https://msdn.microsoft.com/zh-cn/library/azure/dn505706.aspx) | 服务器 | 删除服务器级防火墙规则 |\n\n\n### Azure PowerShell\n\n| Cmdlet | 级别 | 说明 |\n|-----------------------------------------------------------------------------------------------------|--------|------------------------------------------------------------------|\n| [Get-AzureSqlDatabaseServerFirewallRule](https://msdn.microsoft.com/zh-cn/library/azure/dn546731.aspx) | 服务器 | 返回当前的服务器级防火墙规则 |\n| [New-AzureSqlDatabaseServerFirewallRule](https://msdn.microsoft.com/zh-cn/library/azure/dn546724.aspx) | 服务器 | 创建新的服务器级防火墙规则 |\n| [Set-AzureSqlDatabaseServerFirewallRule](https://msdn.microsoft.com/zh-cn/library/azure/dn546739.aspx) | 服务器 | 更新现有服务器级防火墙规则的属性 |\n| [Remove-AzureSqlDatabaseServerFirewallRule](https://msdn.microsoft.com/zh-cn/library/azure/dn546727.aspx) | 服务器 | 删除服务器级防火墙规则 |\n\n> [AZURE.NOTE] 在防火墙设置的更改生效之前，可能最多有五分钟的延迟。\n\n## 数据库防火墙故障排除\n\n在对 Azure SQL 数据库服务的访问与你的期望不符时，请考虑以下几点：\n\n- **本地防火墙配置：**在你的计算机可以访问 Azure SQL 数据库之前，可能需要在你的计算机上创建针对 TCP 端口 1433 的防火墙例外。如果要在 Azure 云边界内部建立连接，可能需要打开其他端口。有关详细信息，请参阅[用于 ADO.NET 4.5 和 SQL 数据库 V12 的非 1433 端口](/documentation/articles/sql-database-develop-direct-route-ports-adonet-v12)中的 **SQL 数据库 V12：内部与外部**部分。\n\n- **网络地址转换 (NAT)：**由于 NAT 的原因，计算机用来连接到 Azure SQL 数据库的 IP 地址可能不同于计算机 IP 配置设置中显示的 IP 地址。若要查看你的计算机用于连接到 Azure 的 IP 地址，请登录经典门户并导航到承载你的数据库的服务器上的“配置”选项卡。在“允许的 IP 地址”部分下，显示了“当前客户端 IP 地址”。单击“添加到允许的 IP 地址”以允许此计算机访问服务器。\n\n- **对允许列表的更改尚未生效：**对 Azure SQL 数据库防火墙配置所做的更改可能最多需要 5 分钟的延迟即可生效。\n\n- **登录名未授权或使用了错误的密码：**如果某个登录名对 Azure SQL 数据库服务器没有权限或者使用的密码不正确，则与 Azure SQL 数据库服务器的连接将被拒绝。创建防火墙设置仅向客户端提供尝试连接到你的服务器的机会；每个客户端必须提供必需的安全凭据。有关准备登录名的详细信息，请参阅在 Azure SQL 数据库中管理数据库、登录名和用户。\n\n- **动态 IP 地址：**如果你的 Internet 连接使用动态 IP 寻址，并且你在通过防火墙时遇到问题，则可以尝试以下解决方法之一：\n\n - 向你的 Internet 服务提供商 (ISP) 询问分配给你的客户端计算机的将用来访问 Azure SQL 数据库服务器的 IP 地址范围，然后将该 IP 地址范围作为防火墙规则添加。\n\n - 改为获取你的客户端计算机的静态 IP 地址，然后将该 IP 地址作为防火墙规则添加。\n\n## 另请参阅\n\n[如何：配置数据库防火墙设置（Azure SQL 数据库）](/documentation/articles/sql-database-configure-firewall-settings)\n\n[SQL Server 数据库引擎和 Azure SQL 数据库安全中心](https://msdn.microsoft.com/zh-cn/library/bb510589)\n\n<!--Image references-->\n[1]: ./media/sql-database-firewall-configure/sqldb-firewall-1.png\n\n<!---HONumber=Mooncake_0118_2016-->\n"
+}

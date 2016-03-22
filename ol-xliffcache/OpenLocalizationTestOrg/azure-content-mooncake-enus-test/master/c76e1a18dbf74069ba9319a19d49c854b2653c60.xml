@@ -1,0 +1,178 @@
+{
+  "nodes": [
+    {
+      "content": "准备 AKV 集成",
+      "pos": [
+        3,
+        12
+      ]
+    },
+    {
+      "content": "若要使用 Azure 密钥保管库集成来配置 SQL Server VM，有以下几个先决条件：",
+      "pos": [
+        13,
+        59
+      ]
+    },
+    {
+      "content": "安装 Azure Powershell",
+      "pos": [
+        66,
+        85
+      ]
+    },
+    {
+      "content": "创建 Azure Active Directory",
+      "pos": [
+        119,
+        144
+      ]
+    },
+    {
+      "content": "创建密钥保管库",
+      "pos": [
+        186,
+        193
+      ]
+    },
+    {
+      "content": "以下各节描述了这些先决条件，以及稍后运行 PowerShell cmdlet 需要收集的信息。",
+      "pos": [
+        217,
+        264
+      ]
+    },
+    {
+      "content": "安装 Azure PowerShell",
+      "pos": [
+        270,
+        289
+      ]
+    },
+    {
+      "pos": [
+        290,
+        412
+      ],
+      "content": "请确保已安装最新的 Azure PowerShell SDK。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何安装和配置 Azure PowerShell<ept id=\"p1\">](/documentation/articles/powershell-install-configure)</ept>。"
+    },
+    {
+      "content": "创建 Azure Active Directory",
+      "pos": [
+        418,
+        443
+      ]
+    },
+    {
+      "pos": [
+        444,
+        541
+      ],
+      "content": "首先，你的订阅中需要具有 <bpt id=\"p1\">[</bpt>Azure Active Directory<ept id=\"p1\">](/pricing/1rmb-trial/)</ept> (AAD)。其优点之一是允许你为特定用户和应用程序授予对密钥保管库的权限。"
+    },
+    {
+      "pos": [
+        543,
+        911
+      ],
+      "content": "然后，将应用程序注册到 Azure AAD。这将为你提供一个服务主体帐户，使你有权访问 VM 所需的密钥保管库。在 Azure 密钥保管库文章中，你可以在<bpt id=\"p1\">[</bpt>将应用程序注册到 Azure Active Directory<ept id=\"p1\">](/documentation/articles/key-vault-get-started#register)</ept> 部分中找到这些步骤，或者可以在<bpt id=\"p2\">[</bpt>此博客文章<ept id=\"p2\">](http://blogs.technet.com/b/kv/archive/2015/01/09/azure-key-vault-step-by-step.aspx)</ept>的<bpt id=\"p3\">**</bpt>获取应用程序的标识<ept id=\"p3\">**</ept>部分中看到这些步骤以及屏幕截图。请注意，在完成这些步骤之前，你需要在注册期间收集以下信息，之后在 SQL VM 上启用 Azure 密钥保管库集成时需要这些信息。"
+    },
+    {
+      "pos": [
+        915,
+        1050
+      ],
+      "content": "添加应用程序后，在“配置”选项卡上找到**客户端 ID**。 \n  ![Azure Active Directory 客户端 ID](./media/virtual-machines-sql-server-akv-prepare/aad-client-id.png)",
+      "leadings": [
+        "",
+        "  "
+      ],
+      "nodes": [
+        {
+          "content": "添加应用程序后，在“配置”选项卡上找到<bpt id=\"p1\">**</bpt>客户端 ID<ept id=\"p1\">**</ept>。",
+          "pos": [
+            0,
+            30
+          ]
+        },
+        {
+          "content": "<ph id=\"ph1\">  ![</ph>Azure Active Directory 客户端 ID<ph id=\"ph2\">](./media/virtual-machines-sql-server-akv-prepare/aad-client-id.png)</ph>",
+          "pos": [
+            32,
+            133
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        1060,
+        1132
+      ],
+      "content": "稍后会将该客户端 ID 分配给 PowerShell 脚本中的 <bpt id=\"p1\">**</bpt>$spName<ept id=\"p1\">**</ept>（服务主体名称）参数，以启用 Azure 密钥保管库集成。"
+    },
+    {
+      "pos": [
+        1136,
+        1331
+      ],
+      "content": "此外，在执行这些步骤期间，请在创建密钥时复制密钥的密码，如下面的屏幕截图中所示。稍后会将此密钥密码分配给 PowerShell 脚本中的 **$spSecret**（服务主体密码）参数。  \n  ![Azure Active Directory 密码](./media/virtual-machines-sql-server-akv-prepare/aad-sp-secret.png)",
+      "leadings": [
+        "",
+        "  "
+      ],
+      "nodes": [
+        {
+          "content": "此外，在执行这些步骤期间，请在创建密钥时复制密钥的密码，如下面的屏幕截图中所示。稍后会将此密钥密码分配给 PowerShell 脚本中的 <bpt id=\"p1\">**</bpt>$spSecret<ept id=\"p1\">**</ept>（服务主体密码）参数。",
+          "pos": [
+            0,
+            93
+          ]
+        },
+        {
+          "content": "<ph id=\"ph1\">  ![</ph>Azure Active Directory 密码<ph id=\"ph2\">](./media/virtual-machines-sql-server-akv-prepare/aad-sp-secret.png)</ph>",
+          "pos": [
+            96,
+            193
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        1334,
+        1600
+      ],
+      "content": "必须为此新的客户端 ID 授予以下访问权限：<bpt id=\"p1\">**</bpt>加密<ept id=\"p1\">**</ept>、<bpt id=\"p2\">**</bpt>解密<ept id=\"p2\">**</ept>、<bpt id=\"p3\">**</bpt>密钥换行<ept id=\"p3\">**</ept>、<bpt id=\"p4\">**</bpt>取消密钥换行<ept id=\"p4\">**</ept>、<bpt id=\"p5\">**</bpt>签名<ept id=\"p5\">**</ept>和<bpt id=\"p6\">**</bpt>验证<ept id=\"p6\">**</ept>。可通过 <bpt id=\"p7\">[</bpt>Set-AzureRmKeyVaultAccessPolicy<ept id=\"p7\">](https://msdn.microsoft.com/zh-cn/library/azure/mt603625.aspx)</ept> cmdlet 实现此操作。有关详细信息，请参阅<bpt id=\"p8\">[</bpt>授权应用程序使用密钥或密码<ept id=\"p8\">](/documentation/articles/key-vault-get-started#authorize)</ept>。"
+    },
+    {
+      "content": "创建密钥保管库",
+      "pos": [
+        1606,
+        1613
+      ]
+    },
+    {
+      "pos": [
+        1614,
+        1821
+      ],
+      "content": "若要使用 Azure 密钥保管库来存储将用于在 VM 中加密的密钥，你将需要对密钥保管库的访问权限。如果你尚未设置密钥保管库，请按照<bpt id=\"p1\">[</bpt>开始使用 Azure 密钥保管库<ept id=\"p1\">](/documentation/articles/key-vault-get-started)</ept>主题中的步骤创建一个。请注意，在完成这些步骤之前，你需要在设置期间收集一些信息，之后在 SQL VM 上启用 Azure 密钥保管库集成时需要这些信息。"
+    },
+    {
+      "pos": [
+        1823,
+        1978
+      ],
+      "content": "进行创建密钥保管库的步骤时，请注意返回的 <bpt id=\"p1\">**</bpt>vaultUri<ept id=\"p1\">**</ept> 属性，它是密钥保管库 URL。下面显示了该步骤中提供的示例，其中的密钥保管库名称是 ContosoKeyVault，因此密钥保管库 URL 将为 https://contosokeyvault.vault.chinacloudapi.cn/。"
+    },
+    {
+      "pos": [
+        2099,
+        2167
+      ],
+      "content": "稍后会将该密钥保管库 URL 分配给 PowerShell 脚本中的 <bpt id=\"p1\">**</bpt>$akvURL<ept id=\"p1\">**</ept> 参数，以启用 Azure 密钥保管库集成。"
+    }
+  ],
+  "content": "## 准备 AKV 集成\n若要使用 Azure 密钥保管库集成来配置 SQL Server VM，有以下几个先决条件：\n\n1.  [安装 Azure Powershell](#install-azure-powershell)\n2.  [创建 Azure Active Directory](#create-an-azure-active-directory)\n3.  [创建密钥保管库](#create-a-key-vault)\n\n以下各节描述了这些先决条件，以及稍后运行 PowerShell cmdlet 需要收集的信息。\n\n### 安装 Azure PowerShell\n请确保已安装最新的 Azure PowerShell SDK。有关详细信息，请参阅[如何安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure)。\n\n### 创建 Azure Active Directory\n首先，你的订阅中需要具有 [Azure Active Directory](/pricing/1rmb-trial/) (AAD)。其优点之一是允许你为特定用户和应用程序授予对密钥保管库的权限。\n\n然后，将应用程序注册到 Azure AAD。这将为你提供一个服务主体帐户，使你有权访问 VM 所需的密钥保管库。在 Azure 密钥保管库文章中，你可以在[将应用程序注册到 Azure Active Directory](/documentation/articles/key-vault-get-started#register) 部分中找到这些步骤，或者可以在[此博客文章](http://blogs.technet.com/b/kv/archive/2015/01/09/azure-key-vault-step-by-step.aspx)的**获取应用程序的标识**部分中看到这些步骤以及屏幕截图。请注意，在完成这些步骤之前，你需要在注册期间收集以下信息，之后在 SQL VM 上启用 Azure 密钥保管库集成时需要这些信息。\n\n- 添加应用程序后，在“配置”选项卡上找到**客户端 ID**。 \n    ![Azure Active Directory 客户端 ID](./media/virtual-machines-sql-server-akv-prepare/aad-client-id.png)\n    \n    稍后会将该客户端 ID 分配给 PowerShell 脚本中的 **$spName**（服务主体名称）参数，以启用 Azure 密钥保管库集成。 \n- 此外，在执行这些步骤期间，请在创建密钥时复制密钥的密码，如下面的屏幕截图中所示。稍后会将此密钥密码分配给 PowerShell 脚本中的 **$spSecret**（服务主体密码）参数。  \n    ![Azure Active Directory 密码](./media/virtual-machines-sql-server-akv-prepare/aad-sp-secret.png)\n- 必须为此新的客户端 ID 授予以下访问权限：**加密**、**解密**、**密钥换行**、**取消密钥换行**、**签名**和**验证**。可通过 [Set-AzureRmKeyVaultAccessPolicy](https://msdn.microsoft.com/zh-cn/library/azure/mt603625.aspx) cmdlet 实现此操作。有关详细信息，请参阅[授权应用程序使用密钥或密码](/documentation/articles/key-vault-get-started#authorize)。\n\n### 创建密钥保管库\n若要使用 Azure 密钥保管库来存储将用于在 VM 中加密的密钥，你将需要对密钥保管库的访问权限。如果你尚未设置密钥保管库，请按照[开始使用 Azure 密钥保管库](/documentation/articles/key-vault-get-started)主题中的步骤创建一个。请注意，在完成这些步骤之前，你需要在设置期间收集一些信息，之后在 SQL VM 上启用 Azure 密钥保管库集成时需要这些信息。\n\n进行创建密钥保管库的步骤时，请注意返回的 **vaultUri** 属性，它是密钥保管库 URL。下面显示了该步骤中提供的示例，其中的密钥保管库名称是 ContosoKeyVault，因此密钥保管库 URL 将为 https://contosokeyvault.vault.chinacloudapi.cn/。\n\n    New-AzureRmKeyVault -VaultName 'ContosoKeyVault' -ResourceGroupName 'ContosoResourceGroup' -Location 'China East'\n\n稍后会将该密钥保管库 URL 分配给 PowerShell 脚本中的 **$akvURL** 参数，以启用 Azure 密钥保管库集成。\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

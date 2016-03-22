@@ -1,0 +1,1314 @@
+{
+  "nodes": [
+    {
+      "content": "服务总线的共享访问签名身份验证 | Azure",
+      "pos": [
+        27,
+        50
+      ]
+    },
+    {
+      "content": "关于服务总线的 SAS 身份验证的详细信息。",
+      "pos": [
+        68,
+        90
+      ]
+    },
+    {
+      "content": "服务总线的共享访问签名身份验证",
+      "pos": [
+        297,
+        312
+      ]
+    },
+    {
+      "pos": [
+        314,
+        482
+      ],
+      "content": "通过<bpt id=\"p1\">[</bpt>共享访问签名 (SAS)<ept id=\"p1\">](/documentation/articles/service-bus-sas-overview)</ept> 身份验证，应用程序能够使用在命名空间或在关联了特定权限的消息传送实体（队列或主题）上配置的访问密钥向服务总线进行身份验证。然后可以使用此密钥生成 SAS 令牌，客户端反过来可用它向服务总线进行身份验证。"
+    },
+    {
+      "pos": [
+        484,
+        621
+      ],
+      "content": "Azure SDK 2.0 版和更高版本包括 SAS 身份验证支持。有关服务总线身份验证的详细信息，请参阅<bpt id=\"p1\">[</bpt>服务总线身份验证和授权<ept id=\"p1\">](/documentation/articles/service-bus-authentication-and-authorization)</ept>。"
+    },
+    {
+      "content": "概念",
+      "pos": [
+        626,
+        628
+      ]
+    },
+    {
+      "content": "服务总线中的 SAS 身份验证涉及配置具有服务总线资源相关权限的加密密钥。客户端通过提供 SAS 令牌，声明访问服务总线资源。此令牌包括正在访问的 URI 资源，以及一个由配置密钥签名的到期时间。",
+      "pos": [
+        630,
+        728
+      ]
+    },
+    {
+      "pos": [
+        730,
+        1035
+      ],
+      "content": "你可以在服务总线<bpt id=\"p1\">[</bpt>中继<ept id=\"p1\">](/documentation/articles/service-bus-fundamentals-hybrid-solutions/#relays)</ept>、<bpt id=\"p2\">[</bpt>队列<ept id=\"p2\">](/documentation/articles/service-bus-fundamentals-hybrid-solutions/#queues)</ept>、<bpt id=\"p3\">[</bpt>主题<ept id=\"p3\">](/documentation/articles/service-bus-fundamentals-hybrid-solutions/#topics)</ept>和<bpt id=\"p4\">[</bpt>事件中心<ept id=\"p4\">](/documentation/services/event-hubs/)</ept>上配置共享访问签名授权规则。"
+    },
+    {
+      "content": "SAS 身份验证使用以下元素：",
+      "pos": [
+        1037,
+        1052
+      ]
+    },
+    {
+      "pos": [
+        1056,
+        1250
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>共享访问授权规则<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx)</ept>：采用 Base64 表示的 256 位主加密密钥、一个可选的配用密钥，以及密钥名称和关联的权限（<bpt id=\"p2\">*</bpt>侦听<ept id=\"p2\">*</ept>、<bpt id=\"p3\">*</bpt>发送<ept id=\"p3\">*</ept>、<bpt id=\"p4\">*</bpt>管理<ept id=\"p4\">*</ept>权限的集合）。"
+    },
+    {
+      "pos": [
+        1254,
+        1635
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>共享访问签名<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.sharedaccesssignaturetokenprovider.sharedaccesssignature.aspx)</ept>令牌：使用 HMAC-SHA256 资源字符串生成的，包括访问的资源 URI 和一个具有加密密钥的过期时间。该签名和以下各节所述的其他元素已被格式化为字符串，用于形成 <bpt id=\"p2\">[</bpt>SharedAccessSignature<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.sharedaccesssignaturetokenprovider.sharedaccesssignature.aspx)</ept> 令牌。"
+    },
+    {
+      "content": "共享访问签名身份验证的配置",
+      "pos": [
+        1640,
+        1653
+      ]
+    },
+    {
+      "pos": [
+        1655,
+        2140
+      ],
+      "content": "你可以在服务总线命名空间、队列，或主题上配置 <bpt id=\"p1\">[</bpt>SharedAccessAuthorizationRule<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx)</ept> 规则。当前不支持在服务总线订阅上配置 <bpt id=\"p2\">[</bpt>SharedAccessAuthorizationRule<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx)</ept>，但是你可以使用命名空间或主题上配置的规则来确保安全访问订阅。有关演示此步骤的工作示例，请参阅<bpt id=\"p3\">[</bpt>使用服务总线订阅的共享访问签名 (SAS) 身份验证<ept id=\"p3\">](http://code.msdn.microsoft.com/windowsazure/Using-Shared-Access-e605b37c)</ept>示例。"
+    },
+    {
+      "content": "服务总线命名空间、队列或主题上可以配置最多 12 条这样的授权规则。在服务总线命名空间上配置的规则适用于该命名空间中的所有实体。",
+      "pos": [
+        2142,
+        2206
+      ]
+    },
+    {
+      "content": "SAS",
+      "pos": [
+        2210,
+        2213
+      ]
+    },
+    {
+      "pos": [
+        2289,
+        2420
+      ],
+      "content": "在此图中，<bpt id=\"p1\">*</bpt>manageRuleNS<ept id=\"p1\">*</ept>、<bpt id=\"p2\">*</bpt>sendRuleNS<ept id=\"p2\">*</ept>，以及 <bpt id=\"p3\">*</bpt>listenRuleNS<ept id=\"p3\">*</ept> 授权规则适用于队列 Q1 和主题 T1，而 <bpt id=\"p4\">*</bpt>listenRuleQ<ept id=\"p4\">*</ept>、<bpt id=\"p5\">*</bpt>sendRuleQ<ept id=\"p5\">*</ept> 仅适用于队列 Q1，<bpt id=\"p6\">*</bpt>sendRuleT<ept id=\"p6\">*</ept> 仅适用于主题 T1。"
+    },
+    {
+      "pos": [
+        2422,
+        2576
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>SharedAccessAuthorizationRule<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx)</ept> 的密钥参数如下："
+    },
+    {
+      "content": "参数",
+      "pos": [
+        2579,
+        2581
+      ]
+    },
+    {
+      "content": "说明",
+      "pos": [
+        2582,
+        2584
+      ]
+    },
+    {
+      "content": "KeyName",
+      "pos": [
+        2598,
+        2605
+      ]
+    },
+    {
+      "content": "描述授权规则的字符串。",
+      "pos": [
+        2607,
+        2618
+      ]
+    },
+    {
+      "content": "PrimaryKey",
+      "pos": [
+        2622,
+        2632
+      ]
+    },
+    {
+      "content": "用于签名和验证 SAS 令牌的 Base64 编码的 256 位主密钥。",
+      "pos": [
+        2634,
+        2670
+      ]
+    },
+    {
+      "content": "SecondaryKey",
+      "pos": [
+        2674,
+        2686
+      ]
+    },
+    {
+      "content": "用于签名和验证 SAS 令牌的 Base64 编码的 256 位备用密钥。",
+      "pos": [
+        2688,
+        2725
+      ]
+    },
+    {
+      "content": "AccessRights",
+      "pos": [
+        2729,
+        2741
+      ]
+    },
+    {
+      "content": "授权规则授予的访问权限列表。这些权限可以是侦听、发送和管理权限的任何集合。",
+      "pos": [
+        2743,
+        2780
+      ]
+    },
+    {
+      "pos": [
+        2783,
+        3312
+      ],
+      "content": "如果预配了服务总线命名空间，默认情况下，将创建 <bpt id=\"p1\">[</bpt>SharedAccessAuthorizationRule<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx)</ept>，其中，<bpt id=\"p2\">[</bpt>KeyName<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.keyname.aspx)</ept> 设置为 <bpt id=\"p3\">**</bpt>RootManageSharedAccessKey<ept id=\"p3\">**</ept>。两个默认 <bpt id=\"p4\">[</bpt>SharedAccessAuthorizationRule<ept id=\"p4\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx)</ept> 对象同样被配置为通知中心：一个具有侦听、发送和管理权限，另一个只具有侦听权限。"
+    },
+    {
+      "content": "重新生成和吊销共享访问授权规则的密钥。",
+      "pos": [
+        3317,
+        3336
+      ]
+    },
+    {
+      "pos": [
+        3338,
+        3865
+      ],
+      "content": "建议你定期重新生成 <bpt id=\"p1\">[</bpt>SharedAccessAuthorizationRule<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx)</ept> 对象中使用的密钥。应用程序通常应使用 <bpt id=\"p2\">[</bpt>PrimaryKey<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.primarykey.aspx)</ept> 来生成 SAS 令牌。在重新生成密钥时，应使用旧主密钥替换 <bpt id=\"p3\">[</bpt>SecondaryKey<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.secondarykey.aspx)</ept>，并生成新密钥作为新主密钥。这让你可以继续使用通过旧的主密钥颁发的尚未过期的授权令牌。"
+    },
+    {
+      "pos": [
+        3867,
+        4355
+      ],
+      "content": "如果密钥已泄漏，并且必须吊销这些密钥，你可以同时生成 <bpt id=\"p1\">[</bpt>SharedAccessAuthorizationRule<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx)</ept> 的 <bpt id=\"p2\">[</bpt>PrimaryKey<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.primarykey.aspx)</ept> 和 <bpt id=\"p3\">[</bpt>SecondaryKey<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.secondarykey.aspx)</ept>，并用新的密钥替换它们。此过程将使得由旧密钥签名的所有令牌失效。"
+    },
+    {
+      "content": "生成共享访问签名令牌",
+      "pos": [
+        4360,
+        4370
+      ]
+    },
+    {
+      "content": "任何有权访问共享访问授权规则中指定的签名密钥的客户端均可以生成 SAS 令牌。格式如下：",
+      "pos": [
+        4372,
+        4416
+      ]
+    },
+    {
+      "pos": [
+        4527,
+        4746
+      ],
+      "content": "SAS 令牌的<bpt id=\"p1\">**</bpt>签名<ept id=\"p1\">**</ept>使用签名字符串的 HMAC-SHA256 哈希来计算，此字符串包含授权规则的 <bpt id=\"p2\">[</bpt>PrimaryKey<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.primarykey.aspx)</ept> 属性。签名字符串由资源 URI 和到期时间组成，格式如下："
+    },
+    {
+      "pos": [
+        4803,
+        5063
+      ],
+      "content": "请注意，对此操作应使用编码的资源 URI。资源 URI 是向其声明访问权限的服务总线资源的完整 URI。例如，<ph id=\"ph1\">`http://&lt;namespace&gt;.servicebus.chinacloudapi.cn/&lt;entityPath&gt;`</ph> 或 <ph id=\"ph2\">`sb://&lt;namespace&gt;.servicebus.chinacloudapi.cn/&lt;entityPath&gt;`</ph>；即，<ph id=\"ph3\">`http://contoso.servicebus.chinacloudapi.cn/contosoTopics/T1/Subscriptions/S3`</ph>。"
+    },
+    {
+      "content": "到期时间表示为自 1970 年 1 月 1 日 00:00:00 UTC 时期以后的秒数。",
+      "pos": [
+        5065,
+        5110
+      ]
+    },
+    {
+      "pos": [
+        5112,
+        5275
+      ],
+      "content": "用于签名的共享访问授权规则必须在此 URI 指定的实体上，或由其分层父级之一进行配置。例如，前面的示例中的 <ph id=\"ph1\">`http://contoso.servicebus.chinacloudapi.cn/contosoTopics/T1`</ph> 或 <ph id=\"ph2\">`http://contoso.servicebus.chinacloudapi.cn`</ph>。"
+    },
+    {
+      "pos": [
+        5277,
+        5321
+      ],
+      "content": "SAS 令牌对于签名字符串中使用的 <ph id=\"ph1\">`&lt;resourceURI&gt;`</ph> 下的所有资源均有效。"
+    },
+    {
+      "pos": [
+        5323,
+        5495
+      ],
+      "content": "SAS 令牌中的 <bpt id=\"p1\">[</bpt>KeyName<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.keyname.aspx)</ept> 是指用于生成令牌的共享访问授权规则的 <bpt id=\"p2\">**</bpt>keyName<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "pos": [
+        5497,
+        5618
+      ],
+      "content": "<bpt id=\"p1\">*</bpt>URL-encoded-resourceURI<ept id=\"p1\">*</ept> 必须与在签名计算期间签名字符串中使用的 URI 相同。它应该是<bpt id=\"p2\">[</bpt>百分比编码<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/4fkewx0t.aspx)</ept>。"
+    },
+    {
+      "content": "如何使用服务总线的共享访问签名身份验证",
+      "pos": [
+        5623,
+        5642
+      ]
+    },
+    {
+      "content": "以下方案包括配置授权规则、生成 SAS 令牌和客户端授权。",
+      "pos": [
+        5644,
+        5673
+      ]
+    },
+    {
+      "pos": [
+        5675,
+        5931
+      ],
+      "content": "有关演示使配置和使用 SAS 授权的服务总线应用程序的完整工作示例，请参阅<bpt id=\"p1\">[</bpt>服务总线的共享访问签名身份验证<ept id=\"p1\">](http://code.msdn.microsoft.com/Shared-Access-Signature-0a88adf8)</ept>。有关演示使用在命名空间或主题中配置的 SAS 授权规则，以保护服务总线订阅的相关示例，请参阅<bpt id=\"p2\">[</bpt>使用服务总线订阅的共享访问签名 (SAS) 身份验证<ept id=\"p2\">](http://code.msdn.microsoft.com/Using-Shared-Access-e605b37c)</ept>。"
+    },
+    {
+      "content": "访问命名空间上的共享访问授权规则",
+      "pos": [
+        5936,
+        5952
+      ]
+    },
+    {
+      "pos": [
+        5954,
+        6140
+      ],
+      "content": "在服务总线命名空间根路径上的操作需要证书身份验证。你必须上载用于 Azure 订阅的管理证书若要上载管理证书，请在 [Azure 经典门户][] 的左窗格中单击“设置”。有关 Azure 管理证书的详细信息，请参阅<bpt id=\"p1\">[</bpt>为 Azure 创建管理证书<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/gg551722.aspx)</ept>。"
+    },
+    {
+      "content": "访问服务总线命名空间上的共享访问授权规则的终结点如下所示：",
+      "pos": [
+        6142,
+        6171
+      ]
+    },
+    {
+      "pos": [
+        6303,
+        6510
+      ],
+      "content": "若要在服务总线命名空间上创建 <bpt id=\"p1\">[</bpt>SharedAccessAuthorizationRule<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx)</ept> 对象，在此终结点上使用序列化为 JSON 或 XML 的规则信息执行 POST 操作。例如："
+    },
+    {
+      "content": "与之类似，使用终结点上的 GET 操作来读取在命名空间上配置的授权规则。",
+      "pos": [
+        7700,
+        7736
+      ]
+    },
+    {
+      "content": "若要更新或删除特定的授权规则，请使用以下终结点：",
+      "pos": [
+        7738,
+        7762
+      ]
+    },
+    {
+      "content": "访问实体上的共享访问授权规则",
+      "pos": [
+        7906,
+        7920
+      ]
+    },
+    {
+      "pos": [
+        7922,
+        8646
+      ],
+      "content": "你可以通过在相应 <bpt id=\"p1\">[</bpt>QueueDescription<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.queuedescription.aspx)</ept>、<bpt id=\"p2\">[</bpt>TopicDescription<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.topicdescription.aspx)</ept> 或 <bpt id=\"p3\">[</bpt>NotificationHubDescription<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.notifications.notificationhubdescription.aspx)</ept> 对象上的 <bpt id=\"p4\">[</bpt>AuthorizationRules<ept id=\"p4\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.authorizationrules.aspx)</ept> 集合，访问在服务总线队列或主题中配置的 <bpt id=\"p5\">[</bpt>Microsoft.ServiceBus.Messaging.SharedAccessAuthorizationRule<ept id=\"p5\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx)</ept> 对象。"
+    },
+    {
+      "content": "下面的代码演示了如何向队列添加授权规则。",
+      "pos": [
+        8648,
+        8668
+      ]
+    },
+    {
+      "content": "使用共享访问签名授权",
+      "pos": [
+        9879,
+        9889
+      ]
+    },
+    {
+      "pos": [
+        9891,
+        10117
+      ],
+      "content": "使用具有服务总线 .NET 库的 Azure.NET SDK 的应用程序可以通过 <bpt id=\"p1\">[</bpt>SharedAccessSignatureTokenProvider<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.sharedaccesssignaturetokenprovider.aspx)</ept> 类使用 SAS 授权。下面的代码演示了使用令牌提供程序向服务总线队列发送消息。"
+    },
+    {
+      "content": "应用程序还可以通过使用可接受连接字符串的方法中的 SAS 连接字符串来使用 SAS 进行身份验证。",
+      "pos": [
+        10610,
+        10659
+      ]
+    },
+    {
+      "pos": [
+        10661,
+        11024
+      ],
+      "content": "请注意，若要使用服务总线中继的 SAS 授权，你可以使用服务总线命名空间上配置的 SAS 密钥。如果在命名空间上显式创建中继（<bpt id=\"p1\">[</bpt>NamespaceManager<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.namespacemanager.aspx)</ept> 与 <bpt id=\"p2\">[</bpt>RelayDescription<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.relaydescription.aspx)</ept>）对象，你可以只为该中继设置 SAS 规则。若要使用服务总线订阅的 SAS 授权，你可以使用服务总线命名空间或主题上配置的 SAS 密钥。"
+    },
+    {
+      "content": "服务总线操作所需的权限",
+      "pos": [
+        11029,
+        11040
+      ]
+    },
+    {
+      "content": "下表显示对服务总线资源进行各种操作所需的访问权限。",
+      "pos": [
+        11042,
+        11067
+      ]
+    },
+    {
+      "content": "操作",
+      "pos": [
+        11070,
+        11072
+      ]
+    },
+    {
+      "content": "所需声明",
+      "pos": [
+        11073,
+        11077
+      ]
+    },
+    {
+      "content": "声明范围",
+      "pos": [
+        11078,
+        11082
+      ]
+    },
+    {
+      "content": "命名空间",
+      "pos": [
+        11101,
+        11105
+      ]
+    },
+    {
+      "content": "在命名空间上配置授权规则",
+      "pos": [
+        11112,
+        11124
+      ]
+    },
+    {
+      "content": "管理",
+      "pos": [
+        11125,
+        11127
+      ]
+    },
+    {
+      "content": "任何命名空间地址",
+      "pos": [
+        11128,
+        11136
+      ]
+    },
+    {
+      "content": "服务注册表",
+      "pos": [
+        11141,
+        11146
+      ]
+    },
+    {
+      "content": "枚举私有策略",
+      "pos": [
+        11153,
+        11159
+      ]
+    },
+    {
+      "content": "管理",
+      "pos": [
+        11160,
+        11162
+      ]
+    },
+    {
+      "content": "任何命名空间地址",
+      "pos": [
+        11163,
+        11171
+      ]
+    },
+    {
+      "content": "中继",
+      "pos": [
+        11174,
+        11176
+      ]
+    },
+    {
+      "content": "开始在命名空间上侦听",
+      "pos": [
+        11181,
+        11191
+      ]
+    },
+    {
+      "content": "侦听",
+      "pos": [
+        11192,
+        11194
+      ]
+    },
+    {
+      "content": "任何命名空间地址",
+      "pos": [
+        11195,
+        11203
+      ]
+    },
+    {
+      "content": "将消息发送到命名空间中的侦听器",
+      "pos": [
+        11206,
+        11221
+      ]
+    },
+    {
+      "content": "发送",
+      "pos": [
+        11222,
+        11224
+      ]
+    },
+    {
+      "content": "任何命名空间地址",
+      "pos": [
+        11225,
+        11233
+      ]
+    },
+    {
+      "content": "队列",
+      "pos": [
+        11238,
+        11240
+      ]
+    },
+    {
+      "content": "创建队列",
+      "pos": [
+        11247,
+        11251
+      ]
+    },
+    {
+      "content": "管理",
+      "pos": [
+        11252,
+        11254
+      ]
+    },
+    {
+      "content": "任何命名空间地址",
+      "pos": [
+        11255,
+        11263
+      ]
+    },
+    {
+      "content": "删除队列",
+      "pos": [
+        11266,
+        11270
+      ]
+    },
+    {
+      "content": "管理",
+      "pos": [
+        11271,
+        11273
+      ]
+    },
+    {
+      "content": "任何有效队列地址",
+      "pos": [
+        11274,
+        11282
+      ]
+    },
+    {
+      "content": "枚举队列",
+      "pos": [
+        11285,
+        11289
+      ]
+    },
+    {
+      "content": "管理",
+      "pos": [
+        11290,
+        11292
+      ]
+    },
+    {
+      "content": "/$Resources/Queues",
+      "pos": [
+        11293,
+        11311
+      ]
+    },
+    {
+      "content": "获取队列说明",
+      "pos": [
+        11314,
+        11320
+      ]
+    },
+    {
+      "content": "管理或发送",
+      "pos": [
+        11321,
+        11326
+      ]
+    },
+    {
+      "content": "任何有效队列地址",
+      "pos": [
+        11327,
+        11335
+      ]
+    },
+    {
+      "content": "在队列上配置授权规则",
+      "pos": [
+        11338,
+        11348
+      ]
+    },
+    {
+      "content": "管理",
+      "pos": [
+        11349,
+        11351
+      ]
+    },
+    {
+      "content": "任何有效队列地址",
+      "pos": [
+        11352,
+        11360
+      ]
+    },
+    {
+      "content": "发送到队列",
+      "pos": [
+        11363,
+        11368
+      ]
+    },
+    {
+      "content": "发送",
+      "pos": [
+        11369,
+        11371
+      ]
+    },
+    {
+      "content": "任何有效队列地址",
+      "pos": [
+        11372,
+        11380
+      ]
+    },
+    {
+      "content": "从队列接收消息",
+      "pos": [
+        11383,
+        11390
+      ]
+    },
+    {
+      "content": "侦听",
+      "pos": [
+        11391,
+        11393
+      ]
+    },
+    {
+      "content": "任何有效队列地址",
+      "pos": [
+        11394,
+        11402
+      ]
+    },
+    {
+      "content": "在查看锁定模式下接收消息后放弃或完成消息",
+      "pos": [
+        11405,
+        11425
+      ]
+    },
+    {
+      "content": "侦听",
+      "pos": [
+        11426,
+        11428
+      ]
+    },
+    {
+      "content": "任何有效队列地址",
+      "pos": [
+        11429,
+        11437
+      ]
+    },
+    {
+      "content": "推迟消息以供将来检索",
+      "pos": [
+        11440,
+        11450
+      ]
+    },
+    {
+      "content": "侦听",
+      "pos": [
+        11451,
+        11453
+      ]
+    },
+    {
+      "content": "任何有效队列地址",
+      "pos": [
+        11454,
+        11462
+      ]
+    },
+    {
+      "content": "将消息放入死信队列",
+      "pos": [
+        11465,
+        11474
+      ]
+    },
+    {
+      "content": "侦听",
+      "pos": [
+        11475,
+        11477
+      ]
+    },
+    {
+      "content": "任何有效队列地址",
+      "pos": [
+        11478,
+        11486
+      ]
+    },
+    {
+      "content": "获取与消息队列会话关联的状态",
+      "pos": [
+        11489,
+        11503
+      ]
+    },
+    {
+      "content": "侦听",
+      "pos": [
+        11504,
+        11506
+      ]
+    },
+    {
+      "content": "任何有效队列地址",
+      "pos": [
+        11507,
+        11515
+      ]
+    },
+    {
+      "content": "设置与消息队列会话关联的状态",
+      "pos": [
+        11518,
+        11532
+      ]
+    },
+    {
+      "content": "侦听",
+      "pos": [
+        11533,
+        11535
+      ]
+    },
+    {
+      "content": "任何有效队列地址",
+      "pos": [
+        11536,
+        11544
+      ]
+    },
+    {
+      "content": "主题",
+      "pos": [
+        11549,
+        11551
+      ]
+    },
+    {
+      "content": "创建主题",
+      "pos": [
+        11558,
+        11562
+      ]
+    },
+    {
+      "content": "管理",
+      "pos": [
+        11563,
+        11565
+      ]
+    },
+    {
+      "content": "任何命名空间地址",
+      "pos": [
+        11566,
+        11574
+      ]
+    },
+    {
+      "content": "删除主题",
+      "pos": [
+        11577,
+        11581
+      ]
+    },
+    {
+      "content": "管理",
+      "pos": [
+        11582,
+        11584
+      ]
+    },
+    {
+      "content": "任何有效主题地址",
+      "pos": [
+        11585,
+        11593
+      ]
+    },
+    {
+      "content": "枚举主题",
+      "pos": [
+        11596,
+        11600
+      ]
+    },
+    {
+      "content": "管理",
+      "pos": [
+        11601,
+        11603
+      ]
+    },
+    {
+      "content": "/$Resources/Topics",
+      "pos": [
+        11604,
+        11622
+      ]
+    },
+    {
+      "content": "获取主题描述",
+      "pos": [
+        11625,
+        11631
+      ]
+    },
+    {
+      "content": "管理或发送",
+      "pos": [
+        11632,
+        11637
+      ]
+    },
+    {
+      "content": "任何有效主题地址",
+      "pos": [
+        11638,
+        11646
+      ]
+    },
+    {
+      "content": "在主题上配置授权规则",
+      "pos": [
+        11649,
+        11659
+      ]
+    },
+    {
+      "content": "管理",
+      "pos": [
+        11660,
+        11662
+      ]
+    },
+    {
+      "content": "任何有效主题地址",
+      "pos": [
+        11663,
+        11671
+      ]
+    },
+    {
+      "content": "发送到主题",
+      "pos": [
+        11674,
+        11679
+      ]
+    },
+    {
+      "content": "发送",
+      "pos": [
+        11680,
+        11682
+      ]
+    },
+    {
+      "content": "任何有效主题地址",
+      "pos": [
+        11683,
+        11691
+      ]
+    },
+    {
+      "content": "订阅",
+      "pos": [
+        11696,
+        11698
+      ]
+    },
+    {
+      "content": "创建订阅",
+      "pos": [
+        11705,
+        11709
+      ]
+    },
+    {
+      "content": "管理",
+      "pos": [
+        11710,
+        11712
+      ]
+    },
+    {
+      "content": "任何命名空间地址",
+      "pos": [
+        11713,
+        11721
+      ]
+    },
+    {
+      "content": "删除订阅",
+      "pos": [
+        11724,
+        11728
+      ]
+    },
+    {
+      "content": "管理",
+      "pos": [
+        11729,
+        11731
+      ]
+    },
+    {
+      "content": "../myTopic/Subscriptions/mySubscription",
+      "pos": [
+        11732,
+        11771
+      ]
+    },
+    {
+      "content": "枚举订阅",
+      "pos": [
+        11774,
+        11778
+      ]
+    },
+    {
+      "content": "管理",
+      "pos": [
+        11779,
+        11781
+      ]
+    },
+    {
+      "content": "../myTopic/Subscriptions",
+      "pos": [
+        11782,
+        11806
+      ]
+    },
+    {
+      "content": "获取订阅说明",
+      "pos": [
+        11809,
+        11815
+      ]
+    },
+    {
+      "content": "管理或侦听",
+      "pos": [
+        11816,
+        11821
+      ]
+    },
+    {
+      "content": "../myTopic/Subscriptions/mySubscription",
+      "pos": [
+        11822,
+        11861
+      ]
+    },
+    {
+      "content": "在查看锁定模式下接收消息后放弃或完成消息",
+      "pos": [
+        11864,
+        11884
+      ]
+    },
+    {
+      "content": "侦听",
+      "pos": [
+        11885,
+        11887
+      ]
+    },
+    {
+      "content": "../myTopic/Subscriptions/mySubscription",
+      "pos": [
+        11888,
+        11927
+      ]
+    },
+    {
+      "content": "推迟消息以供将来检索",
+      "pos": [
+        11930,
+        11940
+      ]
+    },
+    {
+      "content": "侦听",
+      "pos": [
+        11941,
+        11943
+      ]
+    },
+    {
+      "content": "../myTopic/Subscriptions/mySubscription",
+      "pos": [
+        11944,
+        11983
+      ]
+    },
+    {
+      "content": "将消息放入死信队列",
+      "pos": [
+        11986,
+        11995
+      ]
+    },
+    {
+      "content": "侦听",
+      "pos": [
+        11996,
+        11998
+      ]
+    },
+    {
+      "content": "../myTopic/Subscriptions/mySubscription",
+      "pos": [
+        11999,
+        12038
+      ]
+    },
+    {
+      "content": "获取与主题会话关联的状态",
+      "pos": [
+        12041,
+        12053
+      ]
+    },
+    {
+      "content": "侦听",
+      "pos": [
+        12054,
+        12056
+      ]
+    },
+    {
+      "content": "../myTopic/Subscriptions/mySubscription",
+      "pos": [
+        12057,
+        12096
+      ]
+    },
+    {
+      "content": "设置与主题会话关联的状态",
+      "pos": [
+        12099,
+        12111
+      ]
+    },
+    {
+      "content": "侦听",
+      "pos": [
+        12112,
+        12114
+      ]
+    },
+    {
+      "content": "../myTopic/Subscriptions/mySubscription",
+      "pos": [
+        12115,
+        12154
+      ]
+    },
+    {
+      "content": "规则",
+      "pos": [
+        12159,
+        12161
+      ]
+    },
+    {
+      "content": "创建规则",
+      "pos": [
+        12168,
+        12172
+      ]
+    },
+    {
+      "content": "管理",
+      "pos": [
+        12173,
+        12175
+      ]
+    },
+    {
+      "content": "../myTopic/Subscriptions/mySubscription",
+      "pos": [
+        12176,
+        12215
+      ]
+    },
+    {
+      "content": "删除规则",
+      "pos": [
+        12218,
+        12222
+      ]
+    },
+    {
+      "content": "管理",
+      "pos": [
+        12223,
+        12225
+      ]
+    },
+    {
+      "content": "../myTopic/Subscriptions/mySubscription",
+      "pos": [
+        12226,
+        12265
+      ]
+    },
+    {
+      "content": "枚举规则",
+      "pos": [
+        12268,
+        12272
+      ]
+    },
+    {
+      "content": "管理或侦听",
+      "pos": [
+        12273,
+        12278
+      ]
+    },
+    {
+      "content": "../myTopic/Subscriptions/mySubscription/Rules",
+      "pos": [
+        12279,
+        12324
+      ]
+    },
+    {
+      "content": "通知中心",
+      "pos": [
+        12329,
+        12333
+      ]
+    },
+    {
+      "content": "创建通知中心",
+      "pos": [
+        12340,
+        12346
+      ]
+    },
+    {
+      "content": "管理",
+      "pos": [
+        12347,
+        12349
+      ]
+    },
+    {
+      "content": "任何命名空间地址",
+      "pos": [
+        12350,
+        12358
+      ]
+    },
+    {
+      "content": "为活动设备创建或更新注册",
+      "pos": [
+        12361,
+        12373
+      ]
+    },
+    {
+      "content": "侦听或管理",
+      "pos": [
+        12374,
+        12379
+      ]
+    },
+    {
+      "content": "../notificationHub/tags/{tag}/registrations",
+      "pos": [
+        12380,
+        12423
+      ]
+    },
+    {
+      "content": "更新 PNS 信息",
+      "pos": [
+        12426,
+        12435
+      ]
+    },
+    {
+      "content": "侦听或管理",
+      "pos": [
+        12436,
+        12441
+      ]
+    },
+    {
+      "content": "../notificationHub/tags/{tag}/registrations/updatepnshandle",
+      "pos": [
+        12442,
+        12501
+      ]
+    },
+    {
+      "content": "发送到通知中心",
+      "pos": [
+        12504,
+        12511
+      ]
+    },
+    {
+      "content": "发送",
+      "pos": [
+        12512,
+        12514
+      ]
+    },
+    {
+      "content": "../notificationHub/messages",
+      "pos": [
+        12515,
+        12542
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        12548,
+        12552
+      ]
+    },
+    {
+      "pos": [
+        12554,
+        12635
+      ],
+      "content": "有关服务总线中的 SAS 的高级概述，请参阅<bpt id=\"p1\">[</bpt>共享访问签名<ept id=\"p1\">](/documentation/articles/service-bus-sas-overview)</ept>。"
+    },
+    {
+      "content": "有关服务总线身份验证的更多背景信息，请参阅<bpt id=\"p1\">[</bpt>服务总线身份验证和授权<ept id=\"p1\">](/documentation/articles/service-bus-authentication-and-authorization)</ept>。",
+      "pos": [
+        12637,
+        12742
+      ]
+    },
+    {
+      "content": "[Azure 经典门户]: http://manage.windowsazure.cn",
+      "pos": [
+        12743,
+        12786
+      ]
+    }
+  ],
+  "content": "<properties \n   pageTitle=\"服务总线的共享访问签名身份验证 | Azure\"\n   description=\"关于服务总线的 SAS 身份验证的详细信息。\"\n   services=\"service-bus\"\n   documentationCenter=\"na\"\n   authors=\"sethmanheim\"\n   manager=\"timlt\"\n   editor=\"\" />\n<tags \n   ms.service=\"service-bus\"\n   ms.date=\"12/09/2015\"\n   wacn.date=\"01/14/2016\" />\n\n# 服务总线的共享访问签名身份验证\n\n通过[共享访问签名 (SAS)](/documentation/articles/service-bus-sas-overview) 身份验证，应用程序能够使用在命名空间或在关联了特定权限的消息传送实体（队列或主题）上配置的访问密钥向服务总线进行身份验证。然后可以使用此密钥生成 SAS 令牌，客户端反过来可用它向服务总线进行身份验证。\n\nAzure SDK 2.0 版和更高版本包括 SAS 身份验证支持。有关服务总线身份验证的详细信息，请参阅[服务总线身份验证和授权](/documentation/articles/service-bus-authentication-and-authorization)。\n\n## 概念\n\n服务总线中的 SAS 身份验证涉及配置具有服务总线资源相关权限的加密密钥。客户端通过提供 SAS 令牌，声明访问服务总线资源。此令牌包括正在访问的 URI 资源，以及一个由配置密钥签名的到期时间。\n\n你可以在服务总线[中继](/documentation/articles/service-bus-fundamentals-hybrid-solutions/#relays)、[队列](/documentation/articles/service-bus-fundamentals-hybrid-solutions/#queues)、[主题](/documentation/articles/service-bus-fundamentals-hybrid-solutions/#topics)和[事件中心](/documentation/services/event-hubs/)上配置共享访问签名授权规则。\n\nSAS 身份验证使用以下元素：\n\n- [共享访问授权规则](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx)：采用 Base64 表示的 256 位主加密密钥、一个可选的配用密钥，以及密钥名称和关联的权限（*侦听*、*发送*、*管理*权限的集合）。\n\n- [共享访问签名](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.sharedaccesssignaturetokenprovider.sharedaccesssignature.aspx)令牌：使用 HMAC-SHA256 资源字符串生成的，包括访问的资源 URI 和一个具有加密密钥的过期时间。该签名和以下各节所述的其他元素已被格式化为字符串，用于形成 [SharedAccessSignature](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.sharedaccesssignaturetokenprovider.sharedaccesssignature.aspx) 令牌。\n\n## 共享访问签名身份验证的配置\n\n你可以在服务总线命名空间、队列，或主题上配置 [SharedAccessAuthorizationRule](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx) 规则。当前不支持在服务总线订阅上配置 [SharedAccessAuthorizationRule](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx)，但是你可以使用命名空间或主题上配置的规则来确保安全访问订阅。有关演示此步骤的工作示例，请参阅[使用服务总线订阅的共享访问签名 (SAS) 身份验证](http://code.msdn.microsoft.com/windowsazure/Using-Shared-Access-e605b37c)示例。\n\n服务总线命名空间、队列或主题上可以配置最多 12 条这样的授权规则。在服务总线命名空间上配置的规则适用于该命名空间中的所有实体。\n\n![SAS](./media/service-bus-shared-access-signature-authentication/IC676272.gif)\n\n在此图中，*manageRuleNS*、*sendRuleNS*，以及 *listenRuleNS* 授权规则适用于队列 Q1 和主题 T1，而 *listenRuleQ*、*sendRuleQ* 仅适用于队列 Q1，*sendRuleT* 仅适用于主题 T1。\n\n[SharedAccessAuthorizationRule](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx) 的密钥参数如下：\n\n|参数|说明|\n|---|---|\n|*KeyName*|描述授权规则的字符串。|\n|*PrimaryKey*|用于签名和验证 SAS 令牌的 Base64 编码的 256 位主密钥。|\n|*SecondaryKey*|用于签名和验证 SAS 令牌的 Base64 编码的 256 位备用密钥。|\n|*AccessRights*|授权规则授予的访问权限列表。这些权限可以是侦听、发送和管理权限的任何集合。|\n\n如果预配了服务总线命名空间，默认情况下，将创建 [SharedAccessAuthorizationRule](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx)，其中，[KeyName](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.keyname.aspx) 设置为 **RootManageSharedAccessKey**。两个默认 [SharedAccessAuthorizationRule](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx) 对象同样被配置为通知中心：一个具有侦听、发送和管理权限，另一个只具有侦听权限。\n\n## 重新生成和吊销共享访问授权规则的密钥。\n\n建议你定期重新生成 [SharedAccessAuthorizationRule](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx) 对象中使用的密钥。应用程序通常应使用 [PrimaryKey](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.primarykey.aspx) 来生成 SAS 令牌。在重新生成密钥时，应使用旧主密钥替换 [SecondaryKey](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.secondarykey.aspx)，并生成新密钥作为新主密钥。这让你可以继续使用通过旧的主密钥颁发的尚未过期的授权令牌。\n\n如果密钥已泄漏，并且必须吊销这些密钥，你可以同时生成 [SharedAccessAuthorizationRule](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx) 的 [PrimaryKey](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.primarykey.aspx) 和 [SecondaryKey](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.secondarykey.aspx)，并用新的密钥替换它们。此过程将使得由旧密钥签名的所有令牌失效。\n\n## 生成共享访问签名令牌\n\n任何有权访问共享访问授权规则中指定的签名密钥的客户端均可以生成 SAS 令牌。格式如下：\n\n```\nSharedAccessSignature sig=<signature-string>&se=<expiry>&skn=<keyName>&sr=<URL-encoded-resourceURI>\n```\n\nSAS 令牌的**签名**使用签名字符串的 HMAC-SHA256 哈希来计算，此字符串包含授权规则的 [PrimaryKey](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.primarykey.aspx) 属性。签名字符串由资源 URI 和到期时间组成，格式如下：\n\n```\nStringToSign = <resourceURI> + \"\\n\" + expiry;\n```\n\n请注意，对此操作应使用编码的资源 URI。资源 URI 是向其声明访问权限的服务总线资源的完整 URI。例如，`http://<namespace>.servicebus.chinacloudapi.cn/<entityPath>` 或 `sb://<namespace>.servicebus.chinacloudapi.cn/<entityPath>`；即，`http://contoso.servicebus.chinacloudapi.cn/contosoTopics/T1/Subscriptions/S3`。\n\n到期时间表示为自 1970 年 1 月 1 日 00:00:00 UTC 时期以后的秒数。\n\n用于签名的共享访问授权规则必须在此 URI 指定的实体上，或由其分层父级之一进行配置。例如，前面的示例中的 `http://contoso.servicebus.chinacloudapi.cn/contosoTopics/T1` 或 `http://contoso.servicebus.chinacloudapi.cn`。\n\nSAS 令牌对于签名字符串中使用的 `<resourceURI>` 下的所有资源均有效。\n\nSAS 令牌中的 [KeyName](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.keyname.aspx) 是指用于生成令牌的共享访问授权规则的 **keyName**。\n\n*URL-encoded-resourceURI* 必须与在签名计算期间签名字符串中使用的 URI 相同。它应该是[百分比编码](https://msdn.microsoft.com/zh-cn/library/4fkewx0t.aspx)。\n\n## 如何使用服务总线的共享访问签名身份验证\n\n以下方案包括配置授权规则、生成 SAS 令牌和客户端授权。\n\n有关演示使配置和使用 SAS 授权的服务总线应用程序的完整工作示例，请参阅[服务总线的共享访问签名身份验证](http://code.msdn.microsoft.com/Shared-Access-Signature-0a88adf8)。有关演示使用在命名空间或主题中配置的 SAS 授权规则，以保护服务总线订阅的相关示例，请参阅[使用服务总线订阅的共享访问签名 (SAS) 身份验证](http://code.msdn.microsoft.com/Using-Shared-Access-e605b37c)。\n\n## 访问命名空间上的共享访问授权规则\n\n在服务总线命名空间根路径上的操作需要证书身份验证。你必须上载用于 Azure 订阅的管理证书若要上载管理证书，请在 [Azure 经典门户][] 的左窗格中单击“设置”。有关 Azure 管理证书的详细信息，请参阅[为 Azure 创建管理证书](https://msdn.microsoft.com/zh-cn/library/azure/gg551722.aspx)。\n\n访问服务总线命名空间上的共享访问授权规则的终结点如下所示：\n\n```\nhttps://management.core.chinacloudapi.cn/{subscriptionId}/services/ServiceBus/namespaces/{namespace}/AuthorizationRules/\n```\n\n若要在服务总线命名空间上创建 [SharedAccessAuthorizationRule](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx) 对象，在此终结点上使用序列化为 JSON 或 XML 的规则信息执行 POST 操作。例如：\n\n```\n// Base address for accessing authorization rules on a namespace\nstring baseAddress = @\"https://management.core.chinacloudapi.cn/<subscriptionId>/services/ServiceBus/namespaces/<namespace>/AuthorizationRules/\";\n\n// Configure authorization rule with base64-encoded 256-bit key and Send rights\nvar sendRule = new SharedAccessAuthorizationRule(\"contosoSendAll\",\n    SharedAccessAuthorizationRule.GenerateRandomKey(),\n    new[] { AccessRights.Send });\n\n// Operations on the Service Bus namespace root require certificate authentication.\nWebRequestHandler handler = new WebRequestHandler\n{\n    ClientCertificateOptions = ClientCertificateOption.Manual\n};\n// Access the management certificate by subject name\nhandler.ClientCertificates.Add(GetCertificate(<certificateSN>));\n\nHttpClient httpClient = new HttpClient(handler)\n{\n    BaseAddress = new Uri(baseAddress)\n};\nhttpClient.DefaultRequestHeaders.Accept.Add(\n    new MediaTypeWithQualityHeaderValue(\"application/json\"));\nhttpClient.DefaultRequestHeaders.Add(\"x-ms-version\", \"2015-01-01\");\n\n// Execute a POST operation on the baseAddress above to create an auth rule\nvar postResult = httpClient.PostAsJsonAsync(\"\", sendRule).Result;\n```\n\n与之类似，使用终结点上的 GET 操作来读取在命名空间上配置的授权规则。\n\n若要更新或删除特定的授权规则，请使用以下终结点：\n\n```\nhttps://management.core.chinacloudapi.cn/{subscriptionId}/services/ServiceBus/namespaces/{namespace}/AuthorizationRules/{KeyName}\n```\n\n## 访问实体上的共享访问授权规则\n\n你可以通过在相应 [QueueDescription](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.queuedescription.aspx)、[TopicDescription](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.topicdescription.aspx) 或 [NotificationHubDescription](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.notifications.notificationhubdescription.aspx) 对象上的 [AuthorizationRules](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.authorizationrules.aspx) 集合，访问在服务总线队列或主题中配置的 [Microsoft.ServiceBus.Messaging.SharedAccessAuthorizationRule](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.sharedaccessauthorizationrule.aspx) 对象。\n\n下面的代码演示了如何向队列添加授权规则。\n\n```\n// Create an instance of NamespaceManager for the operation\nNamespaceManager nsm = NamespaceManager.CreateFromConnectionString( \n    <connectionString> );\nQueueDescription qd = new QueueDescription( <qPath> );\n\n// Create a rule with send rights with keyName as \"contosoQSendKey\"\n// and add it to the queue description.\nqd.Authorization.Add(new SharedAccessAuthorizationRule(\"contosoSendKey\", \n    SharedAccessAuthorizationRule.GenerateRandomKey(), \n    new[] { AccessRights.Send }));\n\n// Create a rule with listen rights with keyName as \"contosoQListenKey\"\n// and add it to the queue description.\nqd.Authorization.Add(new SharedAccessAuthorizationRule(\"contosoQListenKey\",\n    SharedAccessAuthorizationRule.GenerateRandomKey(),\n    new[] { AccessRights.Listen }));\n\n// Create a rule with manage rights with keyName as \"contosoQManageKey\"\n// and add it to the queue description.\n// A rule with manage rights must also have send and receive rights.\nqd.Authorization.Add(new SharedAccessAuthorizationRule(\"contosoQManageKey\",\n    SharedAccessAuthorizationRule.GenerateRandomKey(),\n    new[] {AccessRights.Manage, AccessRights.Listen, AccessRights.Send }));\n\n// Create the queue.\nnsm.CreateQueue(qd);\n```\n\n## 使用共享访问签名授权\n\n使用具有服务总线 .NET 库的 Azure.NET SDK 的应用程序可以通过 [SharedAccessSignatureTokenProvider](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.sharedaccesssignaturetokenprovider.aspx) 类使用 SAS 授权。下面的代码演示了使用令牌提供程序向服务总线队列发送消息。\n\n```\nUri runtimeUri = ServiceBusEnvironment.CreateServiceUri(\"sb\", \n    <yourServiceNamespace>, string.Empty);\nMessagingFactory mf = MessagingFactory.Create(runtimeUri, \n    TokenProvider.CreateSharedAccessSignatureTokenProvider(keyName, key));\nQueueClient sendClient = mf.CreateQueueClient(qPath);\n\n//Sending hello message to queue.\nBrokeredMessage helloMessage = new BrokeredMessage(\"Hello, Service Bus!\");\nhelloMessage.MessageId = \"SAS-Sample-Message\";\nsendClient.Send(helloMessage);\n```\n\n应用程序还可以通过使用可接受连接字符串的方法中的 SAS 连接字符串来使用 SAS 进行身份验证。\n\n请注意，若要使用服务总线中继的 SAS 授权，你可以使用服务总线命名空间上配置的 SAS 密钥。如果在命名空间上显式创建中继（[NamespaceManager](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.namespacemanager.aspx) 与 [RelayDescription](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.relaydescription.aspx)）对象，你可以只为该中继设置 SAS 规则。若要使用服务总线订阅的 SAS 授权，你可以使用服务总线命名空间或主题上配置的 SAS 密钥。\n\n## 服务总线操作所需的权限\n\n下表显示对服务总线资源进行各种操作所需的访问权限。\n\n|操作|所需声明|声明范围|\n|---|---|---|\n|**命名空间**|||\n|在命名空间上配置授权规则|管理|任何命名空间地址|\n|**服务注册表**|||\n|枚举私有策略|管理|任何命名空间地址|\n|中继|||\n|开始在命名空间上侦听|侦听|任何命名空间地址|\n|将消息发送到命名空间中的侦听器|发送|任何命名空间地址|\n|**队列**|||\n|创建队列|管理|任何命名空间地址|\n|删除队列|管理|任何有效队列地址|\n|枚举队列|管理|/$Resources/Queues|\n|获取队列说明|管理或发送|任何有效队列地址|\n|在队列上配置授权规则|管理|任何有效队列地址|\n|发送到队列|发送|任何有效队列地址|\n|从队列接收消息|侦听|任何有效队列地址|\n|在查看锁定模式下接收消息后放弃或完成消息|侦听|任何有效队列地址|\n|推迟消息以供将来检索|侦听|任何有效队列地址|\n|将消息放入死信队列|侦听|任何有效队列地址|\n|获取与消息队列会话关联的状态|侦听|任何有效队列地址|\n|设置与消息队列会话关联的状态|侦听|任何有效队列地址|\n|**主题**|||\n|创建主题|管理|任何命名空间地址|\n|删除主题|管理|任何有效主题地址|\n|枚举主题|管理|/$Resources/Topics|\n|获取主题描述|管理或发送|任何有效主题地址|\n|在主题上配置授权规则|管理|任何有效主题地址|\n|发送到主题|发送|任何有效主题地址|\n|**订阅**|||\n|创建订阅|管理|任何命名空间地址|\n|删除订阅|管理|../myTopic/Subscriptions/mySubscription|\n|枚举订阅|管理|../myTopic/Subscriptions|\n|获取订阅说明|管理或侦听|../myTopic/Subscriptions/mySubscription|\n|在查看锁定模式下接收消息后放弃或完成消息|侦听|../myTopic/Subscriptions/mySubscription|\n|推迟消息以供将来检索|侦听|../myTopic/Subscriptions/mySubscription|\n|将消息放入死信队列|侦听|../myTopic/Subscriptions/mySubscription|\n|获取与主题会话关联的状态|侦听|../myTopic/Subscriptions/mySubscription|\n|设置与主题会话关联的状态|侦听|../myTopic/Subscriptions/mySubscription|\n|**规则**|||\n|创建规则|管理|../myTopic/Subscriptions/mySubscription|\n|删除规则|管理|../myTopic/Subscriptions/mySubscription|\n|枚举规则|管理或侦听|../myTopic/Subscriptions/mySubscription/Rules|\n|**通知中心**|||\n|创建通知中心|管理|任何命名空间地址|\n|为活动设备创建或更新注册|侦听或管理|../notificationHub/tags/{tag}/registrations|\n|更新 PNS 信息|侦听或管理|../notificationHub/tags/{tag}/registrations/updatepnshandle|\n|发送到通知中心|发送|../notificationHub/messages|\n\n## 后续步骤\n\n有关服务总线中的 SAS 的高级概述，请参阅[共享访问签名](/documentation/articles/service-bus-sas-overview)。\n\n有关服务总线身份验证的更多背景信息，请参阅[服务总线身份验证和授权](/documentation/articles/service-bus-authentication-and-authorization)。\n[Azure 经典门户]: http://manage.windowsazure.cn\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

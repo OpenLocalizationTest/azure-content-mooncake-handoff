@@ -1,0 +1,432 @@
+{
+  "nodes": [
+    {
+      "content": "向移动服务应用添加推送通知 (Windows Phone) | Azure",
+      "pos": [
+        28,
+        65
+      ]
+    },
+    {
+      "content": "了解如何使用 Azure 移动服务和通知中心将推送通知发送到 Windows Phone 应用。",
+      "pos": [
+        85,
+        133
+      ]
+    },
+    {
+      "content": "向移动服务应用程序添加推送通知",
+      "pos": [
+        387,
+        402
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        526,
+        528
+      ]
+    },
+    {
+      "content": "本主题说明如何使用 Azure 移动服务向 Windows Phone Silverlight 应用程序发送推送通知。在本教程中，你将要使用 Azure 通知中心为快速入门项目启用推送通知。完成本教程后，每次插入一条记录时，你的移动服务就会使用通知中心发送一条推送通知。创建的通知中心可在移动服务中任意使用，可独立于移动服务进行管理，并可供其他应用程序和服务使用。",
+      "pos": [
+        530,
+        712
+      ]
+    },
+    {
+      "pos": [
+        714,
+        817
+      ],
+      "content": "本教程是在 TodoList 示例应用程序的基础上制作的。在开始本教程之前，必须先完成主题<bpt id=\"p1\">[</bpt><ept id=\"p1\">将移动服务添加到现有应用程序]</ept>以将项目连接到移动服务。如果尚未连接移动服务，“添加推送通知”向导可为你创建此连接。"
+    },
+    {
+      "pos": [
+        820,
+        996
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>若要向 Windows Phone 8.1 应用商店应用程序发送推送通知，请遵照本教程的 <bpt id=\"p1\">[</bpt>Windows 应用商店应用程序<ept id=\"p1\">](/documentation/articles/mobile-services-javascript-backend-windows-store-dotnet-get-started-push)</ept>版本。"
+    },
+    {
+      "pos": [
+        1001,
+        1035
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"update-app\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>更新应用程序以注册通知"
+    },
+    {
+      "content": "只有在你注册通知通道后，你的应用程序才能接收推送通知。",
+      "pos": [
+        1037,
+        1064
+      ]
+    },
+    {
+      "pos": [
+        1069,
+        1121
+      ],
+      "content": "在 Visual Studio 中，打开文件 App.xaml.cs 并添加以下 <ph id=\"ph1\">`using`</ph> 语句："
+    },
+    {
+      "content": "将以下代码添加到 App.xaml.cs：",
+      "pos": [
+        1171,
+        1192
+      ]
+    },
+    {
+      "content": "此代码检索 ChannelURI 以查找来自 Microsoft 推送通知服务 (MPNS) （由 Windows Phone 8.x \"Silverlight\" 使用）的应用程序， 然后注册该 ChannelURI 以支持推送通知。",
+      "pos": [
+        2042,
+        2159
+      ]
+    },
+    {
+      "pos": [
+        2166,
+        2249
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在本教程中，移动服务将向设备发送一条 toast 通知。而当你发送磁贴通知时，必须在通道上调用 <bpt id=\"p1\">**</bpt>BindToShellTile<ept id=\"p1\">**</ept> 方法。"
+    },
+    {
+      "pos": [
+        2254,
+        2344
+      ],
+      "content": "在 App.xaml.cs 中 <bpt id=\"p1\">**</bpt>Application\\_Launching<ept id=\"p1\">**</ept> 事件处理程序的顶部，添加对新的 <bpt id=\"p2\">**</bpt>AcquirePushChannel<ept id=\"p2\">**</ept> 方法的以下调用："
+    },
+    {
+      "content": "这可以确保每次加载页时都会请求注册。在应用程序中，你可能只需要定期执行此注册以确保注册是最新的。",
+      "pos": [
+        2381,
+        2429
+      ]
+    },
+    {
+      "pos": [
+        2434,
+        2467
+      ],
+      "content": "按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept> 键以运行应用。将显示包含注册密钥的弹出式对话框。"
+    },
+    {
+      "pos": [
+        2474,
+        2575
+      ],
+      "content": "在解决方案资源管理器中，展开“属性”，打开 WMAppManifest.xml 文件，单击“功能”选项卡并确保选中 <bpt id=\"p1\">**</bpt>ID\\_\\_\\_CAP\\_\\_\\_PUSH\\_NOTIFICATION<ept id=\"p1\">**</ept> 功能。"
+    },
+    {
+      "content": "在 VS 中启用通知",
+      "pos": [
+        2583,
+        2593
+      ]
+    },
+    {
+      "content": "这可以确保你的应用程序能够引发 toast 通知。",
+      "pos": [
+        2706,
+        2731
+      ]
+    },
+    {
+      "pos": [
+        2736,
+        2777
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"update-scripts\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>更新服务器脚本以发送推送通知"
+    },
+    {
+      "content": "最后，您必须更新注册到 TodoItem 表上的插入操作的脚本，以便发送通知。",
+      "pos": [
+        2779,
+        2818
+      ]
+    },
+    {
+      "content": "单击“TodoItem”，单击“脚本”，然后选择“插入”。",
+      "pos": [
+        2823,
+        2852
+      ]
+    },
+    {
+      "content": "将 insert 函数替换为以下代码，然后单击“保存”：",
+      "pos": [
+        2858,
+        2886
+      ]
+    },
+    {
+      "content": "插入成功后，此插入脚本会向所有 Windows Phone 应用程序注册发送推送通知（包括插入项的文本）。",
+      "pos": [
+        3993,
+        4046
+      ]
+    },
+    {
+      "content": "单击“推送”选项卡，选中“启用未经身份验证的推送通知”，然后单击“保存”。",
+      "pos": [
+        4051,
+        4088
+      ]
+    },
+    {
+      "content": "这样，移动服务便可以连接到处于未经身份验证模式的 MPNS 以发送推送通知。",
+      "pos": [
+        4094,
+        4132
+      ]
+    },
+    {
+      "pos": [
+        4139,
+        4300
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>本教程使用未经身份验证模式下的 MPNS。在此模式下，MPNS 将限制可发送到某个设备通道的通知数。若要解除此限制，必须生成一个证书，然后通过单击“上载”并选择该证书来上载该证书。有关生成证书的详细信息，请参阅<bpt id=\"p1\">[</bpt><ept id=\"p1\">设置已经过身份验证的 Web 服务以便为 Windows Phone 发送推送通知]</ept>。"
+    },
+    {
+      "pos": [
+        4305,
+        4334
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"test\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>在应用程序中测试推送通知"
+    },
+    {
+      "content": "在 Visual Studio 中，按 F5 键运行应用程序。",
+      "pos": [
+        4339,
+        4370
+      ]
+    },
+    {
+      "pos": [
+        4377,
+        4585
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在 Windows Phone 模拟器测试时，你可能会遇到 401 错误“未授权的 RegistrationAuthorizationException”。由于 Windows Phone 模拟器时钟与主机电脑时钟的同步问题，在调用 <ph id=\"ph2\">`RegisterNativeAsync()`</ph> 期间可能会出现此错误。这可能会导致安全令牌被拒绝。若要解决此问题，只需在模拟器中手动设置时钟，然后再开始测试。"
+    },
+    {
+      "content": "在应用程序中，在文本框中输入文本“hello push”，单击“保存”，然后立即单击开始按钮或后退按钮以退出应用程序。",
+      "pos": [
+        4590,
+        4649
+      ]
+    },
+    {
+      "content": "在应用程序中输入文本",
+      "pos": [
+        4657,
+        4667
+      ]
+    },
+    {
+      "pos": [
+        4781,
+        4850
+      ],
+      "content": "此时会将一个插入请求发送到移动服务，以存储添加的项。可以看到，设备收到了一条包含 <bpt id=\"p1\">**</bpt>hello push<ept id=\"p1\">**</ept> 字样的 toast 通知。"
+    },
+    {
+      "content": "收到的 Toast 通知",
+      "pos": [
+        4858,
+        4870
+      ]
+    },
+    {
+      "pos": [
+        4984,
+        5236
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果你仍未退出应用程序，则不会收到该通知。若要在应用程序处于活动状态时接收 toast 通知，你必须处理 <bpt id=\"p1\">[</bpt>ShellToastNotificationReceived<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/windowsphone/develop/microsoft.phone.notification.httpnotificationchannel.shelltoastnotificationreceived.aspx)</ept> 事件。"
+    },
+    {
+      "pos": [
+        5242,
+        5271
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"next-steps\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>后续步骤"
+    },
+    {
+      "content": "本教程演示了启用 Windows 应用商店应用程序以便使用移动服务和通知中心发送推送通知的基础知识。接下来，请考虑完成以下教程之一：",
+      "pos": [
+        5273,
+        5339
+      ]
+    },
+    {
+      "pos": [
+        5343,
+        5466
+      ],
+      "content": "[将广播通知发送到订户](/documentation/articles/notification-hubs-windows-phone-send-breaking-news)\n  <br/>了解用户如何注册和接收他们感兴趣的类别的推送通知。",
+      "leadings": [
+        "",
+        "  "
+      ],
+      "nodes": [
+        {
+          "content": "将广播通知发送到订户",
+          "pos": [
+            1,
+            11
+          ]
+        },
+        {
+          "content": "了解用户如何注册和接收他们感兴趣的类别的推送通知。",
+          "pos": [
+            96,
+            121
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        5470,
+        5610
+      ],
+      "content": "[将平台无关的通知发送到订户](/documentation/articles/notification-hubs-aspnet-cross-platform-notify-users)\n  <br/>了解如何使用模板从移动服务发送推送通知，且不会在后端中产生平台特定的负载。",
+      "leadings": [
+        "",
+        "  "
+      ],
+      "nodes": [
+        {
+          "content": "将平台无关的通知发送到订户",
+          "pos": [
+            1,
+            14
+          ]
+        },
+        {
+          "content": "了解如何使用模板从移动服务发送推送通知，且不会在后端中产生平台特定的负载。",
+          "pos": [
+            101,
+            138
+          ]
+        }
+      ]
+    },
+    {
+      "content": "通过以下主题了解有关移动服务和通知中心的详细信息：",
+      "pos": [
+        5613,
+        5638
+      ]
+    },
+    {
+      "pos": [
+        5642,
+        5736
+      ],
+      "content": "[Azure 通知中心 - 诊断指南](/documentation/articles/notification-hubs-diagnosing)\n<br/>了解如何排查推送通知问题。",
+      "leadings": [
+        "",
+        "  "
+      ],
+      "nodes": [
+        {
+          "content": "Azure 通知中心 - 诊断指南",
+          "pos": [
+            1,
+            18
+          ]
+        },
+        {
+          "content": "了解如何排查推送通知问题。",
+          "pos": [
+            79,
+            92
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        5740,
+        5789
+      ],
+      "content": "[身份验证入门]\n<br/>了解如何通过移动服务对使用不同帐户类型的应用程序用户进行身份验证。",
+      "leadings": [
+        "",
+        "  "
+      ],
+      "nodes": [
+        {
+          "content": "了解如何通过移动服务对使用不同帐户类型的应用程序用户进行身份验证。",
+          "pos": [
+            14,
+            47
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        5793,
+        5847
+      ],
+      "content": "[什么是通知中心？]\n<br/>了解有关通知中心跨所有主要的客户端平台向你的应用程序交付通知的详细信息。",
+      "leadings": [
+        "",
+        "  "
+      ],
+      "nodes": [
+        {
+          "content": "了解有关通知中心跨所有主要的客户端平台向你的应用程序交付通知的详细信息。",
+          "pos": [
+            16,
+            52
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        5851,
+        5908
+      ],
+      "content": "[移动服务 .NET 操作方法概念性参考]\n<br/>了解有关如何将移动服务与 .NET 一起使用的详细信息。",
+      "leadings": [
+        "",
+        "  "
+      ],
+      "nodes": [
+        {
+          "content": "了解有关如何将移动服务与 .NET 一起使用的详细信息。",
+          "pos": [
+            27,
+            55
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        5912,
+        5957
+      ],
+      "content": "[移动服务服务器脚本参考]\n<br/>了解有关如何在移动服务中实施业务逻辑的详细信息。",
+      "leadings": [
+        "",
+        "  "
+      ],
+      "nodes": [
+        {
+          "content": "了解有关如何在移动服务中实施业务逻辑的详细信息。",
+          "pos": [
+            19,
+            43
+          ]
+        }
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"向移动服务应用添加推送通知 (Windows Phone) | Azure\" \n    description=\"了解如何使用 Azure 移动服务和通知中心将推送通知发送到 Windows Phone 应用。\" \n    services=\"mobile-services,notification-hubs\" \n    documentationCenter=\"windows\" \n    authors=\"ggailey777\" \n    manager=\"dwrede\" \n    editor=\"\"/>\n\n<tags \n    ms.service=\"mobile-services\" \n    ms.date=\"12/07/2015\" \n    wacn.date=\"01/29/2016\"/>\n\n\n#  向移动服务应用程序添加推送通知\n\n[AZURE.INCLUDE [mobile-services-selector-get-started-push](../includes/mobile-services-selector-get-started-push.md)]\n\n## 概述\n\n本主题说明如何使用 Azure 移动服务向 Windows Phone Silverlight 应用程序发送推送通知。在本教程中，你将要使用 Azure 通知中心为快速入门项目启用推送通知。完成本教程后，每次插入一条记录时，你的移动服务就会使用通知中心发送一条推送通知。创建的通知中心可在移动服务中任意使用，可独立于移动服务进行管理，并可供其他应用程序和服务使用。\n\n本教程是在 TodoList 示例应用程序的基础上制作的。在开始本教程之前，必须先完成主题[将移动服务添加到现有应用程序]以将项目连接到移动服务。如果尚未连接移动服务，“添加推送通知”向导可为你创建此连接。\n\n>[AZURE.NOTE]若要向 Windows Phone 8.1 应用商店应用程序发送推送通知，请遵照本教程的 [Windows 应用商店应用程序](/documentation/articles/mobile-services-javascript-backend-windows-store-dotnet-get-started-push)版本。\n\n## <a id=\"update-app\"></a>更新应用程序以注册通知\n\n只有在你注册通知通道后，你的应用程序才能接收推送通知。\n\n1. 在 Visual Studio 中，打开文件 App.xaml.cs 并添加以下 `using` 语句：\n\n        using Microsoft.Phone.Notification;\n\n3. 将以下代码添加到 App.xaml.cs：\n    \n        public static HttpNotificationChannel CurrentChannel { get; private set; }\n\n        private void AcquirePushChannel()\n        {\n            CurrentChannel = HttpNotificationChannel.Find(\"MyPushChannel\");\n\n            if (CurrentChannel == null)\n            {\n                CurrentChannel = new HttpNotificationChannel(\"MyPushChannel\");\n                CurrentChannel.Open();\n                CurrentChannel.BindToShellToast();\n            }\n\n            CurrentChannel.ChannelUriUpdated +=\n                new EventHandler<NotificationChannelUriEventArgs>(async (o, args) =>\n                {\n\n                    // Register for notifications using the new channel\n                    await MobileService.GetPush()\n                        .RegisterNativeAsync(CurrentChannel.ChannelUri.ToString());\n                });\n        }\n\n    此代码检索 ChannelURI 以查找来自 Microsoft 推送通知服务 (MPNS) （由 Windows Phone 8.x \"Silverlight\" 使用）的应用程序， 然后注册该 ChannelURI 以支持推送通知。\n\n    >[AZURE.NOTE]在本教程中，移动服务将向设备发送一条 toast 通知。而当你发送磁贴通知时，必须在通道上调用 **BindToShellTile** 方法。\n\n3. 在 App.xaml.cs 中 **Application\\_Launching** 事件处理程序的顶部，添加对新的 **AcquirePushChannel** 方法的以下调用：\n\n        AcquirePushChannel();\n\n    这可以确保每次加载页时都会请求注册。在应用程序中，你可能只需要定期执行此注册以确保注册是最新的。\n\n5. 按 **F5** 键以运行应用。将显示包含注册密钥的弹出式对话框。\n  \n5. 在解决方案资源管理器中，展开“属性”，打开 WMAppManifest.xml 文件，单击“功能”选项卡并确保选中 **ID\\_\\_\\_CAP\\_\\_\\_PUSH\\_NOTIFICATION** 功能。\n\n    ![在 VS 中启用通知](./media/mobile-services-javascript-backend-windows-phone-get-started-push/mobile-app-enable-push-wp8.png)\n\n    这可以确保你的应用程序能够引发 toast 通知。\n\n## <a id=\"update-scripts\"></a>更新服务器脚本以发送推送通知\n\n最后，您必须更新注册到 TodoItem 表上的插入操作的脚本，以便发送通知。\n\n1. 单击“TodoItem”，单击“脚本”，然后选择“插入”。 \n\n2. 将 insert 函数替换为以下代码，然后单击“保存”：\n\n        function insert(item, user, request) {\n        // Define a payload for the Windows Phone toast notification.\n        var payload = '<?xml version=\"1.0\" encoding=\"utf-8\"?>' +\n            '<wp:Notification xmlns:wp=\"WPNotification\"><wp:Toast>' +\n            '<wp:Text1>New Item</wp:Text1><wp:Text2>' + item.text + \n            '</wp:Text2></wp:Toast></wp:Notification>';\n        \n        request.execute({\n            success: function() {\n                // If the insert succeeds, send a notification.\n                push.mpns.send(null, payload, 'toast', 22, {\n                    success: function(pushResponse) {\n                        console.log(\"Sent push:\", pushResponse);\n                        request.respond();\n                        },              \n                        error: function (pushResponse) {\n                            console.log(\"Error Sending push:\", pushResponse);\n                            request.respond(500, { error: pushResponse });\n                            }\n                        });\n                    }\n                });      \n        }\n\n    插入成功后，此插入脚本会向所有 Windows Phone 应用程序注册发送推送通知（包括插入项的文本）。\n\n3. 单击“推送”选项卡，选中“启用未经身份验证的推送通知”，然后单击“保存”。\n\n    这样，移动服务便可以连接到处于未经身份验证模式的 MPNS 以发送推送通知。\n\n    >[AZURE.NOTE]本教程使用未经身份验证模式下的 MPNS。在此模式下，MPNS 将限制可发送到某个设备通道的通知数。若要解除此限制，必须生成一个证书，然后通过单击“上载”并选择该证书来上载该证书。有关生成证书的详细信息，请参阅[设置已经过身份验证的 Web 服务以便为 Windows Phone 发送推送通知]。\n\n## <a id=\"test\"></a>在应用程序中测试推送通知\n\n1. 在 Visual Studio 中，按 F5 键运行应用程序。\n\n    >[AZURE.NOTE]在 Windows Phone 模拟器测试时，你可能会遇到 401 错误“未授权的 RegistrationAuthorizationException”。由于 Windows Phone 模拟器时钟与主机电脑时钟的同步问题，在调用 `RegisterNativeAsync()` 期间可能会出现此错误。这可能会导致安全令牌被拒绝。若要解决此问题，只需在模拟器中手动设置时钟，然后再开始测试。\n\n5. 在应用程序中，在文本框中输入文本“hello push”，单击“保存”，然后立即单击开始按钮或后退按钮以退出应用程序。\n\n    ![在应用程序中输入文本](./media/mobile-services-javascript-backend-windows-phone-get-started-push/mobile-quickstart-push3-wp8.png)\n\n    此时会将一个插入请求发送到移动服务，以存储添加的项。可以看到，设备收到了一条包含 **hello push** 字样的 toast 通知。\n\n    ![收到的 Toast 通知](./media/mobile-services-javascript-backend-windows-phone-get-started-push/mobile-quickstart-push5-wp8.png)\n\n   >[AZURE.NOTE]如果你仍未退出应用程序，则不会收到该通知。若要在应用程序处于活动状态时接收 toast 通知，你必须处理 [ShellToastNotificationReceived](http://msdn.microsoft.com/zh-cn/library/windowsphone/develop/microsoft.phone.notification.httpnotificationchannel.shelltoastnotificationreceived.aspx) 事件。\n\n##  <a name=\"next-steps\"></a>后续步骤\n\n本教程演示了启用 Windows 应用商店应用程序以便使用移动服务和通知中心发送推送通知的基础知识。接下来，请考虑完成以下教程之一：\n\n+ [将广播通知发送到订户](/documentation/articles/notification-hubs-windows-phone-send-breaking-news)\n    <br/>了解用户如何注册和接收他们感兴趣的类别的推送通知。\n\n+ [将平台无关的通知发送到订户](/documentation/articles/notification-hubs-aspnet-cross-platform-notify-users)\n    <br/>了解如何使用模板从移动服务发送推送通知，且不会在后端中产生平台特定的负载。\n\n\n通过以下主题了解有关移动服务和通知中心的详细信息：\n\n* [Azure 通知中心 - 诊断指南](/documentation/articles/notification-hubs-diagnosing)\n  <br/>了解如何排查推送通知问题。\n\n* [身份验证入门]\n  <br/>了解如何通过移动服务对使用不同帐户类型的应用程序用户进行身份验证。\n\n* [什么是通知中心？]\n  <br/>了解有关通知中心跨所有主要的客户端平台向你的应用程序交付通知的详细信息。\n\n* [移动服务 .NET 操作方法概念性参考]\n  <br/>了解有关如何将移动服务与 .NET 一起使用的详细信息。\n\n* [移动服务服务器脚本参考]\n  <br/>了解有关如何在移动服务中实施业务逻辑的详细信息。\n\n<!-- Anchors. -->\n\n<!-- Images. -->\n\n\n<!-- URLs. -->\n\n[Submit an app page]: http://go.microsoft.com/fwlink/p/?LinkID=266582\n[My Applications]: http://go.microsoft.com/fwlink/p/?LinkId=262039\n[Live SDK for Windows]: http://go.microsoft.com/fwlink/p/?LinkId=262253\n[将移动服务添加到现有应用程序]: /documentation/articles/mobile-services-windows-phone-get-started-data\n[身份验证入门]: /documentation/articles/mobile-services-windows-phone-get-started-users\n\n[设置已经过身份验证的 Web 服务以便为 Windows Phone 发送推送通知]: http://msdn.microsoft.com/zh-cn/library/windowsphone/develop/ff941099(v=vs.105).aspx\n\n[移动服务服务器脚本参考]: /documentation/articles/mobile-services-how-to-use-server-scripts\n[移动服务 .NET 操作方法概念性参考]: /documentation/articles/mobile-services-windows-dotnet-how-to-use-client-library\n\n[什么是通知中心？]: /documentation/articles/notification-hubs-overview\n\n \n\n<!---HONumber=Mooncake_0118_2016-->"
+}

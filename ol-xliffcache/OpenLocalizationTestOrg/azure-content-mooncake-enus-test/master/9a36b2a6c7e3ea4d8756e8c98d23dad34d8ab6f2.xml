@@ -1,0 +1,327 @@
+{
+  "nodes": [
+    {
+      "content": "编写使用服务总线队列的应用程序 | Azure",
+      "pos": [
+        27,
+        50
+      ]
+    },
+    {
+      "content": "如何编写一个基于队列的、使用服务总线的简单应用程序。",
+      "pos": [
+        68,
+        94
+      ]
+    },
+    {
+      "content": "创建使用服务总线队列的应用程序",
+      "pos": [
+        307,
+        322
+      ]
+    },
+    {
+      "content": "本主题介绍了服务总线队列，并说明了如何编写一个基于队列的、使用服务总线的简单应用程序。",
+      "pos": [
+        324,
+        367
+      ]
+    },
+    {
+      "content": "考虑零售业中的这样一种场景，其中来自各销售点 (POS) 终端的销售数据必须路由到库存管理系统，该系统使用此数据来确定何时需要补充库存。此解决方案使用服务总线进行消息传送，以便在终端与库存管理系统之间进行通信，如下图所示：",
+      "pos": [
+        369,
+        480
+      ]
+    },
+    {
+      "content": "Service-Bus-Queues-Img1",
+      "pos": [
+        484,
+        507
+      ]
+    },
+    {
+      "pos": [
+        558,
+        683
+      ],
+      "content": "每个 POS 终端通过将消息发送到 <bpt id=\"p1\">**</bpt>DataCollectionQueue<ept id=\"p1\">**</ept> 来报告其销售数据。这些消息将保留在此队列中，直到库存管理系统检索到它们。此模式通常称为<bpt id=\"p2\">*</bpt>异步消息传送<ept id=\"p2\">*</ept>，因为 POS 终端无需等待库存管理系统的回应即可继续进行处理。"
+    },
+    {
+      "content": "为什么要使用队列？",
+      "pos": [
+        688,
+        697
+      ]
+    },
+    {
+      "content": "在查看设置此应用程序所需的代码之前，请考虑在此方案中使用队列而不是让 POS 终端库存管理系统直接对话（同步）的优点。",
+      "pos": [
+        699,
+        758
+      ]
+    },
+    {
+      "content": "暂时分离",
+      "pos": [
+        764,
+        768
+      ]
+    },
+    {
+      "content": "使用异步消息传送模式，创建方和使用方不需要在同一时间联机。消息传送基础结构可靠地存储消息，直到使用方准备好接收它们。这将允许分布式应用程序的组件断开连接，例如，为进行维护而自动断开，或因组件故障断开连接，而不会影响整个系统。此外，使用方应用程序可能只需在一天的特定时段内联机。例如，在此零售方案中，库存管理系统可能只需要在营业日结束后进入联机状态。",
+      "pos": [
+        770,
+        944
+      ]
+    },
+    {
+      "content": "负载分级",
+      "pos": [
+        950,
+        954
+      ]
+    },
+    {
+      "content": "在许多应用程序中，系统负载随时间而变化，而每个工作单元所需的处理时间通常为常量。使用队列在消息创建方与使用方之间中继意味着，只需将使用方应用程序（辅助角色）预配为处理平均负载而非最大负载。队列深度将随传入负载的变化而加大和减小。这将直接根据为应用程序加载提供服务所需的基础结构的数目来节省成本。",
+      "pos": [
+        956,
+        1103
+      ]
+    },
+    {
+      "content": "Service-Bus-Queues-Img2",
+      "pos": [
+        1107,
+        1130
+      ]
+    },
+    {
+      "content": "负载平衡",
+      "pos": [
+        1185,
+        1189
+      ]
+    },
+    {
+      "content": "随着负载增加，可添加更多的辅助角色以从辅助角色队列中读取。每条消息仅由一个辅助进程处理。另外，可通过此基于拉取的负载平衡来以最合理的方式使用辅助计算机，即使这些辅助计算机具有不同的处理能力（因为它们将以其最大速率拉取消息）也是如此。此模式通常称为“使用者竞争模式”。",
+      "pos": [
+        1191,
+        1324
+      ]
+    },
+    {
+      "content": "Service-Bus-Queues-Img3",
+      "pos": [
+        1328,
+        1351
+      ]
+    },
+    {
+      "content": "松散耦合",
+      "pos": [
+        1406,
+        1410
+      ]
+    },
+    {
+      "content": "使用消息队列在消息创建方与使用方之间中继可在个组件之间提供固有的松散耦合。由于创建方和使用方互不相识，因此，可升级使用方，不会对创建方产生任何影响。此外，消息传送拓扑结构还可以演化而不影响现有终结点。我们将在讲解发布/订阅时介绍此内容的详细信息。",
+      "pos": [
+        1412,
+        1535
+      ]
+    },
+    {
+      "content": "显示相关代码",
+      "pos": [
+        1540,
+        1546
+      ]
+    },
+    {
+      "content": "以下部分介绍了使用服务总线生成此应用程序的方法。",
+      "pos": [
+        1548,
+        1572
+      ]
+    },
+    {
+      "content": "注册服务总线帐户和订阅",
+      "pos": [
+        1578,
+        1589
+      ]
+    },
+    {
+      "pos": [
+        1591,
+        1675
+      ],
+      "content": "需要 Azure 帐户才能开始使用服务总线。如果你尚无订阅，可以在<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](/pricing/1rmb-trial/?WT.mc_id=A85619ABF)</ept>注册试用版。"
+    },
+    {
+      "content": "创建服务命名空间",
+      "pos": [
+        1681,
+        1689
+      ]
+    },
+    {
+      "pos": [
+        1691,
+        1849
+      ],
+      "content": "拥有订阅后，即可创建新命名空间。必须为新命名空间指定在所有服务总线帐户之间唯一的名称。每个命名空间都可充当一组服务总线实体的容器。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何：创建或修改服务总线服务命名空间<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/hh690931.aspx)</ept>。"
+    },
+    {
+      "content": "安装 NuGet 包",
+      "pos": [
+        1855,
+        1865
+      ]
+    },
+    {
+      "pos": [
+        1867,
+        2140
+      ],
+      "content": "若要使用服务总线服务命名空间，应用程序必须引用服务总线程序集，特别是 Microsoft.ServiceBus.dll。你可以在 Azure SDK 的一部分中找到此程序集，也可在 <bpt id=\"p1\">[</bpt>Azure SDK 下载页<ept id=\"p1\">](/downloads/)</ept>下载。但是，服务总线 NuGet 包是获取服务总线 API 并为应用程序配置所有服务总线依赖项的最简单的方法。有关使用 NuGet 和服务总线包的详细信息，请参阅<bpt id=\"p2\">[</bpt>使用 NuGet 服务总线包<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/dn741354.aspx)</ept>。"
+    },
+    {
+      "content": "创建队列",
+      "pos": [
+        2146,
+        2150
+      ]
+    },
+    {
+      "pos": [
+        2152,
+        2849
+      ],
+      "content": "服务总线消息传送实体（队列和发布/订阅主题）的管理操作通过 <bpt id=\"p1\">[</bpt>NamespaceManager<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.namespacemanager.aspx)</ept> 类执行。服务总线使用基于安全模型的<bpt id=\"p2\">[</bpt>共享访问签名 (SAS)<ept id=\"p2\">](/documentation/articles/service-bus-sas-overview)</ept>。<bpt id=\"p3\">[</bpt>TokenProvider<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.tokenprovider.aspx)</ept> 类代表具有内置工厂方法的安全令牌提供程序，这些方法可返回一些众所周知的令牌提供程序。我们将使用 <bpt id=\"p4\">[</bpt>CreateSharedAccessSignatureTokenProvider<ept id=\"p4\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.tokenprovider.createsharedaccesssignaturetokenprovider.aspx)</ept> 方法来保留 SAS 凭据。然后使用服务总线命名空间和令牌提供程序的基址构建 <bpt id=\"p5\">[</bpt>NamespaceManager<ept id=\"p5\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.namespacemanager.aspx)</ept> 实例。"
+    },
+    {
+      "pos": [
+        2851,
+        3144
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>NamespaceManager<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.namespacemanager.aspx)</ept> 类提供了创建、枚举和删除消息传送实体的方法。此处显示的代码介绍了创建 <bpt id=\"p2\">[</bpt>NamespaceManager<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.namespacemanager.aspx)</ept> 实例并用它创建 <bpt id=\"p3\">**</bpt>DataCollectionQueue<ept id=\"p3\">**</ept> 队列的方法。"
+    },
+    {
+      "pos": [
+        3580,
+        3714
+      ],
+      "content": "请注意，存在 <bpt id=\"p1\">[</bpt>CreateQueue<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/hh322663.aspx)</ept> 方法的重载，你可以通过该方法设置队列的属性。例如，可为发送给队列的消息设置默认生存期 (TTL) 值。"
+    },
+    {
+      "content": "将消息发送到队列",
+      "pos": [
+        3720,
+        3728
+      ]
+    },
+    {
+      "pos": [
+        3730,
+        4151
+      ],
+      "content": "为了对服务总线实体进行运行时操作（例如发送和接收消息），应用程序必须首先创建 <bpt id=\"p1\">[</bpt>MessagingFactory<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagingfactory.aspx)</ept> 对象。类似于 <bpt id=\"p2\">[</bpt>NamespaceManager<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.namespacemanager.aspx)</ept> 类，<bpt id=\"p3\">[</bpt>MessagingFactory<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagingfactory.aspx)</ept> 实例也从服务命名空间和令牌提供程序的基址创建。"
+    },
+    {
+      "pos": [
+        4323,
+        5047
+      ],
+      "content": "在服务总线队列中发送和接收的消息是 <bpt id=\"p1\">[</bpt>BrokeredMessage<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.aspx)</ept> 类的实例。此类包含一组标准属性（如 <bpt id=\"p2\">[</bpt>Label<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.label.aspx)</ept> 和 <bpt id=\"p3\">[</bpt>TimeToLive<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.timetolive.aspx)</ept>）、一个用来保存应用程序属性的词典以及大量随机应用程序数据。应用程序可以通过传入任何可序列化对象来设置正文（下面的示例传入 <bpt id=\"p4\">**</bpt>SalesData<ept id=\"p4\">**</ept> 对象，表示来自 POS 终端的销售数据），它将使用 <bpt id=\"p5\">[</bpt>DataContractSerializer<ept id=\"p5\">](https://msdn.microsoft.com/zh-cn/library/azure/system.runtime.serialization.datacontractserializer.aspx)</ept> 来序列化该对象。或者，也可以提供 <bpt id=\"p6\">[</bpt>Stream<ept id=\"p6\">](https://msdn.microsoft.com/zh-cn/library/azure/system.io.stream.aspx)</ept> 对象。"
+    },
+    {
+      "pos": [
+        5049,
+        5428
+      ],
+      "content": "将消息发送到队列（在本例中即 <bpt id=\"p1\">**</bpt>DataCollectionQueue<ept id=\"p1\">**</ept>）的最简单方法是使用 <bpt id=\"p2\">[</bpt>CreateMessageSender<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/hh322659.aspx)</ept> 从 <bpt id=\"p3\">[</bpt>MessagingFactory<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagingfactory.aspx)</ept> 实例直接创建 <bpt id=\"p4\">[</bpt>MessageSender<ept id=\"p4\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagesender.aspx)</ept> 对象。"
+    },
+    {
+      "content": "从队列接收消息",
+      "pos": [
+        5535,
+        5542
+      ]
+    },
+    {
+      "pos": [
+        5544,
+        6173
+      ],
+      "content": "从订阅接收消息的最简单方法是使用 <bpt id=\"p1\">[</bpt>MessageReceiver<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagereceiver.aspx)</ept> 对象，可使用 <bpt id=\"p2\">[</bpt>CreateMessageReceiver<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/hh322642.aspx)</ept> 从 <bpt id=\"p3\">[</bpt>MessagingFactory<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagingfactory.aspx)</ept> 直接创建它。消息接收方可在两种不同模式下工作：<bpt id=\"p4\">**</bpt>ReceiveAndDelete<ept id=\"p4\">**</ept> 和 <bpt id=\"p5\">**</bpt>PeekLock<ept id=\"p5\">**</ept>。创建消息接收方时，<bpt id=\"p6\">[</bpt>ReceiveMode<ept id=\"p6\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.receivemode.aspx)</ept> 将会被设置为 <bpt id=\"p7\">[</bpt>CreateMessageReceiver<ept id=\"p7\">](https://msdn.microsoft.com/zh-cn/library/azure/hh322642.aspx)</ept> 调用的一个参数。"
+    },
+    {
+      "pos": [
+        6176,
+        6406
+      ],
+      "content": "当使用 <bpt id=\"p1\">**</bpt>ReceiveAndDelete<ept id=\"p1\">**</ept> 模式时，接收是一个单次操作。即，当服务总线收到请求时，它会将该消息标记为“已使用”并将其返回给应用程序。<bpt id=\"p2\">**</bpt>ReceiveAndDelete<ept id=\"p2\">**</ept> 模式是最简单的模式，最适合应用程序允许出现故障时不处理消息的方案。为了理解这一点，可以考虑这样一种情形：使用方发出接收请求，但在处理该请求前发生了崩溃。由于服务总线将消息标记为“已使用”，因此当应用程序重新启动并重新开始使用消息时，它会漏掉在发生崩溃前使用的消息。"
+    },
+    {
+      "pos": [
+        6408,
+        6834
+      ],
+      "content": "在 <bpt id=\"p1\">**</bpt>PeekLock<ept id=\"p1\">**</ept> 模式下，接收变成了一个两阶段操作，从而可以支持无法容忍遗漏消息的应用程序。当服务总线收到请求时，它会查找下一条要使用的消息，锁定该消息以防其他使用方接收，然后将该消息返回到应用程序。应用程序完成消息处理（或可靠地存储消息以供将来处理）后，它将通过对收到的消息调用 <bpt id=\"p2\">[</bpt>Complete<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.complete.aspx)</ept> 完成接收过程的第二个阶段。当服务总线发现 <bpt id=\"p3\">[</bpt>Complete<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.complete.aspx)</ept> 调用时，它会将消息标记为“已使用”。"
+    },
+    {
+      "pos": [
+        6836,
+        7187
+      ],
+      "content": "可能会出现另外两种结果。第一种，如果应用程序出于某种原因无法处理消息，它可以对收到的消息调用 <bpt id=\"p1\">[</bpt>Abandon<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/hh181837.aspx)</ept>（而不是 <bpt id=\"p2\">[</bpt>Complete<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.complete.aspx)</ept>）。这将引起服务总线解锁消息，使得同一个使用方或其他竞争使用方能够重新接收它。第二种，存在与锁定关联的超时，如果应用程序无法在锁定超时到期之前处理消息（例如，如果应用程序崩溃），服务总线将解锁该消息并使它可再次被接收。"
+    },
+    {
+      "pos": [
+        7189,
+        7616
+      ],
+      "content": "请注意，如果应用程序在处理消息之后，但在发出 <bpt id=\"p1\">[</bpt>Complete<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.complete.aspx)</ept> 请求之前发生崩溃，则在应用程序重新启动时会将该消息重新传送给它。这通常称为<bpt id=\"p2\">*</bpt>至少一次<ept id=\"p2\">*</ept>处理。这表示每条消息将至少被处理一次，但在某些情况下，同一消息可能会被重新传送。如果方案不容许重复处理，则应用程序中需要用于检测重复的其他逻辑。可以根据消息的 <bpt id=\"p3\">[</bpt>MessageId<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.messageid.aspx)</ept> 属性实现此要求。在多次传送尝试中，此属性的值将保持不变。这称为<bpt id=\"p4\">*</bpt>仅一次<ept id=\"p4\">*</ept>处理。"
+    },
+    {
+      "pos": [
+        7618,
+        7779
+      ],
+      "content": "此处显示的代码使用 <bpt id=\"p1\">**</bpt>PeekLock<ept id=\"p1\">**</ept> 模式接收和处理消息，如果未显式提供 <bpt id=\"p2\">[</bpt>ReceiveMode<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.receivemode.aspx)</ept> 值，则这是默认设置。"
+    },
+    {
+      "content": "使用队列客户端",
+      "pos": [
+        8061,
+        8068
+      ]
+    },
+    {
+      "pos": [
+        8070,
+        8614
+      ],
+      "content": "此部分中前面的示例从 <bpt id=\"p1\">[</bpt>MessagingFactory<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagingfactory.aspx)</ept> 直接创建了 <bpt id=\"p2\">[</bpt>MessageSender<ept id=\"p2\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagesender.aspx)</ept> 和 <bpt id=\"p3\">[</bpt>MessageReceiver<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagereceiver.aspx)</ept> 对象，分别用于向队列发送消息和从队列接收消息。另一种方法是使用 <bpt id=\"p4\">[</bpt>QueueClient<ept id=\"p4\">](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.queueclient.aspx)</ept> 类，它也支持发送和接收操作，并且还具有更高级的功能，例如会话。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        8898,
+        8902
+      ]
+    },
+    {
+      "pos": [
+        8904,
+        9034
+      ],
+      "content": "了解了有关队列的基础知识，即可参阅<bpt id=\"p1\">[</bpt>创建使用服务总线主题和订阅的应用程序<ept id=\"p1\">](/documentation/articles/service-bus-create-topics-subscriptions)</ept>，使用服务总线中转消息传送的发布/订阅功能继续这一讨论。"
+    }
+  ],
+  "content": "<properties \n   pageTitle=\"编写使用服务总线队列的应用程序 | Azure\"\n   description=\"如何编写一个基于队列的、使用服务总线的简单应用程序。\"\n   services=\"service-bus\"\n   documentationCenter=\"na\"\n   authors=\"sethmanheim\"\n   manager=\"timlt\"\n   editor=\"tysonn\" />\n<tags \n   ms.service=\"service-bus\"\n   ms.date=\"12/28/2015\"\n   wacn.date=\"02/26/2016\" />\n\n# 创建使用服务总线队列的应用程序\n\n本主题介绍了服务总线队列，并说明了如何编写一个基于队列的、使用服务总线的简单应用程序。\n\n考虑零售业中的这样一种场景，其中来自各销售点 (POS) 终端的销售数据必须路由到库存管理系统，该系统使用此数据来确定何时需要补充库存。此解决方案使用服务总线进行消息传送，以便在终端与库存管理系统之间进行通信，如下图所示：\n\n![Service-Bus-Queues-Img1](./media/service-bus-create-queues/IC657161.gif)\n\n每个 POS 终端通过将消息发送到 **DataCollectionQueue** 来报告其销售数据。这些消息将保留在此队列中，直到库存管理系统检索到它们。此模式通常称为*异步消息传送*，因为 POS 终端无需等待库存管理系统的回应即可继续进行处理。\n\n## 为什么要使用队列？\n\n在查看设置此应用程序所需的代码之前，请考虑在此方案中使用队列而不是让 POS 终端库存管理系统直接对话（同步）的优点。\n\n### 暂时分离\n\n使用异步消息传送模式，创建方和使用方不需要在同一时间联机。消息传送基础结构可靠地存储消息，直到使用方准备好接收它们。这将允许分布式应用程序的组件断开连接，例如，为进行维护而自动断开，或因组件故障断开连接，而不会影响整个系统。此外，使用方应用程序可能只需在一天的特定时段内联机。例如，在此零售方案中，库存管理系统可能只需要在营业日结束后进入联机状态。\n\n### 负载分级\n\n在许多应用程序中，系统负载随时间而变化，而每个工作单元所需的处理时间通常为常量。使用队列在消息创建方与使用方之间中继意味着，只需将使用方应用程序（辅助角色）预配为处理平均负载而非最大负载。队列深度将随传入负载的变化而加大和减小。这将直接根据为应用程序加载提供服务所需的基础结构的数目来节省成本。\n\n![Service-Bus-Queues-Img2](./media/service-bus-create-queues/IC657162.gif)\n\n### 负载平衡\n\n随着负载增加，可添加更多的辅助角色以从辅助角色队列中读取。每条消息仅由一个辅助进程处理。另外，可通过此基于拉取的负载平衡来以最合理的方式使用辅助计算机，即使这些辅助计算机具有不同的处理能力（因为它们将以其最大速率拉取消息）也是如此。此模式通常称为“使用者竞争模式”。\n\n![Service-Bus-Queues-Img3](./media/service-bus-create-queues/IC657163.gif)\n\n### 松散耦合\n\n使用消息队列在消息创建方与使用方之间中继可在个组件之间提供固有的松散耦合。由于创建方和使用方互不相识，因此，可升级使用方，不会对创建方产生任何影响。此外，消息传送拓扑结构还可以演化而不影响现有终结点。我们将在讲解发布/订阅时介绍此内容的详细信息。\n\n## 显示相关代码\n\n以下部分介绍了使用服务总线生成此应用程序的方法。\n\n### 注册服务总线帐户和订阅\n\n需要 Azure 帐户才能开始使用服务总线。如果你尚无订阅，可以在[此处](/pricing/1rmb-trial/?WT.mc_id=A85619ABF)注册试用版。\n\n### 创建服务命名空间\n\n拥有订阅后，即可创建新命名空间。必须为新命名空间指定在所有服务总线帐户之间唯一的名称。每个命名空间都可充当一组服务总线实体的容器。有关详细信息，请参阅[如何：创建或修改服务总线服务命名空间](https://msdn.microsoft.com/zh-cn/library/azure/hh690931.aspx)。\n\n### 安装 NuGet 包\n\n若要使用服务总线服务命名空间，应用程序必须引用服务总线程序集，特别是 Microsoft.ServiceBus.dll。你可以在 Azure SDK 的一部分中找到此程序集，也可在 [Azure SDK 下载页](/downloads/)下载。但是，服务总线 NuGet 包是获取服务总线 API 并为应用程序配置所有服务总线依赖项的最简单的方法。有关使用 NuGet 和服务总线包的详细信息，请参阅[使用 NuGet 服务总线包](https://msdn.microsoft.com/zh-cn/library/dn741354.aspx)。\n\n### 创建队列\n\n服务总线消息传送实体（队列和发布/订阅主题）的管理操作通过 [NamespaceManager](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.namespacemanager.aspx) 类执行。服务总线使用基于安全模型的[共享访问签名 (SAS)](/documentation/articles/service-bus-sas-overview)。[TokenProvider](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.tokenprovider.aspx) 类代表具有内置工厂方法的安全令牌提供程序，这些方法可返回一些众所周知的令牌提供程序。我们将使用 [CreateSharedAccessSignatureTokenProvider](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.tokenprovider.createsharedaccesssignaturetokenprovider.aspx) 方法来保留 SAS 凭据。然后使用服务总线命名空间和令牌提供程序的基址构建 [NamespaceManager](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.namespacemanager.aspx) 实例。\n\n[NamespaceManager](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.namespacemanager.aspx) 类提供了创建、枚举和删除消息传送实体的方法。此处显示的代码介绍了创建 [NamespaceManager](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.namespacemanager.aspx) 实例并用它创建 **DataCollectionQueue** 队列的方法。\n\n```\nUri uri = ServiceBusEnvironment.CreateServiceUri(\"sb\", \n                \"test-blog\", string.Empty);\nstring name = \"RootManageSharedAccessKey\";\nstring key = \"abcdefghijklmopqrstuvwxyz\";\n \nTokenProvider tokenProvider = \n    TokenProvider.CreateSharedAccessSignatureTokenProvider(name, key);\nNamespaceManager namespaceManager = \n    new NamespaceManager(uri, tokenProvider);\nnamespaceManager.CreateQueue(\"DataCollectionQueue\");\n```\n\n请注意，存在 [CreateQueue](https://msdn.microsoft.com/zh-cn/library/azure/hh322663.aspx) 方法的重载，你可以通过该方法设置队列的属性。例如，可为发送给队列的消息设置默认生存期 (TTL) 值。\n\n### 将消息发送到队列\n\n为了对服务总线实体进行运行时操作（例如发送和接收消息），应用程序必须首先创建 [MessagingFactory](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagingfactory.aspx) 对象。类似于 [NamespaceManager](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.namespacemanager.aspx) 类，[MessagingFactory](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagingfactory.aspx) 实例也从服务命名空间和令牌提供程序的基址创建。\n\n```\n BrokeredMessage bm = new BrokeredMessage(salesData);\n bm.Label = \"SalesReport\";\n bm.Properties[\"StoreName\"] = \"Redmond\";\n bm.Properties[\"MachineID\"] = \"POS_1\";\n```\n\n在服务总线队列中发送和接收的消息是 [BrokeredMessage](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.aspx) 类的实例。此类包含一组标准属性（如 [Label](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.label.aspx) 和 [TimeToLive](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.timetolive.aspx)）、一个用来保存应用程序属性的词典以及大量随机应用程序数据。应用程序可以通过传入任何可序列化对象来设置正文（下面的示例传入 **SalesData** 对象，表示来自 POS 终端的销售数据），它将使用 [DataContractSerializer](https://msdn.microsoft.com/zh-cn/library/azure/system.runtime.serialization.datacontractserializer.aspx) 来序列化该对象。或者，也可以提供 [Stream](https://msdn.microsoft.com/zh-cn/library/azure/system.io.stream.aspx) 对象。\n\n将消息发送到队列（在本例中即 **DataCollectionQueue**）的最简单方法是使用 [CreateMessageSender](https://msdn.microsoft.com/zh-cn/library/azure/hh322659.aspx) 从 [MessagingFactory](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagingfactory.aspx) 实例直接创建 [MessageSender](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagesender.aspx) 对象。\n\n```\nMessageSender sender = factory.CreateMessageSender(\"DataCollectionQueue\");\nsender.Send(bm);\n```\n\n### 从队列接收消息\n\n从订阅接收消息的最简单方法是使用 [MessageReceiver](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagereceiver.aspx) 对象，可使用 [CreateMessageReceiver](https://msdn.microsoft.com/zh-cn/library/azure/hh322642.aspx) 从 [MessagingFactory](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagingfactory.aspx) 直接创建它。消息接收方可在两种不同模式下工作：**ReceiveAndDelete** 和 **PeekLock**。创建消息接收方时，[ReceiveMode](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.receivemode.aspx) 将会被设置为 [CreateMessageReceiver](https://msdn.microsoft.com/zh-cn/library/azure/hh322642.aspx) 调用的一个参数。\n\n\n当使用 **ReceiveAndDelete** 模式时，接收是一个单次操作。即，当服务总线收到请求时，它会将该消息标记为“已使用”并将其返回给应用程序。**ReceiveAndDelete** 模式是最简单的模式，最适合应用程序允许出现故障时不处理消息的方案。为了理解这一点，可以考虑这样一种情形：使用方发出接收请求，但在处理该请求前发生了崩溃。由于服务总线将消息标记为“已使用”，因此当应用程序重新启动并重新开始使用消息时，它会漏掉在发生崩溃前使用的消息。\n\n在 **PeekLock** 模式下，接收变成了一个两阶段操作，从而可以支持无法容忍遗漏消息的应用程序。当服务总线收到请求时，它会查找下一条要使用的消息，锁定该消息以防其他使用方接收，然后将该消息返回到应用程序。应用程序完成消息处理（或可靠地存储消息以供将来处理）后，它将通过对收到的消息调用 [Complete](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.complete.aspx) 完成接收过程的第二个阶段。当服务总线发现 [Complete](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.complete.aspx) 调用时，它会将消息标记为“已使用”。\n\n可能会出现另外两种结果。第一种，如果应用程序出于某种原因无法处理消息，它可以对收到的消息调用 [Abandon](https://msdn.microsoft.com/zh-cn/library/azure/hh181837.aspx)（而不是 [Complete](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.complete.aspx)）。这将引起服务总线解锁消息，使得同一个使用方或其他竞争使用方能够重新接收它。第二种，存在与锁定关联的超时，如果应用程序无法在锁定超时到期之前处理消息（例如，如果应用程序崩溃），服务总线将解锁该消息并使它可再次被接收。\n\n请注意，如果应用程序在处理消息之后，但在发出 [Complete](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.complete.aspx) 请求之前发生崩溃，则在应用程序重新启动时会将该消息重新传送给它。这通常称为*至少一次*处理。这表示每条消息将至少被处理一次，但在某些情况下，同一消息可能会被重新传送。如果方案不容许重复处理，则应用程序中需要用于检测重复的其他逻辑。可以根据消息的 [MessageId](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.brokeredmessage.messageid.aspx) 属性实现此要求。在多次传送尝试中，此属性的值将保持不变。这称为*仅一次*处理。\n\n此处显示的代码使用 **PeekLock** 模式接收和处理消息，如果未显式提供 [ReceiveMode](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.receivemode.aspx) 值，则这是默认设置。\n\n```\nMessageReceiver receiver = factory.CreateMessageReceiver(\"DataCollectionQueue\");\nBrokeredMessage receivedMessage = receiver.Receive();\ntry\n{\n    ProcessMessage(receivedMessage);\n    receivedMessage.Complete();\n}\ncatch (Exception e)\n{\n    receivedMessage.Abandon();\n}\n```\n\n### 使用队列客户端\n\n此部分中前面的示例从 [MessagingFactory](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagingfactory.aspx) 直接创建了 [MessageSender](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagesender.aspx) 和 [MessageReceiver](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.messagereceiver.aspx) 对象，分别用于向队列发送消息和从队列接收消息。另一种方法是使用 [QueueClient](https://msdn.microsoft.com/zh-cn/library/azure/microsoft.servicebus.messaging.queueclient.aspx) 类，它也支持发送和接收操作，并且还具有更高级的功能，例如会话。\n\n```\nQueueClient queueClient = factory.CreateQueueClient(\"DataCollectionQueue\");\nqueueClient.Send(bm);\n            \nBrokeredMessage message = queueClient.Receive();\n\ntry\n{\n    ProcessMessage(message);\n    message.Complete();\n}\ncatch (Exception e)\n{\n    message.Abandon();\n} \n```\n\n## 后续步骤\n\n了解了有关队列的基础知识，即可参阅[创建使用服务总线主题和订阅的应用程序](/documentation/articles/service-bus-create-topics-subscriptions)，使用服务总线中转消息传送的发布/订阅功能继续这一讨论。\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

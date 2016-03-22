@@ -1,0 +1,649 @@
+{
+  "nodes": [
+    {
+      "content": "在 HDInsight 中将 Python 与 Hive 和 Pig 配合使用 | Azure",
+      "pos": [
+        27,
+        74
+      ]
+    },
+    {
+      "content": "了解如何在 HDInsight（Azure 上的 Hadoop 技术堆栈）中通过 Hive 和 Pig 使用 Python 用户定义的函数 (UDF)。",
+      "pos": [
+        93,
+        169
+      ]
+    },
+    {
+      "content": "在 HDInsight 中将 Python 与 Hive 和 Pig 配合使用",
+      "pos": [
+        408,
+        447
+      ]
+    },
+    {
+      "content": "Hive 和 Pig 非常适用于在 HDInsight 中处理数据，但有时你需要一种更通用的语言。Hive 和 Pig 都可让你使用各种编程语言创建用户定义的功能 (UDF)。在本文中，你将了解如何通过 Hive 和 Pig 使用 Python UDF。",
+      "pos": [
+        449,
+        576
+      ]
+    },
+    {
+      "pos": [
+        580,
+        636
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 本文中的步骤适用于 HDInsight 群集版本 2.1、3.0、3.1 和 3.2。"
+    },
+    {
+      "content": "要求",
+      "pos": [
+        640,
+        642
+      ]
+    },
+    {
+      "content": "HDInsight 群集（基于 Windows）",
+      "pos": [
+        646,
+        670
+      ]
+    },
+    {
+      "content": "文本编辑器",
+      "pos": [
+        674,
+        679
+      ]
+    },
+    {
+      "pos": [
+        684,
+        724
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"python\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>HDInsight 上的 Python"
+    },
+    {
+      "content": "默认情况下，Python2.7 安装在 HDInsight 3.0 和更高版本的群集上。可以将 Hive 与此版本的 Python 配合使用，以进行流式处理（使用 STDOUT/STDIN 在 Hive 和 Python 之间传递数据）。",
+      "pos": [
+        726,
+        845
+      ]
+    },
+    {
+      "content": "HDInsight 还包含 Jython，后者是用 Java 编写的 Python 实现。Pig 无需采用流式处理即可知道如何与 Jython 通信，因此，在使用 Pig 时，Jython 是首选。",
+      "pos": [
+        847,
+        946
+      ]
+    },
+    {
+      "pos": [
+        951,
+        989
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"hivepython\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>Hive 和 Python"
+    },
+    {
+      "pos": [
+        991,
+        1094
+      ],
+      "content": "可以通过 HiveQL <bpt id=\"p1\">**</bpt>TRANSFORM<ept id=\"p1\">**</ept> 语句将 Python 用作 Hive 中的 UDF。例如，以下 HiveQL 将调用 <bpt id=\"p2\">**</bpt>streaming.py<ept id=\"p2\">**</ept> 文件中存储的 Python 脚本。"
+    },
+    {
+      "content": "基于 Windows 的 HDInsight",
+      "pos": [
+        1098,
+        1120
+      ]
+    },
+    {
+      "pos": [
+        1391,
+        1496
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 在基于 Windows 的 HDInsight 群集上，<bpt id=\"p1\">**</bpt>USING<ept id=\"p1\">**</ept> 子句必须指定 python.exe 的完整路径。这始终是 <ph id=\"ph2\">`D:\\Python27\\python.exe`</ph>。"
+    },
+    {
+      "content": "下面是本示例执行的操作：",
+      "pos": [
+        1498,
+        1510
+      ]
+    },
+    {
+      "pos": [
+        1515,
+        1583
+      ],
+      "content": "文件开头的 <bpt id=\"p1\">**</bpt>add file<ept id=\"p1\">**</ept> 语句将 <bpt id=\"p2\">**</bpt>streaming.py<ept id=\"p2\">**</ept> 文件添加到分布式缓存，使群集中的所有节点都可访问该文件。"
+    },
+    {
+      "pos": [
+        1588,
+        1709
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>SELECT TRANSFORM ...USING<ept id=\"p1\">**</ept> 语句从 <bpt id=\"p2\">**</bpt>hivesampletable<ept id=\"p2\">**</ept> 中选择数据，并将 clientid、devicemake 和 devicemodel 传递到 <bpt id=\"p3\">**</bpt>streaming.py<ept id=\"p3\">**</ept> 脚本。"
+    },
+    {
+      "pos": [
+        1714,
+        1749
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>AS<ept id=\"p1\">**</ept> 子句描述从 <bpt id=\"p2\">**</bpt>streaming.py<ept id=\"p2\">**</ept> 返回的字段"
+    },
+    {
+      "content": "下面是该 HiveQL 示例使用的 <bpt id=\"p1\">**</bpt>streaming.py<ept id=\"p1\">**</ept> 文件。",
+      "pos": [
+        1778,
+        1816
+      ]
+    },
+    {
+      "content": "由于我们要使用流式处理，因此此脚本必须执行以下操作：",
+      "pos": [
+        2225,
+        2251
+      ]
+    },
+    {
+      "pos": [
+        2256,
+        2309
+      ],
+      "content": "从 STDIN 中读取数据。在本示例中，这是使用 <ph id=\"ph1\">`sys.stdin.readline()`</ph> 来完成的。"
+    },
+    {
+      "pos": [
+        2314,
+        2377
+      ],
+      "content": "已使用 <ph id=\"ph1\">`string.strip(line, \"\\n \")`</ph> 删除尾部的换行符，因为我们只需要文本数据，而不需要行尾指示符。"
+    },
+    {
+      "pos": [
+        2382,
+        2466
+      ],
+      "content": "执行流式处理时，一个行就包含了所有值，每两个值之间有一个制表符。因此，<ph id=\"ph1\">`string.split(line, \"\\t\")`</ph> 可用于在每个制表符处拆分输入，并只返回字段。"
+    },
+    {
+      "pos": [
+        2471,
+        2609
+      ],
+      "content": "在处理完成后，必须将输出以单行形式写入到 STDOUT，并在每两个字段之间提供一个制表符。这可以通过使用 <ph id=\"ph1\">`print \"\\t\".join([clientid, phone_label, hashlib.md5(phone_label).hexdigest()])`</ph> 来实现。"
+    },
+    {
+      "pos": [
+        2614,
+        2682
+      ],
+      "content": "这全都发生在 <ph id=\"ph1\">`while`</ph> 循环中，该循环将不断重复，直到不再读到任何 <ph id=\"ph2\">`line`</ph> 为止，此时 <ph id=\"ph3\">`break`</ph> 退出循环且脚本终止。"
+    },
+    {
+      "pos": [
+        2684,
+        2826
+      ],
+      "content": "除此之外，脚本只会连接 <ph id=\"ph1\">`devicemake`</ph> 和 <ph id=\"ph2\">`devicemodel`</ph> 的输入值，并计算连接值的哈希。很简单，但说明了从 Hive 调用的任何 Python 脚本工作原理的基本知识：循环，读取输入直到没有更多的输入，用制表符拆分每个输入行，处理，写入以制表符分隔的单行输出。"
+    },
+    {
+      "pos": [
+        2828,
+        2876
+      ],
+      "content": "有关如何在 HDInsight 群集上运行此示例的信息，请参阅<bpt id=\"p1\">[</bpt>运行示例<ept id=\"p1\">](#running)</ept>。"
+    },
+    {
+      "pos": [
+        2881,
+        2917
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"pigpython\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>Pig 和 Python"
+    },
+    {
+      "pos": [
+        2919,
+        3005
+      ],
+      "content": "在整个 <bpt id=\"p1\">**</bpt>GENERATE<ept id=\"p1\">**</ept> 语句中，Python 脚本可用作 Pig 中的 UDF。例如，以下示例使用 <bpt id=\"p2\">**</bpt>jython.py<ept id=\"p2\">**</ept> 文件中存储的 Python 脚本。"
+    },
+    {
+      "content": "下面是此示例的工作原理：",
+      "pos": [
+        3265,
+        3277
+      ]
+    },
+    {
+      "pos": [
+        3282,
+        3462
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>Jython<ept id=\"p1\">**</ept> 注册包含 Python 脚本 (<bpt id=\"p2\">**</bpt>jython.py<ept id=\"p2\">**</ept>) 的文件，并将该脚本作为 <bpt id=\"p3\">**</bpt>myfuncs<ept id=\"p3\">**</ept> 公开给 Pig。Jython 是用 Java 编写的 Python 实现，可在 Pig 所在的同一个 Java 虚拟机中运行。这样，我们便可将 Python 脚本视为传统的函数调用，而不是对 Hive 使用的流式处理方法。"
+    },
+    {
+      "pos": [
+        3467,
+        3592
+      ],
+      "content": "下一代码行将示例数据文件 <bpt id=\"p1\">**</bpt>sample.log<ept id=\"p1\">**</ept> 加载到 <bpt id=\"p2\">**</bpt>LOGS<ept id=\"p2\">**</ept> 中。由于此日志文件不包含一致的架构，因此它还将每条记录（在本例中为 <bpt id=\"p3\">**</bpt>LINE<ept id=\"p3\">**</ept>）定义为 <bpt id=\"p4\">**</bpt>chararray<ept id=\"p4\">**</ept>。简单而言，Chararray 就是一个字符串。"
+    },
+    {
+      "pos": [
+        3597,
+        3636
+      ],
+      "content": "第三个代码行筛选出所有 null 值，并将操作结果存储在 <bpt id=\"p1\">**</bpt>LOG<ept id=\"p1\">**</ept> 中。"
+    },
+    {
+      "pos": [
+        3641,
+        3772
+      ],
+      "content": "接下来，它将循环访问 <bpt id=\"p1\">**</bpt>LOG<ept id=\"p1\">**</ept> 中的记录，并使用 <bpt id=\"p2\">**</bpt>GENERATE<ept id=\"p2\">**</ept> 来调用作为 <bpt id=\"p3\">**</bpt>myfuncs<ept id=\"p3\">**</ept> 加载的 <bpt id=\"p4\">**</bpt>jython.py<ept id=\"p4\">**</ept> 脚本中包含的 <bpt id=\"p5\">**</bpt>create\\_structure<ept id=\"p5\">**</ept> 方法。<bpt id=\"p6\">**</bpt>LINE<ept id=\"p6\">**</ept> 用于将当前记录传递给函数。"
+    },
+    {
+      "pos": [
+        3777,
+        3861
+      ],
+      "content": "最后，使用 <bpt id=\"p1\">**</bpt>DUMP<ept id=\"p1\">**</ept> 命令将输出转储到 STDOUT。这只是为了在完成操作后立即显示结果；在实际脚本中，你通常会使用 <bpt id=\"p2\">**</bpt>STORE<ept id=\"p2\">**</ept> 将数据存储到新文件中。"
+    },
+    {
+      "content": "下面是该 Pig 示例使用的 <bpt id=\"p1\">**</bpt>jython.py<ept id=\"p1\">**</ept> 文件：",
+      "pos": [
+        3887,
+        3919
+      ]
+    },
+    {
+      "pos": [
+        4303,
+        4398
+      ],
+      "content": "还记得吗？我们前面只是将 <bpt id=\"p1\">**</bpt>LINE<ept id=\"p1\">**</ept> 输入定义为 chararray，因为输入没有一致的架构。 <bpt id=\"p2\">**</bpt>jython.py<ept id=\"p2\">**</ept> 的任务是将数据转换成用于输出的一致架构。其工作方式如下所述："
+    },
+    {
+      "pos": [
+        4403,
+        4507
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>@outputSchema<ept id=\"p1\">**</ept> 语句定义要返回到 Pig 的数据的格式。在本例中，该格式为<bpt id=\"p2\">**</bpt>数据袋<ept id=\"p2\">**</ept>，这是一种 Pig 数据类型。该数据袋包含以下字段，所有这些字段都是 chararray（字符串）："
+    },
+    {
+      "content": "date - 创建日志条目的日期",
+      "pos": [
+        4515,
+        4531
+      ]
+    },
+    {
+      "content": "time - 创建日志条目的时间",
+      "pos": [
+        4538,
+        4554
+      ]
+    },
+    {
+      "content": "classname - 为其创建该条目的类名",
+      "pos": [
+        4561,
+        4583
+      ]
+    },
+    {
+      "content": "level - 日志级别",
+      "pos": [
+        4590,
+        4602
+      ]
+    },
+    {
+      "content": "detail - 日志条目的详细信息",
+      "pos": [
+        4609,
+        4627
+      ]
+    },
+    {
+      "pos": [
+        4632,
+        4688
+      ],
+      "content": "接下来，<bpt id=\"p1\">**</bpt>def create\\_structure(input)<ept id=\"p1\">**</ept> 将定义 Pig 要将行项传递到的函数。"
+    },
+    {
+      "pos": [
+        4693,
+        4875
+      ],
+      "content": "示例数据 <bpt id=\"p1\">**</bpt>sample.log<ept id=\"p1\">**</ept> 基本上符合我们要返回的日期、时间、类名、级别和详细信息架构。但是，它还包含了一些以字符串“<bpt id=\"p2\">*</bpt>java.lang.Exception<ept id=\"p2\">*</ept>”开头的行，我们需要修改这些行，使之与架构匹配。<bpt id=\"p3\">**</bpt>if<ept id=\"p3\">**</ept> 语句将检查这些行，然后调整输入数据以将“<bpt id=\"p4\">*</bpt>java.lang.Exception<ept id=\"p4\">*</ept>”字符串移到末尾，使数据与预期的输出架构相一致。"
+    },
+    {
+      "pos": [
+        4880,
+        4954
+      ],
+      "content": "接下来，使用 <bpt id=\"p1\">**</bpt>split<ept id=\"p1\">**</ept> 命令在前四个空格字符处拆分数据。这将生成五个值，它们将分配到“日期”、“时间”、“类名”、“级别”和“详细信息”。"
+    },
+    {
+      "content": "最后，将值返回到 Pig。",
+      "pos": [
+        4959,
+        4972
+      ]
+    },
+    {
+      "pos": [
+        4974,
+        5020
+      ],
+      "content": "当数据返回到 Pig 时，其架构将与 <bpt id=\"p1\">**</bpt>@outputSchema<ept id=\"p1\">**</ept> 语句中的定义一致。"
+    },
+    {
+      "pos": [
+        5024,
+        5050
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"running\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>运行示例"
+    },
+    {
+      "pos": [
+        5052,
+        5119
+      ],
+      "content": "如果使用的是基于 Windows 的 HDInsight 群集和 Windows 客户端，请使用 <bpt id=\"p1\">**</bpt>PowerShell<ept id=\"p1\">**</ept> 步骤。"
+    },
+    {
+      "content": "Hive",
+      "pos": [
+        5125,
+        5129
+      ]
+    },
+    {
+      "pos": [
+        5134,
+        5191
+      ],
+      "content": "使用 <ph id=\"ph1\">`hive`</ph> 命令来启动 hive shell。在 shell 加载后，你应会看到 <ph id=\"ph2\">`hive&gt;`</ph> 提示符。"
+    },
+    {
+      "pos": [
+        5196,
+        5217
+      ],
+      "content": "在 <ph id=\"ph1\">`hive&gt;`</ph> 提示符下输入以下命令。"
+    },
+    {
+      "content": "在输入最后一行后，该作业应该启动。最终，它将返回类似于以下内容的输出。",
+      "pos": [
+        5487,
+        5522
+      ]
+    },
+    {
+      "content": "Pig",
+      "pos": [
+        5858,
+        5861
+      ]
+    },
+    {
+      "pos": [
+        5866,
+        5919
+      ],
+      "content": "使用 <ph id=\"ph1\">`pig`</ph> 命令来启动该 shell。在 shell 加载后，你应会看到 <ph id=\"ph2\">`grunt&gt;`</ph> 提示符。"
+    },
+    {
+      "pos": [
+        5924,
+        5946
+      ],
+      "content": "在 <ph id=\"ph1\">`grunt&gt;`</ph> 提示符下输入以下语句。"
+    },
+    {
+      "content": "在输入以下行后，作业应会启动。最终，它将返回类似于以下内容的输出。",
+      "pos": [
+        6227,
+        6260
+      ]
+    },
+    {
+      "content": "PowerShell",
+      "pos": [
+        6688,
+        6698
+      ]
+    },
+    {
+      "pos": [
+        6700,
+        6852
+      ],
+      "content": "这些步骤使用 Azure PowerShell。如果尚未在开发计算机上安装并配置 Azure PowerShell，请在使用以下步骤之前，参阅<bpt id=\"p1\">[</bpt>如何安装和配置 Azure PowerShell<ept id=\"p1\">](/documentation/articles/powershell-install-configure)</ept>。"
+    },
+    {
+      "pos": [
+        6857,
+        6941
+      ],
+      "content": "使用 Python 示例 <bpt id=\"p1\">[</bpt>streaming.py<ept id=\"p1\">](#streamingpy)</ept> 和 <bpt id=\"p2\">[</bpt>jython.py<ept id=\"p2\">](#jythonpy)</ept> 创建开发计算机上的文件的本地副本。"
+    },
+    {
+      "pos": [
+        6946,
+        7088
+      ],
+      "content": "使用以下 PowerShell 脚本将 <bpt id=\"p1\">**</bpt>streaming.py<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>jython.py<ept id=\"p2\">**</ept> 文件上载到服务器。在脚本的前三行中替换为你的 Azure HDInsight 群集的名称，并替换为 <bpt id=\"p3\">**</bpt>streaming.py<ept id=\"p3\">**</ept> 和 <bpt id=\"p4\">**</bpt>jython.py<ept id=\"p4\">**</ept> 文件的路径。"
+    },
+    {
+      "content": "此脚本将检索 HDInsight 群集的信息，然后提取默认存储帐户的名称和密钥，并将文件上载到容器的根目录。",
+      "pos": [
+        7958,
+        8012
+      ]
+    },
+    {
+      "pos": [
+        8020,
+        8126
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> <bpt id=\"p1\">[</bpt>在 HDInsight 中上载 Hadoop 作业的数据<ept id=\"p1\">](/documentation/articles/hdinsight-upload-data)</ept>文档中介绍了上载脚本的其他方法。"
+    },
+    {
+      "content": "上载文件后，使用以下 PowerShell 脚本启动作业。在完成作业时，会将输出写入到 PowerShell 控制台。",
+      "pos": [
+        8128,
+        8187
+      ]
+    },
+    {
+      "content": "Hive",
+      "pos": [
+        8193,
+        8197
+      ]
+    },
+    {
+      "pos": [
+        9277,
+        9298
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Hive<ept id=\"p1\">**</ept> 作业的输出应该如下所示："
+    },
+    {
+      "content": "Pig",
+      "pos": [
+        9614,
+        9617
+      ]
+    },
+    {
+      "pos": [
+        10659,
+        10679
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Pig<ept id=\"p1\">**</ept> 作业的输出应该如下所示："
+    },
+    {
+      "pos": [
+        11086,
+        11120
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"troubleshooting\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>故障排除"
+    },
+    {
+      "content": "运行作业时出现错误",
+      "pos": [
+        11125,
+        11134
+      ]
+    },
+    {
+      "content": "在运行 hive 作业时，你可能会遇到如下错误：",
+      "pos": [
+        11136,
+        11160
+      ]
+    },
+    {
+      "content": "此问题可能是由 streaming.py 文件中的行尾结束符号导致的。许多 Windows 编辑器默认为使用 CRLF 作为行尾结束符号，但 Linux 应用程序通常应使用 LF。",
+      "pos": [
+        11348,
+        11438
+      ]
+    },
+    {
+      "content": "如果你使用的编辑器无法创建 LF 行尾结束符号，或者不确定要使用什么行尾结束符号，在将文件上载到 HDInsight 之前，请使用以下 PowerShell 语句删除 CR 字符：",
+      "pos": [
+        11440,
+        11530
+      ]
+    },
+    {
+      "content": "PowerShell 脚本",
+      "pos": [
+        11706,
+        11719
+      ]
+    },
+    {
+      "content": "用于运行示例的两个示例 PowerShell 脚本都包含一个带注释的行，该行将显示作业的错误输出。如果你未看到作业的预期输出，请取消注释以下行，并查看错误信息中是否指明了问题。",
+      "pos": [
+        11721,
+        11809
+      ]
+    },
+    {
+      "content": "错误信息 (STDERR) 和作业的结果 (STDOUT) 还会记录到群集默认 Blob 容器中的以下位置。",
+      "pos": [
+        11901,
+        11955
+      ]
+    },
+    {
+      "content": "对于此作业...",
+      "pos": [
+        11957,
+        11965
+      ]
+    },
+    {
+      "content": "在 Blob 容器中查看这些文件",
+      "pos": [
+        11966,
+        11982
+      ]
+    },
+    {
+      "content": "Hive",
+      "pos": [
+        11991,
+        11995
+      ]
+    },
+    {
+      "content": "/HivePython/stderr",
+      "pos": [
+        11996,
+        12014
+      ]
+    },
+    {
+      "content": "/HivePython/stdout",
+      "pos": [
+        12017,
+        12035
+      ]
+    },
+    {
+      "content": "Pig",
+      "pos": [
+        12036,
+        12039
+      ]
+    },
+    {
+      "content": "/PigPython/stderr",
+      "pos": [
+        12040,
+        12057
+      ]
+    },
+    {
+      "content": "/PigPython/stdout",
+      "pos": [
+        12060,
+        12077
+      ]
+    },
+    {
+      "pos": [
+        12081,
+        12104
+      ],
+      "content": "<ph id=\"ph1\">&lt;a name=\"next\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>后续步骤"
+    },
+    {
+      "pos": [
+        12106,
+        12293
+      ],
+      "content": "如果需要加载默认情况下未提供的 Python 模块，请参阅<bpt id=\"p1\">[</bpt>如何将模块部署到 Azure HDInsight<ept id=\"p1\">](http://blogs.msdn.com/b/benjguin/archive/2014/03/03/how-to-deploy-a-python-module-to-windows-azure-hdinsight.aspx)</ept>，以获取有关如何执行此操作的示例。"
+    },
+    {
+      "content": "若要了解使用 Pig、Hive 的其他方式以及如何使用 MapReduce，请参阅以下内容。",
+      "pos": [
+        12295,
+        12341
+      ]
+    },
+    {
+      "content": "将 Hive 与 HDInsight 配合使用",
+      "pos": [
+        12346,
+        12369
+      ]
+    },
+    {
+      "content": "将 Pig 与 HDInsight 配合使用",
+      "pos": [
+        12419,
+        12441
+      ]
+    },
+    {
+      "content": "将 MapReduce 与 HDInsight 配合使用",
+      "pos": [
+        12490,
+        12518
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"在 HDInsight 中将 Python 与 Hive 和 Pig 配合使用 | Azure\"\n    description=\"了解如何在 HDInsight（Azure 上的 Hadoop 技术堆栈）中通过 Hive 和 Pig 使用 Python 用户定义的函数 (UDF)。\"\n    services=\"hdinsight\"\n    documentationCenter=\"\"\n    authors=\"Blackmist\"\n    manager=\"paulettm\"\n    editor=\"cgronlun\"\n    tags=\"azure-portal\"/>\n\n<tags\n    ms.service=\"hdinsight\"\n    ms.date=\"02/10/2016\"\n    wacn.date=\"03/17/2016\"/>\n\n#在 HDInsight 中将 Python 与 Hive 和 Pig 配合使用\n\nHive 和 Pig 非常适用于在 HDInsight 中处理数据，但有时你需要一种更通用的语言。Hive 和 Pig 都可让你使用各种编程语言创建用户定义的功能 (UDF)。在本文中，你将了解如何通过 Hive 和 Pig 使用 Python UDF。\n\n> [AZURE.NOTE] 本文中的步骤适用于 HDInsight 群集版本 2.1、3.0、3.1 和 3.2。\n\n##要求\n\n* HDInsight 群集（基于 Windows）\n\n* 文本编辑器\n \n##<a name=\"python\"></a>HDInsight 上的 Python\n\n默认情况下，Python2.7 安装在 HDInsight 3.0 和更高版本的群集上。可以将 Hive 与此版本的 Python 配合使用，以进行流式处理（使用 STDOUT/STDIN 在 Hive 和 Python 之间传递数据）。\n\nHDInsight 还包含 Jython，后者是用 Java 编写的 Python 实现。Pig 无需采用流式处理即可知道如何与 Jython 通信，因此，在使用 Pig 时，Jython 是首选。\n\n###<a name=\"hivepython\"></a>Hive 和 Python\n\n可以通过 HiveQL **TRANSFORM** 语句将 Python 用作 Hive 中的 UDF。例如，以下 HiveQL 将调用 **streaming.py** 文件中存储的 Python 脚本。\n\n**基于 Windows 的 HDInsight**\n\n    add file wasb:///streaming.py;\n\n    SELECT TRANSFORM (clientid, devicemake, devicemodel)\n      USING 'D:\\Python27\\python.exe streaming.py' AS\n      (clientid string, phoneLable string, phoneHash string)\n    FROM hivesampletable\n    ORDER BY clientid LIMIT 50;\n\n> [AZURE.NOTE] 在基于 Windows 的 HDInsight 群集上，**USING** 子句必须指定 python.exe 的完整路径。这始终是 `D:\\Python27\\python.exe`。\n\n下面是本示例执行的操作：\n\n1. 文件开头的 **add file** 语句将 **streaming.py** 文件添加到分布式缓存，使群集中的所有节点都可访问该文件。\n\n2. **SELECT TRANSFORM ...USING** 语句从 **hivesampletable** 中选择数据，并将 clientid、devicemake 和 devicemodel 传递到 **streaming.py** 脚本。\n\n3. **AS** 子句描述从 **streaming.py** 返回的字段\n\n<a name=\"streamingpy\"></a>\n下面是该 HiveQL 示例使用的 **streaming.py** 文件。\n\n    #!/usr/bin/env python\n\n    import sys\n    import string\n    import hashlib\n\n    while True:\n      line = sys.stdin.readline()\n      if not line:\n        break\n\n      line = string.strip(line, \"\\n \")\n      clientid, devicemake, devicemodel = string.split(line, \"\\t\")\n      phone_label = devicemake + ' ' + devicemodel\n      print \"\\t\".join([clientid, phone_label, hashlib.md5(phone_label).hexdigest()])\n\n由于我们要使用流式处理，因此此脚本必须执行以下操作：\n\n1. 从 STDIN 中读取数据。在本示例中，这是使用 `sys.stdin.readline()` 来完成的。\n\n2. 已使用 `string.strip(line, \"\\n \")` 删除尾部的换行符，因为我们只需要文本数据，而不需要行尾指示符。\n\n2. 执行流式处理时，一个行就包含了所有值，每两个值之间有一个制表符。因此，`string.split(line, \"\\t\")` 可用于在每个制表符处拆分输入，并只返回字段。\n\n3. 在处理完成后，必须将输出以单行形式写入到 STDOUT，并在每两个字段之间提供一个制表符。这可以通过使用 `print \"\\t\".join([clientid, phone_label, hashlib.md5(phone_label).hexdigest()])` 来实现。\n\n4. 这全都发生在 `while` 循环中，该循环将不断重复，直到不再读到任何 `line` 为止，此时 `break` 退出循环且脚本终止。\n\n除此之外，脚本只会连接 `devicemake` 和 `devicemodel` 的输入值，并计算连接值的哈希。很简单，但说明了从 Hive 调用的任何 Python 脚本工作原理的基本知识：循环，读取输入直到没有更多的输入，用制表符拆分每个输入行，处理，写入以制表符分隔的单行输出。\n\n有关如何在 HDInsight 群集上运行此示例的信息，请参阅[运行示例](#running)。\n\n###<a name=\"pigpython\"></a>Pig 和 Python\n\n在整个 **GENERATE** 语句中，Python 脚本可用作 Pig 中的 UDF。例如，以下示例使用 **jython.py** 文件中存储的 Python 脚本。\n\n    Register 'wasb:///jython.py' using jython as myfuncs;\n    LOGS = LOAD 'wasb:///example/data/sample.log' as (LINE:chararray);\n    LOG = FILTER LOGS by LINE is not null;\n    DETAILS = FOREACH LOG GENERATE myfuncs.create_structure(LINE);\n    DUMP DETAILS;\n\n下面是此示例的工作原理：\n\n1. 使用 **Jython** 注册包含 Python 脚本 (**jython.py**) 的文件，并将该脚本作为 **myfuncs** 公开给 Pig。Jython 是用 Java 编写的 Python 实现，可在 Pig 所在的同一个 Java 虚拟机中运行。这样，我们便可将 Python 脚本视为传统的函数调用，而不是对 Hive 使用的流式处理方法。\n\n2. 下一代码行将示例数据文件 **sample.log** 加载到 **LOGS** 中。由于此日志文件不包含一致的架构，因此它还将每条记录（在本例中为 **LINE**）定义为 **chararray**。简单而言，Chararray 就是一个字符串。\n\n3. 第三个代码行筛选出所有 null 值，并将操作结果存储在 **LOG** 中。\n\n4. 接下来，它将循环访问 **LOG** 中的记录，并使用 **GENERATE** 来调用作为 **myfuncs** 加载的 **jython.py** 脚本中包含的 **create\\_structure** 方法。**LINE** 用于将当前记录传递给函数。\n\n5. 最后，使用 **DUMP** 命令将输出转储到 STDOUT。这只是为了在完成操作后立即显示结果；在实际脚本中，你通常会使用 **STORE** 将数据存储到新文件中。\n\n<a name=\"jythonpy\"></a>\n下面是该 Pig 示例使用的 **jython.py** 文件：\n\n    @outputSchema(\"log: {(date:chararray, time:chararray, classname:chararray, level:chararray, detail:chararray)}\")\n    def create_structure(input):\n      if (input.startswith('java.lang.Exception')):\n        input = input[21:len(input)] + ' - java.lang.Exception'\n      date, time, classname, level, detail = input.split(' ', 4)\n      return date, time, classname, level, detail\n\n还记得吗？我们前面只是将 **LINE** 输入定义为 chararray，因为输入没有一致的架构。 **jython.py** 的任务是将数据转换成用于输出的一致架构。其工作方式如下所述：\n\n1. **@outputSchema** 语句定义要返回到 Pig 的数据的格式。在本例中，该格式为**数据袋**，这是一种 Pig 数据类型。该数据袋包含以下字段，所有这些字段都是 chararray（字符串）：\n\n    * date - 创建日志条目的日期\n    * time - 创建日志条目的时间\n    * classname - 为其创建该条目的类名\n    * level - 日志级别\n    * detail - 日志条目的详细信息\n\n2. 接下来，**def create\\_structure(input)** 将定义 Pig 要将行项传递到的函数。\n\n3. 示例数据 **sample.log** 基本上符合我们要返回的日期、时间、类名、级别和详细信息架构。但是，它还包含了一些以字符串“*java.lang.Exception*”开头的行，我们需要修改这些行，使之与架构匹配。**if** 语句将检查这些行，然后调整输入数据以将“*java.lang.Exception*”字符串移到末尾，使数据与预期的输出架构相一致。\n\n4. 接下来，使用 **split** 命令在前四个空格字符处拆分数据。这将生成五个值，它们将分配到“日期”、“时间”、“类名”、“级别”和“详细信息”。\n\n5. 最后，将值返回到 Pig。\n\n当数据返回到 Pig 时，其架构将与 **@outputSchema** 语句中的定义一致。\n\n##<a name=\"running\"></a>运行示例\n\n如果使用的是基于 Windows 的 HDInsight 群集和 Windows 客户端，请使用 **PowerShell** 步骤。\n\n####Hive\n\n1. 使用 `hive` 命令来启动 hive shell。在 shell 加载后，你应会看到 `hive>` 提示符。\n\n2. 在 `hive>` 提示符下输入以下命令。\n\n        add file wasb:///streaming.py;\n        SELECT TRANSFORM (clientid, devicemake, devicemodel)\n          USING 'streaming.py' AS\n          (clientid string, phoneLabel string, phoneHash string)\n        FROM hivesampletable\n        ORDER BY clientid LIMIT 50;\n\n3. 在输入最后一行后，该作业应该启动。最终，它将返回类似于以下内容的输出。\n\n        100041  RIM 9650    d476f3687700442549a83fac4560c51c\n        100041  RIM 9650    d476f3687700442549a83fac4560c51c\n        100042  Apple iPhone 4.2.x  375ad9a0ddc4351536804f1d5d0ea9b9\n        100042  Apple iPhone 4.2.x  375ad9a0ddc4351536804f1d5d0ea9b9\n        100042  Apple iPhone 4.2.x  375ad9a0ddc4351536804f1d5d0ea9b9\n\n####Pig\n\n1. 使用 `pig` 命令来启动该 shell。在 shell 加载后，你应会看到 `grunt>` 提示符。\n\n2. 在 `grunt>` 提示符下输入以下语句。\n\n        Register wasb:///jython.py using jython as myfuncs;\n        LOGS = LOAD 'wasb:///example/data/sample.log' as (LINE:chararray);\n        LOG = FILTER LOGS by LINE is not null;\n        DETAILS = foreach LOG generate myfuncs.create_structure(LINE);\n        DUMP DETAILS;\n\n3. 在输入以下行后，作业应会启动。最终，它将返回类似于以下内容的输出。\n\n        ((2012-02-03,20:11:56,SampleClass5,[TRACE],verbose detail for id 990982084))\n        ((2012-02-03,20:11:56,SampleClass7,[TRACE],verbose detail for id 1560323914))\n        ((2012-02-03,20:11:56,SampleClass8,[DEBUG],detail for id 2083681507))\n        ((2012-02-03,20:11:56,SampleClass3,[TRACE],verbose detail for id 1718828806))\n        ((2012-02-03,20:11:56,SampleClass3,[INFO],everything normal for id 530537821))\n\n###PowerShell\n\n这些步骤使用 Azure PowerShell。如果尚未在开发计算机上安装并配置 Azure PowerShell，请在使用以下步骤之前，参阅[如何安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure)。\n\n1. 使用 Python 示例 [streaming.py](#streamingpy) 和 [jython.py](#jythonpy) 创建开发计算机上的文件的本地副本。\n\n2. 使用以下 PowerShell 脚本将 **streaming.py** 和 **jython.py** 文件上载到服务器。在脚本的前三行中替换为你的 Azure HDInsight 群集的名称，并替换为 **streaming.py** 和 **jython.py** 文件的路径。\n\n        $clusterName = YourHDIClusterName\n        $pathToStreamingFile = \"C:\\path\\to\\streaming.py\"\n        $pathToJythonFile = \"C:\\path\\to\\jython.py\"\n\n        $hdiStore = get-azurehdinsightcluster -name $clusterName\n        $storageAccountName = $hdiStore.DefaultStorageAccount.StorageAccountName.Split(\".\",2)[0]\n        $storageAccountKey = $hdiStore.defaultstorageaccount.storageaccountkey\n        $defaultContainer = $hdiStore.DefaultStorageAccount.StorageContainerName\n\n        $destContext = new-azurestoragecontext -storageaccountname $storageAccountName -storageaccountkey $storageAccountKey\n        set-azurestorageblobcontent -file $pathToStreamingFile -Container $defaultContainer -Blob \"streaming.py\" -context $destContext\n        set-azurestorageblobcontent -file $pathToJythonFile -Container $defaultContainer -Blob \"jython.py\" -context $destContext\n\n    此脚本将检索 HDInsight 群集的信息，然后提取默认存储帐户的名称和密钥，并将文件上载到容器的根目录。\n\n    > [AZURE.NOTE] [在 HDInsight 中上载 Hadoop 作业的数据](/documentation/articles/hdinsight-upload-data)文档中介绍了上载脚本的其他方法。\n\n上载文件后，使用以下 PowerShell 脚本启动作业。在完成作业时，会将输出写入到 PowerShell 控制台。\n\n####Hive\n\n    # Replace 'YourHDIClusterName' with the name of your cluster\n    $clusterName = YourHDIClusterName\n    $HiveQuery = \"add file wasb:///streaming.py;\" +\n                 \"SELECT TRANSFORM (clientid, devicemake, devicemodel) \" +\n                   \"USING 'D:\\Python27\\python.exe streaming.py' AS \" +\n                   \"(clientid string, phoneLabel string, phoneHash string) \" +\n                 \"FROM hivesampletable \" +\n                 \"ORDER BY clientid LIMIT 50;\"\n\n    $jobDefinition = New-AzureHDInsightHiveJobDefinition -Query $HiveQuery -StatusFolder '/hivepython'\n\n    $job = Start-AzureHDInsightJob -Cluster $clusterName -JobDefinition $jobDefinition\n    Write-Host \"Wait for the Hive job to complete ...\" -ForegroundColor Green\n    Wait-AzureHDInsightJob -Job $job\n    # Uncomment the following to see stderr output\n    # Get-AzureHDInsightJobOutput -StandardError -JobId $job.JobId -Cluster $clusterName\n    Write-Host \"Display the standard output ...\" -ForegroundColor Green\n    Get-AzureHDInsightJobOutput -Cluster $clusterName -JobId $job.JobId -StandardOutput\n\n**Hive** 作业的输出应该如下所示：\n\n    100041  RIM 9650    d476f3687700442549a83fac4560c51c\n    100041  RIM 9650    d476f3687700442549a83fac4560c51c\n    100042  Apple iPhone 4.2.x  375ad9a0ddc4351536804f1d5d0ea9b9\n    100042  Apple iPhone 4.2.x  375ad9a0ddc4351536804f1d5d0ea9b9\n    100042  Apple iPhone 4.2.x  375ad9a0ddc4351536804f1d5d0ea9b9\n\n####Pig\n\n    # Replace 'YourHDIClusterName' with the name of your cluster\n    $clusterName = YourHDIClusterName\n    $PigQuery = \"Register wasb:///jython.py using jython as myfuncs;\" +\n                \"LOGS = LOAD 'wasb:///example/data/sample.log' as (LINE:chararray);\" +\n                \"LOG = FILTER LOGS by LINE is not null;\" +\n                \"DETAILS = foreach LOG generate myfuncs.create_structure(LINE);\" +\n                \"DUMP DETAILS;\"\n\n    $jobDefinition = New-AzureHDInsightPigJobDefinition -Query $PigQuery -StatusFolder '/pigpython'\n\n    $job = Start-AzureHDInsightJob -Cluster $clusterName -JobDefinition $jobDefinition\n    Write-Host \"Wait for the Pig job to complete ...\" -ForegroundColor Green\n    Wait-AzureHDInsightJob -Job $job\n    # Uncomment the following to see stderr output\n    # Get-AzureHDInsightJobOutput -StandardError -JobId $job.JobId -Cluster $clusterName\n    Write-Host \"Display the standard output ...\" -ForegroundColor Green\n    Get-AzureHDInsightJobOutput -Cluster $clusterName -JobId $job.JobId -StandardOutput\n\n**Pig** 作业的输出应该如下所示：\n\n    ((2012-02-03,20:11:56,SampleClass5,[TRACE],verbose detail for id 990982084))\n    ((2012-02-03,20:11:56,SampleClass7,[TRACE],verbose detail for id 1560323914))\n    ((2012-02-03,20:11:56,SampleClass8,[DEBUG],detail for id 2083681507))\n    ((2012-02-03,20:11:56,SampleClass3,[TRACE],verbose detail for id 1718828806))\n    ((2012-02-03,20:11:56,SampleClass3,[INFO],everything normal for id 530537821))\n\n##<a name=\"troubleshooting\"></a>故障排除\n\n###运行作业时出现错误\n\n在运行 hive 作业时，你可能会遇到如下错误：\n\n    Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: [Error 20001]: An error occurred while reading or writing to your custom script. It may have crashed with an error.\n    \n此问题可能是由 streaming.py 文件中的行尾结束符号导致的。许多 Windows 编辑器默认为使用 CRLF 作为行尾结束符号，但 Linux 应用程序通常应使用 LF。\n\n如果你使用的编辑器无法创建 LF 行尾结束符号，或者不确定要使用什么行尾结束符号，在将文件上载到 HDInsight 之前，请使用以下 PowerShell 语句删除 CR 字符：\n\n    $original_file ='c:\\path\\to\\streaming.py'\n    $text = [IO.File]::ReadAllText($original_file) -replace \"`r`n\", \"`n\"\n    [IO.File]::WriteAllText($original_file, $text)\n\n###PowerShell 脚本\n\n用于运行示例的两个示例 PowerShell 脚本都包含一个带注释的行，该行将显示作业的错误输出。如果你未看到作业的预期输出，请取消注释以下行，并查看错误信息中是否指明了问题。\n\n    # Get-AzureHDInsightJobOutput -StandardError -JobId $job.JobId -Cluster $clusterName\n\n错误信息 (STDERR) 和作业的结果 (STDOUT) 还会记录到群集默认 Blob 容器中的以下位置。\n\n对于此作业...|在 Blob 容器中查看这些文件\n---|---\nHive|/HivePython/stderr<p>/HivePython/stdout\nPig|/PigPython/stderr<p>/PigPython/stdout\n\n##<a name=\"next\"></a>后续步骤\n\n如果需要加载默认情况下未提供的 Python 模块，请参阅[如何将模块部署到 Azure HDInsight](http://blogs.msdn.com/b/benjguin/archive/2014/03/03/how-to-deploy-a-python-module-to-windows-azure-hdinsight.aspx)，以获取有关如何执行此操作的示例。\n\n若要了解使用 Pig、Hive 的其他方式以及如何使用 MapReduce，请参阅以下内容。\n\n* [将 Hive 与 HDInsight 配合使用](/documentation/articles/hdinsight-use-hive)\n\n* [将 Pig 与 HDInsight 配合使用](/documentation/articles/hdinsight-use-pig)\n\n* [将 MapReduce 与 HDInsight 配合使用](/documentation/articles/hdinsight-use-mapreduce)\n\n<!---HONumber=Mooncake_0307_2016-->"
+}

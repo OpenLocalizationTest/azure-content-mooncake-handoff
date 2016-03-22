@@ -1,0 +1,495 @@
+{
+  "nodes": [
+    {
+      "content": "使用 Maven 构建 HBase 应用程序并将其部署到基于 Windows 的 HDInsight | Azure",
+      "pos": [
+        27,
+        85
+      ]
+    },
+    {
+      "content": "了解如何使用 Apache Maven 构建基于 Java 的 Apache HBase 应用程序，然后将其部署到基于 Windows 的 Azure HDInsight 群集。",
+      "pos": [
+        104,
+        193
+      ]
+    },
+    {
+      "content": "借助 Maven 生成可将 HBase 与 HDInsight (Hadoop) 配合使用的 Java 应用程序",
+      "pos": [
+        432,
+        488
+      ]
+    },
+    {
+      "pos": [
+        490,
+        609
+      ],
+      "content": "了解如何通过使用 Apache Maven 在 Java 中创建和构建 <bpt id=\"p1\">[</bpt>Apache HBase<ept id=\"p1\">](http://hbase.apache.org/)</ept> 应用程序。然后，将该应用程序用于 Azure HDInsight (Hadoop)。"
+    },
+    {
+      "pos": [
+        611,
+        766
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Maven<ept id=\"p1\">](http://maven.apache.org/)</ept> 是一种软件项目管理和综合工具，可用于为 Java 项目构建软件、文档和报告。在本文中，你将要了解如何使用 Maven 创建一个基本的 Java 应用程序，该应用程序可在 Azure HDInsight 群集中创建、查询和删除 HBase 表。"
+    },
+    {
+      "content": "要求",
+      "pos": [
+        770,
+        772
+      ]
+    },
+    {
+      "pos": [
+        776,
+        865
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Java 平台 JDK<ept id=\"p1\">](http://www.oracle.com/technetwork/java/javase/downloads/index.html)</ept> 7 或更高版本"
+    },
+    {
+      "content": "Maven",
+      "pos": [
+        870,
+        875
+      ]
+    },
+    {
+      "content": "安装有 HBase 的 Azure HDInsight 群集",
+      "pos": [
+        907,
+        937
+      ]
+    },
+    {
+      "content": "创建项目",
+      "pos": [
+        1028,
+        1032
+      ]
+    },
+    {
+      "pos": [
+        1037,
+        1087
+      ],
+      "content": "在开发环境中，通过命令行将目录更改为要创建项目的位置，例如 <ph id=\"ph1\">`cd code\\hdinsight`</ph>。"
+    },
+    {
+      "pos": [
+        1092,
+        1128
+      ],
+      "content": "使用随同 Maven 一起安装的 <bpt id=\"p1\">__</bpt>mvn<ept id=\"p1\">__</ept> 命令，为项目生成基架。"
+    },
+    {
+      "pos": [
+        1294,
+        1366
+      ],
+      "content": "此时，将使用 <bpt id=\"p1\">__</bpt>artifactID<ept id=\"p1\">__</ept> 参数（本示例中的 <bpt id=\"p2\">**</bpt>hbaseapp<ept id=\"p2\">**</ept>）指定的名称在当前目录中创建新目录。 此目录将包含以下项："
+    },
+    {
+      "pos": [
+        1374,
+        1496
+      ],
+      "content": "<bpt id=\"p1\">__</bpt>pom.xml<ept id=\"p1\">__</ept>：项目对象模型 (<bpt id=\"p2\">[</bpt>POM<ept id=\"p2\">](http://maven.apache.org/guides/introduction/introduction-to-the-pom.html)</ept>)，其中包含用于生成项目的信息和配置详细信息。"
+    },
+    {
+      "pos": [
+        1504,
+        1574
+      ],
+      "content": "<bpt id=\"p1\">__</bpt>src<ept id=\"p1\">__</ept>：包含 <bpt id=\"p2\">__</bpt>main\\\\java\\\\com\\\\microsoft\\\\examples<ept id=\"p2\">__</ept> 目录的目录，你将在其中创作应用程序。"
+    },
+    {
+      "pos": [
+        1579,
+        1657
+      ],
+      "content": "删除 <bpt id=\"p1\">__</bpt>src\\\\test\\\\java\\\\com\\\\microsoft\\\\examples\\\\apptest.java<ept id=\"p1\">__</ept> 文件，因为本示例用不到该文件。"
+    },
+    {
+      "content": "更新项目对象模型",
+      "pos": [
+        1661,
+        1669
+      ]
+    },
+    {
+      "pos": [
+        1674,
+        1722
+      ],
+      "content": "编辑 <bpt id=\"p1\">__</bpt>pom.xml<ept id=\"p1\">__</ept> 文件，并将以下代码添加到 <ph id=\"ph1\">`&lt;dependencies&gt;`</ph> 部分："
+    },
+    {
+      "pos": [
+        1910,
+        2127
+      ],
+      "content": "这将会告知 Maven，项目需要 <bpt id=\"p1\">__</bpt>hbase-client<ept id=\"p1\">__</ept> 版本 <bpt id=\"p2\">__</bpt>0.98.4-hadoop2<ept id=\"p2\">__</ept>。在编译时，将从默认的 Maven 存储库下载该版本。你可以使用 <bpt id=\"p3\">[</bpt>Maven 中央存储库<ept id=\"p3\">](http://search.maven.org/#artifactdetails%7Corg.apache.hbase%7Chbase-client%7C0.98.4-hadoop2%7Cjar)</ept>搜索来了解有关此依赖性的详细信息。"
+    },
+    {
+      "pos": [
+        2132,
+        2234
+      ],
+      "content": "将以下代码添加到 <bpt id=\"p1\">__</bpt>pom.xml<ept id=\"p1\">__</ept> 文件。它必须位于文件中的 <ph id=\"ph1\">`&lt;project&gt;...&lt;/project&gt;`</ph> 标记内，例如 <ph id=\"ph2\">`&lt;/dependencies&gt;`</ph> 和 <ph id=\"ph3\">`&lt;/project&gt;`</ph> 之间。"
+    },
+    {
+      "pos": [
+        3717,
+        3769
+      ],
+      "content": "这将配置包含与 HBase 有关的配置信息的资源 (<bpt id=\"p1\">__</bpt>conf\\\\hbase-site.xml<ept id=\"p1\">__</ept>)。"
+    },
+    {
+      "pos": [
+        3777,
+        3847
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>你也可以通过代码设置配置值。有关如何完成此操作的说明，请参阅所采用的 <bpt id=\"p1\">__</bpt>CreateTable<ept id=\"p1\">__</ept> 示例中的注释。"
+    },
+    {
+      "pos": [
+        3853,
+        4160
+      ],
+      "content": "此外，这还将配置 <bpt id=\"p1\">[</bpt>Maven 编译器插件<ept id=\"p1\">](http://maven.apache.org/plugins/maven-compiler-plugin/)</ept>和 <bpt id=\"p2\">[</bpt>Maven 阴影插件<ept id=\"p2\">](http://maven.apache.org/plugins/maven-shade-plugin/)</ept>。该编译器插件用于编译拓扑。该阴影插件用于防止在由 Maven 构建的 JAR 程序包中复制许可证。使用此插件的原因在于，重复的许可证文件会导致 HDInsight 群集在运行时出错。将 maven-shade-plugin 用于 <ph id=\"ph1\">`ApacheLicenseResourceTransformer`</ph> 实现可防止发生此错误。"
+    },
+    {
+      "content": "maven-shade-plugin 还会生成 uber jar（或 fat jar），其中包含应用程序所需的所有依赖项。",
+      "pos": [
+        4166,
+        4227
+      ]
+    },
+    {
+      "pos": [
+        4232,
+        4250
+      ],
+      "content": "保存 <bpt id=\"p1\">__</bpt>pom.xml<ept id=\"p1\">__</ept> 文件。"
+    },
+    {
+      "pos": [
+        4255,
+        4348
+      ],
+      "content": "在 <bpt id=\"p1\">__</bpt>hbaseapp<ept id=\"p1\">__</ept> 目录中创建名为 <bpt id=\"p2\">__</bpt>conf<ept id=\"p2\">__</ept> 的新目录。在 <bpt id=\"p3\">__</bpt>conf<ept id=\"p3\">__</ept> 目录中，创建名为 <bpt id=\"p4\">__</bpt>hbase-site.xml<ept id=\"p4\">__</ept> 的新文件，然后使用以下项作为内容："
+    },
+    {
+      "content": "此文件将用于加载 HDInsight 群集的 HBase 配置。",
+      "pos": [
+        5951,
+        5983
+      ]
+    },
+    {
+      "pos": [
+        5991,
+        6324
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>这是极小的 hbase-site.xml 文件，其中包含 HDInsight 群集的基本最低设置。有关 HDInsight 使用的 hbase-site.xml 配置文件的完整版本，请参阅<bpt id=\"p1\">[</bpt>使用 Azure 管理门户管理 HDInsight 中的 Hadoop 群集<ept id=\"p1\">](/documentation/articles/hdinsight-administer-use-management-portal-v1#rdp)</ept>。hbase-site.xml 文件位于 C:\\\\apps\\\\dist\\\\hbase-&amp;lt;version number&gt;-hadoop2\\\\conf 目录中。在群集上更新 HBase 后，文件路径的版本号部分将发生变化。"
+    },
+    {
+      "pos": [
+        6329,
+        6354
+      ],
+      "content": "保存 <bpt id=\"p1\">__</bpt>hbase-site.xml<ept id=\"p1\">__</ept> 文件。"
+    },
+    {
+      "content": "创建应用程序",
+      "pos": [
+        6358,
+        6364
+      ]
+    },
+    {
+      "pos": [
+        6369,
+        6472
+      ],
+      "content": "转到 <bpt id=\"p1\">__</bpt>hbaseapp\\\\src\\\\main\\\\java\\\\com\\\\microsoft\\\\examples<ept id=\"p1\">__</ept> 目录，然后将 app.java 文件重命名为 <bpt id=\"p2\">__</bpt>CreateTable.java<ept id=\"p2\">__</ept>。"
+    },
+    {
+      "pos": [
+        6477,
+        6518
+      ],
+      "content": "打开 <bpt id=\"p1\">__</bpt>CreateTable.java<ept id=\"p1\">__</ept> 文件，并将现有内容替换为以下内容："
+    },
+    {
+      "pos": [
+        9466,
+        9524
+      ],
+      "content": "这是 <bpt id=\"p1\">__</bpt>CreateTable<ept id=\"p1\">__</ept> 类，该类将创建名为 <bpt id=\"p2\">__</bpt>people<ept id=\"p2\">__</ept> 的表，并使用一些预定义的用户填充它。"
+    },
+    {
+      "pos": [
+        9529,
+        9556
+      ],
+      "content": "保存 <bpt id=\"p1\">__</bpt>CreateTable.java<ept id=\"p1\">__</ept> 文件。"
+    },
+    {
+      "pos": [
+        9561,
+        9670
+      ],
+      "content": "在 <bpt id=\"p1\">__</bpt>hbaseapp\\\\src\\\\main\\\\java\\\\com\\\\microsoft\\\\examples<ept id=\"p1\">__</ept> 目录中，创建名为 <bpt id=\"p2\">__</bpt>SearchByEmail.java<ept id=\"p2\">__</ept> 的新文件。使用以下项作为此文件的内容："
+    },
+    {
+      "pos": [
+        12914,
+        12984
+      ],
+      "content": "<bpt id=\"p1\">__</bpt>SearchByEmail<ept id=\"p1\">__</ept> 类可用于按电子邮件地址查询行。由于它使用正则表达式筛选器，因此，你可以在使用类时提供字符串或正则表达式。"
+    },
+    {
+      "pos": [
+        12989,
+        13018
+      ],
+      "content": "保存 <bpt id=\"p1\">__</bpt>SearchByEmail.java<ept id=\"p1\">__</ept> 文件。"
+    },
+    {
+      "pos": [
+        13023,
+        13130
+      ],
+      "content": "在 <bpt id=\"p1\">__</bpt>hbaseapp\\\\src\\\\main\\\\hava\\\\com\\\\microsoft\\\\examples<ept id=\"p1\">__</ept> 目录中，创建名为 <bpt id=\"p2\">__</bpt>DeleteTable.java<ept id=\"p2\">__</ept> 的新文件。使用以下项作为此文件的内容："
+    },
+    {
+      "pos": [
+        13821,
+        13863
+      ],
+      "content": "此类用于清除本示例，方法是禁用并删除由 <bpt id=\"p1\">__</bpt>CreateTable<ept id=\"p1\">__</ept> 类创建的表。"
+    },
+    {
+      "pos": [
+        13868,
+        13895
+      ],
+      "content": "保存 <bpt id=\"p1\">__</bpt>DeleteTable.java<ept id=\"p1\">__</ept> 文件。"
+    },
+    {
+      "content": "生成并打包应用程序",
+      "pos": [
+        13899,
+        13908
+      ]
+    },
+    {
+      "pos": [
+        13913,
+        13946
+      ],
+      "content": "打开命令提示符，然后将目录更改为 <bpt id=\"p1\">__</bpt>hbaseapp<ept id=\"p1\">__</ept> 目录。"
+    },
+    {
+      "content": "使用以下命令来构建包含应用程序的 JAR 文件：",
+      "pos": [
+        13951,
+        13975
+      ]
+    },
+    {
+      "content": "这将清除任何以前构建的项目，下载任何尚未安装的依赖项，然后构建和打包应用程序。",
+      "pos": [
+        14008,
+        14047
+      ]
+    },
+    {
+      "pos": [
+        14052,
+        14122
+      ],
+      "content": "完成该命令后，<bpt id=\"p1\">__</bpt>hbaseapp\\\\target<ept id=\"p1\">__</ept> 目录将包含名为 <bpt id=\"p2\">__</bpt>hbaseapp-1.0-SNAPSHOT.jar<ept id=\"p2\">__</ept> 的文件。"
+    },
+    {
+      "pos": [
+        14130,
+        14218
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph><bpt id=\"p1\">__</bpt>hbaseapp-1.0-SNAPSHOT.jar<ept id=\"p1\">__</ept> 文件是 uber jar（有时称为 fat jar），其中包含运行应用程序所需的所有依赖项。"
+    },
+    {
+      "content": "上载 JAR 文件并启动作业",
+      "pos": [
+        14222,
+        14236
+      ]
+    },
+    {
+      "pos": [
+        14240,
+        14443
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>你可以使用多种方法将文件上载到 HDInsight 群集，如<bpt id=\"p1\">[</bpt>在 HDInsight 中为 Hadoop 作业上载数据<ept id=\"p1\">](/documentation/articles/hdinsight-upload-data)</ept>中所述。以下步骤使用 <bpt id=\"p2\">[</bpt>Azure PowerShell<ept id=\"p2\">](/documentation/articles/powershell-install-configure)</ept>。"
+    },
+    {
+      "pos": [
+        14448,
+        14520
+      ],
+      "content": "安装并配置 Azure PowerShell 后，请创建名为 <bpt id=\"p1\">__</bpt>hbase-runner.psm1<ept id=\"p1\">__</ept> 的新文件。使用以下项作为此文件的内容："
+    },
+    {
+      "content": "此文件包含两个模块：",
+      "pos": [
+        21572,
+        21582
+      ]
+    },
+    {
+      "pos": [
+        21590,
+        21632
+      ],
+      "content": "<bpt id=\"p1\">__</bpt>Add-HDInsightFile<ept id=\"p1\">__</ept> - 用于将文件上载到 HDInsight"
+    },
+    {
+      "pos": [
+        21640,
+        21675
+      ],
+      "content": "<bpt id=\"p1\">__</bpt>Start-HBaseExample<ept id=\"p1\">__</ept> - 用于运行以前创建的类"
+    },
+    {
+      "pos": [
+        21680,
+        21708
+      ],
+      "content": "保存 <bpt id=\"p1\">__</bpt>hbase-runner.psm1<ept id=\"p1\">__</ept> 文件。"
+    },
+    {
+      "pos": [
+        21713,
+        21770
+      ],
+      "content": "打开新的 Azure PowerShell 窗口，将目录切换到 <bpt id=\"p1\">__</bpt>hbaseapp<ept id=\"p1\">__</ept> 目录，然后运行以下命令。"
+    },
+    {
+      "pos": [
+        21835,
+        21906
+      ],
+      "content": "将路径切换到前面创建的 <bpt id=\"p1\">__</bpt>hbase-runner.psm1<ept id=\"p1\">__</ept> 文件所在的位置。这将为此 Azure PowerShell 会话注册模块。"
+    },
+    {
+      "pos": [
+        21911,
+        21968
+      ],
+      "content": "使用以下命令将 <bpt id=\"p1\">__</bpt>hbaseapp-1.0-SNAPSHOT.jar<ept id=\"p1\">__</ept> 上载到你的 HDInsight 群集。"
+    },
+    {
+      "pos": [
+        22135,
+        22263
+      ],
+      "content": "将 <bpt id=\"p1\">__</bpt>hdinsightclustername<ept id=\"p1\">__</ept> 替换为 HDInsight 群集的名称。此后，该命令将 <bpt id=\"p2\">__</bpt>hbaseapp-1.0-SNAPSHOT.jar<ept id=\"p2\">__</ept> 上载到 HDInsight 群集的主存储中的 <bpt id=\"p3\">__</bpt>example/jars<ept id=\"p3\">__</ept> 位置。"
+    },
+    {
+      "pos": [
+        22268,
+        22305
+      ],
+      "content": "在上载这些文件后，使用以下代码来通过 <bpt id=\"p1\">__</bpt>hbaseapp<ept id=\"p1\">__</ept> 创建新表："
+    },
+    {
+      "pos": [
+        22419,
+        22466
+      ],
+      "content": "将 <bpt id=\"p1\">__</bpt>hdinsightclustername<ept id=\"p1\">__</ept> 替换为 HDInsight 群集的名称。"
+    },
+    {
+      "pos": [
+        22472,
+        22529
+      ],
+      "content": "此命令将在 HDInsight 群集中创建名为 <bpt id=\"p1\">__</bpt>people<ept id=\"p1\">__</ept> 的新表。此命令在控制台窗口中不显示任何输出。"
+    },
+    {
+      "content": "若要在表中搜索条目，请使用以下命令：",
+      "pos": [
+        22534,
+        22552
+      ]
+    },
+    {
+      "pos": [
+        22692,
+        22739
+      ],
+      "content": "将 <bpt id=\"p1\">__</bpt>hdinsightclustername<ept id=\"p1\">__</ept> 替换为 HDInsight 群集的名称。"
+    },
+    {
+      "pos": [
+        22745,
+        22850
+      ],
+      "content": "此命令使用 <bpt id=\"p1\">**</bpt>SearchByEmail<ept id=\"p1\">**</ept> 类搜索任何 <bpt id=\"p2\">__</bpt>contactinformation<ept id=\"p2\">__</ept> 列系列和 <bpt id=\"p3\">__</bpt>email<ept id=\"p3\">__</ept> 列包含字符串 <bpt id=\"p4\">__</bpt>contoso.com<ept id=\"p4\">__</ept> 的行。你应该会收到以下结果："
+    },
+    {
+      "pos": [
+        23107,
+        23247
+      ],
+      "content": "将 <bpt id=\"p1\">__</bpt>fabrikam.com<ept id=\"p1\">__</ept> 用于 <ph id=\"ph1\">`-emailRegex`</ph> 值会返回电子邮件字段中包含 <bpt id=\"p2\">__</bpt>fabrikam.com<ept id=\"p2\">__</ept> 的用户。由于此搜索是使用基于正则表达式的筛选器执行的，因此你也可以输入正则表达式，例如 <bpt id=\"p3\">__</bpt>^r<ept id=\"p3\">__</ept>，这样就会返回电子邮件以字母“r”开头的条目。"
+    },
+    {
+      "content": "删除表",
+      "pos": [
+        23251,
+        23254
+      ]
+    },
+    {
+      "pos": [
+        23256,
+        23318
+      ],
+      "content": "在完成该示例后，请在 Azure PowerShell 会话中使用以下命令，以删除本示例中使用的 <bpt id=\"p1\">__</bpt>people<ept id=\"p1\">__</ept> 表："
+    },
+    {
+      "pos": [
+        23424,
+        23471
+      ],
+      "content": "将 <bpt id=\"p1\">__</bpt>hdinsightclustername<ept id=\"p1\">__</ept> 替换为 HDInsight 群集的名称。"
+    },
+    {
+      "content": "故障排除",
+      "pos": [
+        23475,
+        23479
+      ]
+    },
+    {
+      "content": "使用 Start-HBaseExample 时无结果或意外结果",
+      "pos": [
+        23484,
+        23515
+      ]
+    },
+    {
+      "pos": [
+        23517,
+        23558
+      ],
+      "content": "使用 <ph id=\"ph1\">`-showErr`</ph> 参数可查看运行作业时生成的标准错误 (STDERR)。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"使用 Maven 构建 HBase 应用程序并将其部署到基于 Windows 的 HDInsight | Azure\"\n    description=\"了解如何使用 Apache Maven 构建基于 Java 的 Apache HBase 应用程序，然后将其部署到基于 Windows 的 Azure HDInsight 群集。\"\n    services=\"hdinsight\"\n    documentationCenter=\"\"\n    authors=\"Blackmist\"\n    manager=\"paulettm\"\n    editor=\"cgronlun\"\n    tags=\"azure-portal\"/>\n\n<tags\n    ms.service=\"hdinsight\"\n    ms.date=\"12/04/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n#借助 Maven 生成可将 HBase 与 HDInsight (Hadoop) 配合使用的 Java 应用程序\n\n了解如何通过使用 Apache Maven 在 Java 中创建和构建 [Apache HBase](http://hbase.apache.org/) 应用程序。然后，将该应用程序用于 Azure HDInsight (Hadoop)。\n\n[Maven](http://maven.apache.org/) 是一种软件项目管理和综合工具，可用于为 Java 项目构建软件、文档和报告。在本文中，你将要了解如何使用 Maven 创建一个基本的 Java 应用程序，该应用程序可在 Azure HDInsight 群集中创建、查询和删除 HBase 表。\n\n##要求\n\n* [Java 平台 JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html) 7 或更高版本\n\n* [Maven](http://maven.apache.org/)\n\n* [安装有 HBase 的 Azure HDInsight 群集](/documentation/articles/hdinsight-hbase-tutorial-get-started-v1#create-hbase-cluster)\n\n##创建项目\n\n1. 在开发环境中，通过命令行将目录更改为要创建项目的位置，例如 `cd code\\hdinsight`。\n\n2. 使用随同 Maven 一起安装的 __mvn__ 命令，为项目生成基架。\n\n        mvn archetype:generate -DgroupId=com.microsoft.examples -DartifactId=hbaseapp -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false\n\n    此时，将使用 __artifactID__ 参数（本示例中的 **hbaseapp**）指定的名称在当前目录中创建新目录。 此目录将包含以下项：\n\n    * __pom.xml__：项目对象模型 ([POM](http://maven.apache.org/guides/introduction/introduction-to-the-pom.html))，其中包含用于生成项目的信息和配置详细信息。\n\n    * __src__：包含 __main\\\\java\\\\com\\\\microsoft\\\\examples__ 目录的目录，你将在其中创作应用程序。\n\n3. 删除 __src\\\\test\\\\java\\\\com\\\\microsoft\\\\examples\\\\apptest.java__ 文件，因为本示例用不到该文件。\n\n##更新项目对象模型\n\n1. 编辑 __pom.xml__ 文件，并将以下代码添加到 `<dependencies>` 部分：\n\n        <dependency>\n          <groupId>org.apache.hbase</groupId>\n          <artifactId>hbase-client</artifactId>\n          <version>0.98.4-hadoop2</version>\n        </dependency>\n\n    这将会告知 Maven，项目需要 __hbase-client__ 版本 __0.98.4-hadoop2__。在编译时，将从默认的 Maven 存储库下载该版本。你可以使用 [Maven 中央存储库](http://search.maven.org/#artifactdetails%7Corg.apache.hbase%7Chbase-client%7C0.98.4-hadoop2%7Cjar)搜索来了解有关此依赖性的详细信息。\n\n2. 将以下代码添加到 __pom.xml__ 文件。它必须位于文件中的 `<project>...</project>` 标记内，例如 `</dependencies>` 和 `</project>` 之间。\n\n        <build>\n          <sourceDirectory>src</sourceDirectory>\n          <resources>\n            <resource>\n              <directory>${basedir}/conf</directory>\n              <filtering>false</filtering>\n              <includes>\n                <include>hbase-site.xml</include>\n              </includes>\n            </resource>\n          </resources>\n          <plugins>\n            <plugin>\n              <groupId>org.apache.maven.plugins</groupId>\n              <artifactId>maven-compiler-plugin</artifactId>\n                        <version>3.3</version>\n              <configuration>\n                <source>1.6</source>\n                <target>1.6</target>\n              </configuration>\n            </plugin>\n            <plugin>\n              <groupId>org.apache.maven.plugins</groupId>\n              <artifactId>maven-shade-plugin</artifactId>\n              <version>2.3</version>\n              <configuration>\n                <transformers>\n                  <transformer implementation=\"org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer\">\n                  </transformer>\n                </transformers>\n              </configuration>\n              <executions>\n                <execution>\n                  <phase>package</phase>\n                  <goals>\n                    <goal>shade</goal>\n                  </goals>\n                </execution>\n              </executions>\n            </plugin>\n          </plugins>\n        </build>\n\n    这将配置包含与 HBase 有关的配置信息的资源 (__conf\\\\hbase-site.xml__)。\n\n    > [AZURE.NOTE]你也可以通过代码设置配置值。有关如何完成此操作的说明，请参阅所采用的 __CreateTable__ 示例中的注释。\n\n    此外，这还将配置 [Maven 编译器插件](http://maven.apache.org/plugins/maven-compiler-plugin/)和 [Maven 阴影插件](http://maven.apache.org/plugins/maven-shade-plugin/)。该编译器插件用于编译拓扑。该阴影插件用于防止在由 Maven 构建的 JAR 程序包中复制许可证。使用此插件的原因在于，重复的许可证文件会导致 HDInsight 群集在运行时出错。将 maven-shade-plugin 用于 `ApacheLicenseResourceTransformer` 实现可防止发生此错误。\n\n    maven-shade-plugin 还会生成 uber jar（或 fat jar），其中包含应用程序所需的所有依赖项。\n\n3. 保存 __pom.xml__ 文件。\n\n4. 在 __hbaseapp__ 目录中创建名为 __conf__ 的新目录。在 __conf__ 目录中，创建名为 __hbase-site.xml__ 的新文件，然后使用以下项作为内容：\n\n        <?xml version=\"1.0\"?>\n        <?xml-stylesheet type=\"text/xsl\" href=\"configuration.xsl\"?>\n        <!--\n        /**\n         * Copyright 2010 The Apache Software Foundation\n         *\n         * Licensed to the Apache Software Foundation (ASF) under one\n         * or more contributor license agreements.  See the NOTICE file\n         * distributed with this work for additional information\n         * regarding copyright ownership.  The ASF licenses this file\n         * to you under the Apache License, Version 2.0 (the\n         * \"License\"); you may not use this file except in compliance\n         * with the License.  You may obtain a copy of the License at\n         *\n         *     http://www.apache.org/licenses/LICENSE-2.0\n         *\n         * Unless required by applicable law or agreed to in writing, software\n         * distributed under the License is distributed on an \"AS IS\" BASIS,\n         * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n         * See the License for the specific language governing permissions and\n         * limitations under the License.\n         */\n        -->\n        <configuration>\n          <property>\n            <name>hbase.cluster.distributed</name>\n            <value>true</value>\n          </property>\n          <property>\n            <name>hbase.zookeeper.quorum</name>\n            <value>zookeeper0,zookeeper1,zookeeper2</value>\n          </property>\n          <property>\n            <name>hbase.zookeeper.property.clientPort</name>\n            <value>2181</value>\n          </property>\n        </configuration>\n\n    此文件将用于加载 HDInsight 群集的 HBase 配置。\n\n    > [AZURE.NOTE]这是极小的 hbase-site.xml 文件，其中包含 HDInsight 群集的基本最低设置。有关 HDInsight 使用的 hbase-site.xml 配置文件的完整版本，请参阅[使用 Azure 管理门户管理 HDInsight 中的 Hadoop 群集](/documentation/articles/hdinsight-administer-use-management-portal-v1#rdp)。hbase-site.xml 文件位于 C:\\\\apps\\\\dist\\\\hbase-&lt;version number>-hadoop2\\\\conf 目录中。在群集上更新 HBase 后，文件路径的版本号部分将发生变化。\n\n3. 保存 __hbase-site.xml__ 文件。\n\n##创建应用程序\n\n1. 转到 __hbaseapp\\\\src\\\\main\\\\java\\\\com\\\\microsoft\\\\examples__ 目录，然后将 app.java 文件重命名为 __CreateTable.java__。\n\n2. 打开 __CreateTable.java__ 文件，并将现有内容替换为以下内容：\n\n        package com.microsoft.examples;\n        import java.io.IOException;\n\n        import org.apache.hadoop.conf.Configuration;\n        import org.apache.hadoop.hbase.HBaseConfiguration;\n        import org.apache.hadoop.hbase.client.HBaseAdmin;\n        import org.apache.hadoop.hbase.HTableDescriptor;\n        import org.apache.hadoop.hbase.TableName;\n        import org.apache.hadoop.hbase.HColumnDescriptor;\n        import org.apache.hadoop.hbase.client.HTable;\n        import org.apache.hadoop.hbase.client.Put;\n        import org.apache.hadoop.hbase.util.Bytes;\n\n        public class CreateTable {\n          public static void main(String[] args) throws IOException {\n            Configuration config = HBaseConfiguration.create();\n\n            // Example of setting zookeeper values for HDInsight\n            //   in code instead of an hbase-site.xml file\n            //\n            // config.set(\"hbase.zookeeper.quorum\",\n            //            \"zookeepernode0,zookeepernode1,zookeepernode2\");\n            //config.set(\"hbase.zookeeper.property.clientPort\", \"2181\");\n            //config.set(\"hbase.cluster.distributed\", \"true\");\n\n            // create an admin object using the config\n            HBaseAdmin admin = new HBaseAdmin(config);\n\n            // create the table...\n            HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf(\"people\"));\n            // ... with two column families\n            tableDescriptor.addFamily(new HColumnDescriptor(\"name\"));\n            tableDescriptor.addFamily(new HColumnDescriptor(\"contactinfo\"));\n            admin.createTable(tableDescriptor);\n\n            // define some people\n            String[][] people = {\n                { \"1\", \"Marcel\", \"Haddad\", \"marcel@fabrikam.com\"},\n                { \"2\", \"Franklin\", \"Holtz\", \"franklin@contoso.com\" },\n                { \"3\", \"Dwayne\", \"McKee\", \"dwayne@fabrikam.com\" },\n                { \"4\", \"Rae\", \"Schroeder\", \"rae@contoso.com\" },\n                { \"5\", \"Rosalie\", \"burton\", \"rosalie@fabrikam.com\"},\n                { \"6\", \"Gabriela\", \"Ingram\", \"gabriela@contoso.com\"} };\n\n            HTable table = new HTable(config, \"people\");\n\n            // Add each person to the table\n            //   Use the `name` column family for the name\n            //   Use the `contactinfo` column family for the email\n            for (int i = 0; i< people.length; i++) {\n              Put person = new Put(Bytes.toBytes(people[i][0]));\n              person.add(Bytes.toBytes(\"name\"), Bytes.toBytes(\"first\"), Bytes.toBytes(people[i][1]));\n              person.add(Bytes.toBytes(\"name\"), Bytes.toBytes(\"last\"), Bytes.toBytes(people[i][2]));\n              person.add(Bytes.toBytes(\"contactinfo\"), Bytes.toBytes(\"email\"), Bytes.toBytes(people[i][3]));\n              table.put(person);\n            }\n            // flush commits and close the table\n            table.flushCommits();\n            table.close();\n          }\n        }\n\n    这是 __CreateTable__ 类，该类将创建名为 __people__ 的表，并使用一些预定义的用户填充它。\n\n3. 保存 __CreateTable.java__ 文件。\n\n4. 在 __hbaseapp\\\\src\\\\main\\\\java\\\\com\\\\microsoft\\\\examples__ 目录中，创建名为 __SearchByEmail.java__ 的新文件。使用以下项作为此文件的内容：\n\n        package com.microsoft.examples;\n        import java.io.IOException;\n\n        import org.apache.hadoop.conf.Configuration;\n        import org.apache.hadoop.hbase.HBaseConfiguration;\n        import org.apache.hadoop.hbase.client.HTable;\n        import org.apache.hadoop.hbase.client.Scan;\n        import org.apache.hadoop.hbase.client.ResultScanner;\n        import org.apache.hadoop.hbase.client.Result;\n        import org.apache.hadoop.hbase.filter.RegexStringComparator;\n        import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;\n        import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;\n        import org.apache.hadoop.hbase.util.Bytes;\n        import org.apache.hadoop.util.GenericOptionsParser;\n\n        public class SearchByEmail {\n          public static void main(String[] args) throws IOException {\n            Configuration config = HBaseConfiguration.create();\n\n            // Use GenericOptionsParser to get only the parameters to the class\n            // and not all the parameters passed (when using WebHCat for example)\n            String[] otherArgs = new GenericOptionsParser(config, args).getRemainingArgs();\n            if (otherArgs.length != 1) {\n              System.out.println(\"usage: [regular expression]\");\n              System.exit(-1);\n            }\n\n            // Open the table\n            HTable table = new HTable(config, \"people\");\n\n            // Define the family and qualifiers to be used\n            byte[] contactFamily = Bytes.toBytes(\"contactinfo\");\n            byte[] emailQualifier = Bytes.toBytes(\"email\");\n            byte[] nameFamily = Bytes.toBytes(\"name\");\n            byte[] firstNameQualifier = Bytes.toBytes(\"first\");\n            byte[] lastNameQualifier = Bytes.toBytes(\"last\");\n\n            // Create a new regex filter\n            RegexStringComparator emailFilter = new RegexStringComparator(otherArgs[0]);\n            // Attach the regex filter to a filter\n            //   for the email column\n            SingleColumnValueFilter filter = new SingleColumnValueFilter(\n              contactFamily,\n              emailQualifier,\n              CompareOp.EQUAL,\n              emailFilter\n            );\n\n            // Create a scan and set the filter\n            Scan scan = new Scan();\n            scan.setFilter(filter);\n\n            // Get the results\n            ResultScanner results = table.getScanner(scan);\n            // Iterate over results and print  values\n            for (Result result : results ) {\n              String id = new String(result.getRow());\n              byte[] firstNameObj = result.getValue(nameFamily, firstNameQualifier);\n              String firstName = new String(firstNameObj);\n              byte[] lastNameObj = result.getValue(nameFamily, lastNameQualifier);\n              String lastName = new String(lastNameObj);\n              System.out.println(firstName + \" \" + lastName + \" - ID: \" + id);\n              byte[] emailObj = result.getValue(contactFamily, emailQualifier);\n              String email = new String(emailObj);\n              System.out.println(firstName + \" \" + lastName + \" - \" + email + \" - ID: \" + id);\n            }\n            results.close();\n            table.close();\n          }\n        }\n\n    __SearchByEmail__ 类可用于按电子邮件地址查询行。由于它使用正则表达式筛选器，因此，你可以在使用类时提供字符串或正则表达式。\n\n5. 保存 __SearchByEmail.java__ 文件。\n\n6. 在 __hbaseapp\\\\src\\\\main\\\\hava\\\\com\\\\microsoft\\\\examples__ 目录中，创建名为 __DeleteTable.java__ 的新文件。使用以下项作为此文件的内容：\n\n        package com.microsoft.examples;\n        import java.io.IOException;\n\n        import org.apache.hadoop.conf.Configuration;\n        import org.apache.hadoop.hbase.HBaseConfiguration;\n        import org.apache.hadoop.hbase.client.HBaseAdmin;\n\n        public class DeleteTable {\n          public static void main(String[] args) throws IOException {\n            Configuration config = HBaseConfiguration.create();\n\n            // Create an admin object using the config\n            HBaseAdmin admin = new HBaseAdmin(config);\n\n            // Disable, and then delete the table\n            admin.disableTable(\"people\");\n            admin.deleteTable(\"people\");\n          }\n        }\n\n    此类用于清除本示例，方法是禁用并删除由 __CreateTable__ 类创建的表。\n\n7. 保存 __DeleteTable.java__ 文件。\n\n##生成并打包应用程序\n\n1. 打开命令提示符，然后将目录更改为 __hbaseapp__ 目录。\n\n2. 使用以下命令来构建包含应用程序的 JAR 文件：\n\n        mvn clean package\n\n    这将清除任何以前构建的项目，下载任何尚未安装的依赖项，然后构建和打包应用程序。\n\n3. 完成该命令后，__hbaseapp\\\\target__ 目录将包含名为 __hbaseapp-1.0-SNAPSHOT.jar__ 的文件。\n\n    > [AZURE.NOTE]__hbaseapp-1.0-SNAPSHOT.jar__ 文件是 uber jar（有时称为 fat jar），其中包含运行应用程序所需的所有依赖项。\n\n##上载 JAR 文件并启动作业\n\n> [AZURE.NOTE]你可以使用多种方法将文件上载到 HDInsight 群集，如[在 HDInsight 中为 Hadoop 作业上载数据](/documentation/articles/hdinsight-upload-data)中所述。以下步骤使用 [Azure PowerShell](/documentation/articles/powershell-install-configure)。\n\n1. 安装并配置 Azure PowerShell 后，请创建名为 __hbase-runner.psm1__ 的新文件。使用以下项作为此文件的内容：\n\n        <#\n        .SYNOPSIS\n        Copies a file to the primary storage of an HDInsight cluster.\n        .DESCRIPTION\n        Copies a file from a local directory to the blob container for\n        the HDInsight cluster.\n        .EXAMPLE\n        Start-HBaseExample -className \"com.microsoft.examples.CreateTable\"\n        -clusterName \"MyHDInsightCluster\"\n        \n        .EXAMPLE\n        Start-HBaseExample -className \"com.microsoft.examples.SearchByEmail\"\n        -clusterName \"MyHDInsightCluster\"\n        -emailRegex \"contoso.com\"\n        \n        .EXAMPLE\n        Start-HBaseExample -className \"com.microsoft.examples.SearchByEmail\"\n        -clusterName \"MyHDInsightCluster\"\n        -emailRegex \"^r\" -showErr\n        #>\n        \n        function Start-HBaseExample {\n        [CmdletBinding(SupportsShouldProcess = $true)]\n        param(\n        #The class to run\n        [Parameter(Mandatory = $true)]\n        [String]$className,\n        \n        #The name of the HDInsight cluster\n        [Parameter(Mandatory = $true)]\n        [String]$clusterName,\n        \n        #Only used when using SearchByEmail\n        [Parameter(Mandatory = $false)]\n        [String]$emailRegex,\n        \n        #Use if you want to see stderr output\n        [Parameter(Mandatory = $false)]\n        [Switch]$showErr\n        )\n        \n        Set-StrictMode -Version 3\n        \n        # Is the Azure module installed?\n        FindAzure\n        \n        # Get the login for the HDInsight cluster\n        $creds = Get-Credential\n        \n        # Get storage information\n        $storage = GetStorage -clusterName $clusterName\n        \n        # The JAR\n        $jarFile = \"wasb:///example/jars/hbaseapp-1.0-SNAPSHOT.jar\"\n        \n        # The job definition\n        $jobDefinition = New-AzureHDInsightMapReduceJobDefinition `\n            -JarFile $jarFile `\n            -ClassName $className `\n            -Arguments $emailRegex\n        \n        # Get the job output\n        $job = Start-AzureHDInsightJob `\n            -Cluster $clusterName `\n            -JobDefinition $jobDefinition `\n            -Credential $creds\n        Write-Host \"Wait for the job to complete ...\" -ForegroundColor Green\n        Wait-AzureHDInsightJob `\n            -Cluster $clusterName `\n            -JobId $job.JobId `\n            -Credential $creds\n        if($showErr)\n        {\n        Write-Host \"STDERR\"\n        Get-AzureHDInsightJobOutput `\n                    -Cluster $clusterName `\n                    -JobId $job.JobId `\n                    -Credential $creds\n                    -StandardError\n        }\n        Write-Host \"Display the standard output ...\" -ForegroundColor Green\n        Get-AzureHDInsightJobOutput `\n                    -Cluster $clusterName `\n                    -JobId $job.JobId `\n                    -Credential $creds\n        }\n        \n        <#\n        .SYNOPSIS\n        Copies a file to the primary storage of an HDInsight cluster.\n        .DESCRIPTION\n        Copies a file from a local directory to the blob container for\n        the HDInsight cluster.\n        .EXAMPLE\n        Add-HDInsightFile -localPath \"C:\\temp\\data.txt\"\n        -destinationPath \"example/data/data.txt\"\n        -ClusterName \"MyHDInsightCluster\"\n        .EXAMPLE\n        Add-HDInsightFile -localPath \"C:\\temp\\data.txt\"\n        -destinationPath \"example/data/data.txt\"\n        -ClusterName \"MyHDInsightCluster\"\n        -Container \"MyContainer\"\n        #>\n        \n        function Add-HDInsightFile {\n            [CmdletBinding(SupportsShouldProcess = $true)]\n            param(\n                #The path to the local file.\n                [Parameter(Mandatory = $true)]\n                [String]$localPath,\n                \n                #The destination path and file name, relative to the root of the container.\n                [Parameter(Mandatory = $true)]\n                [String]$destinationPath,\n                \n                #The name of the HDInsight cluster\n                [Parameter(Mandatory = $true)]\n                [String]$clusterName,\n                \n                #If specified, overwrites existing files without prompting\n                [Parameter(Mandatory = $false)]\n                [Switch]$force\n            )\n            \n            Set-StrictMode -Version 3\n            \n            # Is the Azure module installed?\n            FindAzure\n            \n            # Get authentication for the cluster\n            $creds=Get-Credential\n            \n            # Does the local path exist?\n            if (-not (Test-Path $localPath))\n            {\n                throw \"Source path '$localPath' does not exist.\"\n            }\n            \n            # Get the primary storage container\n            $storage = GetStorage -clusterName $clusterName\n            \n            # Upload file to storage, overwriting existing files if -force was used.\n            Set-AzureStorageBlobContent -File $localPath `\n                -Blob $destinationPath `\n                -force:$force `\n                -Container $storage.container `\n                -Context $storage.context\n        }\n        \n        function FindAzure {\n            # Is there an active Azure subscription?\n            $sub = Get-AzureSubscription -ErrorAction SilentlyContinue\n            if(-not($sub))\n            {\n                throw \"No active Azure subscription found! If you have a subscription, use the Add-AzureAccount cmdlet to login to your subscription.\"\n            }\n        }\n        \n        function GetStorage {\n            param(\n                [Parameter(Mandatory = $true)]\n                [String]$clusterName\n            )\n            $hdi = Get-AzureHDInsightCluster -Name $clusterName\n            # Does the cluster exist?\n            if (!$hdi)\n            {\n                throw \"HDInsight cluster '$clusterName' does not exist.\"\n            }\n            # Create a return object for context & container\n            $return = @{}\n            $storageAccounts = @{}\n            \n            # Get storage information\n            $resourceGroup = $hdi.ResourceGroup\n            $storageAccountName=$hdi.DefaultStorageAccount.split('.')[0]\n            $container=$hdi.DefaultStorageContainer\n            $storageAccountKey=Get-AzureStorageKey `\n                -StorageAccountName $storageAccountName `\n                | %{ $_.Primary }\n            # Get the storage context, as we can't depend\n            # on using the default storage context\n            $return.context = New-AzureStorageContext -StorageAccountName $storageAccountName -StorageAccountKey $storageAccountKey\n            # Get the container, so we know where to\n            # find/store blobs\n            $return.container = $container\n            # Return storage accounts to support finding all accounts for\n            # a cluster\n            $return.storageAccount = $storageAccountName\n            $return.storageAccountKey = $storageAccountKey\n            \n            return $return\n        }\n        # Only export the verb-phrase things\n        export-modulemember *-*\n\n    此文件包含两个模块：\n\n    * __Add-HDInsightFile__ - 用于将文件上载到 HDInsight\n\n    * __Start-HBaseExample__ - 用于运行以前创建的类\n\n2. 保存 __hbase-runner.psm1__ 文件。\n\n3. 打开新的 Azure PowerShell 窗口，将目录切换到 __hbaseapp__ 目录，然后运行以下命令。\n\n        PS C:\\ Import-Module c:\\path\\to\\hbase-runner.psm1\n\n    将路径切换到前面创建的 __hbase-runner.psm1__ 文件所在的位置。这将为此 Azure PowerShell 会话注册模块。\n\n2. 使用以下命令将 __hbaseapp-1.0-SNAPSHOT.jar__ 上载到你的 HDInsight 群集。\n\n        Add-HDInsightFile -localPath target\\hbaseapp-1.0-SNAPSHOT.jar -destinationPath example/jars/hbaseapp-1.0-SNAPSHOT.jar -clusterName hdinsightclustername\n\n    将 __hdinsightclustername__ 替换为 HDInsight 群集的名称。此后，该命令将 __hbaseapp-1.0-SNAPSHOT.jar__ 上载到 HDInsight 群集的主存储中的 __example/jars__ 位置。\n\n3. 在上载这些文件后，使用以下代码来通过 __hbaseapp__ 创建新表：\n\n        Start-HBaseExample -className com.microsoft.examples.CreateTable -clusterName hdinsightclustername\n\n    将 __hdinsightclustername__ 替换为 HDInsight 群集的名称。\n\n    此命令将在 HDInsight 群集中创建名为 __people__ 的新表。此命令在控制台窗口中不显示任何输出。\n\n2. 若要在表中搜索条目，请使用以下命令：\n\n        Start-HBaseExample -className com.microsoft.examples.SearchByEmail -clusterName hdinsightclustername -emailRegex contoso.com\n\n    将 __hdinsightclustername__ 替换为 HDInsight 群集的名称。\n\n    此命令使用 **SearchByEmail** 类搜索任何 __contactinformation__ 列系列和 __email__ 列包含字符串 __contoso.com__ 的行。你应该会收到以下结果：\n\n        Franklin Holtz - ID: 2\n        Franklin Holtz - franklin@contoso.com - ID: 2\n        Rae Schroeder - ID: 4\n        Rae Schroeder - rae@contoso.com - ID: 4\n        Gabriela Ingram - ID: 6\n        Gabriela Ingram - gabriela@contoso.com - ID: 6\n\n    将 __fabrikam.com__ 用于 `-emailRegex` 值会返回电子邮件字段中包含 __fabrikam.com__ 的用户。由于此搜索是使用基于正则表达式的筛选器执行的，因此你也可以输入正则表达式，例如 __^r__，这样就会返回电子邮件以字母“r”开头的条目。\n\n##删除表\n\n在完成该示例后，请在 Azure PowerShell 会话中使用以下命令，以删除本示例中使用的 __people__ 表：\n\n    Start-HBaseExample -className com.microsoft.examples.DeleteTable -clusterName hdinsightclustername\n\n将 __hdinsightclustername__ 替换为 HDInsight 群集的名称。\n\n##故障排除\n\n###使用 Start-HBaseExample 时无结果或意外结果\n\n使用 `-showErr` 参数可查看运行作业时生成的标准错误 (STDERR)。\n\n<!---HONumber=Mooncake_1207_2015-->"
+}

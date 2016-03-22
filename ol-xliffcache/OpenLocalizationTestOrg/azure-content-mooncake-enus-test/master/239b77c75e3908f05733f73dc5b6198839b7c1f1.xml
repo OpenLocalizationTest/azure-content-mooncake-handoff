@@ -1,0 +1,859 @@
+{
+  "nodes": [
+    {
+      "content": "基本配置测试环境",
+      "pos": [
+        27,
+        35
+      ]
+    },
+    {
+      "content": "了解如何在 Azure 中创建模拟简化 Intranet 的简单开发/测试环境。",
+      "pos": [
+        54,
+        94
+      ]
+    },
+    {
+      "content": "基本配置测试环境",
+      "pos": [
+        354,
+        362
+      ]
+    },
+    {
+      "pos": [
+        364,
+        450
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]"
+    },
+    {
+      "content": "本文为你提供在 Azure 虚拟网络中创建基本配置测试环境的分步说明。",
+      "pos": [
+        452,
+        487
+      ]
+    },
+    {
+      "content": "可以使用生成的测试环境：",
+      "pos": [
+        489,
+        501
+      ]
+    },
+    {
+      "content": "进行应用程序开发和测试。",
+      "pos": [
+        505,
+        517
+      ]
+    },
+    {
+      "pos": [
+        520,
+        624
+      ],
+      "content": "适用于<bpt id=\"p1\">[</bpt>模拟混合云环境<ept id=\"p1\">](/documentation/articles/virtual-networks-setup-simulated-hybrid-cloud-environment-testing)</ept>。"
+    },
+    {
+      "content": "对于你自己设计的测试环境，使用其他虚拟机和 Azure 服务对其进行扩展。",
+      "pos": [
+        627,
+        664
+      ]
+    },
+    {
+      "content": "基本配置测试环境由名为 TestLab 的仅限云虚拟网络中的公司网络子网组成，它模拟连接到 Internet 的简化专用 Intranet。",
+      "pos": [
+        666,
+        736
+      ]
+    },
+    {
+      "content": "它包含：",
+      "pos": [
+        818,
+        822
+      ]
+    },
+    {
+      "content": "一个运行 Windows Server 2012 R2 的名为 DC1 的 Azure 虚拟机，它配置为 Intranet 域控制器和域名系统 (DNS) 服务器。",
+      "pos": [
+        826,
+        908
+      ]
+    },
+    {
+      "content": "一个运行 Windows Server 2012 R2 的名为 APP1 的 Azure 虚拟机，它配置为常规应用程序和 Web 服务器。",
+      "pos": [
+        911,
+        980
+      ]
+    },
+    {
+      "content": "一个运行 Windows Server 2012 R2 的名为 CLIENT1 的 Azure 虚拟机，它将充当 Intranet 客户端。",
+      "pos": [
+        983,
+        1053
+      ]
+    },
+    {
+      "content": "此配置允许 DC1、APP1、CLIENT1 及其他公司网络子网计算机执行以下操作：",
+      "pos": [
+        1055,
+        1097
+      ]
+    },
+    {
+      "content": "连接到 Internet 安装更新、实时访问 Internet 资源，以及参与公有云技术（如 Microsoft Office 365 及其他 Azure 服务）。",
+      "pos": [
+        1101,
+        1183
+      ]
+    },
+    {
+      "content": "从连接到 Internet 或组织网络的计算机使用远程桌面连接进行远程管理。",
+      "pos": [
+        1186,
+        1224
+      ]
+    },
+    {
+      "content": "在 Azure 中设置 Windows Server 2012 R2 基本配置测试环境的公司网络子网分为四个阶段。",
+      "pos": [
+        1226,
+        1283
+      ]
+    },
+    {
+      "content": "创建虚拟网络。",
+      "pos": [
+        1289,
+        1296
+      ]
+    },
+    {
+      "content": "配置 DC1。",
+      "pos": [
+        1301,
+        1308
+      ]
+    },
+    {
+      "content": "配置 APP1。",
+      "pos": [
+        1313,
+        1321
+      ]
+    },
+    {
+      "content": "配置 CLIENT1。",
+      "pos": [
+        1326,
+        1337
+      ]
+    },
+    {
+      "pos": [
+        1339,
+        1401
+      ],
+      "content": "如果你还没有 Azure 帐户，可以在<bpt id=\"p1\">[</bpt>试用 Azure<ept id=\"p1\">](/pricing/1rmb-trial)</ept> 中注册一个免费试用版。"
+    },
+    {
+      "pos": [
+        1405,
+        1627
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> Azure 中的虚拟机在运行时会持续产生货币成本。此成本是针对你的试用或付费订阅进行计费的。有关正在运行的 Azure 虚拟机的成本的详细信息，请参阅<bpt id=\"p1\">[</bpt>虚拟机定价详细信息<ept id=\"p1\">](/home/features/virtual-machines/#price)</ept>和 <bpt id=\"p2\">[</bpt>Azure 定价计算器<ept id=\"p2\">](/pricing/calculator/)</ept>。若要控制成本，请参阅<bpt id=\"p3\">[</bpt>将 Azure 中的测试环境虚拟机的成本降至最低<ept id=\"p3\">](#costs)</ept>。"
+    },
+    {
+      "content": "阶段 1：创建虚拟网络",
+      "pos": [
+        1632,
+        1643
+      ]
+    },
+    {
+      "content": "首先，你可以创建将托管基本配置的公司网络子网的 TestLab 虚拟网络。",
+      "pos": [
+        1645,
+        1682
+      ]
+    },
+    {
+      "pos": [
+        1688,
+        1769
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>的任务栏中，单击“新建”&gt;“网络服务”&gt;“虚拟网络”&gt;“自定义创建”。"
+    },
+    {
+      "pos": [
+        1774,
+        1811
+      ],
+      "content": "在“虚拟网络详细信息”页的<bpt id=\"p1\">**</bpt>“名称”<ept id=\"p1\">**</ept>中键入 <bpt id=\"p2\">**</bpt>TestLab<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "pos": [
+        1816,
+        1835
+      ],
+      "content": "在<bpt id=\"p1\">**</bpt>“位置”<ept id=\"p1\">**</ept>中，选择相应的区域。"
+    },
+    {
+      "content": "单击“下一步”箭头。",
+      "pos": [
+        1840,
+        1850
+      ]
+    },
+    {
+      "pos": [
+        1855,
+        1957
+      ],
+      "content": "在“DNS 服务器和 VPN 连接”页的<bpt id=\"p1\">**</bpt>“DNS 服务器”<ept id=\"p1\">**</ept>中，在<bpt id=\"p2\">**</bpt>“选择或输入名称”<ept id=\"p2\">**</ept>中键入 <bpt id=\"p3\">**</bpt>DC1<ept id=\"p3\">**</ept>，在<bpt id=\"p4\">**</bpt>“IP 地址”<ept id=\"p4\">**</ept>中键入 <bpt id=\"p5\">**</bpt>10.0.0.4<ept id=\"p5\">**</ept>，然后单击“下一步”箭头。"
+    },
+    {
+      "pos": [
+        1962,
+        2023
+      ],
+      "content": "在“虚拟网络地址空间”页上，在<bpt id=\"p1\">**</bpt>“子网”<ept id=\"p1\">**</ept>中，单击 <bpt id=\"p2\">**</bpt>Subnet-1<ept id=\"p2\">**</ept>，并将名称替换为 <bpt id=\"p3\">**</bpt>Corpnet<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "pos": [
+        2028,
+        2079
+      ],
+      "content": "在 Corpnet 子网的<bpt id=\"p1\">**</bpt>“CIDR (地址计数)”<ept id=\"p1\">**</ept>列中，单击<bpt id=\"p2\">**</bpt>“/24 (256)”<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "单击“完成”图标。请等到虚拟网络创建完以后再继续。",
+      "pos": [
+        2084,
+        2109
+      ]
+    },
+    {
+      "pos": [
+        2111,
+        2255
+      ],
+      "content": "接下来，请按<bpt id=\"p1\">[</bpt>如何安装和配置 Azure PowerShell<ept id=\"p1\">](/documentation/articles/powershell-install-configure)</ept> 中的说明在本地计算机上安装 Azure PowerShell。打开 Azure PowerShell 命令提示符。"
+    },
+    {
+      "content": "首先，使用以下命令选择相应的 Azure 订阅。将引号内的所有内容（包括 &lt; and &gt; 字符）替换为相应的名称。",
+      "pos": [
+        2257,
+        2314
+      ]
+    },
+    {
+      "pos": [
+        2415,
+        2482
+      ],
+      "content": "你可以从 <bpt id=\"p1\">**</bpt>Get-AzureSubscription<ept id=\"p1\">**</ept> 命令显示的 <bpt id=\"p2\">**</bpt>SubscriptionName<ept id=\"p2\">**</ept> 属性获取订阅名称。"
+    },
+    {
+      "content": "接下来，你将创建一个 Azure 云服务。云服务充当虚拟网络中放置的虚拟机的安全边界和逻辑容器。它还为你提供了远程连接到 Corpnet 子网中的虚拟机并对其进行管理的方法。",
+      "pos": [
+        2484,
+        2571
+      ]
+    },
+    {
+      "pos": [
+        2573,
+        2633
+      ],
+      "content": "必须为你的云服务选取唯一名称。<bpt id=\"p1\">*</bpt>云服务名称只能包含字母、数字和连字符。该字段中的第一个和最后一个字符必须是字母或数字。<ept id=\"p1\">*</ept>"
+    },
+    {
+      "pos": [
+        2635,
+        2756
+      ],
+      "content": "例如，你可以将云服务命名为 TestLab-<bpt id=\"p1\">*</bpt>UniqueSequence<ept id=\"p1\">*</ept>，其中 <bpt id=\"p2\">*</bpt>UniqueSequence<ept id=\"p2\">*</ept> 是你组织的缩写。例如，如果你的组织名为 Tailspin Toys，则可以将云服务命名为 TestLab-Tailspin。"
+    },
+    {
+      "content": "你可以使用此 Azure PowerShell 命令测试名称的唯一性。",
+      "pos": [
+        2758,
+        2793
+      ]
+    },
+    {
+      "content": "如果此命令返回“False”，则你建议的名称是唯一的。然后，使用以下命令创建云服务。",
+      "pos": [
+        2854,
+        2896
+      ]
+    },
+    {
+      "content": "记录云服务的实际名称。",
+      "pos": [
+        3044,
+        3055
+      ]
+    },
+    {
+      "pos": [
+        3057,
+        3151
+      ],
+      "content": "接下来，你可以配置将包含虚拟机的磁盘和额外的数据磁盘的存储帐户。<bpt id=\"p1\">*</bpt>必须选择只包含小写字母和数字的唯一名称。<ept id=\"p1\">*</ept> 你可以使用此 Azure PowerShell 命令测试存储帐户名称的唯一性。"
+    },
+    {
+      "content": "如果此命令返回“False”，则你建议的名称是唯一的。然后，使用这些命令创建存储帐户并设置订阅以使用它。",
+      "pos": [
+        3214,
+        3266
+      ]
+    },
+    {
+      "content": "这是你当前的配置。",
+      "pos": [
+        3507,
+        3516
+      ]
+    },
+    {
+      "content": "阶段 2：配置 DC1",
+      "pos": [
+        3601,
+        3612
+      ]
+    },
+    {
+      "content": "DC1 是 corp.contoso.com Active Directory 域服务 (AD DS) 域的域控制器和 TestLab 虚拟网络虚拟机的 DNS 服务器。",
+      "pos": [
+        3614,
+        3699
+      ]
+    },
+    {
+      "content": "首先，填写云服务的名称，并在本地计算机上的 Azure PowerShell 命令提示符下运行这些命令以为 DC1 创建 Azure 虚拟机。",
+      "pos": [
+        3701,
+        3772
+      ]
+    },
+    {
+      "content": "接下来，连接到 DC1 虚拟机。",
+      "pos": [
+        4593,
+        4609
+      ]
+    },
+    {
+      "pos": [
+        4615,
+        4680
+      ],
+      "content": "在 Azure 管理门户中，单击左窗格中的<bpt id=\"p1\">**</bpt>“虚拟机”<ept id=\"p1\">**</ept>，然后单击 DC1 虚拟机的<bpt id=\"p2\">**</bpt>“状态”<ept id=\"p2\">**</ept>列中的<bpt id=\"p3\">**</bpt>“已启动”<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "pos": [
+        4687,
+        4704
+      ],
+      "content": "在任务栏中，单击<bpt id=\"p1\">**</bpt>“连接”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        4709,
+        4739
+      ],
+      "content": "当系统提示你打开 DC1.rdp 时，单击<bpt id=\"p1\">**</bpt>“打开”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        4744,
+        4770
+      ],
+      "content": "遇到远程桌面连接消息框提示时，单击<bpt id=\"p1\">**</bpt>“连接”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "当系统提示你输入凭据时，请使用以下凭据：",
+      "pos": [
+        4775,
+        4795
+      ]
+    },
+    {
+      "pos": [
+        4798,
+        4820
+      ],
+      "content": "名称：*<bpt id=\"p1\">*</bpt>DC1\\*<ept id=\"p1\">*</ept>[本地管理员帐户名称]"
+    },
+    {
+      "content": "密码：[本地管理员帐户密码]",
+      "pos": [
+        4823,
+        4837
+      ]
+    },
+    {
+      "pos": [
+        4842,
+        4876
+      ],
+      "content": "当系统使用引用证书的远程桌面连接消息框提示你时，单击<bpt id=\"p1\">**</bpt>“是”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "接下来，将额外的数据磁盘添加为驱动器盘符为 F: 的新卷。",
+      "pos": [
+        4878,
+        4907
+      ]
+    },
+    {
+      "pos": [
+        4913,
+        4955
+      ],
+      "content": "在服务器管理器的左窗格中，单击<bpt id=\"p1\">**</bpt>“文件和存储服务”<ept id=\"p1\">**</ept>，然后单击<bpt id=\"p2\">**</bpt>“磁盘”<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "在内容窗格的“磁盘”组中，单击“磁盘 2”（其“分区”设置为“未知”）。",
+      "pos": [
+        4960,
+        4996
+      ]
+    },
+    {
+      "pos": [
+        5001,
+        5026
+      ],
+      "content": "单击<bpt id=\"p1\">**</bpt>“任务”<ept id=\"p1\">**</ept>，然后单击<bpt id=\"p2\">**</bpt>“新建卷”<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "pos": [
+        5031,
+        5059
+      ],
+      "content": "在新建卷向导的“开始之前”页上，单击<bpt id=\"p1\">**</bpt>“下一步”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "在“选择服务器和磁盘”页上，单击“磁盘 2”，然后单击“下一步”。出现提示时，单击“确定”。",
+      "pos": [
+        5064,
+        5110
+      ]
+    },
+    {
+      "pos": [
+        5115,
+        5139
+      ],
+      "content": "在“指定卷的大小”页上，单击<bpt id=\"p1\">**</bpt>“下一步”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        5144,
+        5173
+      ],
+      "content": "在“分配到驱动器号或文件夹”页上，单击<bpt id=\"p1\">**</bpt>“下一步”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        5178,
+        5204
+      ],
+      "content": "在“选择文件系统设置”页上，单击<bpt id=\"p1\">**</bpt>“下一步”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        5209,
+        5230
+      ],
+      "content": "在“确认选择”页上，单击<bpt id=\"p1\">**</bpt>“创建”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        5235,
+        5250
+      ],
+      "content": "完成后，单击<bpt id=\"p1\">**</bpt>“关闭”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "接下来，将 DC1 配置为 corp.contoso.com 域的域控制器和 DNS 服务器。在管理员级 Windows PowerShell 命令提示符下运行这些命令。",
+      "pos": [
+        5252,
+        5337
+      ]
+    },
+    {
+      "content": "在 DC1 重启后，重新连接到 DC1 虚拟机。",
+      "pos": [
+        5529,
+        5553
+      ]
+    },
+    {
+      "pos": [
+        5559,
+        5610
+      ],
+      "content": "在 Azure 管理门户的虚拟机页上，单击 DC1 虚拟机<bpt id=\"p1\">**</bpt>“状态”<ept id=\"p1\">**</ept>列中的<bpt id=\"p2\">**</bpt>“正在运行”<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "pos": [
+        5615,
+        5632
+      ],
+      "content": "在任务栏中，单击<bpt id=\"p1\">**</bpt>“连接”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        5637,
+        5667
+      ],
+      "content": "当系统提示你打开 DC1.rdp 时，单击<bpt id=\"p1\">**</bpt>“打开”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        5672,
+        5698
+      ],
+      "content": "遇到远程桌面连接消息框提示时，单击<bpt id=\"p1\">**</bpt>“连接”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "当系统提示你输入凭据时，请使用以下凭据：",
+      "pos": [
+        5703,
+        5723
+      ]
+    },
+    {
+      "pos": [
+        5726,
+        5749
+      ],
+      "content": "名称：*<bpt id=\"p1\">*</bpt>CORP\\*<ept id=\"p1\">*</ept>[本地管理员帐户名称]"
+    },
+    {
+      "content": "密码：[本地管理员帐户密码]",
+      "pos": [
+        5752,
+        5766
+      ]
+    },
+    {
+      "pos": [
+        5771,
+        5801
+      ],
+      "content": "当引用证书的远程桌面连接消息框提示你时，单击<bpt id=\"p1\">**</bpt>“是”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "接下来，在 Active Directory 中创建登录到 CORP 域成员计算机时将使用的用户帐户。在管理员级别的 Windows PowerShell 命令提示符下，一次一个地运行这些命令。",
+      "pos": [
+        5803,
+        5900
+      ]
+    },
+    {
+      "pos": [
+        6305,
+        6493
+      ],
+      "content": "请注意，第一个命令将产生提供 User1 帐户密码的提示。由于此帐户将用于所有 CORP 域成员计算机的远程桌面连接，请选择一个强密码。若要检查其强度，请参阅<bpt id=\"p1\">[</bpt>密码检查器：使用强密码<ept id=\"p1\">](https://www.microsoft.com/security/pc-security/password-checker.aspx)</ept>。记录 User1 帐户密码，并将其存储在安全位置。"
+    },
+    {
+      "content": "使用 CORP\\\\User1 帐户重新连接到 DC1 虚拟机。",
+      "pos": [
+        6495,
+        6526
+      ]
+    },
+    {
+      "content": "接下来，若要允许 Ping 工具的流量，请在管理员级别的 Windows PowerShell 命令提示符下运行此命令。",
+      "pos": [
+        6528,
+        6588
+      ]
+    },
+    {
+      "content": "这是你当前的配置。",
+      "pos": [
+        6696,
+        6705
+      ]
+    },
+    {
+      "content": "阶段 3：配置 APP1",
+      "pos": [
+        6790,
+        6802
+      ]
+    },
+    {
+      "content": "APP1 提供 Web 服务和文件共享服务。",
+      "pos": [
+        6804,
+        6826
+      ]
+    },
+    {
+      "content": "首先，填写云服务的名称，并在本地计算机上的 Azure PowerShell 命令提示符下运行这些命令以为 APP1 创建 Azure 虚拟机。",
+      "pos": [
+        6828,
+        6900
+      ]
+    },
+    {
+      "content": "接下来，使用 CORP\\\\User1 凭据连接到 APP1 虚拟机，然后打开管理员级别的 Windows PowerShell 命令提示符。",
+      "pos": [
+        7816,
+        7886
+      ]
+    },
+    {
+      "pos": [
+        7888,
+        7965
+      ],
+      "content": "若要检查 APP1 与 DC1 之间的名称解析和网络通信，请运行 <bpt id=\"p1\">**</bpt>ping dc1.corp.contoso.com<ept id=\"p1\">**</ept> 命令，并验证是否有四条答复。"
+    },
+    {
+      "content": "接下来，在 Windows PowerShell 命令提示符下使用此命令将 APP1 设为 Web 服务器。",
+      "pos": [
+        7967,
+        8021
+      ]
+    },
+    {
+      "content": "接下来，使用以下命令在 APP1 上的文件夹中创建共享文件夹和文本文件。",
+      "pos": [
+        8089,
+        8125
+      ]
+    },
+    {
+      "content": "这是你当前的配置。",
+      "pos": [
+        8315,
+        8324
+      ]
+    },
+    {
+      "content": "阶段 4：配置 CLIENT1",
+      "pos": [
+        8409,
+        8424
+      ]
+    },
+    {
+      "content": "CLIENT1 在 Contoso Intranet 中充当典型笔记本电脑、平板电脑或台式计算机。",
+      "pos": [
+        8426,
+        8475
+      ]
+    },
+    {
+      "content": "首先，填写云服务的名称，并在本地计算机上的 Azure PowerShell 命令提示符下运行这些命令以为 CLIENT1 创建 Azure 虚拟机。",
+      "pos": [
+        8477,
+        8552
+      ]
+    },
+    {
+      "content": "接下来，使用 CORP\\\\User1 凭据连接到 CLIENT1 虚拟机。",
+      "pos": [
+        9474,
+        9511
+      ]
+    },
+    {
+      "pos": [
+        9513,
+        9620
+      ],
+      "content": "若要检查 CLIENT1 与 DC1 之间的名称解析和网络通信，请在 Windows PowerShell 命令提示符下运行 <bpt id=\"p1\">**</bpt>ping dc1.corp.contoso.com<ept id=\"p1\">**</ept> 命令，并验证是否有四条答复。"
+    },
+    {
+      "content": "接下来，验证是否可以从 CLIENT1 访问 APP1 上的 Web 资源和文件共享资源。",
+      "pos": [
+        9622,
+        9667
+      ]
+    },
+    {
+      "pos": [
+        9673,
+        9700
+      ],
+      "content": "在服务器管理器的树窗格中，单击<bpt id=\"p1\">**</bpt>“本地服务器”<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        9705,
+        9755
+      ],
+      "content": "在<bpt id=\"p1\">**</bpt>“CLIENT1 的属性”<ept id=\"p1\">**</ept>中，单击<bpt id=\"p2\">**</bpt>“IE 增强的安全配置”<ept id=\"p2\">**</ept>旁边的<bpt id=\"p3\">**</bpt>“启用”<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "pos": [
+        9760,
+        9837
+      ],
+      "content": "在<bpt id=\"p1\">**</bpt>“Internet Explorer 增强的安全配置”<ept id=\"p1\">**</ept>中，对<bpt id=\"p2\">**</bpt>“管理员”<ept id=\"p2\">**</ept>和<bpt id=\"p3\">**</bpt>“用户”<ept id=\"p3\">**</ept>单击<bpt id=\"p4\">**</bpt>“关闭”<ept id=\"p4\">**</ept>，然后单击<bpt id=\"p5\">**</bpt>“确定”<ept id=\"p5\">**</ept>。"
+    },
+    {
+      "pos": [
+        9842,
+        9890
+      ],
+      "content": "在“开始”屏幕中，单击<bpt id=\"p1\">**</bpt>“Internet Explorer”<ept id=\"p1\">**</ept>，然后单击<bpt id=\"p2\">**</bpt>“确定”<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "pos": [
+        9895,
+        9978
+      ],
+      "content": "在地址栏中，键入 <bpt id=\"p1\">**</bpt>http://app1.corp.contoso.com/<ept id=\"p1\">**</ept>，然后按 Enter。你应看到 APP1 的默认 Internet 信息服务网页。"
+    },
+    {
+      "content": "在桌面任务栏上，单击“文件资源管理器”图标。",
+      "pos": [
+        9983,
+        10005
+      ]
+    },
+    {
+      "pos": [
+        10010,
+        10048
+      ],
+      "content": "在地址栏中，键入 <bpt id=\"p1\">**</bpt>\\\\\\app1\\\\Files<ept id=\"p1\">**</ept>，然后按 Enter。"
+    },
+    {
+      "content": "你应看到显示文件共享文件夹的内容的文件夹窗口。",
+      "pos": [
+        10053,
+        10076
+      ]
+    },
+    {
+      "pos": [
+        10081,
+        10144
+      ],
+      "content": "在<bpt id=\"p1\">**</bpt>“文件”<ept id=\"p1\">**</ept>共享文件夹窗口中，双击 <bpt id=\"p2\">**</bpt>Example.txt<ept id=\"p2\">**</ept> 文件。你应看到 Example.txt 文件的内容。"
+    },
+    {
+      "pos": [
+        10149,
+        10191
+      ],
+      "content": "关闭<bpt id=\"p1\">**</bpt>“example.txt - 记事本”<ept id=\"p1\">**</ept>和<bpt id=\"p2\">**</bpt>“文件”<ept id=\"p2\">**</ept>共享文件夹窗口。"
+    },
+    {
+      "content": "这是你的最后配置。",
+      "pos": [
+        10193,
+        10202
+      ]
+    },
+    {
+      "content": "Azure 中的基本配置现已可用于应用程序开发和测试或其他测试环境。",
+      "pos": [
+        10284,
+        10318
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        10323,
+        10327
+      ]
+    },
+    {
+      "pos": [
+        10331,
+        10442
+      ],
+      "content": "设置<bpt id=\"p1\">[</bpt>模拟的混合云环境<ept id=\"p1\">](/documentation/articles/virtual-networks-setup-simulated-hybrid-cloud-environment-testing)</ept>以测试混合配置。"
+    },
+    {
+      "pos": [
+        10447,
+        10489
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"costs\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>将 Azure 中的测试环境虚拟机的成本降至最低"
+    },
+    {
+      "content": "若要将运行测试环境虚拟机的开销降至最低，可以执行以下操作之一：",
+      "pos": [
+        10491,
+        10522
+      ]
+    },
+    {
+      "content": "创建测试环境，并尽可能快地执行所需的测试和演示。完成后，删除测试环境虚拟机。",
+      "pos": [
+        10526,
+        10564
+      ]
+    },
+    {
+      "content": "关闭测试环境虚拟机，使其处于释放状态。",
+      "pos": [
+        10567,
+        10586
+      ]
+    },
+    {
+      "content": "若要使用 Azure PowerShell 关闭虚拟机，请填写云服务名称，并运行这些命令。",
+      "pos": [
+        10588,
+        10633
+      ]
+    },
+    {
+      "content": "若要确保从已停止（释放）状态启动所有虚拟机时这些虚拟机正常工作，应按以下顺序启动它们：",
+      "pos": [
+        10876,
+        10919
+      ]
+    },
+    {
+      "content": "DC1",
+      "pos": [
+        10925,
+        10928
+      ]
+    },
+    {
+      "content": "APP1",
+      "pos": [
+        10933,
+        10937
+      ]
+    },
+    {
+      "content": "CLIENT1",
+      "pos": [
+        10942,
+        10949
+      ]
+    },
+    {
+      "content": "若要使用 Azure PowerShell 按顺序启动虚拟机，请填写云服务名称，并运行这些命令。",
+      "pos": [
+        10951,
+        10999
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"基本配置测试环境\"\n    description=\"了解如何在 Azure 中创建模拟简化 Intranet 的简单开发/测试环境。\"\n    documentationCenter=\"\"\n    services=\"virtual-machines\"\n    authors=\"JoeDavies-MSFT\"\n    manager=\"timlt\"\n    editor=\"\"\n    tags=\"azure-service-management\"/>\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"01/12/2016\"\n    wacn.date=\"02/26/2016\"/>\n\n# 基本配置测试环境\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-classic-include.md)]\n\n本文为你提供在 Azure 虚拟网络中创建基本配置测试环境的分步说明。\n\n可以使用生成的测试环境：\n\n- 进行应用程序开发和测试。\n- 适用于[模拟混合云环境](/documentation/articles/virtual-networks-setup-simulated-hybrid-cloud-environment-testing)。\n- 对于你自己设计的测试环境，使用其他虚拟机和 Azure 服务对其进行扩展。\n\n基本配置测试环境由名为 TestLab 的仅限云虚拟网络中的公司网络子网组成，它模拟连接到 Internet 的简化专用 Intranet。\n\n![](./media/virtual-machines-base-configuration-test-environment/BC_TLG04.png)\n\n它包含：\n\n- 一个运行 Windows Server 2012 R2 的名为 DC1 的 Azure 虚拟机，它配置为 Intranet 域控制器和域名系统 (DNS) 服务器。\n- 一个运行 Windows Server 2012 R2 的名为 APP1 的 Azure 虚拟机，它配置为常规应用程序和 Web 服务器。\n- 一个运行 Windows Server 2012 R2 的名为 CLIENT1 的 Azure 虚拟机，它将充当 Intranet 客户端。\n\n此配置允许 DC1、APP1、CLIENT1 及其他公司网络子网计算机执行以下操作：\n\n- 连接到 Internet 安装更新、实时访问 Internet 资源，以及参与公有云技术（如 Microsoft Office 365 及其他 Azure 服务）。\n- 从连接到 Internet 或组织网络的计算机使用远程桌面连接进行远程管理。\n\n在 Azure 中设置 Windows Server 2012 R2 基本配置测试环境的公司网络子网分为四个阶段。\n\n1.  创建虚拟网络。\n2.  配置 DC1。\n3.  配置 APP1。\n4.  配置 CLIENT1。\n\n如果你还没有 Azure 帐户，可以在[试用 Azure](/pricing/1rmb-trial) 中注册一个免费试用版。\n\n> [AZURE.NOTE] Azure 中的虚拟机在运行时会持续产生货币成本。此成本是针对你的试用或付费订阅进行计费的。有关正在运行的 Azure 虚拟机的成本的详细信息，请参阅[虚拟机定价详细信息](/home/features/virtual-machines/#price)和 [Azure 定价计算器](/pricing/calculator/)。若要控制成本，请参阅[将 Azure 中的测试环境虚拟机的成本降至最低](#costs)。\n\n## 阶段 1：创建虚拟网络\n\n首先，你可以创建将托管基本配置的公司网络子网的 TestLab 虚拟网络。\n\n1.  在 [Azure 管理门户](https://manage.windowsazure.cn)的任务栏中，单击“新建”>“网络服务”>“虚拟网络”>“自定义创建”。\n2.  在“虚拟网络详细信息”页的**“名称”**中键入 **TestLab**。\n3.  在**“位置”**中，选择相应的区域。\n4.  单击“下一步”箭头。\n5.  在“DNS 服务器和 VPN 连接”页的**“DNS 服务器”**中，在**“选择或输入名称”**中键入 **DC1**，在**“IP 地址”**中键入 **10.0.0.4**，然后单击“下一步”箭头。\n6.  在“虚拟网络地址空间”页上，在**“子网”**中，单击 **Subnet-1**，并将名称替换为 **Corpnet**。\n7.  在 Corpnet 子网的**“CIDR (地址计数)”**列中，单击**“/24 (256)”**。\n8.  单击“完成”图标。请等到虚拟网络创建完以后再继续。\n\n接下来，请按[如何安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure) 中的说明在本地计算机上安装 Azure PowerShell。打开 Azure PowerShell 命令提示符。\n\n首先，使用以下命令选择相应的 Azure 订阅。将引号内的所有内容（包括 < and > 字符）替换为相应的名称。\n\n    $subscr=\"<Subscription name>\"\n    Select-AzureSubscription -SubscriptionName $subscr -Current\n\n你可以从 **Get-AzureSubscription** 命令显示的 **SubscriptionName** 属性获取订阅名称。\n\n接下来，你将创建一个 Azure 云服务。云服务充当虚拟网络中放置的虚拟机的安全边界和逻辑容器。它还为你提供了远程连接到 Corpnet 子网中的虚拟机并对其进行管理的方法。\n\n必须为你的云服务选取唯一名称。*云服务名称只能包含字母、数字和连字符。该字段中的第一个和最后一个字符必须是字母或数字。*\n\n例如，你可以将云服务命名为 TestLab-*UniqueSequence*，其中 *UniqueSequence* 是你组织的缩写。例如，如果你的组织名为 Tailspin Toys，则可以将云服务命名为 TestLab-Tailspin。\n\n你可以使用此 Azure PowerShell 命令测试名称的唯一性。\n\n    Test-AzureName -Service <Proposed cloud service name>\n\n如果此命令返回“False”，则你建议的名称是唯一的。然后，使用以下命令创建云服务。\n\n    $loc=\"<the same location (region) as your TestLab virtual network>\"\n    New-AzureService -Service <Unique cloud service name> -Location $loc\n\n记录云服务的实际名称。\n\n接下来，你可以配置将包含虚拟机的磁盘和额外的数据磁盘的存储帐户。*必须选择只包含小写字母和数字的唯一名称。* 你可以使用此 Azure PowerShell 命令测试存储帐户名称的唯一性。\n\n    Test-AzureName -Storage <Proposed storage account name>\n\n如果此命令返回“False”，则你建议的名称是唯一的。然后，使用这些命令创建存储帐户并设置订阅以使用它。\n\n    $stAccount=\"<your storage account name>\"\n    New-AzureStorageAccount -StorageAccountName $stAccount -Location $loc\n    Set-AzureSubscription -Environment AzureChinaCloud -SubscriptionName $subscr -CurrentStorageAccountName $stAccount\n\n这是你当前的配置。\n\n![](./media/virtual-machines-base-configuration-test-environment/BC_TLG01.png)\n\n## 阶段 2：配置 DC1\n\nDC1 是 corp.contoso.com Active Directory 域服务 (AD DS) 域的域控制器和 TestLab 虚拟网络虚拟机的 DNS 服务器。\n\n首先，填写云服务的名称，并在本地计算机上的 Azure PowerShell 命令提示符下运行这些命令以为 DC1 创建 Azure 虚拟机。\n\n    $serviceName=\"<your cloud service name>\"\n    $cred=Get-Credential -Message \"Type the name and password of the local administrator account for DC1.\"\n    $image= Get-AzureVMImage | where { $_.ImageFamily -eq \"Windows Server 2012 R2 Datacenter\" } | sort PublishedDate -Descending | select -ExpandProperty ImageName -First 1\n    $vm1=New-AzureVMConfig -Name DC1 -InstanceSize Small -ImageName $image\n    $vm1 | Add-AzureProvisioningConfig -Windows -AdminUsername $cred.GetNetworkCredential().Username -Password $cred.GetNetworkCredential().Password\n    $vm1 | Add-AzureDataDisk -CreateNew -DiskSizeInGB 20 -DiskLabel \"AD\" -LUN 0 -HostCaching None\n    $vm1 | Set-AzureSubnet -SubnetNames Corpnet\n    $vm1 | Set-AzureStaticVNetIP -IPAddress 10.0.0.4\n    New-AzureVM -ServiceName $serviceName -VMs $vm1 -VNetName TestLab\n\n接下来，连接到 DC1 虚拟机。\n\n1.  在 Azure 管理门户中，单击左窗格中的**“虚拟机”**，然后单击 DC1 虚拟机的**“状态”**列中的**“已启动”**。  \n2.  在任务栏中，单击**“连接”**。\n3.  当系统提示你打开 DC1.rdp 时，单击**“打开”**。\n4.  遇到远程桌面连接消息框提示时，单击**“连接”**。\n5.  当系统提示你输入凭据时，请使用以下凭据：\n- 名称：**DC1\\**[本地管理员帐户名称]\n- 密码：[本地管理员帐户密码]\n6.  当系统使用引用证书的远程桌面连接消息框提示你时，单击**“是”**。\n\n接下来，将额外的数据磁盘添加为驱动器盘符为 F: 的新卷。\n\n1.  在服务器管理器的左窗格中，单击**“文件和存储服务”**，然后单击**“磁盘”**。\n2.  在内容窗格的“磁盘”组中，单击“磁盘 2”（其“分区”设置为“未知”）。\n3.  单击**“任务”**，然后单击**“新建卷”**。\n4.  在新建卷向导的“开始之前”页上，单击**“下一步”**。\n5.  在“选择服务器和磁盘”页上，单击“磁盘 2”，然后单击“下一步”。出现提示时，单击“确定”。\n6.  在“指定卷的大小”页上，单击**“下一步”**。\n7.  在“分配到驱动器号或文件夹”页上，单击**“下一步”**。\n8.  在“选择文件系统设置”页上，单击**“下一步”**。\n9.  在“确认选择”页上，单击**“创建”**。\n10. 完成后，单击**“关闭”**。\n\n接下来，将 DC1 配置为 corp.contoso.com 域的域控制器和 DNS 服务器。在管理员级 Windows PowerShell 命令提示符下运行这些命令。\n\n    Install-WindowsFeature AD-Domain-Services -IncludeManagementTools\n    Install-ADDSForest -DomainName corp.contoso.com -DatabasePath \"F:\\NTDS\" -SysvolPath \"F:\\SYSVOL\" -LogPath \"F:\\Logs\"\n\n在 DC1 重启后，重新连接到 DC1 虚拟机。\n\n1.  在 Azure 管理门户的虚拟机页上，单击 DC1 虚拟机**“状态”**列中的**“正在运行”**。\n2.  在任务栏中，单击**“连接”**。\n3.  当系统提示你打开 DC1.rdp 时，单击**“打开”**。\n4.  遇到远程桌面连接消息框提示时，单击**“连接”**。\n5.  当系统提示你输入凭据时，请使用以下凭据：\n- 名称：**CORP\\**[本地管理员帐户名称]\n- 密码：[本地管理员帐户密码]\n6.  当引用证书的远程桌面连接消息框提示你时，单击**“是”**。\n\n接下来，在 Active Directory 中创建登录到 CORP 域成员计算机时将使用的用户帐户。在管理员级别的 Windows PowerShell 命令提示符下，一次一个地运行这些命令。\n\n    New-ADUser -SamAccountName User1 -AccountPassword (read-host \"Set user password\" -assecurestring) -name \"User1\" -enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false\n    Add-ADPrincipalGroupMembership -Identity \"CN=User1,CN=Users,DC=corp,DC=contoso,DC=com\" -MemberOf \"CN=Enterprise Admins,CN=Users,DC=corp,DC=contoso,DC=com\",\"CN=Domain Admins,CN=Users,DC=corp,DC=contoso,DC=com\"\n\n请注意，第一个命令将产生提供 User1 帐户密码的提示。由于此帐户将用于所有 CORP 域成员计算机的远程桌面连接，请选择一个强密码。若要检查其强度，请参阅[密码检查器：使用强密码](https://www.microsoft.com/security/pc-security/password-checker.aspx)。记录 User1 帐户密码，并将其存储在安全位置。\n\n使用 CORP\\\\User1 帐户重新连接到 DC1 虚拟机。\n\n接下来，若要允许 Ping 工具的流量，请在管理员级别的 Windows PowerShell 命令提示符下运行此命令。\n\n    Set-NetFirewallRule -DisplayName \"File and Printer Sharing (Echo Request - ICMPv4-In)\" -enabled True\n\n这是你当前的配置。\n\n![](./media/virtual-machines-base-configuration-test-environment/BC_TLG02.png)\n\n## 阶段 3：配置 APP1\n\nAPP1 提供 Web 服务和文件共享服务。\n\n首先，填写云服务的名称，并在本地计算机上的 Azure PowerShell 命令提示符下运行这些命令以为 APP1 创建 Azure 虚拟机。\n\n    $serviceName=\"<your cloud service name>\"\n    $cred1=Get-Credential -Message \"Type the name and password of the local administrator account for APP1.\"\n    $cred2=Get-Credential -UserName \"CORP\\User1\" -Message \"Now type the password for the CORP\\User1 account.\"\n    $image= Get-AzureVMImage | where { $_.ImageFamily -eq \"Windows Server 2012 R2 Datacenter\" } | sort PublishedDate -Descending | select -ExpandProperty ImageName -First 1\n    $vm1=New-AzureVMConfig -Name APP1 -InstanceSize Small -ImageName $image\n    $vm1 | Add-AzureProvisioningConfig -AdminUsername $cred1.GetNetworkCredential().Username -Password $cred1.GetNetworkCredential().Password -WindowsDomain -Domain \"CORP\" -DomainUserName \"User1\" -DomainPassword $cred2.GetNetworkCredential().Password -JoinDomain \"corp.contoso.com\"\n    $vm1 | Set-AzureSubnet -SubnetNames Corpnet\n    New-AzureVM -ServiceName $serviceName -VMs $vm1 -VNetName TestLab\n\n接下来，使用 CORP\\\\User1 凭据连接到 APP1 虚拟机，然后打开管理员级别的 Windows PowerShell 命令提示符。\n\n若要检查 APP1 与 DC1 之间的名称解析和网络通信，请运行 **ping dc1.corp.contoso.com** 命令，并验证是否有四条答复。\n\n接下来，在 Windows PowerShell 命令提示符下使用此命令将 APP1 设为 Web 服务器。\n\n    Install-WindowsFeature Web-WebServer -IncludeManagementTools\n\n接下来，使用以下命令在 APP1 上的文件夹中创建共享文件夹和文本文件。\n\n    New-Item -path c:\\files -type directory\n    Write-Output \"This is a shared file.\" | out-file c:\\files\\example.txt\n    New-SmbShare -name files -path c:\\files -changeaccess CORP\\User1\n\n这是你当前的配置。\n\n![](./media/virtual-machines-base-configuration-test-environment/BC_TLG03.png)\n\n## 阶段 4：配置 CLIENT1\n\nCLIENT1 在 Contoso Intranet 中充当典型笔记本电脑、平板电脑或台式计算机。\n\n首先，填写云服务的名称，并在本地计算机上的 Azure PowerShell 命令提示符下运行这些命令以为 CLIENT1 创建 Azure 虚拟机。\n\n    $serviceName=\"<your cloud service name>\"\n    $cred1=Get-Credential -Message \"Type the name and password of the local administrator account for CLIENT1.\"\n    $cred2=Get-Credential -UserName \"CORP\\User1\" -Message \"Now type the password for the CORP\\User1 account.\"\n    $image= Get-AzureVMImage | where { $_.ImageFamily -eq \"Windows Server 2012 R2 Datacenter\" } | sort PublishedDate -Descending | select -ExpandProperty ImageName -First 1\n    $vm1=New-AzureVMConfig -Name CLIENT1 -InstanceSize Small -ImageName $image\n    $vm1 | Add-AzureProvisioningConfig -AdminUsername $cred1.GetNetworkCredential().Username -Password $cred1.GetNetworkCredential().Password -WindowsDomain -Domain \"CORP\" -DomainUserName \"User1\" -DomainPassword $cred2.GetNetworkCredential().Password -JoinDomain \"corp.contoso.com\"\n    $vm1 | Set-AzureSubnet -SubnetNames Corpnet\n    New-AzureVM -ServiceName $serviceName -VMs $vm1 -VNetName TestLab\n\n接下来，使用 CORP\\\\User1 凭据连接到 CLIENT1 虚拟机。\n\n若要检查 CLIENT1 与 DC1 之间的名称解析和网络通信，请在 Windows PowerShell 命令提示符下运行 **ping dc1.corp.contoso.com** 命令，并验证是否有四条答复。\n\n接下来，验证是否可以从 CLIENT1 访问 APP1 上的 Web 资源和文件共享资源。\n\n1.  在服务器管理器的树窗格中，单击**“本地服务器”**。\n2.  在**“CLIENT1 的属性”**中，单击**“IE 增强的安全配置”**旁边的**“启用”**。\n3.  在**“Internet Explorer 增强的安全配置”**中，对**“管理员”**和**“用户”**单击**“关闭”**，然后单击**“确定”**。\n4.  在“开始”屏幕中，单击**“Internet Explorer”**，然后单击**“确定”**。\n5.  在地址栏中，键入 **http://app1.corp.contoso.com/**，然后按 Enter。你应看到 APP1 的默认 Internet 信息服务网页。\n6.  在桌面任务栏上，单击“文件资源管理器”图标。\n7.  在地址栏中，键入 **\\\\\\app1\\\\Files**，然后按 Enter。\n8.  你应看到显示文件共享文件夹的内容的文件夹窗口。\n9.  在**“文件”**共享文件夹窗口中，双击 **Example.txt** 文件。你应看到 Example.txt 文件的内容。\n10. 关闭**“example.txt - 记事本”**和**“文件”**共享文件夹窗口。\n\n这是你的最后配置。\n\n![](./media/virtual-machines-base-configuration-test-environment/BC_TLG04.png)\n\nAzure 中的基本配置现已可用于应用程序开发和测试或其他测试环境。\n\n## 后续步骤\n\n- 设置[模拟的混合云环境](/documentation/articles/virtual-networks-setup-simulated-hybrid-cloud-environment-testing)以测试混合配置。\n\n## <a id=\"costs\"></a>将 Azure 中的测试环境虚拟机的成本降至最低\n\n若要将运行测试环境虚拟机的开销降至最低，可以执行以下操作之一：\n\n- 创建测试环境，并尽可能快地执行所需的测试和演示。完成后，删除测试环境虚拟机。\n- 关闭测试环境虚拟机，使其处于释放状态。\n\n若要使用 Azure PowerShell 关闭虚拟机，请填写云服务名称，并运行这些命令。\n\n    $serviceName=\"<your cloud service name>\"\n    Stop-AzureVM -ServiceName $serviceName -Name \"CLIENT1\"\n    Stop-AzureVM -ServiceName $serviceName -Name \"APP1\"\n    Stop-AzureVM -ServiceName $serviceName -Name \"DC1\" -Force -StayProvisioned\n\n\n若要确保从已停止（释放）状态启动所有虚拟机时这些虚拟机正常工作，应按以下顺序启动它们：\n\n1.  DC1\n2.  APP1\n3.  CLIENT1\n\n若要使用 Azure PowerShell 按顺序启动虚拟机，请填写云服务名称，并运行这些命令。\n\n    $serviceName=\"<your cloud service name>\"\n    Start-AzureVM -ServiceName $serviceName -Name \"DC1\"\n    Start-AzureVM -ServiceName $serviceName -Name \"APP1\"\n    Start-AzureVM -ServiceName $serviceName -Name \"CLIENT1\"\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

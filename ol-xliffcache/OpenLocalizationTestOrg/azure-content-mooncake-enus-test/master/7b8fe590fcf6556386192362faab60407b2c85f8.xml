@@ -1,0 +1,362 @@
+{
+  "nodes": [
+    {
+      "content": "通知中心突发新闻教程 - iOS",
+      "pos": [
+        27,
+        43
+      ]
+    },
+    {
+      "content": "了解如何使用 Azure 服务总线通知中心向 iOS 设备发送突发新闻通知。",
+      "pos": [
+        62,
+        100
+      ]
+    },
+    {
+      "content": "使用通知中心发送突发新闻",
+      "pos": [
+        325,
+        337
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        459,
+        461
+      ]
+    },
+    {
+      "content": "本主题说明如何使用 Azure 通知中心将突发新闻通知广播到 iOS 应用程序。完成时，你可以注册感兴趣的突发新闻类别并仅接收这些类别的推送通知。此方案对于很多应用程序来说是常见模式，在其中必须将通知发送到以前声明过对它们感兴趣的一组用户，这样的应用程序有 RSS 阅读器、针对音乐迷的应用程序等。",
+      "pos": [
+        463,
+        612
+      ]
+    },
+    {
+      "pos": [
+        614,
+        717
+      ],
+      "content": "在创建通知中心的注册时，通过加入一个或多个<bpt id=\"p1\">_</bpt>标记<ept id=\"p1\">_</ept>来启用广播方案。将通知发送到标签时，已注册该标签的所有设备将接收通知。因为标签是简单的字符串，它们不必提前设置。有关标记的详细信息，请参阅<bpt id=\"p2\">[</bpt><ept id=\"p2\">通知中心指南]</ept>。"
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        722,
+        726
+      ]
+    },
+    {
+      "pos": [
+        728,
+        803
+      ],
+      "content": "本主题以你在<bpt id=\"p1\">[</bpt>通知中心入门<ept id=\"p1\">][get-started]</ept>中创建的应用程序为基础。在开始本教程之前，必须先阅读<bpt id=\"p2\">[</bpt>通知中心入门<ept id=\"p2\">][get-started]</ept>。"
+    },
+    {
+      "content": "向应用程序中添加类别选择",
+      "pos": [
+        807,
+        819
+      ]
+    },
+    {
+      "content": "第一步是向现有 Storyboard 添加 UI 元素，这些元素允许用户选择要注册的类别。用户选择的类别存储在设备上。应用程序启动时，使用所选类别作为标签在你的通知中心创建设备注册。",
+      "pos": [
+        821,
+        912
+      ]
+    },
+    {
+      "content": "在 MainStoryboard\\_iPhone.storyboard 中，从对象库添加以下组件：",
+      "pos": [
+        917,
+        966
+      ]
+    },
+    {
+      "content": "具有“Breaking News”文本的标签",
+      "pos": [
+        973,
+        995
+      ]
+    },
+    {
+      "content": "具有“World”、“Politics”、“Business”、“Technology”、“Science”、“Sports”类别文本的标签",
+      "pos": [
+        1002,
+        1072
+      ]
+    },
+    {
+      "pos": [
+        1079,
+        1125
+      ],
+      "content": "六个开关，每个类别一个。默认情况下，每个开关的 <bpt id=\"p1\">**</bpt>State<ept id=\"p1\">**</ept> 设置为 <bpt id=\"p2\">**</bpt>Off<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "一个标有“Subscribe”的按钮",
+      "pos": [
+        1132,
+        1150
+      ]
+    },
+    {
+      "content": "Storyboard 应类似于：",
+      "pos": [
+        1156,
+        1172
+      ]
+    },
+    {
+      "content": "在助手编辑器中，为所有开关创建插座并称它们为“WorldSwitch”、“PoliticsSwitch”、“BusinessSwitch”、“TechnologySwitch”、“ScienceSwitch”、“SportsSwitch”",
+      "pos": [
+        1189,
+        1308
+      ]
+    },
+    {
+      "content": "为名为“subscribe”的按钮创建一个操作。ViewController.h 应包含以下内容：",
+      "pos": [
+        1314,
+        1363
+      ]
+    },
+    {
+      "pos": [
+        1834,
+        1909
+      ],
+      "content": "创建名为 <ph id=\"ph1\">`Notifications`</ph> 的新 <bpt id=\"p1\">**</bpt>Cocoa Touch 类<ept id=\"p1\">**</ept>。在文件 Notifications.h 的接口部分中复制以下代码："
+    },
+    {
+      "content": "将以下导入指令添加到 Notifications.m：",
+      "pos": [
+        2247,
+        2274
+      ]
+    },
+    {
+      "content": "在文件 Notifications.m 的实现部分中复制以下代码。",
+      "pos": [
+        2344,
+        2377
+      ]
+    },
+    {
+      "pos": [
+        3958,
+        4068
+      ],
+      "content": "此类使用本地存储区存储和检索此设备将要接收的新闻类别。此外，它还包含了一个方法用于通过<bpt id=\"p1\">[</bpt>模板<ept id=\"p1\">](/documentation/articles/notification-hubs-templates)</ept>注册来注册这些类别。"
+    },
+    {
+      "content": "在 AppDelegate.h 文件中，添加 Notifications.h 的导入语句，并添加 Notifications 类实例的属性：",
+      "pos": [
+        4073,
+        4143
+      ]
+    },
+    {
+      "pos": [
+        4249,
+        4336
+      ],
+      "content": "在 AppDelegate.m 的 <bpt id=\"p1\">**</bpt>didFinishLaunchingWithOptions<ept id=\"p1\">**</ept> 方法中，于方法开头添加代码来初始化 notifications 实例："
+    },
+    {
+      "pos": [
+        4343,
+        4517
+      ],
+      "content": "在 hubinfo.h 中定义的 <ph id=\"ph1\">`HUBNAME`</ph> 和 <ph id=\"ph2\">`HUBLISTENACCESS`</ph> 内，<ph id=\"ph3\">`&lt;hub name&gt;`</ph> 和 <ph id=\"ph4\">`&lt;connection string with listen access&gt;`</ph> 占位符应已替换为你的通知中心的名称和你之前获取的 <bpt id=\"p1\">*</bpt>DefaultListenSharedAccessSignature<ept id=\"p1\">*</ept> 的连接字符串。"
+    },
+    {
+      "pos": [
+        4637,
+        4770
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>由于使用客户端应用程序分发的凭据通常是不安全的，你只应使用客户端应用程序分发具有侦听访问权限的密钥。侦听访问权限允许应用程序注册通知，但是无法修改现有注册，也无法发送通知。在受保护的后端服务中使用完全访问权限密钥，以便发送通知和更改现有注册。"
+    },
+    {
+      "pos": [
+        4776,
+        4977
+      ],
+      "content": "在 AppDelegate.m 的 <bpt id=\"p1\">**</bpt>didRegisterForRemoteNotificationsWithDeviceToken<ept id=\"p1\">**</ept> 方法中，使用以下代码来替换方法中的代码，以将设备令牌传递给 notifications 类。notifications 类将通知注册到类别。如果用户更改类别选择，我们将调用 <ph id=\"ph1\">`subscribeWithCategories`</ph> 方法以响应“订阅”按钮来进行更新。"
+    },
+    {
+      "pos": [
+        4985,
+        5119
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>由于 Apple 推送通知服务 (APNS) 分配的设备标记随时可能更改，因此你应该经常注册通知以避免通知失败。此示例在每次应用程序启动时注册通知。对于经常运行（一天一次以上）的应用程序，如果每次注册间隔时间不到一天，你可以跳过注册来节省带宽。"
+    },
+    {
+      "pos": [
+        5647,
+        5718
+      ],
+      "content": "请注意，此时 <bpt id=\"p1\">**</bpt>didRegisterForRemoteNotificationsWithDeviceToken<ept id=\"p1\">**</ept> 方法中应没有其他代码。"
+    },
+    {
+      "pos": [
+        5724,
+        5789
+      ],
+      "content": "完成<bpt id=\"p1\">[</bpt>通知中心入门<ept id=\"p1\">][get-started]</ept>教程时，以下方法应已经出现在 AppDelegate.m 中。否则，请添加这些方法。"
+    },
+    {
+      "pos": [
+        6374,
+        6412
+      ],
+      "content": "此方法通过显示简单的 <bpt id=\"p1\">**</bpt>UIAlert<ept id=\"p1\">**</ept> 处理运行应用程序时收到的通知。"
+    },
+    {
+      "pos": [
+        6418,
+        6531
+      ],
+      "content": "在 ViewController.m 中，添加 AppDelegate.h 的导入语句，并将以下代码复制到 XCode 生成的 <bpt id=\"p1\">**</bpt>subscribe<ept id=\"p1\">**</ept> 方法中。此代码将更新通知注册，以使用用户在用户界面中选择的新类别标记。"
+    },
+    {
+      "pos": [
+        7582,
+        7683
+      ],
+      "content": "此方法创建一个类别的 <bpt id=\"p1\">**</bpt>NSMutableArray<ept id=\"p1\">**</ept> 并使用 <bpt id=\"p2\">**</bpt>Notifications<ept id=\"p2\">**</ept> 类将该列表存储在本地存储区中，将相应的标记注册到你的通知中心。更改类别时，使用新类别重新创建注册。"
+    },
+    {
+      "pos": [
+        7689,
+        7756
+      ],
+      "content": "在 ViewController.m 中，于 <bpt id=\"p1\">**</bpt>viewDidLoad<ept id=\"p1\">**</ept> 方法中添加以下代码，以根据前面保存的类别来设置用户界面。"
+    },
+    {
+      "pos": [
+        8533,
+        8658
+      ],
+      "content": "应用程序现在可以在设备的本地存储区中存储一组类别，每当应用程序启动时，将使用这些类别注册到通知中心。用户可以在运行时更改选择的类别，然后单击 <bpt id=\"p1\">**</bpt>subscribe<ept id=\"p1\">**</ept> 方法来更新设备注册。接下来，你将更新应用程序，以直接从应用本身发送突发新闻通知。"
+    },
+    {
+      "content": "（可选）发送带标记的通知",
+      "pos": [
+        8663,
+        8675
+      ]
+    },
+    {
+      "content": "如果你无权访问 Visual Studio，可以跳到下一部分，并从应用内部发送通知。你还可以在 [Azure 经典门户] 中使用通知中心的调试选项卡发送适当的模板通知。",
+      "pos": [
+        8677,
+        8761
+      ]
+    },
+    {
+      "content": "（可选）从设备发送通知",
+      "pos": [
+        8887,
+        8898
+      ]
+    },
+    {
+      "pos": [
+        8900,
+        9000
+      ],
+      "content": "通常，通知将由后端服务发送，但你也可以直接从应用发送突发新闻通知。为此，我们需要更新<bpt id=\"p1\">[</bpt>通知中心入门<ept id=\"p1\">][get-started]</ept>教程中所定义的 <ph id=\"ph1\">`SendNotificationRESTAPI`</ph> 方法。"
+    },
+    {
+      "pos": [
+        9006,
+        9141
+      ],
+      "content": "在 ViewController.m 中，按如下所示更新 <ph id=\"ph1\">`SendNotificationRESTAPI`</ph> 方法，使其接受类别标记的参数并发送适当的<bpt id=\"p1\">[</bpt>模板<ept id=\"p1\">](/documentation/articles/notification-hubs-templates)</ept>通知。"
+    },
+    {
+      "content": "在 ViewController.m 中，更新“发送通知”操作（如以下代码所示）。因此，它将使用每个标记分别发送通知，并发送到多个平台。",
+      "pos": [
+        11997,
+        12065
+      ]
+    },
+    {
+      "content": "重新生成项目，并确定没有生成错误。",
+      "pos": [
+        12653,
+        12670
+      ]
+    },
+    {
+      "content": "运行应用并生成通知",
+      "pos": [
+        12675,
+        12684
+      ]
+    },
+    {
+      "content": "按“运行”按钮生成项目并启动应用程序。选择要订阅的一些突发新闻选项，然后按“订阅”按钮。你应会看到一个对话框，表示已订阅通知。",
+      "pos": [
+        12689,
+        12752
+      ]
+    },
+    {
+      "content": "选择“订阅”时，应用程序将所选类别转换为标记并针对所选标签从通知中心请求注册新设备。",
+      "pos": [
+        12770,
+        12812
+      ]
+    },
+    {
+      "content": "输入要以突发新闻形式发送的消息，然后按“发送通知”按钮。或者，运行 .NET 控制台应用以生成通知。",
+      "pos": [
+        12817,
+        12867
+      ]
+    },
+    {
+      "content": "每个订阅突发新闻的设备都会收到刚刚发送的突发新闻通知。",
+      "pos": [
+        12885,
+        12912
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        12919,
+        12923
+      ]
+    },
+    {
+      "content": "在本教程中，我们了解了如何按类别广播突发消息。请考虑学习侧重说明其他高级通知中心方案的以下教程之一：",
+      "pos": [
+        12925,
+        12975
+      ]
+    },
+    {
+      "content": "使用通知中心广播本地化的突发新闻",
+      "pos": [
+        12982,
+        12998
+      ]
+    },
+    {
+      "content": "了解如何扩展突发新闻应用程序以允许发送本地化的通知。",
+      "pos": [
+        13007,
+        13033
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"通知中心突发新闻教程 - iOS\"\n    description=\"了解如何使用 Azure 服务总线通知中心向 iOS 设备发送突发新闻通知。\"\n    services=\"notification-hubs\"\n    documentationCenter=\"ios\"\n    authors=\"wesmc7777\"\n    manager=\"dwrede\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"notification-hubs\"\n    ms.date=\"12/15/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n# 使用通知中心发送突发新闻\n\n[AZURE.INCLUDE [notification-hubs-selector-breaking-news](../includes/notification-hubs-selector-breaking-news.md)]\n\n\n##概述\n\n本主题说明如何使用 Azure 通知中心将突发新闻通知广播到 iOS 应用程序。完成时，你可以注册感兴趣的突发新闻类别并仅接收这些类别的推送通知。此方案对于很多应用程序来说是常见模式，在其中必须将通知发送到以前声明过对它们感兴趣的一组用户，这样的应用程序有 RSS 阅读器、针对音乐迷的应用程序等。\n\n在创建通知中心的注册时，通过加入一个或多个_标记_来启用广播方案。将通知发送到标签时，已注册该标签的所有设备将接收通知。因为标签是简单的字符串，它们不必提前设置。有关标记的详细信息，请参阅[通知中心指南]。\n\n\n##先决条件\n\n本主题以你在[通知中心入门][get-started]中创建的应用程序为基础。在开始本教程之前，必须先阅读[通知中心入门][get-started]。\n\n##向应用程序中添加类别选择\n\n第一步是向现有 Storyboard 添加 UI 元素，这些元素允许用户选择要注册的类别。用户选择的类别存储在设备上。应用程序启动时，使用所选类别作为标签在你的通知中心创建设备注册。\n\n1. 在 MainStoryboard\\_iPhone.storyboard 中，从对象库添加以下组件：\n    + 具有“Breaking News”文本的标签\n    + 具有“World”、“Politics”、“Business”、“Technology”、“Science”、“Sports”类别文本的标签\n    + 六个开关，每个类别一个。默认情况下，每个开关的 **State** 设置为 **Off**。\n    + 一个标有“Subscribe”的按钮\n\n    Storyboard 应类似于：\n\n    ![][3]\n\n2. 在助手编辑器中，为所有开关创建插座并称它们为“WorldSwitch”、“PoliticsSwitch”、“BusinessSwitch”、“TechnologySwitch”、“ScienceSwitch”、“SportsSwitch”\n\n\n3. 为名为“subscribe”的按钮创建一个操作。ViewController.h 应包含以下内容：\n\n        @property (weak, nonatomic) IBOutlet UISwitch *WorldSwitch;\n        @property (weak, nonatomic) IBOutlet UISwitch *PoliticsSwitch;\n        @property (weak, nonatomic) IBOutlet UISwitch *BusinessSwitch;\n        @property (weak, nonatomic) IBOutlet UISwitch *TechnologySwitch;\n        @property (weak, nonatomic) IBOutlet UISwitch *ScienceSwitch;\n        @property (weak, nonatomic) IBOutlet UISwitch *SportsSwitch;\n\n        - (IBAction)subscribe:(id)sender;\n\n4. 创建名为 `Notifications` 的新 **Cocoa Touch 类**。在文件 Notifications.h 的接口部分中复制以下代码：\n\n        @property NSData* deviceToken;\n\n        - (void)storeCategoriesAndSubscribeWithCategories:(NSArray*)categories \n                    completion:(void (^)(NSError* error))completion;\n\n        - (NSSet*)retrieveCategories;\n\n        - (void)subscribeWithCategories:(NSSet*)categories completion:(void (^)(NSError *))completion;\n\n5. 将以下导入指令添加到 Notifications.m：\n\n        #import <WindowsAzureMessaging/WindowsAzureMessaging.h>\n\n6. 在文件 Notifications.m 的实现部分中复制以下代码。\n\n        SBNotificationHub* hub;\n\n        - (id)initWithConnectionString:(NSString*)listenConnectionString HubName:(NSString*)hubName{\n\n            hub = [[SBNotificationHub alloc] initWithConnectionString:listenConnectionString\n                                        notificationHubPath:hubName];\n\n            return self;\n        }\n\n        - (void)storeCategoriesAndSubscribeWithCategories:(NSSet *)categories completion:(void (^)(NSError *))completion {\n            NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];\n            [defaults setValue:[categories allObjects] forKey:@\"BreakingNewsCategories\"];\n\n            [self subscribeWithCategories:categories completion:completion];\n        }\n\n\n        - (NSSet*)retrieveCategories {\n            NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];\n\n            NSArray* categories = [defaults stringArrayForKey:@\"BreakingNewsCategories\"];\n\n            if (!categories) return [[NSSet alloc] init];\n            return [[NSSet alloc] initWithArray:categories];\n        }\n\n\n        - (void)subscribeWithCategories:(NSSet *)categories completion:(void (^)(NSError *))completion\n        {\n           //[hub registerNativeWithDeviceToken:self.deviceToken tags:categories completion: completion];\n\n            NSString* templateBodyAPNS = @\"{\"aps\":{\"alert\":\"$(messageParam)\"}}\";\n\n            [hub registerTemplateWithDeviceToken:self.deviceToken name:@\"simpleAPNSTemplate\" \n                jsonBodyTemplate:templateBodyAPNS expiryTemplate:@\"0\" tags:categories completion:completion];\n        }\n\n\n\n    此类使用本地存储区存储和检索此设备将要接收的新闻类别。此外，它还包含了一个方法用于通过[模板](/documentation/articles/notification-hubs-templates)注册来注册这些类别。\n\n7. 在 AppDelegate.h 文件中，添加 Notifications.h 的导入语句，并添加 Notifications 类实例的属性：\n\n        #import \"Notifications.h\"\n\n        @property (nonatomic) Notifications* notifications;\n    \n\n8. 在 AppDelegate.m 的 **didFinishLaunchingWithOptions** 方法中，于方法开头添加代码来初始化 notifications 实例：\n \n    在 hubinfo.h 中定义的 `HUBNAME` 和 `HUBLISTENACCESS` 内，`<hub name>` 和 `<connection string with listen access>` 占位符应已替换为你的通知中心的名称和你之前获取的 *DefaultListenSharedAccessSignature* 的连接字符串。\n\n        self.notifications = [[Notifications alloc] initWithConnectionString:HUBLISTENACCESS HubName:HUBNAME];\n\n    > [AZURE.NOTE]由于使用客户端应用程序分发的凭据通常是不安全的，你只应使用客户端应用程序分发具有侦听访问权限的密钥。侦听访问权限允许应用程序注册通知，但是无法修改现有注册，也无法发送通知。在受保护的后端服务中使用完全访问权限密钥，以便发送通知和更改现有注册。\n\n\n9. 在 AppDelegate.m 的 **didRegisterForRemoteNotificationsWithDeviceToken** 方法中，使用以下代码来替换方法中的代码，以将设备令牌传递给 notifications 类。notifications 类将通知注册到类别。如果用户更改类别选择，我们将调用 `subscribeWithCategories` 方法以响应“订阅”按钮来进行更新。\n\n    > [AZURE.NOTE]由于 Apple 推送通知服务 (APNS) 分配的设备标记随时可能更改，因此你应该经常注册通知以避免通知失败。此示例在每次应用程序启动时注册通知。对于经常运行（一天一次以上）的应用程序，如果每次注册间隔时间不到一天，你可以跳过注册来节省带宽。\n\n        self.notifications.deviceToken = deviceToken;\n\n        // Retrieves the categories from local storage and requests a registration for these categories\n        // each time the app starts and performs a registration.\n\n        NSSet* categories = [self.notifications retrieveCategories];\n        [self.notifications subscribeWithCategories:categories completion:^(NSError* error) {\n            if (error != nil) {\n                NSLog(@\"Error registering for notifications: %@\", error);\n            }\n        }];\n\n\n    请注意，此时 **didRegisterForRemoteNotificationsWithDeviceToken** 方法中应没有其他代码。\n\n10. 完成[通知中心入门][get-started]教程时，以下方法应已经出现在 AppDelegate.m 中。否则，请添加这些方法。\n\n        -(void)MessageBox:(NSString *)title message:(NSString *)messageText\n        {\n            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:messageText delegate:self \n                cancelButtonTitle:@\"OK\" otherButtonTitles: nil];\n            [alert show];\n        }\n\n        - (void)application:(UIApplication *)application didReceiveRemoteNotification:\n            (NSDictionary *)userInfo {\n            NSLog(@\"%@\", userInfo);\n            [self MessageBox:@\"Notification\" message:[[userInfo objectForKey:@\"aps\"] valueForKey:@\"alert\"]];\n        }\n\n    此方法通过显示简单的 **UIAlert** 处理运行应用程序时收到的通知。\n\n11. 在 ViewController.m 中，添加 AppDelegate.h 的导入语句，并将以下代码复制到 XCode 生成的 **subscribe** 方法中。此代码将更新通知注册，以使用用户在用户界面中选择的新类别标记。\n\n        ```\n        #import \"Notifications.h\"\n        ```\n\n        NSMutableArray* categories = [[NSMutableArray alloc] init];\n\n        if (self.WorldSwitch.isOn) [categories addObject:@\"World\"];\n        if (self.PoliticsSwitch.isOn) [categories addObject:@\"Politics\"];\n        if (self.BusinessSwitch.isOn) [categories addObject:@\"Business\"];\n        if (self.TechnologySwitch.isOn) [categories addObject:@\"Technology\"];\n        if (self.ScienceSwitch.isOn) [categories addObject:@\"Science\"];\n        if (self.SportsSwitch.isOn) [categories addObject:@\"Sports\"];\n\n        Notifications* notifications = [(AppDelegate*)[[UIApplication sharedApplication]delegate] notifications];\n\n        [notifications storeCategoriesAndSubscribeWithCategories:categories completion: ^(NSError* error) {\n            if (!error) {\n                [(AppDelegate*)[[UIApplication sharedApplication]delegate] MessageBox:@\"Notification\" message:@\"Subscribed!\"];\n            } else {\n                NSLog(@\"Error subscribing: %@\", error);\n            }\n        }];\n\n    此方法创建一个类别的 **NSMutableArray** 并使用 **Notifications** 类将该列表存储在本地存储区中，将相应的标记注册到你的通知中心。更改类别时，使用新类别重新创建注册。\n\n12. 在 ViewController.m 中，于 **viewDidLoad** 方法中添加以下代码，以根据前面保存的类别来设置用户界面。\n\n\n        // This updates the UI on startup based on the status of previously saved categories.\n\n        Notifications* notifications = [(AppDelegate*)[[UIApplication sharedApplication]delegate] notifications];\n\n        NSSet* categories = [notifications retrieveCategories];\n\n        if ([categories containsObject:@\"World\"]) self.WorldSwitch.on = true;\n        if ([categories containsObject:@\"Politics\"]) self.PoliticsSwitch.on = true;\n        if ([categories containsObject:@\"Business\"]) self.BusinessSwitch.on = true;\n        if ([categories containsObject:@\"Technology\"]) self.TechnologySwitch.on = true;\n        if ([categories containsObject:@\"Science\"]) self.ScienceSwitch.on = true;\n        if ([categories containsObject:@\"Sports\"]) self.SportsSwitch.on = true;\n\n\n\n应用程序现在可以在设备的本地存储区中存储一组类别，每当应用程序启动时，将使用这些类别注册到通知中心。用户可以在运行时更改选择的类别，然后单击 **subscribe** 方法来更新设备注册。接下来，你将更新应用程序，以直接从应用本身发送突发新闻通知。\n\n\n##（可选）发送带标记的通知\n\n如果你无权访问 Visual Studio，可以跳到下一部分，并从应用内部发送通知。你还可以在 [Azure 经典门户] 中使用通知中心的调试选项卡发送适当的模板通知。\n\n[AZURE.INCLUDE [notification-hubs-send-categories-template](../includes/notification-hubs-send-categories-template.md)]\n\n\n##（可选）从设备发送通知\n\n通常，通知将由后端服务发送，但你也可以直接从应用发送突发新闻通知。为此，我们需要更新[通知中心入门][get-started]教程中所定义的 `SendNotificationRESTAPI` 方法。\n\n\n1. 在 ViewController.m 中，按如下所示更新 `SendNotificationRESTAPI` 方法，使其接受类别标记的参数并发送适当的[模板](/documentation/articles/notification-hubs-templates)通知。\n\n        - (void)SendNotificationRESTAPI:(NSString*)categoryTag\n        {\n            NSURLSession* session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration\n                                     defaultSessionConfiguration] delegate:nil delegateQueue:nil];\n            \n            NSString *json;\n            \n            // Construct the messages REST endpoint\n            NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@\"%@%@/messages/%@\", HubEndpoint,\n                                               HUBNAME, API_VERSION]];\n            \n            // Generated the token to be used in the authorization header.\n            NSString* authorizationToken = [self generateSasToken:[url absoluteString]];\n\n            //Create the request to add the template notification message to the hub\n            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];\n            [request setHTTPMethod:@\"POST\"];\n            \n            // Add the category as a tag\n            [request setValue:categoryTag forHTTPHeaderField:@\"ServiceBusNotification-Tags\"];\n\n            // Template notification\n            json = [NSString stringWithFormat:@\"{\"messageParam\":\"Breaking %@ News : %@\"}\",\n                    categoryTag, self.notificationMessage.text];\n\n            // Signify template notification format\n            [request setValue:@\"template\" forHTTPHeaderField:@\"ServiceBusNotification-Format\"];\n\n            // JSON Content-Type\n            [request setValue:@\"application/json;charset=utf-8\" forHTTPHeaderField:@\"Content-Type\"];\n\n            //Authenticate the notification message POST request with the SaS token\n            [request setValue:authorizationToken forHTTPHeaderField:@\"Authorization\"];\n            \n            //Add the notification message body\n            [request setHTTPBody:[json dataUsingEncoding:NSUTF8StringEncoding]];\n            \n            // Send the REST request\n            NSURLSessionDataTask* dataTask = [session dataTaskWithRequest:request\n                       completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)\n                       {\n                       NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*) response;\n                           if (error || httpResponse.statusCode != 200)\n                           {\n                               NSLog(@\"\\nError status: %d\\nError: %@\", httpResponse.statusCode, error);\n                           }\n                           if (data != NULL)\n                           {\n                               //xmlParser = [[NSXMLParser alloc] initWithData:data];\n                               //[xmlParser setDelegate:self];\n                               //[xmlParser parse];\n                           }\n                       }];\n            [dataTask resume];\n        }\n        \n\n\n2. 在 ViewController.m 中，更新“发送通知”操作（如以下代码所示）。因此，它将使用每个标记分别发送通知，并发送到多个平台。\n\n\n\n        - (IBAction)SendNotificationMessage:(id)sender\n        {\n            self.sendResults.text = @\"\";\n            \n            NSArray* categories = [NSArray arrayWithObjects: @\"World\", @\"Politics\", @\"Business\", \n                                    @\"Technology\", @\"Science\", @\"Sports\", nil];\n        \n            // Lets send the message as breaking news for each category to WNS, GCM, and APNS\n            // using a template.\n            for(NSString* category in categories)\n            {\n                [self SendNotificationRESTAPI:category];\n            }\n        }\n\n\n\n3. 重新生成项目，并确定没有生成错误。\n\n\n##运行应用并生成通知\n\n1. 按“运行”按钮生成项目并启动应用程序。选择要订阅的一些突发新闻选项，然后按“订阅”按钮。你应会看到一个对话框，表示已订阅通知。\n\n    ![][1]\n\n    选择“订阅”时，应用程序将所选类别转换为标记并针对所选标签从通知中心请求注册新设备。\n\n2. 输入要以突发新闻形式发送的消息，然后按“发送通知”按钮。或者，运行 .NET 控制台应用以生成通知。\n\n    ![][2]\n\n\n3. 每个订阅突发新闻的设备都会收到刚刚发送的突发新闻通知。\n\n\n\n## 后续步骤\n\n在本教程中，我们了解了如何按类别广播突发消息。请考虑学习侧重说明其他高级通知中心方案的以下教程之一：\n\n+ **[使用通知中心广播本地化的突发新闻]**\n\n    了解如何扩展突发新闻应用程序以允许发送本地化的通知。\n\n\n\n\n\n<!-- Images. -->\n[1]: ./media/notification-hubs-ios-send-breaking-news/notification-hub-breakingnews-subscribed.png\n[2]: ./media/notification-hubs-ios-send-breaking-news/notification-hub-breakingnews-ios1.png\n[3]: ./media/notification-hubs-ios-send-breaking-news/notification-hub-breakingnews-ios2.png\n\n\n\n\n\n\n\n\n<!-- URLs. -->\n[How To: Service Bus Notification Hubs (iOS Apps)]: http://msdn.microsoft.com/zh-cn/library/jj927168.aspx\n[使用通知中心广播本地化的突发新闻]: /documentation/articles/notification-hubs-ios-send-localized-breaking-news\n[Mobile Service]: /documentation/articles/notification-hubs-ios-mobile-services-register-user-push-notifications\n[使用通知中心通知用户]: /documentation/articles/notification-hubs-ios-aspnet-register-user-push-notifications\n[Azure Management Portal]: https://manage.windowsazure.cn/\n[通知中心指南]: http://msdn.microsoft.com/zh-cn/library/jj927170.aspx\n[Notification Hubs How-To for iOS]: http://msdn.microsoft.com/zh-cn/library/jj927168.aspx\n[get-started]: /documentation/articles/notification-hubs-ios-get-started\n<!---HONumber=Mooncake_0104_2016-->"
+}

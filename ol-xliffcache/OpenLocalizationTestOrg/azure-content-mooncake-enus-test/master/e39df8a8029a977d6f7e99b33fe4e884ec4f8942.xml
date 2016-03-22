@@ -1,0 +1,250 @@
+{
+  "nodes": [
+    {
+      "content": "如何通过 Python 使用表存储 | Azure",
+      "pos": [
+        27,
+        52
+      ]
+    },
+    {
+      "content": "了解如何通过 Python 使用表服务来创建和删除表，以及插入和查询表。",
+      "pos": [
+        71,
+        107
+      ]
+    },
+    {
+      "content": "如何通过 Python 使用表存储",
+      "pos": [
+        322,
+        339
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        441,
+        443
+      ]
+    },
+    {
+      "content": "本指南将演示如何使用 Azure 表存储服务执行常见方案。相关示例是使用 Python 编写的，并使用 [Python Azure 存储包][]。涉及的方案包括创建和删除表、以及在表中插入和查询实体。",
+      "pos": [
+        445,
+        545
+      ]
+    },
+    {
+      "pos": [
+        741,
+        854
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果您需要安装 Python 或 <bpt id=\"p1\">[</bpt>Python Azure 包<ept id=\"p1\">][]</ept>，请参阅 <bpt id=\"p2\">[</bpt>Python 安装指南<ept id=\"p2\">](/documentation/articles/python-how-to-install)</ept>。"
+    },
+    {
+      "content": "创建表",
+      "pos": [
+        860,
+        863
+      ]
+    },
+    {
+      "pos": [
+        865,
+        975
+      ],
+      "content": "可通过 <bpt id=\"p1\">**</bpt>TableService<ept id=\"p1\">**</ept> 对象使用表服务。以下代码创建 <bpt id=\"p2\">**</bpt>TableService<ept id=\"p2\">**</ept> 对象。在你希望在其中以编程方式访问 Azure 存储空间的任何 Python 文件中，将代码添加到文件的顶部附近："
+    },
+    {
+      "pos": [
+        1035,
+        1106
+      ],
+      "content": "以下代码使用存储帐户名称和帐户密钥创建 <bpt id=\"p1\">**</bpt>TableService<ept id=\"p1\">**</ept> 对象。使用实际帐户和密钥替换“myaccount”和“mykey”。"
+    },
+    {
+      "content": "将实体添加到表",
+      "pos": [
+        1237,
+        1244
+      ]
+    },
+    {
+      "pos": [
+        1246,
+        1457
+      ],
+      "content": "若要添加实体，请首先创建定义实体属性名称和值的字典。请注意，对于每个实体，你必须指定 <bpt id=\"p1\">**</bpt>PartitionKey<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>RowKey<ept id=\"p2\">**</ept>。这些是您的实体的唯一标识符。您可以查询这些值，比查询其他属性快得多。系统使用 <bpt id=\"p3\">**</bpt>PartitionKey<ept id=\"p3\">**</ept> 自动将表的实体分发到多个存储节点上。具有相同的 <bpt id=\"p4\">**</bpt>PartitionKey<ept id=\"p4\">**</ept> 的实体存储在同一个节点上。<bpt id=\"p5\">**</bpt>RowKey<ept id=\"p5\">**</ept> 是实体在其所属分区内的唯一 ID。"
+    },
+    {
+      "pos": [
+        1459,
+        1501
+      ],
+      "content": "若要将实体添加到表中，请将字典对象传递给 <bpt id=\"p1\">**</bpt>insert_entity<ept id=\"p1\">**</ept> 方法。"
+    },
+    {
+      "pos": [
+        1670,
+        1716
+      ],
+      "content": "你还可以将 <bpt id=\"p1\">**</bpt>Entity<ept id=\"p1\">**</ept> 类的实例传递给 <bpt id=\"p2\">**</bpt>insert_entity<ept id=\"p2\">**</ept> 方法。"
+    },
+    {
+      "content": "更新实体",
+      "pos": [
+        1916,
+        1920
+      ]
+    },
+    {
+      "content": "此代码演示如何使用更新版本替换现有实体的旧版本。",
+      "pos": [
+        1922,
+        1946
+      ]
+    },
+    {
+      "pos": [
+        2091,
+        2245
+      ],
+      "content": "如果要更新的实体不存在，更新操作将失败。如果你要存储实体，而不管它以前是否已存在，请使用 <bpt id=\"p1\">**</bpt>insert_or_replace_entity<ept id=\"p1\">**</ept>。在下面的示例中，第一次调用将替换现有实体。第二次调用将插入新实体，因为表中不存在具有指定的 <bpt id=\"p2\">**</bpt>PartitionKey<ept id=\"p2\">**</ept> 和 <bpt id=\"p3\">**</bpt>RowKey<ept id=\"p3\">**</ept> 的实体。"
+    },
+    {
+      "content": "更改实体组",
+      "pos": [
+        2557,
+        2562
+      ]
+    },
+    {
+      "pos": [
+        2564,
+        2738
+      ],
+      "content": "有时，有必要成批地同时提交多项操作以确保通过服务器进行原子处理。若要实现该目的，请对 <bpt id=\"p1\">**</bpt>TableService<ept id=\"p1\">**</ept> 使用 <bpt id=\"p2\">**</bpt>begin_batch<ept id=\"p2\">**</ept> 方法，然后像通常一样调用一系列操作。在你确实要按批提交时，可调用 <bpt id=\"p3\">**</bpt>commit_batch<ept id=\"p3\">**</ept>。请注意，所有实体必须在相同分区中才能更改为批处理。下面的示例将两个实体一起添加到批处理中。"
+    },
+    {
+      "content": "查询实体",
+      "pos": [
+        3152,
+        3156
+      ]
+    },
+    {
+      "pos": [
+        3158,
+        3223
+      ],
+      "content": "若要查询表中的实体，请使用 <bpt id=\"p1\">**</bpt>get_entity<ept id=\"p1\">**</ept> 方法并传递 <bpt id=\"p2\">**</bpt>PartitionKey<ept id=\"p2\">**</ept> 和 <bpt id=\"p3\">**</bpt>RowKey<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "content": "查询实体集",
+      "pos": [
+        3352,
+        3357
+      ]
+    },
+    {
+      "pos": [
+        3359,
+        3400
+      ],
+      "content": "此示例基于 <bpt id=\"p1\">**</bpt>PartitionKey<ept id=\"p1\">**</ept> 查找 Seattle 中的所有任务。"
+    },
+    {
+      "content": "查询一部分实体属性",
+      "pos": [
+        3578,
+        3587
+      ]
+    },
+    {
+      "pos": [
+        3589,
+        3678
+      ],
+      "content": "对表的查询可以只检索实体中的少数几个属性。此方法称为“投影”，可减少带宽并提高查询性能，尤其适用于大型实体。使用 <bpt id=\"p1\">**</bpt>select<ept id=\"p1\">**</ept> 参数并传递你希望显示给客户端的属性的名称。"
+    },
+    {
+      "content": "以下代码中的查询只返回表中实体的说明。",
+      "pos": [
+        3680,
+        3699
+      ]
+    },
+    {
+      "pos": [
+        3701,
+        3739
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>下面的代码段仅对云存储服务有效。不受存储模拟器支持。"
+    },
+    {
+      "content": "删除实体",
+      "pos": [
+        3903,
+        3907
+      ]
+    },
+    {
+      "content": "可以使用实体的分区键和行键删除实体。",
+      "pos": [
+        3909,
+        3927
+      ]
+    },
+    {
+      "content": "删除表",
+      "pos": [
+        3999,
+        4002
+      ]
+    },
+    {
+      "content": "以下代码从存储帐户中删除一个表。",
+      "pos": [
+        4004,
+        4020
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        4070,
+        4074
+      ]
+    },
+    {
+      "content": "现在，您已了解有关表存储的基础知识，请按照下面的链接了解更复杂的存储任务：",
+      "pos": [
+        4076,
+        4113
+      ]
+    },
+    {
+      "content": "请参阅 MSDN 参考：[Azure 存储服务][]。",
+      "pos": [
+        4119,
+        4146
+      ]
+    },
+    {
+      "pos": [
+        4151,
+        4173
+      ],
+      "content": "访问 <bpt id=\"p1\">[</bpt>Azure 存储空间团队博客<ept id=\"p1\">][]</ept>。"
+    },
+    {
+      "pos": [
+        4175,
+        4221
+      ],
+      "content": "有关详细信息，另请参阅 <bpt id=\"p1\">[</bpt>Python 开发人员中心<ept id=\"p1\">](/develop/python/)</ept>。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"如何通过 Python 使用表存储 | Azure\"\n    description=\"了解如何通过 Python 使用表服务来创建和删除表，以及插入和查询表。\"\n    services=\"storage\"\n    documentationCenter=\"python\"\n    authors=\"emgerner-msft\"\n    manager=\"wpickett\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"storage\"\n    ms.date=\"12/11/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n\n# 如何通过 Python 使用表存储\n\n[AZURE.INCLUDE [storage-selector-table-include](../includes/storage-selector-table-include.md)]\n\n## 概述\n\n本指南将演示如何使用 Azure 表存储服务执行常见方案。相关示例是使用 Python 编写的，并使用 [Python Azure 存储包][]。涉及的方案包括创建和删除表、以及在表中插入和查询实体。\n\n[AZURE.INCLUDE [storage-table-concepts-include](../includes/storage-table-concepts-include.md)]\n\n[AZURE.INCLUDE [storage-create-account-include](../includes/storage-create-account-include.md)]\n\n[AZURE.NOTE]如果您需要安装 Python 或 [Python Azure 包][]，请参阅 [Python 安装指南](/documentation/articles/python-how-to-install)。\n\n\n## 创建表\n\n可通过 **TableService** 对象使用表服务。以下代码创建 **TableService** 对象。在你希望在其中以编程方式访问 Azure 存储空间的任何 Python 文件中，将代码添加到文件的顶部附近：\n\n    from azure.storage.table import TableService, Entity\n\n以下代码使用存储帐户名称和帐户密钥创建 **TableService** 对象。使用实际帐户和密钥替换“myaccount”和“mykey”。\n\n    table_service = TableService(account_name='myaccount', account_key='mykey')\n\n    table_service.create_table('tasktable')\n\n## 将实体添加到表\n\n若要添加实体，请首先创建定义实体属性名称和值的字典。请注意，对于每个实体，你必须指定 **PartitionKey** 和 **RowKey**。这些是您的实体的唯一标识符。您可以查询这些值，比查询其他属性快得多。系统使用 **PartitionKey** 自动将表的实体分发到多个存储节点上。具有相同的 **PartitionKey** 的实体存储在同一个节点上。**RowKey** 是实体在其所属分区内的唯一 ID。\n\n若要将实体添加到表中，请将字典对象传递给 **insert_entity** 方法。\n\n    task = {'PartitionKey': 'tasksSeattle', 'RowKey': '1', 'description' : 'Take out the trash', 'priority' : 200}\n    table_service.insert_entity('tasktable', task)\n\n你还可以将 **Entity** 类的实例传递给 **insert_entity** 方法。\n\n    task = Entity()\n    task.PartitionKey = 'tasksSeattle'\n    task.RowKey = '2'\n    task.description = 'Wash the car'\n    task.priority = 100\n    table_service.insert_entity('tasktable', task)\n\n## 更新实体\n\n此代码演示如何使用更新版本替换现有实体的旧版本。\n\n    task = {'description' : 'Take out the garbage', 'priority' : 250}\n    table_service.update_entity('tasktable', 'tasksSeattle', '1', task)\n\n如果要更新的实体不存在，更新操作将失败。如果你要存储实体，而不管它以前是否已存在，请使用 **insert_or_replace_entity**。在下面的示例中，第一次调用将替换现有实体。第二次调用将插入新实体，因为表中不存在具有指定的 **PartitionKey** 和 **RowKey** 的实体。\n\n    task = {'description' : 'Take out the garbage again', 'priority' : 250}\n    table_service.insert_or_replace_entity('tasktable', 'tasksSeattle', '1', task)\n\n    task = {'description' : 'Buy detergent', 'priority' : 300}\n    table_service.insert_or_replace_entity('tasktable', 'tasksSeattle', '3', task)\n\n## 更改实体组\n\n有时，有必要成批地同时提交多项操作以确保通过服务器进行原子处理。若要实现该目的，请对 **TableService** 使用 **begin_batch** 方法，然后像通常一样调用一系列操作。在你确实要按批提交时，可调用 **commit_batch**。请注意，所有实体必须在相同分区中才能更改为批处理。下面的示例将两个实体一起添加到批处理中。\n\n    task10 = {'PartitionKey': 'tasksSeattle', 'RowKey': '10', 'description' : 'Go grocery shopping', 'priority' : 400}\n    task11 = {'PartitionKey': 'tasksSeattle', 'RowKey': '11', 'description' : 'Clean the bathroom', 'priority' : 100}\n    table_service.begin_batch()\n    table_service.insert_entity('tasktable', task10)\n    table_service.insert_entity('tasktable', task11)\n    table_service.commit_batch()\n\n## 查询实体\n\n若要查询表中的实体，请使用 **get_entity** 方法并传递 **PartitionKey** 和 **RowKey**。\n\n    task = table_service.get_entity('tasktable', 'tasksSeattle', '1')\n    print(task.description)\n    print(task.priority)\n\n## 查询实体集\n\n此示例基于 **PartitionKey** 查找 Seattle 中的所有任务。\n\n    tasks = table_service.query_entities('tasktable', \"PartitionKey eq 'tasksSeattle'\")\n    for task in tasks:\n        print(task.description)\n        print(task.priority)\n\n## 查询一部分实体属性\n\n对表的查询可以只检索实体中的少数几个属性。此方法称为“投影”，可减少带宽并提高查询性能，尤其适用于大型实体。使用 **select** 参数并传递你希望显示给客户端的属性的名称。\n\n以下代码中的查询只返回表中实体的说明。\n\n[AZURE.NOTE]下面的代码段仅对云存储服务有效。不受存储模拟器支持。\n\n    tasks = table_service.query_entities('tasktable', \"PartitionKey eq 'tasksSeattle'\", 'description')\n    for task in tasks:\n        print(task.description)\n\n## 删除实体\n\n可以使用实体的分区键和行键删除实体。\n\n    table_service.delete_entity('tasktable', 'tasksSeattle', '1')\n\n## 删除表\n\n以下代码从存储帐户中删除一个表。\n\n    table_service.delete_table('tasktable')\n\n## 后续步骤\n\n现在，您已了解有关表存储的基础知识，请按照下面的链接了解更复杂的存储任务：\n\n-   请参阅 MSDN 参考：[Azure 存储服务][]。\n-   访问 [Azure 存储空间团队博客][]。\n\n有关详细信息，另请参阅 [Python 开发人员中心](/develop/python/)。\n\n[Azure 存储空间团队博客]: http://blogs.msdn.com/b/windowsazurestorage/\n[Python Azure 包]: https://pypi.python.org/pypi/azure\n[Python Azure 存储空间包]: https://pypi.python.org/pypi/azure-storage\n\n<!---HONumber=Mooncake_0104_2016-->"
+}

@@ -1,0 +1,110 @@
+{
+  "nodes": [
+    {
+      "content": "如何为 Web 应用配置 TLS 相互身份验证",
+      "pos": [
+        28,
+        51
+      ]
+    },
+    {
+      "content": "了解如何将 Web 应用配置为使用 TLS 客户端证书身份验证。",
+      "pos": [
+        71,
+        103
+      ]
+    },
+    {
+      "content": "如何为 Web 应用配置 TLS 相互身份验证",
+      "pos": [
+        322,
+        345
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        350,
+        352
+      ]
+    },
+    {
+      "content": "通过为 Azure Web 应用启用不同类型的身份验证可以限制对网站的访问。执行此操作的方法之一是在通过 TLS/SSL 发送请求时使用客户端证书进行身份验证。此机制称为 TLS 相互身份验证或客户端证书身份验证，本文将详细说明如何将 Web 应用设置为使用客户端证书身份验证。",
+      "pos": [
+        356,
+        495
+      ]
+    },
+    {
+      "content": "将 Web 应用配置为使用客户端证书身份验证",
+      "pos": [
+        500,
+        522
+      ]
+    },
+    {
+      "content": "若要将 Web 应用设置为要求使用客户端证书，你需要为 Web 应用添加 clientCertEnabled 站点设置并将该设置指定为 true。目前无法通过门户中的管理体验进行此设置，你需要使用 REST API 来实现此目的。",
+      "pos": [
+        526,
+        641
+      ]
+    },
+    {
+      "pos": [
+        643,
+        741
+      ],
+      "content": "你可以使用 <bpt id=\"p1\">[</bpt>ARMClient 工具<ept id=\"p1\">](https://github.com/projectkudu/ARMClient)</ept>轻松创建 REST API 调用。使用该工具登录之后，需要发出以下命令："
+    },
+    {
+      "pos": [
+        744,
+        895
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 使用 <ph id=\"ph2\">`ARMClient.exe login [environment name]`</ph> 登陆时， <ph id=\"ph3\">`[environment name]`</ph> 应为 <ph id=\"ph4\">`MOONCAKE`</ph>。也就是说，完成登陆 Azure 中国的命令为 <ph id=\"ph5\">`ARMClient.exe login MOONCAKE`</ph>。"
+    },
+    {
+      "content": "将 {} 中的所有内容替换为 Web 应用的信息，并创建包含以下 JSON 内容的 enableclientcert.json 文件：",
+      "pos": [
+        1089,
+        1156
+      ]
+    },
+    {
+      "content": "确保将“location”的值更改为 Web 应用所在的位置，例如 China North 或 China East。",
+      "pos": [
+        1296,
+        1355
+      ]
+    },
+    {
+      "content": "从 Web 应用访问客户端证书",
+      "pos": [
+        1361,
+        1376
+      ]
+    },
+    {
+      "content": "将 Web 应用配置为使用客户端证书身份验证后，可以通过“X-ARR-ClientCert”请求标头中的 base64 编码值在应用中使用客户端证书。应用程序可以基于此值创建证书，然后将它用于应用程序中的身份验证和授权。",
+      "pos": [
+        1380,
+        1490
+      ]
+    },
+    {
+      "content": "有关证书验证的特殊注意事项",
+      "pos": [
+        1495,
+        1508
+      ]
+    },
+    {
+      "content": "Azure Web Apps 平台不会针对发送到应用程序的客户端证书进行任何验证。验证此证书是 Web 应用的责任。下面是为了进行身份验证而验证证书属性的示例 ASP.NET 代码。",
+      "pos": [
+        1512,
+        1603
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"如何为 Web 应用配置 TLS 相互身份验证\" \n    description=\"了解如何将 Web 应用配置为使用 TLS 客户端证书身份验证。\" \n    services=\"app-service\" \n    documentationCenter=\"\" \n    authors=\"naziml\" \n    manager=\"wpickett\" \n    editor=\"jimbe\"/>\n\n<tags\n    ms.service=\"app-service\"\n    ms.date=\"12/17/2015\"\n    wacn.date=\"02/26/2016\"/>\n\n# 如何为 Web 应用配置 TLS 相互身份验证\n\n## 概述 ##\n通过为 Azure Web 应用启用不同类型的身份验证可以限制对网站的访问。执行此操作的方法之一是在通过 TLS/SSL 发送请求时使用客户端证书进行身份验证。此机制称为 TLS 相互身份验证或客户端证书身份验证，本文将详细说明如何将 Web 应用设置为使用客户端证书身份验证。\n\n## 将 Web 应用配置为使用客户端证书身份验证 ##\n若要将 Web 应用设置为要求使用客户端证书，你需要为 Web 应用添加 clientCertEnabled 站点设置并将该设置指定为 true。目前无法通过门户中的管理体验进行此设置，你需要使用 REST API 来实现此目的。\n\n你可以使用 [ARMClient 工具](https://github.com/projectkudu/ARMClient)轻松创建 REST API 调用。使用该工具登录之后，需要发出以下命令：\n\n>[AZURE.NOTE] 使用 `ARMClient.exe login [environment name]` 登陆时， `[environment name]` 应为 `MOONCAKE`。也就是说，完成登陆 Azure 中国的命令为 `ARMClient.exe login MOONCAKE`。\n\n    ARMClient PUT subscriptions/{Subscription Id}/resourcegroups/{Resource Group Name}/providers/Microsoft.Web/sites/{Website Name}?api-version=2015-04-01 @enableclientcert.json -verbose\n    \n将 {} 中的所有内容替换为 Web 应用的信息，并创建包含以下 JSON 内容的 enableclientcert.json 文件：\n\n    {\n       \"location\": \"My Web App Location\",   \n       \"properties\": \n       {  \n         \"clientCertEnabled\": true\n       }\n    }  \n\n\n确保将“location”的值更改为 Web 应用所在的位置，例如 China North 或 China East。\n\n\n## 从 Web 应用访问客户端证书 ##\n将 Web 应用配置为使用客户端证书身份验证后，可以通过“X-ARR-ClientCert”请求标头中的 base64 编码值在应用中使用客户端证书。应用程序可以基于此值创建证书，然后将它用于应用程序中的身份验证和授权。\n\n## 有关证书验证的特殊注意事项 ##\nAzure Web Apps 平台不会针对发送到应用程序的客户端证书进行任何验证。验证此证书是 Web 应用的责任。下面是为了进行身份验证而验证证书属性的示例 ASP.NET 代码。\n\n    using System;\n    using System.Collections.Specialized;\n    using System.Security.Cryptography.X509Certificates;\n    using System.Web;\n\n    namespace ClientCertificateUsageSample\n    {\n        public partial class cert : System.Web.UI.Page\n        {\n            public string certHeader = \"\";\n            public string errorString = \"\";\n            private X509Certificate2 certificate = null;\n            public string certThumbprint = \"\";\n            public string certSubject = \"\";\n            public string certIssuer = \"\";\n            public string certSignatureAlg = \"\";\n            public string certIssueDate = \"\";\n            public string certExpiryDate = \"\";\n            public bool isValidCert = false;\n\n            //\n            // Read the certificate from the header into an X509Certificate2 object\n            // Display properties of the certificate on the page\n            //\n            protected void Page_Load(object sender, EventArgs e)\n            {\n                NameValueCollection headers = base.Request.Headers;\n                certHeader = headers[\"X-ARR-ClientCert\"];\n                if (!String.IsNullOrEmpty(certHeader))\n                {\n                    try\n                    {\n                        byte[] clientCertBytes = Convert.FromBase64String(certHeader);\n                        certificate = new X509Certificate2(clientCertBytes);\n                        certSubject = certificate.Subject;\n                        certIssuer = certificate.Issuer;\n                        certThumbprint = certificate.Thumbprint;\n                        certSignatureAlg = certificate.SignatureAlgorithm.FriendlyName;\n                        certIssueDate = certificate.NotBefore.ToShortDateString() + \" \" + certificate.NotBefore.ToShortTimeString();\n                        certExpiryDate = certificate.NotAfter.ToShortDateString() + \" \" + certificate.NotAfter.ToShortTimeString();\n                    }\n                    catch (Exception ex)\n                    {\n                        errorString = ex.ToString();\n                    }\n                    finally \n                    {\n                        isValidCert = IsValidClientCertificate();\n                        if (!isValidCert) Response.StatusCode = 403;\n                        else Response.StatusCode = 200;\n                    }\n                }\n                else\n                {\n                    certHeader = \"\";\n                }\n            }\n\n            //\n            // This is a SAMPLE verification routine. Depending on your application logic and security requirements, \n            // you should modify this method\n            //\n            private bool IsValidClientCertificate()\n            {\n                // In this example we will only accept the certificate as a valid certificate if all the conditions below are met:\n                // 1. The certificate is not expired and is active for the current time on server.\n                // 2. The subject name of the certificate has the common name nildevecc\n                // 3. The issuer name of the certificate has the common name nildevecc and organization name Microsoft Corp\n                // 4. The thumbprint of the certificate is 30757A2E831977D8BD9C8496E4C99AB26CB9622B\n                //\n                // This example does NOT test that this certificate is chained to a Trusted Root Authority (or revoked) on the server \n                // and it allows for self signed certificates\n                //\n\n                if (certificate == null || !String.IsNullOrEmpty(errorString)) return false;\n                \n                // 1. Check time validity of certificate\n                if (DateTime.Compare(DateTime.Now, certificate.NotBefore) < 0 && DateTime.Compare(DateTime.Now, certificate.NotAfter) > 0) return false;\n                \n                // 2. Check subject name of certificate\n                bool foundSubject = false;\n                string[] certSubjectData = certificate.Subject.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);\n                foreach (string s in certSubjectData)\n                {\n                    if (String.Compare(s.Trim(), \"CN=nildevecc\") == 0)\n                    {\n                        foundSubject = true;\n                        break;\n                    }\n                }\n                if (!foundSubject) return false;\n\n                // 3. Check issuer name of certificate\n                bool foundIssuerCN = false, foundIssuerO = false;\n                string[] certIssuerData = certificate.Issuer.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);\n                foreach (string s in certIssuerData)\n                {\n                    if (String.Compare(s.Trim(), \"CN=nildevecc\") == 0)\n                    {\n                        foundIssuerCN = true;\n                        if (foundIssuerO) break;\n                    }\n\n                    if (String.Compare(s.Trim(), \"O=Microsoft Corp\") == 0)\n                    {\n                        foundIssuerO = true;\n                        if (foundIssuerCN) break;\n                    }\n                }\n\n                if (!foundIssuerCN || !foundIssuerO) return false;\n\n                // 4. Check thumprint of certificate\n                if (String.Compare(certificate.Thumbprint.Trim().ToUpper(), \"30757A2E831977D8BD9C8496E4C99AB26CB9622B\") != 0) return false;\n\n                // If you also want to test if the certificate chains to a Trusted Root Authority you can uncomment the code below\n                //\n                //X509Chain certChain = new X509Chain();\n                //certChain.Build(certificate);\n                //bool isValidCertChain = true;\n                //foreach (X509ChainElement chElement in certChain.ChainElements)\n                //{\n                //    if (!chElement.Certificate.Verify())\n                //    {\n                //        isValidCertChain = false;\n                //        break;\n                //    }\n                //}\n                //if (!isValidCertChain) return false;\n\n                return true;\n            }\n        }\n    }\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

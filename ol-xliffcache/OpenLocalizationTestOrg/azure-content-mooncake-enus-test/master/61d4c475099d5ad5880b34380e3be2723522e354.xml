@@ -1,0 +1,180 @@
+{
+  "nodes": [
+    {
+      "content": "在 Mac OS X 上使用 Ruby 和 TinyTDS 连接到 SQL 数据库(Yosemite)",
+      "pos": [
+        27,
+        78
+      ]
+    },
+    {
+      "content": "提供可在 Mac OS X (Yosemite) 上运行的，用于连接到 Azure SQL 数据库的 Ruby 代码示例。",
+      "pos": [
+        97,
+        158
+      ]
+    },
+    {
+      "content": "在 Mac OS X 上使用 Ruby 连接到 SQL 数据库(Yosemite)",
+      "pos": [
+        370,
+        411
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        416,
+        432
+      ]
+    },
+    {
+      "content": "Node.js",
+      "pos": [
+        436,
+        443
+      ]
+    },
+    {
+      "content": "Python",
+      "pos": [
+        512,
+        518
+      ]
+    },
+    {
+      "content": "Ruby",
+      "pos": [
+        591,
+        595
+      ]
+    },
+    {
+      "content": "本主题演示了一个在装有 Yosemite 的 Mac 计算机上运行的，用于连接到 Azure SQL 数据库数据库的 Ruby 代码示例。",
+      "pos": [
+        665,
+        734
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        739,
+        743
+      ]
+    },
+    {
+      "content": "安装所需的模块",
+      "pos": [
+        749,
+        756
+      ]
+    },
+    {
+      "content": "打开终端并安装以下组件：",
+      "pos": [
+        758,
+        770
+      ]
+    },
+    {
+      "pos": [
+        772,
+        826
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>1) Homebrew<ept id=\"p1\">**</ept>：从你的终端运行以下命令。这将在你的计算机上下载 Homebrew 包管理器。"
+    },
+    {
+      "pos": [
+        923,
+        994
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>2) FreeTDS<ept id=\"p1\">**</ept>：从你的终端运行以下命令。这将在你的计算机上安装 FreeTDS。要使 TinyTDS 正常工作，必须安装该组件。"
+    },
+    {
+      "pos": [
+        1022,
+        1069
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>3) TinyTDS<ept id=\"p1\">**</ept>：从你的终端运行以下命令。这将在你的计算机上安装 TinyTDS。"
+    },
+    {
+      "content": "SQL 数据库",
+      "pos": [
+        1101,
+        1108
+      ]
+    },
+    {
+      "pos": [
+        1110,
+        1250
+      ],
+      "content": "请参阅<bpt id=\"p1\">[</bpt>入门页<ept id=\"p1\">](/documentation/articles/sql-database-get-started)</ept>，以了解如何创建示例数据库。必须根据指南创建 <bpt id=\"p2\">**</bpt>AdventureWorks 数据库模板<ept id=\"p2\">**</ept>。下面所示的示例只适用于 <bpt id=\"p3\">**</bpt>AdventureWorks 架构<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "content": "步骤 1：获取连接详细信息",
+      "pos": [
+        1256,
+        1269
+      ]
+    },
+    {
+      "content": "步骤 2：连接",
+      "pos": [
+        1433,
+        1440
+      ]
+    },
+    {
+      "pos": [
+        1442,
+        1521
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>TinyTDS::Client<ept id=\"p1\">](https://github.com/rails-sqlserver/tiny_tds)</ept> 函数用于连接到 SQL 数据库。"
+    },
+    {
+      "content": "步骤 3：执行查询",
+      "pos": [
+        1751,
+        1760
+      ]
+    },
+    {
+      "pos": [
+        1762,
+        1949
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>TinyTds::Result<ept id=\"p1\">](https://github.com/rails-sqlserver/tiny_tds)</ept> 函数用于检索针对 SQL 数据库执行的查询所返回的结果集。此函数接受查询并返回结果集。可以使用 <bpt id=\"p2\">[</bpt>result.each do |row|<ept id=\"p2\">](https://github.com/rails-sqlserver/tiny_tds)</ept> 循环访问结果集。"
+    },
+    {
+      "content": "步骤 4：插入行",
+      "pos": [
+        2312,
+        2320
+      ]
+    },
+    {
+      "pos": [
+        2322,
+        2578
+      ],
+      "content": "在本示例中，你将了解如何安全地执行 <bpt id=\"p1\">[</bpt>INSERT<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/ms174335.aspx)</ept> 语句，传递参数以保护应用程序免遭 <bpt id=\"p2\">[</bpt>SQL 注入<ept id=\"p2\">](https://technet.microsoft.com/zh-cn/library/ms161953(v=sql.105).aspx)</ept> 漏洞的危害，然后检索自动生成的<bpt id=\"p3\">[</bpt>主键<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/ms179610.aspx)</ept>值。"
+    },
+    {
+      "pos": [
+        2581,
+        2727
+      ],
+      "content": "若要配合使用 TinyTDS 和 Azure，建议你运行多个 <ph id=\"ph1\">`SET`</ph> 语句来更改当前会话处理特定信息的方式。建议使用代码示例中所提供的 <ph id=\"ph2\">`SET`</ph> 语句。例如，即使未显式指定列的可为 null 状态，<ph id=\"ph3\">`SET ANSI_NULL_DFLT_ON`</ph> 也可以让你创建新列来允许 null 值。"
+    },
+    {
+      "pos": [
+        2729,
+        2909
+      ],
+      "content": "为了符合 Microsoft SQL Server <bpt id=\"p1\">[</bpt>日期时间<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/ms187819.aspx)</ept>格式，请使用 <bpt id=\"p2\">[</bpt>strftime<ept id=\"p2\">](http://ruby-doc.org/core-2.2.0/Time.html#method-i-strftime)</ept> 函数转换成对应的日期时间格式。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"在 Mac OS X 上使用 Ruby 和 TinyTDS 连接到 SQL 数据库(Yosemite)\"\n    description=\"提供可在 Mac OS X (Yosemite) 上运行的，用于连接到 Azure SQL 数据库的 Ruby 代码示例。\"\n    services=\"sql-database\"\n    documentationCenter=\"\"\n    authors=\"ajlam\"\n    manager=\"jeffreyg\"\n    editor=\"\"/>\n\n\n<tags\n    ms.service=\"sql-database\"\n    ms.date=\"12/17/2015\"\n    wacn.date=\"01/29/2016\"/>\n\n\n# 在 Mac OS X 上使用 Ruby 连接到 SQL 数据库(Yosemite)\n\n\n> [AZURE.SELECTOR]\n- [Node.js](/documentation/articles/sql-database-develop-nodejs-simple-mac)\n- [Python](/documentation/articles/sql-database-develop-python-simple-mac-osx)\n- [Ruby](/documentation/articles/sql-database-develop-ruby-simple-mac-osx)\n\n\n本主题演示了一个在装有 Yosemite 的 Mac 计算机上运行的，用于连接到 Azure SQL 数据库数据库的 Ruby 代码示例。\n\n## 先决条件\n\n### 安装所需的模块\n\n打开终端并安装以下组件：\n\n**1) Homebrew**：从你的终端运行以下命令。这将在你的计算机上下载 Homebrew 包管理器。\n\n    ruby -e \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"\n\n**2) FreeTDS**：从你的终端运行以下命令。这将在你的计算机上安装 FreeTDS。要使 TinyTDS 正常工作，必须安装该组件。\n\n    brew install FreeTDS\n\n**3) TinyTDS**：从你的终端运行以下命令。这将在你的计算机上安装 TinyTDS。\n\n    gem install tiny_tds\n\n### SQL 数据库\n\n请参阅[入门页](/documentation/articles/sql-database-get-started)，以了解如何创建示例数据库。必须根据指南创建 **AdventureWorks 数据库模板**。下面所示的示例只适用于 **AdventureWorks 架构**。\n\n\n## 步骤 1：获取连接详细信息\n\n[AZURE.INCLUDE [sql-database-include-connection-string-details-20-portalshots](../includes/sql-database-include-connection-string-details-20-portalshots.md)]\n\n## 步骤 2：连接\n\n[TinyTDS::Client](https://github.com/rails-sqlserver/tiny_tds) 函数用于连接到 SQL 数据库。\n\n    require 'tiny_tds'\n    client = TinyTds::Client.new username: 'yourusername@yourserver', password: 'yourpassword',\n    host: 'yourserver.database.chinacloudapi.cn', port: 1433,\n    database: 'AdventureWorks', azure:true\n\n## 步骤 3：执行查询\n\n[TinyTds::Result](https://github.com/rails-sqlserver/tiny_tds) 函数用于检索针对 SQL 数据库执行的查询所返回的结果集。此函数接受查询并返回结果集。可以使用 [result.each do |row|](https://github.com/rails-sqlserver/tiny_tds) 循环访问结果集。\n\n    require 'tiny_tds'  \n    print 'test'     \n    client = TinyTds::Client.new username: 'yourusername@yourserver', password: 'yourpassword',\n    host: 'yourserver.database.chinacloudapi.cn', port: 1433,\n    database: 'AdventureWorks', azure:true\n    results = client.execute(\"select * from SalesLT.Product\")\n    results.each do |row|\n    puts row\n    end\n\n## 步骤 4：插入行\n\n在本示例中，你将了解如何安全地执行 [INSERT](https://msdn.microsoft.com/zh-cn/library/ms174335.aspx) 语句，传递参数以保护应用程序免遭 [SQL 注入](https://technet.microsoft.com/zh-cn/library/ms161953(v=sql.105).aspx) 漏洞的危害，然后检索自动生成的[主键](https://msdn.microsoft.com/zh-cn/library/ms179610.aspx)值。\n\n\n若要配合使用 TinyTDS 和 Azure，建议你运行多个 `SET` 语句来更改当前会话处理特定信息的方式。建议使用代码示例中所提供的 `SET` 语句。例如，即使未显式指定列的可为 null 状态，`SET ANSI_NULL_DFLT_ON` 也可以让你创建新列来允许 null 值。\n\n为了符合 Microsoft SQL Server [日期时间](http://msdn.microsoft.com/zh-cn/library/ms187819.aspx)格式，请使用 [strftime](http://ruby-doc.org/core-2.2.0/Time.html#method-i-strftime) 函数转换成对应的日期时间格式。\n\n    require 'tiny_tds'\n    client = TinyTds::Client.new username: 'yourusername@yourserver', password: 'yourpassword',\n    host: 'yourserver.database.chinacloudapi.cn', port: 1433,\n    database: 'AdventureWorks', azure:true\n    results = client.execute(\"SET ANSI_NULLS ON\")\n    results = client.execute(\"SET CURSOR_CLOSE_ON_COMMIT OFF\")\n    results = client.execute(\"SET ANSI_NULL_DFLT_ON ON\")\n    results = client.execute(\"SET IMPLICIT_TRANSACTIONS OFF\")\n    results = client.execute(\"SET ANSI_PADDING ON\")\n    results = client.execute(\"SET QUOTED_IDENTIFIER ON\")\n    results = client.execute(\"SET ANSI_WARNINGS ON\")\n    results = client.execute(\"SET CONCAT_NULL_YIELDS_NULL ON\")\n    require 'date'\n    t = Time.now\n    curr_date = t.strftime(\"%Y-%m-%d %H:%M:%S.%L\")\n    results = client.execute(\"INSERT SalesLT.Product (Name, ProductNumber, StandardCost, ListPrice, SellStartDate)\n    OUTPUT INSERTED.ProductID VALUES ('SQL Server Express New', 'SQLEXPRESS New', 0, 0, '#{curr_date}' )\")\n    results.each do |row|\n    puts row\n    end\n\n<!---HONumber=Mooncake_0118_2016-->\n"
+}

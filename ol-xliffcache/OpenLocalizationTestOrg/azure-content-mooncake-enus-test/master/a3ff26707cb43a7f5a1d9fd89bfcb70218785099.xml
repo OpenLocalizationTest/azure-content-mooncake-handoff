@@ -1,0 +1,530 @@
+{
+  "nodes": [
+    {
+      "content": "在运行 Linux 的 Azure 虚拟机上安装和配置 PostgreSQL",
+      "pos": [
+        27,
+        65
+      ]
+    },
+    {
+      "content": "了解如何在 Azure 中的 Linux 虚拟机上安装和配置 PostgreSQL",
+      "pos": [
+        84,
+        125
+      ]
+    },
+    {
+      "content": "在 Azure 上安装和配置 PostgreSQL",
+      "pos": [
+        405,
+        430
+      ]
+    },
+    {
+      "content": "PostgreSQL 是一种类似于 Oracle 和 DB2 的高级开放源代码数据库。它包含许多企业级功能，比如完整的 ACID 合规性、可靠的事务处理和多版本并发控制。它还支持 ANSI SQL 和 SQL/MED（包括 Oracle、MySQL、MongoDB 等等的外来数据包装器）等标准。它具有高度的可扩展性，支持超过 12 种程序语言，并支持 GIN 和 GiST 索引、空间数据，以及面向 JSON 或基于键值的应用程序的多款类似于 NoSQL 的功能。",
+      "pos": [
+        432,
+        665
+      ]
+    },
+    {
+      "content": "在本文中，你将了解如何在运行 Linux 的 Azure 虚拟机上安装和配置 PostgreSQL。",
+      "pos": [
+        667,
+        717
+      ]
+    },
+    {
+      "pos": [
+        720,
+        803
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-both-include.md)</ept>]"
+    },
+    {
+      "content": "安装 PostgreSQL",
+      "pos": [
+        809,
+        822
+      ]
+    },
+    {
+      "pos": [
+        826,
+        990
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>你必须已经有一个运行 Linux 的 Azure 虚拟机，才能完成本教程。在继续操作前，若要创建并设置 Linux VM，请参阅 <bpt id=\"p1\">[</bpt>Azure Linux VM 教程<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-tutorial-portal-rm)</ept>。"
+    },
+    {
+      "content": "在此示例中，使用端口 1999 作为 PostgreSQL 端口。",
+      "pos": [
+        992,
+        1025
+      ]
+    },
+    {
+      "pos": [
+        1027,
+        1196
+      ],
+      "content": "通过 PuTTY 连接到你创建的 Linux VM。如果这是你首次使用 Azure Linux VM，请参阅<bpt id=\"p1\">[</bpt>如何在 Azure 上将 SSH 用于 Linux<ept id=\"p1\">](/documentation/articles/virtual-machines-linux-use-ssh-key)</ept>，以了解如何使用 PuTTY 连接到 Linux VM。"
+    },
+    {
+      "content": "运行以下命令切换成根用户（管理员）：",
+      "pos": [
+        1201,
+        1219
+      ]
+    },
+    {
+      "content": "某些分发版具有在安装 PostgreSQL 之前必须安装的依赖项。查看此列表中的分发版并运行相应的命令：",
+      "pos": [
+        1245,
+        1297
+      ]
+    },
+    {
+      "content": "基于 Red Hat 的 Linux：",
+      "pos": [
+        1305,
+        1324
+      ]
+    },
+    {
+      "content": "基于 Debian 的 Linux：",
+      "pos": [
+        1487,
+        1505
+      ]
+    },
+    {
+      "content": "SUSE Linux：",
+      "pos": [
+        1671,
+        1682
+      ]
+    },
+    {
+      "content": "将 PostgreSQL 下载到根目录中，然后对包进行解压缩：",
+      "pos": [
+        1845,
+        1876
+      ]
+    },
+    {
+      "pos": [
+        2024,
+        2107
+      ],
+      "content": "上面是一个示例：你可以在 <bpt id=\"p1\">[</bpt>/pub/source/ 的索引<ept id=\"p1\">](https://ftp.postgresql.org/pub/source/)</ept>中找到更详细的下载地址。"
+    },
+    {
+      "content": "若要启动生成，请运行这些命令：",
+      "pos": [
+        2112,
+        2127
+      ]
+    },
+    {
+      "content": "如果希望生成所有能生成的内容，包括文档（HTML 和手册页）和其他模块 (contrib)，则改为运行以下命令：",
+      "pos": [
+        2217,
+        2273
+      ]
+    },
+    {
+      "content": "你应该会收到以下确认消息：",
+      "pos": [
+        2310,
+        2323
+      ]
+    },
+    {
+      "content": "配置 PostgreSQL",
+      "pos": [
+        2413,
+        2426
+      ]
+    },
+    {
+      "content": "（可选）创建一个符号链接以便将 PostgreSQL 引用缩短为不包含版本号：",
+      "pos": [
+        2431,
+        2470
+      ]
+    },
+    {
+      "content": "为数据库创建一个目录：",
+      "pos": [
+        2519,
+        2530
+      ]
+    },
+    {
+      "pos": [
+        2571,
+        2620
+      ],
+      "content": "创建一个非根用户并修改该用户的配置文件。然后，切换到该新用户（本例中称为 <bpt id=\"p1\">*</bpt>postgres<ept id=\"p1\">*</ept>）："
+    },
+    {
+      "pos": [
+        2733,
+        2784
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>出于安全原因，PostgreSQL 将使用非根用户来初始化、启动或关闭数据库。"
+    },
+    {
+      "pos": [
+        2790,
+        2850
+      ],
+      "content": "通过输入以下命令编辑 <bpt id=\"p1\">*</bpt>bash\\_profile<ept id=\"p1\">*</ept> 文件。这些行将添加到 <bpt id=\"p2\">*</bpt>bash\\_profile<ept id=\"p2\">*</ept> 文件的末尾："
+    },
+    {
+      "pos": [
+        3249,
+        3271
+      ],
+      "content": "执行 <bpt id=\"p1\">*</bpt>bash\\_profile<ept id=\"p1\">*</ept> 文件："
+    },
+    {
+      "content": "使用以下命令验证你的安装：",
+      "pos": [
+        3308,
+        3321
+      ]
+    },
+    {
+      "content": "如果安装成功，你将看到以下响应：",
+      "pos": [
+        3349,
+        3365
+      ]
+    },
+    {
+      "content": "你还可以检查 PostgreSQL 版本：",
+      "pos": [
+        3399,
+        3420
+      ]
+    },
+    {
+      "content": "初始化数据库：",
+      "pos": [
+        3444,
+        3451
+      ]
+    },
+    {
+      "content": "你应该会收到以下输出：",
+      "pos": [
+        3520,
+        3531
+      ]
+    },
+    {
+      "content": "图像",
+      "pos": [
+        3535,
+        3537
+      ]
+    },
+    {
+      "content": "设置 PostgreSQL",
+      "pos": [
+        3594,
+        3607
+      ]
+    },
+    {
+      "content": "运行以下命令：",
+      "pos": [
+        3647,
+        3654
+      ]
+    },
+    {
+      "pos": [
+        3750,
+        3874
+      ],
+      "content": "修改 /etc/init.d/postgresql 文件中的两个变量。前缀设置为 PostgreSQL 的安装路径：<bpt id=\"p1\">**</bpt>/opt/pgsql<ept id=\"p1\">**</ept>。PGDATA 设置为 PostgreSQL 的数据存储路径：<bpt id=\"p2\">**</bpt>/opt/pgsql\\_data<ept id=\"p2\">**</ept>。"
+    },
+    {
+      "content": "图像",
+      "pos": [
+        4016,
+        4018
+      ]
+    },
+    {
+      "content": "更改文件以使其成为可执行文件：",
+      "pos": [
+        4072,
+        4087
+      ]
+    },
+    {
+      "content": "启动 PostgreSQL：",
+      "pos": [
+        4128,
+        4142
+      ]
+    },
+    {
+      "content": "检查 PostgreSQL 的终结点是否已打开：",
+      "pos": [
+        4180,
+        4204
+      ]
+    },
+    {
+      "content": "你应该会看到以下输出：",
+      "pos": [
+        4238,
+        4249
+      ]
+    },
+    {
+      "content": "图像",
+      "pos": [
+        4253,
+        4255
+      ]
+    },
+    {
+      "content": "连接到 Postgres 数据库",
+      "pos": [
+        4312,
+        4328
+      ]
+    },
+    {
+      "content": "再次切换成 postgres 用户：",
+      "pos": [
+        4330,
+        4348
+      ]
+    },
+    {
+      "content": "创建一个 Postgres 数据库：",
+      "pos": [
+        4371,
+        4389
+      ]
+    },
+    {
+      "content": "连接到刚创建的事件数据库：",
+      "pos": [
+        4414,
+        4427
+      ]
+    },
+    {
+      "content": "创建和删除 Postgres 表",
+      "pos": [
+        4454,
+        4470
+      ]
+    },
+    {
+      "content": "既然已经连接到数据库，就可以在其中创建表了。",
+      "pos": [
+        4472,
+        4494
+      ]
+    },
+    {
+      "content": "例如，使用以下命令创建一个新的示例 Postgres 表：",
+      "pos": [
+        4496,
+        4525
+      ]
+    },
+    {
+      "content": "现在已经设置一个具有以下列名和限制的 4 列表：",
+      "pos": [
+        4630,
+        4654
+      ]
+    },
+    {
+      "content": "“name”列受 VARCHAR 命令限制，必须少于 20 个字符。",
+      "pos": [
+        4659,
+        4693
+      ]
+    },
+    {
+      "content": "“food”列指示每个人将携带的食物。VARCHAR 将此文本限制为 30 个字符以下。",
+      "pos": [
+        4697,
+        4741
+      ]
+    },
+    {
+      "content": "“confirmed”列记录此人是否接受了百乐餐邀请。可接受的值为“Y”和“N”。",
+      "pos": [
+        4745,
+        4786
+      ]
+    },
+    {
+      "content": "“date”列将在他们报名参加该活动时显示。Postgres 要求日期格式为 yyyy-mm-dd。",
+      "pos": [
+        4790,
+        4840
+      ]
+    },
+    {
+      "content": "如果成功创建了表，你应该会看到以下内容：",
+      "pos": [
+        4842,
+        4862
+      ]
+    },
+    {
+      "content": "图像",
+      "pos": [
+        4866,
+        4868
+      ]
+    },
+    {
+      "content": "你还可以使用以下命令检查表结构：",
+      "pos": [
+        4922,
+        4938
+      ]
+    },
+    {
+      "content": "图像",
+      "pos": [
+        4942,
+        4944
+      ]
+    },
+    {
+      "content": "向表中添加数据",
+      "pos": [
+        5002,
+        5009
+      ]
+    },
+    {
+      "content": "首先，将信息插入某一行：",
+      "pos": [
+        5011,
+        5023
+      ]
+    },
+    {
+      "content": "你应该会看到以下输出：",
+      "pos": [
+        5135,
+        5146
+      ]
+    },
+    {
+      "content": "图像",
+      "pos": [
+        5150,
+        5152
+      ]
+    },
+    {
+      "content": "你也可以向表中多添加几个人。下面是几个选项，你也可以自行创建：",
+      "pos": [
+        5206,
+        5237
+      ]
+    },
+    {
+      "content": "显示表",
+      "pos": [
+        5568,
+        5571
+      ]
+    },
+    {
+      "content": "使用以下命令来显示表：",
+      "pos": [
+        5573,
+        5584
+      ]
+    },
+    {
+      "content": "输出为：",
+      "pos": [
+        5614,
+        5618
+      ]
+    },
+    {
+      "content": "图像",
+      "pos": [
+        5622,
+        5624
+      ]
+    },
+    {
+      "content": "删除表中的数据",
+      "pos": [
+        5682,
+        5689
+      ]
+    },
+    {
+      "content": "使用以下命令来删除表中的数据：",
+      "pos": [
+        5691,
+        5706
+      ]
+    },
+    {
+      "content": "这将删除“John”行中的所有信息。输出为：",
+      "pos": [
+        5752,
+        5774
+      ]
+    },
+    {
+      "content": "图像",
+      "pos": [
+        5778,
+        5780
+      ]
+    },
+    {
+      "content": "更新表中的数据",
+      "pos": [
+        5838,
+        5845
+      ]
+    },
+    {
+      "content": "使用以下命令来更新表中的数据。在此示例中，Sandy 已经确认将出席活动，因此我们将她的回复从“N”更改为“Y”：",
+      "pos": [
+        5847,
+        5904
+      ]
+    },
+    {
+      "content": "获取有关 PostgreSQL 的详细信息",
+      "pos": [
+        5971,
+        5992
+      ]
+    },
+    {
+      "content": "现在，你已完成在 Azure Linux VM 中安装 PostgreSQL，你可以在 Azure 中享受使用它的过程。若要了解有关 PostgreSQL 的详细信息，请访问 <bpt id=\"p1\">[</bpt>PostgreSQL 网站<ept id=\"p1\">](http://www.postgresql.org/)</ept>。",
+      "pos": [
+        5993,
+        6125
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"在运行 Linux 的 Azure 虚拟机上安装和配置 PostgreSQL\"\n    description=\"了解如何在 Azure 中的 Linux 虚拟机上安装和配置 PostgreSQL\"\n    services=\"virtual-machines\"\n    documentationCenter=\"\"\n    authors=\"SuperScottz\"\n    manager=\"timlt\"\n    editor=\"\"\n    tags=\"azure-resource-manager,azure-service-management\"/>\n\n<tags\n    ms.service=\"virtual-machines\"\n    ms.date=\"08/10/2015\"\n    wacn.date=\"12/31/2015\"/>\n\n\n#在 Azure 上安装和配置 PostgreSQL\n\nPostgreSQL 是一种类似于 Oracle 和 DB2 的高级开放源代码数据库。它包含许多企业级功能，比如完整的 ACID 合规性、可靠的事务处理和多版本并发控制。它还支持 ANSI SQL 和 SQL/MED（包括 Oracle、MySQL、MongoDB 等等的外来数据包装器）等标准。它具有高度的可扩展性，支持超过 12 种程序语言，并支持 GIN 和 GiST 索引、空间数据，以及面向 JSON 或基于键值的应用程序的多款类似于 NoSQL 的功能。\n\n在本文中，你将了解如何在运行 Linux 的 Azure 虚拟机上安装和配置 PostgreSQL。\n\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-both-include.md)]\n\n\n## 安装 PostgreSQL\n\n> [AZURE.NOTE]你必须已经有一个运行 Linux 的 Azure 虚拟机，才能完成本教程。在继续操作前，若要创建并设置 Linux VM，请参阅 [Azure Linux VM 教程](/documentation/articles/virtual-machines-linux-tutorial-portal-rm)。\n\n在此示例中，使用端口 1999 作为 PostgreSQL 端口。\n\n通过 PuTTY 连接到你创建的 Linux VM。如果这是你首次使用 Azure Linux VM，请参阅[如何在 Azure 上将 SSH 用于 Linux](/documentation/articles/virtual-machines-linux-use-ssh-key)，以了解如何使用 PuTTY 连接到 Linux VM。\n\n1. 运行以下命令切换成根用户（管理员）：\n\n        # sudo su -\n\n2. 某些分发版具有在安装 PostgreSQL 之前必须安装的依赖项。查看此列表中的分发版并运行相应的命令：\n\n    - 基于 Red Hat 的 Linux：\n\n            # yum install readline-devel gcc make zlib-devel openssl openssl-devel libxml2-devel pam-devel pam  libxslt-devel tcl-devel python-devel -y  \n\n    - 基于 Debian 的 Linux：\n\n            # apt-get install readline-devel gcc make zlib-devel openssl openssl-devel libxml2-devel pam-devel pam libxslt-devel tcl-devel python-devel -y  \n\n    - SUSE Linux：\n\n            # zypper install readline-devel gcc make zlib-devel openssl openssl-devel libxml2-devel pam-devel pam  libxslt-devel tcl-devel python-devel -y  \n\n3. 将 PostgreSQL 下载到根目录中，然后对包进行解压缩：\n\n        # wget https://ftp.postgresql.org/pub/source/v9.3.5/postgresql-9.3.5.tar.bz2 -P /root/\n\n        # tar jxvf  postgresql-9.3.5.tar.bz2\n\n    上面是一个示例：你可以在 [/pub/source/ 的索引](https://ftp.postgresql.org/pub/source/)中找到更详细的下载地址。\n\n4. 若要启动生成，请运行这些命令：\n\n        # cd postgresql-9.3.5\n\n        # ./configure --prefix=/opt/postgresql-9.3.5\n\n5. 如果希望生成所有能生成的内容，包括文档（HTML 和手册页）和其他模块 (contrib)，则改为运行以下命令：\n\n        # gmake install-world\n\n    你应该会收到以下确认消息：\n\n        PostgreSQL, contrib, and documentation successfully made. Ready to install.\n\n## 配置 PostgreSQL\n\n1. （可选）创建一个符号链接以便将 PostgreSQL 引用缩短为不包含版本号：\n\n        # ln -s /opt/pgsql9.3.5 /opt/pgsql\n\n2. 为数据库创建一个目录：\n\n        # mkdir -p /opt/pgsql_data\n\n3. 创建一个非根用户并修改该用户的配置文件。然后，切换到该新用户（本例中称为 *postgres*）：\n\n        # useradd postgres\n\n        # chown -R postgres.postgres /opt/pgsql_data\n\n        # su - postgres\n\n   >[AZURE.NOTE]出于安全原因，PostgreSQL 将使用非根用户来初始化、启动或关闭数据库。\n\n\n4. 通过输入以下命令编辑 *bash\\_profile* 文件。这些行将添加到 *bash\\_profile* 文件的末尾：\n\n        cat >> ~/.bash_profile <<EOF\n        export PGPORT=1999\n        export PGDATA=/opt/pgsql_data\n        export LANG=en_US.utf8\n        export PGHOME=/opt/pgsql\n        export PATH=\\$PATH:\\$PGHOME/bin\n        export MANPATH=\\$MANPATH:\\$PGHOME/share/man\n        export DATA=`date +\"%Y%m%d%H%M\"`\n        export PGUSER=postgres\n        alias rm='rm -i'\n        alias ll='ls -lh'\n        EOF\n\n5. 执行 *bash\\_profile* 文件：\n\n        $ source .bash_profile\n\n6. 使用以下命令验证你的安装：\n\n        $ which psql\n\n    如果安装成功，你将看到以下响应：\n\n        /opt/pgsql/bin/psql\n\n7. 你还可以检查 PostgreSQL 版本：\n\n        $ psql -V\n\n8. 初始化数据库：\n\n        $ initdb -D $PGDATA -E UTF8 --locale=C -U postgres -W\n\n    你应该会收到以下输出：\n\n![图像](./media/virtual-machines-linux-postgresql/no1.png)\n\n## 设置 PostgreSQL\n\n<!--    [postgres@ test ~]$ exit -->\n\n运行以下命令：\n\n    # cd /root/postgresql-9.3.5/contrib/start-scripts\n\n    # cp linux /etc/init.d/postgresql\n\n修改 /etc/init.d/postgresql 文件中的两个变量。前缀设置为 PostgreSQL 的安装路径：**/opt/pgsql**。PGDATA 设置为 PostgreSQL 的数据存储路径：**/opt/pgsql\\_data**。\n\n    # sed -i '32s#usr/local#opt#' /etc/init.d/postgresql\n\n    # sed -i '35s#usr/local/pgsql/data#opt/pgsql_data#' /etc/init.d/postgresql\n\n![图像](./media/virtual-machines-linux-postgresql/no2.png)\n\n更改文件以使其成为可执行文件：\n\n    # chmod +x /etc/init.d/postgresql\n\n启动 PostgreSQL：\n\n    # /etc/init.d/postgresql start\n\n检查 PostgreSQL 的终结点是否已打开：\n\n    # netstat -tunlp|grep 1999\n\n你应该会看到以下输出：\n\n![图像](./media/virtual-machines-linux-postgresql/no3.png)\n\n## 连接到 Postgres 数据库\n\n再次切换成 postgres 用户：\n\n    # su - postgres\n\n创建一个 Postgres 数据库：\n\n    $ createdb events\n\n连接到刚创建的事件数据库：\n\n    $ psql -d events\n\n## 创建和删除 Postgres 表\n\n既然已经连接到数据库，就可以在其中创建表了。\n\n例如，使用以下命令创建一个新的示例 Postgres 表：\n\n    CREATE TABLE potluck (name VARCHAR(20), food VARCHAR(30),   confirmed CHAR(1), signup_date DATE);\n\n现在已经设置一个具有以下列名和限制的 4 列表：\n\n1. “name”列受 VARCHAR 命令限制，必须少于 20 个字符。\n2. “food”列指示每个人将携带的食物。VARCHAR 将此文本限制为 30 个字符以下。\n3. “confirmed”列记录此人是否接受了百乐餐邀请。可接受的值为“Y”和“N”。\n4. “date”列将在他们报名参加该活动时显示。Postgres 要求日期格式为 yyyy-mm-dd。\n\n如果成功创建了表，你应该会看到以下内容：\n\n![图像](./media/virtual-machines-linux-postgresql/no4.png)\n\n你还可以使用以下命令检查表结构：\n\n![图像](./media/virtual-machines-linux-postgresql/no5.png)\n\n### 向表中添加数据\n\n首先，将信息插入某一行：\n\n    INSERT INTO potluck (name, food, confirmed, signup_date) VALUES('John', 'Casserole', 'Y', '2012-04-11');\n\n你应该会看到以下输出：\n\n![图像](./media/virtual-machines-linux-postgresql/no6.png)\n\n你也可以向表中多添加几个人。下面是几个选项，你也可以自行创建：\n\n    INSERT INTO potluck (name, food, confirmed, signup_date) VALUES('Sandy', 'Key Lime Tarts', 'N', '2012-04-14');\n\n    INSERT INTO potluck (name, food, confirmed, signup_date) VALUES ('Tom', 'BBQ','Y', '2012-04-18');\n\n    INSERT INTO potluck (name, food, confirmed, signup_date) VALUES('Tina', 'Salad', 'Y', '2012-04-18');\n\n### 显示表\n\n使用以下命令来显示表：\n\n    select * from potluck;\n\n输出为：\n\n![图像](./media/virtual-machines-linux-postgresql/no7.png)\n\n### 删除表中的数据\n\n使用以下命令来删除表中的数据：\n\n    delete from potluck where name=’John’;\n\n这将删除“John”行中的所有信息。输出为：\n\n![图像](./media/virtual-machines-linux-postgresql/no8.png)\n\n### 更新表中的数据\n\n使用以下命令来更新表中的数据。在此示例中，Sandy 已经确认将出席活动，因此我们将她的回复从“N”更改为“Y”：\n\n    UPDATE potluck set confirmed = 'Y' WHERE name = 'Sandy';\n\n\n##获取有关 PostgreSQL 的详细信息\n现在，你已完成在 Azure Linux VM 中安装 PostgreSQL，你可以在 Azure 中享受使用它的过程。若要了解有关 PostgreSQL 的详细信息，请访问 [PostgreSQL 网站](http://www.postgresql.org/)。\n\n<!---HONumber=Mooncake_1221_2015-->"
+}

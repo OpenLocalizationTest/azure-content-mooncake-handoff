@@ -1,0 +1,47 @@
+{
+  "nodes": [
+    {
+      "pos": [
+        4,
+        74
+      ],
+      "content": "登录到 <bpt id=\"p1\">[</bpt>Azure 经典门户<ept id=\"p1\">](https://manage.windowsazure.cn/)</ept>，单击“移动服务”，然后单击你的移动服务。"
+    },
+    {
+      "content": "单击“推送”选项卡、为“权限”选择“仅经过身份验证的用户”，单击“保存”，然后单击“编辑脚本”。",
+      "pos": [
+        79,
+        127
+      ]
+    },
+    {
+      "pos": [
+        137,
+        221
+      ],
+      "content": "这样，你便可以自定义推送通知注册回调函数。如果你使用 Git 来编辑源代码，则在 <ph id=\"ph1\">`.\\service\\extensions\\push.js`</ph> 中找到这一相同注册函数。"
+    },
+    {
+      "pos": [
+        226,
+        254
+      ],
+      "content": "将现有<bpt id=\"p1\">**</bpt>注册<ept id=\"p1\">**</ept>函数替换为以下代码，然后单击“保存”："
+    },
+    {
+      "content": "这会向注册添加一个标记（已登录用户的 ID）。将验证提供的标记以防止用户注册其他用户的 ID。通知发送给该用户后，用户可在此设备和用户所注册的其他任何设备上接收通知。",
+      "pos": [
+        1422,
+        1505
+      ]
+    },
+    {
+      "content": "依次单击向后箭头、“数据”选项卡、“TodoItem”、“脚本”，然后选择“插入”。",
+      "pos": [
+        1510,
+        1552
+      ]
+    }
+  ],
+  "content": "\n1. 登录到 [Azure 经典门户](https://manage.windowsazure.cn/)，单击“移动服务”，然后单击你的移动服务。\n\n2. 单击“推送”选项卡、为“权限”选择“仅经过身份验证的用户”，单击“保存”，然后单击“编辑脚本”。\n    \n    这样，你便可以自定义推送通知注册回调函数。如果你使用 Git 来编辑源代码，则在 `.\\service\\extensions\\push.js` 中找到这一相同注册函数。\n\n3. 将现有**注册**函数替换为以下代码，然后单击“保存”：\n\n        exports.register = function (registration, registrationContext, done) {   \n            // Get the ID of the logged-in user.\n            var userId = registrationContext.user.userId;    \n            \n            // Perform a check here for any disallowed tags.\n            if (!validateTags(registration))\n            {\n                // Return a service error when the client tries \n                // to set a user ID tag, which is not allowed.      \n                done(\"You cannot supply a tag that is a user ID\");      \n            }\n            else{\n                // Add a new tag that is the user ID.\n                registration.tags.push(userId);\n                \n                // Complete the callback as normal.\n                done();\n            }\n        };\n        \n        function validateTags(registration){\n            for(var i = 0; i < registration.tags.length; i++) { \n                console.log(registration.tags[i]);           \n                if (registration.tags[i]\n                .search(/microsoft:/i) !== -1){\n                    return false;\n                }\n                return true;\n            }\n        }\n\n    这会向注册添加一个标记（已登录用户的 ID）。将验证提供的标记以防止用户注册其他用户的 ID。通知发送给该用户后，用户可在此设备和用户所注册的其他任何设备上接收通知。\n\n4. 依次单击向后箭头、“数据”选项卡、“TodoItem”、“脚本”，然后选择“插入”。\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

@@ -1,0 +1,376 @@
+{
+  "nodes": [
+    {
+      "content": "在 Linux 和 Mac 上使用 SSH | Azure",
+      "pos": [
+        28,
+        57
+      ]
+    },
+    {
+      "content": "在 Linux 和 Mac 上为 Azure 上的资源管理器和经典部署模型生成和使用 SSH 密钥。",
+      "pos": [
+        77,
+        127
+      ]
+    },
+    {
+      "content": "如何在 Azure 上将 SSH 用于 Linux 和 Mac",
+      "pos": [
+        412,
+        443
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        447,
+        463
+      ]
+    },
+    {
+      "content": "Windows",
+      "pos": [
+        467,
+        474
+      ]
+    },
+    {
+      "content": "Linux/Mac",
+      "pos": [
+        541,
+        550
+      ]
+    },
+    {
+      "pos": [
+        613,
+        889
+      ],
+      "content": "本主题介绍如何在 Linux 和 Mac 上使用 <bpt id=\"p1\">**</bpt>ssh-keygen<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>openssl<ept id=\"p2\">**</ept>，创建和使用 <bpt id=\"p3\">**</bpt>ssh-rsa<ept id=\"p3\">**</ept> 格式和 <bpt id=\"p4\">**</bpt>.pem<ept id=\"p4\">**</ept> 格式文件来基于 Linux 保护与 Azure VM 的通信。对于新部署，建议使用资源管理器部署模型创建基于 Linux 的 Azure 虚拟机，并采用 <bpt id=\"p5\">*</bpt>ssh-rsa<ept id=\"p5\">*</ept> 类型公钥文件或字符串（具体取决于部署客户端）。<bpt id=\"p6\">[</bpt>预览门户<ept id=\"p6\">](https://manage.windowsazure.cn)</ept>当前仅接受 <bpt id=\"p7\">**</bpt>ssh-rsa<ept id=\"p7\">**</ept> 格式字符串，无论是进行经典部署还是资源管理器部署。"
+    },
+    {
+      "pos": [
+        891,
+        974
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-both-include.md)</ept>]"
+    },
+    {
+      "content": "你需要哪些文件？",
+      "pos": [
+        979,
+        987
+      ]
+    },
+    {
+      "pos": [
+        989,
+        1170
+      ],
+      "content": "Azure 的基本 SSH 设置包括 2048 位的 <bpt id=\"p1\">**</bpt>ssh-rsa<ept id=\"p1\">**</ept> 公钥和私钥对（默认情况下，<bpt id=\"p2\">**</bpt>ssh-keygen<ept id=\"p2\">**</ept> 会将这些文件存储为 <bpt id=\"p3\">**</bpt>~/.ssh/id\\_rsa<ept id=\"p3\">**</ept> 和 <bpt id=\"p4\">**</bpt>~/.ssh/id-rsa.pub<ept id=\"p4\">**</ept>，除非更改默认值）以及从 <bpt id=\"p5\">**</bpt>id\\_rsa<ept id=\"p5\">**</ept> 私钥文件生成的 <ph id=\"ph1\">`.pem`</ph> 文件，以供与经典门户的经典部署模型一起使用。"
+    },
+    {
+      "content": "以下是部署方案，你在每个方案中使用的文件类型为：",
+      "pos": [
+        1172,
+        1196
+      ]
+    },
+    {
+      "pos": [
+        1201,
+        1277
+      ],
+      "content": "无论是哪种部署模型，使用<bpt id=\"p1\">[</bpt>预览门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>的所有部署都必需使用 <bpt id=\"p2\">**</bpt>ssh-rsa<ept id=\"p2\">**</ept> 密钥。"
+    },
+    {
+      "pos": [
+        1281,
+        1416
+      ],
+      "content": "使用<bpt id=\"p1\">[</bpt>经典门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>创建 VM 时必需使用 .pem 文件。使用 <bpt id=\"p2\">[</bpt>Azure CLI<ept id=\"p2\">](/documentation/articles/xplat-cli-install)</ept> 的经典部署也支持 .pem 文件。"
+    },
+    {
+      "content": "创建密钥以用于 SSH",
+      "pos": [
+        1422,
+        1433
+      ]
+    },
+    {
+      "pos": [
+        1435,
+        1526
+      ],
+      "content": "Azure 需要 2048 位的 <bpt id=\"p1\">**</bpt>ssh-rsa<ept id=\"p1\">**</ept> 格式密钥文件或等效的 .pem 文件，具体取决于你的方案。如果你已有此类文件，在创建 Azure VM 时，请传递公钥文件。"
+    },
+    {
+      "content": "如果你需要创建这些文件：",
+      "pos": [
+        1528,
+        1540
+      ]
+    },
+    {
+      "pos": [
+        1545,
+        1592
+      ],
+      "content": "请确保 <bpt id=\"p1\">**</bpt>ssh-keygen<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>openssl<ept id=\"p2\">**</ept> 实现是最新的。这因平台而异。"
+    },
+    {
+      "pos": [
+        1601,
+        1681
+      ],
+      "content": "对于 Mac，请务必访问 <bpt id=\"p1\">[</bpt>Apple 产品安全性网站<ept id=\"p1\">](https://support.apple.com/HT201222)</ept>，并选择适当的更新（如有必要）。"
+    },
+    {
+      "content": "对于基于 Debian 的 Linux 分发（如 Ubuntu、Debian、Mint 等）：",
+      "pos": [
+        1688,
+        1735
+      ]
+    },
+    {
+      "content": "对于基于 RPM 的 Linux 分发（如 CentOS 和 Oracle Linux）：",
+      "pos": [
+        1827,
+        1872
+      ]
+    },
+    {
+      "content": "对于 SLES 和 OpenSUSE",
+      "pos": [
+        1956,
+        1974
+      ]
+    },
+    {
+      "pos": [
+        2061,
+        2158
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>ssh-keygen<ept id=\"p1\">**</ept> 创建 2048 位的 RSA 公钥和私钥文件，除非你为文件设置了特定位置或特定名称，否则接受默认位置和名称（即，<ph id=\"ph1\">`~/.ssh/id_rsa`</ph>）。基本命令是："
+    },
+    {
+      "pos": [
+        2200,
+        2264
+      ],
+      "content": "通常情况下，<bpt id=\"p1\">**</bpt>ssh-keygen<ept id=\"p1\">**</ept> 实现将添加注释，通常为计算机的用户名和主机名。你可以使用 <ph id=\"ph1\">`-C`</ph> 选项指定特定注释。"
+    },
+    {
+      "pos": [
+        2269,
+        2335
+      ],
+      "content": "从 <ph id=\"ph1\">`~/.ssh/id_rsa`</ph> 文件创建 .pem 文件，使你能够使用Azure 门户。使用 <bpt id=\"p1\">**</bpt>openssl<ept id=\"p1\">**</ept>，如下所示："
+    },
+    {
+      "pos": [
+        2437,
+        2473
+      ],
+      "content": "如果要从不同的私钥文件创建 .pem 文件，请修改 <ph id=\"ph1\">`-key`</ph> 参数。"
+    },
+    {
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果你计划管理使用经典部署模型部署的服务，则可能还要创建 <bpt id=\"p1\">**</bpt>.cer<ept id=\"p1\">**</ept> 格式的文件来上载到门户，尽管这不涉及 <bpt id=\"p2\">**</bpt>ssh<ept id=\"p2\">**</ept> 或连接到 Linux VM，但这是本文的主题。若要在 Linux 或 Mac 上创建这些文件，请键入：",
+      "pos": [
+        2477,
+        2605
+      ]
+    },
+    {
+      "content": "openssl.exe x509 -outform der -in myCert.pem -out myCert.cer",
+      "pos": [
+        2612,
+        2672
+      ]
+    },
+    {
+      "content": "将 .pem 文件转换为 DER 编码的 X509 证书文件。",
+      "pos": [
+        2674,
+        2705
+      ]
+    },
+    {
+      "content": "使用已有的 SSH 密钥",
+      "pos": [
+        2710,
+        2722
+      ]
+    },
+    {
+      "pos": [
+        2724,
+        2809
+      ],
+      "content": "你可以将 ssh-rsa (<ph id=\"ph1\">`.pub`</ph>) 密钥用于所有新工作，特别是用于资源管理器部署模型和预览门户；如果你需要使用经典门户，可能需要基于密钥创建 <ph id=\"ph2\">`.pem`</ph> 文件。"
+    },
+    {
+      "content": "使用公钥文件创建 VM",
+      "pos": [
+        2814,
+        2825
+      ]
+    },
+    {
+      "content": "创建所需的文件后，有许多方式可创建一个 VM，你可以使用公钥/私钥交换安全地连接到它。几乎在所有情况下，特别是使用资源管理器部署，当系统提示输入 ssh 密钥文件路径或字符串形式的文件内容时，可传递 .pub 文件。",
+      "pos": [
+        2827,
+        2935
+      ]
+    },
+    {
+      "content": "示例：使用 id\\_rsa.pub 文件创建 VM",
+      "pos": [
+        2941,
+        2966
+      ]
+    },
+    {
+      "pos": [
+        2968,
+        3113
+      ],
+      "content": "最常见的用法是以命令方式创建 VM 或上载模板以创建 VM。以下代码示例演示如何通过将公钥文件名（在本示例中，为默认的 <ph id=\"ph1\">`~/.ssh/id_rsa.pub`</ph> 文件）传递给 <ph id=\"ph2\">`azure vm create`</ph> 命令来在 Azure 中创建新的安全 Linux VM。（其他参数以前已创建。）"
+    },
+    {
+      "pos": [
+        3462,
+        3585
+      ],
+      "content": "下一个示例演示如何将 <bpt id=\"p1\">**</bpt>ssh-rsa<ept id=\"p1\">**</ept> 格式与资源管理器模板和 Azure CLI 配合使用来创建受字符串形式的 <ph id=\"ph1\">`~/.ssh/id_rsa.pub`</ph> 用户名和内容保护的 Ubuntu VM。（在此示例中，将缩短公钥字符串以增加可读性。）"
+    },
+    {
+      "content": "示例：使用 .pem 文件创建 VM",
+      "pos": [
+        5423,
+        5441
+      ]
+    },
+    {
+      "pos": [
+        5443,
+        5499
+      ],
+      "content": "然后可以在经典门户或经典部署模式和 <ph id=\"ph1\">`azure vm create`</ph> 中使用 .pem 文件，如以下示例所示："
+    },
+    {
+      "content": "连接到 VM",
+      "pos": [
+        6155,
+        6161
+      ]
+    },
+    {
+      "pos": [
+        6163,
+        6300
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>ssh<ept id=\"p1\">**</ept> 命令使用用户名、计算机的网络地址、连接到该地址的端口以及许多其他特殊变体来登录。（有关 <bpt id=\"p2\">**</bpt>ssh<ept id=\"p2\">**</ept> 的详细信息，可参阅这篇<bpt id=\"p3\">[</bpt>有关 Secure Shell 的文章<ept id=\"p3\">](https://en.wikipedia.org/wiki/Secure_Shell)</ept>）"
+    },
+    {
+      "content": "如果你只是已指定子域和部署位置，则使用资源管理器部署的典型用法可能如下所示：",
+      "pos": [
+        6302,
+        6340
+      ]
+    },
+    {
+      "content": "或者，如果你要连接到经典部署云服务，则要使用的地址可能如下所示：",
+      "pos": [
+        6398,
+        6430
+      ]
+    },
+    {
+      "content": "由于地址形式可能会更改（你始终可以使用 IP 地址或者也许你已分配自定义域名），你需要发现 Azure VM 的地址。",
+      "pos": [
+        6479,
+        6538
+      ]
+    },
+    {
+      "content": "使用经典部署发现 Azure VM SSH 地址",
+      "pos": [
+        6544,
+        6568
+      ]
+    },
+    {
+      "pos": [
+        6570,
+        6626
+      ],
+      "content": "你可以通过使用包含 VM 名称的 <ph id=\"ph1\">`azure vm show`</ph> 命令来发现要用于 VM 和经典部署模型的地址："
+    },
+    {
+      "content": "使用资源管理器部署发现 Azure VM SSH 地址",
+      "pos": [
+        8079,
+        8106
+      ]
+    },
+    {
+      "content": "检查网络配置文件节：",
+      "pos": [
+        8289,
+        8299
+      ]
+    },
+    {
+      "pos": [
+        9177,
+        9255
+      ],
+      "content": "如果你在创建 VM 时未使用默认 SSH 端口 22，则可以使用 <ph id=\"ph1\">`azure network nsg show`</ph> 命令发现哪些端口有入站规则，如下例所示："
+    },
+    {
+      "content": "示例：使用 .pem 密钥和经典部署的 SSH 会话的输出",
+      "pos": [
+        11198,
+        11227
+      ]
+    },
+    {
+      "pos": [
+        11229,
+        11343
+      ],
+      "content": "如果你已使用从 <ph id=\"ph1\">`~/.ssh/id_rsa`</ph> 文件创建的 .pem 文件创建 VM，则可以直接通过 ssh 登录到该 VM。请注意，当你执行该操作时，证书握手将使用 <ph id=\"ph2\">`~/.ssh/id_rsa`</ph> 处的私钥。它可能如下例所示："
+    },
+    {
+      "content": "如果你无法连接",
+      "pos": [
+        12738,
+        12745
+      ]
+    },
+    {
+      "pos": [
+        12747,
+        12858
+      ],
+      "content": "可以阅读 <bpt id=\"p1\">[</bpt>SSH 连接疑难解答<ept id=\"p1\">](/documentation/articles/virtual-machines-troubleshoot-ssh-connections)</ept>中的建议以了解这些建议是否可以帮助解决该情况。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        12863,
+        12867
+      ]
+    },
+    {
+      "content": "现在，你已连接到 VM，请确保在继续使用所选分发之前对其进行更新。",
+      "pos": [
+        12870,
+        12903
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"在 Linux 和 Mac 上使用 SSH | Azure\" \n    description=\"在 Linux 和 Mac 上为 Azure 上的资源管理器和经典部署模型生成和使用 SSH 密钥。\" \n    services=\"virtual-machines\" \n    documentationCenter=\"\" \n    authors=\"squillace\" \n    manager=\"timlt\" \n    editor=\"\"\n    tags=\"azure-service-management,azure-resource-manager\" />\n\n<tags \n    ms.service=\"virtual-machines\"\n    ms.date=\"12/15/2015\" \n    wacn.date=\"01/29/2016\"/>\n\n#如何在 Azure 上将 SSH 用于 Linux 和 Mac\n\n> [AZURE.SELECTOR]\n- [Windows](/documentation/articles/virtual-machines-windows-use-ssh-key)\n- [Linux/Mac](/documentation/articles/virtual-machines-linux-use-ssh-key)\n\n本主题介绍如何在 Linux 和 Mac 上使用 **ssh-keygen** 和 **openssl**，创建和使用 **ssh-rsa** 格式和 **.pem** 格式文件来基于 Linux 保护与 Azure VM 的通信。对于新部署，建议使用资源管理器部署模型创建基于 Linux 的 Azure 虚拟机，并采用 *ssh-rsa* 类型公钥文件或字符串（具体取决于部署客户端）。[预览门户](https://manage.windowsazure.cn)当前仅接受 **ssh-rsa** 格式字符串，无论是进行经典部署还是资源管理器部署。\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-both-include.md)]\n\n## 你需要哪些文件？\n\nAzure 的基本 SSH 设置包括 2048 位的 **ssh-rsa** 公钥和私钥对（默认情况下，**ssh-keygen** 会将这些文件存储为 **~/.ssh/id\\_rsa** 和 **~/.ssh/id-rsa.pub**，除非更改默认值）以及从 **id\\_rsa** 私钥文件生成的 `.pem` 文件，以供与经典门户的经典部署模型一起使用。\n\n以下是部署方案，你在每个方案中使用的文件类型为：\n\n1. 无论是哪种部署模型，使用[预览门户](https://manage.windowsazure.cn)的所有部署都必需使用 **ssh-rsa** 密钥。\n2. 使用[经典门户](https://manage.windowsazure.cn)创建 VM 时必需使用 .pem 文件。使用 [Azure CLI](/documentation/articles/xplat-cli-install) 的经典部署也支持 .pem 文件。 \n\n## 创建密钥以用于 SSH\n\nAzure 需要 2048 位的 **ssh-rsa** 格式密钥文件或等效的 .pem 文件，具体取决于你的方案。如果你已有此类文件，在创建 Azure VM 时，请传递公钥文件。\n\n如果你需要创建这些文件：\n\n1. 请确保 **ssh-keygen** 和 **openssl** 实现是最新的。这因平台而异。 \n\n    - 对于 Mac，请务必访问 [Apple 产品安全性网站](https://support.apple.com/HT201222)，并选择适当的更新（如有必要）。\n    - 对于基于 Debian 的 Linux 分发（如 Ubuntu、Debian、Mint 等）：\n\n            sudo apt-get update ssh-keygen\n            sudo apt-get update openssl\n\n    - 对于基于 RPM 的 Linux 分发（如 CentOS 和 Oracle Linux）：\n\n            sudo yum update ssh-keygen\n            sudo yum update openssl\n\n    - 对于 SLES 和 OpenSUSE\n\n            sudo zypper update ssh-keygen\n            sudo zypper update openssl\n\n2. 使用 **ssh-keygen** 创建 2048 位的 RSA 公钥和私钥文件，除非你为文件设置了特定位置或特定名称，否则接受默认位置和名称（即，`~/.ssh/id_rsa`）。基本命令是：\n\n        ssh-keygen -t rsa -b 2048 \n\n    通常情况下，**ssh-keygen** 实现将添加注释，通常为计算机的用户名和主机名。你可以使用 `-C` 选项指定特定注释。\n\n3. 从 `~/.ssh/id_rsa` 文件创建 .pem 文件，使你能够使用Azure 门户。使用 **openssl**，如下所示：\n\n        openssl req -x509 -key ~/.ssh/id_rsa -nodes -days 365 -newkey rsa:2048 -out myCert.pem\n\n    如果要从不同的私钥文件创建 .pem 文件，请修改 `-key` 参数。\n\n> [AZURE.NOTE]如果你计划管理使用经典部署模型部署的服务，则可能还要创建 **.cer** 格式的文件来上载到门户，尽管这不涉及 **ssh** 或连接到 Linux VM，但这是本文的主题。若要在 Linux 或 Mac 上创建这些文件，请键入：<br /> openssl.exe x509 -outform der -in myCert.pem -out myCert.cer\n\n将 .pem 文件转换为 DER 编码的 X509 证书文件。\n\n## 使用已有的 SSH 密钥\n\n你可以将 ssh-rsa (`.pub`) 密钥用于所有新工作，特别是用于资源管理器部署模型和预览门户；如果你需要使用经典门户，可能需要基于密钥创建 `.pem` 文件。\n\n## 使用公钥文件创建 VM\n\n创建所需的文件后，有许多方式可创建一个 VM，你可以使用公钥/私钥交换安全地连接到它。几乎在所有情况下，特别是使用资源管理器部署，当系统提示输入 ssh 密钥文件路径或字符串形式的文件内容时，可传递 .pub 文件。\n\n### 示例：使用 id\\_rsa.pub 文件创建 VM\n\n最常见的用法是以命令方式创建 VM 或上载模板以创建 VM。以下代码示例演示如何通过将公钥文件名（在本示例中，为默认的 `~/.ssh/id_rsa.pub` 文件）传递给 `azure vm create` 命令来在 Azure 中创建新的安全 Linux VM。（其他参数以前已创建。）\n\n    azure vm create \\\n    --nic-name testnic \\\n    --public-ip-name testpip \\\n    --vnet-name testvnet \\\n    --vnet-subnet-name testsubnet \\\n    --storage-account-name computeteststore \n    --image-urn canonical:UbuntuServer:14.04.3-LTS:latest \\\n    --username ops \\\n    -ssh-publickey-file ~/.ssh/id_rsa.pub \\\n    testrg testvm westeurope linux\n\n下一个示例演示如何将 **ssh-rsa** 格式与资源管理器模板和 Azure CLI 配合使用来创建受字符串形式的 `~/.ssh/id_rsa.pub` 用户名和内容保护的 Ubuntu VM。（在此示例中，将缩短公钥字符串以增加可读性。）\n\n    azure group deployment create \\\n    --resource-group test-sshtemplate \\\n    --template-uri https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-vm-sshkey/azuredeploy.json \\\n    --name mysshdeployment\n    info:    Executing command group deployment create\n    info:    Supply values for the following parameters\n    testnewStorageAccountName: testsshvmtemplate3\n    adminUserName: ops\n    sshKeyData: ssh-rsa AAAAB3NzaC1yc2EAAAADAQA+/L+rHIjz+nXTzxApgnP+iKDZco9 user@macbookpro\n    dnsNameForPublicIP: testsshvmtemplate\n    location: West Europe\n    vmName: sshvm\n    + Initializing template configurations and parameters\n    + Creating a deployment\n    info:    Created template deployment \"mysshdeployment\"\n    + Waiting for deployment to complete\n    data:    DeploymentName     : mysshdeployment\n    data:    ResourceGroupName  : test-sshtemplate\n    data:    ProvisioningState  : Succeeded\n    data:    Timestamp          : 2015-10-08T00:12:12.2529678Z\n    data:    Mode               : Incremental\n    data:    TemplateLink       : https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-vm-sshkey/azuredeploy.json\n    data:    ContentVersion     : 1.0.0.0\n    data:    Name                   Type    Value\n\n    data:    newStorageAccountName  String  testtestsshvmtemplate3\n    data:    adminUserName          String  ops\n    data:    sshKeyData             String  ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAkek3P6V3EhmD+xP+iKDZco9 user@macbookpro\n    data:    dnsNameForPublicIP     String  testsshvmtemplate\n    data:    location               String  West Europe\n    data:    vmSize                 String  Standard_A2\n    data:    vmName                 String  sshvm\n    data:    ubuntuOSVersion        String  14.04.2-LTS\n    info:    group deployment create command OK\n\n\n### 示例：使用 .pem 文件创建 VM\n\n然后可以在经典门户或经典部署模式和 `azure vm create` 中使用 .pem 文件，如以下示例所示：\n\n    azure vm create \\\n    -l \"China East\" -n testpemasm \\\n    -P -t myCert.pem -e 22 \\\n    testpemasm \\\n    b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_3-LTS-amd64-server-20150908-en-us-30GB \\\n    ops\n    info:    Executing command vm create\n    warn:    --vm-size has not been specified. Defaulting to \"Small\".\n    + Looking up image b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_3-LTS-amd64-server-20150908-en-us-30GB\n    + Looking up cloud service\n    info:    cloud service testpemasm not found.\n    + Creating cloud service\n    + Retrieving storage accounts\n    + Configuring certificate\n    + Creating VM\n    info:    vm create command OK\n\n\n## 连接到 VM\n\n**ssh** 命令使用用户名、计算机的网络地址、连接到该地址的端口以及许多其他特殊变体来登录。（有关 **ssh** 的详细信息，可参阅这篇[有关 Secure Shell 的文章](https://en.wikipedia.org/wiki/Secure_Shell)）\n\n如果你只是已指定子域和部署位置，则使用资源管理器部署的典型用法可能如下所示：\n\n    ssh user@subdomain.westus.cloudapp.azure.com -p 22\n\n或者，如果你要连接到经典部署云服务，则要使用的地址可能如下所示：\n\n    ssh user@subdomain.chinacloudapp.cn -p 22\n\n由于地址形式可能会更改（你始终可以使用 IP 地址或者也许你已分配自定义域名），你需要发现 Azure VM 的地址。\n\n### 使用经典部署发现 Azure VM SSH 地址\n\n你可以通过使用包含 VM 名称的 `azure vm show` 命令来发现要用于 VM 和经典部署模型的地址：\n\n    azure vm show testpemasm\n    info:    Executing command vm show\n    + Getting virtual machines\n    data:    DNSName \"testpemasm.chinacloudapp.cn\"\n    data:    Location \"China East\"\n    data:    VMName \"testpemasm\"\n    data:    IPAddress \"100.116.160.154\"\n    data:    InstanceStatus \"ReadyRole\"\n    data:    InstanceSize \"Small\"\n    data:    Image \"b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_3-LTS-amd64-server-20150908-en-us-30GB\"\n    data:    OSDisk hostCaching \"ReadWrite\"\n    data:    OSDisk name \"testpemasm-testpemasm-0-201510102050230517\"\n    data:    OSDisk mediaLink \"https://portalvhds4blttsxgjj1rf.blob.core.chinacloudapi.cn/vhd-store/testpemasm-2747c9c432b043ff.vhd\"\n    data:    OSDisk sourceImageName \"b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_3-LTS-amd64-server-20150908-en-us-30GB\"\n    data:    OSDisk operatingSystem \"Linux\"\n    data:    OSDisk iOType \"Standard\"\n    data:    ReservedIPName \"\"\n    data:    VirtualIPAddresses 0 address \"40.83.178.221\"\n    data:    VirtualIPAddresses 0 name \"testpemasmContractContract\"\n    data:    VirtualIPAddresses 0 isDnsProgrammed true\n    data:    Network Endpoints 0 localPort 22\n    data:    Network Endpoints 0 name \"ssh\"\n    data:    Network Endpoints 0 port 22\n    data:    Network Endpoints 0 protocol \"tcp\"\n    data:    Network Endpoints 0 virtualIPAddress \"40.83.178.221\"\n    data:    Network Endpoints 0 enableDirectServerReturn false\n    info:    vm show command OK\n\n### 使用资源管理器部署发现 Azure VM SSH 地址\n\n    azure vm show testrg testvm\n    info:    Executing command vm show\n    + Looking up the VM \"testvm\"\n    + Looking up the NIC \"testnic\"\n    + Looking up the public ip \"testpip\"\n\n检查网络配置文件节：\n\n    data:    Network Profile:\n    data:      Network Interfaces:\n    data:        Network Interface #1:\n    data:          Id                        :/subscriptions/<guid>/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/testnic\n    data:          Primary                   :true\n    data:          MAC Address               :00-0D-3A-21-8E-AE\n    data:          Provisioning State        :Succeeded\n    data:          Name                      :testnic\n    data:          Location                  :westeurope\n    data:            Private IP alloc-method :Static\n    data:            Private IP address      :192.168.1.101\n    data:            Public IP address       :40.115.48.189\n    data:            FQDN                    :testsubdomain.westeurope.cloudapp.azure.com\n    data:\n    data:    Diagnostics Instance View:\n    info:    vm show command OK\n\n如果你在创建 VM 时未使用默认 SSH 端口 22，则可以使用 `azure network nsg show` 命令发现哪些端口有入站规则，如下例所示：\n\n    azure network nsg show testrg testnsg\n    info:    Executing command network nsg show\n    + Looking up the network security group \"testnsg\"\n    data:    Id                              : /subscriptions/<guid>/resourceGroups/testrg/providers/Microsoft.Network/networkSecurityGroups/testnsg\n    data:    Name                            : testnsg\n    data:    Type                            : Microsoft.Network/networkSecurityGroups\n    data:    Location                        : westeurope\n    data:    Provisioning state              : Succeeded\n    data:    Security group rules:\n    data:    Name                           Source IP          Source Port  Destination IP  Destination Port  Protocol  Direction  Access  Priority\n    data:    -----------------------------  -----------------  -----------  --------------  ----------------  --------  ---------  ------  --------\n    data:    testnsgrule                    *                  *            *               22                Tcp       Inbound    Allow   1000\n    data:    AllowVnetInBound               VirtualNetwork     *            VirtualNetwork  *                 *         Inbound    Allow   65000\n    data:    AllowAzureLoadBalancerInBound  AzureLoadBalancer  *            *               *                 *         Inbound    Allow   65001\n    data:    DenyAllInBound                 *                  *            *               *                 *         Inbound    Deny    65500\n    data:    AllowVnetOutBound              VirtualNetwork     *            VirtualNetwork  *                 *         Outbound   Allow   65000\n    data:    AllowInternetOutBound          *                  *            Internet        *                 *         Outbound   Allow   65001\n    data:    DenyAllOutBound                *                  *            *               *                 *         Outbound   Deny    65500\n    info:    network nsg show command OK\n\n### 示例：使用 .pem 密钥和经典部署的 SSH 会话的输出\n\n如果你已使用从 `~/.ssh/id_rsa` 文件创建的 .pem 文件创建 VM，则可以直接通过 ssh 登录到该 VM。请注意，当你执行该操作时，证书握手将使用 `~/.ssh/id_rsa` 处的私钥。它可能如下例所示：\n\n    ssh ops@testpemasm.chinacloudapp.cn -p 22\n    The authenticity of host 'testpemasm.chinacloudapp.cn (40.83.178.221)' can't be established.\n    RSA key fingerprint is dc:bb:e4:cc:59:db:b9:49:dc:71:a3:c8:37:36:fd:62.\n    Are you sure you want to continue connecting (yes/no)? yes\n    Warning: Permanently added 'testpemasm.chinacloudapp.cn,40.83.178.221' (RSA) to the list of known hosts.\n    Saving password to keychain failed\n    Identity added: /Users/user/.ssh/id_rsa.pub (/Users/user/.ssh/id_rsa.pub)\n    Welcome to Ubuntu 14.04.3 LTS (GNU/Linux 3.19.0-28-generic x86_64)\n\n    * Documentation:  https://help.ubuntu.com/\n\n    System information as of Sat Oct 10 20:53:08 UTC 2015\n\n    System load: 0.52              Memory usage: 5%   Processes:       80\n    Usage of /:  45.3% of 1.94GB   Swap usage:   0%   Users logged in: 0\n\n    Graph this data and manage this system at:\n        https://landscape.canonical.com/\n\n    Get cloud support with Ubuntu Advantage Cloud Guest:\n        http://www.ubuntu.com/business/services/cloud\n\n    0 packages can be updated.\n    0 updates are security updates.\n\n    The programs included with the Ubuntu system are free software;\n    the exact distribution terms for each program are described in the\n    individual files in /usr/share/doc/*/copyright.\n\n    Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by\n    applicable law.\n\n## 如果你无法连接\n\n可以阅读 [SSH 连接疑难解答](/documentation/articles/virtual-machines-troubleshoot-ssh-connections)中的建议以了解这些建议是否可以帮助解决该情况。\n\n## 后续步骤\n \n现在，你已连接到 VM，请确保在继续使用所选分发之前对其进行更新。\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

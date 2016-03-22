@@ -1,0 +1,523 @@
+{
+  "nodes": [
+    {
+      "content": "SQL 数据仓库中的 PolyBase 教程 | Azure",
+      "pos": [
+        26,
+        56
+      ]
+    },
+    {
+      "content": "了解什么是 PolyBase，以及如何将其用于数据仓库方案。",
+      "pos": [
+        74,
+        104
+      ]
+    },
+    {
+      "content": "使用 PolyBase 加载数据",
+      "pos": [
+        337,
+        353
+      ]
+    },
+    {
+      "content": "PolyBase 技术可让你完全使用 Transact-SQL 命令来查询和联接多个源的数据。",
+      "pos": [
+        354,
+        401
+      ]
+    },
+    {
+      "content": "使用 PolyBase 时，可以通过执行以下步骤来查询存储在 Azure Blob 存储中的数据，再将数据载入 SQL 数据仓库数据库：",
+      "pos": [
+        403,
+        471
+      ]
+    },
+    {
+      "content": "创建数据库主密钥和凭据。",
+      "pos": [
+        475,
+        487
+      ]
+    },
+    {
+      "content": "创建 PolyBase 对象：外部数据源、外部文件格式和外部表。",
+      "pos": [
+        490,
+        522
+      ]
+    },
+    {
+      "content": "查询存储在 Azure Blob 存储中的数据。",
+      "pos": [
+        526,
+        550
+      ]
+    },
+    {
+      "content": "将数据从 Azure Blob 存储载入 SQL 数据仓库。",
+      "pos": [
+        553,
+        583
+      ]
+    },
+    {
+      "content": "将数据从 SQL 数据仓库导出到 Azure Blob 存储。",
+      "pos": [
+        586,
+        617
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        623,
+        627
+      ]
+    },
+    {
+      "content": "若要逐步完成本教程，你需要：",
+      "pos": [
+        628,
+        642
+      ]
+    },
+    {
+      "content": "Azure 存储帐户",
+      "pos": [
+        646,
+        656
+      ]
+    },
+    {
+      "content": "在 Azure Blob 存储中存储为分隔文本文件的数据",
+      "pos": [
+        659,
+        687
+      ]
+    },
+    {
+      "content": "首先，你要创建当 PolyBase 连接到 Azure Blob 存储和查询数据时所需的对象。",
+      "pos": [
+        689,
+        736
+      ]
+    },
+    {
+      "pos": [
+        740,
+        784
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph>PolyBase 支持的 Azure 存储帐户类型为："
+    },
+    {
+      "content": "标准本地冗余存储 (Standard-LRS)",
+      "pos": [
+        792,
+        815
+      ]
+    },
+    {
+      "content": "标准异地冗余存储 (Standard-GRS)",
+      "pos": [
+        820,
+        843
+      ]
+    },
+    {
+      "content": "标准读取访问权限异地冗余存储 (Standard-RAGRS)",
+      "pos": [
+        848,
+        879
+      ]
+    },
+    {
+      "content": "PolyBase 不支持标准区域冗余存储 (Standard-ZRS) 和高级本地冗余存储 (Premium-LRS) 帐户类型。如果你要创建新的 Azure 存储帐户，请确保从定价层中选择 PolyBase 支持的存储帐户类型。",
+      "pos": [
+        884,
+        999
+      ]
+    },
+    {
+      "content": "步骤 1：将凭据存储在数据库中",
+      "pos": [
+        1004,
+        1019
+      ]
+    },
+    {
+      "content": "若要访问 Azure Blob 存储，需要创建数据库范围的凭据，其中存储 Azure 存储帐户的身份验证信息。遵循以下步骤存储数据库的凭据。",
+      "pos": [
+        1020,
+        1090
+      ]
+    },
+    {
+      "content": "连接到你的 SQL 数据仓库数据库。",
+      "pos": [
+        1095,
+        1113
+      ]
+    },
+    {
+      "content": "使用 [CREATE MASTER KEY (Transact-SQL)][] 创建数据库的主密钥。如果数据库已有主密钥，则不需要创建另一个主密钥。在下一个步骤中，将使用此密钥来加密凭据“机密”。",
+      "pos": [
+        1117,
+        1215
+      ]
+    },
+    {
+      "content": "检查你是否已有任何数据库凭据。为此，请使用 sys.database\\_credentials 系统视图，而不要使用只显示服务器凭据的 sys.credentials。",
+      "pos": [
+        1273,
+        1357
+      ]
+    },
+    {
+      "content": "使用 [CREATE CREDENTIAL (Transact-SQL)][] 为你想要访问的每个 Azure 存储帐户创建数据库范围的凭据。在此示例中，IDENTITY 是凭据的友好名称。它不影响对 Azure 存储空间的身份验证。SECRET 是 Azure 存储帐户密钥。",
+      "pos": [
+        1434,
+        1573
+      ]
+    },
+    {
+      "content": "-- Dropping credential",
+      "pos": [
+        1799,
+        1821
+      ]
+    },
+    {
+      "content": "DROP DATABASE SCOPED CREDENTIAL ASBSecret",
+      "pos": [
+        1822,
+        1863
+      ]
+    },
+    {
+      "content": ";",
+      "pos": [
+        1864,
+        1865
+      ]
+    },
+    {
+      "content": "-- Create an external file format for a text-delimited file.",
+      "pos": [
+        2622,
+        2682
+      ]
+    },
+    {
+      "content": "-- Data is uncompressed and fields are separated with the",
+      "pos": [
+        2683,
+        2740
+      ]
+    },
+    {
+      "content": "-- pipe character.",
+      "pos": [
+        2741,
+        2759
+      ]
+    },
+    {
+      "content": "CREATE EXTERNAL FILE FORMAT text_file_format",
+      "pos": [
+        2760,
+        2804
+      ]
+    },
+    {
+      "content": "WITH",
+      "pos": [
+        2806,
+        2810
+      ]
+    },
+    {
+      "content": "(",
+      "pos": [
+        2812,
+        2813
+      ]
+    },
+    {
+      "content": "FORMAT_TYPE = DELIMITEDTEXT,",
+      "pos": [
+        2821,
+        2849
+      ]
+    },
+    {
+      "content": "FORMAT_OPTIONS",
+      "pos": [
+        2855,
+        2869
+      ]
+    },
+    {
+      "content": "(",
+      "pos": [
+        2876,
+        2877
+      ]
+    },
+    {
+      "content": "FIELD_TERMINATOR ='|',",
+      "pos": [
+        2886,
+        2908
+      ]
+    },
+    {
+      "content": "USE_TYPE_DEFAULT = TRUE",
+      "pos": [
+        2917,
+        2940
+      ]
+    },
+    {
+      "content": ")",
+      "pos": [
+        2945,
+        2946
+      ]
+    },
+    {
+      "content": ")",
+      "pos": [
+        2947,
+        2948
+      ]
+    },
+    {
+      "content": ";",
+      "pos": [
+        2949,
+        2950
+      ]
+    },
+    {
+      "content": "-- Dropping external file format",
+      "pos": [
+        3009,
+        3041
+      ]
+    },
+    {
+      "content": "DROP EXTERNAL FILE FORMAT text_file_format",
+      "pos": [
+        3042,
+        3084
+      ]
+    },
+    {
+      "content": ";",
+      "pos": [
+        3085,
+        3086
+      ]
+    },
+    {
+      "content": "-- Creating an external table for data in Azure blob storage.",
+      "pos": [
+        3479,
+        3540
+      ]
+    },
+    {
+      "content": "CREATE EXTERNAL TABLE [ext].[CarSensor_Data]",
+      "pos": [
+        3541,
+        3585
+      ]
+    },
+    {
+      "content": "(",
+      "pos": [
+        3587,
+        3588
+      ]
+    },
+    {
+      "content": "[SensorKey]     int    NOT NULL,",
+      "pos": [
+        3594,
+        3626
+      ]
+    },
+    {
+      "content": "[CustomerKey]   int    NOT NULL,",
+      "pos": [
+        3632,
+        3664
+      ]
+    },
+    {
+      "content": "[GeographyKey]  int        NULL,",
+      "pos": [
+        3670,
+        3702
+      ]
+    },
+    {
+      "content": "[Speed]         float  NOT NULL,",
+      "pos": [
+        3708,
+        3740
+      ]
+    },
+    {
+      "content": "[YearMeasured]  int    NOT NULL,",
+      "pos": [
+        3746,
+        3778
+      ]
+    },
+    {
+      "content": ")",
+      "pos": [
+        3779,
+        3780
+      ]
+    },
+    {
+      "content": "WITH",
+      "pos": [
+        3781,
+        3785
+      ]
+    },
+    {
+      "content": "(",
+      "pos": [
+        3787,
+        3788
+      ]
+    },
+    {
+      "content": "LOCATION    = '/Demo/',",
+      "pos": [
+        3793,
+        3816
+      ]
+    },
+    {
+      "content": "DATA_SOURCE = azure_storage,",
+      "pos": [
+        3821,
+        3849
+      ]
+    },
+    {
+      "content": "FILE_FORMAT = text_file_format",
+      "pos": [
+        3854,
+        3884
+      ]
+    },
+    {
+      "content": ")",
+      "pos": [
+        3891,
+        3892
+      ]
+    },
+    {
+      "content": ";",
+      "pos": [
+        3893,
+        3894
+      ]
+    },
+    {
+      "content": "--Dropping external table",
+      "pos": [
+        3995,
+        4020
+      ]
+    },
+    {
+      "content": "DROP EXTERNAL TABLE [ext].[CarSensor_Data]",
+      "pos": [
+        4021,
+        4063
+      ]
+    },
+    {
+      "content": ";",
+      "pos": [
+        4064,
+        4065
+      ]
+    },
+    {
+      "content": "-- Query Azure storage resident data via external table.",
+      "pos": [
+        4610,
+        4666
+      ]
+    },
+    {
+      "content": "SELECT * FROM [ext].[CarSensor_Data]",
+      "pos": [
+        4668,
+        4704
+      ]
+    },
+    {
+      "content": ";",
+      "pos": [
+        4705,
+        4706
+      ]
+    },
+    {
+      "content": "create statistics [SensorKey] on [Customer_Speed] ([SensorKey]);",
+      "pos": [
+        5762,
+        5826
+      ]
+    },
+    {
+      "content": "create statistics [CustomerKey] on [Customer_Speed] ([CustomerKey]);",
+      "pos": [
+        5827,
+        5895
+      ]
+    },
+    {
+      "content": "create statistics [GeographyKey] on [Customer_Speed] ([GeographyKey]);",
+      "pos": [
+        5896,
+        5966
+      ]
+    },
+    {
+      "content": "create statistics [Speed] on [Customer_Speed] ([Speed]);",
+      "pos": [
+        5967,
+        6023
+      ]
+    },
+    {
+      "content": "create statistics [YearMeasured] on [Customer_Speed] ([YearMeasured]);",
+      "pos": [
+        6024,
+        6094
+      ]
+    },
+    {
+      "content": "Get-Content &lt;input_file_name&gt; -Encoding Unicode | Set-Content &lt;output_file_name&gt; -Encoding utf8",
+      "pos": [
+        7063,
+        7158
+      ]
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"SQL 数据仓库中的 PolyBase 教程 | Azure\"\n   description=\"了解什么是 PolyBase，以及如何将其用于数据仓库方案。\"\n   services=\"sql-data-warehouse\"\n   documentationCenter=\"NA\"\n   authors=\"barbkess\"\n   manager=\"jhubbard\"\n   editor=\"jrowlandjones\"/>\n\n<tags\n   ms.service=\"sql-data-warehouse\"\n   ms.date=\"11/04/2015\"\n   wacn.date=\"01/20/2016\"/>\n\n\n# 使用 PolyBase 加载数据\nPolyBase 技术可让你完全使用 Transact-SQL 命令来查询和联接多个源的数据。\n\n使用 PolyBase 时，可以通过执行以下步骤来查询存储在 Azure Blob 存储中的数据，再将数据载入 SQL 数据仓库数据库：\n\n- 创建数据库主密钥和凭据。\n- 创建 PolyBase 对象：外部数据源、外部文件格式和外部表。 \n- 查询存储在 Azure Blob 存储中的数据。\n- 将数据从 Azure Blob 存储载入 SQL 数据仓库。\n- 将数据从 SQL 数据仓库导出到 Azure Blob 存储。\n\n\n## 先决条件\n若要逐步完成本教程，你需要：\n\n- Azure 存储帐户\n- 在 Azure Blob 存储中存储为分隔文本文件的数据\n\n首先，你要创建当 PolyBase 连接到 Azure Blob 存储和查询数据时所需的对象。\n\n> [AZURE.IMPORTANT]PolyBase 支持的 Azure 存储帐户类型为：\n> \n> + 标准本地冗余存储 (Standard-LRS)\n> + 标准异地冗余存储 (Standard-GRS)\n> + 标准读取访问权限异地冗余存储 (Standard-RAGRS)\n>\n> PolyBase 不支持标准区域冗余存储 (Standard-ZRS) 和高级本地冗余存储 (Premium-LRS) 帐户类型。如果你要创建新的 Azure 存储帐户，请确保从定价层中选择 PolyBase 支持的存储帐户类型。\n\n## 步骤 1：将凭据存储在数据库中\n若要访问 Azure Blob 存储，需要创建数据库范围的凭据，其中存储 Azure 存储帐户的身份验证信息。遵循以下步骤存储数据库的凭据。\n\n1. 连接到你的 SQL 数据仓库数据库。\n2. 使用 [CREATE MASTER KEY (Transact-SQL)][] 创建数据库的主密钥。如果数据库已有主密钥，则不需要创建另一个主密钥。在下一个步骤中，将使用此密钥来加密凭据“机密”。\n\n```\n-- Create a E master key\nCREATE MASTER KEY;\n```\n\n4. 检查你是否已有任何数据库凭据。为此，请使用 sys.database\\_credentials 系统视图，而不要使用只显示服务器凭据的 sys.credentials。\n\n``` \n    -- 检查是否存在数据库范围的凭据。SELECT * FROM sys.database\\_credentials;\n```\n5. 使用 [CREATE CREDENTIAL (Transact-SQL)][] 为你想要访问的每个 Azure 存储帐户创建数据库范围的凭据。在此示例中，IDENTITY 是凭据的友好名称。它不影响对 Azure 存储空间的身份验证。SECRET 是 Azure 存储帐户密钥。\n\n```\n    -- 创建数据库范围凭据：\n    CREATE DATABASE SCOPED CREDENTIAL ASBSecret\n    WITH IDENTITY = 'joe' \n    , Secret = '<azure_storage_account_key>' \n    ; \n    ```\n\n6. 如果需要删除某个数据库范围的凭据，请使用 [DROP CREDENTIAL (Transact-SQL)][]：\n\n```\n-- Dropping credential\nDROP DATABASE SCOPED CREDENTIAL ASBSecret\n;\n```\n\n## 步骤 2：创建外部数据源\n外部数据源是存储 Azure Blob 存储数据位置及访问信息的数据库对象。使用 [CREATE EXTERNAL DATA SOURCE (Transact-SQL)][] 为你想要访问的每个 Azure 存储 Blob 定义外部数据源。\n\n```\n    -- Create an external data source for an Azure storage blob\n    CREATE EXTERNAL DATA SOURCE azure_storage \n    WITH\n    (\n        TYPE = HADOOP,\n        LOCATION ='wasbs://mycontainer@test.blob.core.chinacloudapi.cn',\n        CREDENTIAL = ASBSecret\n    )\n    ;\n```\n\n如果需要删除外部表，请使用 [DROP EXTERNAL DATA SOURCE][]：\n\n```\n    -- Drop an external data source\n    DROP EXTERNAL DATA SOURCE azure_storage\n    ;\n```\n\n## 步骤 3：创建外部文件格式\n外部文件格式是指定外部数据格式的数据库对象。PolyBase 可以处理压缩和未压缩的数据，包括分隔的文本、Hive RCFILE 和 HIVE ORC 格式。\n\n使用 [CREATE EXTERNAL FILE FORMAT (Transact-SQL)][] 来创建外部文件格式。此示例指定文件中的数据为未压缩的文本，字段以竖线字符（“|”）分隔。\n\n```\n-- Create an external file format for a text-delimited file.\n-- Data is uncompressed and fields are separated with the\n-- pipe character.\nCREATE EXTERNAL FILE FORMAT text_file_format \nWITH \n(   \n    FORMAT_TYPE = DELIMITEDTEXT, \n    FORMAT_OPTIONS  \n    (\n        FIELD_TERMINATOR ='|',\n        USE_TYPE_DEFAULT = TRUE\n    )\n)\n;\n```\n\n如果需要删除某个外部文件格式，请使用 [DROP EXTERNAL FILE FORMAT]。\n\n```\n-- Dropping external file format\nDROP EXTERNAL FILE FORMAT text_file_format\n;\n```\n\n## 创建外部表\n\n外部表定义类似于关系表定义。主要区别在于数据的位置和格式。\n\n- 外部表定义以元数据的形式存储在 SQL 数据仓库数据库中。 \n- 数据存储在数据源所指定的位置。\n\n使用 [CREATE EXTERNAL TABLE (Transact-SQL)][] 来定义外部表。\n\nLOCATION 选项指定从数据源根目录到数据的路径。在此示例中，数据位于 'wasbs://mycontainer@test.Blob.core.chinacloudapi.cn/path/Demo/'。同一个表的所有文件必须在 Azure Blob 存储中相同的逻辑文件夹下。\n\n你也可以选择指定拒绝选项（REJECT\\_TYPE、REJECT\\_VALUE、REJECT\\_SAMPLE\\_VALUE），以确定 PolyBase 如何处理从外部数据源收到的脏记录。\n\n```\n-- Creating an external table for data in Azure blob storage.\nCREATE EXTERNAL TABLE [ext].[CarSensor_Data] \n(\n     [SensorKey]     int    NOT NULL,\n     [CustomerKey]   int    NOT NULL,\n     [GeographyKey]  int        NULL,\n     [Speed]         float  NOT NULL,\n     [YearMeasured]  int    NOT NULL,\n)\nWITH \n(\n    LOCATION    = '/Demo/',\n    DATA_SOURCE = azure_storage,\n    FILE_FORMAT = text_file_format      \n)\n;\n```\n\n刚刚创建的对象存储在 SQL 数据仓库数据库中。可以在 SQL Server Data Tools (SSDT) 对象资源管理器中查看它们。\n\n若要删除外部表，需要使用以下语法：\n\n```\n--Dropping external table\nDROP EXTERNAL TABLE [ext].[CarSensor_Data]\n;\n```\n\n> [AZURE.NOTE]删除外部表时，必须使用 `DROP EXTERNAL TABLE`。**不能**使用 `DROP TABLE`。\n\n参考主题：[DROP EXTERNAL TABLE (Transact-SQL)][]。\n\n另外值得注意的是，在 `sys.tables` 和 `sys.external_tables` 目录视图（后者更明确）中都会显示外部表。\n\n## 轮换存储密钥\n\n有时出于安全考虑，想要更改 Blob 存储的访问密钥。\n\n执行此任务的最佳方式是遵循称为“轮换密钥”的过程。你可能已注意到，Blob 存储帐户有两个存储密钥。这样你便可以转换\n\n轮换 Azure 存储帐户密钥的过程只需简单的三个步骤\n\n1. 创建基于辅助存储访问密钥的第二个数据库范围凭据\n2. 创建基于新凭据的第二个外部数据源\n3. 删除并创建指向新外部数据源的外部表\n\n当你将所有外部表迁移到新的外部数据源时，可以执行清理任务：\n \n1. 删除第一个外部数据源\n2. 删除基于主存储访问密钥的第一个数据库范围凭据\n3. 登录 Azure 并重新生成主访问密钥供下一次使用\n\n## 查询 Azure Blob 存储数据\n针对外部表的查询只使用表名称，如关系表一样。\n\n\n```\n-- Query Azure storage resident data via external table. \nSELECT * FROM [ext].[CarSensor_Data]\n;\n```\n\n> [AZURE.NOTE]对外部表的查询可能因“查询已中止 -- 从外部源读取时已达最大拒绝阈值”错误而失败。这表示外部数据包含*脏*记录。如果实际数据类型/列数目不匹配外部表的列定义，或数据不匹配指定的外部文件格式，则会将数据记录视为脏记录。若要解决此问题，请确保外部表和外部文件格式定义正确，并且外部数据符合这些定义。如果外部数据记录的子集是脏的，你可以通过使用 CREATE EXTERNAL TABLE DDL 中的拒绝选项，选择拒绝这些查询记录。\n\n\n## 从 Azure Blob 存储加载数据\n此示例将 Azure Blob 存储中的数据加载到 SQL 数据仓库数据库中。\n\n直接存储数据可免除查询时的数据传输时间。配合列存储索引存储数据可让分析查询的查询性能提升 10 倍。\n\n此示例使用 CREATE TABLE AS SELECT 语句来加载数据。新表继承查询中指定的列。它从外部表定义继承这些列的数据类型。\n\nCREATE TABLE AS SELECT 是高性能 TRANSACT-SQL 语句，可将数据并行加载到 SQL 数据仓库的所有计算节点。它最初是针对分析平台系统中的大规模并行处理 (MPP) 引擎开发的，现已纳入 SQL 数据仓库。\n\n```\n    -- Load data from Azure blob storage to SQL Data Warehouse  \n    CREATE TABLE [dbo].[Customer_Speed]\n    WITH \n    (   \n        CLUSTERED COLUMNSTORE INDEX\n    ,   DISTRIBUTION = HASH([CarSensor_Data].[CustomerKey])\n    )\n    AS \n    SELECT * \n    FROM   [ext].[CarSensor_Data]\n    ;\n```\n\n请参阅 [CREATE TABLE AS SELECT (Transact-SQL)][]。\n\n## 基于新加载的数据创建统计信息\n\nAzure SQL 数据仓库尚不支持自动创建或自动更新统计信息。为了获得查询的最佳性能，在首次加载数据或者在数据发生重大更改之后，创建所有表的所有列统计信息非常重要。有关统计信息的详细说明，请参阅开发主题组中的[统计信息][]主题。以下快速示例说明如何基于此示例中加载的表创建统计信息。\n\n```\ncreate statistics [SensorKey] on [Customer_Speed] ([SensorKey]);\ncreate statistics [CustomerKey] on [Customer_Speed] ([CustomerKey]);\ncreate statistics [GeographyKey] on [Customer_Speed] ([GeographyKey]);\ncreate statistics [Speed] on [Customer_Speed] ([Speed]);\ncreate statistics [YearMeasured] on [Customer_Speed] ([YearMeasured]);\n```\n\n## 将数据导出到 Azure Blob 存储\n本部分说明如何将数据从 SQL 数据仓库导出到 Azure Blob 存储。此示例使用 CREATE EXTERNAL TABLE AS SELECT（高性能 TRANSACT-SQL 语句）将数据从所有计算节点并行导出。\n\n以下示例使用 dbo.Weblogs 表中的列定义和数据从 dbo 创建外部表 Weblogs2014。外部表定义存储在 SQL 数据仓库中，SELECT 语句的结果将导出到数据源所指定的 Blob 容器下的“/archive/log2014/”目录中。将以指定的文本文件格式导出数据。\n\n```\n    CREATE EXTERNAL TABLE Weblogs2014 WITH\n    (\n        LOCATION='/archive/log2014/',\n        DATA_SOURCE=azure_storage,\n        FILE_FORMAT=text_file_format\n    )\n    AS\n    SELECT\n        Uri,\n        DateRequested\n    FROM\n        dbo.Weblogs\n    WHERE\n        1=1\n        AND DateRequested > '12/31/2013'\n        AND DateRequested < '01/01/2015';\n```\n\n\n## 满足 PolyBase UTF-8 要求\n目前 PolyBase 支持加载 UTF-8 编码的数据文件。由于 UTF-8 使用与 ASCII 相同的字符编码，PolyBase 也支持加载 ASCII 编码的数据。但是，PolyBase 不支持其他字符编码，例如 UTF-16/Unicode 或扩展的 ASCII 字符。扩展的 ASCII 包括具有重音符号的字符，例如德语中常见的变音符号。\n\n满足这项要求的最佳方法是重新编写为 UTF-8 编码。\n\n有多种方法可实现此目的。以下是两种使用 Powershell 的方法：\n\n### 适用于小文件的简单示例\n\n以下是用于创建文件的一行简单 Powershell 脚本。\n \n```\nGet-Content <input_file_name> -Encoding Unicode | Set-Content <output_file_name> -Encoding utf8\n```\n\n但是，尽管将数据重新编码的方法非常简单，但绝非最有效的做法。以下 IO 流式处理示例要快得多，并可达到相同的效果。\n\n### 适用于较大文件的 IO 流式处理示例\n\n以下代码示例更为复杂，但在流式处理从源到目标的数据行时要有效得多。请对较大的文件应用此方法。\n\n    #Static variables\n    $ascii = [System.Text.Encoding]::ASCII\n    $utf16le = [System.Text.Encoding]::Unicode\n    $utf8 = [System.Text.Encoding]::UTF8\n    $ansi = [System.Text.Encoding]::Default\n    $append = $False\n    \n    #Set source file path and file name\n    $src = [System.IO.Path]::Combine(\"C:\\input_file_path\",\"input_file_name.txt\")\n    \n    #Set source file encoding (using list above)\n    $src_enc = $ansi\n    \n    #Set target file path and file name\n    $tgt = [System.IO.Path]::Combine(\"C:\\output_file_path\",\"output_file_name.txt\")\n    \n    #Set target file encoding (using list above)\n    $tgt_enc = $utf8\n    \n    $read = New-Object System.IO.StreamReader($src,$src_enc)\n    $write = New-Object System.IO.StreamWriter($tgt,$append,$tgt_enc)\n    \n    while ($read.Peek() -ne -1)\n    {\n        $line = $read.ReadLine();\n        $write.WriteLine($line);\n    }\n    $read.Close()\n    $read.Dispose()\n    $write.Close()\n    $write.Dispose()\n\n\n## 后续步骤\n有关更多开发技巧，请参阅[开发概述][]。\n\n<!--Image references-->\n\n<!--Article references-->\n[Load data with bcp]: /documentation/articles/sql-data-warehouse-load-with-bcp\n[Load with PolyBase]: /documentation/articles/sql-data-warehouse-load-with-polybase\n[solution partners]: /documentation/articles/sql-data-warehouse-solution-partners\n[开发概述]: /documentation/articles/sql-data-warehouse-overview-develop\n[统计信息]: /documentation/articles/sql-data-warehouse-develop-statistics\n\n<!--MSDN references-->\n[supported source/sink]: https://msdn.microsoft.com/zh-cn/library/dn894007.aspx\n[copy activity]: https://msdn.microsoft.com/zh-cn/library/dn835035.aspx\n[SQL Server destination adapter]: https://msdn.microsoft.com/zh-cn/library/ms141095.aspx\n[SSIS]: https://msdn.microsoft.com/zh-cn/library/ms141026.aspx\n\n\n<!-- External Links -->\n[CREATE EXTERNAL DATA SOURCE (Transact-SQL)]: https://msdn.microsoft.com/zh-cn/library/dn935022(v=sql.130).aspx\n[CREATE EXTERNAL FILE FORMAT (Transact-SQL)]: https://msdn.microsoft.com/zh-cn/library/dn935026(v=sql.130).aspx\n[CREATE EXTERNAL TABLE (Transact-SQL)]: https://msdn.microsoft.com/zh-cn/library/dn935021(v=sql.130).aspx\n\n[DROP EXTERNAL DATA SOURCE (Transact-SQL)]: https://msdn.microsoft.com/zh-cn/library/mt146367.aspx\n[DROP EXTERNAL FILE FORMAT (Transact-SQL)]: https://msdn.microsoft.com/zh-cn/library/mt146379.aspx\n[DROP EXTERNAL TABLE (Transact-SQL)]: https://msdn.microsoft.com/zh-cn/library/mt130698.aspx\n\n[CREATE TABLE AS SELECT (Transact-SQL)]: https://msdn.microsoft.com/zh-cn/library/mt204041.aspx\n[CREATE MASTER KEY (Transact-SQL)]: https://msdn.microsoft.com/zh-cn/library/ms174382.aspx\n[CREATE CREDENTIAL (Transact-SQL)]: https://msdn.microsoft.com/zh-cn/library/ms189522.aspx\n[DROP CREDENTIAL (Transact-SQL)]: https://msdn.microsoft.com/zh-cn/library/ms189450.aspx\n\n<!---HONumber=Mooncake_1207_2015-->\n"
+}

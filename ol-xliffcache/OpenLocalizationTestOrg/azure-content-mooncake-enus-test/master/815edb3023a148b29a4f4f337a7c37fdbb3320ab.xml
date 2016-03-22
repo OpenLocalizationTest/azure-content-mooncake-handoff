@@ -1,0 +1,411 @@
+{
+  "nodes": [
+    {
+      "content": "如何使用表存储 (C++) | Azure",
+      "pos": [
+        28,
+        49
+      ]
+    },
+    {
+      "content": "了解如何在 Azure 中使用表存储服务。示例用 C++ 编写。",
+      "pos": [
+        69,
+        101
+      ]
+    },
+    {
+      "content": "如何通过 C++ 使用表存储",
+      "pos": [
+        311,
+        325
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        427,
+        429
+      ]
+    },
+    {
+      "pos": [
+        432,
+        598
+      ],
+      "content": "本指南将演示如何使用 Azure 表存储服务执行常见方案。示例用 C++ 编写，并使用<bpt id=\"p1\">[</bpt>适用于 C++ 的 Azure 存储空间客户端库<ept id=\"p1\">](https://github.com/Azure/azure-storage-cpp/blob/v1.0.0/README.md)</ept>。涉及的方案包括<bpt id=\"p2\">**</bpt>创建和删除表<ept id=\"p2\">**</ept>，以及<bpt id=\"p3\">**</bpt>使用表实体<ept id=\"p3\">**</ept>。"
+    },
+    {
+      "pos": [
+        601,
+        770
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 本指南主要面向适用于 C++ 的 Azure 存储空间客户端库 1.0.0 版及更高版本。建议的版本是存储空间客户端库 1.0.0，它可以通过 <bpt id=\"p1\">[</bpt>NuGet<ept id=\"p1\">](http://www.nuget.org/packages/wastorage)</ept> 或 <bpt id=\"p2\">[</bpt>GitHub<ept id=\"p2\">](https://github.com/)</ept> 获得。"
+    },
+    {
+      "content": "创建 C++ 应用程序",
+      "pos": [
+        969,
+        980
+      ]
+    },
+    {
+      "content": "在本指南中，你将使用存储功能，这些功能可以在 C++ 应用程序中运行。为此，你将需要安装适用于 C++ 的 Azure 存储客户端库，并在你的 Azure 订阅中创建 Azure 存储帐户。",
+      "pos": [
+        983,
+        1078
+      ]
+    },
+    {
+      "content": "若要安装适用于 C++ 的 Azure 存储客户端库，你可以使用以下方法：",
+      "pos": [
+        1082,
+        1119
+      ]
+    },
+    {
+      "pos": [
+        1125,
+        1245
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Linux：<ept id=\"p1\">**</ept>按照<bpt id=\"p2\">[</bpt>适用于 C++ 的 Azure 存储空间客户端库自述文件<ept id=\"p2\">](https://github.com/Azure/azure-storage-cpp/blob/master/README.md)</ept>页中提供的说明进行操作。"
+    },
+    {
+      "pos": [
+        1252,
+        1431
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Windows：<ept id=\"p1\">**</ept>在 Visual Studio 主菜单中，单击“工具”-&gt;“NuGet 程序包管理器”-&gt;“程序包管理器控制台”。在 <bpt id=\"p2\">[</bpt>NuGet 包管理器控制台<ept id=\"p2\">](http://docs.nuget.org/docs/start-here/using-the-package-manager-console)</ept>窗口中键入以下命令，然后按 Enter。"
+    },
+    {
+      "content": "配置应用程序以访问表存储",
+      "pos": [
+        1473,
+        1485
+      ]
+    },
+    {
+      "content": "将以下 include 语句添加到要在其中使用 Azure 存储 API 访问表的 C++ 文件的顶部：",
+      "pos": [
+        1488,
+        1540
+      ]
+    },
+    {
+      "content": "设置 Azure 存储连接字符串",
+      "pos": [
+        1610,
+        1626
+      ]
+    },
+    {
+      "pos": [
+        1629,
+        1908
+      ],
+      "content": "Azure 存储客户端使用存储连接字符串来存储用于访问数据管理服务的终结点和凭据。运行客户端应用程序时，必须提供以下格式的存储连接字符串。使用<bpt id=\"p1\">[</bpt>管理门户<ept id=\"p1\">](https://manage.windowsazure.cn)</ept>中列出的存储帐户的存储帐户名称和存储访问密钥作为 <bpt id=\"p2\">*</bpt>AccountName<ept id=\"p2\">*</ept> 和 <bpt id=\"p3\">*</bpt>AccountKey<ept id=\"p3\">*</ept> 值。有关存储帐户和访问密钥的信息，请参阅<bpt id=\"p4\">[</bpt>关于 Azure 存储帐户<ept id=\"p4\">](/documentation/articles/storage-create-storage-account)</ept>。此示例演示如何声明一个静态字段以保存连接字符串："
+    },
+    {
+      "pos": [
+        2164,
+        2374
+      ],
+      "content": "若要在本地基于 Windows 的计算机中测试你的应用程序，可以使用随 <bpt id=\"p1\">[</bpt>Azure SDK<ept id=\"p1\">](/downloads/)</ept> 一起安装的 Azure <bpt id=\"p2\">[</bpt>存储模拟器<ept id=\"p2\">](/documentation/articles/storage-use-emulator)</ept>。存储模拟器是一种用于模拟本地开发计算机上提供的 Azure Blob、队列和表服务的实用程序。以下示例演示如何声明一个静态字段以将连接字符串保存到你的本地存储模拟器："
+    },
+    {
+      "content": "若要启动 Azure 存储模拟器，请单击“开始”按钮或按 Windows 键。开始键入“Azure 存储模拟器”，然后从应用程序列表中选择“Azure 存储模拟器”。",
+      "pos": [
+        2535,
+        2618
+      ]
+    },
+    {
+      "content": "下面的示例假定你使用了这两个方法之一来获取存储连接字符串。",
+      "pos": [
+        2621,
+        2650
+      ]
+    },
+    {
+      "content": "检索你的连接字符串",
+      "pos": [
+        2655,
+        2664
+      ]
+    },
+    {
+      "pos": [
+        2667,
+        2748
+      ],
+      "content": "可以使用 <bpt id=\"p1\">**</bpt>cloud_storage_account<ept id=\"p1\">**</ept> 类来表示您的存储帐户信息。若要从存储连接字符串中检索你的存储帐户信息，你可以使用 parse 方法。"
+    },
+    {
+      "pos": [
+        2948,
+        3062
+      ],
+      "content": "接下来，获取对 <bpt id=\"p1\">**</bpt>cloud_table_client<ept id=\"p1\">**</ept> 类的引用，因为使用它可以获取表存储服务中存储的表和实体的引用对象。以下代码使用我们在上面检索到的存储帐户对象创建 <bpt id=\"p2\">**</bpt>cloud_table_client<ept id=\"p2\">**</ept> 对象："
+    },
+    {
+      "content": "创建表",
+      "pos": [
+        3201,
+        3204
+      ]
+    },
+    {
+      "pos": [
+        3205,
+        3290
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>cloud_table_client<ept id=\"p1\">**</ept> 对象，可以获得表和实体的引用对象。以下代码将创建 <bpt id=\"p2\">**</bpt>cloud_table_client<ept id=\"p2\">**</ept> 对象并使用它创建新表。"
+    },
+    {
+      "content": "将实体添加到表",
+      "pos": [
+        3838,
+        3845
+      ]
+    },
+    {
+      "pos": [
+        3846,
+        4113
+      ],
+      "content": "若要将实体添加到表，请创建一个新的 <bpt id=\"p1\">**</bpt>table_entity<ept id=\"p1\">**</ept> 对象并将其传递到 <bpt id=\"p2\">**</bpt>table_operation::insert_entity<ept id=\"p2\">**</ept>。以下代码使用客户的名字作为行键，并使用姓氏作为分区键。实体的分区键和行键共同唯一地标识表中的实体。查询分区键相同的实体的速度快于查询分区键不同的实体的速度，但使用不同的分区键可实现更高的并行操作可伸缩性。有关详细信息，请参阅 <bpt id=\"p3\">[</bpt>Azure 存储性能和可伸缩性清单<ept id=\"p3\">](/documentation/articles/storage-performance-checklist)</ept>。"
+    },
+    {
+      "pos": [
+        4115,
+        4350
+      ],
+      "content": "以下代码创建了包含要存储的某些客户数据的 <bpt id=\"p1\">**</bpt>table_entity<ept id=\"p1\">**</ept> 类的新实例。接下来，该代码调用 <bpt id=\"p2\">**</bpt>table_operation::insert_entity<ept id=\"p2\">**</ept> 以创建一个 <bpt id=\"p3\">**</bpt>table_operation<ept id=\"p3\">**</ept> 对象，以便将实体插入表中，并将新的表实体与之关联。最后，该代码调用 <bpt id=\"p4\">**</bpt>cloud_table<ept id=\"p4\">**</ept> 对象的 execute 方法。并且新的 <bpt id=\"p5\">**</bpt>table_operation<ept id=\"p5\">**</ept> 向表服务发送请求，以将新的客户实体插入\"people\"表中。"
+    },
+    {
+      "content": "插入一批实体",
+      "pos": [
+        5589,
+        5595
+      ]
+    },
+    {
+      "pos": [
+        5596,
+        5797
+      ],
+      "content": "你可以通过一次写入操作将一批实体插入到表服务。以下代码创建一个 <bpt id=\"p1\">**</bpt>table_batch_operation<ept id=\"p1\">**</ept> 对象，然后向其中添加三个插入操作。每个插入操作的添加方法如下：创建一个新的实体对象，设置它的值，然后对 <bpt id=\"p2\">**</bpt>table_batch_operation<ept id=\"p2\">**</ept> 对象调用 insert 方法以将实体与新的插入操作相关联。然后调用 <bpt id=\"p3\">**</bpt>cloud_table.execute<ept id=\"p3\">**</ept> 以执行此操作。"
+    },
+    {
+      "content": "批处理操作的注意事项如下：",
+      "pos": [
+        7968,
+        7981
+      ]
+    },
+    {
+      "content": "您在单次批处理操作中最多可以执行 100 个插入、删除、合并、替换、插入或合并以及插入或替换操作（可以是这些操作的任意组合）。",
+      "pos": [
+        7987,
+        8050
+      ]
+    },
+    {
+      "content": "批处理操作也可以包含检索操作，但前提是检索操作是批处理中仅有的操作。",
+      "pos": [
+        8057,
+        8091
+      ]
+    },
+    {
+      "content": "单次批处理操作中的所有实体都必须具有相同的分区键。",
+      "pos": [
+        8098,
+        8123
+      ]
+    },
+    {
+      "content": "批处理操作的数据负载限制为 4MB。",
+      "pos": [
+        8130,
+        8148
+      ]
+    },
+    {
+      "content": "检索分区中的所有实体",
+      "pos": [
+        8155,
+        8165
+      ]
+    },
+    {
+      "pos": [
+        8166,
+        8266
+      ],
+      "content": "若要查询表以获取分区中的所有实体，请使用 <bpt id=\"p1\">**</bpt>table_query<ept id=\"p1\">**</ept> 对象。以下代码示例指定了一个筛选器，以筛选分区键为  'Smith' 的实体。此示例会将查询结果中每个实体的字段输出到控制台。"
+    },
+    {
+      "content": "此示例中的查询将检索出与筛选条件匹配的所有实体。如果你有大型表并需要经常下载表实体，我们建议你改为将数据存储在 Azure 存储 Blob 中。",
+      "pos": [
+        9655,
+        9727
+      ]
+    },
+    {
+      "content": "检索分区中的一部分实体",
+      "pos": [
+        9732,
+        9743
+      ]
+    },
+    {
+      "content": "如果不想查询分区中的所有实体，则可以通过结合使用分区键筛选器与行键筛选器来指定一个范围。以下代码示例使用两个筛选器来获取分区“Smith”中的、行键（名字）以字母“E”前面的字母开头的所有实体，然后输出查询结果。",
+      "pos": [
+        9744,
+        9850
+      ]
+    },
+    {
+      "content": "检索单个实体",
+      "pos": [
+        11479,
+        11485
+      ]
+    },
+    {
+      "pos": [
+        11486,
+        11642
+      ],
+      "content": "你可以编写查询以检索单个特定实体。以下代码使用 <bpt id=\"p1\">**</bpt>table_operation::retrive_entity<ept id=\"p1\">**</ept> 来指定客户  'Jeff Smith'。此方法只返回一个实体，而不是一个集合，并且返回的值在 <bpt id=\"p2\">**</bpt>table_result<ept id=\"p2\">**</ept> 中。在查询中指定分区键和行键是从表服务中检索单个实体的最快方法。"
+    },
+    {
+      "content": "替换实体",
+      "pos": [
+        12802,
+        12806
+      ]
+    },
+    {
+      "pos": [
+        12807,
+        13136
+      ],
+      "content": "若要替换实体，请从表服务中检索它，修改实体对象，然后将更改保存回表服务。以下代码更改现有客户的电话号码和电子邮件地址。此代码不是调用 <bpt id=\"p1\">**</bpt>table_operation::insert_entity<ept id=\"p1\">**</ept>，而是使用 <bpt id=\"p2\">**</bpt>table_operation::replace_entity<ept id=\"p2\">**</ept>。这将导致在服务器上完全替换该实体，除非服务器上的该实体自检索到它以后发生更改，在此情况下，该操作将失败。操作失败将防止您的应用程序无意中覆盖应用程序的其他组件在检索与更新之间所做的更改。正确处理此失败的方法是再次检索实体，进行更改（如果仍有效），然后执行另一个 <bpt id=\"p3\">**</bpt>table_operation::replace_entity<ept id=\"p3\">**</ept> 操作。下一节将为你演示如何重写此行为。"
+    },
+    {
+      "content": "插入或替换实体",
+      "pos": [
+        14430,
+        14437
+      ]
+    },
+    {
+      "pos": [
+        14438,
+        14833
+      ],
+      "content": "如果该实体自从服务器中检索到它以后发生更改，则 <bpt id=\"p1\">**</bpt>table_operation::replace_entity<ept id=\"p1\">**</ept> 操作将失败。此外，你必须首先从服务器中检索该实体，<bpt id=\"p2\">**</bpt>table_operation::replace_entity<ept id=\"p2\">**</ept> 才能成功。但是，有时您不知道服务器上是否存在该实体以及存储在其中的当前值是否无关 - 更新操作会将其全部覆盖。为实现此目的，你将使用 <bpt id=\"p3\">**</bpt>table_operation::insert_or_replace_entity<ept id=\"p3\">**</ept> 操作。如果该实体不存在，此操作将插入它，如果存在，则替换它，而不管上次更新是何时进行的。在以下代码示例中，仍将检索 Jeff Smith 的客户实体，但稍后会使用 <bpt id=\"p4\">**</bpt>table_operation::insert_or_replace_entity<ept id=\"p4\">**</ept> 将其保存回服务器。将覆盖在检索与更新操作之间对实体进行的任何更新。"
+    },
+    {
+      "content": "查询一部分实体属性",
+      "pos": [
+        16252,
+        16261
+      ]
+    },
+    {
+      "pos": [
+        16264,
+        16350
+      ],
+      "content": "对表的查询可以只检索实体中的少数几个属性。以下代码中的查询使用 <bpt id=\"p1\">**</bpt>table_query::set_select_columns<ept id=\"p1\">**</ept> 方法，仅返回表中实体的电子邮件地址。"
+    },
+    {
+      "pos": [
+        17701,
+        17738
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 查询实体的几个属性是比检索所有属性更高效的操作。"
+    },
+    {
+      "content": "删除实体",
+      "pos": [
+        17743,
+        17747
+      ]
+    },
+    {
+      "pos": [
+        17748,
+        17883
+      ],
+      "content": "你可以在检索到实体后轻松将其删除。检索到实体后，对要删除的实体调用 <bpt id=\"p1\">**</bpt>table_operation::delete_entity<ept id=\"p1\">**</ept>。然后调用 <bpt id=\"p2\">**</bpt>cloud_table.execute<ept id=\"p2\">**</ept> 方法。以下代码检索并删除分区键为\"Smith\"、行键为\"Jeff\"的实体。"
+    },
+    {
+      "content": "删除表",
+      "pos": [
+        18999,
+        19002
+      ]
+    },
+    {
+      "content": "最后，以下代码示例将从存储帐户中删除表。在删除表之后的一段时间内无法重新创建它。",
+      "pos": [
+        19003,
+        19043
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        20155,
+        20159
+      ]
+    },
+    {
+      "content": "现在，你已了解表存储的基础知识，请打开以下链接了解有关 Azure 存储空间的详细信息：",
+      "pos": [
+        20160,
+        20204
+      ]
+    },
+    {
+      "content": "如何通过 C++ 使用 Blob 存储",
+      "pos": [
+        20211,
+        20230
+      ]
+    },
+    {
+      "content": "如何通过 C++ 使用队列存储",
+      "pos": [
+        20299,
+        20314
+      ]
+    },
+    {
+      "content": "使用 C++ 列出 Azure 存储资源",
+      "pos": [
+        20384,
+        20404
+      ]
+    },
+    {
+      "content": "适用于 C++ 的存储空间客户端库参考",
+      "pos": [
+        20468,
+        20487
+      ]
+    },
+    {
+      "content": "Azure 存档文档",
+      "pos": [
+        20536,
+        20546
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"如何使用表存储 (C++) | Azure\" \n    description=\"了解如何在 Azure 中使用表存储服务。示例用 C++ 编写。\" \n    services=\"storage\" \n    documentationCenter=\".net\" \n    authors=\"tamram\" \n    manager=\"adinah\" \n    editor=\"\"/>\n\n<tags \n    ms.service=\"storage\" \n    ms.date=\"01/05/2016\"\n    wacn.date=\"02/25/2016\"/>\n\n# 如何通过 C++ 使用表存储\n\n[AZURE.INCLUDE [storage-selector-table-include](../includes/storage-selector-table-include.md)]\n\n## 概述  \n本指南将演示如何使用 Azure 表存储服务执行常见方案。示例用 C++ 编写，并使用[适用于 C++ 的 Azure 存储空间客户端库](https://github.com/Azure/azure-storage-cpp/blob/v1.0.0/README.md)。涉及的方案包括**创建和删除表**，以及**使用表实体**。\n\n>[AZURE.NOTE] 本指南主要面向适用于 C++ 的 Azure 存储空间客户端库 1.0.0 版及更高版本。建议的版本是存储空间客户端库 1.0.0，它可以通过 [NuGet](http://www.nuget.org/packages/wastorage) 或 [GitHub](https://github.com/) 获得。\n\n[AZURE.INCLUDE [storage-table-concepts-include](../includes/storage-table-concepts-include.md)]\n[AZURE.INCLUDE [storage-create-account-include](../includes/storage-create-account-include.md)]\n\n\n## 创建 C++ 应用程序  \n在本指南中，你将使用存储功能，这些功能可以在 C++ 应用程序中运行。为此，你将需要安装适用于 C++ 的 Azure 存储客户端库，并在你的 Azure 订阅中创建 Azure 存储帐户。  \n\n若要安装适用于 C++ 的 Azure 存储客户端库，你可以使用以下方法：\n\n-   **Linux：**按照[适用于 C++ 的 Azure 存储空间客户端库自述文件](https://github.com/Azure/azure-storage-cpp/blob/master/README.md)页中提供的说明进行操作。  \n-   **Windows：**在 Visual Studio 主菜单中，单击“工具”->“NuGet 程序包管理器”->“程序包管理器控制台”。在 [NuGet 包管理器控制台](http://docs.nuget.org/docs/start-here/using-the-package-manager-console)窗口中键入以下命令，然后按 Enter。  \n\n        Install-Package wastorage\n\n## 配置应用程序以访问表存储  \n将以下 include 语句添加到要在其中使用 Azure 存储 API 访问表的 C++ 文件的顶部：\n\n    #include \"was/storage_account.h\"\n    #include \"was/table.h\"\n\n## 设置 Azure 存储连接字符串  \nAzure 存储客户端使用存储连接字符串来存储用于访问数据管理服务的终结点和凭据。运行客户端应用程序时，必须提供以下格式的存储连接字符串。使用[管理门户](https://manage.windowsazure.cn)中列出的存储帐户的存储帐户名称和存储访问密钥作为 *AccountName* 和 *AccountKey* 值。有关存储帐户和访问密钥的信息，请参阅[关于 Azure 存储帐户](/documentation/articles/storage-create-storage-account)。此示例演示如何声明一个静态字段以保存连接字符串：\n\n    // Define the connection string with your values.\n    const utility::string_t storage_connection_string(U(\"DefaultEndpointsProtocol=https;AccountName=your_storage_account;AccountKey=your_storage_account_key;EndpointSuffix=core.chinacloudapi.cn\"));\n\n\n若要在本地基于 Windows 的计算机中测试你的应用程序，可以使用随 [Azure SDK](/downloads/) 一起安装的 Azure [存储模拟器](/documentation/articles/storage-use-emulator)。存储模拟器是一种用于模拟本地开发计算机上提供的 Azure Blob、队列和表服务的实用程序。以下示例演示如何声明一个静态字段以将连接字符串保存到你的本地存储模拟器：\n\n\n    // Define the connection string with Azure storage emulator.\n    const utility::string_t storage_connection_string(U(\"UseDevelopmentStorage=true;\"));  \n\n\n若要启动 Azure 存储模拟器，请单击“开始”按钮或按 Windows 键。开始键入“Azure 存储模拟器”，然后从应用程序列表中选择“Azure 存储模拟器”。\n\n\n下面的示例假定你使用了这两个方法之一来获取存储连接字符串。\n\n## 检索你的连接字符串  \n可以使用 **cloud_storage_account** 类来表示您的存储帐户信息。若要从存储连接字符串中检索你的存储帐户信息，你可以使用 parse 方法。\n\n    // Retrieve the storage account from the connection string.\n    azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);\n\n接下来，获取对 **cloud_table_client** 类的引用，因为使用它可以获取表存储服务中存储的表和实体的引用对象。以下代码使用我们在上面检索到的存储帐户对象创建 **cloud_table_client** 对象：  \n\n    // Create the table client.\n    azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();\n\n## 创建表\n使用 **cloud_table_client** 对象，可以获得表和实体的引用对象。以下代码将创建 **cloud_table_client** 对象并使用它创建新表。 \n\n    // Retrieve the storage account from the connection string.\n    azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);  \n\n    // Create the table client.\n    azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();\n\n    // Retrieve a reference to a table.\n    azure::storage::cloud_table table = table_client.get_table_reference(U(\"people\"));\n\n    // Create the table if it doesn't exist.\n    table.create_if_not_exists();  \n\n## 将实体添加到表\n若要将实体添加到表，请创建一个新的 **table_entity** 对象并将其传递到 **table_operation::insert_entity**。以下代码使用客户的名字作为行键，并使用姓氏作为分区键。实体的分区键和行键共同唯一地标识表中的实体。查询分区键相同的实体的速度快于查询分区键不同的实体的速度，但使用不同的分区键可实现更高的并行操作可伸缩性。有关详细信息，请参阅 [Azure 存储性能和可伸缩性清单](/documentation/articles/storage-performance-checklist)。\n\n以下代码创建了包含要存储的某些客户数据的 **table_entity** 类的新实例。接下来，该代码调用 **table_operation::insert_entity** 以创建一个 **table_operation** 对象，以便将实体插入表中，并将新的表实体与之关联。最后，该代码调用 **cloud_table** 对象的 execute 方法。并且新的 **table_operation** 向表服务发送请求，以将新的客户实体插入\"people\"表中。  \n\n    // Retrieve the storage account from the connection string.\n    azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);\n\n    // Create the table client.\n    azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();\n\n    // Retrieve a reference to a table.\n    azure::storage::cloud_table table = table_client.get_table_reference(U(\"people\"));\n\n    // Create the table if it doesn't exist.\n    table.create_if_not_exists();\n\n    // Create a new customer entity.\n    azure::storage::table_entity customer1(U(\"Harp\"), U(\"Walter\"));\n\n    azure::storage::table_entity::properties_type& properties = customer1.properties();\n    properties.reserve(2);\n    properties[U(\"Email\")] = azure::storage::entity_property(U(\"Walter@contoso.com\"));\n\n    properties[U(\"Phone\")] = azure::storage::entity_property(U(\"425-555-0101\"));\n\n    // Create the table operation that inserts the customer entity.\n    azure::storage::table_operation insert_operation = azure::storage::table_operation::insert_entity(customer1);\n\n    // Execute the insert operation.\n    azure::storage::table_result insert_result = table.execute(insert_operation);\n\n## 插入一批实体\n你可以通过一次写入操作将一批实体插入到表服务。以下代码创建一个 **table_batch_operation** 对象，然后向其中添加三个插入操作。每个插入操作的添加方法如下：创建一个新的实体对象，设置它的值，然后对 **table_batch_operation** 对象调用 insert 方法以将实体与新的插入操作相关联。然后调用 **cloud_table.execute** 以执行此操作。  \n\n    // Retrieve the storage account from the connection string.\n    azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);\n\n    // Create the table client.\n    azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();\n\n    // Create a cloud table object for the table.\n    azure::storage::cloud_table table = table_client.get_table_reference(U(\"people\"));\n\n    // Define a batch operation.\n    azure::storage::table_batch_operation batch_operation;\n\n    // Create a customer entity and add it to the table.\n    azure::storage::table_entity customer1(U(\"Smith\"), U(\"Jeff\"));\n\n    azure::storage::table_entity::properties_type& properties1 = customer1.properties();\n    properties1.reserve(2);\n    properties1[U(\"Email\")] = azure::storage::entity_property(U(\"Jeff@contoso.com\"));\n    properties1[U(\"Phone\")] = azure::storage::entity_property(U(\"425-555-0104\"));\n\n    // Create another customer entity and add it to the table.\n    azure::storage::table_entity customer2(U(\"Smith\"), U(\"Ben\"));\n\n    azure::storage::table_entity::properties_type& properties2 = customer2.properties();\n    properties2.reserve(2);\n    properties2[U(\"Email\")] = azure::storage::entity_property(U(\"Ben@contoso.com\"));\n    properties2[U(\"Phone\")] = azure::storage::entity_property(U(\"425-555-0102\"));\n\n    // Create a third customer entity to add to the table.\n    azure::storage::table_entity customer3(U(\"Smith\"), U(\"Denise\"));\n\n    azure::storage::table_entity::properties_type& properties3 = customer3.properties();\n    properties3.reserve(2);\n    properties3[U(\"Email\")] = azure::storage::entity_property(U(\"Denise@contoso.com\"));\n    properties3[U(\"Phone\")] = azure::storage::entity_property(U(\"425-555-0103\"));\n\n    // Add customer entities to the batch insert operation.\n    batch_operation.insert_or_replace_entity(customer1);\n    batch_operation.insert_or_replace_entity(customer2);\n    batch_operation.insert_or_replace_entity(customer3);\n\n    // Execute the batch operation.\n    std::vector<azure::storage::table_result> results = table.execute_batch(batch_operation);\n\n批处理操作的注意事项如下：\n\n-   您在单次批处理操作中最多可以执行 100 个插入、删除、合并、替换、插入或合并以及插入或替换操作（可以是这些操作的任意组合）。  \n-   批处理操作也可以包含检索操作，但前提是检索操作是批处理中仅有的操作。  \n-   单次批处理操作中的所有实体都必须具有相同的分区键。  \n-   批处理操作的数据负载限制为 4MB。  \n\n## 检索分区中的所有实体\n若要查询表以获取分区中的所有实体，请使用 **table_query** 对象。以下代码示例指定了一个筛选器，以筛选分区键为  'Smith' 的实体。此示例会将查询结果中每个实体的字段输出到控制台。  \n\n    // Retrieve the storage account from the connection string.\n    azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);\n\n    // Create the table client.\n    azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();\n\n    // Create a cloud table object for the table.\n    azure::storage::cloud_table table = table_client.get_table_reference(U(\"people\"));\n\n    // Construct the query operation for all customer entities where PartitionKey=\"Smith\".\n    azure::storage::table_query query;\n\n    query.set_filter_string(azure::storage::table_query::generate_filter_condition(U(\"PartitionKey\"), azure::storage::query_comparison_operator::equal, U(\"Smith\")));\n\n    // Execute the query.\n    azure::storage::table_query_iterator it = table.execute_query(query);\n\n    // Print the fields for each customer.\n    azure::storage::table_query_iterator end_of_results;\n    for (; it != end_of_results; ++it)\n    {\n        const azure::storage::table_entity::properties_type& properties = it->properties();\n\n        std::wcout << U(\"PartitionKey: \") << it->partition_key() << U(\", RowKey: \") << it->row_key()\n            << U(\", Property1: \") << properties.at(U(\"Email\")).string_value()\n            << U(\", Property2: \") << properties.at(U(\"Phone\")).string_value() << std::endl;\n    }  \n\n此示例中的查询将检索出与筛选条件匹配的所有实体。如果你有大型表并需要经常下载表实体，我们建议你改为将数据存储在 Azure 存储 Blob 中。\n\n## 检索分区中的一部分实体\n如果不想查询分区中的所有实体，则可以通过结合使用分区键筛选器与行键筛选器来指定一个范围。以下代码示例使用两个筛选器来获取分区“Smith”中的、行键（名字）以字母“E”前面的字母开头的所有实体，然后输出查询结果。\n\n    // Retrieve the storage account from the connection string.\n    azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);\n\n    // Create the table client.\n    azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();\n\n    // Create a cloud table object for the table.\n    azure::storage::cloud_table table = table_client.get_table_reference(U(\"people\"));\n\n    // Create the table query.\n    azure::storage::table_query query;\n\n    query.set_filter_string(azure::storage::table_query::combine_filter_conditions(\n        azure::storage::table_query::generate_filter_condition(U(\"PartitionKey\"),\n        azure::storage::query_comparison_operator::equal, U(\"Smith\")),\n        azure::storage::query_logical_operator::op_and,\n        azure::storage::table_query::generate_filter_condition(U(\"RowKey\"), azure::storage::query_comparison_operator::less_than, U(\"E\"))));\n\n    // Execute the query.\n    azure::storage::table_query_iterator it = table.execute_query(query);\n\n    // Loop through the results, displaying information about the entity.\n    azure::storage::table_query_iterator end_of_results;\n    for (; it != end_of_results; ++it)\n    {\n        const azure::storage::table_entity::properties_type& properties = it->properties();\n\n        std::wcout << U(\"PartitionKey: \") << it->partition_key() << U(\", RowKey: \") << it->row_key()\n            << U(\", Property1: \") << properties.at(U(\"Email\")).string_value()\n            << U(\", Property2: \") << properties.at(U(\"Phone\")).string_value() << std::endl;\n    }  \n\n## 检索单个实体\n你可以编写查询以检索单个特定实体。以下代码使用 **table_operation::retrive_entity** 来指定客户  'Jeff Smith'。此方法只返回一个实体，而不是一个集合，并且返回的值在 **table_result** 中。在查询中指定分区键和行键是从表服务中检索单个实体的最快方法。  \n\n    azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);\n\n    // Create the table client.\n    azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();\n\n    // Create a cloud table object for the table.\n    azure::storage::cloud_table table = table_client.get_table_reference(U(\"people\"));\n\n    // Retrieve the entity with partition key of \"Smith\" and row key of \"Jeff\".\n    azure::storage::table_operation retrieve_operation = azure::storage::table_operation::retrieve_entity(U(\"Smith\"), U(\"Jeff\"));\n    azure::storage::table_result retrieve_result = table.execute(retrieve_operation);\n\n    // Output the entity.\n    azure::storage::table_entity entity = retrieve_result.entity();\n    const azure::storage::table_entity::properties_type& properties = entity.properties();\n\n    std::wcout << U(\"PartitionKey: \") << entity.partition_key() << U(\", RowKey: \") << entity.row_key()\n        << U(\", Property1: \") << properties.at(U(\"Email\")).string_value()\n        << U(\", Property2: \") << properties.at(U(\"Phone\")).string_value() << std::endl;\n\n## 替换实体\n若要替换实体，请从表服务中检索它，修改实体对象，然后将更改保存回表服务。以下代码更改现有客户的电话号码和电子邮件地址。此代码不是调用 **table_operation::insert_entity**，而是使用 **table_operation::replace_entity**。这将导致在服务器上完全替换该实体，除非服务器上的该实体自检索到它以后发生更改，在此情况下，该操作将失败。操作失败将防止您的应用程序无意中覆盖应用程序的其他组件在检索与更新之间所做的更改。正确处理此失败的方法是再次检索实体，进行更改（如果仍有效），然后执行另一个 **table_operation::replace_entity** 操作。下一节将为你演示如何重写此行为。  \n\n    // Retrieve the storage account from the connection string.\n    azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);\n\n    // Create the table client.\n    azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();\n\n    // Create a cloud table object for the table.\n    azure::storage::cloud_table table = table_client.get_table_reference(U(\"people\"));\n\n    // Replace an entity.\n    azure::storage::table_entity entity_to_replace(U(\"Smith\"), U(\"Jeff\"));\n    azure::storage::table_entity::properties_type& properties_to_replace = entity_to_replace.properties();\n    properties_to_replace.reserve(2);\n\n    // Specify a new phone number.\n    properties_to_replace[U(\"Phone\")] = azure::storage::entity_property(U(\"425-555-0106\"));\n\n    // Specify a new email address.\n    properties_to_replace[U(\"Email\")] = azure::storage::entity_property(U(\"JeffS@contoso.com\"));\n\n    // Create an operation to replace the entity.\n    azure::storage::table_operation replace_operation = azure::storage::table_operation::replace_entity(entity_to_replace);\n\n    // Submit the operation to the Table service.\n    azure::storage::table_result replace_result = table.execute(replace_operation);\n\n## 插入或替换实体\n如果该实体自从服务器中检索到它以后发生更改，则 **table_operation::replace_entity** 操作将失败。此外，你必须首先从服务器中检索该实体，**table_operation::replace_entity** 才能成功。但是，有时您不知道服务器上是否存在该实体以及存储在其中的当前值是否无关 - 更新操作会将其全部覆盖。为实现此目的，你将使用 **table_operation::insert_or_replace_entity** 操作。如果该实体不存在，此操作将插入它，如果存在，则替换它，而不管上次更新是何时进行的。在以下代码示例中，仍将检索 Jeff Smith 的客户实体，但稍后会使用 **table_operation::insert_or_replace_entity** 将其保存回服务器。将覆盖在检索与更新操作之间对实体进行的任何更新。  \n\n    // Retrieve the storage account from the connection string.\n    azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);\n\n    // Create the table client.\n    azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();\n\n    // Create a cloud table object for the table.\n    azure::storage::cloud_table table = table_client.get_table_reference(U(\"people\"));\n\n    // Insert-or-replace an entity.\n    azure::storage::table_entity entity_to_insert_or_replace(U(\"Smith\"), U(\"Jeff\"));\n    azure::storage::table_entity::properties_type& properties_to_insert_or_replace = entity_to_insert_or_replace.properties();\n\n    properties_to_insert_or_replace.reserve(2);\n\n    // Specify a phone number.\n    properties_to_insert_or_replace[U(\"Phone\")] = azure::storage::entity_property(U(\"425-555-0107\"));\n\n    // Specify an email address.\n    properties_to_insert_or_replace[U(\"Email\")] = azure::storage::entity_property(U(\"Jeffsm@contoso.com\"));\n\n    // Create an operation to insert-or-replace the entity.\n    azure::storage::table_operation insert_or_replace_operation = azure::storage::table_operation::insert_or_replace_entity(entity_to_insert_or_replace);\n\n    // Submit the operation to the Table service.\n    azure::storage::table_result insert_or_replace_result = table.execute(insert_or_replace_operation);\n\n## 查询一部分实体属性  \n对表的查询可以只检索实体中的少数几个属性。以下代码中的查询使用 **table_query::set_select_columns** 方法，仅返回表中实体的电子邮件地址。  \n\n    // Retrieve the storage account from the connection string.\n    azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);\n\n    // Create the table client.\n    azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();\n\n    // Create a cloud table object for the table.\n    azure::storage::cloud_table table = table_client.get_table_reference(U(\"people\"));\n\n    // Define the query, and select only the Email property.\n    azure::storage::table_query query;\n    std::vector<utility::string_t> columns;\n\n    columns.push_back(U(\"Email\"));\n    query.set_select_columns(columns);\n\n    // Execute the query.\n    azure::storage::table_query_iterator it = table.execute_query(query);\n\n    // Display the results.\n    azure::storage::table_query_iterator end_of_results;\n    for (; it != end_of_results; ++it)\n    {\n        std::wcout << U(\"PartitionKey: \") << it->partition_key() << U(\", RowKey: \") << it->row_key();\n\n        const azure::storage::table_entity::properties_type& properties = it->properties();\n        for (auto prop_it = properties.begin(); prop_it != properties.end(); ++prop_it)\n        {\n            std::wcout << \", \" << prop_it->first << \": \" << prop_it->second.str();\n        }\n\n        std::wcout << std::endl;\n    }\n\n>[AZURE.NOTE] 查询实体的几个属性是比检索所有属性更高效的操作。\n\n## 删除实体\n你可以在检索到实体后轻松将其删除。检索到实体后，对要删除的实体调用 **table_operation::delete_entity**。然后调用 **cloud_table.execute** 方法。以下代码检索并删除分区键为\"Smith\"、行键为\"Jeff\"的实体。  \n\n    // Retrieve the storage account from the connection string.\n    azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);\n\n    // Create the table client.\n    azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();\n\n    // Create a cloud table object for the table.\n    azure::storage::cloud_table table = table_client.get_table_reference(U(\"people\"));\n\n    // Create an operation to retrieve the entity with partition key of \"Smith\" and row key of \"Jeff\".\n    azure::storage::table_operation retrieve_operation = azure::storage::table_operation::retrieve_entity(U(\"Smith\"), U(\"Jeff\"));\n    azure::storage::table_result retrieve_result = table.execute(retrieve_operation);\n\n    // Create an operation to delete the entity.\n    azure::storage::table_operation delete_operation = azure::storage::table_operation::delete_entity(retrieve_result.entity());\n\n    // Submit the delete operation to the Table service.\n    azure::storage::table_result delete_result = table.execute(delete_operation);  \n\n## 删除表\n最后，以下代码示例将从存储帐户中删除表。在删除表之后的一段时间内无法重新创建它。\n\n    // Retrieve the storage account from the connection string.\n    azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);\n\n    // Create the table client.\n    azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();\n\n    // Create a cloud table object for the table.\n    azure::storage::cloud_table table = table_client.get_table_reference(U(\"people\"));\n\n    // Create an operation to retrieve the entity with partition key of \"Smith\" and row key of \"Jeff\".\n    azure::storage::table_operation retrieve_operation = azure::storage::table_operation::retrieve_entity(U(\"Smith\"), U(\"Jeff\"));\n    azure::storage::table_result retrieve_result = table.execute(retrieve_operation);\n\n    // Create an operation to delete the entity.\n    azure::storage::table_operation delete_operation = azure::storage::table_operation::delete_entity(retrieve_result.entity());\n\n    // Submit the delete operation to the Table service.\n    azure::storage::table_result delete_result = table.execute(delete_operation);\n\n## 后续步骤\n现在，你已了解表存储的基础知识，请打开以下链接了解有关 Azure 存储空间的详细信息：\n\n-   [如何通过 C++ 使用 Blob 存储](/documentation/articles/storage-c-plus-plus-how-to-use-blobs)\n-   [如何通过 C++ 使用队列存储](/documentation/articles/storage-c-plus-plus-how-to-use-queues)\n-   [使用 C++ 列出 Azure 存储资源](/documentation/articles/storage-c-plus-plus-enumeration)\n-   [适用于 C++ 的存储空间客户端库参考](http://azure.github.io/azure-storage-cpp)\n-   [Azure 存档文档](http://azure.microsoft.com/documentation/services/storage/)\n \n\n<!---HONumber=Mooncake_0215_2016-->"
+}

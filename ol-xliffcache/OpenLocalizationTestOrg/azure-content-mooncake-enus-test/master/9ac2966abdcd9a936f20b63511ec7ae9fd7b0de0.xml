@@ -1,0 +1,530 @@
+{
+  "nodes": [
+    {
+      "content": "使用弹性数据库池向外缩放资源 | Azure",
+      "pos": [
+        28,
+        50
+      ]
+    },
+    {
+      "content": "了解如何通过创建弹性数据库池，使用 PowerShell 向外缩放 Azure SQL 数据库资源以管理多个数据库。",
+      "pos": [
+        70,
+        128
+      ]
+    },
+    {
+      "content": "使用 PowerShell 创建弹性数据库池以便向外缩放多个 SQL 数据库的资源",
+      "pos": [
+        378,
+        419
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        424,
+        440
+      ]
+    },
+    {
+      "content": "Azure 门户",
+      "pos": [
+        444,
+        452
+      ]
+    },
+    {
+      "content": "C",
+      "pos": [
+        515,
+        516
+      ]
+    },
+    {
+      "content": "PowerShell",
+      "pos": [
+        580,
+        590
+      ]
+    },
+    {
+      "pos": [
+        655,
+        752
+      ],
+      "content": "了解如何使用 PowerShell cmdlet 通过<bpt id=\"p1\">[</bpt>创建弹性数据库池<ept id=\"p1\">](/documentation/articles/sql-database-elastic-pool)</ept>来管理多个数据库。"
+    },
+    {
+      "pos": [
+        756,
+        916
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 弹性数据库池目前为预览版，仅适用于 SQL 数据库 V12 服务器。如果你有一个 SQL 数据库 V11 服务器，可以通过一个步骤<bpt id=\"p1\">[</bpt>使用 PowerShell 升级到 V12 并创建池<ept id=\"p1\">](/documentation/articles/sql-database-upgrade-server)</ept>。"
+    },
+    {
+      "content": "弹性数据库池允许你向外缩放数据库资源和跨多个 SQL 数据库进行管理。",
+      "pos": [
+        918,
+        953
+      ]
+    },
+    {
+      "content": "本文说明如何创建所有必要项目（包括 V12 服务器，Azure 订阅除外）来创建和配置弹性数据库池。如果你需要 Azure 订阅，只需单击本页顶部的“试用”，然后再回来完成本文的相关操作即可。",
+      "pos": [
+        955,
+        1051
+      ]
+    },
+    {
+      "content": "我们对使用 Azure PowerShell 创建弹性数据库池的各个步骤进行了剖析。如果你只需命令的简明列表，请参阅本文底部的“汇总”部分。",
+      "pos": [
+        1056,
+        1126
+      ]
+    },
+    {
+      "pos": [
+        1129,
+        1269
+      ],
+      "content": "若要运行 PowerShell cmdlet，需要已安装并运行 Azure PowerShell。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>如何安装和配置 Azure PowerShell<ept id=\"p1\">](/documentation/articles/powershell-install-configure)</ept>。"
+    },
+    {
+      "content": "配置你的凭据，然后选择你的订阅",
+      "pos": [
+        1277,
+        1292
+      ]
+    },
+    {
+      "content": "现在，你已经运行 Azure 资源管理器模块，因此可以访问创建和配置弹性数据库池所需的所有 cmdlet。首先，你必须能够访问 Azure 帐户。运行以下项目，然后就会出现一个要求你输入凭据的登录屏幕。使用登录 Azure 门户时所用的相同电子邮件和密码。",
+      "pos": [
+        1294,
+        1422
+      ]
+    },
+    {
+      "content": "成功登录后，你会在屏幕上看到一些信息，其中包括你登录时使用的 ID，以及你有权访问的 Azure 订阅。",
+      "pos": [
+        1481,
+        1533
+      ]
+    },
+    {
+      "content": "选择 Azure 订阅",
+      "pos": [
+        1540,
+        1551
+      ]
+    },
+    {
+      "pos": [
+        1553,
+        1707
+      ],
+      "content": "若要选择订阅，你需要提供订阅 ID 或订阅名称 (<bpt id=\"p1\">**</bpt>-SubscriptionName<ept id=\"p1\">**</ept>)。你可以从前面的步骤中复制该信息，或者，如果你有多个订阅，你可以运行 <bpt id=\"p2\">**</bpt>Get-AzureSubscription<ept id=\"p2\">**</ept> cmdlet，然后从结果集中复制所需的订阅信息。获得订阅以后，你可以运行以下 cmdlet："
+    },
+    {
+      "content": "创建资源组、服务器和防火墙规则",
+      "pos": [
+        1798,
+        1813
+      ]
+    },
+    {
+      "pos": [
+        1815,
+        2024
+      ],
+      "content": "现在，你已经有了针对 Azure 订阅运行 cmdlet 所需的访问权限，因此下一步是建立一个资源组，其中包含创建弹性数据库池（包含多个数据库）所需的服务器。你可以编辑下一个命令，以便使用所选择的有效位置。运行 <bpt id=\"p1\">**</bpt>(Get-AzureRmLocation | where-object {$\\_.Name -eq \"Microsoft.Sql/servers\" }).Locations<ept id=\"p1\">**</ept>，以便获取有效位置的列表。"
+    },
+    {
+      "content": "如果你已经有了一个资源组，则可转到下一步，也可运行以下命令来创建新的资源组：",
+      "pos": [
+        2026,
+        2064
+      ]
+    },
+    {
+      "content": "创建服务器",
+      "pos": [
+        2147,
+        2152
+      ]
+    },
+    {
+      "pos": [
+        2155,
+        2483
+      ],
+      "content": "弹性数据库池在 Azure SQL 数据库服务器中创建。如果你已经有了一个服务器，则可转到下一步，也可运行 <bpt id=\"p1\">[</bpt>New-AzureRmSqlServer<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/mt603715.aspx)</ept> cmdlet 来创建新的 V12 服务器。将 ServerName 替换为你的服务器的名称。该服务器名称对于 Azure SQL Server 必须是唯一的，因此如果该服务器名称已被使用，你会在此处收到一个错误。还必须指出的是，该命令可能需要数分钟才能运行完毕。成功创建服务器后，会显示服务器详细信息和 PowerShell 提示。你可以编辑该命令，以便使用所选的任何有效位置。"
+    },
+    {
+      "pos": [
+        2615,
+        2697
+      ],
+      "content": "当你运行此命令时，会打开一个窗口，要求你提供<bpt id=\"p1\">**</bpt>用户名<ept id=\"p1\">**</ept>和<bpt id=\"p2\">**</bpt>密码<ept id=\"p2\">**</ept>。这不是你的 Azure 凭据，请输入用户名和密码，将其作为你要为新服务器创建的管理员凭据。"
+    },
+    {
+      "content": "配置服务器防火墙规则，允许对服务器进行访问",
+      "pos": [
+        2704,
+        2725
+      ]
+    },
+    {
+      "pos": [
+        2727,
+        2871
+      ],
+      "content": "建立针对服务器访问的防火墙规则。运行 <bpt id=\"p1\">[</bpt>New-AzureRmSqlServerFirewallRule<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/mt603586.aspx)</ept> 命令，将开始和结尾的 IP 地址替换为你计算机的有效值。"
+    },
+    {
+      "pos": [
+        2873,
+        2965
+      ],
+      "content": "如果你的服务器需要允许到其他 Azure 服务的访问，请添加 <bpt id=\"p1\">**</bpt>-AllowAllAzureIPs<ept id=\"p1\">**</ept> 开关，以便添加一个特殊的防火墙规则，允许到服务器的所有 Azure 流量访问。"
+    },
+    {
+      "pos": [
+        3151,
+        3238
+      ],
+      "content": "有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure SQL 数据库防火墙<ept id=\"p1\">](/documentation/articles/sql-database-firewall-configure)</ept>。"
+    },
+    {
+      "content": "创建弹性数据库池和弹性数据库",
+      "pos": [
+        3244,
+        3258
+      ]
+    },
+    {
+      "pos": [
+        3260,
+        3603
+      ],
+      "content": "现在，你已经有了一个资源组、一个服务器，并且配置了防火墙规则，因此可以访问服务器。<bpt id=\"p1\">[</bpt>New-AzureRmSqlElasticPool<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/mt619378.aspx)</ept> cmdlet 将创建弹性数据库池。该命令将创建一个池，可以共享总共 400 eDTU。可以确保池中的每个数据库始终有 10 eDTU (DatabaseDtuMin) 可用。池中的各个数据库最多可以耗用 100 eDTU (DatabaseDtuMax)。有关详细的参数说明，请参阅 <bpt id=\"p2\">[</bpt>Azure SQL 数据库弹性池<ept id=\"p2\">](/documentation/articles/sql-database-elastic-pool)</ept>。"
+    },
+    {
+      "content": "在弹性数据库池中创建或添加弹性数据库",
+      "pos": [
+        3800,
+        3818
+      ]
+    },
+    {
+      "content": "在上一步创建的池是空的，里面没有弹性数据库。以下部分说明如何在池中创建新的弹性数据库，以及如何将现有数据库添加到池中。",
+      "pos": [
+        3820,
+        3879
+      ]
+    },
+    {
+      "pos": [
+        3882,
+        4047
+      ],
+      "content": "创建池后，你还可以使用 Transact-SQL 在该池中创建新的弹性数据库，以及将现有数据库移入和移出池。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>弹性数据库池参考 - Transact-SQL<ept id=\"p1\">](/documentation/articles/sql-database-elastic-pool-reference/#Transact-SQL)</ept>。"
+    },
+    {
+      "content": "在弹性数据库池中创建新的弹性数据库",
+      "pos": [
+        4054,
+        4071
+      ]
+    },
+    {
+      "pos": [
+        4073,
+        4213
+      ],
+      "content": "若要直接在池中创建新的数据库，请使用 <bpt id=\"p1\">[</bpt>New-AzureRmSqlDatabase<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/mt619339.aspx)</ept> cmdlet 并设置 <bpt id=\"p2\">**</bpt>ElasticPoolName<ept id=\"p2\">**</ept> 参数。"
+    },
+    {
+      "content": "将现有数据库移入弹性数据库池",
+      "pos": [
+        4366,
+        4380
+      ]
+    },
+    {
+      "pos": [
+        4382,
+        4520
+      ],
+      "content": "若要将现有数据库移到池中，请使用 <bpt id=\"p1\">[</bpt>Set-AzureRmSqlDatabase<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/mt619433.aspx)</ept> cmdlet 并设置 <bpt id=\"p2\">**</bpt>ElasticPoolName<ept id=\"p2\">**</ept> 参数。"
+    },
+    {
+      "content": "为了演示，请创建一个不在弹性数据库池中的数据库。",
+      "pos": [
+        4523,
+        4547
+      ]
+    },
+    {
+      "content": "将现有数据库移到弹性数据库池中。",
+      "pos": [
+        4681,
+        4697
+      ]
+    },
+    {
+      "content": "更改弹性数据库池的性能设置",
+      "pos": [
+        4846,
+        4859
+      ]
+    },
+    {
+      "content": "监视弹性数据库和弹性数据库池",
+      "pos": [
+        5037,
+        5051
+      ]
+    },
+    {
+      "content": "弹性数据库池提供度量值报告以帮助你向外缩放资源来管理多个数据库。",
+      "pos": [
+        5052,
+        5084
+      ]
+    },
+    {
+      "content": "获取弹性数据库池的操作状态",
+      "pos": [
+        5091,
+        5104
+      ]
+    },
+    {
+      "content": "你可以跟踪弹性数据库池的操作（包括创建和更新）状态。",
+      "pos": [
+        5106,
+        5132
+      ]
+    },
+    {
+      "content": "获取将弹性数据库移入和移出弹性数据库池的状态",
+      "pos": [
+        5269,
+        5291
+      ]
+    },
+    {
+      "content": "获取弹性数据库池的资源消耗度量值",
+      "pos": [
+        5449,
+        5465
+      ]
+    },
+    {
+      "content": "可以检索的以资源池限制值百分比形式表示的指标：",
+      "pos": [
+        5467,
+        5490
+      ]
+    },
+    {
+      "content": "平均 CPU 使用率 - cpu\\_percent",
+      "pos": [
+        5494,
+        5519
+      ]
+    },
+    {
+      "content": "平均 IO 使用率 - data\\_io\\_percent",
+      "pos": [
+        5523,
+        5552
+      ]
+    },
+    {
+      "content": "平均日志使用率 - log\\_write\\_percent",
+      "pos": [
+        5556,
+        5585
+      ]
+    },
+    {
+      "content": "平均内存使用率 - memory\\_percent",
+      "pos": [
+        5589,
+        5614
+      ]
+    },
+    {
+      "content": "平均 eDTU 使用率（以 CPU/IO/日志最大使用率的形式表示）– DTU\\_percent",
+      "pos": [
+        5618,
+        5666
+      ]
+    },
+    {
+      "content": "并发用户请求（工作进程）最大数 – max\\_concurrent\\_requests",
+      "pos": [
+        5670,
+        5713
+      ]
+    },
+    {
+      "content": "并发用户会话最大数 – max\\_concurrent\\_sessions",
+      "pos": [
+        5717,
+        5754
+      ]
+    },
+    {
+      "content": "弹性池的总存储大小 – storage\\_in\\_megabytes",
+      "pos": [
+        5758,
+        5792
+      ]
+    },
+    {
+      "content": "指标粒度/保持期：",
+      "pos": [
+        5796,
+        5805
+      ]
+    },
+    {
+      "content": "将以 5 分钟的粒度返回数据。",
+      "pos": [
+        5809,
+        5824
+      ]
+    },
+    {
+      "content": "数据保持期为 14 天。",
+      "pos": [
+        5829,
+        5841
+      ]
+    },
+    {
+      "content": "此 cmdlet 和 API 将能够在一次调用中检索的行数限制为 1000 行（大约 3 天的数据，如果粒度值为 5 分钟的话）。不过，可以使用不同的开始/结束时间间隔来多次调用此命令，以便检索更多数据",
+      "pos": [
+        5846,
+        5947
+      ]
+    },
+    {
+      "content": "检索指标：",
+      "pos": [
+        5950,
+        5955
+      ]
+    },
+    {
+      "content": "通过重复调用和追加数据来获取更多天数：",
+      "pos": [
+        6241,
+        6260
+      ]
+    },
+    {
+      "content": "设置表的格式：",
+      "pos": [
+        6558,
+        6565
+      ]
+    },
+    {
+      "content": "导出到 CSV 文件：",
+      "pos": [
+        6613,
+        6624
+      ]
+    },
+    {
+      "content": "获取弹性数据库的资源消耗指标",
+      "pos": [
+        6735,
+        6749
+      ]
+    },
+    {
+      "content": "这些 API 与当前用来监视单独数据库的资源使用率的 (V12) API 相同，但存在以下语义差异",
+      "pos": [
+        6751,
+        6800
+      ]
+    },
+    {
+      "content": "就此 API 来说，检索的度量值将表示为为该弹性数据库池设置的单个 databaseDtuMax（或者 CPU、IO 等基础度量值的等效最大值）的百分比。例如，对于任何此类度量值来说，50% 的使用率表示特定资源消耗为父弹性数据库池中该资源的相应 DB 上限的 50%。",
+      "pos": [
+        6804,
+        6939
+      ]
+    },
+    {
+      "content": "获取指标：",
+      "pos": [
+        6942,
+        6947
+      ]
+    },
+    {
+      "content": "重复进行调用并追加数据，以便根据需要获取更多天数：",
+      "pos": [
+        7221,
+        7246
+      ]
+    },
+    {
+      "content": "设置表的格式：",
+      "pos": [
+        7531,
+        7538
+      ]
+    },
+    {
+      "content": "导出到 CSV 文件：",
+      "pos": [
+        7586,
+        7597
+      ]
+    },
+    {
+      "content": "汇总",
+      "pos": [
+        7707,
+        7709
+      ]
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        10192,
+        10196
+      ]
+    },
+    {
+      "pos": [
+        10198,
+        10344
+      ],
+      "content": "创建弹性数据库池后，你可以通过创建弹性作业来管理池中的弹性数据库。弹性作业可以用来根据池中数据库的数目来运行 T-SQL 脚本。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>弹性数据库作业概述<ept id=\"p1\">](/documentation/articles/sql-database-elastic-jobs-overview)</ept>。"
+    },
+    {
+      "content": "弹性数据库参考",
+      "pos": [
+        10350,
+        10357
+      ]
+    },
+    {
+      "pos": [
+        10359,
+        10469
+      ],
+      "content": "有关弹性数据库和弹性数据库池的详细信息，包括 API 和错误详细信息，请参阅<bpt id=\"p1\">[</bpt>弹性数据库池参考<ept id=\"p1\">](/documentation/articles/sql-database-elastic-pool-reference)</ept>。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"使用弹性数据库池向外缩放资源 | Azure\" \n    description=\"了解如何通过创建弹性数据库池，使用 PowerShell 向外缩放 Azure SQL 数据库资源以管理多个数据库。\" \n    keywords=\"多个数据库,向外缩放\"    \n    services=\"sql-database\" \n    documentationCenter=\"\" \n    authors=\"stevestein\" \n    manager=\"jeffreyg\" \n    editor=\"\"/>\n\n<tags\n    ms.service=\"sql-database\"\n    ms.date=\"12/01/2015\"\n    wacn.date=\"03/18/2016\"/>\n\n# 使用 PowerShell 创建弹性数据库池以便向外缩放多个 SQL 数据库的资源 \n\n> [AZURE.SELECTOR]\n- [Azure 门户](/documentation/articles/sql-database-elastic-pool-portal)\n- [C#](/documentation/articles/sql-database-elastic-pool-csharp)\n- [PowerShell](/documentation/articles/sql-database-elastic-pool-powershell)\n\n了解如何使用 PowerShell cmdlet 通过[创建弹性数据库池](/documentation/articles/sql-database-elastic-pool)来管理多个数据库。\n\n> [AZURE.NOTE] 弹性数据库池目前为预览版，仅适用于 SQL 数据库 V12 服务器。如果你有一个 SQL 数据库 V11 服务器，可以通过一个步骤[使用 PowerShell 升级到 V12 并创建池](/documentation/articles/sql-database-upgrade-server)。\n\n弹性数据库池允许你向外缩放数据库资源和跨多个 SQL 数据库进行管理。\n\n本文说明如何创建所有必要项目（包括 V12 服务器，Azure 订阅除外）来创建和配置弹性数据库池。如果你需要 Azure 订阅，只需单击本页顶部的“试用”，然后再回来完成本文的相关操作即可。\n\n\n\n\n我们对使用 Azure PowerShell 创建弹性数据库池的各个步骤进行了剖析。如果你只需命令的简明列表，请参阅本文底部的“汇总”部分。\n\n\n若要运行 PowerShell cmdlet，需要已安装并运行 Azure PowerShell。有关详细信息，请参阅[如何安装和配置 Azure PowerShell](/documentation/articles/powershell-install-configure)。\n\n\n\n\n## 配置你的凭据，然后选择你的订阅\n\n现在，你已经运行 Azure 资源管理器模块，因此可以访问创建和配置弹性数据库池所需的所有 cmdlet。首先，你必须能够访问 Azure 帐户。运行以下项目，然后就会出现一个要求你输入凭据的登录屏幕。使用登录 Azure 门户时所用的相同电子邮件和密码。\n\n    Add-AzureRmAccount -EnvironmentName AzureChinaCloud\n\n成功登录后，你会在屏幕上看到一些信息，其中包括你登录时使用的 ID，以及你有权访问的 Azure 订阅。\n\n\n### 选择 Azure 订阅\n\n若要选择订阅，你需要提供订阅 ID 或订阅名称 (**-SubscriptionName**)。你可以从前面的步骤中复制该信息，或者，如果你有多个订阅，你可以运行 **Get-AzureSubscription** cmdlet，然后从结果集中复制所需的订阅信息。获得订阅以后，你可以运行以下 cmdlet：\n\n    Select-AzureRmSubscription -SubscriptionId 4cac86b0-1e56-bbbb-aaaa-000000000000\n\n\n## 创建资源组、服务器和防火墙规则\n\n现在，你已经有了针对 Azure 订阅运行 cmdlet 所需的访问权限，因此下一步是建立一个资源组，其中包含创建弹性数据库池（包含多个数据库）所需的服务器。你可以编辑下一个命令，以便使用所选择的有效位置。运行 **(Get-AzureRmLocation | where-object {$\\_.Name -eq \"Microsoft.Sql/servers\" }).Locations**，以便获取有效位置的列表。\n\n如果你已经有了一个资源组，则可转到下一步，也可运行以下命令来创建新的资源组：\n\n    New-AzureRmResourceGroup -Name \"resourcegroup1\" -Location \"China North\"\n\n### 创建服务器 \n\n弹性数据库池在 Azure SQL 数据库服务器中创建。如果你已经有了一个服务器，则可转到下一步，也可运行 [New-AzureRmSqlServer](https://msdn.microsoft.com/zh-cn/library/azure/mt603715.aspx) cmdlet 来创建新的 V12 服务器。将 ServerName 替换为你的服务器的名称。该服务器名称对于 Azure SQL Server 必须是唯一的，因此如果该服务器名称已被使用，你会在此处收到一个错误。还必须指出的是，该命令可能需要数分钟才能运行完毕。成功创建服务器后，会显示服务器详细信息和 PowerShell 提示。你可以编辑该命令，以便使用所选的任何有效位置。\n\n    New-AzureRmSqlServer -ResourceGroupName \"resourcegroup1\" -ServerName \"server1\" -Location \"China North\" -ServerVersion \"12.0\"\n\n当你运行此命令时，会打开一个窗口，要求你提供**用户名**和**密码**。这不是你的 Azure 凭据，请输入用户名和密码，将其作为你要为新服务器创建的管理员凭据。\n\n\n### 配置服务器防火墙规则，允许对服务器进行访问\n\n建立针对服务器访问的防火墙规则。运行 [New-AzureRmSqlServerFirewallRule](https://msdn.microsoft.com/zh-cn/library/azure/mt603586.aspx) 命令，将开始和结尾的 IP 地址替换为你计算机的有效值。\n\n如果你的服务器需要允许到其他 Azure 服务的访问，请添加 **-AllowAllAzureIPs** 开关，以便添加一个特殊的防火墙规则，允许到服务器的所有 Azure 流量访问。\n\n    New-AzureRmSqlServerFirewallRule -ResourceGroupName \"resourcegroup1\" -ServerName \"server1\" -FirewallRuleName \"rule1\" -StartIpAddress \"192.168.0.198\" -EndIpAddress \"192.168.0.199\"\n\n有关详细信息，请参阅 [Azure SQL 数据库防火墙](/documentation/articles/sql-database-firewall-configure)。\n\n\n## 创建弹性数据库池和弹性数据库\n\n现在，你已经有了一个资源组、一个服务器，并且配置了防火墙规则，因此可以访问服务器。[New-AzureRmSqlElasticPool](https://msdn.microsoft.com/zh-cn/library/azure/mt619378.aspx) cmdlet 将创建弹性数据库池。该命令将创建一个池，可以共享总共 400 eDTU。可以确保池中的每个数据库始终有 10 eDTU (DatabaseDtuMin) 可用。池中的各个数据库最多可以耗用 100 eDTU (DatabaseDtuMax)。有关详细的参数说明，请参阅 [Azure SQL 数据库弹性池](/documentation/articles/sql-database-elastic-pool)。\n\n\n    New-AzureRmSqlElasticPool -ResourceGroupName \"resourcegroup1\" -ServerName \"server1\" -ElasticPoolName \"elasticpool1\" -Edition \"Standard\" -Dtu 400 -DatabaseDtuMin 10 -DatabaseDtuMax 100\n\n\n### 在弹性数据库池中创建或添加弹性数据库\n\n在上一步创建的池是空的，里面没有弹性数据库。以下部分说明如何在池中创建新的弹性数据库，以及如何将现有数据库添加到池中。\n\n*创建池后，你还可以使用 Transact-SQL 在该池中创建新的弹性数据库，以及将现有数据库移入和移出池。有关详细信息，请参阅[弹性数据库池参考 - Transact-SQL](/documentation/articles/sql-database-elastic-pool-reference/#Transact-SQL)。*\n\n### 在弹性数据库池中创建新的弹性数据库\n\n若要直接在池中创建新的数据库，请使用 [New-AzureRmSqlDatabase](https://msdn.microsoft.com/zh-cn/library/azure/mt619339.aspx) cmdlet 并设置 **ElasticPoolName** 参数。\n\n\n    New-AzureRmSqlDatabase -ResourceGroupName \"resourcegroup1\" -ServerName \"server1\" -DatabaseName \"database1\" -ElasticPoolName \"elasticpool1\"\n\n\n\n### 将现有数据库移入弹性数据库池\n\n若要将现有数据库移到池中，请使用 [Set-AzureRmSqlDatabase](https://msdn.microsoft.com/zh-cn/library/azure/mt619433.aspx) cmdlet 并设置 **ElasticPoolName** 参数。\n\n\n为了演示，请创建一个不在弹性数据库池中的数据库。\n\n    New-AzureRmSqlDatabase -ResourceGroupName \"resourcegroup1\" -ServerName \"server1\" -DatabaseName \"database1\" -Edition \"Standard\"\n\n将现有数据库移到弹性数据库池中。\n\n    Set-AzureRmSqlDatabase -ResourceGroupName \"resourcegroup1\" -ServerName \"server1\" -DatabaseName \"database1\" -ElasticPoolName \"elasticpool1\"\n\n## 更改弹性数据库池的性能设置\n\n\n    Set-AzureRmSqlElasticPool –ResourceGroupName “resourcegroup1” –ServerName “server1” –ElasticPoolName “elasticpool1” –Dtu 1200 –DatabaseDtuMax 100 –DatabaseDtuMin 50 \n\n\n## 监视弹性数据库和弹性数据库池\n弹性数据库池提供度量值报告以帮助你向外缩放资源来管理多个数据库。\n\n\n### 获取弹性数据库池的操作状态\n\n你可以跟踪弹性数据库池的操作（包括创建和更新）状态。\n\n    Get-AzureRmSqlElasticPoolActivity –ResourceGroupName “resourcegroup1” –ServerName “server1” –ElasticPoolName “elasticpool1” \n\n\n### 获取将弹性数据库移入和移出弹性数据库池的状态\n\n    Get-AzureRmSqlDatabaseActivity -ResourceGroupName \"resourcegroup1\" -ServerName \"server1\" -DatabaseName \"database1\" -ElasticPoolName \"elasticpool1\"\n\n### 获取弹性数据库池的资源消耗度量值\n\n可以检索的以资源池限制值百分比形式表示的指标：\n\n* 平均 CPU 使用率 - cpu\\_percent \n* 平均 IO 使用率 - data\\_io\\_percent \n* 平均日志使用率 - log\\_write\\_percent \n* 平均内存使用率 - memory\\_percent \n* 平均 eDTU 使用率（以 CPU/IO/日志最大使用率的形式表示）– DTU\\_percent \n* 并发用户请求（工作进程）最大数 – max\\_concurrent\\_requests \n* 并发用户会话最大数 – max\\_concurrent\\_sessions \n* 弹性池的总存储大小 – storage\\_in\\_megabytes \n\n\n指标粒度/保持期：\n\n* 将以 5 分钟的粒度返回数据。  \n* 数据保持期为 14 天。  \n\n\n此 cmdlet 和 API 将能够在一次调用中检索的行数限制为 1000 行（大约 3 天的数据，如果粒度值为 5 分钟的话）。不过，可以使用不同的开始/结束时间间隔来多次调用此命令，以便检索更多数据\n\n\n检索指标：\n\n    $metrics = (Get-Metrics -ResourceId /subscriptions/d7c1d29a-ad13-4033-877e-8cc11d27ebfd/resourceGroups/FabrikamData01/providers/Microsoft.Sql/servers/fabrikamsqldb02/elasticPools/franchisepool -TimeGrain ([TimeSpan]::FromMinutes(5)) -StartTime \"4/18/2015\" -EndTime \"4/21/2015\") \n\n通过重复调用和追加数据来获取更多天数：\n\n    $metrics = $metrics + (Get-Metrics -ResourceId /subscriptions/d7c1d29a-ad13-4033-877e-8cc11d27ebfd/resourceGroups/FabrikamData01/providers/Microsoft.Sql/servers/fabrikamsqldb02/elasticPools/franchisepool -TimeGrain ([TimeSpan]::FromMinutes(5)) -StartTime \"4/21/2015\" -EndTime \"4/24/2015\") \n \n设置表的格式：\n\n    $table = Format-MetricsAsTable $metrics \n\n导出到 CSV 文件：\n\n    foreach($e in $table) { Export-csv -Path c:\\temp\\metrics.csv -input $e -Append -NoTypeInformation} \n\n### 获取弹性数据库的资源消耗指标\n\n这些 API 与当前用来监视单独数据库的资源使用率的 (V12) API 相同，但存在以下语义差异\n\n* 就此 API 来说，检索的度量值将表示为为该弹性数据库池设置的单个 databaseDtuMax（或者 CPU、IO 等基础度量值的等效最大值）的百分比。例如，对于任何此类度量值来说，50% 的使用率表示特定资源消耗为父弹性数据库池中该资源的相应 DB 上限的 50%。 \n\n获取指标：\n\n    $metrics = (Get-Metrics -ResourceId /subscriptions/d7c1d29a-ad13-4033-877e-8cc11d27ebfd/resourceGroups/FabrikamData01/providers/Microsoft.Sql/servers/fabrikamsqldb02/databases/myDB -TimeGrain ([TimeSpan]::FromMinutes(5)) -StartTime \"4/18/2015\" -EndTime \"4/21/2015\") \n\n重复进行调用并追加数据，以便根据需要获取更多天数：\n\n    $metrics = $metrics + (Get-Metrics -ResourceId /subscriptions/d7c1d29a-ad13-4033-877e-8cc11d27ebfd/resourceGroups/FabrikamData01/providers/Microsoft.Sql/servers/fabrikamsqldb02/databases/myDB -TimeGrain ([TimeSpan]::FromMinutes(5)) -StartTime \"4/21/2015\" -EndTime \"4/24/2015\") \n\n设置表的格式：\n\n    $table = Format-MetricsAsTable $metrics \n\n导出到 CSV 文件：\n\n    foreach($e in $table) { Export-csv -Path c:\\temp\\metrics.csv -input $e -Append -NoTypeInformation}\n\n\n## 汇总\n\n\n    Add-AzureRmAccount -EnvironmentName AzureChinaCloud\n    Select-AzureRmSubscription -SubscriptionId 4cac86b0-1e56-bbbb-aaaa-000000000000\n    New-AzureRmResourceGroup -Name \"resourcegroup1\" -Location \"China North\"\n    New-AzureRmSqlServer -ResourceGroupName \"resourcegroup1\" -ServerName \"server1\" -Location \"China North\" -ServerVersion \"12.0\"\n    New-AzureRmSqlServerFirewallRule -ResourceGroupName \"resourcegroup1\" -ServerName \"server1\" -FirewallRuleName \"rule1\" -StartIpAddress \"192.168.0.198\" -EndIpAddress \"192.168.0.199\"\n    New-AzureRmSqlElasticPool -ResourceGroupName \"resourcegroup1\" -ServerName \"server1\" -ElasticPoolName \"elasticpool1\" -Edition \"Standard\" -Dtu 400 -DatabaseDtuMin 10 -DatabaseDtuMax 100\n    New-AzureRmSqlDatabase -ResourceGroupName \"resourcegroup1\" -ServerName \"server1\" -DatabaseName \"database1\" -ElasticPoolName \"elasticpool1\" -MaxSizeBytes 10GB\n    Set-AzureRmSqlElasticPool –ResourceGroupName “resourcegroup1” –ServerName “server1” –ElasticPoolName “elasticpool1” –Dtu 1200 –DatabaseDtuMax 100 –DatabaseDtuMin 50 \n    \n    $metrics = (Get-Metrics -ResourceId /subscriptions/d7c1d29a-ad13-4033-877e-8cc11d27ebfd/resourceGroups/FabrikamData01/providers/Microsoft.Sql/servers/fabrikamsqldb02/elasticPools/franchisepool -TimeGrain ([TimeSpan]::FromMinutes(5)) -StartTime \"4/18/2015\" -EndTime \"4/21/2015\") \n    $metrics = $metrics + (Get-Metrics -ResourceId /subscriptions/d7c1d29a-ad13-4033-877e-8cc11d27ebfd/resourceGroups/FabrikamData01/providers/Microsoft.Sql/servers/fabrikamsqldb02/elasticPools/franchisepool -TimeGrain ([TimeSpan]::FromMinutes(5)) -StartTime \"4/21/2015\" -EndTime \"4/24/2015\")\n    $table = Format-MetricsAsTable $metrics\n    foreach($e in $table) { Export-csv -Path c:\\temp\\metrics.csv -input $e -Append -NoTypeInformation}\n\n    $metrics = (Get-Metrics -ResourceId /subscriptions/d7c1d29a-ad13-4033-877e-8cc11d27ebfd/resourceGroups/FabrikamData01/providers/Microsoft.Sql/servers/fabrikamsqldb02/databases/myDB -TimeGrain ([TimeSpan]::FromMinutes(5)) -StartTime \"4/18/2015\" -EndTime \"4/21/2015\") \n    $metrics = $metrics + (Get-Metrics -ResourceId /subscriptions/d7c1d29a-ad13-4033-877e-8cc11d27ebfd/resourceGroups/FabrikamData01/providers/Microsoft.Sql/servers/fabrikamsqldb02/databases/myDB -TimeGrain ([TimeSpan]::FromMinutes(5)) -StartTime \"4/21/2015\" -EndTime \"4/24/2015\")\n    $table = Format-MetricsAsTable $metrics\n    foreach($e in $table) { Export-csv -Path c:\\temp\\metrics.csv -input $e -Append -NoTypeInformation}\n\n## 后续步骤\n\n创建弹性数据库池后，你可以通过创建弹性作业来管理池中的弹性数据库。弹性作业可以用来根据池中数据库的数目来运行 T-SQL 脚本。有关详细信息，请参阅[弹性数据库作业概述](/documentation/articles/sql-database-elastic-jobs-overview)。\n\n\n## 弹性数据库参考\n\n有关弹性数据库和弹性数据库池的详细信息，包括 API 和错误详细信息，请参阅[弹性数据库池参考](/documentation/articles/sql-database-elastic-pool-reference)。\n\n<!---HONumber=Mooncake_0118_2016-->\n"
+}

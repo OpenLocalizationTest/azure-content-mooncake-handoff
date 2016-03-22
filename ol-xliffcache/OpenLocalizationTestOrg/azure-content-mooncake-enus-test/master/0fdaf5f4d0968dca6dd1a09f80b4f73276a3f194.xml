@@ -1,0 +1,320 @@
+{
+  "nodes": [
+    {
+      "content": "Office 365 和 Azure AD 用户证书续订指南。",
+      "pos": [
+        28,
+        59
+      ]
+    },
+    {
+      "content": "本文向 Office 365 用户说明了如何解决向其发送证书续订通知的电子邮件的问题。",
+      "pos": [
+        79,
+        122
+      ]
+    },
+    {
+      "content": "续订 Office 365 和 Azure AD 的联合身份验证证书",
+      "pos": [
+        358,
+        392
+      ]
+    },
+    {
+      "content": "如果你收到电子邮件或门户通知，要求你续订 Office 365 的证书，则可参阅本文，了解如何解决此问题并防止其再次发生。本文假定你使用 AD FS 作为联合服务器。",
+      "pos": [
+        394,
+        477
+      ]
+    },
+    {
+      "pos": [
+        480,
+        576
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.IMPORTANT]</ph> 请注意，执行下列操作之一后，在 Windows Server 2012 或 Windows Server 2008 R2 上通过代理进行身份验证可能会失败："
+    },
+    {
+      "content": "证书在 AD FS 中滚动更新后，你的代理续订了信任令牌",
+      "pos": [
+        581,
+        609
+      ]
+    },
+    {
+      "content": "你手动替换了 AD FS 证书",
+      "pos": [
+        612,
+        627
+      ]
+    },
+    {
+      "pos": [
+        635,
+        755
+      ],
+      "content": "可以使用一个修补程序来解决此问题。请参阅<bpt id=\"p1\">[</bpt>在 Windows Server 2012 或 Windows 2008 R2 SP1 中通过代理进行身份验证失败<ept id=\"p1\">](http://support.microsoft.com/kb/3094446)</ept>"
+    },
+    {
+      "content": "查看是否需要执行任何操作",
+      "pos": [
+        760,
+        772
+      ]
+    },
+    {
+      "content": "如果你使用的是 AD FS 2.0 或更高版本，Office 365 和 Azure AD 会在你的证书过期之前自动对其进行更新。你不需要执行任何手动步骤，也不需要以计划任务的形式运行脚本。为此，你必须让以下两项默认的 AD FS 配置设置生效：",
+      "pos": [
+        774,
+        897
+      ]
+    },
+    {
+      "content": "AD FS 属性 AutoCertificateRollover 必须设置为 True，表示 AD FS 会在旧的令牌签名和令牌解密证书过期之前自动生成新的。",
+      "pos": [
+        901,
+        980
+      ]
+    },
+    {
+      "pos": [
+        987,
+        1109
+      ],
+      "content": "如果该值为 False，则表示你使用的是自定义证书设置。如需全面指导，请转到<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/JJ933264.aspx#BKMK_NotADFSCert)</ept>。"
+    },
+    {
+      "content": "联合身份验证元数据必须可以通过公共 Internet 进行使用。",
+      "pos": [
+        1112,
+        1144
+      ]
+    },
+    {
+      "content": "下面是如何进行检查：",
+      "pos": [
+        1154,
+        1164
+      ]
+    },
+    {
+      "content": "通过在主联合服务器的 PowerShell 命令窗口中执行以下命令，验证你的 AD FS 安装使用的是自动证书滚动更新：",
+      "pos": [
+        1172,
+        1232
+      ]
+    },
+    {
+      "content": "（请注意，如果你使用的是 AD FS 2.0，则需先运行 Add-Pssnapin Microsoft.Adfs.Powershell）。",
+      "pos": [
+        1268,
+        1337
+      ]
+    },
+    {
+      "content": "从公共 Internet（企业网络之外）上的计算机导航到以下 URL，查看你的联合身份验证元数据是否可以公开访问：",
+      "pos": [
+        1339,
+        1396
+      ]
+    },
+    {
+      "content": "https://(your_FS_name)/federationmetadata/2007-06/federationmetadata.xml",
+      "pos": [
+        1399,
+        1471
+      ]
+    },
+    {
+      "pos": [
+        1473,
+        1561
+      ],
+      "content": "其中，<ph id=\"ph1\">`(your_FS_name) `</ph> 将替换为你组织使用的联合身份验证服务主机名，例如 fs.contoso.com。如果你能够成功验证这两项设置，则无需执行任何其他操作。"
+    },
+    {
+      "content": "示例：https://fs.contos.com/federationmetadata/2007-06/federationmetadata.xml",
+      "pos": [
+        1563,
+        1637
+      ]
+    },
+    {
+      "content": "如果你的 AutoCertificateRollover 属性设置为 False",
+      "pos": [
+        1642,
+        1682
+      ]
+    },
+    {
+      "pos": [
+        1684,
+        1891
+      ],
+      "content": "如果你的 AutoCertificateRollover 属性设置为 False，则你使用的是非默认 AD FS 证书设置。这种情况最常见的原因是，你的组织通过组织证书颁发机构来管理注册的 AD FS 证书。在这种情况下，你需要自行续订和更新证书。使用<bpt id=\"p1\">[</bpt>此处<ept id=\"p1\">](https://msdn.microsoft.com/library/azure/JJ933264.aspx#BKMK_NotADFSCert)</ept>的指南。"
+    },
+    {
+      "content": "如果你的元数据不可公开访问",
+      "pos": [
+        1896,
+        1909
+      ]
+    },
+    {
+      "content": "如果 AutocertificateRollover 设置为 True 而联合身份验证元数据不可公开使用，则可执行以下步骤以确保在本地和云中对证书进行了更新：",
+      "pos": [
+        1910,
+        1989
+      ]
+    },
+    {
+      "content": "确保 AD FS 系统已生成新的证书。",
+      "pos": [
+        1995,
+        2014
+      ]
+    },
+    {
+      "content": "确保你已登录主 AD FS 服务器。",
+      "pos": [
+        2019,
+        2037
+      ]
+    },
+    {
+      "content": "通过打开 PowerShell 命令窗口并运行以下命令，检查 AD FS 中的当前签名证书：",
+      "pos": [
+        2040,
+        2086
+      ]
+    },
+    {
+      "content": "（请注意，如果你使用的是 AD FS 2.0，则需先运行 Add-Pssnapin Microsoft.Adfs.Powershell）",
+      "pos": [
+        2151,
+        2219
+      ]
+    },
+    {
+      "content": "查看命令输出中是否存在任何已列出的证书。如果 AD FS 已生成新证书，你应该会在输出中看到两个证书：一个证书的 IsPrimary 值为 True，NotAfter 日期为 5 天内；另一个证书的 IsPrimary 为 False，NotAfter 大约为未来的 1 年。",
+      "pos": [
+        2224,
+        2362
+      ]
+    },
+    {
+      "content": "如果你只看到一个证书，且 NotAfter 日期在 5 天内，则需执行以下步骤以生成新的证书。",
+      "pos": [
+        2370,
+        2417
+      ]
+    },
+    {
+      "pos": [
+        2421,
+        2520
+      ],
+      "content": "若要生成新的证书，请在 PowerShell 命令提示符下执行以下命令：<ph id=\"ph1\">`PS C:\\&gt;Update-ADFSCertificate –CertificateType token-signing`</ph>。"
+    },
+    {
+      "content": "通过再次运行以下命令来验证更新：PS C:\\&gt;Get-ADFSCertificate –CertificateType token-signing",
+      "pos": [
+        2524,
+        2597
+      ]
+    },
+    {
+      "content": "接下来，若要手动更新 Office 365 联合身份验证信任属性，请按以下步骤操作。",
+      "pos": [
+        2600,
+        2642
+      ]
+    },
+    {
+      "content": "此时会列出两个证书，其中一个的 NotAfter 日期大约为未来的 1 年，其 IsPrimary 值为 False。",
+      "pos": [
+        2644,
+        2703
+      ]
+    },
+    {
+      "content": "手动更新 Office 365 联合身份验证信任属性，按以下步骤操作。",
+      "pos": [
+        2710,
+        2745
+      ]
+    },
+    {
+      "content": "打开用于 Windows PowerShell 的 Azure Active Directory 模块。",
+      "pos": [
+        2751,
+        2803
+      ]
+    },
+    {
+      "content": "运行 $cred=Get-Credential。当此 cmdlet 提示你输入凭据时，键入你的云服务管理员帐户凭据。",
+      "pos": [
+        2808,
+        2866
+      ]
+    },
+    {
+      "content": "运行 Connect-MsolService –Credential $cred。此 cmdlet 会将你连接到云服务。通过工具运行任何其他已安装的 cmdlet 之前，必须创建将你连接到云服务的上下文。",
+      "pos": [
+        2871,
+        2973
+      ]
+    },
+    {
+      "content": "如果你在并非用作 AD FS 主联合服务器的计算机上运行这些命令，请运行 Set-MSOLAdfscontext -Computer",
+      "pos": [
+        2978,
+        3044
+      ]
+    },
+    {
+      "content": "，其中",
+      "pos": [
+        3067,
+        3070
+      ]
+    },
+    {
+      "content": "是主 AD FS 服务器的内部 FQDN 名称。此 cmdlet 生成将你连接到 AD FS 的上下文。",
+      "pos": [
+        3094,
+        3146
+      ]
+    },
+    {
+      "content": "运行 Update-MSOLFederatedDomain –DomainName",
+      "pos": [
+        3152,
+        3193
+      ]
+    },
+    {
+      "content": "。此 cmdlet 会将 AD FS 中的设置更新到云服务中，并配置两者之间的信任关系。",
+      "pos": [
+        3202,
+        3246
+      ]
+    },
+    {
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 如果你需要支持多个顶级域（例如 contoso.com 和 fabrikam.com），则必须将 SupportMultipleDomain 开关用于任何 cmdlet。有关详细信息，请参阅“支持多个顶级域”。",
+      "pos": [
+        3249,
+        3367
+      ]
+    },
+    {
+      "content": "最后，请确保所有网站代理服务器都通过 <bpt id=\"p1\">[</bpt>Windows Server May 2014<ept id=\"p1\">](http://support.microsoft.com/kb/2955164)</ept> 汇总进行了更新，否则代理可能无法使用新证书自行进行更新，导致服务中断。",
+      "pos": [
+        3368,
+        3489
+      ]
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"Office 365 和 Azure AD 用户证书续订指南。\" \n    description=\"本文向 Office 365 用户说明了如何解决向其发送证书续订通知的电子邮件的问题。\" \n    services=\"active-directory\" \n    documentationCenter=\"\" \n    authors=\"billmath\" \n    manager=\"stevenpo\" \n    editor=\"curtand\"/>\n\n<tags \n    ms.service=\"active-directory\" \n    ms.date=\"01/11/2016\"\n    wacn.date=\"02/25/2016\"/>\n\n\n# 续订 Office 365 和 Azure AD 的联合身份验证证书\n\n如果你收到电子邮件或门户通知，要求你续订 Office 365 的证书，则可参阅本文，了解如何解决此问题并防止其再次发生。本文假定你使用 AD FS 作为联合服务器。\n\n>[AZURE.IMPORTANT] 请注意，执行下列操作之一后，在 Windows Server 2012 或 Windows Server 2008 R2 上通过代理进行身份验证可能会失败：\n>\n- 证书在 AD FS 中滚动更新后，你的代理续订了信任令牌\n- 你手动替换了 AD FS 证书\n>     \n可以使用一个修补程序来解决此问题。请参阅[在 Windows Server 2012 或 Windows 2008 R2 SP1 中通过代理进行身份验证失败](http://support.microsoft.com/kb/3094446)\n\n## 查看是否需要执行任何操作\n\n如果你使用的是 AD FS 2.0 或更高版本，Office 365 和 Azure AD 会在你的证书过期之前自动对其进行更新。你不需要执行任何手动步骤，也不需要以计划任务的形式运行脚本。为此，你必须让以下两项默认的 AD FS 配置设置生效：\n\n- AD FS 属性 AutoCertificateRollover 必须设置为 True，表示 AD FS 会在旧的令牌签名和令牌解密证书过期之前自动生成新的。\n    - 如果该值为 False，则表示你使用的是自定义证书设置。如需全面指导，请转到[此处](https://msdn.microsoft.com/zh-cn/library/azure/JJ933264.aspx#BKMK_NotADFSCert)。\n- 联合身份验证元数据必须可以通过公共 Internet 进行使用。\n    \n    下面是如何进行检查：\n\n    - 通过在主联合服务器的 PowerShell 命令窗口中执行以下命令，验证你的 AD FS 安装使用的是自动证书滚动更新：\n\n    `PS C:\\> Get-ADFSProperties`\n\n（请注意，如果你使用的是 AD FS 2.0，则需先运行 Add-Pssnapin Microsoft.Adfs.Powershell）。\n\n从公共 Internet（企业网络之外）上的计算机导航到以下 URL，查看你的联合身份验证元数据是否可以公开访问：\n\n\nhttps://(your_FS_name)/federationmetadata/2007-06/federationmetadata.xml\n\n其中，`(your_FS_name) ` 将替换为你组织使用的联合身份验证服务主机名，例如 fs.contoso.com。如果你能够成功验证这两项设置，则无需执行任何其他操作。\n\n示例：https://fs.contos.com/federationmetadata/2007-06/federationmetadata.xml\n\n## 如果你的 AutoCertificateRollover 属性设置为 False\n\n如果你的 AutoCertificateRollover 属性设置为 False，则你使用的是非默认 AD FS 证书设置。这种情况最常见的原因是，你的组织通过组织证书颁发机构来管理注册的 AD FS 证书。在这种情况下，你需要自行续订和更新证书。使用[此处](https://msdn.microsoft.com/library/azure/JJ933264.aspx#BKMK_NotADFSCert)的指南。\n\n## 如果你的元数据不可公开访问\n如果 AutocertificateRollover 设置为 True 而联合身份验证元数据不可公开使用，则可执行以下步骤以确保在本地和云中对证书进行了更新：\n\n### 确保 AD FS 系统已生成新的证书。 \n\n- 确保你已登录主 AD FS 服务器。\n- 通过打开 PowerShell 命令窗口并运行以下命令，检查 AD FS 中的当前签名证书： \n\n`PS C:\\>Get-ADFSCertificate –CertificateType token-signing.`\n\n（请注意，如果你使用的是 AD FS 2.0，则需先运行 Add-Pssnapin Microsoft.Adfs.Powershell）\n\n\n- 查看命令输出中是否存在任何已列出的证书。如果 AD FS 已生成新证书，你应该会在输出中看到两个证书：一个证书的 IsPrimary 值为 True，NotAfter 日期为 5 天内；另一个证书的 IsPrimary 为 False，NotAfter 大约为未来的 1 年。\n    \n- 如果你只看到一个证书，且 NotAfter 日期在 5 天内，则需执行以下步骤以生成新的证书。\n\n- 若要生成新的证书，请在 PowerShell 命令提示符下执行以下命令：`PS C:\\>Update-ADFSCertificate –CertificateType token-signing`。\n\n- 通过再次运行以下命令来验证更新：PS C:\\>Get-ADFSCertificate –CertificateType token-signing\n- 接下来，若要手动更新 Office 365 联合身份验证信任属性，请按以下步骤操作。\n\n此时会列出两个证书，其中一个的 NotAfter 日期大约为未来的 1 年，其 IsPrimary 值为 False。\n\n\n### 手动更新 Office 365 联合身份验证信任属性，按以下步骤操作。\n\n1.  打开用于 Windows PowerShell 的 Azure Active Directory 模块。\n2.  运行 $cred=Get-Credential。当此 cmdlet 提示你输入凭据时，键入你的云服务管理员帐户凭据。\n3.  运行 Connect-MsolService –Credential $cred。此 cmdlet 会将你连接到云服务。通过工具运行任何其他已安装的 cmdlet 之前，必须创建将你连接到云服务的上下文。\n4.  如果你在并非用作 AD FS 主联合服务器的计算机上运行这些命令，请运行 Set-MSOLAdfscontext -Computer <AD FS primary server>，其中 <AD FS primary server> 是主 AD FS 服务器的内部 FQDN 名称。此 cmdlet 生成将你连接到 AD FS 的上下文。 \n5.  运行 Update-MSOLFederatedDomain –DomainName <domain>。此 cmdlet 会将 AD FS 中的设置更新到云服务中，并配置两者之间的信任关系。\n\n>[AZURE.NOTE] 如果你需要支持多个顶级域（例如 contoso.com 和 fabrikam.com），则必须将 SupportMultipleDomain 开关用于任何 cmdlet。有关详细信息，请参阅“支持多个顶级域”。\n最后，请确保所有网站代理服务器都通过 [Windows Server May 2014](http://support.microsoft.com/kb/2955164) 汇总进行了更新，否则代理可能无法使用新证书自行进行更新，导致服务中断。\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

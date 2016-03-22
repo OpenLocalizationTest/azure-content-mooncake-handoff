@@ -1,0 +1,704 @@
+{
+  "nodes": [
+    {
+      "content": "在 Azure 中创建连接到虚拟机上运行的 MongoDB 的 Web 应用",
+      "pos": [
+        28,
+        66
+      ]
+    },
+    {
+      "content": "本教程介绍如何使用 Git 将 ASP.NET 应用部署到连接至Azure 虚拟机上 MongoDB 的 Azure Web 应用。",
+      "pos": [
+        86,
+        152
+      ]
+    },
+    {
+      "content": "在 Azure 中创建连接到虚拟机上运行的 MongoDB 的 Web 应用",
+      "pos": [
+        420,
+        458
+      ]
+    },
+    {
+      "pos": [
+        460,
+        676
+      ],
+      "content": "使用 Git，你可以将 ASP.NET 应用程序部署到 Azure Web 应用。在本教程中，你将构建一个简单的前端 ASP.NET MVC 任务列表应用程序，该程序将连接至在 Azure 内的虚拟机中运行的 MongoDB 数据库。<bpt id=\"p1\">[</bpt>MongoDB<ept id=\"p1\">][MongoDB]</ept> 是一个受欢迎的开源、高性能 NoSQL 数据库。在开发计算机上运行并测试了该 ASP.NET 应用程序后，可使用 Git 将其上载至 Azure Web 应用。"
+    },
+    {
+      "pos": [
+        678,
+        793
+      ],
+      "content": "[WACOM.INCLUDE <bpt id=\"p1\">[</bpt>create-account-and-websites-and-vms-note<ept id=\"p1\">](../includes/create-account-and-websites-and-vms-note.md)</ept>]"
+    },
+    {
+      "content": "背景知识",
+      "pos": [
+        797,
+        801
+      ]
+    },
+    {
+      "content": "以下知识对于学习本教程有用但非必需：",
+      "pos": [
+        805,
+        823
+      ]
+    },
+    {
+      "pos": [
+        827,
+        919
+      ],
+      "content": "MongoDB 的 C# 驱动程序。有关针对 MongoDB 开发 C# 应用程序的更多信息，请参阅 <bpt id=\"p1\">[</bpt>MongoDB CSharp 语言中心<ept id=\"p1\">][MongoC#LangCenter]</ept>。"
+    },
+    {
+      "pos": [
+        923,
+        977
+      ],
+      "content": "ASP .NET Web 应用框架。可通过 <bpt id=\"p1\">[</bpt>ASP.net Web 应用<ept id=\"p1\">][ASP.NET]</ept>进行全面了解。"
+    },
+    {
+      "content": "ASP .NET MVC Web 应用框架。可通过 [ASP.NET MVC Web 应用][MVCWebSite] 进行全面了解。",
+      "pos": [
+        980,
+        1046
+      ]
+    },
+    {
+      "pos": [
+        1049,
+        1089
+      ],
+      "content": "Azure。你可以先阅读 <bpt id=\"p1\">[</bpt>Azure<ept id=\"p1\">][WindowsAzure]</ept> 上的文章。"
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        1094,
+        1098
+      ]
+    },
+    {
+      "pos": [
+        1105,
+        1179
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Visual Studio Express 2013 for Web<ept id=\"p1\">][VSEWeb]</ept> 或 <bpt id=\"p2\">[</bpt>Visual Studio 2013<ept id=\"p2\">][VSUlt]</ept>"
+    },
+    {
+      "content": "Azure SDK for .NET",
+      "pos": [
+        1183,
+        1201
+      ]
+    },
+    {
+      "content": "有效的 Azure 订阅",
+      "pos": [
+        1297,
+        1309
+      ]
+    },
+    {
+      "content": "创建虚拟机和安装 MongoDB",
+      "pos": [
+        1443,
+        1459
+      ]
+    },
+    {
+      "content": "本教程假定你已在 Azure 中创建了一个虚拟机。创建虚拟机后，你需要在该虚拟机上安装 MongoDB：",
+      "pos": [
+        1464,
+        1516
+      ]
+    },
+    {
+      "content": "若要创建 Windows 虚拟机并安装 MongoDB，请参阅 [在 Azure 中，在运行 Windows Server 的虚拟机上安装 MongoDB][InstallMongoOnWindowsVM]。",
+      "pos": [
+        1520,
+        1624
+      ]
+    },
+    {
+      "content": "或者，若要创建 Linux 虚拟机并安装 MongoDB，请参阅 [在 Azure 中，在运行 CentOS 的虚拟机上安装 MongoDB][InstallMongoOnCentOSLinuxVM]。",
+      "pos": [
+        1627,
+        1728
+      ]
+    },
+    {
+      "content": "在 Azure 中创建虚拟机并安装 MongoDB 后，请务必记住该虚拟机的 DNS 名称（例如“testlinuxvm.chinacloudapp.cn”）以及你在终结点中指定的 MongoDB 的外部端口。本教程后面的步骤中将会用到此信息。",
+      "pos": [
+        1730,
+        1852
+      ]
+    },
+    {
+      "content": "创建应用程序",
+      "pos": [
+        1880,
+        1886
+      ]
+    },
+    {
+      "content": "在本部分中，你将使用 Visual Studio 创建一个名为“My Task List”的 ASP.NET 应用程序，并执行到 Azure Web 应用的初始部署。你将在本地运行该应用程序，但其将连接到你在 Azure 上的虚拟机并使用你在此处创建的 MongoDB 实例。",
+      "pos": [
+        1891,
+        2029
+      ]
+    },
+    {
+      "content": "在 Visual Studio 中，单击“新建项目”。",
+      "pos": [
+        2034,
+        2061
+      ]
+    },
+    {
+      "content": "新项目开始页面",
+      "pos": [
+        2069,
+        2076
+      ]
+    },
+    {
+      "content": "在“新建项目”窗口中的左侧窗格中，选择“Visual C#”，然后选择“Web”。在中间窗格中，选择“ASP.NET Web 应用”。在底部，将项目命名为“MyTaskListApp”，然后单击“确定”。",
+      "pos": [
+        2103,
+        2205
+      ]
+    },
+    {
+      "content": "新建项目对话框",
+      "pos": [
+        2213,
+        2220
+      ]
+    },
+    {
+      "content": "在“新建 ASP.NET 项目”对话框中，选择“MVC”，然后单击“确定”。确保不选中“在云中托管”，点击“OK”。",
+      "pos": [
+        2251,
+        2309
+      ]
+    },
+    {
+      "content": "项目完成后，将显示由模板创建的默认页。",
+      "pos": [
+        2315,
+        2334
+      ]
+    },
+    {
+      "content": "默认的 ASP.NET MVC 应用程序",
+      "pos": [
+        2342,
+        2362
+      ]
+    },
+    {
+      "content": "如果还没新建好 Web 应用，可以到 Azure 管理门户新建一个，并在“仪表板”的“速览”下，下载“发布配置文件”。",
+      "pos": [
+        2398,
+        2457
+      ]
+    },
+    {
+      "content": "右键单击你的解决方案，单击“发布”。",
+      "pos": [
+        2462,
+        2480
+      ]
+    },
+    {
+      "content": "点击“导入”，选择之前下载的“发布配置文件”，然后确认。",
+      "pos": [
+        2485,
+        2513
+      ]
+    },
+    {
+      "content": "将默认的 ASP.NET 应用程序发布到 Azure Web 应用后，将在浏览器中启动该应用程序。",
+      "pos": [
+        2593,
+        2642
+      ]
+    },
+    {
+      "content": "安装 MongoDB C# 驱动程序",
+      "pos": [
+        2646,
+        2664
+      ]
+    },
+    {
+      "content": "MongoDB 通过驱动程序为 C# 应用程序提供客户端支持，你需要在本地开发计算机上安装此驱动程序。C# 驱动程序通过 NuGet 提供。",
+      "pos": [
+        2666,
+        2736
+      ]
+    },
+    {
+      "content": "安装 MongoDB C# 驱动程序的步骤：",
+      "pos": [
+        2738,
+        2760
+      ]
+    },
+    {
+      "content": "在“解决方案资源管理器”中右键单击“MyTaskListApp”项目，然后选择“管理 NuGet 包”。",
+      "pos": [
+        2765,
+        2817
+      ]
+    },
+    {
+      "content": "管理 NuGet 包",
+      "pos": [
+        2825,
+        2835
+      ]
+    },
+    {
+      "content": "在“管理 NuGet 包”窗口的左侧窗格中，单击“联机”。在右侧的“联机搜索”框中，键入“mongodb.driver”。单击“安装”安装此驱动程序。",
+      "pos": [
+        2868,
+        2943
+      ]
+    },
+    {
+      "content": "搜索 MongoDB C# 驱动程序",
+      "pos": [
+        2951,
+        2969
+      ]
+    },
+    {
+      "content": "单击“我接受”接受 10gen, Inc. 的许可条款。",
+      "pos": [
+        3005,
+        3033
+      ]
+    },
+    {
+      "pos": [
+        3038,
+        3110
+      ],
+      "content": "安装驱动程序后，单击“关闭”。\n ![已安装 MongoDB C# 驱动程序][MongoDBCsharpDriverInstalled]",
+      "leadings": [
+        "",
+        "   "
+      ],
+      "nodes": [
+        {
+          "content": "安装驱动程序后，单击“关闭”。",
+          "pos": [
+            0,
+            15
+          ]
+        },
+        {
+          "content": "已安装 MongoDB C# 驱动程序",
+          "pos": [
+            19,
+            38
+          ]
+        }
+      ]
+    },
+    {
+      "pos": [
+        3113,
+        3208
+      ],
+      "content": "MongoDB C# 驱动程序现已安装。对 <bpt id=\"p1\">**</bpt>MongoDB.Bson<ept id=\"p1\">**</ept>、<bpt id=\"p2\">**</bpt>MongoDB.Driver<ept id=\"p2\">**</ept> 和 <bpt id=\"p3\">**</bpt>MongoDB.Driver.Core<ept id=\"p3\">**</ept> 库的引用已添加到项目。"
+    },
+    {
+      "content": "MongoDB C# 驱动程序引用",
+      "pos": [
+        3212,
+        3229
+      ]
+    },
+    {
+      "content": "添加模型",
+      "pos": [
+        3266,
+        3270
+      ]
+    },
+    {
+      "pos": [
+        3274,
+        3375
+      ],
+      "content": "在“解决方案资源管理器”中，右键单击“Models”文件夹，选择<bpt id=\"p1\">**</bpt>添加<ept id=\"p1\">**</ept>一个新<bpt id=\"p2\">**</bpt>类<ept id=\"p2\">**</ept>，并将其命名为 <bpt id=\"p3\">*</bpt>TaskModel.cs<ept id=\"p3\">*</ept>。在 <bpt id=\"p4\">*</bpt>TaskModel.cs<ept id=\"p4\">*</ept> 中，将现有代码替换为以下代码："
+    },
+    {
+      "content": "添加数据访问层",
+      "pos": [
+        4176,
+        4183
+      ]
+    },
+    {
+      "pos": [
+        4187,
+        4326
+      ],
+      "content": "在“解决方案资源管理器”中，右键单击“MyTaskListApp”项目并选择<bpt id=\"p1\">**</bpt>添加<ept id=\"p1\">**</ept>一个名为 <bpt id=\"p2\">*</bpt>DAL<ept id=\"p2\">*</ept> 的<bpt id=\"p3\">**</bpt>新文件夹<ept id=\"p3\">**</ept>。右键单击“DAL”文件夹并选择<bpt id=\"p4\">**</bpt>添加<ept id=\"p4\">**</ept>一个新<bpt id=\"p5\">**</bpt>类<ept id=\"p5\">**</ept>。将该类文件命名为 <bpt id=\"p6\">*</bpt>Dal.cs<ept id=\"p6\">*</ept>。在 <bpt id=\"p7\">*</bpt>Dal.cs<ept id=\"p7\">*</ept> 中，将现有代码替换为以下代码："
+    },
+    {
+      "content": "添加控制器",
+      "pos": [
+        7806,
+        7811
+      ]
+    },
+    {
+      "pos": [
+        7815,
+        7880
+      ],
+      "content": "在“解决方案资源管理器”中打开 <bpt id=\"p1\">*</bpt>Controllers\\\\HomeController.cs<ept id=\"p1\">*</ept> 文件，将现有代码替换为以下代码："
+    },
+    {
+      "content": "设置样式",
+      "pos": [
+        9697,
+        9701
+      ]
+    },
+    {
+      "pos": [
+        9705,
+        9833
+      ],
+      "content": "若要更改页面顶部的标题，请在“解决方案资源管理器”中打开 <bpt id=\"p1\">*</bpt>Views\\\\Shared\\_Layout.cshtml<ept id=\"p1\">*</ept> 文件，将导航条标头中的“Application name”替换为“My Task List Application”以便其类似如下所示："
+    },
+    {
+      "pos": [
+        9941,
+        10009
+      ],
+      "content": "为了设置 Task List 菜单，请打开 <bpt id=\"p1\">*</bpt>\\\\Views\\\\Home\\\\Index.cshtml<ept id=\"p1\">*</ept> 文件并将现有代码替换为以下代码："
+    },
+    {
+      "pos": [
+        10768,
+        10848
+      ],
+      "content": "若要增加创建新任务的功能，右键单击“Views\\\\Home\\\\”文件夹并选择<bpt id=\"p1\">*</bpt>添加<ept id=\"p1\">*</ept>一个<bpt id=\"p2\">**</bpt>视图<ept id=\"p2\">**</ept>。将该视图命名为 <bpt id=\"p3\">*</bpt>Create<ept id=\"p3\">*</ept>。将此代码替换为以下代码："
+    },
+    {
+      "content": "“解决方案资源管理器”应类似如下所示：",
+      "pos": [
+        12354,
+        12373
+      ]
+    },
+    {
+      "content": "解决方案资源管理器",
+      "pos": [
+        12377,
+        12386
+      ]
+    },
+    {
+      "content": "设置 MongoDB 连接字符串",
+      "pos": [
+        12423,
+        12439
+      ]
+    },
+    {
+      "pos": [
+        12443,
+        12484
+      ],
+      "content": "在“解决方案资源管理器”中，打开 <bpt id=\"p1\">*</bpt>DAL/Dal.cs<ept id=\"p1\">*</ept> 文件。找到以下代码行："
+    },
+    {
+      "pos": [
+        12552,
+        12677
+      ],
+      "content": "将 <ph id=\"ph1\">`&lt;vm-dns-name&gt;`</ph> 替换为运行 MongoDB 的虚拟机（在本教程的<bpt id=\"p1\">[</bpt>创建虚拟机并安装 MongoDB<ept id=\"p1\">][]</ept> 步骤中创建）的 DNS 名。若要查找虚拟机的 DNS 名，请转到 Azure 管理门户，选择“虚拟机”并找到“DNS 名”。"
+    },
+    {
+      "content": "如果虚拟机的 DNS 名是“testlinuxvm.chinacloudapp.cn”而 MongoDB 在默认端口 27017 进行侦听，连接字符串代码行将如下所示：",
+      "pos": [
+        12679,
+        12763
+      ]
+    },
+    {
+      "content": "如果虚拟机终结点为 MongoDB 指定了不同的外部端口，你可在连接字符串中指定端口：",
+      "pos": [
+        12846,
+        12889
+      ]
+    },
+    {
+      "pos": [
+        12978,
+        13032
+      ],
+      "content": "有关 MongoDB 连接字符串的详细信息，请参阅<bpt id=\"p1\">[</bpt>连接<ept id=\"p1\">][MongoConnectionStrings]</ept>。"
+    },
+    {
+      "content": "测试本地部署",
+      "pos": [
+        13037,
+        13043
+      ]
+    },
+    {
+      "pos": [
+        13048,
+        13170
+      ],
+      "content": "若要在开发计算机上运行应用程序，请从“调试”菜单选择“启动调试”或按 <bpt id=\"p1\">**</bpt>F5<ept id=\"p1\">**</ept>。IIS Express 启动，浏览器打开并显示该引用程序的主页。你可以添加一个新任务，而后将其添加到在 Azure 中的虚拟机上运行的 MongoDB 数据库。"
+    },
+    {
+      "content": "My Task List 应用程序",
+      "pos": [
+        13174,
+        13191
+      ]
+    },
+    {
+      "content": "将 ASP.NET 应用程序部署到 Azure Web 应用",
+      "pos": [
+        13216,
+        13246
+      ]
+    },
+    {
+      "content": "在本部分中，你将创建一个 Web 应用并使用 Git 部署 My Task List ASP.NET 应用程序。",
+      "pos": [
+        13253,
+        13309
+      ]
+    },
+    {
+      "content": "创建 Azure Web 应用",
+      "pos": [
+        13341,
+        13356
+      ]
+    },
+    {
+      "content": "本部分中，你将创建一个 Azure Web 应用。",
+      "pos": [
+        13360,
+        13385
+      ]
+    },
+    {
+      "pos": [
+        13390,
+        13449
+      ],
+      "content": "打开 Web 浏览器并浏览至 <bpt id=\"p1\">[</bpt>Azure 管理门户<ept id=\"p1\">][AzurePortal]</ept>。使用您的 Azure 帐户进行登录。"
+    },
+    {
+      "content": "在页面底部，依次单击“+新建”、“WEB APPS”和“速览”。",
+      "pos": [
+        13454,
+        13486
+      ]
+    },
+    {
+      "content": "为应用程序的 URL 输入唯一的前缀。",
+      "pos": [
+        13490,
+        13509
+      ]
+    },
+    {
+      "content": "选择区域。",
+      "pos": [
+        13513,
+        13518
+      ]
+    },
+    {
+      "content": "单击“创建 Web 应用”。",
+      "pos": [
+        13522,
+        13536
+      ]
+    },
+    {
+      "content": "创建新 Web 应用",
+      "pos": [
+        13540,
+        13550
+      ]
+    },
+    {
+      "content": "你的 Web 应用将快速创建，并显示在“WEB APPS”列表中。",
+      "pos": [
+        13575,
+        13608
+      ]
+    },
+    {
+      "content": "WAWSDashboardMyTaskListApp",
+      "pos": [
+        13612,
+        13638
+      ]
+    },
+    {
+      "content": "使用 Git 将 ASP.NET 应用程序部署到 Web 应用",
+      "pos": [
+        13695,
+        13726
+      ]
+    },
+    {
+      "content": "在本部分中，你将使用 Git 部署 My Task List 应用程序。",
+      "pos": [
+        13727,
+        13763
+      ]
+    },
+    {
+      "content": "在“WEB APPS”中单击你的 Web 应用名称，然后单击“仪表板”。在右侧的“速览”下，单击“从源代码管理设置部署”。",
+      "pos": [
+        13768,
+        13829
+      ]
+    },
+    {
+      "content": "在“你的源代码位置”页面，选择“本地 Git 存储库”并单击“下一步”箭头。",
+      "pos": [
+        13833,
+        13871
+      ]
+    },
+    {
+      "content": "Git 存储库将快速创建。请注意生成页面上的说明，这些内容将在后面的部分用到。",
+      "pos": [
+        13876,
+        13915
+      ]
+    },
+    {
+      "content": "Git 存储库准备就绪",
+      "pos": [
+        13923,
+        13934
+      ]
+    },
+    {
+      "content": "在“将我的本地文件推送至 Azure”下提供了将代码推送至 Azure 的说明。说明内容类似如下所示：",
+      "pos": [
+        13948,
+        13999
+      ]
+    },
+    {
+      "content": "将本地文件推送到 Azure",
+      "pos": [
+        14007,
+        14021
+      ]
+    },
+    {
+      "content": "如果没有安装 Git，可使用步骤 1 中的“从此处获取”链接进行安装。",
+      "pos": [
+        14040,
+        14075
+      ]
+    },
+    {
+      "content": "按照步骤 2 中的说明提交你的本地文件。",
+      "pos": [
+        14079,
+        14099
+      ]
+    },
+    {
+      "content": "按照步骤 3 中的说明添加远程 Azure 存储库并将你的文件推送至 Azure Web 应用。",
+      "pos": [
+        14105,
+        14153
+      ]
+    },
+    {
+      "content": "部署完成后，你将看到以下确认信息：",
+      "pos": [
+        14157,
+        14174
+      ]
+    },
+    {
+      "content": "部署完成",
+      "pos": [
+        14182,
+        14186
+      ]
+    },
+    {
+      "content": "你的 Azure Web 应用现已可用。查看你的站点的“仪表板”页面，找到“站点 URL”字段以确定站点的 URL。按照本教程的步骤执行，你的站点的 URL 应该是：http://mytasklistapp.chinacloudsites.cn。",
+      "pos": [
+        14201,
+        14324
+      ]
+    },
+    {
+      "content": "摘要",
+      "pos": [
+        14328,
+        14330
+      ]
+    },
+    {
+      "content": "现在，你已将 ASP.NET 应用程序成功部署到 Azure Web Apps。查看 Web 应用：",
+      "pos": [
+        14334,
+        14384
+      ]
+    },
+    {
+      "content": "登录到 Azure 门户。",
+      "pos": [
+        14389,
+        14402
+      ]
+    },
+    {
+      "content": "单击“Web Apps”。",
+      "pos": [
+        14406,
+        14419
+      ]
+    },
+    {
+      "content": "在“Web Apps”列表中选择你的 Web 应用。",
+      "pos": [
+        14424,
+        14450
+      ]
+    },
+    {
+      "pos": [
+        14452,
+        14518
+      ],
+      "content": "有关针对 MongoDB 开发 C# 应用程序的详细信息，请参阅 <bpt id=\"p1\">[</bpt>CSharp 语言中心<ept id=\"p1\">][MongoC#LangCenter]</ept>。"
+    }
+  ],
+  "content": "<properties \n    pageTitle=\"在 Azure 中创建连接到虚拟机上运行的 MongoDB 的 Web 应用\" \n    description=\"本教程介绍如何使用 Git 将 ASP.NET 应用部署到连接至Azure 虚拟机上 MongoDB 的 Azure Web 应用。\"\n    tags=\"azure-portal\" \n    services=\"app-service\\web, virtual-machines\" \n    documentationCenter=\".net\" \n    authors=\"cephalin\" \n    manager=\"wpickett\" \n    editor=\"\"/>\n\n<tags \n    ms.service=\"web-sites\" \n    ms.date=\"12/11/2015\" \n    wacn.date=\"02/17/2016\"/>\n\n\n# 在 Azure 中创建连接到虚拟机上运行的 MongoDB 的 Web 应用\n\n使用 Git，你可以将 ASP.NET 应用程序部署到 Azure Web 应用。在本教程中，你将构建一个简单的前端 ASP.NET MVC 任务列表应用程序，该程序将连接至在 Azure 内的虚拟机中运行的 MongoDB 数据库。[MongoDB][MongoDB] 是一个受欢迎的开源、高性能 NoSQL 数据库。在开发计算机上运行并测试了该 ASP.NET 应用程序后，可使用 Git 将其上载至 Azure Web 应用。\n\n[WACOM.INCLUDE [create-account-and-websites-and-vms-note](../includes/create-account-and-websites-and-vms-note.md)]\n\n##背景知识##\n\n以下知识对于学习本教程有用但非必需：\n\n* MongoDB 的 C# 驱动程序。有关针对 MongoDB 开发 C# 应用程序的更多信息，请参阅 [MongoDB CSharp 语言中心][MongoC#LangCenter]。 \n* ASP .NET Web 应用框架。可通过 [ASP.net Web 应用][ASP.NET]进行全面了解。\n* ASP .NET MVC Web 应用框架。可通过 [ASP.NET MVC Web 应用][MVCWebSite] 进行全面了解。\n* Azure。你可以先阅读 [Azure][WindowsAzure] 上的文章。\n\n## 先决条件 ##\n\n- [Visual Studio Express 2013 for Web][VSEWeb] 或 [Visual Studio 2013][VSUlt]\n- [Azure SDK for .NET](https://www.microsoft.com/web/handlers/webpi.ashx/getinstaller/VWDOrVs2013AzurePack.appids)\n- 有效的 Azure 订阅\n\n[AZURE.INCLUDE [create-account-and-websites-note](../includes/create-account-and-websites-note.md)]\n\n<a id=\"virtualmachine\"></a>\n## 创建虚拟机和安装 MongoDB ##\n\n本教程假定你已在 Azure 中创建了一个虚拟机。创建虚拟机后，你需要在该虚拟机上安装 MongoDB：\n\n* 若要创建 Windows 虚拟机并安装 MongoDB，请参阅 [在 Azure 中，在运行 Windows Server 的虚拟机上安装 MongoDB][InstallMongoOnWindowsVM]。\n* 或者，若要创建 Linux 虚拟机并安装 MongoDB，请参阅 [在 Azure 中，在运行 CentOS 的虚拟机上安装 MongoDB][InstallMongoOnCentOSLinuxVM]。\n\n在 Azure 中创建虚拟机并安装 MongoDB 后，请务必记住该虚拟机的 DNS 名称（例如“testlinuxvm.chinacloudapp.cn”）以及你在终结点中指定的 MongoDB 的外部端口。本教程后面的步骤中将会用到此信息。\n\n<a id=\"createapp\"></a>\n## 创建应用程序 ##\n\n在本部分中，你将使用 Visual Studio 创建一个名为“My Task List”的 ASP.NET 应用程序，并执行到 Azure Web 应用的初始部署。你将在本地运行该应用程序，但其将连接到你在 Azure 上的虚拟机并使用你在此处创建的 MongoDB 实例。\n\n1. 在 Visual Studio 中，单击“新建项目”。\n\n    ![新项目开始页面][StartPageNewProject]\n\n1. 在“新建项目”窗口中的左侧窗格中，选择“Visual C#”，然后选择“Web”。在中间窗格中，选择“ASP.NET Web 应用”。在底部，将项目命名为“MyTaskListApp”，然后单击“确定”。\n\n    ![新建项目对话框][NewProjectMyTaskListApp]\n\n1. 在“新建 ASP.NET 项目”对话框中，选择“MVC”，然后单击“确定”。确保不选中“在云中托管”，点击“OK”。\n\n    项目完成后，将显示由模板创建的默认页。\n\n    ![默认的 ASP.NET MVC 应用程序][VS2013DefaultMVCApplication]\n\n    如果还没新建好 Web 应用，可以到 Azure 管理门户新建一个，并在“仪表板”的“速览”下，下载“发布配置文件”。\n\n1. 右键单击你的解决方案，单击“发布”。\n\n2. 点击“导入”，选择之前下载的“发布配置文件”，然后确认。\n\n    ![](./media/web-sites-dotnet-store-data-mongodb-vm/VSPublishWeb.png)\n\n    将默认的 ASP.NET 应用程序发布到 Azure Web 应用后，将在浏览器中启动该应用程序。\n## 安装 MongoDB C# 驱动程序\n\nMongoDB 通过驱动程序为 C# 应用程序提供客户端支持，你需要在本地开发计算机上安装此驱动程序。C# 驱动程序通过 NuGet 提供。\n\n安装 MongoDB C# 驱动程序的步骤：\n\n1. 在“解决方案资源管理器”中右键单击“MyTaskListApp”项目，然后选择“管理 NuGet 包”。\n\n    ![管理 NuGet 包][VS2013ManageNuGetPackages]\n\n2. 在“管理 NuGet 包”窗口的左侧窗格中，单击“联机”。在右侧的“联机搜索”框中，键入“mongodb.driver”。单击“安装”安装此驱动程序。\n\n    ![搜索 MongoDB C# 驱动程序][SearchforMongoDBCSharpDriver]\n\n3. 单击“我接受”接受 10gen, Inc. 的许可条款。\n\n4. 安装驱动程序后，单击“关闭”。\n    ![已安装 MongoDB C# 驱动程序][MongoDBCsharpDriverInstalled]\n\n\nMongoDB C# 驱动程序现已安装。对 **MongoDB.Bson**、**MongoDB.Driver** 和 **MongoDB.Driver.Core** 库的引用已添加到项目。\n\n![MongoDB C# 驱动程序引用][MongoDBCSharpDriverReferences]\n\n## 添加模型 ##\n在“解决方案资源管理器”中，右键单击“Models”文件夹，选择**添加**一个新**类**，并将其命名为 *TaskModel.cs*。在 *TaskModel.cs* 中，将现有代码替换为以下代码：\n\n    using System;\n    using System.Collections.Generic;\n    using System.Linq;\n    using System.Web;\n    using MongoDB.Bson.Serialization.Attributes;\n    using MongoDB.Bson.Serialization.IdGenerators;\n    using MongoDB.Bson;\n    \n    namespace MyTaskListApp.Models\n    {\n        public class MyTask\n        {\n            [BsonId(IdGenerator = typeof(CombGuidGenerator))]\n            public Guid Id { get; set; }\n    \n            [BsonElement(\"Name\")]\n            public string Name { get; set; }\n    \n            [BsonElement(\"Category\")]\n            public string Category { get; set; }\n    \n            [BsonElement(\"Date\")]\n            public DateTime Date { get; set; }\n    \n            [BsonElement(\"CreatedDate\")]\n            public DateTime CreatedDate { get; set; }\n    \n        }\n    }\n\n## 添加数据访问层 ##\n在“解决方案资源管理器”中，右键单击“MyTaskListApp”项目并选择**添加**一个名为 *DAL* 的**新文件夹**。右键单击“DAL”文件夹并选择**添加**一个新**类**。将该类文件命名为 *Dal.cs*。在 *Dal.cs* 中，将现有代码替换为以下代码：\n\n    using System;\n    using System.Collections.Generic;\n    using System.Linq;\n    using System.Web;\n    using MyTaskListApp.Models;\n    using MongoDB.Driver;\n    using System.Configuration;\n    \n    namespace MyTaskListApp\n    {\n        public class Dal : IDisposable\n        {\n            private MongoServer mongoServer = null;\n            private bool disposed = false;\n    \n            // To do: update the connection string with the DNS name\n            // or IP address of your server. \n            //For example, \"mongodb://testlinux.chinacloudapp.cn\"\n            private string connectionString = \"mongodb://<vm-dns-name>\";\n    \n            // This sample uses a database named \"Tasks\" and a \n            //collection named \"TasksList\".  The database and collection \n            //will be automatically created if they don't already exist.\n            private string dbName = \"Tasks\";\n            private string collectionName = \"TasksList\";\n    \n            // Default constructor.        \n            public Dal()\n            {\n            }        \n    \n            // Gets all Task items from the MongoDB server.        \n            public List<MyTask> GetAllTasks()\n            {\n                try\n                {\n                    MongoCollection<MyTask> collection = GetTasksCollection();\n                    return collection.FindAll().ToList<MyTask>();\n                }\n                catch (MongoConnectionException)\n                {\n                    return new List<MyTask >();\n                }\n            }\n    \n            // Creates a Task and inserts it into the collection in MongoDB.\n            public void CreateTask(MyTask task)\n            {\n                MongoCollection<MyTask> collection = GetTasksCollectionForEdit();\n                try\n                {\n                    collection.Insert(task, SafeMode.True);\n                }\n                catch (MongoCommandException ex)\n                {\n                    string msg = ex.Message;\n                }\n            }\n    \n            private MongoCollection<MyTask> GetTasksCollection()\n            {\n                MongoServer server = MongoServer.Create(connectionString);\n                MongoDatabase database = server[dbName];\n                MongoCollection<MyTask> todoTaskCollection = database.GetCollection<MyTask>(collectionName);\n                return todoTaskCollection;\n            }\n    \n            private MongoCollection<MyTask> GetTasksCollectionForEdit()\n            {\n                MongoServer server = MongoServer.Create(connectionString);\n                MongoDatabase database = server[dbName];\n                MongoCollection<MyTask> todoTaskCollection = database.GetCollection<MyTask>(collectionName);\n                return todoTaskCollection;\n            }\n    \n            # region IDisposable\n    \n            public void Dispose()\n            {\n                this.Dispose(true);\n                GC.SuppressFinalize(this);\n            }\n    \n            protected virtual void Dispose(bool disposing)\n            {\n                if (!this.disposed)\n                {\n                    if (disposing)\n                    {\n                        if (mongoServer != null)\n                        {\n                            this.mongoServer.Disconnect();\n                        }\n                    }\n                }\n    \n                this.disposed = true;\n            }\n    \n            # endregion\n        }\n    }\n\n## 添加控制器 ##\n在“解决方案资源管理器”中打开 *Controllers\\\\HomeController.cs* 文件，将现有代码替换为以下代码：\n\n    using System;\n    using System.Collections.Generic;\n    using System.Linq;\n    using System.Web;\n    using System.Web.Mvc;\n    using MyTaskListApp.Models;\n    using System.Configuration;\n    \n    namespace MyTaskListApp.Controllers\n    {\n        public class HomeController : Controller, IDisposable\n        {\n            private Dal dal = new Dal();\n            private bool disposed = false;\n            //\n            // GET: /MyTask/\n    \n            public ActionResult Index()\n            {\n                return View(dal.GetAllTasks());\n            }\n    \n            //\n            // GET: /MyTask/Create\n    \n            public ActionResult Create()\n            {\n                return View();\n            }\n    \n            //\n            // POST: /MyTask/Create\n    \n            [HttpPost]\n            public ActionResult Create(MyTask task)\n            {\n                try\n                {\n                    dal.CreateTask(task);\n                    return RedirectToAction(\"Index\");\n                }\n                catch\n                {\n                    return View();\n                }\n            }\n    \n            public ActionResult About()\n            {\n                return View();\n            }\n    \n            # region IDisposable\n    \n            new protected void Dispose()\n            {\n                this.Dispose(true);\n                GC.SuppressFinalize(this);\n            }\n    \n            new protected virtual void Dispose(bool disposing)\n            {\n                if (!this.disposed)\n                {\n                    if (disposing)\n                    {\n                        this.dal.Dispose();\n                    }\n                }\n    \n                this.disposed = true;\n            }\n    \n            # endregion\n    \n        }\n    }\n\n## 设置样式 ##\n若要更改页面顶部的标题，请在“解决方案资源管理器”中打开 *Views\\\\Shared\\_Layout.cshtml* 文件，将导航条标头中的“Application name”替换为“My Task List Application”以便其类似如下所示：\n\n    @Html.ActionLink(\"My Task List Application\", \"Index\", \"Home\", null, new { @class = \"navbar-brand\" })\n\n为了设置 Task List 菜单，请打开 *\\\\Views\\\\Home\\\\Index.cshtml* 文件并将现有代码替换为以下代码：\n    \n    @model IEnumerable<MyTaskListApp.Models.MyTask>\n    \n    @{\n        ViewBag.Title = \"My Task List\";\n    }\n    \n    <h2>My Task List</h2>\n    \n    <table border=\"1\">\n        <tr>\n            <th>Task</th>\n            <th>Category</th>\n            <th>Date</th>\n            \n        </tr>\n    \n    @foreach (var item in Model) {\n        <tr>\n            <td>\n                @Html.DisplayFor(modelItem => item.Name)\n            </td>\n            <td>\n                @Html.DisplayFor(modelItem => item.Category)\n            </td>\n            <td>\n                @Html.DisplayFor(modelItem => item.Date)\n            </td>\n            \n        </tr>\n    }\n    \n    </table>\n    <div>  @Html.Partial(\"Create\", new MyTaskListApp.Models.MyTask())</div>\n\n\n若要增加创建新任务的功能，右键单击“Views\\\\Home\\\\”文件夹并选择*添加*一个**视图**。将该视图命名为 *Create*。将此代码替换为以下代码：\n\n    @model MyTaskListApp.Models.MyTask\n    \n    <script src=\"@Url.Content(\"~/Scripts/jquery-1.10.2.min.js\")\" type=\"text/javascript\"></script>\n    <script src=\"@Url.Content(\"~/Scripts/jquery.validate.min.js\")\" type=\"text/javascript\"></script>\n    <script src=\"@Url.Content(\"~/Scripts/jquery.validate.unobtrusive.min.js\")\" type=\"text/javascript\"></script>\n    \n    @using (Html.BeginForm(\"Create\", \"Home\")) {\n        @Html.ValidationSummary(true)\n        <fieldset>\n            <legend>New Task</legend>\n    \n            <div class=\"editor-label\">\n                @Html.LabelFor(model => model.Name)\n            </div>\n            <div class=\"editor-field\">\n                @Html.EditorFor(model => model.Name)\n                @Html.ValidationMessageFor(model => model.Name)\n            </div>\n    \n            <div class=\"editor-label\">\n                @Html.LabelFor(model => model.Category)\n            </div>\n            <div class=\"editor-field\">\n                @Html.EditorFor(model => model.Category)\n                @Html.ValidationMessageFor(model => model.Category)\n            </div>\n    \n            <div class=\"editor-label\">\n                @Html.LabelFor(model => model.Date)\n            </div>\n            <div class=\"editor-field\">\n                @Html.EditorFor(model => model.Date)\n                @Html.ValidationMessageFor(model => model.Date)\n            </div>\n    \n            <p>\n                <input type=\"submit\" value=\"Create\" />\n            </p>\n        </fieldset>\n    }\n\n“解决方案资源管理器”应类似如下所示：\n\n![解决方案资源管理器][SolutionExplorerMyTaskListApp]\n\n## 设置 MongoDB 连接字符串 ##\n在“解决方案资源管理器”中，打开 *DAL/Dal.cs* 文件。找到以下代码行：\n\n    private string connectionString = \"mongodb://<vm-dns-name>\";\n\n将 `<vm-dns-name>` 替换为运行 MongoDB 的虚拟机（在本教程的[创建虚拟机并安装 MongoDB][] 步骤中创建）的 DNS 名。若要查找虚拟机的 DNS 名，请转到 Azure 管理门户，选择“虚拟机”并找到“DNS 名”。\n\n如果虚拟机的 DNS 名是“testlinuxvm.chinacloudapp.cn”而 MongoDB 在默认端口 27017 进行侦听，连接字符串代码行将如下所示：\n\n    private string connectionString = \"mongodb://testlinuxvm.chinacloudapp.cn\";\n\n如果虚拟机终结点为 MongoDB 指定了不同的外部端口，你可在连接字符串中指定端口：\n\n    private string connectionString = \"mongodb://testlinuxvm.chinacloudapp.cn:12345\";\n\n有关 MongoDB 连接字符串的详细信息，请参阅[连接][MongoConnectionStrings]。\n\n## 测试本地部署 ##\n\n若要在开发计算机上运行应用程序，请从“调试”菜单选择“启动调试”或按 **F5**。IIS Express 启动，浏览器打开并显示该引用程序的主页。你可以添加一个新任务，而后将其添加到在 Azure 中的虚拟机上运行的 MongoDB 数据库。\n\n![My Task List 应用程序][TaskListAppBlank]\n\n<h2>将 ASP.NET 应用程序部署到 Azure Web 应用</h2>\n\n在本部分中，你将创建一个 Web 应用并使用 Git 部署 My Task List ASP.NET 应用程序。\n\n<a id=\"createwebsite\"></a>\n###创建 Azure Web 应用###\n本部分中，你将创建一个 Azure Web 应用。\n\n1. 打开 Web 浏览器并浏览至 [Azure 管理门户][AzurePortal]。使用您的 Azure 帐户进行登录。 \n2. 在页面底部，依次单击“+新建”、“WEB APPS”和“速览”。\n3. 为应用程序的 URL 输入唯一的前缀。\n4. 选择区域。\n5. 单击“创建 Web 应用”。\n\n![创建新 Web 应用][WAWSCreateWebSite]\n\n6. 你的 Web 应用将快速创建，并显示在“WEB APPS”列表中。\n\n![WAWSDashboardMyTaskListApp][WAWSDashboardMyTaskListApp]\n\n<a id=\"deployapp\"></a>\n###使用 Git 将 ASP.NET 应用程序部署到 Web 应用\n在本部分中，你将使用 Git 部署 My Task List 应用程序。\n\n1. 在“WEB APPS”中单击你的 Web 应用名称，然后单击“仪表板”。在右侧的“速览”下，单击“从源代码管理设置部署”。\n2. 在“你的源代码位置”页面，选择“本地 Git 存储库”并单击“下一步”箭头。 \n3. Git 存储库将快速创建。请注意生成页面上的说明，这些内容将在后面的部分用到。\n\n    ![Git 存储库准备就绪][Image9]\n\n4. 在“将我的本地文件推送至 Azure”下提供了将代码推送至 Azure 的说明。说明内容类似如下所示：\n\n    ![将本地文件推送到 Azure][Image10]\n    \n5. 如果没有安装 Git，可使用步骤 1 中的“从此处获取”链接进行安装。\n6. 按照步骤 2 中的说明提交你的本地文件。  \n7. 按照步骤 3 中的说明添加远程 Azure 存储库并将你的文件推送至 Azure Web 应用。\n8. 部署完成后，你将看到以下确认信息：\n\n    ![部署完成][Image11]\n\n9. 你的 Azure Web 应用现已可用。查看你的站点的“仪表板”页面，找到“站点 URL”字段以确定站点的 URL。按照本教程的步骤执行，你的站点的 URL 应该是：http://mytasklistapp.chinacloudsites.cn。\n\n##摘要##\n\n现在，你已将 ASP.NET 应用程序成功部署到 Azure Web Apps。查看 Web 应用：\n\n1. 登录到 Azure 门户。\n2. 单击“Web Apps”。 \n3. 在“Web Apps”列表中选择你的 Web 应用。\n\n有关针对 MongoDB 开发 C# 应用程序的详细信息，请参阅 [CSharp 语言中心][MongoC#LangCenter]。\n\n<!-- HYPERLINKS -->\n\n[AzurePortal]: http://manage.windowsazure.cn\n[WindowsAzure]: http://www.windowsazure.cn\n[MongoC#LangCenter]: http://docs.mongodb.org/ecosystem/drivers/csharp/\n[MVC Website]: http://www.asp.net/mvc\n[ASP.NET]: http://www.asp.net/\n[MongoConnectionStrings]: http://www.mongodb.org/display/DOCS/Connections\n[MongoDB]: http://www.mongodb.org\n\n[VSEWeb]: http://www.visualstudio.com/zh-cn/downloads/download-visual-studio-vs\n[VSUlt]: http://www.visualstudio.com/zh-cn/downloads/download-visual-studio-vs\n\n<!-- IMAGES -->\n\n\n[StartPageNewProject]: ./media/web-sites-dotnet-store-data-mongodb-vm/NewProject.png\n[NewProjectMyTaskListApp]: ./media/web-sites-dotnet-store-data-mongodb-vm/NewProjectMyTaskListApp.png\n[VS2013SelectMVCTemplate]: ./media/web-sites-dotnet-store-data-mongodb-vm/VS2013SelectMVCTemplate.png\n[VS2013DefaultMVCApplication]: ./media/web-sites-dotnet-store-data-mongodb-vm/VS2013DefaultMVCApplication.png\n[VS2013ManageNuGetPackages]: ./media/web-sites-dotnet-store-data-mongodb-vm/VS2013ManageNuGetPackages.png\n[SearchforMongoDBCSharpDriver]: ./media/web-sites-dotnet-store-data-mongodb-vm/SearchforMongoDBCSharpDriver.png\n[MongoDBCsharpDriverInstalled]: ./media/web-sites-dotnet-store-data-mongodb-vm/MongoDBCsharpDriverInstalled.png\n[MongoDBCSharpDriverReferences]: ./media/web-sites-dotnet-store-data-mongodb-vm/MongoDBCSharpDriverReferences.png\n[SolutionExplorerMyTaskListApp]: ./media/web-sites-dotnet-store-data-mongodb-vm/SolutionExplorerMyTaskListApp.png\n[TaskListAppBlank]: ./media/web-sites-dotnet-store-data-mongodb-vm/TaskListAppBlank.png\n[WAWSCreateWebSite]: ./media/web-sites-dotnet-store-data-mongodb-vm/WAWSCreateWebSite.png\n[WAWSDashboardMyTaskListApp]: ./media/web-sites-dotnet-store-data-mongodb-vm/WAWSDashboardMyTaskListApp.png\n[Image9]: ./media/web-sites-dotnet-store-data-mongodb-vm/RepoReady.png\n[Image10]: ./media/web-sites-dotnet-store-data-mongodb-vm/GitInstructions.png\n[Image11]: ./media/web-sites-dotnet-store-data-mongodb-vm/GitDeploymentComplete.png\n\n<!-- TOC BOOKMARKS -->\n[创建虚拟机并安装 MongoDB]: #virtualmachine\n[Create and run the My Task List ASP.NET application on your development computer]: #createapp\n[Create an Azure web site]: #createwebsite\n[Deploy the ASP.NET application to the web site using Git]: #deployapp\n\n<!---HONumber=71-->"
+}

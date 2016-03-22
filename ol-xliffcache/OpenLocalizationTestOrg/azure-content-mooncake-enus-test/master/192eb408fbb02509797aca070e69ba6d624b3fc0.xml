@@ -1,0 +1,362 @@
+{
+  "nodes": [
+    {
+      "content": "在 Windows 上配合使用 Java 和 JDBC 连接到 SQL 数据库",
+      "pos": [
+        27,
+        66
+      ]
+    },
+    {
+      "content": "演示了一个可以用来连接到 Azure SQL 数据库的 Java 代码示例。该示例使用 JDBC，并在 Windows 客户端计算机上运行。",
+      "pos": [
+        85,
+        155
+      ]
+    },
+    {
+      "content": "在 Windows 上配合使用 Java 和 JDBC 连接到 SQL 数据库",
+      "pos": [
+        379,
+        418
+      ]
+    },
+    {
+      "content": "[AZURE.SELECTOR]",
+      "pos": [
+        423,
+        439
+      ]
+    },
+    {
+      "content": "C",
+      "pos": [
+        443,
+        444
+      ]
+    },
+    {
+      "content": "PHP",
+      "pos": [
+        510,
+        513
+      ]
+    },
+    {
+      "content": "Python",
+      "pos": [
+        583,
+        589
+      ]
+    },
+    {
+      "content": "Ruby",
+      "pos": [
+        662,
+        666
+      ]
+    },
+    {
+      "content": "Java",
+      "pos": [
+        737,
+        741
+      ]
+    },
+    {
+      "content": "Node.js",
+      "pos": [
+        812,
+        819
+      ]
+    },
+    {
+      "content": "本主题演示了一个可以用来连接到 Azure SQL 数据库的 Java 代码示例。该 Java 示例依赖于 Java 开发工具包 (JDK) 版本 1.8。该示例将使用 JDBC 驱动程序连接到 Azure SQL 数据库。",
+      "pos": [
+        891,
+        1003
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        1009,
+        1013
+      ]
+    },
+    {
+      "content": "驱动程序和库",
+      "pos": [
+        1019,
+        1025
+      ]
+    },
+    {
+      "pos": [
+        1029,
+        1159
+      ],
+      "content": "<bpt id=\"p1\">[</bpt>Microsoft JDBC Driver for SQL Server - SQL JDBC 4<ept id=\"p1\">](http://www.microsoft.com/zh-cn/download/details.aspx?displaylang=en&amp;id=11774)</ept>。"
+    },
+    {
+      "pos": [
+        1162,
+        1277
+      ],
+      "content": "运行 <bpt id=\"p1\">[</bpt>Java 开发工具包 1.8<ept id=\"p1\">](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)</ept> 的任何操作系统平台。"
+    },
+    {
+      "content": "SQL 数据库",
+      "pos": [
+        1283,
+        1290
+      ]
+    },
+    {
+      "pos": [
+        1292,
+        1362
+      ],
+      "content": "请参阅<bpt id=\"p1\">[</bpt>入门页<ept id=\"p1\">](/documentation/articles/sql-database-get-started)</ept>，以了解如何创建数据库。"
+    },
+    {
+      "content": "SQL 表",
+      "pos": [
+        1368,
+        1373
+      ]
+    },
+    {
+      "content": "本主题中的 Java 代码示例假设 Azure SQL 数据库数据库中已存在以下测试表。",
+      "pos": [
+        1375,
+        1419
+      ]
+    },
+    {
+      "content": "步骤 1：获取连接字符串",
+      "pos": [
+        1762,
+        1774
+      ]
+    },
+    {
+      "pos": [
+        1931,
+        2096
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>如果你使用的是 JTDS JDBC 驱动程序，则需要将“ssl=require”添加到连接字符串的 URL，并需要设置以下 JVM 选项：“-Djsse.enableCBCProtection=false”。此 JVM 选项会禁用针对某个安全漏洞的修复程序，因此在设置此选项之前，请确保你了解涉及哪些风险。"
+    },
+    {
+      "content": "步骤 2：编译 Java 代码示例",
+      "pos": [
+        2102,
+        2119
+      ]
+    },
+    {
+      "content": "本部分包含 Java 代码示例的主干。代码中包含注释，指出你可以在何处复制并粘贴后续部分中提供的较小 Java 段。即使不在注释附近复制并粘贴代码段，本部分中的示例也可以编译和运行，不过，它只会连接，然后结束。你会看到的注释如下：",
+      "pos": [
+        2122,
+        2237
+      ]
+    },
+    {
+      "pos": [
+        2364,
+        2418
+      ],
+      "content": "下面是 Java 代码示例的主干。该示例包含 <ph id=\"ph1\">`SQLDatabaseTest`</ph> 类的 <ph id=\"ph2\">`main`</ph> 函数。"
+    },
+    {
+      "content": "当然，若要实际运行上面的 Java 代码示例，你必须将实际值填入连接字符串以替换占位符：",
+      "pos": [
+        4309,
+        4353
+      ]
+    },
+    {
+      "content": "你的服务器",
+      "pos": [
+        4358,
+        4363
+      ]
+    },
+    {
+      "content": "你的数据库",
+      "pos": [
+        4366,
+        4371
+      ]
+    },
+    {
+      "content": "你的用户",
+      "pos": [
+        4374,
+        4378
+      ]
+    },
+    {
+      "content": "你的密码",
+      "pos": [
+        4381,
+        4385
+      ]
+    },
+    {
+      "content": "步骤 3：插入行",
+      "pos": [
+        4391,
+        4399
+      ]
+    },
+    {
+      "content": "此 Java 段将发出 Transact-SQL INSERT 语句，以在 Person 表中插入两行。一般顺序如下：",
+      "pos": [
+        4402,
+        4461
+      ]
+    },
+    {
+      "pos": [
+        4467,
+        4511
+      ],
+      "content": "使用 <ph id=\"ph1\">`Connection`</ph> 对象生成 <ph id=\"ph2\">`PreparedStatement`</ph> 对象。"
+    },
+    {
+      "pos": [
+        4515,
+        4583
+      ],
+      "content": "我们包含了参数 <ph id=\"ph1\">`Statement.RETURN_GENERATED_KEYS`</ph>，以便稍后可以获取自动为 <bpt id=\"p1\">**</bpt>id<ept id=\"p1\">**</ept> 键值生成的值。"
+    },
+    {
+      "pos": [
+        4587,
+        4627
+      ],
+      "content": "对 <ph id=\"ph1\">`PreparedStatement`</ph> 对象调用 <ph id=\"ph2\">`execute`</ph> 方法。"
+    },
+    {
+      "pos": [
+        4631,
+        4670
+      ],
+      "content": "使用 <ph id=\"ph1\">`PreparedStatement`</ph> 对象获取自动为主键生成的数字值。"
+    },
+    {
+      "pos": [
+        4674,
+        4719
+      ],
+      "content": "此值与 Person 表中 <bpt id=\"p1\">**</bpt>id<ept id=\"p1\">**</ept> 列上的 AUTO\\_INCREMENT 规范相关"
+    },
+    {
+      "pos": [
+        4722,
+        4791
+      ],
+      "content": "将此简短 Java 段复制并粘贴到主代码示例中注释 <ph id=\"ph1\">`// INSERT two rows into the table.`</ph> 所在的位置。"
+    },
+    {
+      "content": "步骤 4：提交事务",
+      "pos": [
+        5421,
+        5430
+      ]
+    },
+    {
+      "pos": [
+        5432,
+        5502
+      ],
+      "content": "以下 Java 代码段将发出 Transact-SQL UPDATE 语句，以增大 Person 表中每行的 <ph id=\"ph1\">`age`</ph> 值。一般顺序如下："
+    },
+    {
+      "pos": [
+        5508,
+        5545
+      ],
+      "content": "调用 <ph id=\"ph1\">`setAutoCommit`</ph> 方法，以防止在数据库中自动提交更新。"
+    },
+    {
+      "pos": [
+        5549,
+        5588
+      ],
+      "content": "调用 <ph id=\"ph1\">`executeUpdate`</ph> 方法以在事务上下文中执行 UPDATE。"
+    },
+    {
+      "pos": [
+        5592,
+        5614
+      ],
+      "content": "调用 <ph id=\"ph1\">`commit`</ph> 方法以显式提交事务。"
+    },
+    {
+      "pos": [
+        5617,
+        5692
+      ],
+      "content": "将此简短 Java 段复制并粘贴到主代码示例中注释 <ph id=\"ph1\">`// TRANSACTION and commit for an UPDATE.`</ph> 所在的位置。"
+    },
+    {
+      "content": "步骤 4：执行查询",
+      "pos": [
+        6244,
+        6253
+      ]
+    },
+    {
+      "content": "此 Java 段执行 Transact-SQL SELECT 语句，以查看 Person 表中所有已更新的行。一般顺序如下：",
+      "pos": [
+        6256,
+        6318
+      ]
+    },
+    {
+      "pos": [
+        6324,
+        6360
+      ],
+      "content": "使用 <ph id=\"ph1\">`Connection`</ph> 对象生成 <ph id=\"ph2\">`Statement`</ph> 对象。"
+    },
+    {
+      "pos": [
+        6364,
+        6399
+      ],
+      "content": "使用 <ph id=\"ph1\">`Statement`</ph> 对象生成 <ph id=\"ph2\">`ResultSet`</ph> 对象。"
+    },
+    {
+      "pos": [
+        6403,
+        6437
+      ],
+      "content": "循环调用 <ph id=\"ph1\">`resultSet.next`</ph> 以循环访问所有返回的行。"
+    },
+    {
+      "pos": [
+        6440,
+        6503
+      ],
+      "content": "将此简短 Java 段复制并粘贴到主代码示例中注释 <ph id=\"ph1\">`// SELECT rows from a table.`</ph> 所在的位置。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        6928,
+        6932
+      ]
+    },
+    {
+      "pos": [
+        6934,
+        6974
+      ],
+      "content": "有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Java 开发人员中心<ept id=\"p1\">](/develop/java)</ept>。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"在 Windows 上配合使用 Java 和 JDBC 连接到 SQL 数据库\"\n    description=\"演示了一个可以用来连接到 Azure SQL 数据库的 Java 代码示例。该示例使用 JDBC，并在 Windows 客户端计算机上运行。\"\n    services=\"sql-database\"\n    documentationCenter=\"\"\n    authors=\"LuisBosquez\"\n    manager=\"jeffreyg\"\n    editor=\"genemi\"/>\n\n\n<tags\n    ms.service=\"sql-database\"\n    ms.date=\"12/17/2015\"\n    wacn.date=\"01/15/2016\"/>\n\n\n# 在 Windows 上配合使用 Java 和 JDBC 连接到 SQL 数据库\n\n\n> [AZURE.SELECTOR]\n- [C#](/documentation/articles/sql-database-develop-dotnet-simple)\n- [PHP](/documentation/articles/sql-database-develop-php-simple-windows)\n- [Python](/documentation/articles/sql-database-develop-python-simple-windows)\n- [Ruby](/documentation/articles/sql-database-develop-ruby-simple-windows)\n- [Java](/documentation/articles/sql-database-develop-java-simple-windows)\n- [Node.js](/documentation/articles/sql-database-develop-nodejs-simple-windows)\n\n\n本主题演示了一个可以用来连接到 Azure SQL 数据库的 Java 代码示例。该 Java 示例依赖于 Java 开发工具包 (JDK) 版本 1.8。该示例将使用 JDBC 驱动程序连接到 Azure SQL 数据库。\n\n\n## 先决条件\n\n### 驱动程序和库\n\n- [Microsoft JDBC Driver for SQL Server - SQL JDBC 4](http://www.microsoft.com/zh-cn/download/details.aspx?displaylang=en&id=11774)。\n- 运行 [Java 开发工具包 1.8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) 的任何操作系统平台。\n\n### SQL 数据库\n\n请参阅[入门页](/documentation/articles/sql-database-get-started)，以了解如何创建数据库。\n\n### SQL 表\n\n本主题中的 Java 代码示例假设 Azure SQL 数据库数据库中已存在以下测试表。\n\n<!--\nCould this instead be a #tempPerson table, so that the Java code sample could be fully self-sufficient and be runnable (with automatic cleanup)?\n-->\n\n\n    CREATE TABLE Person\n    (\n        id         INT    PRIMARY KEY    IDENTITY(1,1),\n        firstName  VARCHAR(32),\n        lastName   VARCHAR(32),\n        age        INT\n    );\n\n\n## 步骤 1：获取连接字符串\n\n[AZURE.INCLUDE [sql-database-include-connection-string-jdbc-20-portalshots](../includes/sql-database-include-connection-string-jdbc-20-portalshots.md)]\n\n> [AZURE.NOTE]如果你使用的是 JTDS JDBC 驱动程序，则需要将“ssl=require”添加到连接字符串的 URL，并需要设置以下 JVM 选项：“-Djsse.enableCBCProtection=false”。此 JVM 选项会禁用针对某个安全漏洞的修复程序，因此在设置此选项之前，请确保你了解涉及哪些风险。\n\n\n## 步骤 2：编译 Java 代码示例\n\n\n本部分包含 Java 代码示例的主干。代码中包含注释，指出你可以在何处复制并粘贴后续部分中提供的较小 Java 段。即使不在注释附近复制并粘贴代码段，本部分中的示例也可以编译和运行，不过，它只会连接，然后结束。你会看到的注释如下：\n\n\n1. `// INSERT two rows into the table.`\n2. `// TRANSACTION and commit for an UPDATE.`\n3. `// SELECT rows from the table.`\n\n\n下面是 Java 代码示例的主干。该示例包含 `SQLDatabaseTest` 类的 `main` 函数。\n\n\n    import java.sql.*;\n    import com.microsoft.sqlserver.jdbc.*;\n\n    public class SQLDatabaseTest {\n\n        public static void main(String[] args) {\n            String connectionString =\n                \"jdbc:sqlserver://your_server.database.chinacloudapi.cn:1433;\"\n                + \"database=your_database;\"\n                + \"user=your_user@your_server;\"\n                + \"password=your_password;\"\n                + \"encrypt=true;\"\n                + \"trustServerCertificate=false;\"\n                + \"hostNameInCertificate=*.database.chinacloudapi.cn;\"\n                + \"loginTimeout=30;\";\n\n            // Declare the JDBC objects.\n            Connection connection = null;\n            Statement statement = null;\n            ResultSet resultSet = null;\n            PreparedStatement prepsInsertPerson = null;\n            PreparedStatement prepsUpdateAge = null;\n\n            try {\n                connection = DriverManager.getConnection(connectionString);\n\n                // INSERT two rows into the table.\n                // ...\n\n                // TRANSACTION and commit for an UPDATE.\n                // ...\n\n                // SELECT rows from the table.\n                // ...\n            }\n            catch (Exception e) {\n                e.printStackTrace();\n            }\n            finally {\n                // Close the connections after the data has been handled.\n                if (prepsInsertPerson != null) try { prepsInsertPerson.close(); } catch(Exception e) {}\n                if (prepsUpdateAge != null) try { prepsUpdateAge.close(); } catch(Exception e) {}\n                if (resultSet != null) try { resultSet.close(); } catch(Exception e) {}\n                if (statement != null) try { statement.close(); } catch(Exception e) {}\n                if (connection != null) try { connection.close(); } catch(Exception e) {}\n            }\n        }\n    }\n\n\n当然，若要实际运行上面的 Java 代码示例，你必须将实际值填入连接字符串以替换占位符：\n\n\n- 你的服务器\n- 你的数据库\n- 你的用户\n- 你的密码\n\n\n## 步骤 3：插入行\n\n\n此 Java 段将发出 Transact-SQL INSERT 语句，以在 Person 表中插入两行。一般顺序如下：\n\n\n1. 使用 `Connection` 对象生成 `PreparedStatement` 对象。\n - 我们包含了参数 `Statement.RETURN_GENERATED_KEYS`，以便稍后可以获取自动为 **id** 键值生成的值。\n2. 对 `PreparedStatement` 对象调用 `execute` 方法。\n3. 使用 `PreparedStatement` 对象获取自动为主键生成的数字值。\n - 此值与 Person 表中 **id** 列上的 AUTO\\_INCREMENT 规范相关\n\n\n将此简短 Java 段复制并粘贴到主代码示例中注释 `// INSERT two rows into the table.` 所在的位置。\n\n\n    // Create and execute an INSERT SQL prepared statement.\n    String insertSql = \"INSERT INTO Person (firstName, lastName, age) VALUES \"\n        + \"('Bill', 'Gates', 59), \"\n        + \"('Steve', 'Ballmer', 59);\";\n\n    prepsInsertPerson = connection.prepareStatement(\n        insertSql,\n        Statement.RETURN_GENERATED_KEYS);\n    prepsInsertPerson.execute();\n    // Retrieve the generated key from the insert.\n    resultSet = prepsInsertPerson.getGeneratedKeys();\n    // Iterate through the set of generated keys.\n    while (resultSet.next()) {\n        System.out.println(\"Generated: \" + resultSet.getString(1));\n    }\n\n\n## 步骤 4：提交事务\n\n以下 Java 代码段将发出 Transact-SQL UPDATE 语句，以增大 Person 表中每行的 `age` 值。一般顺序如下：\n\n\n1. 调用 `setAutoCommit` 方法，以防止在数据库中自动提交更新。\n2. 调用 `executeUpdate` 方法以在事务上下文中执行 UPDATE。\n3. 调用 `commit` 方法以显式提交事务。\n\n\n将此简短 Java 段复制并粘贴到主代码示例中注释 `// TRANSACTION and commit for an UPDATE.` 所在的位置。\n\n\n    // Set AutoCommit value to false to execute a single transaction at a time.\n    connection.setAutoCommit(false);\n\n    // Write the SQL Update instruction and get the PreparedStatement object.\n    String transactionSql = \"UPDATE Person SET Person.age = Person.age + 1;\";\n    prepsUpdateAge = connection.prepareStatement(transactionSql);\n\n    // Execute the statement.\n    prepsUpdateAge.executeUpdate();\n\n    //Commit the transaction.\n    connection.commit();\n\n    // Return the AutoCommit value to true.\n    connection.setAutoCommit(true);\n\n\n## 步骤 4：执行查询\n\n\n此 Java 段执行 Transact-SQL SELECT 语句，以查看 Person 表中所有已更新的行。一般顺序如下：\n\n\n1. 使用 `Connection` 对象生成 `Statement` 对象。\n2. 使用 `Statement` 对象生成 `ResultSet` 对象。\n3. 循环调用 `resultSet.next` 以循环访问所有返回的行。\n\n\n将此简短 Java 段复制并粘贴到主代码示例中注释 `// SELECT rows from a table.` 所在的位置。\n\n\n    // Create and execute a SELECT SQL statement.\n    String selectSql = \"SELECT firstName, lastName, age FROM dbo.Person\";\n    statement = connection.createStatement();\n    resultSet = statement.executeQuery(selectSql);\n\n    // Iterate through the result set and print the attributes.\n    while (resultSet.next()) {\n        System.out.println(resultSet.getString(2) + \" \"\n            + resultSet.getString(3));\n    }\n\n## 后续步骤\n\n有关详细信息，请参阅 [Java 开发人员中心](/develop/java)。\n\n<!---HONumber=Mooncake_0104_2016-->\n"
+}

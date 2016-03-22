@@ -1,0 +1,110 @@
+{
+  "nodes": [
+    {
+      "content": "接下来，需要更改注册推送通知的方式，以确保在尝试注册之前对用户进行身份验证。客户端应用更新取决于实现推送通知的方式。",
+      "pos": [
+        1,
+        59
+      ]
+    },
+    {
+      "content": "使用 Visual Studio 2013 Update 2 或更高版本中的添加推送通知向导",
+      "pos": [
+        65,
+        111
+      ]
+    },
+    {
+      "content": "使用这种方法时，向导会在你的项目中生成新的 push.register.cs 文件。",
+      "pos": [
+        113,
+        155
+      ]
+    },
+    {
+      "pos": [
+        160,
+        266
+      ],
+      "content": "在 Visual Studio 的解决方案资源管理器中，打开 app.xaml.cs 项目文件，然后在 <bpt id=\"p1\">**</bpt>OnLaunched<ept id=\"p1\">**</ept> 事件处理程序中注释掉或删除对 <bpt id=\"p2\">**</bpt>UploadChannel<ept id=\"p2\">**</ept> 方法的调用。"
+    },
+    {
+      "pos": [
+        272,
+        328
+      ],
+      "content": "打开 push.register.cs 项目文件，并将 <bpt id=\"p1\">**</bpt>UploadChannel<ept id=\"p1\">**</ept> 方法替换为以下代码："
+    },
+    {
+      "content": "这可以确保使用包含已验证用户凭据的同一客户端实例完成注册。否则，注册将会失败并返回“未授权(401)”错误。",
+      "pos": [
+        936,
+        990
+      ]
+    },
+    {
+      "pos": [
+        995,
+        1057
+      ],
+      "content": "打开共享的 MainPage.cs 项目文件中，并将 <bpt id=\"p1\">**</bpt>ButtonLogin\\_Click<ept id=\"p1\">**</ept> 处理程序替换为以下内容："
+    },
+    {
+      "content": "这将确保在尝试注册推送之前进行身份验证。",
+      "pos": [
+        1514,
+        1534
+      ]
+    },
+    {
+      "pos": [
+        1540,
+        1636
+      ],
+      "content": "在前面的代码中，将生成的推送类名称 (<ph id=\"ph1\">`todolistPush`</ph>) 替换为向导生成的类名称，其格式通常为 <ph id=\"ph2\">&lt;code&gt;</ph><ph id=\"ph3\">&lt;em&gt;</ph><ph id=\"ph4\">mobile\\_service</ph><ph id=\"ph5\">&lt;/em&gt;</ph><ph id=\"ph6\">Push</ph><ph id=\"ph7\">&lt;/code&gt;</ph>。"
+    },
+    {
+      "content": "手动启用推送通知",
+      "pos": [
+        1642,
+        1650
+      ]
+    },
+    {
+      "content": "使用此方法时，需要将本教程中的注册代码直接添加到 app.xaml.cs 项目文件。",
+      "pos": [
+        1660,
+        1702
+      ]
+    },
+    {
+      "pos": [
+        1707,
+        1830
+      ],
+      "content": "在 Visual Studio 的 Solution Explorer 中，打开 app.xaml.cs 项目文件，然后在 <bpt id=\"p1\">**</bpt>OnLaunched<ept id=\"p1\">**</ept> 事件处理程序中注释掉或删除对 <bpt id=\"p2\">**</bpt>InitNotificationsAsync<ept id=\"p2\">**</ept> 的调用。"
+    },
+    {
+      "pos": [
+        1837,
+        1915
+      ],
+      "content": "将 <bpt id=\"p1\">**</bpt>InitNotificationsAsync<ept id=\"p1\">**</ept> 方法的可访问性从 <ph id=\"ph1\">`private`</ph> 更改为 <ph id=\"ph2\">`public`</ph>，并添加 <ph id=\"ph3\">`static`</ph> 修饰符。"
+    },
+    {
+      "pos": [
+        1920,
+        1982
+      ],
+      "content": "打开共享的 MainPage.cs 项目文件中，并将 <bpt id=\"p1\">**</bpt>ButtonLogin\\_Click<ept id=\"p1\">**</ept> 处理程序替换为以下内容："
+    },
+    {
+      "content": "这将确保在尝试注册推送之前进行身份验证。",
+      "pos": [
+        2443,
+        2463
+      ]
+    }
+  ],
+  "content": "\n接下来，需要更改注册推送通知的方式，以确保在尝试注册之前对用户进行身份验证。客户端应用更新取决于实现推送通知的方式。\n\n### 使用 Visual Studio 2013 Update 2 或更高版本中的添加推送通知向导\n\n使用这种方法时，向导会在你的项目中生成新的 push.register.cs 文件。\n\n1. 在 Visual Studio 的解决方案资源管理器中，打开 app.xaml.cs 项目文件，然后在 **OnLaunched** 事件处理程序中注释掉或删除对 **UploadChannel** 方法的调用。 \n\n2. 打开 push.register.cs 项目文件，并将 **UploadChannel** 方法替换为以下代码：\n\n        public async static void UploadChannel()\n        {\n            var channel = \n                await Windows.Networking.PushNotifications.PushNotificationChannelManager\n                .CreatePushNotificationChannelForApplicationAsync();\n        \n            try\n            {\n                // Create a native push notification registration.\n                await App.MobileService.GetPush().RegisterNativeAsync(channel.Uri);             \n        \n            }\n            catch (Exception exception)\n            {\n                HandleRegisterException(exception);\n            }\n        }\n\n    这可以确保使用包含已验证用户凭据的同一客户端实例完成注册。否则，注册将会失败并返回“未授权(401)”错误。\n\n3. 打开共享的 MainPage.cs 项目文件中，并将 **ButtonLogin\\_Click** 处理程序替换为以下内容：\n\n        private async void ButtonLogin_Click(object sender, RoutedEventArgs e)\n        {\n            // Login the user and then load data from the mobile service.\n            await AuthenticateAsync();\n            todolistPush.UploadChannel();\n\n            // Hide the login button and load items from the mobile service.\n            this.ButtonLogin.Visibility = Windows.UI.Xaml.Visibility.Collapsed;\n            await RefreshTodoItems();\n        }\n\n    这将确保在尝试注册推送之前进行身份验证。\n\n4.  在前面的代码中，将生成的推送类名称 (`todolistPush`) 替换为向导生成的类名称，其格式通常为 <code><em>mobile\\_service</em>Push</code>。\n\n### 手动启用推送通知        \n\n使用此方法时，需要将本教程中的注册代码直接添加到 app.xaml.cs 项目文件。\n\n1. 在 Visual Studio 的 Solution Explorer 中，打开 app.xaml.cs 项目文件，然后在 **OnLaunched** 事件处理程序中注释掉或删除对 **InitNotificationsAsync** 的调用。 \n \n2. 将 **InitNotificationsAsync** 方法的可访问性从 `private` 更改为 `public`，并添加 `static` 修饰符。\n\n3. 打开共享的 MainPage.cs 项目文件中，并将 **ButtonLogin\\_Click** 处理程序替换为以下内容：\n\n        private async void ButtonLogin_Click(object sender, RoutedEventArgs e)\n        {\n            // Login the user and then load data from the mobile service.\n            await AuthenticateAsync();\n            App.InitNotificationsAsync();\n\n            // Hide the login button and load items from the mobile service.\n            this.ButtonLogin.Visibility = Windows.UI.Xaml.Visibility.Collapsed;\n            await RefreshTodoItems();\n        }\n    \n    这将确保在尝试注册推送之前进行身份验证。\n\n<!---HONumber=74-->"
+}

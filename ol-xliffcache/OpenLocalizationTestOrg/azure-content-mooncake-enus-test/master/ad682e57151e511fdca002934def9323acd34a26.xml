@@ -1,0 +1,40 @@
+{
+  "nodes": [
+    {
+      "content": "以下说明适用于更新 Windows 应用商店客户端应用，不过，你可以 Azure 移动服务支持的任何其他平台上测试此应用。",
+      "pos": [
+        2,
+        63
+      ]
+    },
+    {
+      "pos": [
+        69,
+        130
+      ],
+      "content": "在 Visual Studio 中，打开 MainPage.xaml.cs 并将以下 <ph id=\"ph1\">`using`</ph> 语句添加到文件顶部。"
+    },
+    {
+      "content": "在 MainPage.xaml.cs 中，将以下类定义添加到名称空间以帮助序列化用户信息。",
+      "pos": [
+        168,
+        213
+      ]
+    },
+    {
+      "pos": [
+        1115,
+        1191
+      ],
+      "content": "在 MainPage.xaml.cs 中，更新  <ph id=\"ph1\">`AuthenticateAsync`</ph> 方法来调用自定义 API，从 AAD 返回有关用户的其他信息。"
+    },
+    {
+      "content": "保存更改并生成服务，以验证是否没有语法错误。",
+      "pos": [
+        2339,
+        2361
+      ]
+    }
+  ],
+  "content": "\n\n以下说明适用于更新 Windows 应用商店客户端应用，不过，你可以 Azure 移动服务支持的任何其他平台上测试此应用。\n\n\n1. 在 Visual Studio 中，打开 MainPage.xaml.cs 并将以下 `using` 语句添加到文件顶部。\n \n        using System.Net.Http;\n\n2. 在 MainPage.xaml.cs 中，将以下类定义添加到名称空间以帮助序列化用户信息。\n\n        public class UserInfo\n        {\n            public String displayName { get; set; }\n            public String streetAddress { get; set; }\n            public String city { get; set; }\n            public String state { get; set; }\n            public String postalCode { get; set; }\n            public String mail { get; set; }\n            public String[] otherMails { get; set; }\n            \n            public override string ToString()\n            {\n                return \"displayName : \" + displayName + \"\\n\" +\n                       \"streetAddress : \" + streetAddress + \"\\n\" +\n                       \"city : \" + city + \"\\n\" +\n                       \"state : \" + state + \"\\n\" +\n                       \"postalCode : \" + postalCode + \"\\n\" +\n                       \"mail : \" + mail + \"\\n\" +\n                       \"otherMails : \" + string.Join(\", \", otherMails);\n            }\n        }\n\n\n3. 在 MainPage.xaml.cs 中，更新  `AuthenticateAsync` 方法来调用自定义 API，从 AAD 返回有关用户的其他信息。 \n\n        private async System.Threading.Tasks.Task AuthenticateAsync()\n        {\n            while (user == null)\n            {\n                string message;\n                try\n                {\n                    // Change 'MobileService' to the name of your MobileServiceClient instance.\n                    // Sign-in using Facebook authentication.\n                    user = await App.MobileService\n                        .LoginAsync(MobileServiceAuthenticationProvider.WindowsAzureActiveDirectory);\n\n                    UserInfo userInfo = await App.MobileService\n                        .InvokeApiAsync<UserInfo>(\"getuserinfo\", HttpMethod.Get, null);\n\n                    message = string.Format(\"User info for the logged in user...\\n\\n{0}\",userInfo.ToString());\n                }\n                catch (InvalidOperationException)\n                {\n                    message = \"You must log in. Login Required\";\n                }\n                \n                var dialog = new MessageDialog(message);\n                dialog.Commands.Add(new UICommand(\"OK\"));\n                await dialog.ShowAsync();\n            }\n        }\n\n\n4. 保存更改并生成服务，以验证是否没有语法错误。\n\n<!---HONumber=71-->"
+}

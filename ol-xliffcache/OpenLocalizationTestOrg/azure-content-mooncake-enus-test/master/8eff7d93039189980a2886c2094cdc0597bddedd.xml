@@ -1,0 +1,607 @@
+{
+  "nodes": [
+    {
+      "content": "资源组部署故障排除 | Azure",
+      "pos": [
+        26,
+        43
+      ]
+    },
+    {
+      "content": "描述部署使用资源管理器部署模型创建的资源时出现的常见问题，并说明如何检测和修复这些问题。",
+      "pos": [
+        61,
+        105
+      ]
+    },
+    {
+      "content": "Azure 中的资源组部署故障排除",
+      "pos": [
+        378,
+        395
+      ]
+    },
+    {
+      "content": "在部署期间遇到问题时，你需要了解何处出现了问题。资源管理器提供了两种方式来查明发生了什么情况以及发生的原因。你可以使用部署命令，为资源组获取有关特定部署的信息。或者，可以使用审计日志来获取有关对某个资源组所执行全部操作的信息。利用这些信息，可以解决问题并恢复解决方案中的操作。",
+      "pos": [
+        397,
+        535
+      ]
+    },
+    {
+      "pos": [
+        537,
+        646
+      ],
+      "content": "本主题主要介绍使用部署命令来排除部署问题。有关使用审计日志来跟踪对资源所执行全部操作的信息，请参阅<bpt id=\"p1\">[</bpt>使用资源管理器审计操作<ept id=\"p1\">](/documentation/articles/resource-group-audit)</ept>。"
+    },
+    {
+      "content": "本主题介绍如何通过 Azure PowerShell、Azure CLI 和 REST API 获取故障排除信息。",
+      "pos": [
+        648,
+        705
+      ]
+    },
+    {
+      "content": "本主题还描述了用户常见错误的解决方案。",
+      "pos": [
+        707,
+        726
+      ]
+    },
+    {
+      "pos": [
+        728,
+        832
+      ],
+      "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-rm-include.md)</ept>]经典部署模型。不能使用经典部署模型创建资源组。"
+    },
+    {
+      "content": "使用 PowerShell 进行故障排除",
+      "pos": [
+        838,
+        858
+      ]
+    },
+    {
+      "pos": [
+        963,
+        1032
+      ],
+      "content": "可以用 <bpt id=\"p1\">**</bpt>Get-AzureRmResourceGroupDeployment<ept id=\"p1\">**</ept> 命令获取部署的总体状态。在下面的示例中，部署已失败。"
+    },
+    {
+      "pos": [
+        1921,
+        2042
+      ],
+      "content": "每个部署通常由多个操作组成，而每个操作表示部署过程中的一个步骤。为了查明部署何处出现问题，通常需要查看部署操作的详细信息。可以用 <bpt id=\"p1\">**</bpt>Get-AzureRmResourceGroupDeploymentOperation<ept id=\"p1\">**</ept> 查看操作的状态。"
+    },
+    {
+      "content": "它显示部署中的两个操作。其中一个的预配状态为“失败”，另一个的预配状态为“成功”。",
+      "pos": [
+        2485,
+        2526
+      ]
+    },
+    {
+      "content": "你可以用以下命令获取状态信息：",
+      "pos": [
+        2528,
+        2543
+      ]
+    },
+    {
+      "content": "使用 Azure CLI 进行故障排除",
+      "pos": [
+        2935,
+        2954
+      ]
+    },
+    {
+      "pos": [
+        2956,
+        3018
+      ],
+      "content": "可以用 <bpt id=\"p1\">**</bpt>azure group deployment show<ept id=\"p1\">**</ept> 命令获取部署的总体状态。在下面的示例中，部署已失败。"
+    },
+    {
+      "pos": [
+        3788,
+        3894
+      ],
+      "content": "可以在审计日志中找出有关部署失败原因的更多信息。若要查看审计日志，请运行 <bpt id=\"p1\">**</bpt>azure group log show<ept id=\"p1\">**</ept> 命令。可以包含 <bpt id=\"p2\">**</bpt>--last-deployment<ept id=\"p2\">**</ept> 选项以只获取最近部署的日志。"
+    },
+    {
+      "pos": [
+        3953,
+        4129
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>azure group log show<ept id=\"p1\">**</ept> 命令可以返回很多信息。进行故障排除，你通常希望专注于失败的操作。以下脚本使用 <bpt id=\"p2\">**</bpt>--json<ept id=\"p2\">**</ept> 选项和 <bpt id=\"p3\">**</bpt>jq<ept id=\"p3\">**</ept>，在日志中搜索部署失败。若要了解有关 <bpt id=\"p4\">**</bpt>jq<ept id=\"p4\">**</ept> 等工具的信息，请参阅<bpt id=\"p5\">[</bpt>与 Azure 交互的有用工具<ept id=\"p5\">](#useful-tools-to-interact-with-azure)</ept>"
+    },
+    {
+      "pos": [
+        6245,
+        6286
+      ],
+      "content": "你可以看到 <bpt id=\"p1\">**</bpt>properties<ept id=\"p1\">**</ept> 在 json 中包含有关失败操作的信息。"
+    },
+    {
+      "pos": [
+        6288,
+        6422
+      ],
+      "content": "可以使用 <bpt id=\"p1\">**</bpt>--verbose<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>-vv<ept id=\"p2\">**</ept> 选项，在日志中查看更多信息。使用 <bpt id=\"p3\">**</bpt>--verbose<ept id=\"p3\">**</ept> 选项显示操作在 <ph id=\"ph1\">`stdout`</ph> 上进行的步骤。要查看完整的请求历史记录，请使用 <bpt id=\"p4\">**</bpt>-vv<ept id=\"p4\">**</ept> 选项。这些消息经常提供有关任何失败原因的重要线索。"
+    },
+    {
+      "content": "使用 REST API 进行故障排除",
+      "pos": [
+        6427,
+        6445
+      ]
+    },
+    {
+      "content": "资源管理器 REST API 提供若干 URI 来获取有关部署的信息、部署的操作以及有关特定操作的详细信息。有关这些命令的完整描述，请参阅：",
+      "pos": [
+        6447,
+        6517
+      ]
+    },
+    {
+      "content": "获取有关模板部署的信息",
+      "pos": [
+        6522,
+        6533
+      ]
+    },
+    {
+      "content": "列出所有模板部署操作",
+      "pos": [
+        6600,
+        6610
+      ]
+    },
+    {
+      "content": "获取有关模板部署操作的信息",
+      "pos": [
+        6677,
+        6690
+      ]
+    },
+    {
+      "content": "刷新过期的凭据",
+      "pos": [
+        6759,
+        6766
+      ]
+    },
+    {
+      "content": "如果你的 Azure 凭据已过期或者尚未登录你的 Azure 帐户，则你的部署将失败。如果会话打开时间过长，则你的凭据可能会过期。你可以使用以下选项刷新你的凭据：",
+      "pos": [
+        6768,
+        6849
+      ]
+    },
+    {
+      "pos": [
+        6853,
+        7003
+      ],
+      "content": "对于 PowerShell，使用 <bpt id=\"p1\">**</bpt>Login-AzureRmAccount<ept id=\"p1\">**</ept> cmdlet（PowerShell 1.0 预览版以前的版本使用 <bpt id=\"p2\">**</bpt>Add-AzureAccount<ept id=\"p2\">**</ept>）。发布设置文件中的凭据不足以满足 AzureResourceManager 模块中的 cmdlet 的需要。"
+    },
+    {
+      "pos": [
+        7006,
+        7117
+      ],
+      "content": "对于 Azure CLI，使用 <bpt id=\"p1\">**</bpt>azure login<ept id=\"p1\">**</ept>。若要获取有关身份验证错误的帮助，请确保<bpt id=\"p2\">[</bpt>正确配置 Azure CLI<ept id=\"p2\">](/documentation/articles/xplat-cli-connect)</ept>。"
+    },
+    {
+      "content": "检查模板和参数的格式",
+      "pos": [
+        7122,
+        7132
+      ]
+    },
+    {
+      "content": "如果模板或参数文件的格式不正确，则你的部署会失败。在执行部署之前，可以测试模板和参数的有效性。",
+      "pos": [
+        7134,
+        7181
+      ]
+    },
+    {
+      "content": "PowerShell",
+      "pos": [
+        7187,
+        7197
+      ]
+    },
+    {
+      "pos": [
+        7199,
+        7319
+      ],
+      "content": "对于 PowerShell，使用 <bpt id=\"p1\">**</bpt>Test-AzureRmResourceGroupDeployment<ept id=\"p1\">**</ept>（PowerShell 1.0 预览版以前的版本使用 <bpt id=\"p2\">**</bpt>Test-AzureResourceGroupTemplate<ept id=\"p2\">**</ept>）。"
+    },
+    {
+      "content": "Azure CLI",
+      "pos": [
+        7572,
+        7581
+      ]
+    },
+    {
+      "pos": [
+        7583,
+        7649
+      ],
+      "content": "对于 Azure CLI，使用 <bpt id=\"p1\">**</bpt>azure group template validate <ph id=\"ph1\">&lt;resource group&gt;</ph><ept id=\"p1\">**</ept>"
+    },
+    {
+      "content": "下面的示例演示了如何验证模板及任何需要的参数。Azure CLI 提示你输入需要的参数值。",
+      "pos": [
+        7651,
+        7696
+      ]
+    },
+    {
+      "content": "REST API",
+      "pos": [
+        8175,
+        8183
+      ]
+    },
+    {
+      "pos": [
+        8185,
+        8271
+      ],
+      "content": "对于 REST API，请参阅<bpt id=\"p1\">[</bpt>验证模板部署<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/dn790547.aspx)</ept>。"
+    },
+    {
+      "content": "检查哪些位置支持资源",
+      "pos": [
+        8276,
+        8286
+      ]
+    },
+    {
+      "content": "在为一个资源指定位置时，必须使用支持资源的位置之一。在输入资源的位置之前，请使用以下命令之一验证该位置是否支持此资源类型。",
+      "pos": [
+        8288,
+        8349
+      ]
+    },
+    {
+      "content": "PowerShell",
+      "pos": [
+        8355,
+        8365
+      ]
+    },
+    {
+      "pos": [
+        8367,
+        8436
+      ],
+      "content": "对于 PowerShell 1.0 预览版之前的版本，可以使用 <bpt id=\"p1\">**</bpt>Get-AzureLocation<ept id=\"p1\">**</ept> 命令查看资源和位置的完整列表。"
+    },
+    {
+      "content": "你可以用以下命令指定特定类型的资源：",
+      "pos": [
+        8898,
+        8916
+      ]
+    },
+    {
+      "content": "Azure CLI",
+      "pos": [
+        9305,
+        9314
+      ]
+    },
+    {
+      "pos": [
+        9316,
+        9440
+      ],
+      "content": "对于 Azure CLI，可以使用 <bpt id=\"p1\">**</bpt>Azure 位置列表<ept id=\"p1\">**</ept>。因为位置列表可能很长，而且有多个提供程序，所以你可以先使用工具来检查提供程序和位置，再使用尚未使用的位置。以下脚本使用 <bpt id=\"p2\">**</bpt>jq<ept id=\"p2\">**</ept> 发现 Azure 虚拟机资源提供程序的可用位置。"
+    },
+    {
+      "content": "REST API",
+      "pos": [
+        9650,
+        9658
+      ]
+    },
+    {
+      "pos": [
+        9660,
+        9753
+      ],
+      "content": "对于 REST API，请参阅<bpt id=\"p1\">[</bpt>获取有关资源提供程序的信息<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/dn790534.aspx)</ept>。"
+    },
+    {
+      "content": "创建唯一的资源名称",
+      "pos": [
+        9758,
+        9767
+      ]
+    },
+    {
+      "content": "对某些资源，尤其是存储帐户、数据库服务器和网站，必须为其提供一个名称，这个名称在所有 Azure 中都是唯一的。目前，没有方法来测试某个名称是否唯一。我们建议使用其他组织不太可能使用的命名约定。",
+      "pos": [
+        9769,
+        9866
+      ]
+    },
+    {
+      "content": "身份验证、订阅、角色和配额问题",
+      "pos": [
+        9871,
+        9886
+      ]
+    },
+    {
+      "content": "可能有一个或多个问题防止部署成功，包含身份验证和授权以及 Azure Active Directory。无论你如何管理 Azure 资源组，你用于登录到你的帐户的标识必须是一个 Azure Active Directory 对象。此标识可以是你创建的或分配到你的工作或学校帐户，或者也可以为应用程序创建一个服务主体。",
+      "pos": [
+        9888,
+        10046
+      ]
+    },
+    {
+      "pos": [
+        10048,
+        10375
+      ],
+      "content": "但是 Azure Active Directory 可让你或你的系统管理员非常精确地控制哪些标识可以访问哪些资源。如果你的部署失败，请检查请求本身是否存在身份验证或授权问题的迹象，并检查资源组的部署日志。你可能会发现，当你拥有某些资源的权限时，就没有其他资源的权限。使用 Azure CLI 可以通过 <ph id=\"ph1\">`azure ad`</ph> 命令检查 Azure Active Directory 租户和用户。（有关 Azure CLI 命令的完整列表，请参阅<bpt id=\"p1\">[</bpt>将适用于 Mac、Linux 和 Windows 的 Azure CLI 与 Azure 资源管理器配合使用<ept id=\"p1\">](/documentation/articles/azure-cli-arm-commands)</ept>。）"
+    },
+    {
+      "pos": [
+        10377,
+        10533
+      ],
+      "content": "当部署达到默认配额（可能是根据资源组、订阅、帐户和其他范围指定的）时，你也可能会遇到问题。确认你拥有可用于正确部署的资源。有关完整的配额信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 订阅和服务限制、配额与约束<ept id=\"p1\">](/documentation/articles/azure-subscription-service-limits)</ept>。"
+    },
+    {
+      "pos": [
+        10535,
+        10681
+      ],
+      "content": "若要检查你自己的订阅的核心配额，在 Azure CLI 中，你应使用 <ph id=\"ph1\">`azure vm list-usage`</ph> 命令，在 PowerShell 中，你应使用 <bpt id=\"p1\">**</bpt>Get-AzureVMUsage<ept id=\"p1\">**</ept> cmdlet。下面显示了 Azure CLI 中的命令，说明一个试用帐户的核心配额为 4："
+    },
+    {
+      "content": "如果你打算尝试部署一个模板，该模板在中国北部区域的上述订阅中创建多于 4 个的核心，则你会遇到与以下错误类似的部署错误（在门户中或通过调查部署日志）：",
+      "pos": [
+        10953,
+        11028
+      ]
+    },
+    {
+      "content": "在这种情况中，你应前往门户并提交一份支持问题以增加你在要部署区域内的配额。",
+      "pos": [
+        11301,
+        11338
+      ]
+    },
+    {
+      "pos": [
+        11342,
+        11479
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph> 请记住，对于资源组，配额针对每个单独的区域，而不是针对整个订阅。如果你需要在中国北部部署 30 个核心，则必须在中国北部寻求 30 个资源管理器核心。如果你需要在你有权访问的任何区域内部署总共 30 个核心，则应在所有区域内寻求总共 30 个核心。"
+    },
+    {
+      "pos": [
+        11489,
+        11552
+      ],
+      "content": "例如，若要明确核心，你可以通过使用以下命令来检查你应为其申请相应配额的区域，该命令传递到 <bpt id=\"p1\">**</bpt>jq<ept id=\"p1\">**</ept> 以供 json 解析。"
+    },
+    {
+      "content": "检查资源提供程序注册",
+      "pos": [
+        11967,
+        11977
+      ]
+    },
+    {
+      "content": "资源由资源提供程序管理，你可以启用帐户或订阅来使用特定的提供程序。如果你可以使用某个提供程序，则还必须注册该提供程序才能使用。Azure 管理门户或正在使用的命令行接口会自动注册大多数提供程序；但非全部。",
+      "pos": [
+        11979,
+        12081
+      ]
+    },
+    {
+      "content": "PowerShell",
+      "pos": [
+        12087,
+        12097
+      ]
+    },
+    {
+      "pos": [
+        12099,
+        12173
+      ],
+      "content": "若要获取资源提供程序和你的注册状态的列表，对于 PowerShell 1.0 预览版以前的版本，请使用 <bpt id=\"p1\">**</bpt>Get-AzureProvider<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        12759,
+        12801
+      ],
+      "content": "若要注册一个提供程序，请使用 <bpt id=\"p1\">**</bpt>Register-AzureProvider<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        12803,
+        12861
+      ],
+      "content": "对于 Powershell 1.0 预览版，请使用 <bpt id=\"p1\">**</bpt>Get-AzureRmResourceProvider<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        13726,
+        13778
+      ],
+      "content": "若要注册一个提供程序，请使用 <bpt id=\"p1\">**</bpt>Register-AzureRmResourceProvider<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "content": "Azure CLI",
+      "pos": [
+        13784,
+        13793
+      ]
+    },
+    {
+      "pos": [
+        13795,
+        13866
+      ],
+      "content": "若要使用 Azure CLI 查看是否已注册提供程序供使用，请使用 <ph id=\"ph1\">`azure provider list`</ph> 命令（以下是截断的输出示例）。"
+    },
+    {
+      "pos": [
+        15023,
+        15105
+      ],
+      "content": "再次指出，如果你需要有关提供程序的更多信息，包括它们的区域可用性，请键入 <ph id=\"ph1\">`azure provider list --json`</ph>。以下仅选择列表中的第一个来查看："
+    },
+    {
+      "pos": [
+        15661,
+        15741
+      ],
+      "content": "如果提供程序需要注册，请使用 <ph id=\"ph1\">`azure provider register &lt;namespace&gt;`</ph> 命令，其中 <bpt id=\"p1\">*</bpt>namespace<ept id=\"p1\">*</ept> 值来自前面的列表。"
+    },
+    {
+      "content": "REST API",
+      "pos": [
+        15747,
+        15755
+      ]
+    },
+    {
+      "pos": [
+        15757,
+        15847
+      ],
+      "content": "若要获取注册状态，请参阅<bpt id=\"p1\">[</bpt>获取有关资源提供程序的信息<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/dn790534.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        15849,
+        15938
+      ],
+      "content": "若要注册提供程序，请参阅<bpt id=\"p1\">[</bpt>使用资源提供程序注册订阅<ept id=\"p1\">](https://msdn.microsoft.com/zh-cn/library/azure/dn790548.aspx)</ept>。"
+    },
+    {
+      "content": "了解自定义模板的部署何时成功",
+      "pos": [
+        15944,
+        15958
+      ]
+    },
+    {
+      "content": "如果你正在使用自己创建的模板，请务必了解 Azure 资源管理器系统会在成功从部署返回所有提供程序时报告部署成功。这意味着已部署所有模板项供你使用。",
+      "pos": [
+        15960,
+        16034
+      ]
+    },
+    {
+      "content": "不过请注意，这不一定表示你的资源组“处于活动状态且可供用户使用”。例如，大多数部署会请求部署下载升级文件、等待其他非模板资源，或者安装复杂的脚本或 Azure 不知道的其他某个可执行活动（因为它不是提供程序正在跟踪的活动）。在这些情况下，可能要在一段时间后，你的资源才可供实际使用。因此，你应该预料到部署状态成功一段时间后，才能使用部署。",
+      "pos": [
+        16036,
+        16205
+      ]
+    },
+    {
+      "pos": [
+        16207,
+        16558
+      ],
+      "content": "不过，创建自定义模板的自定义脚本（例如，使用 <bpt id=\"p1\">[</bpt>CustomScriptExtension<ept id=\"p1\">](http://azure.microsoft.com/blog/2014/08/20/automate-linux-vm-customization-tasks-using-customscript-extension/)</ept>），即可防止 Azure 报告部署成功，而此自定义脚本知道如何监视整个部署以了解系统是否准备就绪，并只在用户可以与整个部署交互时才会成功返回。如果你想要确保最后才运行你的扩展，请在模板中使用 <bpt id=\"p2\">**</bpt>dependsOn<ept id=\"p2\">**</ept> 属性。<bpt id=\"p3\">[</bpt>创建模板部署<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/azure/dn790564.aspx)</ept>时可以查看一个示例。"
+    },
+    {
+      "content": "<ph id=\"ph1\">&lt;a name=\"useful-tools-to-interact-with-azure\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph> 与 Azure 交互的有用工具",
+      "pos": [
+        16562,
+        16628
+      ]
+    },
+    {
+      "content": "当你从命令行处理你的 Azure 资源时，你需要收集帮助你完成工作的工具。Azure 资源组模板为 JSON 文件，而 Azure 资源管理器 API 接受并返回 JSON，因此 JSON 解析工具是帮助你浏览资源的相关信息，以及设计模板和模板参数文件或与之交互的首选工具。",
+      "pos": [
+        16629,
+        16766
+      ]
+    },
+    {
+      "content": "Mac、Linux 和 Windows 工具",
+      "pos": [
+        16772,
+        16794
+      ]
+    },
+    {
+      "pos": [
+        16795,
+        17239
+      ],
+      "content": "如果使用适用于 Mac、Linux 和 Windows 的 Azure 命令行接口，则可能你熟悉标准下载工具，例如 <bpt id=\"p1\">**</bpt><bpt id=\"p2\">[</bpt>curl<ept id=\"p2\">](http://curl.haxx.se/)</ept><ept id=\"p1\">**</ept> 和 <bpt id=\"p3\">**</bpt><bpt id=\"p4\">[</bpt>wget<ept id=\"p4\">](https://www.gnu.org/software/wget/)</ept><ept id=\"p3\">**</ept> 或 <bpt id=\"p5\">**</bpt><bpt id=\"p6\">[</bpt>Resty<ept id=\"p6\">](https://github.com/beders/Resty)</ept><ept id=\"p5\">**</ept>）和 JSON 实用工具，例如 <bpt id=\"p7\">**</bpt><bpt id=\"p8\">[</bpt>jq<ept id=\"p8\">](http://stedolan.github.io/jq/download/)</ept><ept id=\"p7\">**</ept>、<bpt id=\"p9\">**</bpt><bpt id=\"p10\">[</bpt>jsawk<ept id=\"p10\">](https://github.com/micha/jsawk)</ept><ept id=\"p9\">**</ept>，以及处理 JSON 的语言库。（其中的许多工具也有针对 Windows 的端口，例如 <bpt id=\"p11\">[</bpt>wget<ept id=\"p11\">](http://gnuwin32.sourceforge.net/packages/wget.htm)</ept>；事实上，还可以通过多种方法获取 Linux 以及在 Windows 上运行的其他开源软件工具）。"
+    },
+    {
+      "pos": [
+        17241,
+        17326
+      ],
+      "content": "本主题包括一些你可以与 <bpt id=\"p1\">**</bpt>jq<ept id=\"p1\">**</ept> 配合使用的 Azure CLI 命令，以更有效地准确获取所需的信息。你应该选择熟悉的工具集，以帮助了解 Azure 资源的使用情况。"
+    },
+    {
+      "content": "PowerShell",
+      "pos": [
+        17332,
+        17342
+      ]
+    },
+    {
+      "content": "PowerShell 提供了一些基本命令用于执行相同的过程。",
+      "pos": [
+        17344,
+        17374
+      ]
+    },
+    {
+      "pos": [
+        17378,
+        17504
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt><bpt id=\"p2\">[</bpt>Invoke-WebRequest cmdlet<ept id=\"p2\">](https://technet.microsoft.com/zh-cn/library/hh849901%28v=wps.640%29)</ept><ept id=\"p1\">**</ept> 可下载资源组模板或参数 JSON 文件等文件。"
+    },
+    {
+      "pos": [
+        17507,
+        17796
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt><bpt id=\"p2\">[</bpt>ConvertFrom-Json<ept id=\"p2\">](https://technet.microsoft.com/zh-cn/library/hh849898%28v=wps.640%29.aspx)</ept><ept id=\"p1\">**</ept> cmdlet 可将 JSON 字符串转换成自定义对象 (<bpt id=\"p3\">[</bpt>PSCustomObject<ept id=\"p3\">](https://msdn.microsoft.com/zh-cn/library/windows/desktop/system.management.automation.pscustomobject%28v=vs.85%29.aspx)</ept>)，该对象具有 JSON 字符串中每个字段的属性。"
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        17802,
+        17806
+      ]
+    },
+    {
+      "pos": [
+        17808,
+        18128
+      ],
+      "content": "若要掌握模板的创建，请阅读<bpt id=\"p1\">[</bpt>创作 Azure 资源管理器模板<ept id=\"p1\">](/documentation/articles/resource-group-authoring-templates)</ept>，并浏览 <bpt id=\"p2\">[</bpt>Azure 快速启动模板存储库<ept id=\"p2\">](https://github.com/Azure/azure-quickstart-templates)</ept>以了解可部署的示例。<bpt id=\"p3\">[</bpt>使用多个 NIC 和可访问的 RDP 创建虚拟机<ept id=\"p3\">](https://github.com/Azure/azure-quickstart-templates/tree/master/201-1-vm-loadbalancer-2-nics)</ept>是 <bpt id=\"p4\">**</bpt>dependsOn<ept id=\"p4\">**</ept> 属性的一个例子。"
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"资源组部署故障排除 | Azure\"\n   description=\"描述部署使用资源管理器部署模型创建的资源时出现的常见问题，并说明如何检测和修复这些问题。\"\n   services=\"azure-resource-manager,virtual-machines\"\n   documentationCenter=\"\"\n   tags=\"top-support-issue\"\n   authors=\"tfitzmac\"\n   manager=\"wpickett\"\n   editor=\"\"/>\n\n<tags\n    ms.service=\"azure-resource-manager\"\n    ms.date=\"01/06/2016\"\n    wacn.date=\"02/26/2016\"/>\n\n# Azure 中的资源组部署故障排除\n\n在部署期间遇到问题时，你需要了解何处出现了问题。资源管理器提供了两种方式来查明发生了什么情况以及发生的原因。你可以使用部署命令，为资源组获取有关特定部署的信息。或者，可以使用审计日志来获取有关对某个资源组所执行全部操作的信息。利用这些信息，可以解决问题并恢复解决方案中的操作。\n\n本主题主要介绍使用部署命令来排除部署问题。有关使用审计日志来跟踪对资源所执行全部操作的信息，请参阅[使用资源管理器审计操作](/documentation/articles/resource-group-audit)。\n\n本主题介绍如何通过 Azure PowerShell、Azure CLI 和 REST API 获取故障排除信息。\n\n本主题还描述了用户常见错误的解决方案。\n\n[AZURE.INCLUDE [了解部署模型](../includes/learn-about-deployment-models-rm-include.md)]经典部署模型。不能使用经典部署模型创建资源组。\n\n\n## 使用 PowerShell 进行故障排除\n\n[AZURE.INCLUDE [powershell-preview-inline-include](../includes/powershell-preview-inline-include.md)]\n\n可以用 **Get-AzureRmResourceGroupDeployment** 命令获取部署的总体状态。在下面的示例中，部署已失败。\n\n    PS C:\\> Get-AzureRmResourceGroupDeployment -ResourceGroupName ExampleGroup -DeploymentName ExampleDeployment\n\n    DeploymentName    : ExampleDeployment\n    ResourceGroupName : ExampleGroup\n    ProvisioningState : Failed\n    Timestamp         : 8/27/2015 8:03:34 PM\n    Mode              : Incremental\n    TemplateLink      :\n    Parameters        :\n                    Name             Type                       Value\n                    ===============  =========================  ==========\n                    siteName         String                     ExampleSite\n                    hostingPlanName  String                     ExamplePlan\n                    siteLocation     String                     China North\n                    sku              String                     Free\n                    workerSize       String                     0\n\n    Outputs           :\n\n每个部署通常由多个操作组成，而每个操作表示部署过程中的一个步骤。为了查明部署何处出现问题，通常需要查看部署操作的详细信息。可以用 **Get-AzureRmResourceGroupDeploymentOperation** 查看操作的状态。\n\n    PS C:\\> Get-AzureRmResourceGroupDeploymentOperation -DeploymentName ExampleDeployment -ResourceGroupName ExampleGroup\n    Id                        OperationId          Properties         \n    -----------               ----------           -------------\n    /subscriptions/xxxxx...   347A111792B648D8     @{ProvisioningState=Failed; Timestam...\n    /subscriptions/xxxxx...   699776735EFC3D15     @{ProvisioningState=Succeeded; Times...\n\n它显示部署中的两个操作。其中一个的预配状态为“失败”，另一个的预配状态为“成功”。\n\n你可以用以下命令获取状态信息：\n\n    PS C:\\> (Get-AzureRmResourceGroupDeploymentOperation -DeploymentName ExampleDeployment -ResourceGroupName ExampleGroup).Properties.StatusMessage\n\n    Code       : Conflict\n    Message    : Website with given name mysite already exists.\n    Target     :\n    Details    : {@{Message=Website with given name mysite already exists.}, @{Code=Conflict}, @{ErrorEntity=}}\n    Innererror :\n\n## 使用 Azure CLI 进行故障排除\n\n可以用 **azure group deployment show** 命令获取部署的总体状态。在下面的示例中，部署已失败。\n\n    azure group deployment show ExampleGroup ExampleDeployment\n\n    info:    Executing command group deployment show\n    + Getting deployments\n    data:    DeploymentName     : ExampleDeployment\n    data:    ResourceGroupName  : ExampleGroup\n    data:    ProvisioningState  : Failed\n    data:    Timestamp          : 2015-08-27T20:03:34.9178576Z\n    data:    Mode               : Incremental\n    data:    Name             Type    Value\n    data:    ---------------  ------  ------------\n    data:    siteName         String  ExampleSite\n    data:    hostingPlanName  String  ExamplePlan\n    data:    siteLocation     String  China North\n    data:    sku              String  Free\n    data:    workerSize       String  0\n    info:    group deployment show command OK\n\n\n可以在审计日志中找出有关部署失败原因的更多信息。若要查看审计日志，请运行 **azure group log show** 命令。可以包含 **--last-deployment** 选项以只获取最近部署的日志。\n\n    azure group log show ExampleGroup --last-deployment\n\n**azure group log show** 命令可以返回很多信息。进行故障排除，你通常希望专注于失败的操作。以下脚本使用 **--json** 选项和 **jq**，在日志中搜索部署失败。若要了解有关 **jq** 等工具的信息，请参阅[与 Azure 交互的有用工具](#useful-tools-to-interact-with-azure)\n\n    azure group log show ExampleGroup --json | jq '.[] | select(.status.value == \"Failed\")'\n\n    {\n      \"claims\": {\n        \"aud\": \"https://management.core.chinacloudapi.cn/\",\n        \"iss\": \"https://sts.chinacloudapi.cn/<guid>/\",\n        \"iat\": \"1442510510\",\n        \"nbf\": \"1442510510\",\n        \"exp\": \"1442514410\",\n        \"ver\": \"1.0\",\n        \"http://schemas.microsoft.com/identity/claims/tenantid\": \"<guid>\",\n        \"http://schemas.microsoft.com/identity/claims/objectidentifier\": \"<guid>\",\n        \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress\": \"someone@example.com\",\n        \"puid\": \"XXXXXXXXXXXXXXXX\",\n        \"http://schemas.microsoft.com/identity/claims/identityprovider\": \"example.com\",\n\n        \"altsecid\": \"1:example.com:XXXXXXXXXXX\",\n        \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\": \"<hash string>\",\n        \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname\": \"Tom\",\n        \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname\": \"FitzMacken\",\n        \"name\": \"Tom FitzMacken\",\n        \"http://schemas.microsoft.com/claims/authnmethodsreferences\": \"pwd\",\n        \"groups\": \"<guid>\",\n        \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\": \"example.com#someone@example.com\",\n        \"wids\": \"<guid>\",\n        \"appid\": \"<guid>\",\n        \"appidacr\": \"0\",\n        \"http://schemas.microsoft.com/identity/claims/scope\": \"user_impersonation\",\n        \"http://schemas.microsoft.com/claims/authnclassreference\": \"1\",\n        \"ipaddr\": \"000.000.000.000\"\n      },\n      \"properties\": {\n        \"statusCode\": \"Conflict\",\n        \"statusMessage\": \"{\"Code\":\"Conflict\",\"Message\":\"Website with given name mysite already exists.\",\"Target\":null,\"Details\":[{\"Message\":\"Website with given name\n          mysite already exists.\"},{\"Code\":\"Conflict\"},{\"ErrorEntity\":{\"Code\":\"Conflict\",\"Message\":\"Website with given name mysite already exists.\",\"ExtendedCode\":\n          \"54001\",\"MessageTemplate\":\"Website with given name {0} already exists.\",\"Parameters\":[\"mysite\"],\"InnerErrors\":null}}],\"Innererror\":null}\"\n      },\n    ...\n\n你可以看到 **properties** 在 json 中包含有关失败操作的信息。\n\n可以使用 **--verbose** 和 **-vv** 选项，在日志中查看更多信息。使用 **--verbose** 选项显示操作在 `stdout` 上进行的步骤。要查看完整的请求历史记录，请使用 **-vv** 选项。这些消息经常提供有关任何失败原因的重要线索。\n\n## 使用 REST API 进行故障排除\n\n资源管理器 REST API 提供若干 URI 来获取有关部署的信息、部署的操作以及有关特定操作的详细信息。有关这些命令的完整描述，请参阅：\n\n- [获取有关模板部署的信息](https://msdn.microsoft.com/zh-cn/library/azure/dn790565.aspx)\n- [列出所有模板部署操作](https://msdn.microsoft.com/zh-cn/library/azure/dn790518.aspx)\n- [获取有关模板部署操作的信息](https://msdn.microsoft.com/zh-cn/library/azure/dn790519.aspx)\n\n\n## 刷新过期的凭据\n\n如果你的 Azure 凭据已过期或者尚未登录你的 Azure 帐户，则你的部署将失败。如果会话打开时间过长，则你的凭据可能会过期。你可以使用以下选项刷新你的凭据：\n\n- 对于 PowerShell，使用 **Login-AzureRmAccount** cmdlet（PowerShell 1.0 预览版以前的版本使用 **Add-AzureAccount**）。发布设置文件中的凭据不足以满足 AzureResourceManager 模块中的 cmdlet 的需要。\n- 对于 Azure CLI，使用 **azure login**。若要获取有关身份验证错误的帮助，请确保[正确配置 Azure CLI](/documentation/articles/xplat-cli-connect)。\n\n## 检查模板和参数的格式\n\n如果模板或参数文件的格式不正确，则你的部署会失败。在执行部署之前，可以测试模板和参数的有效性。\n\n### PowerShell\n\n对于 PowerShell，使用 **Test-AzureRmResourceGroupDeployment**（PowerShell 1.0 预览版以前的版本使用 **Test-AzureResourceGroupTemplate**）。\n\n    PS C:\\> Test-AzureRmResourceGroupDeployment -ResourceGroupName ExampleGroup -TemplateFile c:\\Azure\\Templates\\azuredeploy.json -TemplateParameterFile c:\\Azure\\Templates\\azuredeploy.parameters.json\n    VERBOSE: 12:55:32 PM - Template is valid.\n\n### Azure CLI\n\n对于 Azure CLI，使用 **azure group template validate <resource group>**\n\n下面的示例演示了如何验证模板及任何需要的参数。Azure CLI 提示你输入需要的参数值。\n\n        azure group template validate \\\n        > --template-uri \"https://contoso.com/templates/azuredeploy.json\" \\\n        > resource-group\n        info:    Executing command group template validate\n        info:    Supply values for the following parameters\n        adminUserName: UserName\n        adminPassword: PassWord\n        + Initializing template configurations and parameters\n        + Validating the template\n        info:    group template validate command OK\n\n### REST API\n\n对于 REST API，请参阅[验证模板部署](https://msdn.microsoft.com/zh-cn/library/azure/dn790547.aspx)。\n\n## 检查哪些位置支持资源\n\n在为一个资源指定位置时，必须使用支持资源的位置之一。在输入资源的位置之前，请使用以下命令之一验证该位置是否支持此资源类型。\n\n### PowerShell\n\n对于 PowerShell 1.0 预览版之前的版本，可以使用 **Get-AzureLocation** 命令查看资源和位置的完整列表。\n\n    PS C:\\> Get-AzureLocation\n\n    Name                                    Locations                               LocationsString\n    ----                                    ---------                               ---------------\n    ResourceGroup                           {China East, china North}               {China East, china North}\n    Microsoft.AppService/apiapps            {China East, china North}               {China East, china North}\n    ...\n\n你可以用以下命令指定特定类型的资源：\n\n    PS C:\\> Get-AzureLocation | Where-Object Name -eq \"Microsoft.Compute/virtualMachines\" | Format-Table Name, LocationsString -Wrap\n\n    Name                                                        LocationsString\n    ----                                                        ---------------\n    Microsoft.Compute/virtualMachines                           China East, China North\n\n### Azure CLI\n\n对于 Azure CLI，可以使用 **Azure 位置列表**。因为位置列表可能很长，而且有多个提供程序，所以你可以先使用工具来检查提供程序和位置，再使用尚未使用的位置。以下脚本使用 **jq** 发现 Azure 虚拟机资源提供程序的可用位置。\n\n    azure location list --json | jq '.[] | select(.name == \"Microsoft.Compute/virtualMachines\")'\n    {\n      \"name\": \"Microsoft.Compute/virtualMachines\",\n      \"location\": \"China East,China North\"\n    }\n\n### REST API\n\n对于 REST API，请参阅[获取有关资源提供程序的信息](https://msdn.microsoft.com/zh-cn/library/azure/dn790534.aspx)。\n\n## 创建唯一的资源名称\n\n对某些资源，尤其是存储帐户、数据库服务器和网站，必须为其提供一个名称，这个名称在所有 Azure 中都是唯一的。目前，没有方法来测试某个名称是否唯一。我们建议使用其他组织不太可能使用的命名约定。\n\n## 身份验证、订阅、角色和配额问题\n\n可能有一个或多个问题防止部署成功，包含身份验证和授权以及 Azure Active Directory。无论你如何管理 Azure 资源组，你用于登录到你的帐户的标识必须是一个 Azure Active Directory 对象。此标识可以是你创建的或分配到你的工作或学校帐户，或者也可以为应用程序创建一个服务主体。\n\n但是 Azure Active Directory 可让你或你的系统管理员非常精确地控制哪些标识可以访问哪些资源。如果你的部署失败，请检查请求本身是否存在身份验证或授权问题的迹象，并检查资源组的部署日志。你可能会发现，当你拥有某些资源的权限时，就没有其他资源的权限。使用 Azure CLI 可以通过 `azure ad` 命令检查 Azure Active Directory 租户和用户。（有关 Azure CLI 命令的完整列表，请参阅[将适用于 Mac、Linux 和 Windows 的 Azure CLI 与 Azure 资源管理器配合使用](/documentation/articles/azure-cli-arm-commands)。）\n\n当部署达到默认配额（可能是根据资源组、订阅、帐户和其他范围指定的）时，你也可能会遇到问题。确认你拥有可用于正确部署的资源。有关完整的配额信息，请参阅 [Azure 订阅和服务限制、配额与约束](/documentation/articles/azure-subscription-service-limits)。\n\n若要检查你自己的订阅的核心配额，在 Azure CLI 中，你应使用 `azure vm list-usage` 命令，在 PowerShell 中，你应使用 **Get-AzureVMUsage** cmdlet。下面显示了 Azure CLI 中的命令，说明一个试用帐户的核心配额为 4：\n\n    azure vm list-usage\n    info:    Executing command vm list-usage\n    Location: chinanorth\n    data:    Name   Unit   CurrentValue  Limit\n    data:    -----  -----  ------------  -----\n    data:    Cores  Count  0             4\n    info:    vm list-usage command OK\n\n如果你打算尝试部署一个模板，该模板在中国北部区域的上述订阅中创建多于 4 个的核心，则你会遇到与以下错误类似的部署错误（在门户中或通过调查部署日志）：\n\n    statusCode:Conflict\n    serviceRequestId:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n    statusMessage:{\"error\":{\"code\":\"OperationNotAllowed\",\"message\":\"Operation results in exceeding quota limits of Core. Maximum allowed: 4, Current in use: 4, Additional requested: 2.\"}}\n\n在这种情况中，你应前往门户并提交一份支持问题以增加你在要部署区域内的配额。\n\n> [AZURE.NOTE] 请记住，对于资源组，配额针对每个单独的区域，而不是针对整个订阅。如果你需要在中国北部部署 30 个核心，则必须在中国北部寻求 30 个资源管理器核心。如果你需要在你有权访问的任何区域内部署总共 30 个核心，则应在所有区域内寻求总共 30 个核心。\n<!-- -->\n例如，若要明确核心，你可以通过使用以下命令来检查你应为其申请相应配额的区域，该命令传递到 **jq** 以供 json 解析。\n<!-- -->\n        azure provider show Microsoft.Compute --json | jq '.resourceTypes[] | select(.name == \"virtualMachines\") | { name,apiVersions, locations}'\n        {\n          \"name\": \"virtualMachines\",\n          \"apiVersions\": [\n            \"2015-05-01-preview\",\n            \"2014-12-01-preview\"\n          ],\n          \"locations\": [\n            \"China East\",\n            \"China North\"\n          ]\n        }\n\n\n## 检查资源提供程序注册\n\n资源由资源提供程序管理，你可以启用帐户或订阅来使用特定的提供程序。如果你可以使用某个提供程序，则还必须注册该提供程序才能使用。Azure 管理门户或正在使用的命令行接口会自动注册大多数提供程序；但非全部。\n\n### PowerShell\n\n若要获取资源提供程序和你的注册状态的列表，对于 PowerShell 1.0 预览版以前的版本，请使用 **Get-AzureProvider**。\n\n    PS C:\\> Get-AzureProvider\n\n    ProviderNamespace                       RegistrationState                       ResourceTypes\n    -----------------                       -----------------                       -------------\n    Microsoft.AppService                    Registered                              {apiapps, appIdentities, gateways, d...\n    Microsoft.Batch                         Registered                              {batchAccounts}\n    microsoft.cache                         Registered                              {Redis, checkNameAvailability, opera...\n    ...\n\n若要注册一个提供程序，请使用 **Register-AzureProvider**。\n\n对于 Powershell 1.0 预览版，请使用 **Get-AzureRmResourceProvider**。\n\n    PS C:\\> Get-AzureRmResourceProvider -ListAvailable\n\n    ProviderNamespace         RegistrationState ResourceTypes                                                                               Locations\n    -----------------         ----------------- -------------                                                                               ---------\n    microsoft.backup          Registering       {BackupVault}                                                                               {China East, China North}\n    Microsoft.Batch           Registered        {batchAccounts, locations, locations/quotas}                                                {China North, China East}\n    microsoft.cache           Registered        {Redis, checkNameAvailability, operations, RedisConfigDefinition...}                        {China North, China East}\n    ...\n\n若要注册一个提供程序，请使用 **Register-AzureRmResourceProvider**。\n\n### Azure CLI\n\n若要使用 Azure CLI 查看是否已注册提供程序供使用，请使用 `azure provider list` 命令（以下是截断的输出示例）。\n\n        azure provider list\n        info:    Executing command provider list\n        + Getting ARM registered providers\n        data:    Namespace                  Registered\n        data:    -------------------------  -----------\n        data:    microsoft.backup           Registering\n        data:    Microsoft.Batch            Registered\n        data:    microsoft.cache            Registered\n        data:    Microsoft.ClassicCompute   Registered\n        data:    Microsoft.ClassicNetwork   Registered\n        data:    Microsoft.ClassicStorage   Registered\n        data:    Microsoft.Insights         Registered\n        data:    Microsoft.KeyVault         Registered\n        data:    Microsoft.SiteRecovery     Registered\n        data:    Microsoft.Sql              Registered\n        data:    Microsoft.StreamAnalytics  Registered\n        data:    Microsoft.Web              Registered\n        data:    Microsoft.Authorization    Registered\n        data:    Microsoft.Features         Registered\n        data:    Microsoft.Resources        Registered\n        data:    Microsoft.Scheduler        Registered\n        info:    provider list command OK\n\n再次指出，如果你需要有关提供程序的更多信息，包括它们的区域可用性，请键入 `azure provider list --json`。以下仅选择列表中的第一个来查看：\n\n        azure provider list --json | jq '.[0]'\n        {\n          \"resourceTypes\": [\n            {\n              \"apiVersions\": [\n                \"2014-02-14\"\n              ],\n              \"locations\": [\n                \"China East\",\n                \"China North\"\n              ],\n              \"properties\": {},\n              \"name\": \"service\"\n            }\n          ],\n          \"id\": \"/subscriptions/<guid>/providers/Microsoft.ApiManagement\",\n          \"namespace\": \"Microsoft.ApiManagement\",\n          \"registrationState\": \"Registered\"\n        }\n\n如果提供程序需要注册，请使用 `azure provider register <namespace>` 命令，其中 *namespace* 值来自前面的列表。\n\n### REST API\n\n若要获取注册状态，请参阅[获取有关资源提供程序的信息](https://msdn.microsoft.com/zh-cn/library/azure/dn790534.aspx)。\n\n若要注册提供程序，请参阅[使用资源提供程序注册订阅](https://msdn.microsoft.com/zh-cn/library/azure/dn790548.aspx)。\n\n\n## 了解自定义模板的部署何时成功\n\n如果你正在使用自己创建的模板，请务必了解 Azure 资源管理器系统会在成功从部署返回所有提供程序时报告部署成功。这意味着已部署所有模板项供你使用。\n\n不过请注意，这不一定表示你的资源组“处于活动状态且可供用户使用”。例如，大多数部署会请求部署下载升级文件、等待其他非模板资源，或者安装复杂的脚本或 Azure 不知道的其他某个可执行活动（因为它不是提供程序正在跟踪的活动）。在这些情况下，可能要在一段时间后，你的资源才可供实际使用。因此，你应该预料到部署状态成功一段时间后，才能使用部署。\n\n不过，创建自定义模板的自定义脚本（例如，使用 [CustomScriptExtension](http://azure.microsoft.com/blog/2014/08/20/automate-linux-vm-customization-tasks-using-customscript-extension/)），即可防止 Azure 报告部署成功，而此自定义脚本知道如何监视整个部署以了解系统是否准备就绪，并只在用户可以与整个部署交互时才会成功返回。如果你想要确保最后才运行你的扩展，请在模板中使用 **dependsOn** 属性。[创建模板部署](https://msdn.microsoft.com/zh-cn/library/azure/dn790564.aspx)时可以查看一个示例。\n\n##<a name=\"useful-tools-to-interact-with-azure\"></a> 与 Azure 交互的有用工具\n当你从命令行处理你的 Azure 资源时，你需要收集帮助你完成工作的工具。Azure 资源组模板为 JSON 文件，而 Azure 资源管理器 API 接受并返回 JSON，因此 JSON 解析工具是帮助你浏览资源的相关信息，以及设计模板和模板参数文件或与之交互的首选工具。\n\n### Mac、Linux 和 Windows 工具\n如果使用适用于 Mac、Linux 和 Windows 的 Azure 命令行接口，则可能你熟悉标准下载工具，例如 **[curl](http://curl.haxx.se/)** 和 **[wget](https://www.gnu.org/software/wget/)** 或 **[Resty](https://github.com/beders/Resty)**）和 JSON 实用工具，例如 **[jq](http://stedolan.github.io/jq/download/)**、**[jsawk](https://github.com/micha/jsawk)**，以及处理 JSON 的语言库。（其中的许多工具也有针对 Windows 的端口，例如 [wget](http://gnuwin32.sourceforge.net/packages/wget.htm)；事实上，还可以通过多种方法获取 Linux 以及在 Windows 上运行的其他开源软件工具）。\n\n本主题包括一些你可以与 **jq** 配合使用的 Azure CLI 命令，以更有效地准确获取所需的信息。你应该选择熟悉的工具集，以帮助了解 Azure 资源的使用情况。\n\n### PowerShell\n\nPowerShell 提供了一些基本命令用于执行相同的过程。\n\n- 使用 **[Invoke-WebRequest cmdlet](https://technet.microsoft.com/zh-cn/library/hh849901%28v=wps.640%29)** 可下载资源组模板或参数 JSON 文件等文件。\n- 使用 **[ConvertFrom-Json](https://technet.microsoft.com/zh-cn/library/hh849898%28v=wps.640%29.aspx)** cmdlet 可将 JSON 字符串转换成自定义对象 ([PSCustomObject](https://msdn.microsoft.com/zh-cn/library/windows/desktop/system.management.automation.pscustomobject%28v=vs.85%29.aspx))，该对象具有 JSON 字符串中每个字段的属性。\n\n\n## 后续步骤\n\n若要掌握模板的创建，请阅读[创作 Azure 资源管理器模板](/documentation/articles/resource-group-authoring-templates)，并浏览 [Azure 快速启动模板存储库](https://github.com/Azure/azure-quickstart-templates)以了解可部署的示例。[使用多个 NIC 和可访问的 RDP 创建虚拟机](https://github.com/Azure/azure-quickstart-templates/tree/master/201-1-vm-loadbalancer-2-nics)是 **dependsOn** 属性的一个例子。\n\n<!--Image references-->\n\n<!--Reference style links - using these makes the source content way more readable than using inline links-->\n\n<!---HONumber=Mooncake_0215_2016-->"
+}

@@ -1,0 +1,327 @@
+{
+  "nodes": [
+    {
+      "content": "使用混合连接从 .NET 后端移动服务连接到本地 SQL Server | Azure 移动服务",
+      "pos": [
+        27,
+        75
+      ]
+    },
+    {
+      "content": "了解如何使用 Azure 混合连接从 .NET 后端移动服务连接到本地 SQL Server",
+      "pos": [
+        94,
+        140
+      ]
+    },
+    {
+      "content": "使用混合连接从 Azure 移动服务连接到本地 SQL Server",
+      "pos": [
+        364,
+        398
+      ]
+    },
+    {
+      "content": "&amp;nbsp;",
+      "pos": [
+        501,
+        507
+      ]
+    },
+    {
+      "pos": [
+        509,
+        818
+      ],
+      "content": "当企业在过渡到云环境时，可能无法立即就将所有资产迁移到 Azure。使用混合连接，Azure 移动服务可以安全地连接到本地资产。这样，移动客户端便可以使用 Azure 访问你的本地数据。支持的资产包括静态 TCP 端口上运行的任何资源，例如 Microsoft SQL Server、MySQL、HTTP Web API 和大多数自定义 Web 服务。混合连接使用共享访问签名 (SAS) 授权，确保从移动服务和本地混合连接管理器到混合连接的连接安全。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>混合连接概述<ept id=\"p1\">](/documentation/articles/integration-hybrid-connection-overview)</ept>。"
+    },
+    {
+      "pos": [
+        820,
+        1072
+      ],
+      "content": "在本教程中，你将学习如何修改 .NET 后端移动服务，以使用本地 SQL Server 数据库，而不是随服务一起提供的默认 Azure SQL 数据库。如<bpt id=\"p1\">[</bpt>此文<ept id=\"p1\">](http://blogs.msdn.com/b/azuremobile/archive/2014/05/12/connecting-to-an-external-database-with-node-js-backend-in-azure-mobile-services.aspx)</ept>中所述，JavaScript 后端移动服务也支持混合连接。"
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        1077,
+        1081
+      ]
+    },
+    {
+      "content": "本教程要求做好以下准备：",
+      "pos": [
+        1085,
+        1097
+      ]
+    },
+    {
+      "content": "现有的 .NET 后端移动服务",
+      "pos": [
+        1103,
+        1118
+      ]
+    },
+    {
+      "content": "遵循<bpt id=\"p1\">[</bpt><ept id=\"p1\">移动服务入门]</ept>教程，从 <bpt id=\"p2\">[</bpt><ept id=\"p2\">Azure 经典门户]</ept>创建和下载新的 .NET 后端移动服务。",
+      "pos": [
+        1125,
+        1172
+      ]
+    },
+    {
+      "content": "安装 SQL Server Express，启用 TCP/IP 并在本地创建一个 SQL Server 数据库",
+      "pos": [
+        1278,
+        1333
+      ]
+    },
+    {
+      "content": "创建混合连接",
+      "pos": [
+        1467,
+        1473
+      ]
+    },
+    {
+      "content": "安装本地混合连接管理器以完成连接",
+      "pos": [
+        1574,
+        1590
+      ]
+    },
+    {
+      "content": "配置移动服务项目以连接到 SQL Server 数据库",
+      "pos": [
+        1723,
+        1750
+      ]
+    },
+    {
+      "content": "在此步骤中，定义本地数据库的连接字符串，并修改移动服务以使用此连接。",
+      "pos": [
+        1752,
+        1786
+      ]
+    },
+    {
+      "content": "在 Visual Studio 2013 中，打开用于定义 .NET 后端移动服务的项目。",
+      "pos": [
+        1791,
+        1836
+      ]
+    },
+    {
+      "pos": [
+        1843,
+        1963
+      ],
+      "content": "若要了解如何下载 .NET 后端项目，请参阅<bpt id=\"p1\">[</bpt>移动服务入门<ept id=\"p1\">](/documentation/articles/mobile-services-dotnet-backend-windows-store-dotnet-get-started)</ept>。"
+    },
+    {
+      "pos": [
+        1968,
+        2073
+      ],
+      "content": "在“解决方案资源管理器”中打开 Web.config 文件，找到 <bpt id=\"p1\">**</bpt>connectionStrings<ept id=\"p1\">**</ept> 节，添加类似于以下内容的新 SqlClient 项目，此项目指向本地 SQL Server 数据库："
+    },
+    {
+      "pos": [
+        2399,
+        2471
+      ],
+      "content": "请记得将这个字符串中的 <ph id=\"ph1\">`&lt;**secure_password**&gt;`</ph> 替换成你为 <bpt id=\"p1\">*</bpt>HbyridConnectionLogin<ept id=\"p1\">*</ept> 创建的密码。"
+    },
+    {
+      "content": "在 Visual Studio 中单击“保存”以保存 Web.config 文件。",
+      "pos": [
+        2480,
+        2521
+      ]
+    },
+    {
+      "pos": [
+        2529,
+        2591
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在本地计算机上运行时，使用此连接设置。在 Azure 中运行时，则以门户中定义的连接设置覆盖此设置。"
+    },
+    {
+      "pos": [
+        2596,
+        2640
+      ],
+      "content": "展开“Models”文件夹并打开文件名以 <bpt id=\"p1\">*</bpt>Context.cs<ept id=\"p1\">*</ept> 结尾的数据模型文件。"
+    },
+    {
+      "pos": [
+        2645,
+        2732
+      ],
+      "content": "修改 <bpt id=\"p1\">**</bpt>DbContext<ept id=\"p1\">**</ept> 实例构造函数，以将 <ph id=\"ph1\">`OnPremisesDBConnection`</ph> 值传递到类似于以下代码段的基本 <bpt id=\"p2\">**</bpt>DbContext<ept id=\"p2\">**</ept> 构造函数："
+    },
+    {
+      "content": "现在，服务将使用新的 SQL Server 数据库连接。",
+      "pos": [
+        2934,
+        2962
+      ]
+    },
+    {
+      "content": "在本地测试数据库连接",
+      "pos": [
+        2965,
+        2975
+      ]
+    },
+    {
+      "content": "在发布到 Azure 并使用混合连接之前，最好先确保数据库连接能够在本地运行时正常工作。这样，你就可以更轻松地诊断并更正任何连接问题，然后重新发布并开始使用混合连接。",
+      "pos": [
+        2977,
+        3060
+      ]
+    },
+    {
+      "content": "更新 Azure 以使用本地连接字符串",
+      "pos": [
+        3236,
+        3255
+      ]
+    },
+    {
+      "content": "在验证数据库连接后，需要为这个新的连接字符串添加应用设置，以便能够从 Azure 使用该连接字符串，并且能够将移动服务发布到 Azure。",
+      "pos": [
+        3257,
+        3326
+      ]
+    },
+    {
+      "pos": [
+        3331,
+        3357
+      ],
+      "content": "在 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure 经典门户]</ept>中，浏览到你的移动服务。"
+    },
+    {
+      "content": "单击“配置”选项卡，然后找到“连接字符串”部分。",
+      "pos": [
+        3362,
+        3386
+      ]
+    },
+    {
+      "content": "本地数据库的连接字符串",
+      "pos": [
+        3394,
+        3405
+      ]
+    },
+    {
+      "pos": [
+        3489,
+        3548
+      ],
+      "content": "添加名为 <ph id=\"ph1\">`OnPremisesDBConnection`</ph> 的新 <bpt id=\"p1\">**</bpt>SQL Server<ept id=\"p1\">**</ept> 连接字符串，其值如下："
+    },
+    {
+      "pos": [
+        3677,
+        3737
+      ],
+      "content": "将 <ph id=\"ph1\">`&lt;**secure_password**&gt;`</ph> 替换为 <bpt id=\"p1\">*</bpt>HybridConnectionLogin<ept id=\"p1\">*</ept> 的安全密码。"
+    },
+    {
+      "content": "按“保存”以保存混合连接以及刚刚创建的连接字符串。",
+      "pos": [
+        3742,
+        3767
+      ]
+    },
+    {
+      "content": "使用 Visual Studio 将更新的移动服务项目发布到 Azure。",
+      "pos": [
+        3772,
+        3809
+      ]
+    },
+    {
+      "content": "此时将显示服务启动页。",
+      "pos": [
+        3815,
+        3826
+      ]
+    },
+    {
+      "content": "与前面一样，使用启动页上的“立即试用”按钮，或使用连接到移动服务的客户端应用程序，调用可生成数据库更改的某些操作。",
+      "pos": [
+        3831,
+        3888
+      ]
+    },
+    {
+      "pos": [
+        3895,
+        3956
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>当你使用“立即试用”按钮来启动帮助 API 页时，请记得提供应用程序密钥作为密码（用户名为空白）。"
+    },
+    {
+      "content": "在 SQL Server Management Studio 中连接到 SQL Server 实例，打开对象资源管理器，然后依次展开“OnPremisesDB”数据库和“表”。",
+      "pos": [
+        3961,
+        4049
+      ]
+    },
+    {
+      "content": "右键单击“hybridService1.TodoItems”表，然后选择“选择前 1000 行”以查看结果。",
+      "pos": [
+        4054,
+        4108
+      ]
+    },
+    {
+      "content": "请注意，移动服务已使用混合连接将应用中生成的更改保存到本地数据库。",
+      "pos": [
+        4114,
+        4147
+      ]
+    },
+    {
+      "content": "另请参阅",
+      "pos": [
+        4151,
+        4155
+      ]
+    },
+    {
+      "content": "混合连接网站",
+      "pos": [
+        4163,
+        4169
+      ]
+    },
+    {
+      "content": "[混合连接概述](/documentation/articles/integration-hybrid-connection-overview",
+      "pos": [
+        4234,
+        4305
+      ]
+    },
+    {
+      "content": "BizTalk 服务：“仪表板”、“监视”、“缩放”、“配置”和“混合连接”选项卡",
+      "pos": [
+        4309,
+        4350
+      ]
+    },
+    {
+      "content": "如何对 .NET 后端移动服务进行数据模型更改",
+      "pos": [
+        4417,
+        4440
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"使用混合连接从 .NET 后端移动服务连接到本地 SQL Server | Azure 移动服务\"\n    description=\"了解如何使用 Azure 混合连接从 .NET 后端移动服务连接到本地 SQL Server\"\n    services=\"mobile-services\"\n    documentationCenter=\"\"\n    authors=\"ggailey777\"\n    manager=\"dwrede\"\n    editor=\"\"/>\n\n<tags \n    ms.service=\"mobile-services\" \n    ms.date=\"12/11/2015\"\n    wacn.date=\"01/29/2016\"/>\n\n  \n# 使用混合连接从 Azure 移动服务连接到本地 SQL Server \n\n[AZURE.INCLUDE [mobile-service-note-mobile-apps](../includes/mobile-services-note-mobile-apps.md)]\n\n&nbsp;\n\n当企业在过渡到云环境时，可能无法立即就将所有资产迁移到 Azure。使用混合连接，Azure 移动服务可以安全地连接到本地资产。这样，移动客户端便可以使用 Azure 访问你的本地数据。支持的资产包括静态 TCP 端口上运行的任何资源，例如 Microsoft SQL Server、MySQL、HTTP Web API 和大多数自定义 Web 服务。混合连接使用共享访问签名 (SAS) 授权，确保从移动服务和本地混合连接管理器到混合连接的连接安全。有关详细信息，请参阅[混合连接概述](/documentation/articles/integration-hybrid-connection-overview)。\n\n在本教程中，你将学习如何修改 .NET 后端移动服务，以使用本地 SQL Server 数据库，而不是随服务一起提供的默认 Azure SQL 数据库。如[此文](http://blogs.msdn.com/b/azuremobile/archive/2014/05/12/connecting-to-an-external-database-with-node-js-backend-in-azure-mobile-services.aspx)中所述，JavaScript 后端移动服务也支持混合连接。\n\n\n##先决条件##\n\n本教程要求做好以下准备：\n\n- **现有的 .NET 后端移动服务**<br/>遵循[移动服务入门]教程，从 [Azure 经典门户]创建和下载新的 .NET 后端移动服务。\n\n[AZURE.INCLUDE [hybrid-connections-prerequisites](../includes/hybrid-connections-prerequisites.md)]\n\n## 安装 SQL Server Express，启用 TCP/IP 并在本地创建一个 SQL Server 数据库\n\n[AZURE.INCLUDE [hybrid-connections-create-on-premises-database](../includes/hybrid-connections-create-on-premises-database.md)]\n\n## 创建混合连接\n\n[AZURE.INCLUDE [hybrid-connections-create-new](../includes/hybrid-connections-create-new.md)]\n\n\n## 安装本地混合连接管理器以完成连接\n\n\n[AZURE.INCLUDE [hybrid-connections-install-connection-manager](../includes/hybrid-connections-install-connection-manager.md)]\n\n## 配置移动服务项目以连接到 SQL Server 数据库\n\n在此步骤中，定义本地数据库的连接字符串，并修改移动服务以使用此连接。\n\n1. 在 Visual Studio 2013 中，打开用于定义 .NET 后端移动服务的项目。 \n\n    若要了解如何下载 .NET 后端项目，请参阅[移动服务入门](/documentation/articles/mobile-services-dotnet-backend-windows-store-dotnet-get-started)。\n\n2. 在“解决方案资源管理器”中打开 Web.config 文件，找到 **connectionStrings** 节，添加类似于以下内容的新 SqlClient 项目，此项目指向本地 SQL Server 数据库：\n    \n        <add name=\"OnPremisesDBConnection\" \n         connectionString=\"Data Source=OnPremisesServer,1433;\n         Initial Catalog=OnPremisesDB;\n         User ID=HybridConnectionLogin;\n         Password=<**secure_password**>;\n         MultipleActiveResultSets=True\"\n         providerName=\"System.Data.SqlClient\" />\n\n    请记得将这个字符串中的 `<**secure_password**>` 替换成你为 *HbyridConnectionLogin* 创建的密码。\n    \n3. 在 Visual Studio 中单击“保存”以保存 Web.config 文件。\n\n    > [AZURE.NOTE]在本地计算机上运行时，使用此连接设置。在 Azure 中运行时，则以门户中定义的连接设置覆盖此设置。\n\n4. 展开“Models”文件夹并打开文件名以 *Context.cs* 结尾的数据模型文件。\n\n5. 修改 **DbContext** 实例构造函数，以将 `OnPremisesDBConnection` 值传递到类似于以下代码段的基本 **DbContext** 构造函数：\n\n        public class hybridService1Context : DbContext\n        {\n            public hybridService1Context()\n                : base(\"OnPremisesDBConnection\")\n            {\n            }\n        }\n\n    现在，服务将使用新的 SQL Server 数据库连接。\n##在本地测试数据库连接\n\n在发布到 Azure 并使用混合连接之前，最好先确保数据库连接能够在本地运行时正常工作。这样，你就可以更轻松地诊断并更正任何连接问题，然后重新发布并开始使用混合连接。\n\n[AZURE.INCLUDE [mobile-services-dotnet-backend-test-local-service-api-documentation](../includes/mobile-services-dotnet-backend-test-local-service-api-documentation.md)]\n\n## 更新 Azure 以使用本地连接字符串\n\n在验证数据库连接后，需要为这个新的连接字符串添加应用设置，以便能够从 Azure 使用该连接字符串，并且能够将移动服务发布到 Azure。\n\n1. 在 [Azure 经典门户]中，浏览到你的移动服务。\n\n1. 单击“配置”选项卡，然后找到“连接字符串”部分。\n\n    ![本地数据库的连接字符串](./media/mobile-services-dotnet-backend-hybrid-connections-get-started/11.png)\n\n3. 添加名为 `OnPremisesDBConnection` 的新 **SQL Server** 连接字符串，其值如下：\n\n        Server=OnPremisesServer,1433;Database=OnPremisesDB;User ID=HybridConnectionsLogin;Password=<**secure_password**>\n\n\n    将 `<**secure_password**>` 替换为 *HybridConnectionLogin* 的安全密码。\n\n4. 按“保存”以保存混合连接以及刚刚创建的连接字符串。\n\n5. 使用 Visual Studio 将更新的移动服务项目发布到 Azure。\n\n    此时将显示服务启动页。\n\n6. 与前面一样，使用启动页上的“立即试用”按钮，或使用连接到移动服务的客户端应用程序，调用可生成数据库更改的某些操作。\n\n    >[AZURE.NOTE]当你使用“立即试用”按钮来启动帮助 API 页时，请记得提供应用程序密钥作为密码（用户名为空白）。\n\n7. 在 SQL Server Management Studio 中连接到 SQL Server 实例，打开对象资源管理器，然后依次展开“OnPremisesDB”数据库和“表”。\n\n8. 右键单击“hybridService1.TodoItems”表，然后选择“选择前 1000 行”以查看结果。\n\n    请注意，移动服务已使用混合连接将应用中生成的更改保存到本地数据库。\n\n##另请参阅##\n \n+ [混合连接网站](http://azure.microsoft.com/zh-cn/services/biztalk-services/)\n+ [混合连接概述](/documentation/articles/integration-hybrid-connection-overview\n+ [BizTalk 服务：“仪表板”、“监视”、“缩放”、“配置”和“混合连接”选项卡](/documentation/articles/biztalk-dashboard-monitor-scale-tabs)\n+ [如何对 .NET 后端移动服务进行数据模型更改](/documentation/articles/mobile-services-dotnet-backend-how-to-use-code-first-migrations)\n\n<!-- IMAGES -->\n\n<!-- Links -->\n[Azure 经典门户]: http://manage.windowsazure.cn\n[移动服务入门]: /documentation/articles/mobile-services-dotnet-backend-windows-store-dotnet-get-started\n\n<!---HONumber=Mooncake_0118_2016-->"
+}

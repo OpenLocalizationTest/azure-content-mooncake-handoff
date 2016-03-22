@@ -1,0 +1,333 @@
+{
+  "nodes": [
+    {
+      "content": "在 HDInsight 中将 Hadoop Pig 与 Curl 配合使用 | Azure",
+      "pos": [
+        26,
+        71
+      ]
+    },
+    {
+      "content": "学习如何使用 Curl 在 Azure HDInsight 中的 Hadoop 群集上运行 Pig Latin 作业。",
+      "pos": [
+        89,
+        148
+      ]
+    },
+    {
+      "content": "使用 Curl 配合 HDInsight 上的 Hadoop 运行 Pig 作业",
+      "pos": [
+        382,
+        422
+      ]
+    },
+    {
+      "content": "在本文档中，你将学习如何使用 Curl 在 Azure HDInsight 群集上运行 Pig Latin 作业。可以使用 Pig Latin 编程语言来描述应用到输入数据以生成所需输出的转换。",
+      "pos": [
+        499,
+        596
+      ]
+    },
+    {
+      "content": "本文档使用 Curl 演示如何使用原始 HTTP 请求来与 HDInsight 交互，以便运行、监视和检索 Pig 作业的结果。若要执行这些操作，需要使用 HDInsight 群集提供的 WebHCat REST API（前称 Templeton）。",
+      "pos": [
+        598,
+        723
+      ]
+    },
+    {
+      "pos": [
+        727,
+        750
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"prereq\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>先决条件"
+    },
+    {
+      "content": "若要完成本文中的步骤，你将需要：",
+      "pos": [
+        752,
+        768
+      ]
+    },
+    {
+      "content": "Azure HDInsight（HDInsight 上的 Hadoop）群集（基于 Windows）",
+      "pos": [
+        772,
+        822
+      ]
+    },
+    {
+      "content": "Curl",
+      "pos": [
+        827,
+        831
+      ]
+    },
+    {
+      "content": "jq",
+      "pos": [
+        859,
+        861
+      ]
+    },
+    {
+      "pos": [
+        897,
+        933
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"curl\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>通过使用 Curl 运行 Pig 作业"
+    },
+    {
+      "pos": [
+        937,
+        1068
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>使用 Curl 或者与 WebHCat 进行任何其他形式的 REST 通信时，必须提供 HDInsight 群集管理员用户名和密码对请求进行身份验证。此外，还必须使用群集名称作为用来向服务器发送请求的统一资源标识符 (URI) 的一部分。"
+    },
+    {
+      "pos": [
+        1071,
+        1308
+      ],
+      "content": "<p>对本部分中的所有命令，请将 **USERNAME** 替换为在群集上进行身份验证群集的用户，并将 **PASSWORD** 替换为用户帐户的密码。将 **CLUSTERNAME** 替换为群集名称。\n<p>REST API 通过[基本访问身份验证](http://en.wikipedia.org/wiki/Basic_access_authentication)进行保护。你始终应该使用安全 HTTP (HTTPS) 来发出请求，以确保安全地将凭据发送到服务器。",
+      "leadings": [
+        "",
+        "> "
+      ],
+      "nodes": [
+        {
+          "content": "对本部分中的所有命令，请将 <bpt id=\"p1\">**</bpt>USERNAME<ept id=\"p1\">**</ept> 替换为在群集上进行身份验证群集的用户，并将 <bpt id=\"p2\">**</bpt>PASSWORD<ept id=\"p2\">**</ept> 替换为用户帐户的密码。将 <bpt id=\"p3\">**</bpt>CLUSTERNAME<ept id=\"p3\">**</ept> 替换为群集名称。",
+          "pos": [
+            3,
+            102
+          ]
+        },
+        {
+          "content": "REST API 通过<bpt id=\"p1\">[</bpt><ept id=\"p1\">基本访问身份验证](http://en.wikipedia.org/wiki/Basic_access_authentication)</ept>进行保护。你始终应该使用安全 HTTP (HTTPS) 来发出请求，以确保安全地将凭据发送到服务器。",
+          "pos": [
+            106,
+            235
+          ]
+        }
+      ]
+    },
+    {
+      "content": "在命令行中，使用以下命令验证你是否可以连接到 HDInsight 群集。",
+      "pos": [
+        1313,
+        1349
+      ]
+    },
+    {
+      "content": "你应会收到类似于下面的响应：",
+      "pos": [
+        1451,
+        1465
+      ]
+    },
+    {
+      "content": "此命令中使用的参数如下：",
+      "pos": [
+        1511,
+        1523
+      ]
+    },
+    {
+      "pos": [
+        1531,
+        1557
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-u<ept id=\"p1\">**</ept>：用来对请求进行身份验证的用户名和密码。"
+    },
+    {
+      "pos": [
+        1564,
+        1582
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-G<ept id=\"p1\">**</ept>：指示这是 GET 请求"
+    },
+    {
+      "pos": [
+        1588,
+        1717
+      ],
+      "content": "所有请求的 URL 开头 ****https://CLUSTERNAME.azurehdinsight.cn/templeton/v1** 都是一样的。路径 <bpt id=\"p1\">**</bpt>/status<ept id=\"p1\">**</ept> 指示请求是要返回服务器的 WebHCat（也称为 Templeton）状态。"
+    },
+    {
+      "content": "使用以下代码将 Pig Latin 作业提交到群集：",
+      "pos": [
+        1722,
+        1748
+      ]
+    },
+    {
+      "content": "此命令中使用的参数如下：",
+      "pos": [
+        2314,
+        2326
+      ]
+    },
+    {
+      "pos": [
+        2334,
+        2385
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>-d<ept id=\"p1\">**</ept>：由于未使用 <ph id=\"ph1\">`-G`</ph>，请求默认为 POST 方法。<ph id=\"ph2\">`-d`</ph> 指定与请求一起发送的数据值。"
+    },
+    {
+      "pos": [
+        2397,
+        2420
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>user.name<ept id=\"p1\">**</ept>：正在运行命令的用户"
+    },
+    {
+      "pos": [
+        2431,
+        2460
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>execute<ept id=\"p1\">**</ept>：要执行的 Pig Latin 语句"
+    },
+    {
+      "pos": [
+        2471,
+        2498
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>statusdir<ept id=\"p1\">**</ept>：此作业的状态要写入到的目录"
+    },
+    {
+      "pos": [
+        2506,
+        2566
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>请注意，在与 Curl 配合使用时，将使用 <ph id=\"ph2\">`+`</ph> 字符替换 Pig Latin 语句中的空格。"
+    },
+    {
+      "content": "此命令应会返回可用来检查作业状态的作业 ID，例如：",
+      "pos": [
+        2572,
+        2598
+      ]
+    },
+    {
+      "pos": [
+        2644,
+        2770
+      ],
+      "content": "若要检查作业的状态，请使用以下命令。将 <bpt id=\"p1\">**</bpt>JOBID<ept id=\"p1\">**</ept> 替换为上一步骤返回的值。例如，如果返回值为 <ph id=\"ph1\">`{\"id\":\"job_1415651640909_0026\"}`</ph>，则 <bpt id=\"p2\">**</bpt>JOBID<ept id=\"p2\">**</ept> 将是 <ph id=\"ph2\">`job_1415651640909_0026`</ph>。"
+    },
+    {
+      "pos": [
+        2917,
+        2944
+      ],
+      "content": "如果作业已完成，状态将是 <bpt id=\"p1\">**</bpt>SUCCEEDED<ept id=\"p1\">**</ept>。"
+    },
+    {
+      "pos": [
+        2952,
+        3027
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>此 Curl 请求返回具有作业相关信息的 JavaScript 对象表示法 (JSON) 文档；使用 jq 可以仅检索状态值。"
+    },
+    {
+      "pos": [
+        3031,
+        3055
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"results\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>查看结果"
+    },
+    {
+      "pos": [
+        3057,
+        3240
+      ],
+      "content": "在作业的状态更改为 <bpt id=\"p1\">**</bpt>SUCCEEDED<ept id=\"p1\">**</ept> 后，你可以从 Azure Blob 存储中检索作业的结果。随查询一起传递的 <ph id=\"ph1\">`statusdir`</ph> 参数包含输出文件的位置；在本例中为 ****wasb:///example/pigcurl**。此地址会将作业的输出存储在 HDInsight 群集所用的默认存储容器的 <bpt id=\"p2\">**</bpt>example/pigcurl<ept id=\"p2\">**</ept> 目录中。"
+    },
+    {
+      "pos": [
+        3242,
+        3353
+      ],
+      "content": "可以使用 <bpt id=\"p1\">[</bpt>Azure CLI<ept id=\"p1\">](/documentation/articles/xplat-cli-install)</ept> 列出并下载这些文件。例如，若要列出 <bpt id=\"p2\">**</bpt>example/pigcurl<ept id=\"p2\">**</ept> 中的文件，请使用以下命令："
+    },
+    {
+      "content": "若要下载文件，请使用以下命令：",
+      "pos": [
+        3417,
+        3432
+      ]
+    },
+    {
+      "pos": [
+        3517,
+        3639
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>你必须使用 <ph id=\"ph2\">`-a`</ph> 和 <ph id=\"ph3\">`-k`</ph> 参数指定包含 Blob 的存储帐户名称，或者设置 <bpt id=\"p1\">**</bpt>AZURE\\_STORAGE\\_ACCOUNT<ept id=\"p1\">**</ept> 和 <bpt id=\"p2\">**</bpt>AZURE\\_STORAGE\\_ACCESS\\_KEY<ept id=\"p2\">**</ept> 环境变量。"
+    },
+    {
+      "pos": [
+        3643,
+        3665
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"summary\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>摘要"
+    },
+    {
+      "content": "如本文档中所示，你可以使用原始 HTTP 请求来运行、监视和查看 HDInsight 群集上的 Pig 作业的结果。",
+      "pos": [
+        3667,
+        3725
+      ]
+    },
+    {
+      "pos": [
+        3727,
+        3834
+      ],
+      "content": "有关本文中使用的 REST 接口的详细信息，请参阅 <bpt id=\"p1\">[</bpt>WebHCat 参考<ept id=\"p1\">](https://cwiki.apache.org/confluence/display/Hive/WebHCat+Reference)</ept>。"
+    },
+    {
+      "pos": [
+        3838,
+        3864
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"nextsteps\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>后续步骤"
+    },
+    {
+      "content": "有关 HDInsight 上的 Pig 的一般信息：",
+      "pos": [
+        3866,
+        3892
+      ]
+    },
+    {
+      "content": "将 Pig 与 HDInsight 上的 Hadoop 配合使用",
+      "pos": [
+        3897,
+        3929
+      ]
+    },
+    {
+      "content": "有关 HDInsight 上的 Hadoop 的其他使用方法的信息：",
+      "pos": [
+        3975,
+        4009
+      ]
+    },
+    {
+      "content": "将 Hive 与 HDInsight 上的 Hadoop 配合使用",
+      "pos": [
+        4014,
+        4047
+      ]
+    },
+    {
+      "content": "将 MapReduce 与 HDInsight 上的 Hadoop 配合使用",
+      "pos": [
+        4097,
+        4135
+      ]
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"在 HDInsight 中将 Hadoop Pig 与 Curl 配合使用 | Azure\"\n   description=\"学习如何使用 Curl 在 Azure HDInsight 中的 Hadoop 群集上运行 Pig Latin 作业。\"\n   services=\"hdinsight\"\n   documentationCenter=\"\"\n   authors=\"Blackmist\"\n   manager=\"paulettm\"\n   editor=\"cgronlun\"\n    tags=\"azure-portal\"/>\n\n<tags\n    ms.service=\"hdinsight\"\n    ms.date=\"01/08/2016\"\n    wacn.date=\"03/03/2016\"/>\n\n#使用 Curl 配合 HDInsight 上的 Hadoop 运行 Pig 作业\n\n[AZURE.INCLUDE [pig-selector](../includes/hdinsight-selector-use-pig.md)]\n\n在本文档中，你将学习如何使用 Curl 在 Azure HDInsight 群集上运行 Pig Latin 作业。可以使用 Pig Latin 编程语言来描述应用到输入数据以生成所需输出的转换。\n\n本文档使用 Curl 演示如何使用原始 HTTP 请求来与 HDInsight 交互，以便运行、监视和检索 Pig 作业的结果。若要执行这些操作，需要使用 HDInsight 群集提供的 WebHCat REST API（前称 Templeton）。\n\n##<a id=\"prereq\"></a>先决条件\n\n若要完成本文中的步骤，你将需要：\n\n* Azure HDInsight（HDInsight 上的 Hadoop）群集（基于 Windows）\n\n* [Curl](http://curl.haxx.se/)\n\n* [jq](http://stedolan.github.io/jq/)\n\n##<a id=\"curl\"></a>通过使用 Curl 运行 Pig 作业\n\n> [AZURE.NOTE]使用 Curl 或者与 WebHCat 进行任何其他形式的 REST 通信时，必须提供 HDInsight 群集管理员用户名和密码对请求进行身份验证。此外，还必须使用群集名称作为用来向服务器发送请求的统一资源标识符 (URI) 的一部分。\n> <p>对本部分中的所有命令，请将 **USERNAME** 替换为在群集上进行身份验证群集的用户，并将 **PASSWORD** 替换为用户帐户的密码。将 **CLUSTERNAME** 替换为群集名称。\n> <p>REST API 通过[基本访问身份验证](http://en.wikipedia.org/wiki/Basic_access_authentication)进行保护。你始终应该使用安全 HTTP (HTTPS) 来发出请求，以确保安全地将凭据发送到服务器。\n\n1. 在命令行中，使用以下命令验证你是否可以连接到 HDInsight 群集。\n\n        curl -u USERNAME:PASSWORD -G https://CLUSTERNAME.azurehdinsight.cn/templeton/v1/status\n\n    你应会收到类似于下面的响应：\n\n        {\"status\":\"ok\",\"version\":\"v1\"}\n\n    此命令中使用的参数如下：\n\n    * **-u**：用来对请求进行身份验证的用户名和密码。\n    * **-G**：指示这是 GET 请求\n\n    所有请求的 URL 开头 ****https://CLUSTERNAME.azurehdinsight.cn/templeton/v1** 都是一样的。路径 **/status** 指示请求是要返回服务器的 WebHCat（也称为 Templeton）状态。\n\n2. 使用以下代码将 Pig Latin 作业提交到群集：\n\n        curl -u USERNAME:PASSWORD -d user.name=USERNAME -d execute=\"LOGS=LOAD+'wasb:///example/data/sample.log';LEVELS=foreach+LOGS+generate+REGEX_EXTRACT($0,'(TRACE|DEBUG|INFO|WARN|ERROR|FATAL)',1)+as+LOGLEVEL;FILTEREDLEVELS=FILTER+LEVELS+by+LOGLEVEL+is+not+null;GROUPEDLEVELS=GROUP+FILTEREDLEVELS+by+LOGLEVEL;FREQUENCIES=foreach+GROUPEDLEVELS+generate+group+as+LOGLEVEL,COUNT(FILTEREDLEVELS.LOGLEVEL)+as+count;RESULT=order+FREQUENCIES+by+COUNT+desc;DUMP+RESULT;\" -d statusdir=\"wasb:///example/pigcurl\" https://CLUSTERNAME.azurehdinsight.cn/templeton/v1/pig\n\n    此命令中使用的参数如下：\n\n    * **-d**：由于未使用 `-G`，请求默认为 POST 方法。`-d` 指定与请求一起发送的数据值。\n\n        * **user.name**：正在运行命令的用户\n        * **execute**：要执行的 Pig Latin 语句\n        * **statusdir**：此作业的状态要写入到的目录\n\n    > [AZURE.NOTE]请注意，在与 Curl 配合使用时，将使用 `+` 字符替换 Pig Latin 语句中的空格。\n\n    此命令应会返回可用来检查作业状态的作业 ID，例如：\n\n        {\"id\":\"job_1415651640909_0026\"}\n\n3. 若要检查作业的状态，请使用以下命令。将 **JOBID** 替换为上一步骤返回的值。例如，如果返回值为 `{\"id\":\"job_1415651640909_0026\"}`，则 **JOBID** 将是 `job_1415651640909_0026`。\n\n        curl -G -u USERNAME:PASSWORD -d user.name=USERNAME https://CLUSTERNAME.azurehdinsight.cn/templeton/v1/jobs/JOBID | jq .status.state\n\n    如果作业已完成，状态将是 **SUCCEEDED**。\n\n    > [AZURE.NOTE]此 Curl 请求返回具有作业相关信息的 JavaScript 对象表示法 (JSON) 文档；使用 jq 可以仅检索状态值。\n\n##<a id=\"results\"></a>查看结果\n\n在作业的状态更改为 **SUCCEEDED** 后，你可以从 Azure Blob 存储中检索作业的结果。随查询一起传递的 `statusdir` 参数包含输出文件的位置；在本例中为 ****wasb:///example/pigcurl**。此地址会将作业的输出存储在 HDInsight 群集所用的默认存储容器的 **example/pigcurl** 目录中。\n\n可以使用 [Azure CLI](/documentation/articles/xplat-cli-install) 列出并下载这些文件。例如，若要列出 **example/pigcurl** 中的文件，请使用以下命令：\n\n    azure storage blob list <container-name> example/pigcurl\n\n若要下载文件，请使用以下命令：\n\n    azure storage blob download <container-name> <blob-name> <destination-file>\n\n> [AZURE.NOTE]你必须使用 `-a` 和 `-k` 参数指定包含 Blob 的存储帐户名称，或者设置 **AZURE\\_STORAGE\\_ACCOUNT** 和 **AZURE\\_STORAGE\\_ACCESS\\_KEY** 环境变量。\n\n##<a id=\"summary\"></a>摘要\n\n如本文档中所示，你可以使用原始 HTTP 请求来运行、监视和查看 HDInsight 群集上的 Pig 作业的结果。\n\n有关本文中使用的 REST 接口的详细信息，请参阅 [WebHCat 参考](https://cwiki.apache.org/confluence/display/Hive/WebHCat+Reference)。\n\n##<a id=\"nextsteps\"></a>后续步骤\n\n有关 HDInsight 上的 Pig 的一般信息：\n\n* [将 Pig 与 HDInsight 上的 Hadoop 配合使用](/documentation/articles/hdinsight-use-pig)\n\n有关 HDInsight 上的 Hadoop 的其他使用方法的信息：\n\n* [将 Hive 与 HDInsight 上的 Hadoop 配合使用](/documentation/articles/hdinsight-use-hive)\n\n* [将 MapReduce 与 HDInsight 上的 Hadoop 配合使用](/documentation/articles/hdinsight-use-mapreduce)\n\n<!---HONumber=Mooncake_1207_2015-->"
+}

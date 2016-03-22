@@ -1,0 +1,453 @@
+{
+  "nodes": [
+    {
+      "content": "在 HDInsight 中的 Hadoop 上将 C# 与 Hive 和 Pig 配合使用 | Azure",
+      "pos": [
+        27,
+        80
+      ]
+    },
+    {
+      "content": "了解在 Azure HDInsight 中如何将 C# 用户定义的函数 (UDF) 与 Hive 和 Pig 流式处理配合使用。",
+      "pos": [
+        99,
+        163
+      ]
+    },
+    {
+      "content": "在 HDInsight 中的 Hadoop 上将 C# 用户定义函数与 Hive 和 Pig 流式处理配合使用",
+      "pos": [
+        403,
+        458
+      ]
+    },
+    {
+      "content": "Hive 和 Pig 非常适合用于处理 Azure HDInsight 中的数据，但有时你需要一种更通用的语言。Hive 和 Pig 都允许你通过用户定义的函数 (UDF) 或流式处理来调用外部代码。",
+      "pos": [
+        460,
+        560
+      ]
+    },
+    {
+      "content": "在本文档中，你将了解如何将 C# 与 Hive 和 Pig 配合使用。",
+      "pos": [
+        562,
+        597
+      ]
+    },
+    {
+      "content": "先决条件",
+      "pos": [
+        601,
+        605
+      ]
+    },
+    {
+      "content": "Windows 7、Windows 8 或 Windows 8.1。",
+      "pos": [
+        609,
+        643
+      ]
+    },
+    {
+      "content": "以下版本的 Visual Studio：",
+      "pos": [
+        647,
+        667
+      ]
+    },
+    {
+      "pos": [
+        675,
+        796
+      ],
+      "content": "包含 <bpt id=\"p1\">[</bpt>Update 4<ept id=\"p1\">](http://www.microsoft.com/download/details.aspx?id=39305)</ept> 的 Visual Studio 2012 Professional/Premium/Ultimate"
+    },
+    {
+      "pos": [
+        804,
+        936
+      ],
+      "content": "包含 <bpt id=\"p1\">[</bpt>Update 4<ept id=\"p1\">](https://www.microsoft.com/download/details.aspx?id=44921)</ept> 的 Visual Studio 2013 Community/Professional/Premium/Ultimate"
+    },
+    {
+      "content": "Visual Studio 2015 预览版",
+      "pos": [
+        944,
+        966
+      ]
+    },
+    {
+      "pos": [
+        970,
+        1081
+      ],
+      "content": "HDInsight 群集上的 Hadoop - 有关创建群集的步骤，请参阅<bpt id=\"p1\">[</bpt>设置 HDInsight 群集<ept id=\"p1\">](/documentation/articles/hdinsight-provision-clusters-v1)</ept>"
+    },
+    {
+      "pos": [
+        1085,
+        1255
+      ],
+      "content": "Hadoop Tools for Visual Studio。有关安装和配置该工具的步骤，请参阅<bpt id=\"p1\">[</bpt>开始使用 HDInsight Hadoop Tools for Visual Studio<ept id=\"p1\">](/documentation/articles/hdinsight-hadoop-visual-studio-tools-get-started)</ept>。"
+    },
+    {
+      "content": "HDInsight 上的 .NET",
+      "pos": [
+        1259,
+        1276
+      ]
+    },
+    {
+      "content": "基于 Windows 的 HDInsight 群集上会默认安装 .NET 通用语言运行时 (CLR) 和框架。这允许你将 C# 应用程序与 Hive 和 Pig 流式处理配合使用（通过 stdout/stdin 在 Hive/Pig 与 C# 应用程序之间传递数据）。",
+      "pos": [
+        1278,
+        1412
+      ]
+    },
+    {
+      "content": ".NET 和流式处理",
+      "pos": [
+        1417,
+        1427
+      ]
+    },
+    {
+      "pos": [
+        1429,
+        1555
+      ],
+      "content": "流式处理涉及 Hive 和 Pig 将数据通过 stdout 传递到外部应用程序，并通过 stdin 接收结果。对于 C# 应用程序，这可以通过 <ph id=\"ph1\">`Console.ReadLine()`</ph> 和 <ph id=\"ph2\">`Console.WriteLine()`</ph> 非常轻松地实现。"
+    },
+    {
+      "pos": [
+        1557,
+        1614
+      ],
+      "content": "因为 Hive 和 Pig 在运行时需要调用应用程序，因此，应当为你的 C# 项目使用<bpt id=\"p1\">**</bpt>控制台应用程序<ept id=\"p1\">**</ept>模板。"
+    },
+    {
+      "content": "Hive 和 C&amp;#35;",
+      "pos": [
+        1618,
+        1631
+      ]
+    },
+    {
+      "content": "创建 C# 项目",
+      "pos": [
+        1636,
+        1644
+      ]
+    },
+    {
+      "content": "打开 Visual Studio 并创建一个新的解决方案。对于项目类型，选择“控制台应用程序”，并将新项目命名为“HiveCSharp”。",
+      "pos": [
+        1649,
+        1718
+      ]
+    },
+    {
+      "pos": [
+        1723,
+        1751
+      ],
+      "content": "将 <bpt id=\"p1\">**</bpt>Program.cs<ept id=\"p1\">**</ept> 的内容替换为以下内容："
+    },
+    {
+      "content": "生成项目。",
+      "pos": [
+        3673,
+        3678
+      ]
+    },
+    {
+      "content": "上载到存储",
+      "pos": [
+        3683,
+        3688
+      ]
+    },
+    {
+      "content": "在 Visual Studio 中，打开“服务器资源管理器”。",
+      "pos": [
+        3693,
+        3724
+      ]
+    },
+    {
+      "content": "依次展开“Azure”和“HDInsight”。",
+      "pos": [
+        3729,
+        3753
+      ]
+    },
+    {
+      "content": "如果出现提示，请输入你的 Azure 订阅凭据，然后单击“登录”。",
+      "pos": [
+        3758,
+        3791
+      ]
+    },
+    {
+      "content": "展开你要将此应用程序部署到的 HDInsight 群集，然后展开“默认存储帐户”。",
+      "pos": [
+        3796,
+        3837
+      ]
+    },
+    {
+      "content": "显示群集存储帐户的服务器资源管理器",
+      "pos": [
+        3845,
+        3862
+      ]
+    },
+    {
+      "content": "双击群集的“默认容器”。这将打开一个新窗口，其中显示了默认容器的内容。",
+      "pos": [
+        3933,
+        3968
+      ]
+    },
+    {
+      "pos": [
+        3973,
+        4055
+      ],
+      "content": "单击上载图标，然后浏览到 <bpt id=\"p1\">**</bpt>HiveCSharp<ept id=\"p1\">**</ept> 项目的 <bpt id=\"p2\">**</bpt>bin\\\\debug<ept id=\"p2\">**</ept> 文件夹。最后，选择 HiveCSharp.exe 文件并单击“确定”。"
+    },
+    {
+      "content": "上载图标",
+      "pos": [
+        4063,
+        4067
+      ]
+    },
+    {
+      "content": "在上载完成后，你将能够通过 Hive 查询使用应用程序。",
+      "pos": [
+        4137,
+        4165
+      ]
+    },
+    {
+      "content": "Hive 查询",
+      "pos": [
+        4170,
+        4177
+      ]
+    },
+    {
+      "content": "在 Visual Studio 中，打开“服务器资源管理器”。",
+      "pos": [
+        4182,
+        4213
+      ]
+    },
+    {
+      "content": "依次展开“Azure”和“HDInsight”。",
+      "pos": [
+        4218,
+        4242
+      ]
+    },
+    {
+      "content": "右键单击你已将“HiveCSharp”应用程序部署到的群集，然后选择“编写 Hive 查询”。",
+      "pos": [
+        4247,
+        4294
+      ]
+    },
+    {
+      "content": "请为 Hive 查询使用以下内容：",
+      "pos": [
+        4299,
+        4316
+      ]
+    },
+    {
+      "pos": [
+        4588,
+        4819
+      ],
+      "content": "这将从 <ph id=\"ph1\">`hivesampletable`</ph> 中选择 <ph id=\"ph2\">`clientid`</ph>、<ph id=\"ph3\">`devicemake`</ph> 和 <ph id=\"ph4\">`devicemodel`</ph> 字段并将这些字段传递到 HiveCSharp.exe 应用程序。该查询预期应用程序返回三个字段，它们将存储为 <ph id=\"ph5\">`clientid`</ph>、<ph id=\"ph6\">`phoneLabel`</ph> 和 <ph id=\"ph7\">`phoneHash`</ph>。该查询还预期在默认存储容器的根目录中找到 HiveCSharp.exe (<ph id=\"ph8\">`add file wasb:///HiveCSharp.exe`</ph>)。"
+    },
+    {
+      "content": "单击“提交”将作业提交到 HDInsight 群集。此时将打开“Hive 作业摘要”窗口。",
+      "pos": [
+        4824,
+        4869
+      ]
+    },
+    {
+      "content": "单击“刷新”以刷新摘要，直到“作业状态”变为“已完成”。若要查看作业输出，请单击“作业输出”。",
+      "pos": [
+        4874,
+        4921
+      ]
+    },
+    {
+      "content": "Pig 和 C&amp;#35;",
+      "pos": [
+        4925,
+        4937
+      ]
+    },
+    {
+      "content": "创建 C# 项目",
+      "pos": [
+        4942,
+        4950
+      ]
+    },
+    {
+      "content": "打开 Visual Studio 并创建一个新的解决方案。对于项目类型，选择“控制台应用程序”，并将新项目命名为“PigUDF”。",
+      "pos": [
+        4955,
+        5020
+      ]
+    },
+    {
+      "pos": [
+        5025,
+        5055
+      ],
+      "content": "将 <bpt id=\"p1\">**</bpt>Program.cs<ept id=\"p1\">**</ept> 文件的内容替换为以下内容："
+    },
+    {
+      "pos": [
+        6100,
+        6156
+      ],
+      "content": "此应用程序将分析发送自 Pig 的行，并对以 <ph id=\"ph1\">`java.lang.Exception`</ph> 开头的行重新设置格式。"
+    },
+    {
+      "pos": [
+        6161,
+        6186
+      ],
+      "content": "保存 <bpt id=\"p1\">**</bpt>Program.cs<ept id=\"p1\">**</ept>，然后生成项目。"
+    },
+    {
+      "content": "上载应用程序",
+      "pos": [
+        6191,
+        6197
+      ]
+    },
+    {
+      "pos": [
+        6202,
+        6363
+      ],
+      "content": "Pig 流式处理预期应用程序位于群集文件系统本地。为 HDInsight 群集启用远程桌面，然后根据<bpt id=\"p1\">[</bpt>使用 RDP 连接到 HDInsight 群集<ept id=\"p1\">](/documentation/articles/hdinsight-administer-use-management-portal-v1#rdp)</ept>中的说明连接到该群集。"
+    },
+    {
+      "pos": [
+        6368,
+        6460
+      ],
+      "content": "在连接后，从你的本地计算机上 PigUDF 项目的 <bpt id=\"p1\">**</bpt>bin/debug<ept id=\"p1\">**</ept> 目录中复制 <bpt id=\"p2\">**</bpt>PigUDF.exe<ept id=\"p2\">**</ept>，并将其粘贴到群集上的 <bpt id=\"p3\">**</bpt>%PIG\\_HOME%<ept id=\"p3\">**</ept> 目录中。"
+    },
+    {
+      "content": "通过 Pig Latin 使用应用程序",
+      "pos": [
+        6465,
+        6484
+      ]
+    },
+    {
+      "content": "从远程桌面会话中，使用桌面上的“Hadoop 命令行”图标启动 Hadoop 命令行。",
+      "pos": [
+        6489,
+        6532
+      ]
+    },
+    {
+      "content": "使用以下命令来启动 Pig 命令行：",
+      "pos": [
+        6537,
+        6555
+      ]
+    },
+    {
+      "pos": [
+        6600,
+        6621
+      ],
+      "content": "系统将为你提供 <ph id=\"ph1\">`grunt&gt;`</ph> 提示符。"
+    },
+    {
+      "content": "输入以下命令以使用 .NET Framework 应用程序运行简单的 Pig 作业：",
+      "pos": [
+        6626,
+        6668
+      ]
+    },
+    {
+      "pos": [
+        6957,
+        7087
+      ],
+      "content": "<ph id=\"ph1\">`DEFINE`</ph> 语句为 pigudf.exe 应用程序创建别名 <ph id=\"ph2\">`streamer`</ph>，<ph id=\"ph3\">`SHIP`</ph> 将其在群集的节点中进行分发。以后，可以将 <ph id=\"ph4\">`streamer`</ph> 与 <ph id=\"ph5\">`STREAM`</ph> 运算符配合使用来处理 LOG 中包含的单一行，并将数据返回为一系列的列。"
+    },
+    {
+      "pos": [
+        7091,
+        7167
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>用于流式处理的应用程序名称在使用别名时必须用 <ph id=\"ph2\">`（反引号）字符括起来，当与 `</ph>SHIP` 一起使用时必须用 '（单引号）括起来。"
+    },
+    {
+      "content": "在输入最后一行后，该作业应该启动。最终，它将返回类似于以下内容的输出：",
+      "pos": [
+        7172,
+        7207
+      ]
+    },
+    {
+      "content": "摘要",
+      "pos": [
+        7634,
+        7636
+      ]
+    },
+    {
+      "pos": [
+        7638,
+        7823
+      ],
+      "content": "在本文档中，你已了解了如何在 HDInsight 上通过 Hive 和 Pig 使用 .NET Framework 应用程序。如果希望了解如何将 Python 与 Hive 和 Pig 配合使用，请参阅<bpt id=\"p1\">[</bpt>在 HDInsight 中将 Python 与 Hive 和 Pig 配合使用<ept id=\"p1\">](/documentation/articles/hdinsight-python)</ept>。"
+    },
+    {
+      "content": "若要了解使用 Pig、Hive 的其他方式以及如何使用 MapReduce，请参阅以下文章：",
+      "pos": [
+        7825,
+        7871
+      ]
+    },
+    {
+      "content": "将 Hive 与 HDInsight 配合使用",
+      "pos": [
+        7876,
+        7899
+      ]
+    },
+    {
+      "content": "将 Pig 与 HDInsight 配合使用",
+      "pos": [
+        7949,
+        7971
+      ]
+    },
+    {
+      "content": "将 MapReduce 与 HDInsight 配合使用",
+      "pos": [
+        8020,
+        8048
+      ]
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"在 HDInsight 中的 Hadoop 上将 C# 与 Hive 和 Pig 配合使用 | Azure\"\n    description=\"了解在 Azure HDInsight 中如何将 C# 用户定义的函数 (UDF) 与 Hive 和 Pig 流式处理配合使用。\"\n    services=\"hdinsight\"\n    documentationCenter=\"\"\n    authors=\"Blackmist\"\n    manager=\"paulettm\"\n    editor=\"cgronlun\"\n    tags=\"azure-portal\"/>\n\n<tags\n    ms.service=\"hdinsight\"\n    ms.date=\"12/04/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n\n#在 HDInsight 中的 Hadoop 上将 C# 用户定义函数与 Hive 和 Pig 流式处理配合使用\n\nHive 和 Pig 非常适合用于处理 Azure HDInsight 中的数据，但有时你需要一种更通用的语言。Hive 和 Pig 都允许你通过用户定义的函数 (UDF) 或流式处理来调用外部代码。\n\n在本文档中，你将了解如何将 C# 与 Hive 和 Pig 配合使用。\n\n##先决条件\n\n* Windows 7、Windows 8 或 Windows 8.1。\n\n* 以下版本的 Visual Studio：\n\n    * 包含 [Update 4](http://www.microsoft.com/download/details.aspx?id=39305) 的 Visual Studio 2012 Professional/Premium/Ultimate\n\n    * 包含 [Update 4](https://www.microsoft.com/download/details.aspx?id=44921) 的 Visual Studio 2013 Community/Professional/Premium/Ultimate\n\n    * Visual Studio 2015 预览版\n\n* HDInsight 群集上的 Hadoop - 有关创建群集的步骤，请参阅[设置 HDInsight 群集](/documentation/articles/hdinsight-provision-clusters-v1)\n\n* Hadoop Tools for Visual Studio。有关安装和配置该工具的步骤，请参阅[开始使用 HDInsight Hadoop Tools for Visual Studio](/documentation/articles/hdinsight-hadoop-visual-studio-tools-get-started)。\n\n##HDInsight 上的 .NET\n\n基于 Windows 的 HDInsight 群集上会默认安装 .NET 通用语言运行时 (CLR) 和框架。这允许你将 C# 应用程序与 Hive 和 Pig 流式处理配合使用（通过 stdout/stdin 在 Hive/Pig 与 C# 应用程序之间传递数据）。\n\n\n##.NET 和流式处理\n\n流式处理涉及 Hive 和 Pig 将数据通过 stdout 传递到外部应用程序，并通过 stdin 接收结果。对于 C# 应用程序，这可以通过 `Console.ReadLine()` 和 `Console.WriteLine()` 非常轻松地实现。\n\n因为 Hive 和 Pig 在运行时需要调用应用程序，因此，应当为你的 C# 项目使用**控制台应用程序**模板。\n\n##Hive 和 C&#35;\n\n###创建 C# 项目\n\n1. 打开 Visual Studio 并创建一个新的解决方案。对于项目类型，选择“控制台应用程序”，并将新项目命名为“HiveCSharp”。\n\n2. 将 **Program.cs** 的内容替换为以下内容：\n\n        using System;\n        using System.Security.Cryptography;\n        using System.Text;\n        using System.Threading.Tasks;\n\n        namespace HiveCSharp\n        {\n            class Program\n            {\n                static void Main(string[] args)\n                {\n                    string line;\n                    // Read stdin in a loop\n                    while ((line = Console.ReadLine()) != null)\n                    {\n                        // Parse the string, trimming line feeds\n                        // and splitting fields at tabs\n                        line = line.TrimEnd('\\n');\n                        string[] field = line.Split('\\t');\n                        string phoneLabel = field[1] + ' ' + field[2];\n                        // Emit new data to stdout, delimited by tabs\n                        Console.WriteLine(\"{0}\\t{1}\\t{2}\", field[0], phoneLabel, GetMD5Hash(phoneLabel));\n                    }\n                }\n                /// <summary>\n                /// Returns an MD5 hash for the given string\n                /// </summary>\n                /// <param name=\"input\">string value</param>\n                /// <returns>an MD5 hash</returns>\n                static string GetMD5Hash(string input)\n                {\n                    // Step 1, calculate MD5 hash from input\n                    MD5 md5 = System.Security.Cryptography.MD5.Create();\n                    byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);\n                    byte[] hash = md5.ComputeHash(inputBytes);\n\n                    // Step 2, convert byte array to hex string\n                    StringBuilder sb = new StringBuilder();\n                    for (int i = 0; i < hash.Length; i++)\n                    {\n                        sb.Append(hash[i].ToString(\"x2\"));\n                    }\n                    return sb.ToString();\n                }\n            }\n        }\n\n3. 生成项目。\n\n###上载到存储\n\n1. 在 Visual Studio 中，打开“服务器资源管理器”。\n\n3. 依次展开“Azure”和“HDInsight”。\n\n4. 如果出现提示，请输入你的 Azure 订阅凭据，然后单击“登录”。\n\n5. 展开你要将此应用程序部署到的 HDInsight 群集，然后展开“默认存储帐户”。\n\n    ![显示群集存储帐户的服务器资源管理器](./media/hdinsight-hadoop-hive-pig-udf-dotnet-csharp/storage.png)\n\n6. 双击群集的“默认容器”。这将打开一个新窗口，其中显示了默认容器的内容。\n\n7. 单击上载图标，然后浏览到 **HiveCSharp** 项目的 **bin\\\\debug** 文件夹。最后，选择 HiveCSharp.exe 文件并单击“确定”。\n\n    ![上载图标](./media/hdinsight-hadoop-hive-pig-udf-dotnet-csharp/upload.png)\n\n8. 在上载完成后，你将能够通过 Hive 查询使用应用程序。\n\n###Hive 查询\n\n1. 在 Visual Studio 中，打开“服务器资源管理器”。\n\n2. 依次展开“Azure”和“HDInsight”。\n\n5. 右键单击你已将“HiveCSharp”应用程序部署到的群集，然后选择“编写 Hive 查询”。\n\n6. 请为 Hive 查询使用以下内容：\n\n        add file wasb:///HiveCSharp.exe;\n\n        SELECT TRANSFORM (clientid, devicemake, devicemodel)\n        USING 'HiveCSharp.exe' AS\n        (clientid string, phoneLabel string, phoneHash string)\n        FROM hivesampletable\n        ORDER BY clientid LIMIT 50;\n\n    这将从 `hivesampletable` 中选择 `clientid`、`devicemake` 和 `devicemodel` 字段并将这些字段传递到 HiveCSharp.exe 应用程序。该查询预期应用程序返回三个字段，它们将存储为 `clientid`、`phoneLabel` 和 `phoneHash`。该查询还预期在默认存储容器的根目录中找到 HiveCSharp.exe (`add file wasb:///HiveCSharp.exe`)。\n\n5. 单击“提交”将作业提交到 HDInsight 群集。此时将打开“Hive 作业摘要”窗口。\n\n6. 单击“刷新”以刷新摘要，直到“作业状态”变为“已完成”。若要查看作业输出，请单击“作业输出”。\n\n##Pig 和 C&#35;\n\n###创建 C# 项目\n\n1. 打开 Visual Studio 并创建一个新的解决方案。对于项目类型，选择“控制台应用程序”，并将新项目命名为“PigUDF”。\n\n2. 将 **Program.cs** 文件的内容替换为以下内容：\n\n        using System;\n\n        namespace PigUDF\n        {\n            class Program\n            {\n                static void Main(string[] args)\n                {\n                    string line;\n                    // Read stdin in a loop\n                    while ((line = Console.ReadLine()) != null)\n                    {\n                        // Fix formatting on lines that begin with an exception\n                        if(line.StartsWith(\"java.lang.Exception\"))\n                        {\n                            // Trim the error info off the beginning and add a note to the end of the line\n                            line = line.Remove(0, 21) + \" - java.lang.Exception\";\n                        }\n                        // Split the fields apart at tab characters\n                        string[] field = line.Split('\\t');\n                        // Put fields back together for writing\n                        Console.WriteLine(String.Join(\"\\t\",field));\n                    }\n                }\n            }\n        }\n\n    此应用程序将分析发送自 Pig 的行，并对以 `java.lang.Exception` 开头的行重新设置格式。\n\n3. 保存 **Program.cs**，然后生成项目。\n\n###上载应用程序\n\n1. Pig 流式处理预期应用程序位于群集文件系统本地。为 HDInsight 群集启用远程桌面，然后根据[使用 RDP 连接到 HDInsight 群集](/documentation/articles/hdinsight-administer-use-management-portal-v1#rdp)中的说明连接到该群集。\n\n2. 在连接后，从你的本地计算机上 PigUDF 项目的 **bin/debug** 目录中复制 **PigUDF.exe**，并将其粘贴到群集上的 **%PIG\\_HOME%** 目录中。\n\n###通过 Pig Latin 使用应用程序\n\n1. 从远程桌面会话中，使用桌面上的“Hadoop 命令行”图标启动 Hadoop 命令行。\n\n2. 使用以下命令来启动 Pig 命令行：\n\n        cd %PIG_HOME%\n        bin\\pig\n\n    系统将为你提供 `grunt>` 提示符。\n\n3. 输入以下命令以使用 .NET Framework 应用程序运行简单的 Pig 作业：\n\n        DEFINE streamer `pigudf.exe` SHIP('pigudf.exe');\n        LOGS = LOAD 'wasb:///example/data/sample.log' as (LINE:chararray);\n        LOG = FILTER LOGS by LINE is not null;\n        DETAILS = STREAM LOG through streamer as (col1, col2, col3, col4, col5);\n        DUMP DETAILS;\n\n    `DEFINE` 语句为 pigudf.exe 应用程序创建别名 `streamer`，`SHIP` 将其在群集的节点中进行分发。以后，可以将 `streamer` 与 `STREAM` 运算符配合使用来处理 LOG 中包含的单一行，并将数据返回为一系列的列。\n\n> [AZURE.NOTE]用于流式处理的应用程序名称在使用别名时必须用 `（反引号）字符括起来，当与 `SHIP` 一起使用时必须用 '（单引号）括起来。\n\n3. 在输入最后一行后，该作业应该启动。最终，它将返回类似于以下内容的输出：\n\n        (2012-02-03 20:11:56 SampleClass5 [WARN] problem finding id 1358451042 - java.lang.Exception)\n        (2012-02-03 20:11:56 SampleClass5 [DEBUG] detail for id 1976092771)\n        (2012-02-03 20:11:56 SampleClass5 [TRACE] verbose detail for id 1317358561)\n        (2012-02-03 20:11:56 SampleClass5 [TRACE] verbose detail for id 1737534798)\n        (2012-02-03 20:11:56 SampleClass7 [DEBUG] detail for id 1475865947)\n\n##摘要\n\n在本文档中，你已了解了如何在 HDInsight 上通过 Hive 和 Pig 使用 .NET Framework 应用程序。如果希望了解如何将 Python 与 Hive 和 Pig 配合使用，请参阅[在 HDInsight 中将 Python 与 Hive 和 Pig 配合使用](/documentation/articles/hdinsight-python)。\n\n若要了解使用 Pig、Hive 的其他方式以及如何使用 MapReduce，请参阅以下文章：\n\n* [将 Hive 与 HDInsight 配合使用](/documentation/articles/hdinsight-use-hive)\n\n* [将 Pig 与 HDInsight 配合使用](/documentation/articles/hdinsight-use-pig)\n\n* [将 MapReduce 与 HDInsight 配合使用](/documentation/articles/hdinsight-use-mapreduce)\n\n<!---HONumber=79-->"
+}

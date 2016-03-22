@@ -1,0 +1,383 @@
+{
+  "nodes": [
+    {
+      "content": "将 MapReduce 与 HDInsight 上的 Hadoop 配合使用 | Azure",
+      "pos": [
+        26,
+        72
+      ]
+    },
+    {
+      "content": "学习如何在 HDInsight 上的 Hadoop 群集中运行 MapReduce 作业。你将运行一个实现为 Java MapReduce 作业的基本单词计数操作。",
+      "pos": [
+        90,
+        172
+      ]
+    },
+    {
+      "content": "在 HDInsight 上的 Hadoop 中使用 MapReduce",
+      "pos": [
+        407,
+        442
+      ]
+    },
+    {
+      "content": "在本文中，你将学习如何在 HDInsight 上的 Hadoop 群集中运行 MapReduce 作业。我们将运行一个实现为 Java MapReduce 作业的基本单词计数操作。",
+      "pos": [
+        531,
+        621
+      ]
+    },
+    {
+      "pos": [
+        625,
+        658
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"whatis\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>什么是 MapReduce？"
+    },
+    {
+      "content": "Hadoop MapReduce 是一个软件框架，用于编写处理海量数据的作业。输入数据已拆分成独立的区块，这些区块将在群集中的节点之间并行处理。MapReduce 作业包括两个函数：",
+      "pos": [
+        660,
+        751
+      ]
+    },
+    {
+      "pos": [
+        755,
+        808
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>映射器<ept id=\"p1\">**</ept>：使用输入数据，对数据进行分析（通常使用筛选器和排序操作），然后发出 Tuple（键/值对）"
+    },
+    {
+      "pos": [
+        811,
+        859
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>化简器<ept id=\"p1\">**</ept>：使用映射器发出的 Tuple，并执行汇总运算，以基于映射器数据创建更小的合并结果"
+    },
+    {
+      "content": "下图演示了一个基本的单词计数 MapReduce 作业示例：",
+      "pos": [
+        861,
+        891
+      ]
+    },
+    {
+      "content": "HDI.WordCountDiagram",
+      "pos": [
+        895,
+        915
+      ]
+    },
+    {
+      "content": "此作业的输出是某个单词在所分析的文本中出现的次数。",
+      "pos": [
+        946,
+        971
+      ]
+    },
+    {
+      "content": "映射器将输入文本中的每行用作一个输入并将其拆分为多个单词。每当文本中的单词后跟一个 1 时，映射器将发出一个键/值对。输出在发送到化简器之前经过排序。",
+      "pos": [
+        975,
+        1050
+      ]
+    },
+    {
+      "content": "随后，化简器会计算每个单词的计数的和并发出一个键/值对（包含单词，后跟该单词的总出现次数）。",
+      "pos": [
+        1054,
+        1100
+      ]
+    },
+    {
+      "content": "可以使用多种语言实现 MapReduce。Java 是最常见的实现，本文档中使用该语言进行演示。",
+      "pos": [
+        1102,
+        1150
+      ]
+    },
+    {
+      "content": "Hadoop 流式处理",
+      "pos": [
+        1156,
+        1167
+      ]
+    },
+    {
+      "content": "与 Java 应用程序一样，基于 Java 和 Java 虚拟机（例如 Scalding 或 Cascading）的语言或框架可以直接作为 MapReduce 作业运行。其他实体（例如 C# 或 Python）或独立的可执行文件必须使用 Hadoop 流式处理。",
+      "pos": [
+        1169,
+        1300
+      ]
+    },
+    {
+      "content": "Hadoop 流式处理通过 STDIN 和 STDOUT 与映射器和化简器通信 - 映射器和化简器每次从 STDIN 读取一行数据，并将输出写入到 STDOUT。读取的每行或者由映射器和化简器发出的每行必须采用制表符分隔的键/值对格式：",
+      "pos": [
+        1302,
+        1420
+      ]
+    },
+    {
+      "pos": [
+        1442,
+        1520
+      ],
+      "content": "有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Hadoop 流式处理<ept id=\"p1\">](http://hadoop.apache.org/docs/r1.2.1/streaming.html)</ept>。"
+    },
+    {
+      "content": "有关将 Hadoop 流式处理与 hdinsight 配合使用的示例，请参阅：",
+      "pos": [
+        1522,
+        1561
+      ]
+    },
+    {
+      "content": "开发 C# Hadoop 流式处理程序",
+      "pos": [
+        1566,
+        1585
+      ]
+    },
+    {
+      "pos": [
+        1662,
+        1685
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"data\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>关于示例数据"
+    },
+    {
+      "content": "对于本示例中的示例数据，你将使用 HDInsight 群集中作为文本文档提供的 Leonardo Da Vinci 笔记本。",
+      "pos": [
+        1687,
+        1749
+      ]
+    },
+    {
+      "pos": [
+        1751,
+        1883
+      ],
+      "content": "示例数据存储在 Azure Blob 存储中，HDInsight 可以将该存储用作 Hadoop 群集的默认文件系统。HDInsight 可以使用 <bpt id=\"p1\">**</bpt>wasb<ept id=\"p1\">**</ept> 前缀访问 Blob 存储中存储的文件。例如，若要访问 sample.log 文件，可使用以下语法："
+    },
+    {
+      "pos": [
+        1933,
+        2022
+      ],
+      "content": "由于 Azure Blob 存储是 HDInsight 的默认存储，因此你也可以使用 <bpt id=\"p1\">**</bpt>/example/data/gutenberg/davinci.txt<ept id=\"p1\">**</ept> 访问该文件。"
+    },
+    {
+      "pos": [
+        2026,
+        2248
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在上述语法中，****wasb:///** 用于访问 HDInsight 群集的默认存储容器中存储的文件。如果你在设置群集时指定了其他存储帐户，并想要访问这些帐户中存储的文件，你可以指定容器名称和存储帐户地址来访问数据。例如 ****wasb://mycontainer@mystorage.blob.core.chinacloudapi.cn/example/data/gutenberg/davinci.txt**。"
+    },
+    {
+      "pos": [
+        2252,
+        2282
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"job\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>关于示例 MapReduce"
+    },
+    {
+      "pos": [
+        2284,
+        2418
+      ],
+      "content": "本示例中使用的 MapReduce 作业位于 HDInsight 群集随附的 ****wasb://example/jars/hadoop-mapreduce-examples.jar** 中。其中包含一个你要针对 <bpt id=\"p1\">**</bpt>davinci.txt<ept id=\"p1\">**</ept> 运行的单词计数示例。"
+    },
+    {
+      "pos": [
+        2422,
+        2508
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>在 HDInsight 2.1 群集上，该文件位置为 ****wasb:///example/jars/hadoop-examples.jar**。"
+    },
+    {
+      "content": "下面提供了单词计数 MapReduce 作业的 Java 代码供你参考：",
+      "pos": [
+        2510,
+        2546
+      ]
+    },
+    {
+      "pos": [
+        5169,
+        5296
+      ],
+      "content": "有关编写自己的 MapReduce 作业的说明，请参阅<bpt id=\"p1\">[</bpt>为 HDInsight 开发 Java MapReduce 程序<ept id=\"p1\">](/documentation/articles/hdinsight-develop-deploy-java-mapreduce)</ept>。"
+    },
+    {
+      "pos": [
+        5300,
+        5328
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"run\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>运行 MapReduce"
+    },
+    {
+      "content": "HDInsight 可以使用各种方法运行 HiveQL 作业。使用下表来确定哪种方法最适合你，然后按链接进行演练。",
+      "pos": [
+        5330,
+        5387
+      ]
+    },
+    {
+      "pos": [
+        5391,
+        5403
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>使用此方法<ept id=\"p1\">**</ept>..."
+    },
+    {
+      "content": "...实现此目的",
+      "pos": [
+        5408,
+        5416
+      ]
+    },
+    {
+      "pos": [
+        5421,
+        5437
+      ],
+      "content": "...使用此<bpt id=\"p1\">**</bpt>群集操作系统<ept id=\"p1\">**</ept>"
+    },
+    {
+      "pos": [
+        5440,
+        5456
+      ],
+      "content": "...从此<bpt id=\"p1\">**</bpt>客户端操作系统<ept id=\"p1\">**</ept>"
+    },
+    {
+      "content": "Curl",
+      "pos": [
+        5678,
+        5682
+      ]
+    },
+    {
+      "pos": [
+        5747,
+        5765
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>REST<ept id=\"p1\">**</ept> 远程提交作业"
+    },
+    {
+      "content": "Windows",
+      "pos": [
+        5768,
+        5775
+      ]
+    },
+    {
+      "content": "Windows",
+      "pos": [
+        5778,
+        5785
+      ]
+    },
+    {
+      "content": "Windows PowerShell",
+      "pos": [
+        5791,
+        5809
+      ]
+    },
+    {
+      "pos": [
+        5880,
+        5912
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>Windows PowerShell<ept id=\"p1\">**</ept> 远程提交作业"
+    },
+    {
+      "content": "Windows",
+      "pos": [
+        5915,
+        5922
+      ]
+    },
+    {
+      "content": "Windows",
+      "pos": [
+        5925,
+        5932
+      ]
+    },
+    {
+      "content": "远程桌面",
+      "pos": [
+        5938,
+        5942
+      ]
+    },
+    {
+      "pos": [
+        6017,
+        6039
+      ],
+      "content": "通过<bpt id=\"p1\">**</bpt>远程桌面<ept id=\"p1\">**</ept>使用 Hadoop 命令"
+    },
+    {
+      "content": "Windows",
+      "pos": [
+        6042,
+        6049
+      ]
+    },
+    {
+      "content": "Windows",
+      "pos": [
+        6052,
+        6059
+      ]
+    },
+    {
+      "pos": [
+        6065,
+        6091
+      ],
+      "content": "<ph id=\"ph1\">&lt;a id=\"nextsteps\"&gt;</ph><ph id=\"ph2\">&lt;/a&gt;</ph>后续步骤"
+    },
+    {
+      "content": "虽然 MapReduce 提供了强大的诊断功能，但掌握起来可能会比较困难。有多个基于 Java 的框架可让你更轻松地定义 MapReduce 应用程序，还有一些技术（例如 Pig 和 Hive）可让你更方便地在 HDInsight 中处理数据。若要了解更多信息，请参阅下列文章：",
+      "pos": [
+        6093,
+        6232
+      ]
+    },
+    {
+      "content": "为 HDInsight 开发 Java MapReduce 程序",
+      "pos": [
+        6237,
+        6269
+      ]
+    },
+    {
+      "content": "将 Hive 与 HDInsight 配合使用",
+      "pos": [
+        6340,
+        6363
+      ]
+    },
+    {
+      "content": "将 Pig 与 HDInsight 配合使用",
+      "pos": [
+        6389,
+        6411
+      ]
+    },
+    {
+      "content": "运行 HDInsight 示例",
+      "pos": [
+        6436,
+        6451
+      ]
+    }
+  ],
+  "content": "<properties\n   pageTitle=\"将 MapReduce 与 HDInsight 上的 Hadoop 配合使用 | Azure\"\n   description=\"学习如何在 HDInsight 上的 Hadoop 群集中运行 MapReduce 作业。你将运行一个实现为 Java MapReduce 作业的基本单词计数操作。\"\n   services=\"hdinsight\"\n   documentationCenter=\"\"\n   authors=\"Blackmist\"\n   manager=\"paulettm\"\n   editor=\"cgronlun\"\n    tags=\"azure-portal\"/>\n\n<tags\n    ms.service=\"hdinsight\"\n    ms.date=\"01/08/2016\"\n    wacn.date=\"03/03/2016\"/>\n\n# 在 HDInsight 上的 Hadoop 中使用 MapReduce\n\n[AZURE.INCLUDE [mapreduce-selector](../includes/hdinsight-selector-use-mapreduce.md)]\n\n在本文中，你将学习如何在 HDInsight 上的 Hadoop 群集中运行 MapReduce 作业。我们将运行一个实现为 Java MapReduce 作业的基本单词计数操作。\n\n##<a id=\"whatis\"></a>什么是 MapReduce？\n\nHadoop MapReduce 是一个软件框架，用于编写处理海量数据的作业。输入数据已拆分成独立的区块，这些区块将在群集中的节点之间并行处理。MapReduce 作业包括两个函数：\n\n* **映射器**：使用输入数据，对数据进行分析（通常使用筛选器和排序操作），然后发出 Tuple（键/值对）\n* **化简器**：使用映射器发出的 Tuple，并执行汇总运算，以基于映射器数据创建更小的合并结果\n\n下图演示了一个基本的单词计数 MapReduce 作业示例：\n\n![HDI.WordCountDiagram][image-hdi-wordcountdiagram]\n\n此作业的输出是某个单词在所分析的文本中出现的次数。\n\n* 映射器将输入文本中的每行用作一个输入并将其拆分为多个单词。每当文本中的单词后跟一个 1 时，映射器将发出一个键/值对。输出在发送到化简器之前经过排序。\n\n* 随后，化简器会计算每个单词的计数的和并发出一个键/值对（包含单词，后跟该单词的总出现次数）。\n\n可以使用多种语言实现 MapReduce。Java 是最常见的实现，本文档中使用该语言进行演示。\n\n### Hadoop 流式处理\n\n与 Java 应用程序一样，基于 Java 和 Java 虚拟机（例如 Scalding 或 Cascading）的语言或框架可以直接作为 MapReduce 作业运行。其他实体（例如 C# 或 Python）或独立的可执行文件必须使用 Hadoop 流式处理。\n\nHadoop 流式处理通过 STDIN 和 STDOUT 与映射器和化简器通信 - 映射器和化简器每次从 STDIN 读取一行数据，并将输出写入到 STDOUT。读取的每行或者由映射器和化简器发出的每行必须采用制表符分隔的键/值对格式：\n\n    [key]/t[value]\n\n有关详细信息，请参阅 [Hadoop 流式处理](http://hadoop.apache.org/docs/r1.2.1/streaming.html)。\n\n有关将 Hadoop 流式处理与 hdinsight 配合使用的示例，请参阅：\n\n* [开发 C# Hadoop 流式处理程序](/documentation/articles/hdinsight-hadoop-develop-deploy-streaming-jobs)\n\n##<a id=\"data\"></a>关于示例数据\n\n对于本示例中的示例数据，你将使用 HDInsight 群集中作为文本文档提供的 Leonardo Da Vinci 笔记本。\n\n示例数据存储在 Azure Blob 存储中，HDInsight 可以将该存储用作 Hadoop 群集的默认文件系统。HDInsight 可以使用 **wasb** 前缀访问 Blob 存储中存储的文件。例如，若要访问 sample.log 文件，可使用以下语法：\n\n    wasb:///example/data/gutenberg/davinci.txt\n\n由于 Azure Blob 存储是 HDInsight 的默认存储，因此你也可以使用 **/example/data/gutenberg/davinci.txt** 访问该文件。\n\n> [AZURE.NOTE]在上述语法中，****wasb:///** 用于访问 HDInsight 群集的默认存储容器中存储的文件。如果你在设置群集时指定了其他存储帐户，并想要访问这些帐户中存储的文件，你可以指定容器名称和存储帐户地址来访问数据。例如 ****wasb://mycontainer@mystorage.blob.core.chinacloudapi.cn/example/data/gutenberg/davinci.txt**。\n\n##<a id=\"job\"></a>关于示例 MapReduce\n\n本示例中使用的 MapReduce 作业位于 HDInsight 群集随附的 ****wasb://example/jars/hadoop-mapreduce-examples.jar** 中。其中包含一个你要针对 **davinci.txt** 运行的单词计数示例。\n\n> [AZURE.NOTE]在 HDInsight 2.1 群集上，该文件位置为 ****wasb:///example/jars/hadoop-examples.jar**。\n\n下面提供了单词计数 MapReduce 作业的 Java 代码供你参考：\n\n    package org.apache.hadoop.examples;\n\n    import java.io.IOException;\n    import java.util.StringTokenizer;\n\n    import org.apache.hadoop.conf.Configuration;\n    import org.apache.hadoop.fs.Path;\n    import org.apache.hadoop.io.IntWritable;\n    import org.apache.hadoop.io.Text;\n    import org.apache.hadoop.mapreduce.Job;\n    import org.apache.hadoop.mapreduce.Mapper;\n    import org.apache.hadoop.mapreduce.Reducer;\n    import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;\n    import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;\n    import org.apache.hadoop.util.GenericOptionsParser;\n\n    public class WordCount {\n\n      public static class TokenizerMapper\n           extends Mapper<Object, Text, Text, IntWritable>{\n\n        private final static IntWritable one = new IntWritable(1);\n        private Text word = new Text();\n\n        public void map(Object key, Text value, Context context\n                        ) throws IOException, InterruptedException {\n          StringTokenizer itr = new StringTokenizer(value.toString());\n          while (itr.hasMoreTokens()) {\n            word.set(itr.nextToken());\n            context.write(word, one);\n          }\n        }\n      }\n\n      public static class IntSumReducer\n           extends Reducer<Text,IntWritable,Text,IntWritable> {\n        private IntWritable result = new IntWritable();\n\n        public void reduce(Text key, Iterable<IntWritable> values,\n                           Context context\n                           ) throws IOException, InterruptedException {\n          int sum = 0;\n          for (IntWritable val : values) {\n            sum += val.get();\n          }\n          result.set(sum);\n          context.write(key, result);\n        }\n      }\n\n      public static void main(String[] args) throws Exception {\n        Configuration conf = new Configuration();\n        String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();\n        if (otherArgs.length != 2) {\n          System.err.println(\"Usage: wordcount <in> <out>\");\n          System.exit(2);\n        }\n        Job job = new Job(conf, \"word count\");\n        job.setJarByClass(WordCount.class);\n        job.setMapperClass(TokenizerMapper.class);\n        job.setCombinerClass(IntSumReducer.class);\n        job.setReducerClass(IntSumReducer.class);\n        job.setOutputKeyClass(Text.class);\n        job.setOutputValueClass(IntWritable.class);\n        FileInputFormat.addInputPath(job, new Path(otherArgs[0]));\n        FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));\n        System.exit(job.waitForCompletion(true) ? 0 : 1);\n      }\n    }\n\n有关编写自己的 MapReduce 作业的说明，请参阅[为 HDInsight 开发 Java MapReduce 程序](/documentation/articles/hdinsight-develop-deploy-java-mapreduce)。\n\n##<a id=\"run\"></a>运行 MapReduce\n\nHDInsight 可以使用各种方法运行 HiveQL 作业。使用下表来确定哪种方法最适合你，然后按链接进行演练。\n\n| **使用此方法**... | **...实现此目的** | ...使用此**群集操作系统** | ...从此**客户端操作系统** |\n|:-------------------------------------------------------------------|:--------------------------------------------------------|:------------------------------------------|:-----------------------------------------|\n| [Curl](/documentation/articles/hdinsight-hadoop-use-mapreduce-curl) | 使用 **REST** 远程提交作业 | Windows | Windows |\n| [Windows PowerShell](/documentation/articles/hdinsight-hadoop-use-mapreduce-powershell) | 使用 **Windows PowerShell** 远程提交作业 | Windows | Windows |\n| [远程桌面](/documentation/articles/hdinsight-hadoop-use-mapreduce-remote-desktop) | 通过**远程桌面**使用 Hadoop 命令 | Windows | Windows |\n\n##<a id=\"nextsteps\"></a>后续步骤\n\n虽然 MapReduce 提供了强大的诊断功能，但掌握起来可能会比较困难。有多个基于 Java 的框架可让你更轻松地定义 MapReduce 应用程序，还有一些技术（例如 Pig 和 Hive）可让你更方便地在 HDInsight 中处理数据。若要了解更多信息，请参阅下列文章：\n\n* [为 HDInsight 开发 Java MapReduce 程序](/documentation/articles/hdinsight-develop-deploy-java-mapreduce)\n\n* [将 Hive 与 HDInsight 配合使用][hdinsight-use-hive]\n\n* [将 Pig 与 HDInsight 配合使用][hdinsight-use-pig]\n\n* [运行 HDInsight 示例][hdinsight-samples]\n\n\n[hdinsight-upload-data]: /documentation/articles/hdinsight-upload-data\n[hdinsight-get-started]: /documentation/articles/hdinsight-hadoop-tutorial-get-started-windows-v1\n[hdinsight-develop-mapreduce-jobs]: /documentation/articles/hdinsight-develop-deploy-java-mapreduce\n[hdinsight-develop-streaming]: /documentation/articles/hdinsight-hadoop-develop-deploy-streaming-jobs\n[hdinsight-use-hive]: /documentation/articles/hdinsight-use-hive\n[hdinsight-use-pig]: /documentation/articles/hdinsight-use-pig\n[hdinsight-samples]: /documentation/articles/hdinsight-run-samples\n[hdinsight-provision]: /documentation/articles/hdinsight-provision-clusters-v1\n\n[powershell-install-configure]: /documentation/articles/powershell-install-configure\n\n[image-hdi-wordcountdiagram]: ./media/hdinsight-use-mapreduce/HDI.WordCountDiagram.gif\n\n<!---HONumber=Mooncake_1207_2015-->"
+}

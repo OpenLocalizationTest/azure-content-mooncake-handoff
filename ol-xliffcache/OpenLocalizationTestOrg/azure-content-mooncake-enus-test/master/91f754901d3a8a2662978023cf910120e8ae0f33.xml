@@ -1,0 +1,467 @@
+{
+  "nodes": [
+    {
+      "content": "如何通过 Node.js 使用通知中心",
+      "pos": [
+        27,
+        46
+      ]
+    },
+    {
+      "content": "了解如何使用通知中心从 Node.js 应用程序发送推送通知。",
+      "pos": [
+        65,
+        96
+      ]
+    },
+    {
+      "content": "如何通过 Node.js 使用通知中心",
+      "pos": [
+        324,
+        343
+      ]
+    },
+    {
+      "content": "概述",
+      "pos": [
+        465,
+        467
+      ]
+    },
+    {
+      "pos": [
+        469,
+        600
+      ],
+      "content": "本指南演示如何从 Node.js 应用程序使用通知中心。涉及的任务包括<bpt id=\"p1\">**</bpt>将通知发送到 Android(GCM 不能用)、iOS、Windows Phone 和 Windows 应用商店应用程序<ept id=\"p1\">**</ept>。有关通知中心的详细信息，请参阅<bpt id=\"p2\">[</bpt>后续步骤<ept id=\"p2\">](#next)</ept>部分。"
+    },
+    {
+      "content": "什么是通知中心？",
+      "pos": [
+        604,
+        612
+      ]
+    },
+    {
+      "pos": [
+        614,
+        751
+      ],
+      "content": "Azure 通知中心可提供用于向移动设备发送推送通知的易于使用、多平台且可缩放的基础结构。有关详细信息，请参阅 <bpt id=\"p1\">[</bpt>Azure 通知中心<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/windowsazure/jj927170.aspx)</ept>。"
+    },
+    {
+      "content": "创建 Node.js 应用程序",
+      "pos": [
+        755,
+        770
+      ]
+    },
+    {
+      "pos": [
+        772,
+        912
+      ],
+      "content": "创建一个空的 Node.js 应用程序。有关创建 Node.js 应用程序的说明，请参阅<bpt id=\"p1\">[</bpt>创建 Node.js 应用程序并将其部署到 Azure 网站<ept id=\"p1\">][]</ept>、<bpt id=\"p2\">[</bpt>Node.js 云服务<ept id=\"p2\">][]</ept>（使用 Windows PowerShell）或<bpt id=\"p3\">[</bpt>使用 WebMatrix 构建网站<ept id=\"p3\">][]</ept>。"
+    },
+    {
+      "content": "将应用程序配置为使用通知中心",
+      "pos": [
+        916,
+        930
+      ]
+    },
+    {
+      "content": "要使用 Azure 通知中心，需要下载并使用 Node.js azure 包。其中包括一组便于与 REST 服务进行通信的库。",
+      "pos": [
+        932,
+        995
+      ]
+    },
+    {
+      "content": "使用 Node 包管理器 (NPM) 可获取该程序包",
+      "pos": [
+        1001,
+        1027
+      ]
+    },
+    {
+      "pos": [
+        1033,
+        1125
+      ],
+      "content": "使用 <bpt id=\"p1\">**</bpt>PowerShell<ept id=\"p1\">**</ept> (Windows)、<bpt id=\"p2\">**</bpt>Terminal<ept id=\"p2\">**</ept> (Mac) 或 <bpt id=\"p3\">**</bpt>Bash<ept id=\"p3\">**</ept> (Unix) 等命令行界面导航到您在其中创建了示例应用程序的文件夹。"
+    },
+    {
+      "pos": [
+        1131,
+        1172
+      ],
+      "content": "在命令窗口中键入 <bpt id=\"p1\">**</bpt>npm install azure<ept id=\"p1\">**</ept>，这应会生成以下输出："
+    },
+    {
+      "pos": [
+        1680,
+        1774
+      ],
+      "content": "可以手动运行 <bpt id=\"p1\">**</bpt>ls<ept id=\"p1\">**</ept> 或 <bpt id=\"p2\">**</bpt>dir<ept id=\"p2\">**</ept> 命令来验证是否创建了 <bpt id=\"p3\">**</bpt>node\\_modules<ept id=\"p3\">**</ept> 文件夹。在该文件夹中，找到 <bpt id=\"p4\">**</bpt>azure<ept id=\"p4\">**</ept> 包，其中包含访问通知中心所需的库。"
+    },
+    {
+      "content": "导入模块",
+      "pos": [
+        1780,
+        1784
+      ]
+    },
+    {
+      "pos": [
+        1786,
+        1829
+      ],
+      "content": "使用某一文本编辑器将以下内容添加到应用程序的 <bpt id=\"p1\">**</bpt>server.js<ept id=\"p1\">**</ept> 文件的顶部："
+    },
+    {
+      "content": "设置 Azure 通知中心连接",
+      "pos": [
+        1870,
+        1885
+      ]
+    },
+    {
+      "pos": [
+        1887,
+        2036
+      ],
+      "content": "可以通过 <bpt id=\"p1\">**</bpt>NotificationHubService<ept id=\"p1\">**</ept> 对象使用通知中心。以下代码为名为 <bpt id=\"p2\">**</bpt>hubname<ept id=\"p2\">**</ept> 的通知中心创建一个<bpt id=\"p3\">**</bpt>NotificationHubService<ept id=\"p3\">**</ept> 对象。将它添加到靠近 <bpt id=\"p4\">**</bpt>server.js<ept id=\"p4\">**</ept> 文件顶部、用于导入 azure 模块的语句之后的位置："
+    },
+    {
+      "pos": [
+        2138,
+        2189
+      ],
+      "content": "可通过执行以下步骤从 [Azure 管理门户]获取连接 <bpt id=\"p1\">**</bpt>connectionstring<ept id=\"p1\">**</ept> 值："
+    },
+    {
+      "content": "在 [Azure 管理门户]中选择“服务总线”，然后选择包含通知中心的命名空间。",
+      "pos": [
+        2194,
+        2234
+      ]
+    },
+    {
+      "content": "选择“通知中心”，然后选择要使用的中心。",
+      "pos": [
+        2239,
+        2259
+      ]
+    },
+    {
+      "content": "从“速览”部分中选择“查看连接字符串”，并复制连接字符串值。",
+      "pos": [
+        2265,
+        2295
+      ]
+    },
+    {
+      "pos": [
+        2299,
+        2440
+      ],
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>还可以使用 Azure PowerShell 提供的 <bpt id=\"p1\">**</bpt>Get-AzureSbNamespace<ept id=\"p1\">**</ept> cmdlet 或者在 Azure 命令行界面 (Azure CLI) 中使用 <bpt id=\"p2\">**</bpt>azure sb namespace show<ept id=\"p2\">**</ept> 命令检索连接字符串。"
+    },
+    {
+      "content": "如何发送通知",
+      "pos": [
+        2444,
+        2450
+      ]
+    },
+    {
+      "pos": [
+        2452,
+        2508
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>NotificationHubService<ept id=\"p1\">**</ept> 对象将公开用于向特定设备和应用程序发送通知的以下对象实例："
+    },
+    {
+      "pos": [
+        2514,
+        2584
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>iOS<ept id=\"p1\">**</ept> - 使用可在 <bpt id=\"p2\">**</bpt>notificationHubService.apns<ept id=\"p2\">**</ept> 中访问的 <bpt id=\"p3\">**</bpt>ApnsService<ept id=\"p3\">**</ept> 对象"
+    },
+    {
+      "pos": [
+        2589,
+        2669
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Windows Phone<ept id=\"p1\">**</ept> - 使用可从 <bpt id=\"p2\">**</bpt>notificationHubService.mpns<ept id=\"p2\">**</ept> 中获取的 <bpt id=\"p3\">**</bpt>MpnsService<ept id=\"p3\">**</ept> 对象"
+    },
+    {
+      "pos": [
+        2674,
+        2755
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>Windows 应用商店应用程序<ept id=\"p1\">**</ept> - 使用可从 <bpt id=\"p2\">**</bpt>notificationHubService.wns<ept id=\"p2\">**</ept> 中获取的 <bpt id=\"p3\">**</bpt>WnsService<ept id=\"p3\">**</ept> 对象"
+    },
+    {
+      "content": "如何发送 Android 应用程序通知",
+      "pos": [
+        2761,
+        2780
+      ]
+    },
+    {
+      "pos": [
+        2782,
+        2857
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>GcmService<ept id=\"p1\">**</ept> 对象提供可用于将通知发送到 Android 应用程序的 <bpt id=\"p2\">**</bpt>send<ept id=\"p2\">**</ept> 方法。该 <bpt id=\"p3\">**</bpt>send<ept id=\"p3\">**</ept> 方法接受以下参数："
+    },
+    {
+      "content": "Tags - 标记标识符。如果没有提供任何标记，通知将发送给所有客户端。",
+      "pos": [
+        2861,
+        2897
+      ]
+    },
+    {
+      "content": "Payload - 消息的 JSON 或字符串负载",
+      "pos": [
+        2900,
+        2925
+      ]
+    },
+    {
+      "content": "Callback - 回调函数",
+      "pos": [
+        2928,
+        2943
+      ]
+    },
+    {
+      "pos": [
+        2945,
+        3042
+      ],
+      "content": "有关负载格式的详细信息，请参阅<bpt id=\"p1\">[</bpt>实施 GCM 服务器<ept id=\"p1\">](http://developer.android.com/google/gcm/server.html#payload)</ept>中的“负载”部分。"
+    },
+    {
+      "pos": [
+        3044,
+        3113
+      ],
+      "content": "以下代码使用 <bpt id=\"p1\">**</bpt>NotificationHubService<ept id=\"p1\">**</ept> 公开的 <bpt id=\"p2\">**</bpt>GcmService<ept id=\"p2\">**</ept> 实例将一条消息发送到所有客户端。"
+    },
+    {
+      "content": "如何发送 iOS 应用程序通知",
+      "pos": [
+        3321,
+        3336
+      ]
+    },
+    {
+      "pos": [
+        3338,
+        3410
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>ApnsService<ept id=\"p1\">**</ept> 对象提供可用于将通知发送到 iOS 应用程序的 <bpt id=\"p2\">**</bpt>send<ept id=\"p2\">**</ept> 方法。该 <bpt id=\"p3\">**</bpt>send<ept id=\"p3\">**</ept> 方法接受以下参数："
+    },
+    {
+      "content": "Tags - 标记标识符。如果没有提供任何标记，通知将发送给所有客户端。",
+      "pos": [
+        3414,
+        3450
+      ]
+    },
+    {
+      "content": "Payload - 消息的 JSON 或字符串负载",
+      "pos": [
+        3453,
+        3478
+      ]
+    },
+    {
+      "content": "Callback - 回调函数",
+      "pos": [
+        3481,
+        3496
+      ]
+    },
+    {
+      "pos": [
+        3498,
+        3550
+      ],
+      "content": "有关负载格式的详细信息，请参阅<bpt id=\"p1\">[</bpt>本地和推送通知编程指南<ept id=\"p1\">][本地和推送通知编程指南]</ept>中的“通知负载”部分。"
+    },
+    {
+      "pos": [
+        3552,
+        3624
+      ],
+      "content": "以下代码使用 <bpt id=\"p1\">**</bpt>NotificationHubService<ept id=\"p1\">**</ept> 公开的 <bpt id=\"p2\">**</bpt>ApnsService<ept id=\"p2\">**</ept> 实例将一条警报消息发送给所有客户端："
+    },
+    {
+      "content": "如何发送 Windows Phone 通知",
+      "pos": [
+        3815,
+        3836
+      ]
+    },
+    {
+      "pos": [
+        3838,
+        3920
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>MpnsService<ept id=\"p1\">**</ept> 对象提供可用于将通知发送到 Windows Phone 应用程序的 <bpt id=\"p2\">**</bpt>send<ept id=\"p2\">**</ept> 方法。该 <bpt id=\"p3\">**</bpt>send<ept id=\"p3\">**</ept> 方法接受以下参数："
+    },
+    {
+      "content": "Tags - 标记标识符。如果没有提供任何标记，通知将发送给所有客户端。",
+      "pos": [
+        3926,
+        3962
+      ]
+    },
+    {
+      "content": "Payload - 消息的 XML 负载",
+      "pos": [
+        3967,
+        3987
+      ]
+    },
+    {
+      "content": "TargetName -“toast”表示 toast 通知。“token”表示磁贴通知。",
+      "pos": [
+        3992,
+        4037
+      ]
+    },
+    {
+      "pos": [
+        4042,
+        4114
+      ],
+      "content": "NotificationClass - 通知的优先级。有关有效值，请参阅<bpt id=\"p1\">[</bpt>从服务器推送通知<ept id=\"p1\">][从服务器推送通知]</ept>中的“HTTP 标头元素”部分。"
+    },
+    {
+      "content": "Options - 可选的请求标头",
+      "pos": [
+        4119,
+        4136
+      ]
+    },
+    {
+      "content": "Callback - 回调函数",
+      "pos": [
+        4141,
+        4156
+      ]
+    },
+    {
+      "pos": [
+        4158,
+        4226
+      ],
+      "content": "有关有效的 TargetName、NotificationClass 和标头选项的列表，请参阅<bpt id=\"p1\">[</bpt>从服务器推送通知<ept id=\"p1\">][从服务器推送通知]</ept>。"
+    },
+    {
+      "pos": [
+        4228,
+        4296
+      ],
+      "content": "以下代码使用 <bpt id=\"p1\">**</bpt>NotificationHubService<ept id=\"p1\">**</ept> 公开的 <bpt id=\"p2\">**</bpt>MpnsService<ept id=\"p2\">**</ept> 实例发送 toast 警报："
+    },
+    {
+      "content": "如何发送 Windows 应用商店应用程序通知",
+      "pos": [
+        4643,
+        4666
+      ]
+    },
+    {
+      "pos": [
+        4668,
+        4747
+      ],
+      "content": "<bpt id=\"p1\">**</bpt>WnsService<ept id=\"p1\">**</ept> 对象提供可用于将通知发送到 Windows 应用商店应用程序的 <bpt id=\"p2\">**</bpt>send<ept id=\"p2\">**</ept> 方法。该 <bpt id=\"p3\">**</bpt>send<ept id=\"p3\">**</ept> 方法接受以下参数："
+    },
+    {
+      "content": "Tags - 标记标识符。如果没有提供任何标记，通知将发送给所有客户端。",
+      "pos": [
+        4753,
+        4789
+      ]
+    },
+    {
+      "content": "Payload - XML 消息负载",
+      "pos": [
+        4794,
+        4812
+      ]
+    },
+    {
+      "content": "Type - 通知类型",
+      "pos": [
+        4817,
+        4828
+      ]
+    },
+    {
+      "content": "Options - 可选的请求标头",
+      "pos": [
+        4833,
+        4850
+      ]
+    },
+    {
+      "content": "Callback - 回调函数",
+      "pos": [
+        4855,
+        4870
+      ]
+    },
+    {
+      "pos": [
+        4872,
+        4921
+      ],
+      "content": "有关有效类型和请求标头的列表，请参阅<bpt id=\"p1\">[</bpt>推送通知服务请求和响应标头<ept id=\"p1\">][推送通知服务请求和响应标头]</ept>。"
+    },
+    {
+      "pos": [
+        4923,
+        4990
+      ],
+      "content": "以下代码使用 <bpt id=\"p1\">**</bpt>NotificationHubService<ept id=\"p1\">**</ept> 公开的 <bpt id=\"p2\">**</bpt>WnsService<ept id=\"p2\">**</ept> 实例发送 toast 警报："
+    },
+    {
+      "content": "后续步骤",
+      "pos": [
+        5262,
+        5266
+      ]
+    },
+    {
+      "content": "现在，你已了解有关通知中心的基础知识，请单击下面的链接了解更多信息。",
+      "pos": [
+        5268,
+        5302
+      ]
+    },
+    {
+      "pos": [
+        5308,
+        5401
+      ],
+      "content": "请参阅 MSDN 参考：<bpt id=\"p1\">[</bpt>Azure 通知中心<ept id=\"p1\">](http://msdn.microsoft.com/zh-cn/library/windowsazure/jj927170.aspx)</ept>。"
+    },
+    {
+      "pos": [
+        5406,
+        5444
+      ],
+      "content": "访问 GitHub 上的 <bpt id=\"p1\">[</bpt><ept id=\"p1\">Azure SDK for Node]</ept> 存储库。"
+    }
+  ],
+  "content": "<properties\n    pageTitle=\"如何通过 Node.js 使用通知中心\"\n    description=\"了解如何使用通知中心从 Node.js 应用程序发送推送通知。\"\n    services=\"notification-hubs\"\n    documentationCenter=\"nodejs\"\n    authors=\"wesmc7777\"\n    manager=\"dwrede\"\n    editor=\"\"/>\n\n<tags\n    ms.service=\"notification-hubs\"\n    ms.date=\"12/10/2015\"\n    wacn.date=\"01/14/2016\"/>\n\n# 如何通过 Node.js 使用通知中心\n[AZURE.INCLUDE [notification-hubs-backend-how-to-selector](../includes/notification-hubs-backend-how-to-selector.md)]\n\n##概述\n\n本指南演示如何从 Node.js 应用程序使用通知中心。涉及的任务包括**将通知发送到 Android(GCM 不能用)、iOS、Windows Phone 和 Windows 应用商店应用程序**。有关通知中心的详细信息，请参阅[后续步骤](#next)部分。\n\n##什么是通知中心？\n\nAzure 通知中心可提供用于向移动设备发送推送通知的易于使用、多平台且可缩放的基础结构。有关详细信息，请参阅 [Azure 通知中心](http://msdn.microsoft.com/zh-cn/library/windowsazure/jj927170.aspx)。\n\n##创建 Node.js 应用程序\n\n创建一个空的 Node.js 应用程序。有关创建 Node.js 应用程序的说明，请参阅[创建 Node.js 应用程序并将其部署到 Azure 网站][]、[Node.js 云服务][]（使用 Windows PowerShell）或[使用 WebMatrix 构建网站][]。\n\n##将应用程序配置为使用通知中心\n\n要使用 Azure 通知中心，需要下载并使用 Node.js azure 包。其中包括一组便于与 REST 服务进行通信的库。\n\n### 使用 Node 包管理器 (NPM) 可获取该程序包\n\n1.  使用 **PowerShell** (Windows)、**Terminal** (Mac) 或 **Bash** (Unix) 等命令行界面导航到您在其中创建了示例应用程序的文件夹。\n\n2.  在命令窗口中键入 **npm install azure**，这应会生成以下输出：\n\n        azure@0.7.0 node_modules\\azure\n        |-- dateformat@1.0.2-1.2.3\n        |-- xmlbuilder@0.4.2\n        |-- node-uuid@1.2.0\n        |-- mime@1.2.9\n        |-- underscore@1.4.4\n        |-- validator@0.4.28\n        |-- tunnel@0.0.2\n        |-- wns@0.5.3\n        |-- xml2js@0.2.6 (sax@0.4.2)\n        |-- request@2.16.6 (forever-agent@0.2.0, aws-sign@0.2.0, tunnel-agent@0.2.0, oauth-sign@0.2.0, json-stringify-safe@3.0.0, cookie-jar@0.2.0, node-uuid@1.4.0, qs@0.5.5, hawk@0.10.2, form-data@0.0.7)\n\n3.  可以手动运行 **ls** 或 **dir** 命令来验证是否创建了 **node\\_modules** 文件夹。在该文件夹中，找到 **azure** 包，其中包含访问通知中心所需的库。\n\n### 导入模块\n\n使用某一文本编辑器将以下内容添加到应用程序的 **server.js** 文件的顶部：\n\n    var azure = require('azure');\n\n### 设置 Azure 通知中心连接\n\n可以通过 **NotificationHubService** 对象使用通知中心。以下代码为名为 **hubname** 的通知中心创建一个**NotificationHubService** 对象。将它添加到靠近 **server.js** 文件顶部、用于导入 azure 模块的语句之后的位置：\n\n    var notificationHubService = azure.createNotificationHubService('hubname','connectionstring');\n\n可通过执行以下步骤从 [Azure 管理门户]获取连接 **connectionstring** 值：\n\n1. 在 [Azure 管理门户]中选择“服务总线”，然后选择包含通知中心的命名空间。\n\n2. 选择“通知中心”，然后选择要使用的中心。\n\n3.  从“速览”部分中选择“查看连接字符串”，并复制连接字符串值。\n\n> [AZURE.NOTE]还可以使用 Azure PowerShell 提供的 **Get-AzureSbNamespace** cmdlet 或者在 Azure 命令行界面 (Azure CLI) 中使用 **azure sb namespace show** 命令检索连接字符串。\n\n##如何发送通知\n\n**NotificationHubService** 对象将公开用于向特定设备和应用程序发送通知的以下对象实例：\n\n-   **iOS** - 使用可在 **notificationHubService.apns** 中访问的 **ApnsService** 对象\n-   **Windows Phone** - 使用可从 **notificationHubService.mpns** 中获取的 **MpnsService** 对象\n-   **Windows 应用商店应用程序** - 使用可从 **notificationHubService.wns** 中获取的 **WnsService** 对象\n\n### 如何发送 Android 应用程序通知\n\n**GcmService** 对象提供可用于将通知发送到 Android 应用程序的 **send** 方法。该 **send** 方法接受以下参数：\n\n* Tags - 标记标识符。如果没有提供任何标记，通知将发送给所有客户端。\n* Payload - 消息的 JSON 或字符串负载\n* Callback - 回调函数\n\n有关负载格式的详细信息，请参阅[实施 GCM 服务器](http://developer.android.com/google/gcm/server.html#payload)中的“负载”部分。\n\n以下代码使用 **NotificationHubService** 公开的 **GcmService** 实例将一条消息发送到所有客户端。\n\n    var payload = {\n      data: {\n        msg: 'Hello!'\n      }\n    };\n    notificationHubService.gcm.send(null, payload, function(error){\n      if(!error){\n        //notification sent\n      }\n    });\n\n### 如何发送 iOS 应用程序通知\n\n**ApnsService** 对象提供可用于将通知发送到 iOS 应用程序的 **send** 方法。该 **send** 方法接受以下参数：\n\n* Tags - 标记标识符。如果没有提供任何标记，通知将发送给所有客户端。\n* Payload - 消息的 JSON 或字符串负载\n* Callback - 回调函数\n\n有关负载格式的详细信息，请参阅[本地和推送通知编程指南][本地和推送通知编程指南]中的“通知负载”部分。\n\n以下代码使用 **NotificationHubService** 公开的 **ApnsService** 实例将一条警报消息发送给所有客户端：\n\n    var payload={ \n        alert: 'Hello!'\n      };\n    notificationHubService.apns.send(null, payload, function(error){\n      if(!error){\n        // notification sent\n      }\n    });\n\n### 如何发送 Windows Phone 通知\n\n**MpnsService** 对象提供可用于将通知发送到 Windows Phone 应用程序的 **send** 方法。该 **send** 方法接受以下参数：\n\n-   Tags - 标记标识符。如果没有提供任何标记，通知将发送给所有客户端。\n-   Payload - 消息的 XML 负载\n-   TargetName -“toast”表示 toast 通知。“token”表示磁贴通知。\n-   NotificationClass - 通知的优先级。有关有效值，请参阅[从服务器推送通知][从服务器推送通知]中的“HTTP 标头元素”部分。\n-   Options - 可选的请求标头\n-   Callback - 回调函数\n\n有关有效的 TargetName、NotificationClass 和标头选项的列表，请参阅[从服务器推送通知][从服务器推送通知]。\n\n以下代码使用 **NotificationHubService** 公开的 **MpnsService** 实例发送 toast 警报：\n\n    var payload = '<?xml version=\"1.0\" encoding=\"utf-8\"?><wp:Notification xmlns:wp=\"WPNotification\"><wp:Toast><wp:Text1>string</wp:Text1><wp:Text2>string</wp:Text2></wp:Toast></wp:Notification>';\n    notificationHubService.mpns.send(null, payload, 'toast', 22, function(error){\n      if(!error){\n        //notification sent\n      }\n    });\n\n### 如何发送 Windows 应用商店应用程序通知\n\n**WnsService** 对象提供可用于将通知发送到 Windows 应用商店应用程序的 **send** 方法。该 **send** 方法接受以下参数：\n\n-   Tags - 标记标识符。如果没有提供任何标记，通知将发送给所有客户端。\n-   Payload - XML 消息负载\n-   Type - 通知类型\n-   Options - 可选的请求标头\n-   Callback - 回调函数\n\n有关有效类型和请求标头的列表，请参阅[推送通知服务请求和响应标头][推送通知服务请求和响应标头]。\n\n以下代码使用 **NotificationHubService** 公开的 **WnsService** 实例发送 toast 警报：\n\n    var payload = '<toast><visual><binding template=\"ToastText01\"><text id=\"1\">Hello!</text></binding></visual></toast>';\n    notificationHubService.wns.send(null, payload , 'wns/toast', function(error){\n      if(!error){\n        // notification sent\n      }\n    });\n\n##后续步骤\n\n现在，你已了解有关通知中心的基础知识，请单击下面的链接了解更多信息。\n\n-   请参阅 MSDN 参考：[Azure 通知中心](http://msdn.microsoft.com/zh-cn/library/windowsazure/jj927170.aspx)。\n-   访问 GitHub 上的 [Azure SDK for Node] 存储库。\n\n  [后续步骤]: #next\n  [什么是 服务总线 通知中心？]: #hub\n  [创建 Node.js 应用程序]: #create\n  [配置应用程序以使用 服务总线]: #config\n  [如何：发送通知]: #send\n  [Azure 服务总线 通知中心]: http://msdn.microsoft.com/zh-cn/library/azure/jj927170.aspx\n  [创建 Node.js 应用程序并将其部署到 Azure 网站]: /documentation/articles/web-sites-nodejs-develop-deploy-mac\n  [Node.js 云服务]: /documentation/articles/cloud-services-nodejs-develop-deploy-app\n  [使用 WebMatrix 构建网站]: /documentation/articles/web-sites-nodejs-use-webmatrix\n  [实施 GCM 服务器]: http://developer.android.com/google/gcm/server.html#payload\n  [本地和推送通知编程指南]: http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html\n  [从服务器推送通知]: http://msdn.microsoft.com/library/hh221551.aspx\n  [推送通知服务请求和响应标头]: http://msdn.microsoft.com/library/windows/apps/hh465435.aspx\n  [Azure SDK for Node]: https://github.com/WindowsAzure/azure-sdk-for-node\n<!---HONumber=Mooncake_0104_2016-->"
+}
