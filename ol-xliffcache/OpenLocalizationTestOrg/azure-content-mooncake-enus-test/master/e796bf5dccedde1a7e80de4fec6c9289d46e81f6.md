@@ -1,16 +1,16 @@
 <properties
-	pageTitle="通过 Memcache 协议将 Azure 中的 Web 应用连接到 Redis 缓存 | Azure"
-	description="使用 Memcache 协议将 Azure App Service 中的 Web 应用连接到 Redis 缓存"
-	services="app-service\web"
-	documentationCenter="php"
-	authors="SyntaxC4"
-	manager="wpickett"
-	editor="riande"/>
+    pageTitle="通过 Memcache 协议将 Azure 中的 Web 应用连接到 Redis 缓存 | Azure"
+    description="使用 Memcache 协议将 Azure App Service 中的 Web 应用连接到 Redis 缓存"
+    services="app-service\web"
+    documentationCenter="php"
+    authors="SyntaxC4"
+    manager="wpickett"
+    editor="riande"/>
 
 <tags
-	ms.service="app-service-web"
-	ms.date="12/24/2015"
-	wacn.date="02/26/2016"/>
+    ms.service="app-service-web"
+    ms.date="12/24/2015"
+    wacn.date="02/26/2016"/>
 
 # 通过 Memcache 协议将 Azure 中的 Web 应用连接到 Redis 缓存
 
@@ -38,7 +38,7 @@ Web Apps Memcache 填充码可以与任何应用程序一起使用，前提是�
 
 你需要创建的第一个应用设置是 **REDIS\_HOST** 应用设置。此设置将对该填充码将缓存信息转发到的目的地进行设置。REDIS\_HOST 应用设置所需的值可以通过以下 PowerShell 命令进行检索。
 
-	$myRedisCache = Get-AzureRmRedisCache -Name "<your cache name>" -ResourceGroupName "<your resource group name>"; $myRedisCache.HostName
+    $myRedisCache = Get-AzureRmRedisCache -Name "<your cache name>" -ResourceGroupName "<your resource group name>"; $myRedisCache.HostName
 
 将应用设置的密钥设置为 **REDIS\_HOST**，将应用设置的值设置为 Redis 缓存实例的**主机名**。
 
@@ -46,7 +46,7 @@ Web Apps Memcache 填充码可以与任何应用程序一起使用，前提是�
 
 你需要创建的第二个应用设置是 **REDIS\_KEY** 应用设置。此设置提供了安全访问 Redis 缓存实例所需的身份验证令牌。REDIS\_KEY 应用设置所需的值可以通过以下的 PowerShell 命令行获得：
 
-	Get-AzureRmRedisCacheKey -Name "<your cache name>" -ResourceGroupName "<your resource group name>"
+    Get-AzureRmRedisCacheKey -Name "<your cache name>" -ResourceGroupName "<your resource group name>"
 
 将应用设置的密钥设置为 **REDIS\_KEY**，将应用设置的值设置为 Redis 缓存实例的**主密钥**。
 
@@ -101,9 +101,9 @@ Web Apps Memcache 填充码可以与任何应用程序一起使用，前提是�
 
 在 `wp-config.php` 文件中，将以下代码添加到该文件末尾附近停止编辑备注的上方。
 
-	$memcached_servers = array(
-		'default' => array('localhost:' . getenv("MEMCACHESHIM_PORT"))
-	);
+    $memcached_servers = array(
+        'default' => array('localhost:' . getenv("MEMCACHESHIM_PORT"))
+    );
 
 粘贴此代码后，monaco 会自动保存该文档。
 
@@ -125,7 +125,7 @@ Web Apps Memcache 填充码可以与任何应用程序一起使用，前提是�
 
 可以使用以下 PowerShell 命令启用非 SSL 端口。
 
-	Set-AzureRmRedisCache -Name "<your cache name>" -ResourceGroupName "<your resource group name>" -EnableNonSslPort $true
+    Set-AzureRmRedisCache -Name "<your cache name>" -ResourceGroupName "<your resource group name>" -EnableNonSslPort $true
 
 ### 从 redis-cli 连接到 Azure Redis Cache
 
@@ -133,7 +133,7 @@ Web Apps Memcache 填充码可以与任何应用程序一起使用，前提是�
 
 打开你选择的命令行控制台并键入以下命令：
 
-	redis-cli -h <hostname-for-redis-cache> -a <primary-key-for-redis-cache> -p 6379
+    redis-cli -h <hostname-for-redis-cache> -a <primary-key-for-redis-cache> -p 6379
 
 将 **&lt;hostname-for-redis-cache&gt;** 替换为实际的 xxxxx.redis.cache.chinacloudapi.cn 主机名，将 **&lt;primary-key-for-redis-cache&gt;** 替换为缓存的访问密钥，然后按 **Enter**。CLI 连接到 Redis 缓存实例之后，发出任何 Redis 命令。在下面的屏幕截图中，我已选择列出密钥。
 
@@ -162,4 +162,4 @@ Web Apps Memcache 填充码可以与任何应用程序一起使用，前提是�
 [12]: /documentation/services/redis-cache
 [13]: http://memcached.org
 
-<!---HONumber=Mooncake_0215_2016-->
+<!---HONumber=Mooncake_0215_2016--><!--HONumber=Mar16_HO4-->
