@@ -64,11 +64,25 @@
       "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>了解部署模型<ept id=\"p1\">](../includes/learn-about-deployment-models-classic-include.md)</ept>]资源管理器模型。"
     },
     {
+      "content": "你的可用性组可以仅包含本地副本或 Azure 副本，也可以跨越本地和 Azure 以实现混合配置。",
       "pos": [
         853,
+        902
+      ]
+    },
+    {
+      "content": "Azure 副本可以位于同一区域，也可以跨越使用多个虚拟网络 (VNet) 的多个区域。",
+      "pos": [
+        902,
+        946
+      ]
+    },
+    {
+      "content": "以下步骤假设你已<bpt id=\"p1\">[</bpt>配置了一个可用性组<ept id=\"p1\">](/documentation/articles/virtual-machines-sql-server-alwayson-availability-groups-gui)</ept>但是没有配置侦听器。",
+      "pos": [
+        946,
         1061
-      ],
-      "content": "你的可用性组可以仅包含本地副本或 Azure 副本，也可以跨越本地和 Azure 以实现混合配置。Azure 副本可以位于同一区域，也可以跨越使用多个虚拟网络 (VNet) 的多个区域。以下步骤假设你已<bpt id=\"p1\">[</bpt>配置了一个可用性组<ept id=\"p1\">](/documentation/articles/virtual-machines-sql-server-alwayson-availability-groups-gui)</ept>但是没有配置侦听器。"
+      ]
     },
     {
       "content": "内部侦听器的准则和限制",
@@ -92,11 +106,25 @@
       ]
     },
     {
+      "content": "每个云服务只支持一个内部可用性组侦听器，因为该侦听器将配置给 ILB，而每个云服务只有一个 ILB。",
       "pos": [
         1198,
+        1248
+      ]
+    },
+    {
+      "content": "但是，可以创建多个外部侦听器。",
+      "pos": [
+        1248,
+        1263
+      ]
+    },
+    {
+      "content": "有关详细信息，请参阅<bpt id=\"p1\">[</bpt>在 Azure 中配置 AlwaysOn 可用性组的外部侦听器<ept id=\"p1\">](/documentation/articles/virtual-machines-sql-server-configure-public-alwayson-availability-group-listener)</ept>。",
+      "pos": [
+        1263,
         1414
-      ],
-      "content": "每个云服务只支持一个内部可用性组侦听器，因为该侦听器将配置给 ILB，而每个云服务只有一个 ILB。但是，可以创建多个外部侦听器。有关详细信息，请参阅<bpt id=\"p1\">[</bpt>在 Azure 中配置 AlwaysOn 可用性组的外部侦听器<ept id=\"p1\">](/documentation/articles/virtual-machines-sql-server-configure-public-alwayson-availability-group-listener)</ept>。"
+      ]
     },
     {
       "content": "不支持在你在其中也有使用云服务的公共 VIP 的外部侦听器的同一云服务中创建内部侦听器。",
@@ -113,11 +141,18 @@
       ]
     },
     {
+      "content": "本文重点介绍如何创建使用<bpt id=\"p1\">**</bpt>内部负载平衡器 (ILB)<ept id=\"p1\">**</ept> 的侦听器。",
       "pos": [
         1593,
+        1628
+      ]
+    },
+    {
+      "content": "如果你需要一个公共/外部侦听器，请参阅本文的另一个版本，其中提供了有关设置<bpt id=\"p1\">[</bpt>外部侦听器<ept id=\"p1\">](/documentation/articles/virtual-machines-sql-server-configure-public-alwayson-availability-group-listener)</ept>的步骤",
+      "pos": [
+        1628,
         1782
-      ],
-      "content": "本文重点介绍如何创建使用<bpt id=\"p1\">**</bpt>内部负载平衡器 (ILB)<ept id=\"p1\">**</ept> 的侦听器。如果你需要一个公共/外部侦听器，请参阅本文的另一个版本，其中提供了有关设置<bpt id=\"p2\">[</bpt>外部侦听器<ept id=\"p2\">](/documentation/articles/virtual-machines-sql-server-configure-public-alwayson-availability-group-listener)</ept>的步骤"
+      ]
     },
     {
       "content": "创建支持直接服务器返回的负载平衡 VM 终结点",
@@ -127,32 +162,67 @@
       ]
     },
     {
-      "content": "对于 ILB，必须先创建内部负载平衡器。以下脚本将执行此操作。",
+      "content": "对于 ILB，必须先创建内部负载平衡器。",
       "pos": [
         1812,
+        1832
+      ]
+    },
+    {
+      "content": "以下脚本将执行此操作。",
+      "pos": [
+        1832,
         1843
       ]
     },
     {
+      "content": "对于 <bpt id=\"p1\">**</bpt>ILB<ept id=\"p1\">**</ept>，应该分配一个静态 IP 地址。",
       "pos": [
         1960,
-        2010
-      ],
-      "content": "对于 <bpt id=\"p1\">**</bpt>ILB<ept id=\"p1\">**</ept>，应该分配一个静态 IP 地址。首先，通过运行以下命令检查当前 VNet 配置："
+        1986
+      ]
     },
     {
+      "content": "首先，通过运行以下命令检查当前 VNet 配置：",
+      "pos": [
+        1986,
+        2010
+      ]
+    },
+    {
+      "content": "先记下包含副本所在虚拟机的子网的 <bpt id=\"p1\">**</bpt>Subnet<ept id=\"p1\">**</ept> 名称。",
       "pos": [
         2063,
-        2124
-      ],
-      "content": "先记下包含副本所在虚拟机的子网的 <bpt id=\"p1\">**</bpt>Subnet<ept id=\"p1\">**</ept> 名称。脚本中的 <bpt id=\"p2\">**</bpt>$SubnetName<ept id=\"p2\">**</ept> 参数将要使用此值。"
+        2094
+      ]
     },
     {
+      "content": "脚本中的 <bpt id=\"p1\">**</bpt>$SubnetName<ept id=\"p1\">**</ept> 参数将要使用此值。",
+      "pos": [
+        2094,
+        2124
+      ]
+    },
+    {
+      "content": "然后，记下包含副本所在虚拟机的子网的 <bpt id=\"p1\">**</bpt>VirtualNetworkSite<ept id=\"p1\">**</ept> 名称和起始 <bpt id=\"p2\">**</bpt>AddressPrefix<ept id=\"p2\">**</ept>。",
       "pos": [
         2130,
+        2196
+      ]
+    },
+    {
+      "content": "再通过将这两个值传递给 <bpt id=\"p1\">**</bpt>Test-AzureStaticVNetIP<ept id=\"p1\">**</ept> 命令并检查 <bpt id=\"p2\">**</bpt>AvailableAddresses<ept id=\"p2\">**</ept> 来查找可用的 IP 地址。",
+      "pos": [
+        2196,
+        2277
+      ]
+    },
+    {
+      "content": "例如，如果 VNet 名为 <bpt id=\"p1\">*</bpt>MyVNet<ept id=\"p1\">*</ept>，并包含起始自 <bpt id=\"p2\">*</bpt>172.16.0.128<ept id=\"p2\">*</ept> 的子网地址范围，则以下命令将列出可用地址：",
+      "pos": [
+        2277,
         2343
-      ],
-      "content": "然后，记下包含副本所在虚拟机的子网的 <bpt id=\"p1\">**</bpt>VirtualNetworkSite<ept id=\"p1\">**</ept> 名称和起始 <bpt id=\"p2\">**</bpt>AddressPrefix<ept id=\"p2\">**</ept>。再通过将这两个值传递给 <bpt id=\"p3\">**</bpt>Test-AzureStaticVNetIP<ept id=\"p3\">**</ept> 命令并检查 <bpt id=\"p4\">**</bpt>AvailableAddresses<ept id=\"p4\">**</ept> 来查找可用的 IP 地址。例如，如果 VNet 名为 <bpt id=\"p5\">*</bpt>MyVNet<ept id=\"p5\">*</ept>，并包含起始自 <bpt id=\"p6\">*</bpt>172.16.0.128<ept id=\"p6\">*</ept> 的子网地址范围，则以下命令将列出可用地址："
+      ]
     },
     {
       "pos": [
@@ -162,9 +232,16 @@
       "content": "选择一个可用地址，并在以下脚本的 <bpt id=\"p1\">**</bpt>$ILBStaticIP<ept id=\"p1\">**</ept> 参数中使用它。"
     },
     {
-      "content": "将以下 PowerShell 脚本复制到文本编辑器中，并根据你的环境设置变量值（注意，这里为某些参数提供了默认值）。请注意，使用地缘组的现有部署不能添加 ILB。",
+      "content": "将以下 PowerShell 脚本复制到文本编辑器中，并根据你的环境设置变量值（注意，这里为某些参数提供了默认值）。",
       "pos": [
         2491,
+        2549
+      ]
+    },
+    {
+      "content": "请注意，使用地缘组的现有部署不能添加 ILB。",
+      "pos": [
+        2549,
         2572
       ]
     },
@@ -176,18 +253,46 @@
       ]
     },
     {
-      "content": "设置变量后，将脚本从文本编辑器复制到 Azure PowerShell 会话中运行。如果提示符仍然显示 &gt;&gt;，请再次按 Enter，以确保脚本开始运行。注意：",
+      "content": "设置变量后，将脚本从文本编辑器复制到 Azure PowerShell 会话中运行。",
       "pos": [
         3934,
+        3976
+      ]
+    },
+    {
+      "content": "如果提示符仍然显示 &gt;&gt;，请再次按 Enter，以确保脚本开始运行。",
+      "pos": [
+        3976,
+        4010
+      ]
+    },
+    {
+      "content": "注意：",
+      "pos": [
+        4010,
         4013
       ]
     },
     {
+      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>Azure 管理门户目前不支持内部负载平衡器，因此你在门户中看不到 ILB 或终结点。",
       "pos": [
         4016,
+        4071
+      ]
+    },
+    {
+      "content": "但是，如果负载平衡器在某个内部 IP 地址上运行，则 <bpt id=\"p1\">**</bpt>Get-AzureEndpoint<ept id=\"p1\">**</ept> 将返回该地址。",
+      "pos": [
+        4071,
+        4127
+      ]
+    },
+    {
+      "content": "否则，将返回 null。",
+      "pos": [
+        4127,
         4139
-      ],
-      "content": "<ph id=\"ph1\">[AZURE.NOTE]</ph>Azure 管理门户目前不支持内部负载平衡器，因此你在门户中看不到 ILB 或终结点。但是，如果负载平衡器在某个内部 IP 地址上运行，则 <bpt id=\"p1\">**</bpt>Get-AzureEndpoint<ept id=\"p1\">**</ept> 将返回该地址。否则，将返回 null。"
+      ]
     },
     {
       "content": "如果需要，请验证是否已安装 KB2854082",
@@ -225,9 +330,16 @@
       "content": "[AZURE.INCLUDE <bpt id=\"p1\">[</bpt>防火墙<ept id=\"p1\">](../includes/virtual-machines-ag-listener-create-listener.md)</ept>]"
     },
     {
-      "content": "对于 ILB，必须使用前面创建的内部负载平衡器 (ILB) 的 IP 地址。在 PowerShell 中使用以下脚本获取此 IP 地址。",
+      "content": "对于 ILB，必须使用前面创建的内部负载平衡器 (ILB) 的 IP 地址。",
       "pos": [
         4457,
+        4495
+      ]
+    },
+    {
+      "content": "在 PowerShell 中使用以下脚本获取此 IP 地址。",
+      "pos": [
+        4495,
         4525
       ]
     },
@@ -239,16 +351,37 @@
       ]
     },
     {
-      "content": "设置变量之后，打开提升的 Windows PowerShell 窗口，然后从文本编辑器复制脚本，并将其粘贴到 Azure PowerShell 会话中运行。如果提示符仍然显示 &gt;&gt;，请再次按 Enter，以确保脚本开始运行。",
+      "content": "设置变量之后，打开提升的 Windows PowerShell 窗口，然后从文本编辑器复制脚本，并将其粘贴到 Azure PowerShell 会话中运行。",
       "pos": [
         5859,
+        5937
+      ]
+    },
+    {
+      "content": "如果提示符仍然显示 &gt;&gt;，请再次按 Enter，以确保脚本开始运行。",
+      "pos": [
+        5937,
         5971
       ]
     },
     {
-      "content": "在每个 VM 上重复此过程。此脚本将使用云服务的 IP 地址来配置 IP 地址资源，同时设置探测端口等其他参数。在 IP 地址资源联机后，它可以响应我们在本教程前面部分创建的负载平衡终结点在探测端口上的轮询。",
+      "content": "在每个 VM 上重复此过程。",
       "pos": [
         5977,
+        5991
+      ]
+    },
+    {
+      "content": "此脚本将使用云服务的 IP 地址来配置 IP 地址资源，同时设置探测端口等其他参数。",
+      "pos": [
+        5991,
+        6033
+      ]
+    },
+    {
+      "content": "在 IP 地址资源联机后，它可以响应我们在本教程前面部分创建的负载平衡终结点在探测端口上的轮询。",
+      "pos": [
+        6033,
         6081
       ]
     },
